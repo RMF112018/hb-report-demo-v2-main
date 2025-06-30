@@ -9,14 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { 
   Users, 
   TrendingUp, 
@@ -26,15 +18,10 @@ import {
   DollarSign,
   Calendar,
   UserCheck,
-  Download,
-  RefreshCw,
-  Home,
   ChevronDown,
   ChevronUp,
   BarChart3,
   FileText,
-  Maximize,
-  Minimize,
   Eye,
   CheckCircle,
   Clock,
@@ -263,61 +250,12 @@ export const ExecutiveStaffingView = () => {
 
   return (
     <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
-      {/* Header with Breadcrumbs */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard/staff-planning">Staff Planning</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbPage>Executive View</BreadcrumbPage>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isLoading}
-          >
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-            Refresh
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsExportModalOpen(true)}
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleFullScreen}
-          >
-            {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-          </Button>
-        </div>
-      </div>
 
       {/* Segmented Control */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="assignments">Assignments</TabsTrigger>
-          <TabsTrigger value="spcr">SPCR Review</TabsTrigger>
+          <TabsTrigger value="assignments">Assignments & SPCR Management</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -416,25 +354,24 @@ export const ExecutiveStaffingView = () => {
           </Collapsible>
         </TabsContent>
 
-        {/* Assignments Tab */}
+        {/* Combined Assignments & SPCR Management Tab */}
         <TabsContent value="assignments" className="space-y-6">
-          <InteractiveStaffingGantt />
-        </TabsContent>
-
-        {/* SPCR Review Tab */}
-        <TabsContent value="spcr" className="space-y-6">
+          {/* Staff Assignment Management */}
+          <InteractiveStaffingGantt userRole="executive" />
+          
+          {/* SPCR Integration Panel */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Staff Planning Change Requests (SPCR)
+                  SPCR Integration Workflow
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   <Tabs value={spcrFilter} onValueChange={(value: any) => setSpcrFilter(value)} className="w-auto">
                     <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="approved">Approved</TabsTrigger>
-                      <TabsTrigger value="pending">Pending</TabsTrigger>
+                      <TabsTrigger value="approved">Ready to Implement</TabsTrigger>
+                      <TabsTrigger value="pending">Pending Review</TabsTrigger>
                       <TabsTrigger value="rejected">Rejected</TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -443,36 +380,130 @@ export const ExecutiveStaffingView = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {spcrFilter === 'approved' && (
+                  <div className="bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="font-medium">Ready for Implementation</span>
+                    </div>
+                    <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                      These approved SPCRs are ready to be converted into staff assignments. Use the "Create Assignment" action to implement them.
+                    </p>
+                  </div>
+                )}
+
                 {filteredSpcrs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No {spcrFilter} SPCRs found
+                    {spcrFilter === 'approved' 
+                      ? "No approved SPCRs ready for implementation" 
+                      : `No ${spcrFilter} SPCRs found`
+                    }
                   </div>
                 ) : (
                   filteredSpcrs.map((spcr) => (
-                    <Card key={spcr.id} className="border-l-4 border-l-blue-500">
+                    <Card key={spcr.id} className={cn(
+                      "border-l-4 transition-colors hover:bg-muted/50",
+                      spcr.status === 'approved' ? "border-l-green-500" : 
+                      spcr.status === 'submitted' ? "border-l-yellow-500" : "border-l-red-500"
+                    )}>
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
-                          <div className="space-y-2">
+                          <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
                               {getSpcrStatusIcon(spcr.status)}
                               <span className="font-medium">{spcr.type}</span>
                               {getSpcrStatusBadge(spcr.status)}
+                              {spcr.status === 'approved' && (
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 animate-pulse">
+                                  Ready to Implement
+                                </Badge>
+                              )}
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                              <div>Position: {spcr.position}</div>
-                              <div>Requested by: {spcr.requestedBy}</div>
-                              <div>Target Start: {new Date(spcr.targetStartDate).toLocaleDateString()}</div>
-                              <div>Duration: {spcr.duration} weeks</div>
+                            <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+                              <div>
+                                <div><strong>Position:</strong> {spcr.position}</div>
+                                <div><strong>Requested by:</strong> {spcr.requestedBy}</div>
+                              </div>
+                              <div>
+                                <div><strong>Target Start:</strong> {new Date(spcr.targetStartDate).toLocaleDateString()}</div>
+                                <div><strong>Duration:</strong> {spcr.duration} weeks</div>
+                              </div>
                             </div>
                             <div className="text-sm">
                               <strong>Justification:</strong> {spcr.justification}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4" />
-                              View Details
-                            </Button>
+                          <div className="flex items-center gap-2 ml-4">
+                            {spcr.status === 'approved' ? (
+                              <>
+                                <Button 
+                                  variant="default" 
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => {
+                                    toast({
+                                      title: "Assignment Created",
+                                      description: `New assignment created for ${spcr.position} position. SPCR has been implemented.`,
+                                    })
+                                  }}
+                                >
+                                  <UserCheck className="h-4 w-4 mr-1" />
+                                  Create Assignment
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </Button>
+                              </>
+                            ) : spcr.status === 'submitted' ? (
+                              <>
+                                <Button 
+                                  variant="default" 
+                                  size="sm"
+                                  onClick={() => {
+                                    // Update SPCR status to approved
+                                    const updatedSpcrs = spcrs.map(s => 
+                                      s.id === spcr.id ? { ...s, status: 'approved' as const } : s
+                                    )
+                                    setSpcrs(updatedSpcrs)
+                                    toast({
+                                      title: "SPCR Approved",
+                                      description: `${spcr.type} request has been approved and is ready for implementation.`,
+                                    })
+                                  }}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => {
+                                    // Update SPCR status to rejected
+                                    const updatedSpcrs = spcrs.map(s => 
+                                      s.id === spcr.id ? { ...s, status: 'rejected' as const } : s
+                                    )
+                                    setSpcrs(updatedSpcrs)
+                                    toast({
+                                      title: "SPCR Rejected",
+                                      description: `${spcr.type} request has been rejected.`,
+                                      variant: "destructive"
+                                    })
+                                  }}
+                                >
+                                  Reject
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </Button>
+                              </>
+                            ) : (
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4" />
+                                View Details
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </CardContent>

@@ -11,14 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { 
   Building2, 
   Users, 
@@ -33,16 +25,11 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
-  Home,
-  RefreshCw,
-  Download,
   Plus,
   ChevronDown,
   ChevronUp,
   FileText,
-  Eye,
-  Maximize,
-  Minimize
+  Eye
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
@@ -229,54 +216,6 @@ export const ProjectExecutiveStaffingView = () => {
 
   return (
     <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
-      {/* Header with Breadcrumbs */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard/staff-planning">Staff Planning</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbPage>Project Executive View</BreadcrumbPage>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isLoading}
-          >
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-            Refresh
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleFullScreen}
-          >
-            {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-          </Button>
-        </div>
-      </div>
 
       {/* Statistics Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
