@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,7 +21,37 @@ import { StandardPageLayout } from '@/components/layout/StandardPageLayout'
 
 export default function ProductivityPage() {
   const { messageThreads, tasks, users } = useProductivityStore()
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState('messages')
+  const [selectedThread, setSelectedThread] = useState<string | null>(null)
+  const [selectedTask, setSelectedTask] = useState<string | null>(null)
+  const [createType, setCreateType] = useState<'message' | 'task' | null>(null)
+
+  // Handle query parameters
+  useEffect(() => {
+    const threadParam = searchParams.get('thread')
+    const taskParam = searchParams.get('task')
+    const createParam = searchParams.get('create') as 'message' | 'task' | null
+
+    if (threadParam) {
+      setSelectedThread(threadParam)
+      setActiveTab('messages')
+    }
+
+    if (taskParam) {
+      setSelectedTask(taskParam)
+      setActiveTab('tasks')
+    }
+
+    if (createParam) {
+      setCreateType(createParam)
+      if (createParam === 'message') {
+        setActiveTab('messages')
+      } else if (createParam === 'task') {
+        setActiveTab('tasks')
+      }
+    }
+  }, [searchParams])
 
   const getStatistics = () => {
     const totalThreads = messageThreads.length
@@ -223,19 +254,28 @@ export default function ProductivityPage() {
 
         <TabsContent value="messages" className="space-y-6">
           <div className="h-[800px]">
-            <MessageBoard />
+            <MessageBoard 
+              selectedThreadId={selectedThread}
+              autoCreate={createType === 'message'}
+            />
           </div>
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-6">
           <div className="h-[800px]">
-            <TaskBoard />
+            <TaskBoard 
+              selectedTaskId={selectedTask}
+              autoCreate={createType === 'task'}
+            />
           </div>
         </TabsContent>
       </Tabs>
 
       {/* Quick Composer Floating Action Button */}
-      <QuickComposer />
+      <QuickComposer 
+        initialType={createType}
+        onClose={() => setCreateType(null)}
+      />
     </StandardPageLayout>
   )
 } 

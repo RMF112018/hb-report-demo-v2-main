@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -26,14 +26,38 @@ import { formatDistanceToNow, parseISO } from 'date-fns'
 
 interface MessageBoardProps {
   className?: string
+  selectedThreadId?: string | null
+  autoCreate?: boolean
 }
 
-export const MessageBoard = ({ className }: MessageBoardProps) => {
+export const MessageBoard = ({ 
+  className, 
+  selectedThreadId, 
+  autoCreate 
+}: MessageBoardProps) => {
   const { messageThreads, users, searchThreads } = useProductivityStore()
   const [selectedThread, setSelectedThread] = useState<MessageThread | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterUser, setFilterUser] = useState<string>('all')
   const [filterFeature, setFilterFeature] = useState<string>('all')
+
+  // Handle selectedThreadId prop
+  useEffect(() => {
+    if (selectedThreadId) {
+      const thread = messageThreads.find(t => t.id === selectedThreadId)
+      if (thread) {
+        setSelectedThread(thread)
+      }
+    }
+  }, [selectedThreadId, messageThreads])
+
+  // Handle autoCreate prop
+  useEffect(() => {
+    if (autoCreate) {
+      // For now, we'll just clear the selection to show the "create new" state
+      setSelectedThread(null)
+    }
+  }, [autoCreate])
 
   const getUserById = (userId: string): User | undefined => {
     return users[userId]

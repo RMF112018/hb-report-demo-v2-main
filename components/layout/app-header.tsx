@@ -2,8 +2,8 @@
 
 import { Input } from "@/components/ui/input"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { MessagesSquare } from "lucide-react"
 import { Search, Moon, Sun, ChevronDown, Building, Wrench, Briefcase, Archive } from "lucide-react"
+import { ProductivityPopover } from "./ProductivityPopover"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -727,20 +727,7 @@ export const AppHeader = () => {
             <TourControls className="text-white [&_button]:text-white [&_button]:hover:bg-white/20" />
 
             {/* Productivity */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative text-white hover:bg-white/20 p-2.5 rounded-lg transition-all duration-200"
-              onClick={() => router.push("/tools/productivity")}
-              aria-label={`Productivity Suite ${notifications > 0 ? `(${notifications} updates)` : ""}`}
-            >
-              <MessagesSquare className="h-4 w-4" />
-              {notifications > 0 && (
-                <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center p-0 text-xs text-white bg-red-500 border-2 border-white rounded-full shadow-lg">
-                  {notifications}
-                </Badge>
-              )}
-            </Button>
+            <ProductivityPopover notifications={notifications} />
           </div>
 
           {/* User Dropdown */}

@@ -1,0 +1,17 @@
+
+> my-v0-project@0.1.0 dev /Users/bobbyfetting/Projects/hb-report/hb-report-demo
+> next dev
+
+  ▲ Next.js 14.2.30
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1369ms
+ ○ Compiling /tools/productivity ...
+ ✓ Compiled /tools/productivity in 3.2s (950 modules)
+ GET /tools/productivity 200 in 3371ms
+ ✓ Compiled in 486ms (479 modules)
+ ✓ Compiled /login in 417ms (1007 modules)
+ GET /login 200 in 479ms
+ ○ Compiling /dashboard ...

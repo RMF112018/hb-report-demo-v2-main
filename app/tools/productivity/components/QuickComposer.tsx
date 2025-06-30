@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -27,9 +27,15 @@ import { cn } from '@/lib/utils'
 
 interface QuickComposerProps {
   className?: string
+  initialType?: 'message' | 'task' | null
+  onClose?: () => void
 }
 
-export const QuickComposer = ({ className }: QuickComposerProps) => {
+export const QuickComposer = ({ 
+  className, 
+  initialType, 
+  onClose 
+}: QuickComposerProps) => {
   const { users, addTask } = useProductivityStore()
   const [showDialog, setShowDialog] = useState(false)
   
@@ -52,6 +58,14 @@ export const QuickComposer = ({ className }: QuickComposerProps) => {
   // Shared state
   const [linkedEntity, setLinkedEntity] = useState<LinkedEntity | null>(null)
   const [showEntityPicker, setShowEntityPicker] = useState(false)
+
+  // Handle initialType prop
+  useEffect(() => {
+    if (initialType) {
+      setComposerType(initialType)
+      setShowDialog(true)
+    }
+  }, [initialType])
 
   const getUserById = (userId: string): User | undefined => {
     return users[userId]
@@ -125,6 +139,7 @@ export const QuickComposer = ({ className }: QuickComposerProps) => {
   const handleCloseDialog = () => {
     setShowDialog(false)
     resetForm()
+    onClose?.()
   }
 
   const toggleParticipant = (userId: string) => {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -33,9 +33,15 @@ import { formatDistanceToNow, parseISO, format } from 'date-fns'
 
 interface TaskBoardProps {
   className?: string
+  selectedTaskId?: string | null
+  autoCreate?: boolean
 }
 
-export const TaskBoard = ({ className }: TaskBoardProps) => {
+export const TaskBoard = ({ 
+  className, 
+  selectedTaskId, 
+  autoCreate 
+}: TaskBoardProps) => {
   const { tasks, users, filterTasks, updateTaskStatus } = useProductivityStore()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -44,6 +50,24 @@ export const TaskBoard = ({ className }: TaskBoardProps) => {
   const [showCompletionDialog, setShowCompletionDialog] = useState(false)
   const [completionComment, setCompletionComment] = useState('')
   const [taskToComplete, setTaskToComplete] = useState<Task | null>(null)
+
+  // Handle selectedTaskId prop
+  useEffect(() => {
+    if (selectedTaskId) {
+      const task = tasks.find(t => t.id === selectedTaskId)
+      if (task) {
+        setSelectedTask(task)
+      }
+    }
+  }, [selectedTaskId, tasks])
+
+  // Handle autoCreate prop
+  useEffect(() => {
+    if (autoCreate) {
+      // For now, we'll just clear the selection to show the "create new" state
+      setSelectedTask(null)
+    }
+  }, [autoCreate])
 
   const getUserById = (userId: string): UserType | undefined => {
     return users[userId]

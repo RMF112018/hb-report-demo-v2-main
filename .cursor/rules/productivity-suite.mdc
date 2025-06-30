@@ -1,0 +1,215 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🧠 Cursor Rules: Productivity Suite – Messaging & Tasks (with Mock Data, Demo Interactivity)
+# This rule set defines how to implement a modular productivity feature inside a Next.js 14 app.
+# Includes: threaded messaging, task management, app integration, mock data, full localStorage functionality for demo.
+
+---
+
+## ✨ GOAL
+
+Develop a self-contained productivity suite with:
+- Threaded messaging
+- Task management
+- Contextual linking to app features
+- Demo-mode functionality using localStorage
+- Inspired by ClickUp and Asana, but focused and streamlined
+
+---
+
+## 📭 NAVIGATION REQUIREMENTS
+
+- Add `/tools/productivity` dashboard page
+- Update App Header:
+  - Replace `Bell` icon with `MessagesSquare` from `lucide-react`
+  - Add new dropdown menu item: `Core Tools → Productivity`
+  - Clicking either navigates to `/tools/productivity` or opens a drawer modal with key content
+
+---
+
+## 🔨 FILE STRUCTURE
+
+Use this structure:
+
+```
+app/
+  tools/
+    productivity/
+      page.tsx
+      components/
+        MessageBoard.tsx
+        TaskBoard.tsx
+        ThreadPanel.tsx
+        QuickComposer.tsx
+      store/
+        useProductivityStore.ts
+      data/
+        messages.json
+        tasks.json
+```
+
+Preload data from:
+- `/data/mock/productivity/messages.json`
+- `/data/mock/productivity/tasks.json`
+
+---
+
+## 🗂️ DATA MODELS
+
+### MessageThread
+```ts
+{
+  id: string
+  title: string
+  createdBy: string
+  participants: string[]
+  createdAt: string
+  updatedAt: string
+  messages: Message[]
+  linkedTo?: {
+    type: "forecast" | "daily-log" | "cost-code" | "procurement" | "draw" | "inspection"
+    id: string
+    label: string
+  }
+}
+```
+
+### Message
+```ts
+{
+  id: string
+  threadId: string
+  parentId?: string
+  sender: string
+  content: string
+  createdAt: string
+  reactions?: { emoji: string, userId: string }[]
+}
+```
+
+### Task
+```ts
+{
+  id: string
+  title: string
+  description?: string
+  createdBy: string
+  assignedTo: string
+  dueDate: string
+  status: "todo" | "in-progress" | "blocked" | "done"
+  priority: "low" | "medium" | "high"
+  createdAt: string
+  linkedTo?: {
+    type: "forecast" | "daily-log" | "cost-code" | "procurement" | "draw" | "inspection"
+    id: string
+    label: string
+  }
+  comments?: Message[]
+}
+```
+
+---
+
+## 📁 MOCK DATA REQUIREMENTS
+
+- Use files:
+  - [`/data/mock/productivity/messages.json`](mdc:sandbox:/mnt/data/messages.json)
+  - [`/data/mock/productivity/tasks.json`](mdc:sandbox:/mnt/data/tasks.json)
+
+- Pull `createdBy`, `assignedTo`, and `participants` from `staffing.json`
+- Ensure link coverage to:
+  - Forecasts (draws)
+  - Daily logs
+  - Procurement packages
+  - Safety inspections
+  - Schedule lookaheads
+
+---
+
+## 💬 COMPONENT BEHAVIOR
+
+### MessageBoard
+- Sidebar: searchable threads
+- Panel: nested replies, reactions, resolution toggle
+- Linked feature badge with quick navigation
+
+### TaskBoard
+- Kanban-style layout (To Do → Done)
+- Filterable by user, feature type
+- Priority indicators and due date badges
+- Task complete action with inline comment
+
+### QuickComposer
+- Floating button opens modal to create:
+  - New message thread
+  - New task
+- Supports linking to application features
+
+### ThreadPanel
+- Shared thread renderer used in both messages and task comments
+- Fully threaded UI with sender, timestamp, and reactions
+
+---
+
+## 🔗 REQUIRED ENHANCEMENTS
+
+### ✅ Feature Linking
+- Messages and tasks must support linking to:
+  - Forecasts, cost codes
+  - Daily logs, inspections
+  - Procurement packages, draw requests
+
+### 👩‍💼 Task Filtering
+- Allow user to filter tasks by:
+  - Assigned demo user
+  - Linked feature type
+
+### 💬 Task Completion Comments
+- When a task is marked complete, allow/require a comment
+- Store it in the thread under that task
+
+---
+
+## 💾 DEMO INTERACTIVITY REQUIREMENT
+
+- All message and task actions (create, reply, complete, filter) **must be fully functional using `localStorage`**
+- Implement `useLocalStorage` or similar hooks in the `store/` directory
+- Preload from:
+  - `messages.json`
+  - `tasks.json`
+- Persist user changes in `localStorage`
+- Ensure data survives page reloads and respects JSON shape
+
+---
+
+## 🧑‍🎨 UI/UX STANDARDS
+
+- All UI must support `dark:` and light themes (Tailwind CSS)
+- Use `shadcn/ui` components for:
+  - Inputs, modals, tooltips, scroll areas, buttons, avatars
+- Use `lucide-react` for icons (`MessagesSquare`, `PlusCircle`, etc.)
+- Match existing layout, spacing, and interaction patterns in app
+- All elements keyboard-accessible and responsive
+
+---
+
+## 🚫 DO NOT INCLUDE
+
+- No Gantt charts, workload graphs, OKRs, calendar sync, or external services in productivity suite (these will go in staffing module)
+
+---
+
+## 📦 OUTPUT EXPECTATIONS
+
+- Fully interactive `/tools/productivity` page
+- Header integration complete
+- Functional message and task flow with mock data and localStorage
+- Realistic demo-ready content across threads and tasks
+- Proper state and type safety across all components
+
+---
+
+# END OF RULE SET
