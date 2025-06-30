@@ -15,6 +15,7 @@ import { useAuth } from "@/context/auth-context"
 import { FieldReportsWidgets, type FieldReportsStats } from "@/components/field-reports/FieldReportsWidgets"
 import { FieldReportsExportUtils } from "@/components/field-reports/FieldReportsExportUtils"
 import { HbiFieldReportsInsights } from "@/components/field-reports/HbiFieldReportsInsights"
+import { ProjectFieldReportsSummary } from "@/components/field-reports/ProjectFieldReportsSummary"
 import { useToast } from "@/hooks/use-toast"
 import {
   Download,
@@ -274,6 +275,90 @@ export default function FieldReportsPage() {
     return businessDays
   }
 
+  // Filter field data based on current filters
+  const filteredFieldData = useMemo(() => {
+    let filteredData = { ...fieldData }
+
+    // Apply project filter
+    if (filters.project !== "all") {
+      filteredData = {
+        dailyLogs: fieldData.dailyLogs.filter(log => log.projectId === filters.project),
+        qualityControl: fieldData.qualityControl.filter(qc => qc.projectId === filters.project),
+        safety: fieldData.safety.filter(safety => safety.projectId === filters.project),
+        manpower: fieldData.manpower.filter(manpower => manpower.projectId === filters.project),
+      }
+    }
+
+    // Apply status filter
+    if (filters.status !== "all") {
+      filteredData.dailyLogs = filteredData.dailyLogs.filter(log => log.status === filters.status)
+      filteredData.qualityControl = filteredData.qualityControl.filter(qc => qc.status === filters.status)
+      filteredData.safety = filteredData.safety.filter(safety => safety.status === filters.status)
+    }
+
+    // Apply contractor filter
+    if (filters.contractor !== "all") {
+      filteredData.manpower = filteredData.manpower.filter(manpower => manpower.contractor === filters.contractor)
+    }
+
+    // Apply trade filter
+    if (filters.trade !== "all") {
+      filteredData.qualityControl = filteredData.qualityControl.filter(qc => qc.trade === filters.trade)
+      filteredData.safety = filteredData.safety.filter(safety => safety.trade === filters.trade)
+      filteredData.manpower = filteredData.manpower.filter(manpower => manpower.trade === filters.trade)
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase()
+      filteredData.dailyLogs = filteredData.dailyLogs.filter(log => 
+        log.projectName.toLowerCase().includes(searchLower) ||
+        log.submittedBy.toLowerCase().includes(searchLower) ||
+        log.comments.toLowerCase().includes(searchLower)
+      )
+      filteredData.qualityControl = filteredData.qualityControl.filter(qc => 
+        qc.projectName.toLowerCase().includes(searchLower) ||
+        qc.description.toLowerCase().includes(searchLower) ||
+        qc.location.toLowerCase().includes(searchLower)
+      )
+      filteredData.safety = filteredData.safety.filter(safety => 
+        safety.projectName.toLowerCase().includes(searchLower) ||
+        safety.description.toLowerCase().includes(searchLower) ||
+        safety.location.toLowerCase().includes(searchLower)
+      )
+      filteredData.manpower = filteredData.manpower.filter(manpower => 
+        manpower.projectName.toLowerCase().includes(searchLower) ||
+        manpower.contractor.toLowerCase().includes(searchLower) ||
+        manpower.location.toLowerCase().includes(searchLower)
+      )
+    }
+
+    // Apply date range filter
+    if (filters.dateRange.from && filters.dateRange.to) {
+      const fromDate = filters.dateRange.from
+      const toDate = filters.dateRange.to
+      
+      filteredData.dailyLogs = filteredData.dailyLogs.filter(log => {
+        const logDate = new Date(log.date)
+        return logDate >= fromDate && logDate <= toDate
+      })
+      filteredData.qualityControl = filteredData.qualityControl.filter(qc => {
+        const qcDate = new Date(qc.date)
+        return qcDate >= fromDate && qcDate <= toDate
+      })
+      filteredData.safety = filteredData.safety.filter(safety => {
+        const safetyDate = new Date(safety.date)
+        return safetyDate >= fromDate && safetyDate <= toDate
+      })
+      filteredData.manpower = filteredData.manpower.filter(manpower => {
+        const manpowerDate = new Date(manpower.date)
+        return manpowerDate >= fromDate && manpowerDate <= toDate
+      })
+    }
+
+    return filteredData
+  }, [fieldData, filters])
+
   // Calculate field metrics
   const fieldMetrics = useMemo<FieldReportsStats>(() => {
     if (!filters.dateRange.from || !filters.dateRange.to) {
@@ -302,27 +387,27 @@ export default function FieldReportsPage() {
     const businessDaysInMonth = calculateBusinessDays(startDate, endDate)
     const businessDaysToDate = calculateBusinessDays(startDate, today < endDate ? today : endDate)
 
-    const totalLogs = fieldData.dailyLogs.length
-    const completedLogs = fieldData.dailyLogs.filter(log => log.status === "submitted").length
+    const totalLogs = filteredFieldData.dailyLogs.length
+    const completedLogs = filteredFieldData.dailyLogs.filter(log => log.status === "submitted").length
     const expectedLogs = businessDaysToDate
     const logComplianceRate = expectedLogs > 0 ? (completedLogs / expectedLogs) * 100 : 100
 
-    const totalWorkers = fieldData.manpower.reduce((sum, record) => sum + record.workers, 0)
-    const totalEfficiency = fieldData.manpower.reduce((sum, record) => sum + record.efficiency, 0)
-    const averageEfficiency = fieldData.manpower.length > 0 ? totalEfficiency / fieldData.manpower.length : 0
+    const totalWorkers = filteredFieldData.manpower.reduce((sum, record) => sum + record.workers, 0)
+    const totalEfficiency = filteredFieldData.manpower.reduce((sum, record) => sum + record.efficiency, 0)
+    const averageEfficiency = filteredFieldData.manpower.length > 0 ? totalEfficiency / filteredFieldData.manpower.length : 0
 
-    const safetyViolations = fieldData.safety.reduce((sum, audit) => sum + audit.violations, 0)
-    const totalSafetyResponses = fieldData.safety.reduce((sum, audit) => sum + audit.responses.length, 0)
-    const safeSafetyResponses = fieldData.safety.reduce((sum, audit) => 
+    const safetyViolations = filteredFieldData.safety.reduce((sum, audit) => sum + audit.violations, 0)
+    const totalSafetyResponses = filteredFieldData.safety.reduce((sum, audit) => sum + audit.responses.length, 0)
+    const safeSafetyResponses = filteredFieldData.safety.reduce((sum, audit) => 
       sum + audit.responses.filter(r => r.response === "Safe").length, 0)
     const safetyComplianceRate = totalSafetyResponses > 0 ? (safeSafetyResponses / totalSafetyResponses) * 100 : 100
 
-    const qualityDefects = fieldData.qualityControl.reduce((sum, inspection) => sum + inspection.defects, 0)
-    const totalInspections = fieldData.qualityControl.length
-    const passedInspections = fieldData.qualityControl.filter(inspection => inspection.status === "pass").length
+    const qualityDefects = filteredFieldData.qualityControl.reduce((sum, inspection) => sum + inspection.defects, 0)
+    const totalInspections = filteredFieldData.qualityControl.length
+    const passedInspections = filteredFieldData.qualityControl.filter(inspection => inspection.status === "pass").length
     const qualityPassRate = totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 100
 
-    const atRiskSafetyItems = fieldData.safety.reduce((sum, audit) => sum + audit.atRiskItems, 0)
+    const atRiskSafetyItems = filteredFieldData.safety.reduce((sum, audit) => sum + audit.atRiskItems, 0)
 
     return {
       totalLogs,
@@ -340,7 +425,7 @@ export default function FieldReportsPage() {
       businessDaysInMonth,
       businessDaysToDate,
     }
-  }, [fieldData, filters.dateRange])
+  }, [filteredFieldData, filters.dateRange])
 
   // Handle export
   const handleExport = async (format: 'pdf' | 'excel' | 'csv') => {
@@ -379,6 +464,16 @@ export default function FieldReportsPage() {
       description: "Field reports data is being updated...",
     })
     // In a real app, this would trigger a data refresh
+  }
+
+  // Handle project selection for filtering
+  const handleProjectSelect = (projectId: string) => {
+    setFilters(prev => ({ ...prev, project: projectId }))
+  }
+
+  // Handle clearing project filter
+  const handleClearProjectFilter = () => {
+    setFilters(prev => ({ ...prev, project: "all" }))
   }
 
   // Get role-based scope description
@@ -513,7 +608,19 @@ export default function FieldReportsPage() {
         <FieldReportsWidgets stats={fieldMetrics} />
 
         {/* HBI Insights */}
-        <HbiFieldReportsInsights data={fieldData} stats={fieldMetrics} />
+        <HbiFieldReportsInsights data={filteredFieldData} stats={fieldMetrics} />
+
+        {/* Project Field Reports Summary - Executive and Project Executive only */}
+        {(user?.role === "executive" || user?.role === "project-executive") && (
+          <div data-tour="project-field-reports-summary">
+            <ProjectFieldReportsSummary
+              data={fieldData}
+              selectedProject={filters.project}
+              onProjectSelect={handleProjectSelect}
+              onClearFilter={handleClearProjectFilter}
+            />
+          </div>
+        )}
 
         {/* Main Content Tabs */}
         <Card className="border-0 shadow-lg">
@@ -551,7 +658,7 @@ export default function FieldReportsPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {fieldData.dailyLogs.slice(0, 5).map((log) => (
+                          {filteredFieldData.dailyLogs.slice(0, 5).map((log) => (
                             <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                               <div>
                                 <div className="font-medium text-sm">{log.projectName}</div>
@@ -573,7 +680,7 @@ export default function FieldReportsPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {fieldData.safety.slice(0, 5).map((safety) => (
+                          {filteredFieldData.safety.slice(0, 5).map((safety) => (
                             <div key={safety.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                               <div>
                                 <div className="font-medium text-sm">{safety.type}</div>

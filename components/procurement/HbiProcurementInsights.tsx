@@ -99,7 +99,7 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
       title: "Market Price Advantage",
       text: "Current concrete prices 8% below market forecast for Q2 2025.",
       action: "Accelerate concrete procurement for upcoming phases to lock in savings.",
-      confidence: 87,
+        confidence: 87,
       impact: "$125K cost avoidance",
       relatedMetrics: ["Market Pricing", "Commodity Trends", "Procurement Timing"],
       project_id: "global"
@@ -212,14 +212,14 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                     <Activity className="h-3 w-3 mr-1" />
                     AI Powered
                   </Badge>
-                </div>
+            </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-purple-700">
                     {avgConfidence}% Confidence
-                  </Badge>
+            </Badge>
                   <ChevronDown className={cn("h-4 w-4 transition-transform text-[#FF6B35]", isOpen && "rotate-180")} />
                 </div>
-              </CardTitle>
+          </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
 
@@ -247,7 +247,7 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                     <div className="text-xs text-blue-600">Forecasts</div>
                   </div>
                 </div>
-              </div>
+        </div>
 
               {/* Insights List */}
               <div className="space-y-3">
@@ -273,10 +273,10 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                           <div className="flex items-center gap-2">
                             <Badge className={cn("text-xs px-2 py-0.5", getSeverityColor(insight.severity))}>
                               {insight.severity}
-                            </Badge>
+                          </Badge>
                             <Badge variant="outline" className="text-xs">
                               {insight.confidence}%
-                            </Badge>
+                          </Badge>
                           </div>
                         </div>
                         
@@ -411,8 +411,8 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                               </span>
                             </div>
                           </div>
-                        </div>
-
+                    </div>
+                    
                         <div className="bg-white/10 rounded-lg p-3">
                           <h4 className="font-semibold mb-2 flex items-center">
                             <Activity className="w-4 h-4 mr-2" />
@@ -438,13 +438,13 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+            </div>
+                    </div>
               )}
-            </CardContent>
+                  </CardContent>
           </CollapsibleContent>
-        </Card>
+                </Card>
       </Collapsible>
-    </div>
+            </div>
   )
 } 
