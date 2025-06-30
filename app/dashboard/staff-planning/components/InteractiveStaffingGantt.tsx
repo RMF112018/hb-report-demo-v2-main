@@ -378,9 +378,9 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             {/* Timeline Header */}
             <div className="relative border-b border-gray-200 dark:border-gray-700 pb-4">
               <div className="flex">
-                <div className="w-96 flex-shrink-0 grid grid-cols-3 gap-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+                <div className="w-[600px] flex-shrink-0 flex gap-6 text-sm font-medium text-gray-900 dark:text-gray-100">
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
+                    className="w-48 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
                     onClick={() => handleSort('name')}
                   >
                     <User className="h-4 w-4" />
@@ -388,14 +388,14 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                     <SortIcon field="name" />
                   </button>
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
+                    className="w-44 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
                     onClick={() => handleSort('position')}
                   >
                     Position
                     <SortIcon field="position" />
                   </button>
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
+                    className="w-56 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
                     onClick={() => handleSort('project')}
                   >
                     <Building className="h-4 w-4" />
@@ -421,11 +421,11 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                 <div key={item.id} className="flex items-center group">
                   {/* Staff Info */}
                   <div 
-                    className="w-96 flex-shrink-0 grid grid-cols-3 gap-4 pr-4"
+                    className="w-[600px] flex-shrink-0 flex gap-6 pr-4"
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, item.staffMember.id)}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="w-48 flex items-center gap-2">
                       {userRole === 'executive' && !isReadOnly && (
                         <DragHandleDots2 
                           className="h-4 w-4 text-gray-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
@@ -433,17 +433,17 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                           onDragStart={() => handleDragStart(item)}
                         />
                       )}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {item.staffMember.name}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="w-44 flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {item.staffMember.position}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="w-56 text-sm text-gray-600 dark:text-gray-400">
                       {item.project.name}
                     </div>
                   </div>
