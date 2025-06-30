@@ -249,7 +249,7 @@ export const ExecutiveStaffingView = () => {
   }
 
   return (
-    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
+          <div className={cn("space-y-6", isFullScreen && "fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-6 overflow-auto")}>
 
       {/* Segmented Control */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

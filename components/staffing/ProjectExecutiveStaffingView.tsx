@@ -91,7 +91,7 @@ export const ProjectExecutiveStaffingView = () => {
         : 0
 
       const pendingSpcrCount = spcrData.filter(spcr => 
-        spcr.projectId === projectId && spcr.status === 'submitted'
+        spcr.project_id === projectId && spcr.status === 'submitted'
       ).length
 
       // Simulate productivity based on project stage and staff experience
@@ -215,7 +215,7 @@ export const ProjectExecutiveStaffingView = () => {
   ]
 
   return (
-    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
+          <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-[9999] bg-background p-6 overflow-auto")}>
 
       {/* Statistics Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

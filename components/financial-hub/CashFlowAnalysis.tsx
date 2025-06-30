@@ -24,7 +24,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { FullscreenToggle } from "@/components/ui/fullscreen-toggle";
+import { CollapseWrapper } from "@/components/ui/collapse-wrapper";
+import { useFinancialHubStore } from "@/hooks/use-financial-hub-store";
 import {
   AreaChart,
   Area,
@@ -162,21 +165,12 @@ const outflowBreakdown = [
   { name: "Overhead", value: 265293.62, color: "#84cc16", percentage: 5.9 },
 ];
 
-/**
- * Cash Flow Analysis Component
- *
- * Provides comprehensive cash flow analysis including:
- * - Real-time cash flow monitoring
- * - Predictive analytics and forecasting
- * - Risk assessment and liquidity analysis
- * - Interactive visualizations
- *
- * @param userRole - Current user role for permissions
- * @param projectData - Project context data
- */
+type ViewMode = "overview" | "inflow" | "outflow" | "forecast";
+
 export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnalysisProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState("6months");
-  const [viewType, setViewType] = useState<"monthly" | "cumulative" | "forecast">("monthly");
+  const { isFullscreen, toggleFullscreen } = useFinancialHubStore();
+  
+  const [viewMode, setViewMode] = useState<ViewMode>("overview");
 
   // Get project-specific data
   const projectCashFlow = cashFlowData.projects[0]; // In production, filter by project
@@ -198,495 +192,583 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
 
   // Transform data for charts
   const chartData = monthlyData.map(month => ({
-    month: new Date(month.month).toLocaleDateString('en-US', { month: 'short' }),
+    month: month.month,
     inflows: month.inflows.total,
     outflows: month.outflows.total,
-    netCashFlow: month.netCashFlow,
-    cumulativeCashFlow: month.cumulativeCashFlow,
-    workingCapital: month.workingCapital,
-    retentionHeld: month.retentionHeld,
-    forecastAccuracy: month.forecastAccuracy * 100,
+    net: month.netCashFlow,
+    cumulative: month.cumulativeCashFlow,
+    workingCapital: month.workingCapital
   }));
 
-  // Risk assessment
-  const riskLevel = peakRequirement > 200000 ? "high" : 
-                   peakRequirement > 100000 ? "medium" : "low";
+  const ViewToggle = () => (
+    <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+      {[
+        { key: "overview", label: "Overview", icon: BarChart3 },
+        { key: "inflow", label: "Inflows", icon: TrendingUp },
+        { key: "outflow", label: "Outflows", icon: TrendingDown },
+        { key: "forecast", label: "Forecast", icon: Calendar }
+      ].map((item) => (
+        <Button
+          key={item.key}
+          variant={viewMode === item.key ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setViewMode(item.key as ViewMode)}
+          className="flex items-center gap-2"
+        >
+          <item.icon className="h-4 w-4" />
+          {item.label}
+        </Button>
+      ))}
+    </div>
+  );
 
-  return (
-    <div className="space-y-6">
-      {/* Key Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Inflows</CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              ${(totalInflows / 1000000).toFixed(1)}M
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              Avg: ${(averageMonthlyInflow / 1000).toFixed(0)}K/month
-            </p>
-          </CardContent>
-        </Card>
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300">Total Outflows</CardTitle>
-            <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-900 dark:text-red-100">
-              ${(totalOutflows / 1000000).toFixed(1)}M
-            </div>
-            <p className="text-xs text-red-600 dark:text-red-400">
-              Avg: ${(averageMonthlyOutflow / 1000).toFixed(0)}K/month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className={`bg-gradient-to-br ${netCashFlow >= 0 ? 
-          "from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800" : 
-          "from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800"}`}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className={`text-sm font-medium ${netCashFlow >= 0 ? 
-              "text-emerald-700 dark:text-emerald-300" : 
-              "text-amber-700 dark:text-amber-300"}`}>
-              Net Cash Flow
-            </CardTitle>
-            <Droplets className={`h-4 w-4 ${netCashFlow >= 0 ? 
-              "text-emerald-600 dark:text-emerald-400" : 
-              "text-amber-600 dark:text-amber-400"}`} />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${netCashFlow >= 0 ? 
-              "text-emerald-900 dark:text-emerald-100" : 
-              "text-amber-900 dark:text-amber-100"}`}>
-              ${(netCashFlow / 1000000).toFixed(1)}M
-            </div>
-            <p className={`text-xs ${netCashFlow >= 0 ? 
-              "text-emerald-600 dark:text-emerald-400" : 
-              "text-amber-600 dark:text-amber-400"}`}>
-              Margin: {cashFlowMargin.toFixed(1)}%
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Working Capital</CardTitle>
-            <Banknote className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-              ${(workingCapital / 1000000).toFixed(1)}M
-            </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">
-              Liquidity ratio: {advancedMetrics.liquidityRatio}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Advanced Analytics */}
-      <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
-            <Activity className="h-5 w-5" />
-            HBI Cash Flow Intelligence
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex items-start gap-3">
-              <Target className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Forecast Accuracy</p>
-                <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  Current accuracy at {(forecastAccuracy * 100).toFixed(1)}% with improving trend. Target: 95%
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Clock className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Cash Runway</p>
-                <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  {advancedMetrics.daysOfCashOnHand} days of operations covered by current working capital
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Risk Level</p>
-                <Badge variant={riskLevel === "high" ? "destructive" : riskLevel === "medium" ? "secondary" : "default"}>
-                  {riskLevel.toUpperCase()}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Main Analytics */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="forecast" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Forecast
-          </TabsTrigger>
-          <TabsTrigger value="breakdown" className="flex items-center gap-2">
-            <PieChartIcon className="h-4 w-4" />
-            Breakdown
-          </TabsTrigger>
-          <TabsTrigger value="insights" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Insights
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Cash Flow Trends */}
-            <Card className="lg:col-span-2">
+  const renderContent = () => {
+    switch (viewMode) {
+      case "overview":
+        return (
+          <div className="space-y-6">
+            {/* Cash Flow Performance Chart */}
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Droplets className="h-5 w-5 text-blue-600" />
-                  Cash Flow Trends
+                  Cash Flow Performance
                 </CardTitle>
-                <CardDescription>Monthly inflows, outflows, and net cash flow</CardDescription>
+                <CardDescription>Monthly cash flow analysis and trends</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
                   <ComposedChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
+                    <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip 
-                      formatter={(value: number) => [`$${(value / 1000).toFixed(0)}K`, ""]}
+                      formatter={(value: number) => [`$${(value / 1000000).toFixed(2)}M`, ""]}
                       labelFormatter={(label) => `Month: ${label}`}
                     />
-                    <Bar dataKey="inflows" fill="#10b981" name="Inflows" opacity={0.8} />
-                    <Bar dataKey="outflows" fill="#ef4444" name="Outflows" opacity={0.8} />
-                    <Line type="monotone" dataKey="netCashFlow" stroke="#3b82f6" strokeWidth={3} name="Net Flow" />
+                    <Area 
+                      type="monotone" 
+                      dataKey="inflows" 
+                      stackId="1"
+                      stroke="#10b981" 
+                      fill="#10b981" 
+                      fillOpacity={0.6}
+                      name="Inflows"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="outflows" 
+                      stackId="2"
+                      stroke="#ef4444" 
+                      fill="#ef4444" 
+                      fillOpacity={0.6}
+                      name="Outflows"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="net" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      name="Net Cash Flow"
+                    />
                   </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Working Capital Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-purple-600" />
+                    Working Capital
+                  </CardTitle>
+                  <CardDescription>Working capital trend analysis</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="month" />
+                      <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
+                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="workingCapital" 
+                        stroke="#8b5cf6" 
+                        strokeWidth={3}
+                        name="Working Capital"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Performance Metrics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-green-600" />
+                    Performance Metrics
+                  </CardTitle>
+                  <CardDescription>Key cash flow performance indicators</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Cash Flow Margin</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={cashFlowMargin >= 10 ? "default" : "secondary"}>
+                          {cashFlowMargin.toFixed(1)}%
+                        </Badge>
+                        {cashFlowMargin >= 10 ? 
+                          <TrendingUp className="h-4 w-4 text-green-600" /> :
+                          <TrendingDown className="h-4 w-4 text-yellow-600" />
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Forecast Accuracy</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={forecastAccuracy >= 0.9 ? "default" : "secondary"}>
+                          {(forecastAccuracy * 100).toFixed(1)}%
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Liquidity Ratio</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={advancedMetrics.liquidityRatio >= 2 ? "default" : "destructive"}>
+                          {advancedMetrics.liquidityRatio.toFixed(1)}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Days Cash on Hand</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={advancedMetrics.daysOfCashOnHand >= 30 ? "default" : "destructive"}>
+                          {advancedMetrics.daysOfCashOnHand} days
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case "inflow":
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Inflow Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5 text-green-600" />
+                    Inflow Sources
+                  </CardTitle>
+                  <CardDescription>Revenue stream breakdown</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RechartsPieChart>
+                      <Pie
+                        data={inflowBreakdown}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={120}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {inflowBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 space-y-2">
+                    {inflowBreakdown.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span>{item.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">{formatCurrency(item.value)}</div>
+                          <div className="text-xs text-muted-foreground">{item.percentage}%</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Monthly Inflow Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    Monthly Inflows
+                  </CardTitle>
+                  <CardDescription>Revenue trend over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="month" />
+                      <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
+                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Area 
+                        type="monotone" 
+                        dataKey="inflows" 
+                        stroke="#10b981" 
+                        fill="#10b981" 
+                        fillOpacity={0.6}
+                        name="Inflows"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case "outflow":
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Outflow Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5 text-red-600" />
+                    Expense Categories
+                  </CardTitle>
+                  <CardDescription>Cost breakdown analysis</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RechartsPieChart>
+                      <Pie
+                        data={outflowBreakdown}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={120}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {outflowBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 space-y-2">
+                    {outflowBreakdown.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span>{item.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">{formatCurrency(item.value)}</div>
+                          <div className="text-xs text-muted-foreground">{item.percentage}%</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Monthly Outflow Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingDown className="h-5 w-5 text-red-600" />
+                    Monthly Outflows
+                  </CardTitle>
+                  <CardDescription>Expense trend over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="month" />
+                      <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
+                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Area 
+                        type="monotone" 
+                        dataKey="outflows" 
+                        stroke="#ef4444" 
+                        fill="#ef4444" 
+                        fillOpacity={0.6}
+                        name="Outflows"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case "forecast":
+        return (
+          <div className="space-y-6">
             {/* Cumulative Cash Flow */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                  Cumulative Position
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  Cash Flow Forecast
                 </CardTitle>
-                <CardDescription>Running cash flow balance</CardDescription>
+                <CardDescription>Projected cash flow performance</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                    <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(value: number) => [`$${(value / 1000).toFixed(0)}K`, ""]} />
-                    <Area 
-                      type="monotone" 
-                      dataKey="cumulativeCashFlow" 
-                      stroke="#10b981" 
-                      fill="#10b981" 
-                      fillOpacity={0.6}
-                      name="Cumulative Flow"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Working Capital */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-purple-600" />
-                  Working Capital
-                </CardTitle>
-                <CardDescription>Available liquidity over time</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={chartData}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <ComposedChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip formatter={(value: number) => [`$${(value / 1000000).toFixed(2)}M`, ""]} />
                     <Area 
                       type="monotone" 
-                      dataKey="workingCapital" 
+                      dataKey="cumulative" 
                       stroke="#8b5cf6" 
                       fill="#8b5cf6" 
-                      fillOpacity={0.6}
-                      name="Working Capital"
+                      fillOpacity={0.3}
+                      name="Cumulative Cash Flow"
                     />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="forecast" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Forecast Accuracy */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  Forecast Accuracy
-                </CardTitle>
-                <CardDescription>Monthly prediction accuracy trends</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                    <XAxis dataKey="month" />
-                    <YAxis domain={[80, 100]} tickFormatter={(value) => `${value}%`} />
-                    <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, ""]} />
                     <Line 
                       type="monotone" 
-                      dataKey="forecastAccuracy" 
+                      dataKey="net" 
                       stroke="#3b82f6" 
-                      strokeWidth={3}
-                      name="Accuracy"
+                      strokeWidth={2}
+                      name="Net Cash Flow"
                     />
-                  </LineChart>
+                  </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            {/* Risk Factors */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  Risk Assessment
-                </CardTitle>
-                <CardDescription>Potential cash flow risk factors</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {advancedMetrics.riskFactors.map((risk, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">{risk.factor}</span>
-                        <div className="flex items-center gap-2">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Risk Assessment */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                    Cash Flow Risks
+                  </CardTitle>
+                  <CardDescription>Potential risks and mitigation strategies</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {advancedMetrics.riskFactors.map((risk, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">{risk.factor}</span>
                           <Badge variant={risk.impact === "high" ? "destructive" : risk.impact === "medium" ? "secondary" : "default"}>
                             {risk.impact}
                           </Badge>
-                          <span className="text-muted-foreground">{(risk.probability * 100).toFixed(0)}%</span>
                         </div>
+                        <Progress value={risk.probability * 100} className="h-2" />
+                        <p className="text-xs text-muted-foreground">
+                          {(risk.probability * 100).toFixed(0)}% probability
+                        </p>
                       </div>
-                      <Progress value={risk.probability * 100} className="h-2" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-        <TabsContent value="breakdown" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Inflow Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpRight className="h-5 w-5 text-green-600" />
-                  Inflow Sources
-                </CardTitle>
-                <CardDescription>Revenue stream distribution</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={inflowBreakdown}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={120}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {inflowBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => `$${(value / 1000).toFixed(0)}K`} />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {inflowBreakdown.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span>{item.name}</span>
+              {/* Forecast Accuracy */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-green-600" />
+                    Forecast Performance
+                  </CardTitle>
+                  <CardDescription>Cash flow forecasting accuracy</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600">
+                        {(advancedMetrics.forecastAccuracy.current * 100).toFixed(1)}%
                       </div>
-                      <span className="font-medium">${(item.value / 1000).toFixed(0)}K</span>
+                      <p className="text-sm text-muted-foreground">Current Accuracy</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Outflow Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownRight className="h-5 w-5 text-red-600" />
-                  Outflow Categories
-                </CardTitle>
-                <CardDescription>Expense category distribution</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={outflowBreakdown}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={120}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {outflowBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => `$${(value / 1000).toFixed(0)}K`} />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {outflowBreakdown.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span>{item.name}</span>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-xl font-semibold">
+                          {(advancedMetrics.forecastAccuracy.target * 100).toFixed(0)}%
+                        </div>
+                        <p className="text-xs text-muted-foreground">Target</p>
                       </div>
-                      <span className="font-medium">${(item.value / 1000).toFixed(0)}K</span>
+                      <div className="text-center">
+                        <Badge variant="default" className="capitalize">
+                          {advancedMetrics.forecastAccuracy.trend}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground mt-1">Trend</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </TabsContent>
+        );
 
-        <TabsContent value="insights" className="space-y-6">
-          {/* Performance Metrics */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Burn Rate</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">${(advancedMetrics.burnRate / 1000).toFixed(0)}K</div>
-                <p className="text-xs text-muted-foreground">Monthly spending rate</p>
-              </CardContent>
-            </Card>
+      default:
+        return null;
+    }
+  };
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Cash Days</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{advancedMetrics.daysOfCashOnHand}</div>
-                <p className="text-xs text-muted-foreground">Days of operations</p>
-              </CardContent>
-            </Card>
+  return (
+    <div className={`space-y-6 ${isFullscreen.cashFlow ? 'fixed inset-0 z-[9999] bg-background p-6 overflow-auto' : ''}`}>
+      {/* Controls Bar */}
+      <div className="flex items-center justify-between">
+        <ViewToggle />
+        <FullscreenToggle
+          isFullscreen={isFullscreen.cashFlow}
+          onToggle={() => toggleFullscreen('cashFlow')}
+        />
+      </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Peak Requirement</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">${(peakRequirement / 1000).toFixed(0)}K</div>
-                <p className="text-xs text-muted-foreground">Maximum negative flow</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Efficiency Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{(forecastAccuracy * 100).toFixed(0)}%</div>
-                <p className="text-xs text-muted-foreground">Forecast accuracy</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Monthly Performance Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-indigo-600" />
-                Monthly Performance Summary
-              </CardTitle>
-              <CardDescription>Detailed monthly cash flow analysis</CardDescription>
+      {/* Collapsible KPI Metrics */}
+      <CollapseWrapper
+        title="Cash Flow Metrics"
+        subtitle="Real-time cash flow performance indicators"
+        defaultCollapsed={false}
+      >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Total Inflows</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">Month</th>
-                      <th className="text-right p-2">Inflows</th>
-                      <th className="text-right p-2">Outflows</th>
-                      <th className="text-right p-2">Net Flow</th>
-                      <th className="text-right p-2">Cumulative</th>
-                      <th className="text-right p-2">Accuracy</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chartData.map((month, index) => (
-                      <tr key={index} className="border-b hover:bg-muted/50">
-                        <td className="p-2 font-medium">{month.month}</td>
-                        <td className="text-right p-2 text-green-600">
-                          ${(month.inflows / 1000).toFixed(0)}K
-                        </td>
-                        <td className="text-right p-2 text-red-600">
-                          ${(month.outflows / 1000).toFixed(0)}K
-                        </td>
-                        <td className={`text-right p-2 font-medium ${
-                          month.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          ${(month.netCashFlow / 1000).toFixed(0)}K
-                        </td>
-                        <td className="text-right p-2">
-                          ${(month.cumulativeCashFlow / 1000).toFixed(0)}K
-                        </td>
-                        <td className="text-right p-2">
-                          <Badge variant={month.forecastAccuracy >= 95 ? "default" : month.forecastAccuracy >= 90 ? "secondary" : "destructive"}>
-                            {month.forecastAccuracy.toFixed(0)}%
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                {formatCurrency(totalInflows)}
               </div>
+              <p className="text-xs text-green-600 dark:text-green-400">
+                Avg: {formatCurrency(averageMonthlyInflow)}/mo
+              </p>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300">Total Outflows</CardTitle>
+              <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-900 dark:text-red-100">
+                {formatCurrency(totalOutflows)}
+              </div>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                Avg: {formatCurrency(averageMonthlyOutflow)}/mo
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Net Cash Flow</CardTitle>
+              <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                {formatCurrency(netCashFlow)}
+              </div>
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                {cashFlowMargin.toFixed(1)}% margin
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Working Capital</CardTitle>
+              <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                {formatCurrency(workingCapital)}
+              </div>
+              <p className="text-xs text-purple-600 dark:text-purple-400">
+                {advancedMetrics.daysOfCashOnHand} days on hand
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </CollapseWrapper>
+
+      {/* Collapsible HBI Intelligence */}
+      <CollapseWrapper
+        title="HBI Cash Flow Intelligence"
+        subtitle="AI-powered cash flow insights and analysis"
+        defaultCollapsed={true}
+      >
+        <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
+          <CardContent className="pt-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Liquidity Status</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Strong liquidity ratio of {advancedMetrics.liquidityRatio} with {advancedMetrics.daysOfCashOnHand} days cash on hand
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Activity className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Forecast Accuracy</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    {(forecastAccuracy * 100).toFixed(1)}% accuracy with {advancedMetrics.forecastAccuracy.trend} trend
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Banknote className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Burn Rate</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Current burn rate: {formatCurrency(advancedMetrics.burnRate)}/month
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </CollapseWrapper>
+
+      {/* Main Content Area */}
+      {renderContent()}
     </div>
   );
 } 
