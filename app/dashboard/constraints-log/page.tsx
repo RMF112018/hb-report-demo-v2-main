@@ -494,6 +494,11 @@ export default function ConstraintsLogPage() {
               </div>
             </div>
 
+            {/* HBI Insights Panel */}
+            <div data-tour="overview-hbi-insights">
+              <HbiInsightsPanel constraints={allConstraints} />
+            </div>
+
             {/* Project Constraints Summary - Executive and Project Executive only */}
             {(user?.role === "executive" || user?.role === "project-executive") && (
               <div data-tour="project-constraints-summary">
@@ -505,11 +510,6 @@ export default function ConstraintsLogPage() {
                 />
               </div>
             )}
-
-            {/* HBI Insights Panel */}
-            <div data-tour="overview-hbi-insights">
-              <HbiInsightsPanel constraints={allConstraints} />
-            </div>
 
             {/* Gantt Chart */}
             <div data-tour="gantt-visualization">
