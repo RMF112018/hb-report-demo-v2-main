@@ -15,11 +15,24 @@ import {
   CreditCard,
   Building2,
   Banknote,
-  Receipt
+  Receipt,
+  Home,
+  RefreshCw,
+  Download,
+  Settings
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { AppHeader } from "@/components/layout/app-header";
 
 // Financial Module Components
@@ -216,74 +229,124 @@ export default function FinancialHubPage() {
   return (
     <>
       <AppHeader />
-      <div className="space-y-6" data-tour="financial-hub-content">
-        {/* Page Header */}
-      <div className="flex items-center justify-between" data-tour="financial-hub-header">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Financial Hub</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Comprehensive financial management and analysis suite
-          </p>
-        </div>
-        <div className="flex items-center gap-4" data-tour="financial-hub-scope">
-          <Badge variant="outline" className="px-3 py-1">
-            {projectScope.description}
-          </Badge>
-          <Badge variant="secondary" className="px-3 py-1">
-            Health Score: {summaryData.healthScore}
-          </Badge>
-        </div>
-      </div>
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Dashboard
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Financial Hub</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="financial-hub-quick-stats">
-        <Card className="p-4 border-border bg-card" data-tour="financial-hub-contract-value">
-          <div className="flex items-center gap-3">
-            <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        {/* Header Section */}
+        <div className="flex flex-col gap-4" data-tour="financial-hub-header">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Contract Value</div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatCurrency(summaryData.totalContractValue)}
+              <h1 className="text-3xl font-bold text-foreground">Financial Hub</h1>
+              <p className="text-muted-foreground mt-1">
+                Comprehensive financial management and analysis suite
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge variant="outline" className="px-3 py-1">
+                  {projectScope.description}
+                </Badge>
+                <Badge variant="secondary" className="px-3 py-1">
+                  {availableModules.length} Modules
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 capitalize">
+                  {user?.role?.replace('-', ' ') || 'User'} View
+                </Badge>
               </div>
             </div>
-          </div>
-        </Card>
-        <Card className="p-4 border-border bg-card" data-tour="financial-hub-cash-flow">
-          <div className="flex items-center gap-3">
-            <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Net Cash Flow</div>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {formatCurrency(summaryData.netCashFlow)}
-              </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button variant="outline">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
             </div>
           </div>
-        </Card>
-        <Card className="p-4 border-border bg-card" data-tour="financial-hub-profit-margin">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Profit Margin</div>
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {summaryData.profitMargin}%
-              </div>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4 border-border bg-card" data-tour="financial-hub-pending-approvals">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            <div>
-              <div className="text-sm font-medium text-muted-foreground">Pending Approvals</div>
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                {summaryData.pendingApprovals}
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
 
-      {/* Financial Modules */}
+          {/* Statistics Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4" data-tour="financial-hub-quick-stats">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                  <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {formatCurrency(summaryData.totalContractValue)}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Contract Value</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {formatCurrency(summaryData.netCashFlow)}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Net Cash Flow</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400 mr-2" />
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {summaryData.profitMargin}%
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Profit Margin</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <CheckCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mr-2" />
+                  <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                    {summaryData.pendingApprovals}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Pending Approvals</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <BarChart3 className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+                  <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    {summaryData.healthScore}%
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Financial Health</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Financial Modules */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
         <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 h-12 bg-muted border-border" data-tour="financial-hub-navigation">

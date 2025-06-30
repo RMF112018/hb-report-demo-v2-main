@@ -19,11 +19,22 @@ import {
   CheckCircle,
   Brain,
   Target,
-  Clock
+  Clock,
+  Home,
+  RefreshCw
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { AppHeader } from "@/components/layout/app-header";
 
 // Scheduler Module Components
@@ -179,23 +190,120 @@ export default function SchedulerPage() {
   return (
     <>
       <AppHeader />
-      <div className="space-y-6" data-tour="scheduler-page-content">
-        {/* Page Header */}
-        <div className="flex items-center justify-between" data-tour="scheduler-page-header">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Scheduler</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              AI-powered project scheduling and optimization platform
-            </p>
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Dashboard
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Scheduler</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Header Section */}
+        <div className="flex flex-col gap-4" data-tour="scheduler-page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Scheduler</h1>
+              <p className="text-muted-foreground mt-1">
+                AI-powered project scheduling and optimization platform
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge variant="outline" className="px-3 py-1">
+                  {projectScope.description}
+                </Badge>
+                <Badge variant="secondary" className="px-3 py-1">
+                  {availableModules.length} Modules
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 capitalize">
+                  {user?.role?.replace('-', ' ') || 'User'} View
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button variant="outline">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-4" data-tour="scheduler-scope-badges">
-            <Badge variant="outline" className="px-3 py-1">
-              {projectScope.description}
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1 flex items-center gap-2">
-              <Activity className="h-3 w-3" />
-              Health Score: {summaryData.scheduleHealth}
-            </Badge>
+
+          {/* Statistics Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                  <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {summaryData.totalActivities.toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Total Activities</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400 mr-2" />
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {formatDuration(summaryData.criticalPathDuration)}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Critical Path</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Activity className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {summaryData.scheduleHealth}%
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Schedule Health</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400 mr-2" />
+                  <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                    {summaryData.currentVariance > 0 ? '+' : ''}{summaryData.currentVariance}d
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Schedule Variance</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Target className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+                  <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    {summaryData.upcomingMilestones}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">Upcoming Milestones</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 

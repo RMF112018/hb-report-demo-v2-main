@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { 
   Building2, 
   Users, 
@@ -23,8 +24,21 @@ import {
   BarChart3,
   ArrowUpRight,
   ArrowDownRight,
-  Minus
+  Minus,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Eye
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+
+// Import components
+import { StaffTimelineChart } from '@/app/dashboard/staff-planning/components/StaffTimelineChart'
+import { SPCRInboxPanel } from '@/app/dashboard/staff-planning/components/SPCRInboxPanel'
+import { LaborVsRevenuePanel } from '@/app/dashboard/staff-planning/components/LaborVsRevenuePanel'
+import { EnhancedHBIInsights } from '@/components/cards/EnhancedHBIInsights'
 
 // Import mock data
 import staffingData from '@/data/mock/staffing/staffing.json'
@@ -48,9 +62,15 @@ interface ProjectStaffing {
 }
 
 export const ProjectExecutiveStaffingView = () => {
+  const { toast } = useToast()
+  
+  // State management
   const [projectStaffing, setProjectStaffing] = useState<ProjectStaffing[]>([])
-  const [selectedTab, setSelectedTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('portfolio')
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
+  const [isOverviewExpanded, setIsOverviewExpanded] = useState(true)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Demo projects for PE user (6 projects)
   const demoProjectIds = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
@@ -62,16 +82,16 @@ export const ProjectExecutiveStaffingView = () => {
       if (!project) return null
 
       const projectStaff = staffingData.filter(staff => 
-        staff.assignments.some(assignment => assignment.project_id === projectId)
+        staff.assignments && staff.assignments.some(assignment => assignment.project_id === projectId)
       )
 
-      const totalLaborCost = projectStaff.reduce((sum, staff) => sum + staff.laborRate, 0)
+      const totalLaborCost = projectStaff.reduce((sum, staff) => sum + (staff.laborRate || 0), 0)
       const avgExperience = projectStaff.length > 0 
-        ? projectStaff.reduce((sum, staff) => sum + staff.experience, 0) / projectStaff.length 
+        ? projectStaff.reduce((sum, staff) => sum + (staff.experience || 0), 0) / projectStaff.length 
         : 0
 
       const pendingSpcrCount = spcrData.filter(spcr => 
-        spcr.project_id === projectId && spcr.status === 'pending'
+        spcr.projectId === projectId && spcr.status === 'submitted'
       ).length
 
       // Simulate productivity based on project stage and staff experience
@@ -99,7 +119,7 @@ export const ProjectExecutiveStaffingView = () => {
       ? projectStaffing.reduce((sum, project) => sum + project.productivity, 0) / projectStaffing.length 
       : 0
     const totalPendingSpcrCount = projectStaffing.reduce((sum, project) => sum + project.pendingSpcrCount, 0)
-    const totalContractValue = projectStaffing.reduce((sum, project) => sum + project.project.contract_value, 0)
+    const totalContractValue = projectStaffing.reduce((sum, project) => sum + (project.project.contract_value || 0), 0)
 
     return {
       totalStaff,
@@ -111,6 +131,31 @@ export const ProjectExecutiveStaffingView = () => {
     }
   }, [projectStaffing])
 
+  // Handle refresh
+  const handleRefresh = () => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Data Refreshed",
+        description: "Portfolio staffing data has been updated",
+      })
+    }, 1000)
+  }
+
+  // Handle export
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Portfolio staffing report is being prepared",
+    })
+  }
+
+  // Toggle fullscreen
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
+
   const getProductivityBadge = (productivity: number) => {
     if (productivity >= 90) return <Badge variant="default" className="bg-green-500">Excellent</Badge>
     if (productivity >= 80) return <Badge variant="default" className="bg-blue-500">Good</Badge>
@@ -120,12 +165,12 @@ export const ProjectExecutiveStaffingView = () => {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'Construction': return 'bg-blue-500'
-      case 'Bidding': return 'bg-yellow-500'
-      case 'Pre-Construction': return 'bg-orange-500'
-      case 'Closeout': return 'bg-green-500'
-      case 'Warranty': return 'bg-purple-500'
-      default: return 'bg-gray-500'
+      case 'Construction': return '#3b82f6'
+      case 'Bidding': return '#eab308'
+      case 'Pre-Construction': return '#f97316'
+      case 'Closeout': return '#22c55e'
+      case 'Warranty': return '#8b5cf6'
+      default: return '#6b7280'
     }
   }
 
@@ -135,303 +180,238 @@ export const ProjectExecutiveStaffingView = () => {
     return <Minus className="h-3 w-3 text-gray-500" />
   }
 
+  // PE-specific insights
+  const peInsights = [
+    {
+      id: "pe-1",
+      type: "opportunity",
+      severity: "medium",
+      title: "Cross-Project Resource Sharing",
+      text: "Opportunity to share specialized resources between Palm Beach and Downtown projects, reducing costs by 12%.",
+      action: "Coordinate with project managers to establish shared resource schedule.",
+      confidence: 86,
+      relatedMetrics: ["Resource Utilization", "Cost Optimization", "Schedule Coordination"]
+    },
+    {
+      id: "pe-2",
+      type: "alert",
+      severity: "high",
+      title: "Portfolio Capacity Risk",
+      text: "3 projects showing potential resource constraints in Q2 2025 based on current hiring pipeline.",
+      action: "Review hiring plans and consider contractor augmentation for critical roles.",
+      confidence: 91,
+      relatedMetrics: ["Resource Planning", "Hiring Pipeline", "Project Delivery"]
+    },
+    {
+      id: "pe-3",
+      type: "performance",
+      severity: "low",
+      title: "Portfolio Productivity Trend",
+      text: "Overall portfolio productivity increased 8.3% compared to last quarter.",
+      action: "Document and replicate successful practices across remaining projects.",
+      confidence: 94,
+      relatedMetrics: ["Productivity", "Best Practices", "Performance Management"]
+    }
+  ]
+
   return (
-    <div className="space-y-6">
-      {/* Portfolio Overview Cards */}
+    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
+
+      {/* Statistics Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Portfolio Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">Portfolio Size</span>
+            </div>
+            <div className="space-y-1">
               <div className="text-2xl font-bold">{portfolioAnalytics.projectCount}</div>
-              <div className="text-xs text-muted-foreground">Active Projects</div>
-              <div className="text-sm">
-                Total Value: ${(portfolioAnalytics.totalContractValue / 1000000).toFixed(1)}M
+              <div className="text-xs text-muted-foreground">
+                ${(portfolioAnalytics.totalContractValue / 1000000).toFixed(1)}M Total Value
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Team Size
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium">Team Size</span>
+            </div>
+            <div className="space-y-1">
               <div className="text-2xl font-bold">{portfolioAnalytics.totalStaff}</div>
-              <div className="text-xs text-muted-foreground">Staff Members</div>
-              <div className="flex items-center gap-1 text-sm">
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
                 {getTrendIcon(3)}
-                <span>+3 this month</span>
+                +3 this month
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Avg Productivity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium">Avg Productivity</span>
+            </div>
+            <div className="space-y-1">
               <div className="text-2xl font-bold">{portfolioAnalytics.avgProductivity.toFixed(1)}%</div>
-              <div className="text-xs text-muted-foreground">Portfolio Average</div>
-              <div className="flex items-center gap-1 text-sm">
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
                 {getTrendIcon(2.1)}
-                <span>+2.1% vs last month</span>
+                +2.1% vs last month
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Pending Reviews
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-orange-600" />
+              <span className="text-sm font-medium">SPCR Reviews</span>
+            </div>
+            <div className="space-y-1">
               <div className="text-2xl font-bold">{portfolioAnalytics.totalPendingSpcrCount}</div>
-              <div className="text-xs text-muted-foreground">SPCRs to Review</div>
-              <div className="flex items-center gap-1 text-sm">
-                {getTrendIcon(-2)}
-                <span>-2 from last week</span>
+              <div className="text-xs text-muted-foreground">
+                Pending approval
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* HBI Insights Panel */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-blue-600" />
+            Portfolio Intelligence Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EnhancedHBIInsights config={peInsights} cardId="pe-staffing" />
+        </CardContent>
+      </Card>
+
       {/* Main Content Tabs */}
-      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Project Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
-          <TabsTrigger value="planning">Resource Planning</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="portfolio">Portfolio Overview</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+          <TabsTrigger value="analytics">Labor Analytics</TabsTrigger>
+          <TabsTrigger value="spcr">SPCR Management</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Project Staffing Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {projectStaffing.map((project) => (
-                  <Card key={project.project.project_id} className="border-l-4" style={{borderLeftColor: getStageColor(project.project.project_stage_name)}}>
-                    <CardContent className="pt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
-                        <div className="md:col-span-2">
-                          <div className="font-medium">{project.project.name}</div>
-                          <div className="text-sm text-muted-foreground">{project.project.project_number}</div>
-                          <Badge variant="outline" className="mt-1">
-                            {project.project.project_stage_name}
-                          </Badge>
-                        </div>
-                        
-                        <div className="text-center">
-                          <div className="text-lg font-bold">{project.staffCount}</div>
-                          <div className="text-xs text-muted-foreground">Staff</div>
-                        </div>
-                        
-                        <div className="text-center">
-                          <div className="text-lg font-bold">${(project.totalLaborCost * 40 / 1000).toFixed(0)}K</div>
-                          <div className="text-xs text-muted-foreground">Weekly Cost</div>
-                        </div>
-                        
-                        <div className="text-center">
-                          {getProductivityBadge(project.productivity)}
-                          <div className="text-xs text-muted-foreground mt-1">{project.productivity.toFixed(1)}%</div>
-                        </div>
-                        
-                        <div className="text-center">
-                          {project.pendingSpcrCount > 0 ? (
-                            <Badge variant="secondary" className="w-full">
-                              {project.pendingSpcrCount} Pending
+        {/* Portfolio Overview Tab */}
+        <TabsContent value="portfolio" className="space-y-6">
+          <Collapsible open={isOverviewExpanded} onOpenChange={setIsOverviewExpanded}>
+            <Card>
+              <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5" />
+                      Project Portfolio Overview
+                    </CardTitle>
+                    {isOverviewExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                  </div>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-4">
+                  {projectStaffing.map((project) => (
+                    <Card key={project.project.project_id} className="border-l-4" style={{borderLeftColor: getStageColor(project.project.project_stage_name)}}>
+                      <CardContent className="pt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+                          <div className="md:col-span-2">
+                            <div className="font-medium">{project.project.name}</div>
+                            <div className="text-sm text-muted-foreground">{project.project.project_number}</div>
+                            <Badge variant="outline" className="mt-1">
+                              {project.project.project_stage_name}
                             </Badge>
-                          ) : (
-                            <Badge variant="outline" className="w-full">
-                              No Requests
-                            </Badge>
-                          )}
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{project.staffCount}</div>
+                            <div className="text-xs text-muted-foreground">Staff</div>
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-lg font-bold">${(project.totalLaborCost * 40 / 1000).toFixed(0)}K</div>
+                            <div className="text-xs text-muted-foreground">Weekly Cost</div>
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{project.productivity.toFixed(0)}%</div>
+                            <div className="text-xs text-muted-foreground">Productivity</div>
+                            {getProductivityBadge(project.productivity)}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setSelectedProject(project.project.project_id)}>
+                              <Eye className="h-4 w-4" />
+                              View Details
+                            </Button>
+                            {project.pendingSpcrCount > 0 && (
+                              <Badge variant="secondary" className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {project.pendingSpcrCount}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  Productivity Trends
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {projectStaffing.map((project) => (
-                    <div key={project.project.project_id} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="truncate font-medium">{project.project.name}</span>
-                        <span>{project.productivity.toFixed(1)}%</span>
-                      </div>
-                      <Progress value={project.productivity} className="h-2" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Labor Cost Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {projectStaffing.map((project) => (
-                    <div key={project.project.project_id} className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium text-sm">{project.project.name}</div>
-                        <div className="text-xs text-muted-foreground">{project.staffCount} staff</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium">${(project.totalLaborCost * 40 / 1000).toFixed(0)}K</div>
-                        <div className="text-xs text-muted-foreground">per week</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Staffing Efficiency Metrics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
-                    {projectStaffing.filter(p => p.productivity >= 90).length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">High Performance</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {projectStaffing.filter(p => p.productivity >= 70 && p.productivity < 90).length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Needs Optimization</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">
-                    {projectStaffing.filter(p => p.productivity < 70).length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Requires Attention</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="planning" className="space-y-4">
+        {/* Timeline View Tab */}
+        <TabsContent value="timeline" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Resource Planning & Forecasting
+                Portfolio Staffing Timeline
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Upcoming Staffing Needs</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between p-2 border rounded">
-                        <span className="text-sm">Palm Beach Luxury Estate</span>
-                        <Badge variant="outline">+2 Superintendents (Mar 2025)</Badge>
-                      </div>
-                      <div className="flex justify-between p-2 border rounded">
-                        <span className="text-sm">Miami Commercial Tower</span>
-                        <Badge variant="outline">+5 Project Managers (Apr 2025)</Badge>
-                      </div>
-                      <div className="flex justify-between p-2 border rounded">
-                        <span className="text-sm">Orlando Retail Complex</span>
-                        <Badge variant="outline">-3 Staff (Closeout Q2)</Badge>
-                      </div>
-                    </div>
-                  </div>
+              <StaffTimelineChart userRole="project-executive" />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Resource Recommendations</h4>
-                    <div className="space-y-2">
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                        <div className="text-sm font-medium text-blue-800">Optimize Productivity</div>
-                        <div className="text-xs text-blue-600">Consider additional QC staff for low-performing projects</div>
-                      </div>
-                      <div className="p-3 bg-green-50 border border-green-200 rounded">
-                        <div className="text-sm font-medium text-green-800">Cost Efficiency</div>
-                        <div className="text-xs text-green-600">Redistribute senior staff to maximize billable rates</div>
-                      </div>
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                        <div className="text-sm font-medium text-yellow-800">Capacity Planning</div>
-                        <div className="text-xs text-yellow-600">Prepare for Q2 project transitions</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        {/* Labor Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Labor vs Revenue Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LaborVsRevenuePanel userRole="project-executive" />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <div>
-                  <h4 className="font-medium mb-3">Quick Actions</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm">
-                      <Users className="h-4 w-4 mr-1" />
-                      Staff Reallocation
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <BarChart3 className="h-4 w-4 mr-1" />
-                      Performance Review
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Schedule Forecast
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Target className="h-4 w-4 mr-1" />
-                      Capacity Planning
-                    </Button>
-                  </div>
-                </div>
-              </div>
+        {/* SPCR Management Tab */}
+        <TabsContent value="spcr" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                SPCR Management Dashboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SPCRInboxPanel userRole="project-executive" />
             </CardContent>
           </Card>
         </TabsContent>
