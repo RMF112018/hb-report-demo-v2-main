@@ -9,8 +9,17 @@ import { DashboardLayout as DashboardLayoutComponent } from "@/components/dashbo
 import { DashboardProvider, useDashboardContext } from "@/context/dashboard-context";
 import type { DashboardCard, DashboardLayout } from "@/types/dashboard";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, ChevronDown, LayoutDashboard, Layout, Maximize2, Minimize2 } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Plus, ChevronDown, LayoutDashboard, Layout, Maximize2, Minimize2, Home, RefreshCw } from "lucide-react";
 import { AppHeader } from "@/components/layout/app-header";
 
 // Mock data imports for cards
@@ -254,172 +263,208 @@ function DashboardContent({ user }: { user: any }) {
   }
 
   return (
-    <div className="min-h-screen bg-background w-full">
-      {/* App Header */}
+    <>
       <AppHeader />
-      
-      {/* Dashboard Content - Full Width */}
-      <div className="w-full">
-        {/* Dashboard Header */}
-        <div className="bg-card border-b border-border px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col gap-3 sm:gap-4">
-            {/* First Row - Title */}
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Dashboard</h1>
-            </div>
-            
-            {/* Second Row - Controls */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
-              <div className="flex items-center gap-3">
-                {/* Dashboard Selector Popover */}
-                <Popover open={dashboardPopoverOpen} onOpenChange={setDashboardPopoverOpen} data-tour="dashboard-selector">
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span>{currentDashboard?.name || 'Select Dashboard'}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-0" align="start">
-                    <div className="p-2">
-                      <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
-                        Available Dashboards
-                      </div>
-                      {dashboards.map(dashboard => (
-                        <button
-                          key={dashboard.id}
-                          onClick={() => handleDashboardSelect(dashboard.id)}
-                          className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                            currentDashboardId === dashboard.id
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'hover:bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          <div className="font-medium">{dashboard.name}</div>
-                          {dashboard.description && (
-                            <div className="text-xs text-muted-foreground mt-0.5">{dashboard.description}</div>
-                          )}
-                        </button>
-                      ))}
-                                              <div className="border-t border-border mt-2 pt-2">
-                        <button
-                          onClick={() => {/* TODO: Add new dashboard */}}
-                          className="w-full text-left px-3 py-2 rounded text-sm text-primary hover:bg-primary/10 flex items-center gap-2"
-                        >
-                          <Plus className="h-4 w-4" />
-                          Add New Dashboard
-                        </button>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-              <div className="flex items-center gap-3" data-tour="dashboard-controls">
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  onClick={() => setIsEditing(!isEditing)}
-                  size="sm"
-                >
-                  {isEditing ? "Exit Edit" : "Edit"}
-                </Button>
-                
-                {isEditing && (
+        {/* Header Section */}
+        <div className="flex flex-col gap-4" data-tour="dashboard-page-header">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-muted-foreground mt-1">
+                {currentDashboard?.description || 'Real-time insights and project management overview'}
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge variant="outline" className="px-3 py-1">
+                  {currentDashboard?.name || 'Loading...'}
+                </Badge>
+                <Badge variant="secondary" className="px-3 py-1">
+                  {currentDashboard?.cards?.length || 0} Widgets
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 capitalize">
+                  {user?.role?.replace('-', ' ') || 'User'} View
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button variant="outline" onClick={toggleFullscreen}>
+                {isFullscreen ? (
                   <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSave}
-                      className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleReset}
-                      className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
-                    >
-                      Reset
-                    </Button>
+                    <Minimize2 className="h-4 w-4 mr-2" />
+                    Exit Fullscreen
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="h-4 w-4 mr-2" />
+                    Fullscreen
                   </>
                 )}
+              </Button>
+              <Button
+                variant={isEditing ? "default" : "outline"}
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                {isEditing ? "Exit Edit" : "Edit Dashboard"}
+              </Button>
+            </div>
+          </div>
 
-                {/* Layout Options Popover */}
-                <Popover open={layoutPopoverOpen} onOpenChange={setLayoutPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
-                      <Layout className="h-4 w-4" />
-                      <span className="hidden sm:inline">{layoutDensity.charAt(0).toUpperCase() + layoutDensity.slice(1)}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-48 p-0" align="end">
-                    <div className="p-2">
-                      <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
-                        Layout Density
-                      </div>
-                      {[
-                        { value: 'compact' as const, label: 'Compact', description: 'Dense layout' },
-                        { value: 'normal' as const, label: 'Normal', description: 'Balanced spacing' },
-                        { value: 'spacious' as const, label: 'Spacious', description: 'Generous spacing' }
-                      ].map(option => (
-                        <button
-                          key={option.value}
-                          onClick={() => handleLayoutDensityChange(option.value)}
-                          className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                            layoutDensity === option.value
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'hover:bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          <div className="font-medium">{option.label}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{option.description}</div>
-                        </button>
-                      ))}
+          {/* Dashboard Controls Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {/* Dashboard Selector */}
+              <Popover open={dashboardPopoverOpen} onOpenChange={setDashboardPopoverOpen} data-tour="dashboard-selector">
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>{currentDashboard?.name || 'Select Dashboard'}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0" align="start">
+                  <div className="p-2">
+                    <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
+                      Available Dashboards
                     </div>
-                  </PopoverContent>
-                </Popover>
+                    {dashboards.map(dashboard => (
+                      <button
+                        key={dashboard.id}
+                        onClick={() => handleDashboardSelect(dashboard.id)}
+                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                          currentDashboardId === dashboard.id
+                            ? 'bg-primary/10 text-primary font-medium'
+                            : 'hover:bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        <div className="font-medium">{dashboard.name}</div>
+                        {dashboard.description && (
+                          <div className="text-xs text-muted-foreground mt-0.5">{dashboard.description}</div>
+                        )}
+                      </button>
+                    ))}
+                    <div className="border-t border-border mt-2 pt-2">
+                      <button
+                        onClick={() => {/* TODO: Add new dashboard */}}
+                        className="w-full text-left px-3 py-2 rounded text-sm text-primary hover:bg-primary/10 flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add New Dashboard
+                      </button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-                {/* Fullscreen Toggle */}
+              {/* Layout Density Selector */}
+              <Popover open={layoutPopoverOpen} onOpenChange={setLayoutPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Layout className="h-4 w-4" />
+                    <span className="hidden sm:inline">{layoutDensity.charAt(0).toUpperCase() + layoutDensity.slice(1)}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-0" align="start">
+                  <div className="p-2">
+                    <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
+                      Layout Density
+                    </div>
+                    {[
+                      { value: 'compact' as const, label: 'Compact', description: 'Dense layout' },
+                      { value: 'normal' as const, label: 'Normal', description: 'Balanced spacing' },
+                      { value: 'spacious' as const, label: 'Spacious', description: 'Generous spacing' }
+                    ].map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleLayoutDensityChange(option.value)}
+                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                          layoutDensity === option.value
+                            ? 'bg-primary/10 text-primary font-medium'
+                            : 'hover:bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{option.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Edit Mode Controls */}
+            {isEditing && (
+              <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={toggleFullscreen}
-                  className="flex items-center gap-2"
-                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                  onClick={handleSave}
+                  className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
                 >
-                  {isFullscreen ? (
-                    <Minimize2 className="h-4 w-4" />
-                  ) : (
-                    <Maximize2 className="h-4 w-4" />
-                  )}
-                  <span className="hidden md:inline">{isFullscreen ? "Exit" : "Fullscreen"}</span>
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
+                >
+                  Reset to Default
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCardAdd}
+                  className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Widget
                 </Button>
               </div>
-            </div>
+            )}
           </div>
         </div>
-        
+
+        {/* Dashboard Content */}
         {currentDashboard && (
           <div data-tour="dashboard-content">
             <DashboardLayoutComponent 
-            cards={currentDashboard.cards}
-            onLayoutChange={handleLayoutChange}
-            onCardRemove={handleCardRemove}
-            onCardConfigure={handleCardConfigure}
-            onCardAdd={handleCardAdd}
-            onSave={handleSave}
-            onReset={handleReset}
-            isEditing={isEditing}
-            onToggleEdit={() => setIsEditing(!isEditing)}
-            layoutDensity={layoutDensity}
-            userRole={user.role}
-          />
+              cards={currentDashboard.cards}
+              onLayoutChange={handleLayoutChange}
+              onCardRemove={handleCardRemove}
+              onCardConfigure={handleCardConfigure}
+              onCardAdd={handleCardAdd}
+              onSave={handleSave}
+              onReset={handleReset}
+              isEditing={isEditing}
+              onToggleEdit={() => setIsEditing(!isEditing)}
+              layoutDensity={layoutDensity}
+              userRole={user.role}
+            />
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
