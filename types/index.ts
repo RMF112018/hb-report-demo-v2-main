@@ -33,3 +33,6 @@ export interface ProjectData {
   manager: string
   location: string
 }
+
+// Export productivity types
+export * from './productivity'

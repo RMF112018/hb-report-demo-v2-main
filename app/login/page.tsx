@@ -31,13 +31,13 @@ import {
   Monitor,
 } from "lucide-react"
 import Link from "next/link"
-import { ThemeProvider } from "@/components/theme-provider"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loginError, setLoginError] = useState("")
   const [currentFeature, setCurrentFeature] = useState(0)
   const [showDemoAccounts, setShowDemoAccounts] = useState(false)
   const [windowSize, setWindowSize] = useState({
@@ -197,6 +197,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setLoginError("")
 
     try {
       const { redirectTo } = await login(email, password)
@@ -206,10 +207,11 @@ export default function LoginPage() {
       })
       router.push(redirectTo)
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Invalid credentials. Please check your email and password."
+      setLoginError(errorMessage)
       toast({
         title: "Login failed",
-        description:
-          error instanceof Error ? error.message : "Invalid credentials. Please check your email and password.",
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
@@ -234,6 +236,7 @@ export default function LoginPage() {
     setEmail(account.email)
     setPassword("demo123")
     setShowDemoAccounts(false)
+    setLoginError("")
     setIsLoading(true)
 
     try {
@@ -261,8 +264,77 @@ export default function LoginPage() {
 
   return (
     // Force light mode for the entire login page, regardless of global theme
-    <div className="light">
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
+    <div className="login-page-container">
+      <style jsx global>{`
+        .login-page-container {
+          --background: 0 0% 100%;
+          --foreground: 0 0% 3.9%;
+          --card: 0 0% 100%;
+          --card-foreground: 0 0% 3.9%;
+          --popover: 0 0% 100%;
+          --popover-foreground: 0 0% 3.9%;
+          --primary: 0 0% 9%;
+          --primary-foreground: 0 0% 98%;
+          --secondary: 0 0% 96.1%;
+          --secondary-foreground: 0 0% 9%;
+          --muted: 0 0% 96.1%;
+          --muted-foreground: 0 0% 45.1%;
+          --accent: 0 0% 96.1%;
+          --accent-foreground: 0 0% 9%;
+          --destructive: 0 84.2% 60.2%;
+          --destructive-foreground: 0 0% 98%;
+          --border: 0 0% 89.8%;
+          --input: 0 0% 89.8%;
+          --ring: 0 0% 3.9%;
+        }
+        .login-page-container * {
+          color-scheme: light;
+        }
+        
+        /* Enhanced visual feedback animations */
+        .login-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        
+        .login-form input:focus {
+          transform: scale(1.01);
+        }
+        
+        /* Improved button states */
+        .login-form button {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .login-form button:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s;
+        }
+        
+        .login-form button:hover:before {
+          left: 100%;
+        }
+        
+        /* Enhanced focus states for accessibility */
+        .login-form *:focus-visible {
+          outline: 2px solid #003087;
+          outline-offset: 2px;
+          box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.1);
+        }
+      `}</style>
       <div
         className="h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative"
         role="main"
@@ -351,7 +423,7 @@ export default function LoginPage() {
                   <h2
                     className={`font-bold mb-3 lg:mb-4 leading-tight bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent ${
                       isLargeScreen ? "text-4xl xl:text-5xl" : "text-2xl lg:text-3xl"
-                    }`}
+                    } animate-in slide-in-from-left-4 duration-1000`}
                   >
                     Build Smarter with Dynamic Project Solutions
                   </h2>
@@ -470,8 +542,8 @@ export default function LoginPage() {
                     </div>
                   )}
 
-                  <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm login-card">
-                    <CardHeader className="text-center pb-4 lg:pb-6">
+                  <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm login-card !bg-white !text-gray-900 !border-gray-200">
+                    <CardHeader className="text-center pb-4 lg:pb-6 !bg-white">
                       <CardTitle
                         className={`font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2 ${
                           isSmallScreen ? "text-2xl" : "text-2xl lg:text-3xl"
@@ -498,8 +570,11 @@ export default function LoginPage() {
                             type="email"
                             placeholder="Enter your work email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="h-11 lg:h-12 border-2 border-gray-200 focus:border-[#003087] focus:ring-[#003087] transition-all duration-200 bg-white text-gray-900"
+                            onChange={(e) => {
+                              setEmail(e.target.value)
+                              if (loginError) setLoginError("")
+                            }}
+                            className="h-11 lg:h-12 !border-2 !border-gray-200 focus:!border-[#003087] focus:!ring-[#003087] transition-all duration-200 !bg-white !text-gray-900 focus-visible:!ring-2 focus-visible:!ring-[#003087] focus-visible:!ring-offset-2"
                             required
                             aria-required="true"
                           />
@@ -516,8 +591,11 @@ export default function LoginPage() {
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter your password"
                               value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              className="h-11 lg:h-12 pr-12 border-2 border-gray-200 focus:border-[#003087] focus:ring-[#003087] transition-all duration-200 bg-white text-gray-900"
+                              onChange={(e) => {
+                                setPassword(e.target.value)
+                                if (loginError) setLoginError("")
+                              }}
+                              className="h-11 lg:h-12 pr-12 !border-2 !border-gray-200 focus:!border-[#003087] focus:!ring-[#003087] transition-all duration-200 !bg-white !text-gray-900 focus-visible:!ring-2 focus-visible:!ring-[#003087] focus-visible:!ring-offset-2"
                               required
                               aria-required="true"
                             />
@@ -525,7 +603,7 @@ export default function LoginPage() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="absolute right-0 top-0 h-11 lg:h-12 px-3 hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                              className="absolute right-0 top-0 h-11 lg:h-12 px-3 hover:!bg-gray-100 !text-gray-500 hover:!text-gray-700 !bg-transparent"
                               onClick={() => setShowPassword(!showPassword)}
                               aria-label={showPassword ? "Hide password" : "Show password"}
                               aria-pressed={showPassword}
@@ -538,6 +616,18 @@ export default function LoginPage() {
                             </Button>
                           </div>
                         </div>
+
+                        {/* Error Message Display */}
+                        {loginError && (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-lg animate-in slide-in-from-top-2 duration-200">
+                            <p className="text-sm text-red-700 flex items-center">
+                              <svg className="h-4 w-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                              </svg>
+                              {loginError}
+                            </p>
+                          </div>
+                        )}
 
                         <Button
                           type="submit"
@@ -578,7 +668,7 @@ export default function LoginPage() {
                             variant="outline"
                             onClick={() => handleSSOLogin("Okta")}
                             disabled={isLoading}
-                            className="h-10 lg:h-11 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-sm bg-white text-gray-900"
+                            className="h-10 lg:h-11 !border-2 !border-gray-200 hover:!bg-gray-50 hover:!border-gray-300 transition-all duration-200 font-medium text-sm !bg-white !text-gray-900"
                             aria-label="Login with Okta"
                           >
                             {isLoading ? (
@@ -592,7 +682,7 @@ export default function LoginPage() {
                             variant="outline"
                             onClick={() => handleSSOLogin("Azure AD")}
                             disabled={isLoading}
-                            className="h-10 lg:h-11 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-sm bg-white text-gray-900"
+                            className="h-10 lg:h-11 !border-2 !border-gray-200 hover:!bg-gray-50 hover:!border-gray-300 transition-all duration-200 font-medium text-sm !bg-white !text-gray-900"
                             aria-label="Login with Azure AD"
                           >
                             {isLoading ? (
@@ -619,7 +709,7 @@ export default function LoginPage() {
                         <Button
                           variant="outline"
                           onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-                          className="w-full h-10 lg:h-11 border-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 font-medium bg-white"
+                          className="w-full h-10 lg:h-11 !border-2 !border-blue-200 !text-blue-700 hover:!bg-blue-50 hover:!border-blue-300 transition-all duration-200 font-medium !bg-white"
                           aria-expanded={showDemoAccounts}
                           aria-controls="demo-accounts-list"
                           aria-label="Toggle demo accounts list"
@@ -644,7 +734,7 @@ export default function LoginPage() {
                                   size="sm"
                                   onClick={() => handleDemoLogin(account)}
                                   disabled={isLoading}
-                                  className="w-full h-auto p-3 text-left border border-blue-100 text-blue-700 hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 flex items-center justify-start bg-white"
+                                  className="w-full h-auto p-3 text-left !border !border-blue-100 !text-blue-700 hover:!bg-blue-50 hover:!border-blue-200 transition-all duration-200 flex items-center justify-start !bg-white"
                                   aria-label={`Login as ${account.label} demo account`}
                                 >
                                   <IconComponent className="h-4 w-4 mr-3 flex-shrink-0 text-blue-600" aria-hidden="true" />
@@ -710,7 +800,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      </ThemeProvider>
     </div>
   )
 }
