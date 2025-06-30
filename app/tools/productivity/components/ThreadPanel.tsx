@@ -64,6 +64,20 @@ export const ThreadPanel = ({ thread, task, className }: ThreadPanelProps) => {
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase()
   }
 
+  const formatSafeDate = (dateValue: any): string => {
+    if (!dateValue) return 'just now'
+    
+    try {
+      const date = new Date(dateValue)
+      if (isNaN(date.getTime())) {
+        return 'just now'
+      }
+      return formatDistanceToNow(date, { addSuffix: true })
+    } catch (error) {
+      return 'just now'
+    }
+  }
+
   const handleSendMessage = () => {
     if (!newMessage.trim() || !threadId) return
 
@@ -187,7 +201,7 @@ export const ThreadPanel = ({ thread, task, className }: ThreadPanelProps) => {
                         </span>
                         <span className="text-xs text-muted-foreground flex items-center">
                           <Clock className="w-3 h-3 mr-1" />
-                          {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
+                          {formatSafeDate(message.createdAt)}
                         </span>
                       </div>
                       
