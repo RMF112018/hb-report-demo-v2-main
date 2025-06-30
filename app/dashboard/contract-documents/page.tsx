@@ -11,7 +11,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { useAuth } from "@/context/auth-context"
+import { ContractDocumentsWidgets } from "@/components/contract-documents/ContractDocumentsWidgets"
+import { HbiContractDocumentsInsights } from "@/components/contract-documents/HbiContractDocumentsInsights"
+import { ContractDocumentsExportUtils } from "@/components/contract-documents/ContractDocumentsExportUtils"
+import { useToast } from "@/hooks/use-toast"
 import {
   Upload,
   FileText,
@@ -37,18 +49,22 @@ import {
   MoreHorizontal,
   ChevronRight,
   AlertCircle,
-  XCircle
+  XCircle,
+  Home,
+  RefreshCw,
+  Plus
 } from "lucide-react"
 import { format } from "date-fns"
+import type { ContractDocument, ContractDocumentsStats } from "@/components/contract-documents/ContractDocumentsExportUtils"
 
 // Mock data for documents
-const mockDocuments = [
+const mockDocuments: ContractDocument[] = [
   {
     id: "doc-001",
     name: "Prime Contract - Wilshire Tower",
     type: "Prime Contract",
     status: "Under Review",
-    uploadDate: "2024-01-15",
+    uploadDate: "2024-01-15T08:30:00Z",
     reviewer: "Sarah Chen",
     priority: "High",
     complianceScore: 85,
@@ -57,16 +73,53 @@ const mockDocuments = [
     tags: ["Contract", "High Value", "Risk Assessment"],
     size: "2.3 MB",
     pages: 47,
-    keyRisks: ["Payment Terms", "Change Order Process", "Liquidated Damages"],
-    opportunities: ["Early Completion Bonus", "Material Escalation"],
-    project: "Wilshire Tower Construction"
+    project: {
+      id: "proj-001",
+      name: "Wilshire Tower Construction",
+      projectNumber: "WT-2024-001"
+    },
+    keyRisks: [
+      {
+        category: "Payment Terms",
+        description: "Complex milestone payment schedule",
+        severity: "High",
+        recommendation: "Define specific measurable completion criteria",
+        clauseReference: "Section 12.3"
+      }
+    ],
+    opportunities: [
+      {
+        category: "Early Completion Bonus",
+        description: "Substantial bonus for early project completion",
+        value: "$125,000",
+        probability: "High",
+        clauseReference: "Section 14.2"
+      }
+    ],
+    complianceChecks: {
+      buildingCodes: {
+        status: "Compliant",
+        lastChecked: "2024-01-15T10:00:00Z",
+        nextReview: "2024-04-15T10:00:00Z"
+      }
+    },
+    aiInsights: {
+      overallRisk: "Medium",
+      costSavingsPotential: 45000,
+      recommendedActions: ["Renegotiate payment milestone criteria"],
+      similarContracts: 3,
+      industryBenchmark: {
+        riskScore: "15% lower than industry average",
+        complianceScore: "8% higher than industry average"
+      }
+    }
   },
   {
     id: "doc-002", 
     name: "Electrical Subcontract Agreement",
     type: "Subcontract",
     status: "Approved",
-    uploadDate: "2024-01-12",
+    uploadDate: "2024-01-12T14:20:00Z",
     reviewer: "Mike Johnson",
     priority: "Medium",
     complianceScore: 92,
@@ -75,16 +128,53 @@ const mockDocuments = [
     tags: ["Subcontract", "Electrical", "Approved"],
     size: "1.8 MB",
     pages: 32,
-    keyRisks: ["Performance Bond", "Insurance Requirements"],
-    opportunities: ["Volume Discount", "Extended Warranty"],
-    project: "Downtown Office Complex"
+    project: {
+      id: "proj-002",
+      name: "Downtown Office Complex",
+      projectNumber: "DOC-2024-005"
+    },
+    keyRisks: [
+      {
+        category: "Performance Bond",
+        description: "Required performance bond may impact cash flow",
+        severity: "Low",
+        recommendation: "Verify bond capacity before project start",
+        clauseReference: "Section 6.1"
+      }
+    ],
+    opportunities: [
+      {
+        category: "Volume Discount",
+        description: "Additional discount for material orders over $100K",
+        value: "3% discount",
+        probability: "High",
+        clauseReference: "Section 4.5"
+      }
+    ],
+    complianceChecks: {
+      buildingCodes: {
+        status: "Compliant",
+        lastChecked: "2024-01-12T15:00:00Z",
+        nextReview: "2024-04-12T15:00:00Z"
+      }
+    },
+    aiInsights: {
+      overallRisk: "Low",
+      costSavingsPotential: 15000,
+      recommendedActions: ["Execute volume discount opportunities"],
+      similarContracts: 12,
+      industryBenchmark: {
+        riskScore: "25% lower than industry average",
+        complianceScore: "12% higher than industry average"
+      }
+    }
   },
   {
     id: "doc-003",
     name: "Building Code Updates - 2024",
     type: "Regulatory",
     status: "Action Required",
-    uploadDate: "2024-01-10",
+    uploadDate: "2024-01-10T09:15:00Z",
     reviewer: "Alex Rodriguez",
     priority: "High",
     complianceScore: 78,
@@ -93,13 +183,50 @@ const mockDocuments = [
     tags: ["Building Code", "Regulatory", "Compliance"],
     size: "5.2 MB",
     pages: 156,
-    keyRisks: ["Code Compliance", "Retrofit Requirements", "Timeline Impact"],
-    opportunities: ["Energy Efficiency Credits", "Tax Incentives"],
-    project: "Multiple Projects"
+    project: {
+      id: "proj-multiple",
+      name: "Multiple Projects",
+      projectNumber: "MULTI-2024"
+    },
+    keyRisks: [
+      {
+        category: "Code Compliance",
+        description: "New building code requirements may require retrofits",
+        severity: "High",
+        recommendation: "Review all active projects for compliance gaps",
+        clauseReference: "Section 4.2"
+      }
+    ],
+    opportunities: [
+      {
+        category: "Energy Efficiency Credits",
+        description: "New code provides energy efficiency tax incentives",
+        value: "Up to $50,000 per project",
+        probability: "Medium",
+        clauseReference: "Appendix C"
+      }
+    ],
+    complianceChecks: {
+      environmentalRegs: {
+        status: "Requires Review",
+        lastChecked: "2024-01-10T10:00:00Z",
+        nextReview: "2024-02-15T10:00:00Z"
+      }
+    },
+    aiInsights: {
+      overallRisk: "High",
+      costSavingsPotential: 125000,
+      recommendedActions: ["Prioritize compliance review", "Leverage efficiency credits"],
+      similarContracts: 8,
+      industryBenchmark: {
+        riskScore: "40% higher than industry average",
+        complianceScore: "2% lower than industry average"
+      }
+    }
   }
 ]
 
-const mockAnalytics = {
+const mockAnalytics: ContractDocumentsStats = {
   totalDocuments: 247,
   pendingReview: 18,
   highRiskDocuments: 12,
@@ -112,14 +239,18 @@ const mockAnalytics = {
 
 export default function ContractDocumentsPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("dashboard")
-  const [selectedDocument, setSelectedDocument] = useState<any>(null)
+  const [selectedDocument, setSelectedDocument] = useState<ContractDocument | null>(null)
   const [showDocumentModal, setShowDocumentModal] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterType, setFilterType] = useState("all")
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [exportFormat, setExportFormat] = useState<"pdf" | "excel" | "csv">("pdf")
+  const [exportFileName, setExportFileName] = useState("contract-documents-export")
 
   useEffect(() => {
     const loadData = async () => {
@@ -134,14 +265,14 @@ export default function ContractDocumentsPage() {
     return mockDocuments.filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            doc.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           doc.project.toLowerCase().includes(searchTerm.toLowerCase())
+                           doc.project.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === "all" || doc.status === filterStatus
       const matchesType = filterType === "all" || doc.type === filterType
       return matchesSearch && matchesStatus && matchesType
     })
   }, [searchTerm, filterStatus, filterType])
 
-  const openDocumentModal = useCallback((document: any) => {
+  const openDocumentModal = useCallback((document: ContractDocument) => {
     setSelectedDocument(document)
     setShowDocumentModal(true)
   }, [])
@@ -174,6 +305,74 @@ export default function ContractDocumentsPage() {
     }
   }
 
+  // Get role-specific scope
+  const getProjectScope = () => {
+    if (!user) return { scope: "all", projectCount: 0, description: "All Projects" }
+    
+    switch (user.role) {
+      case "project-manager":
+        return { 
+          scope: "single", 
+          projectCount: 1, 
+          description: "Single Project View"
+        }
+      case "project-executive":
+        return { 
+          scope: "portfolio", 
+          projectCount: 6, 
+          description: "Portfolio View (6 Projects)"
+        }
+      default:
+        return { 
+          scope: "enterprise", 
+          projectCount: 12, 
+          description: "Enterprise View (All Projects)"
+        }
+    }
+  }
+
+  const projectScope = getProjectScope()
+
+  // Handle refresh
+  const handleRefresh = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      toast({
+        title: "Refreshed",
+        description: "Contract documents have been refreshed",
+      })
+    }, 1000)
+  }
+
+  // Handle export
+  const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string }) => {
+    try {
+      switch (options.format) {
+        case "pdf":
+          ContractDocumentsExportUtils.exportToPDF(mockDocuments, mockAnalytics, "Enterprise Portfolio", options.fileName)
+          break
+        case "excel":
+          ContractDocumentsExportUtils.exportToExcel(mockDocuments, mockAnalytics, "Enterprise Portfolio", options.fileName)
+          break
+        case "csv":
+          ContractDocumentsExportUtils.exportToCSV(mockDocuments, "Enterprise Portfolio", options.fileName)
+          break
+      }
+      toast({
+        title: "Export Successful",
+        description: `Contract documents exported as ${options.format.toUpperCase()}`,
+      })
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export contract documents",
+        variant: "destructive",
+      })
+    }
+    setIsExportModalOpen(false)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -191,109 +390,73 @@ export default function ContractDocumentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <AppHeader />
-      
-      <div className="pt-16">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
-          {/* Header Section */}
-          <div className="flex items-center justify-between mb-6">
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Dashboard
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Contract Documents</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Header Section */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Contract Documents
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                AI-powered document compliance and risk analysis platform
-              </p>
+              <h1 className="text-3xl font-bold text-foreground">Contract Documents</h1>
+              <p className="text-muted-foreground mt-1">Manage and analyze contract documents with AI-powered insights</p>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge variant="outline" className="px-3 py-1">
+                  {projectScope.description}
+                </Badge>
+                <Badge variant="secondary" className="px-3 py-1">
+                  {mockAnalytics.totalDocuments} Total Documents
+                </Badge>
+              </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button 
-                onClick={() => setShowUploadModal(true)}
-                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Document
+              <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Refresh
               </Button>
-              <Button variant="outline">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+              <Button variant="outline" onClick={() => setIsExportModalOpen(true)}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                <Plus className="h-4 w-4 mr-2" />
+                Upload Document
               </Button>
             </div>
           </div>
 
-          {/* Analytics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <Card className="border-l-4 border-l-[#003087]">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Documents
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#003087] dark:text-white">
-                  {mockAnalytics.totalDocuments}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <TrendingUp className="h-3 w-3 inline mr-1" />
-                  +15% from last month
-                </p>
-              </CardContent>
-            </Card>
+          {/* Statistics Widgets */}
+          <ContractDocumentsWidgets stats={mockAnalytics} />
+        </div>
 
-            <Card className="border-l-4 border-l-[#FF6B35]">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Pending Review
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#FF6B35]">
-                  {mockAnalytics.pendingReview}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <Clock className="h-3 w-3 inline mr-1" />
-                  Avg {mockAnalytics.avgReviewTime} days
-                </p>
-              </CardContent>
-            </Card>
+        {/* HBI Insights Panel */}
+        <HbiContractDocumentsInsights documents={mockDocuments} stats={mockAnalytics} />
 
-            <Card className="border-l-4 border-l-red-500">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  High Risk Items
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                  {mockAnalytics.highRiskDocuments}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <AlertTriangle className="h-3 w-3 inline mr-1" />
-                  Require attention
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-green-500">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Compliance Rate
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {mockAnalytics.complianceRate}%
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <CheckCircle className="h-3 w-3 inline mr-1" />
-                  Above target
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        {/* Main Content Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              Document Library
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
@@ -688,7 +851,56 @@ export default function ContractDocumentsPage() {
               </div>
             </TabsContent>
           </Tabs>
-        </div>
+          </CardContent>
+        </Card>
+
+        {/* Help Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Contract Documents Help
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3 text-foreground">Document Management</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    Upload and organize contract documents by type and project
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    Track review status and compliance scores
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    Set up automated compliance monitoring
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-foreground">AI Analysis</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    Identify risks and opportunities automatically
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    Generate compliance and performance insights
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    Benchmark against industry standards
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Document Detail Modal */}
@@ -860,6 +1072,49 @@ export default function ContractDocumentsPage() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+
+      {/* Export Modal */}
+      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#003087] dark:text-white">Export Contract Documents</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Export Format</label>
+              <select 
+                className="w-full px-3 py-2 border rounded-md bg-background"
+                value={exportFormat}
+                onChange={(e) => setExportFormat(e.target.value as "pdf" | "excel" | "csv")}
+              >
+                <option value="pdf">PDF Report</option>
+                <option value="excel">Excel Spreadsheet</option>
+                <option value="csv">CSV Data</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">File Name</label>
+              <Input
+                placeholder="contract-documents-export"
+                value={exportFileName}
+                onChange={(e) => setExportFileName(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3">
+              <Button variant="outline" onClick={() => setIsExportModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white"
+                onClick={() => handleExportSubmit({ format: exportFormat, fileName: exportFileName })}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 } 

@@ -1,15 +1,22 @@
 "use client"
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
+import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { useAuth } from "@/context/auth-context"
 import { useProjectContext } from "@/context/project-context"
 import { AppHeader } from "@/components/layout/app-header"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { useToast } from "@/hooks/use-toast"
 import {
   CalendarDays,
@@ -27,7 +34,10 @@ import {
   Clock,
   Shield,
   Building,
-  RefreshCw
+  RefreshCw,
+  Home,
+  Eye,
+  Edit
 } from "lucide-react"
 
 // Import Permit Components
@@ -37,9 +47,14 @@ import { PermitForm } from "@/components/permit-log/PermitForm"
 import { PermitExportModal } from "@/components/permit-log/PermitExportModal"
 import { PermitTable } from "@/components/permit-log/PermitTable"
 import { PermitCalendar } from "@/components/permit-log/PermitCalendar"
-import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
-import type { Permit, PermitFilters as PermitFiltersType, PermitAnalytics as PermitAnalyticsType } from "@/types/permit-log"
+// Import new components aligned with constraints log
+import { PermitWidgets, type PermitStats } from "@/components/permit-log/PermitWidgets"
+import { HbiPermitInsights } from "@/components/permit-log/HbiPermitInsights"
+import { PermitExportUtils } from "@/components/permit-log/PermitExportUtils"
+import { ExportModal } from "@/components/constraints/ExportModal"
+
+import type { Permit, PermitFilters as PermitFiltersType } from "@/types/permit-log"
 
 // Import mock data
 import permitsData from "@/data/mock/logs/permits.json"
@@ -56,16 +71,11 @@ export default function PermitLogPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
   const [showPermitForm, setShowPermitForm] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
   const [selectedPermit, setSelectedPermit] = useState<Permit | null>(null)
   const [activeTab, setActiveTab] = useState("overview")
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Reference to the app header for sticky positioning
-  const appHeaderRef = useRef<HTMLElement | null>(null)
-  const [headerHeight, setHeaderHeight] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Load permits data
   useEffect(() => {
@@ -96,24 +106,6 @@ export default function PermitLogPage() {
 
     loadPermits()
   }, [toast])
-
-  // Set up header height tracking for sticky positioning
-  useEffect(() => {
-    const header = document.querySelector("header") || document.querySelector('[data-app-header]')
-    if (header) {
-      appHeaderRef.current = header as HTMLElement
-      setHeaderHeight(header.getBoundingClientRect().height)
-    }
-
-    const handleResize = () => {
-      if (appHeaderRef.current) {
-        setHeaderHeight(appHeaderRef.current.getBoundingClientRect().height)
-      }
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
 
   // Role-based access control
   const hasCreateAccess = useMemo(() => {
@@ -208,8 +200,8 @@ export default function PermitLogPage() {
     setFilteredPermits(filtered)
   }, [accessiblePermits, filters, searchTerm])
 
-  // Calculate summary metrics
-  const metrics = useMemo(() => {
+  // Calculate statistics
+  const stats = useMemo((): PermitStats => {
     const totalPermits = filteredPermits.length
     const approvedPermits = filteredPermits.filter((p) => p.status === "approved" || p.status === "renewed").length
     const pendingPermits = filteredPermits.filter((p) => p.status === "pending").length
@@ -240,96 +232,39 @@ export default function PermitLogPage() {
       return expDate <= thirtyDaysFromNow && expDate > new Date() && (p.status === "approved" || p.status === "renewed")
     }).length
 
+    const byType = filteredPermits.reduce((acc, permit) => {
+      acc[permit.type] = (acc[permit.type] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    const byAuthority = filteredPermits.reduce((acc, permit) => {
+      acc[permit.authority] = (acc[permit.authority] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    const byStatus = filteredPermits.reduce((acc, permit) => {
+      acc[permit.status] = (acc[permit.status] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
     return {
       totalPermits,
       approvedPermits,
       pendingPermits,
       expiredPermits,
       rejectedPermits,
+      expiringPermits,
       totalInspections,
       passedInspections,
       failedInspections,
       pendingInspections,
       approvalRate,
       inspectionPassRate,
-      expiringPermits,
+      byType,
+      byAuthority,
+      byStatus,
     }
   }, [filteredPermits])
-
-  // Generate permit-specific insights
-  const generatePermitInsights = useCallback(() => {
-    const insights = []
-
-    if (metrics.expiringPermits > 0) {
-      insights.push({
-        id: "permit-expiring",
-        type: "alert" as const,
-        severity: "high" as const,
-        title: "Permits Expiring Soon",
-        text: `${metrics.expiringPermits} permits will expire within 30 days, requiring immediate renewal action.`,
-        action: "Schedule renewal meetings with permit authorities and prepare required documentation.",
-        confidence: 95,
-        relatedMetrics: ["Permit Renewals", "Authority Relations", "Compliance Timeline"],
-      })
-    }
-
-    if (metrics.approvalRate < 85 && metrics.totalPermits > 0) {
-      insights.push({
-        id: "approval-rate-risk",
-        type: "risk" as const,
-        severity: "medium" as const,
-        title: "Below Average Approval Rate",
-        text: `Current approval rate of ${Math.round(metrics.approvalRate)}% is below industry standard of 85%.`,
-        action: "Review application processes and strengthen relationships with permit authorities.",
-        confidence: 88,
-        relatedMetrics: ["Application Quality", "Authority Relations", "Process Efficiency"],
-      })
-    }
-
-    if (metrics.inspectionPassRate < 90 && metrics.totalInspections > 0) {
-      insights.push({
-        id: "inspection-improvement",
-        type: "opportunity" as const,
-        severity: "medium" as const,
-        title: "Inspection Pass Rate Optimization",
-        text: `${Math.round(metrics.inspectionPassRate)}% pass rate indicates potential for quality improvements.`,
-        action: "Implement pre-inspection checklists and enhanced quality control measures.",
-        confidence: 82,
-        relatedMetrics: ["Quality Control", "Inspection Results", "Compliance Score"],
-      })
-    }
-
-    if (metrics.pendingPermits > 3) {
-      insights.push({
-        id: "permit-backlog",
-        type: "performance" as const,
-        severity: "medium" as const,
-        title: "Permit Processing Backlog",
-        text: `${metrics.pendingPermits} permits are currently pending approval, indicating potential delays.`,
-        action: "Prioritize follow-up communications and consider expedited processing options.",
-        confidence: 90,
-        relatedMetrics: ["Processing Time", "Authority Response", "Project Timeline"],
-      })
-    }
-
-    if (metrics.totalPermits > 5) {
-      const avgCost = filteredPermits.reduce((sum, p) => sum + (p.cost || 0), 0) / filteredPermits.length
-      if (avgCost > 5000) {
-        insights.push({
-          id: "cost-optimization",
-          type: "opportunity" as const,
-          severity: "low" as const,
-          title: "Permit Cost Optimization",
-          text: `Average permit cost of $${Math.round(avgCost).toLocaleString()} suggests potential for bulk processing savings.`,
-          action: "Explore bulk permit applications and negotiate volume discounts with authorities.",
-          confidence: 75,
-          relatedMetrics: ["Permit Costs", "Budget Management", "Process Efficiency"],
-        })
-      }
-    }
-
-    return insights
-  }, [metrics, filteredPermits])
 
   // Event handlers
   const handleCreatePermit = useCallback(() => {
@@ -401,568 +336,424 @@ export default function PermitLogPage() {
     setSearchTerm("")
   }, [])
 
-  const getActiveFilterCount = useCallback(() => {
-    let count = 0
-    if (filters.status) count++
-    if (filters.type) count++
-    if (filters.authority) count++
-    if (filters.projectId) count++
-    if (filters.dateRange) count++
-    if (filters.expiringWithin) count++
-    if (searchTerm) count++
-    return count
-  }, [filters, searchTerm])
-
-  const handleRefresh = useCallback(() => {
+  // Handle refresh
+  const handleRefresh = () => {
     setIsLoading(true)
-    // Simulate refresh delay
     setTimeout(() => {
       setIsLoading(false)
       toast({
-        title: "Success",
-        description: "Permit data refreshed",
+        title: "Data Refreshed",
+        description: "Permit data has been updated",
       })
     }, 1000)
-  }, [toast])
-
-  if (isFullScreen) {
-    return (
-      <div className="fixed inset-0 z-[130] bg-background">
-        <div className="h-full flex flex-col">
-          <div className="flex-shrink-0 p-4 border-b">
-            <Button onClick={() => setIsFullScreen(false)}>
-              <Minimize className="h-4 w-4 mr-2" />
-              Exit Full Screen
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            {/* Full screen content would go here */}
-          </div>
-        </div>
-      </div>
-    )
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
+  // Handle export
+  const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string; filePath: string }) => {
+    try {
+      const projectName = selectedProject?.name || "All Projects"
       
-      {/* Page Title Container - Sticky */}
-      <div
-        className="sticky z-40 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 border-b border-blue-200 dark:border-slate-700 shadow-sm"
-        style={{ top: `${headerHeight}px` }}
-        data-tour="permit-log-page-header"
-      >
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Permit Log & Tracking
-              </h1>
-              <p className="text-lg text-blue-700 dark:text-blue-300">
-                Comprehensive permit management and inspection tracking system
-              </p>
-            </div>
-                        <div className="flex items-center space-x-3" data-tour="permit-log-scope-badges">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isLoading}
-                className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
+      switch (options.format) {
+        case "pdf":
+          PermitExportUtils.exportToPDF(filteredPermits, stats, projectName, options.fileName)
+          break
+        case "excel":
+          PermitExportUtils.exportToExcel(filteredPermits, stats, projectName, options.fileName)
+          break
+        case "csv":
+          PermitExportUtils.exportToCSV(filteredPermits, projectName, options.fileName)
+          break
+      }
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-                {getActiveFilterCount() > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {getActiveFilterCount()}
-                  </Badge>
-                )}
-              </Button>
+      toast({
+        title: "Export Started",
+        description: `Permit data exported to ${options.format.toUpperCase()}`,
+      })
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the data",
+        variant: "destructive",
+      })
+    }
+  }
 
-              {hasExportAccess && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowExportModal(true)}
-                  className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              )}
+  // Toggle fullscreen
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
 
-              <Sheet open={showSettings} onOpenChange={setShowSettings}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Permit Log Settings</SheetTitle>
-                    <SheetDescription>Configure your permit tracking preferences</SheetDescription>
-                  </SheetHeader>
-                  <div className="py-6">
-                    <p className="text-sm text-muted-foreground">Settings panel content would go here...</p>
-                  </div>
-                </SheetContent>
-              </Sheet>
+  // Handle escape key to exit fullscreen
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullScreen) {
+        setIsFullScreen(false)
+      }
+    }
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsFullScreen(!isFullScreen)}
-                className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-              >
-                <Maximize className="h-4 w-4 mr-2" />
-                Full Screen
-              </Button>
+    document.addEventListener("keydown", handleEscape)
+    return () => document.removeEventListener("keydown", handleEscape)
+  }, [isFullScreen])
 
-              {hasCreateAccess && (
-                <Button 
-                  size="sm" 
-                  onClick={handleCreatePermit} 
-                  className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Permit
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+  // Get role-specific project scope description
+  const getProjectScopeDescription = () => {
+    if (!user) return "All Projects"
+    
+    switch (user.role) {
+      case "project-manager":
+        return "Single Project View"
+      case "project-executive":
+        return "Portfolio View (6 Projects)"
+      default:
+        return "Enterprise View (All Projects)"
+    }
+  }
 
-      {/* Page Content Container */}
-      <div className="h-full overflow-y-auto">
-        <div className="p-6 space-y-6">
-          {isLoading ? (
-            // Loading skeletons
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <Card>
-                    <CardHeader>
-                      <Skeleton className="h-6 w-32" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <Skeleton className="h-32 w-full" />
-                        <div className="grid grid-cols-4 gap-4">
-                          <Skeleton className="h-16" />
-                          <Skeleton className="h-16" />
-                          <Skeleton className="h-16" />
-                          <Skeleton className="h-16" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div>
-                  <Card>
-                    <CardHeader>
-                      <Skeleton className="h-6 w-32" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
+  const PermitContentCard = () => (
+    <Card className={isFullScreen ? "fixed inset-0 z-[130] rounded-none" : ""}>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-[#003087] dark:text-blue-400" />
+          Permit Management
+        </CardTitle>
+        <Button variant="outline" size="sm" onClick={toggleFullScreen} className="flex items-center gap-2">
+          {isFullScreen ? (
+            <>
+              <Minimize className="h-4 w-4" />
+              Exit Full Screen
+            </>
           ) : (
             <>
-              {/* Analytics Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" data-tour="permit-log-quick-stats">
-                <div className="lg:col-span-2">
-                  <PermitAnalytics permits={filteredPermits} />
+              <Maximize className="h-4 w-4" />
+              Full Screen
+            </>
+          )}
+        </Button>
+      </CardHeader>
+      <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-background shadow-sm" data-tour="permit-tabs">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="permits" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Permits</span>
+            </TabsTrigger>
+            <TabsTrigger value="inspections" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <CheckCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Inspections</span>
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <CalendarDays className="h-4 w-4" />
+              <span className="hidden sm:inline">Calendar</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Reports</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="mt-6">
+            <div className="space-y-6">
+              <PermitTable
+                permits={filteredPermits.slice(0, 10)}
+                onEdit={handleEditPermit}
+                onView={handleViewPermit}
+                onExport={handleExportPermit}
+                userRole={user?.role}
+                compact={true}
+              />
+            </div>
+          </TabsContent>
+
+          {/* Permits Tab */}
+          <TabsContent value="permits" className="mt-6">
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Permit Management</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    View and manage all construction permits and their details
+                  </p>
                 </div>
-                <div data-tour="overview-hbi-insights">
-                  <EnhancedHBIInsights config={generatePermitInsights()} cardId="permit-insights" />
+                <div className="flex items-center space-x-3">
+                  {hasCreateAccess && (
+                    <Button
+                      size="sm"
+                      onClick={handleCreatePermit}
+                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Permit
+                    </Button>
+                  )}
+                  {hasExportAccess && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowExportModal(true)}
+                      className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Export All
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div data-tour="permits-table">
+              <PermitTable
+                permits={filteredPermits}
+                onEdit={handleEditPermit}
+                onView={handleViewPermit}
+                onExport={handleExportPermit}
+                userRole={user?.role}
+              />
+            </div>
+          </TabsContent>
+
+          {/* Inspections Tab */}
+          <TabsContent value="inspections" className="mt-6">
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Inspection Management</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Track inspection schedules, results, and compliance scores
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  {hasExportAccess && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowExportModal(true)}
+                      className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Inspections
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div data-tour="inspections-scheduling">
+              <PermitTable
+                permits={filteredPermits}
+                onEdit={handleEditPermit}
+                onView={handleViewPermit}
+                onExport={handleExportPermit}
+                userRole={user?.role}
+                showInspections={true}
+              />
+            </div>
+          </TabsContent>
+
+          {/* Calendar Tab */}
+          <TabsContent value="calendar" className="mt-6">
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Permit & Inspection Calendar</h2>
+              <p className="text-sm text-muted-foreground mt-1">Visual timeline of permits and inspections</p>
+            </div>
+            <div data-tour="calendar-events">
+              <PermitCalendar
+                permits={filteredPermits}
+                onEditPermit={handleEditPermit}
+                onViewPermit={handleViewPermit}
+                onCreatePermit={handleCreatePermit}
+                userRole={user?.role}
+              />
+            </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="mt-6">
+            <div data-tour="analytics-charts">
+              <PermitAnalytics permits={filteredPermits} detailed={true} />
+            </div>
+          </TabsContent>
+
+          {/* Reports Tab */}
+          <TabsContent value="reports" className="mt-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Export Reports</h2>
+              <p className="text-sm text-muted-foreground mt-1">Generate comprehensive permit and inspection reports</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="reports-templates">
+              <Button
+                variant="outline"
+                className="h-24 flex flex-col items-center justify-center space-y-2"
+                onClick={() => setShowExportModal(true)}
+              >
+                <FileText className="h-8 w-8 text-[#003087] dark:text-blue-400" />
+                <span>Permit Summary</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-24 flex flex-col items-center justify-center space-y-2"
+                onClick={() => setShowExportModal(true)}
+              >
+                <BarChart3 className="h-8 w-8 text-[#003087] dark:text-blue-400" />
+                <span>Analytics Report</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-24 flex flex-col items-center justify-center space-y-2"
+                onClick={() => setShowExportModal(true)}
+              >
+                <CalendarDays className="h-8 w-8 text-[#003087] dark:text-blue-400" />
+                <span>Inspection Log</span>
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  )
+
+  return (
+    <>
+      <AppHeader />
+      <div className="space-y-6 p-6">
+        {!isFullScreen && (
+          <>
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                    <Home className="h-3 w-3" />
+                    Dashboard
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Permit Log</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
+            {/* Header Section */}
+            <div className="flex flex-col gap-4" data-tour="permit-log-page-header">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Permit Log</h1>
+                  <p className="text-muted-foreground mt-1">Track and manage construction permits and inspections</p>
+                  <div className="flex items-center gap-4 mt-2" data-tour="permit-log-scope-badges">
+                    <Badge variant="outline" className="px-3 py-1">
+                      {getProjectScopeDescription()}
+                    </Badge>
+                    <Badge variant="secondary" className="px-3 py-1">
+                      {stats.totalPermits} Total Permits
+                    </Badge>
+                    <Badge variant="secondary" className="px-3 py-1">
+                      {stats.approvalRate.toFixed(1)}% Approval Rate
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowExportModal(true)}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                  {hasCreateAccess && (
+                    <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Permit
+                    </Button>
+                  )}
                 </div>
               </div>
 
-              {/* Filters Section */}
-              {showFilters && (
-                <Card data-tour="permits-filters">
-                  <CardContent className="p-6">
-                    <PermitFilters
-                      filters={filters}
-                      onFiltersChange={setFilters}
-                      onClose={() => setShowFilters(false)}
-                      searchTerm={searchTerm}
-                      onSearchChange={setSearchTerm}
-                    />
-                  </CardContent>
-                </Card>
-              )}
+              {/* Statistics Widgets */}
+              <div data-tour="permit-log-quick-stats">
+                <PermitWidgets stats={stats} />
+              </div>
+            </div>
 
-              {/* Active Filters Display */}
-              {getActiveFilterCount() > 0 && (
-                <div className="bg-blue-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-600 rounded-lg px-6 py-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-[#003087] dark:text-blue-400">Active Filters:</span>
-                      <div className="flex flex-wrap gap-2">
-                        {searchTerm && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            Search: {searchTerm}
-                          </Badge>
-                        )}
-                        {filters.status && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            Status: {filters.status}
-                          </Badge>
-                        )}
-                        {filters.type && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            Type: {filters.type}
-                          </Badge>
-                        )}
-                        {filters.authority && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            Authority: {filters.authority}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleClearFilters}
-                      className="text-[#003087] hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-slate-700"
-                    >
-                      Clear All
-                    </Button>
+            {/* HBI Insights Panel */}
+            <div data-tour="permit-log-hbi-insights">
+              <HbiPermitInsights permits={filteredPermits} stats={stats} />
+            </div>
+          </>
+        )}
+
+        {/* Main Content */}
+        <PermitContentCard />
+
+        {/* Create/Edit Permit Modal */}
+        {showPermitForm && (
+          <Dialog open={showPermitForm} onOpenChange={setShowPermitForm}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{selectedPermit ? "Edit Permit" : "Create New Permit"}</DialogTitle>
+              </DialogHeader>
+              <PermitForm
+                permit={selectedPermit}
+                onSubmit={handleSavePermit}
+                onCancel={() => setShowPermitForm(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Export Modal */}
+        <div data-tour="permit-export">
+          <ExportModal
+            open={showExportModal}
+            onOpenChange={setShowExportModal}
+            onExport={handleExportSubmit}
+            defaultFileName="PermitLogData"
+          />
+        </div>
+
+        {/* Help & Support Section */}
+        {!isFullScreen && (
+          <Card className="mt-8 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
+                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Permit Management Help</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                    Access comprehensive tools for managing construction permits, inspections, and compliance with AI-powered insights.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                      Permit Applications
+                    </Badge>
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                      Inspection Scheduling
+                    </Badge>
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                      Compliance Tracking
+                    </Badge>
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                      Authority Relations
+                    </Badge>
+                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                      HBI Insights
+                    </Badge>
                   </div>
                 </div>
-              )}
-
-              {/* Tabs Container */}
-              <Card>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <div className="border-b">
-                    <TabsList className="grid w-full grid-cols-6 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700" data-tour="permit-log-tabs">
-                      <TabsTrigger
-                        value="overview"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="overview-tab"
-                      >
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Overview
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="permits"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="permits-tab"
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        Permits ({metrics.totalPermits})
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="inspections"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="inspections-tab"
-                      >
-                        <Users className="h-4 w-4 mr-2" />
-                        Inspections ({metrics.totalInspections})
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="calendar"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="calendar-tab"
-                      >
-                        <CalendarDays className="h-4 w-4 mr-2" />
-                        Calendar
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="analytics"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="analytics-tab"
-                      >
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Analytics
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="reports"
-                        className="data-[state=active]:bg-[#003087] data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-                        data-tour="reports-tab"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Reports
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  {/* Overview Tab */}
-                  <TabsContent value="overview" className="mt-0">
-                    <div className="p-6 space-y-6">
-                      {/* Summary Cards */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-tour="overview-key-metrics">
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Approval Rate</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold text-[#003087] dark:text-blue-400">
-                              {Math.round(metrics.approvalRate)}%
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {metrics.approvedPermits} of {metrics.totalPermits} permits
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Inspection Pass Rate</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold text-green-600">
-                              {Math.round(metrics.inspectionPassRate)}%
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {metrics.passedInspections} of {metrics.totalInspections} inspections
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Actions</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold text-yellow-600">
-                              {metrics.pendingPermits + metrics.pendingInspections}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {metrics.pendingPermits} permits, {metrics.pendingInspections} inspections
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Expiring Soon</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold text-orange-600">{metrics.expiringPermits}</div>
-                            <p className="text-xs text-muted-foreground mt-1">Within 30 days</p>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      {/* Permit Table */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-[#003087] dark:text-blue-400">Recent Permit Activity</CardTitle>
-                          <CardDescription>Latest updates and changes</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <PermitTable
-                            permits={filteredPermits.slice(0, 10)}
-                            onEdit={handleEditPermit}
-                            onView={handleViewPermit}
-                            onExport={handleExportPermit}
-                            userRole={user?.role}
-                            compact={true}
-                          />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </TabsContent>
-
-                  {/* Permits Tab */}
-                  <TabsContent value="permits" className="mt-0">
-                    <CardContent className="p-6">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Permit Management</h2>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              View and manage all construction permits and their details
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            {hasCreateAccess && (
-                              <Button
-                                size="sm"
-                                onClick={handleCreatePermit}
-                                className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
-                              >
-                                <Plus className="h-4 w-4 mr-2" />
-                                New Permit
-                              </Button>
-                            )}
-                            {hasExportAccess && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setShowExportModal(true)}
-                                className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Export All
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div data-tour="permits-table">
-                        <PermitTable
-                          permits={filteredPermits}
-                          onEdit={handleEditPermit}
-                          onView={handleViewPermit}
-                          onExport={handleExportPermit}
-                          userRole={user?.role}
-                        />
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-
-                  {/* Inspections Tab */}
-                  <TabsContent value="inspections" className="mt-0">
-                    <CardContent className="p-6">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Inspection Management</h2>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Track inspection schedules, results, and compliance scores
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            {hasExportAccess && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setShowExportModal(true)}
-                                className="border-[#003087] text-[#003087] hover:bg-[#003087] hover:text-white dark:border-blue-400 dark:text-blue-400"
-                              >
-                                <Download className="h-4 w-4 mr-2" />
-                                Export Inspections
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div data-tour="inspections-scheduling">
-                        <PermitTable
-                          permits={filteredPermits}
-                          onEdit={handleEditPermit}
-                          onView={handleViewPermit}
-                          onExport={handleExportPermit}
-                          userRole={user?.role}
-                          showInspections={true}
-                        />
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-
-                  {/* Calendar Tab */}
-                  <TabsContent value="calendar" className="mt-0">
-                    <CardContent className="p-6">
-                      <div className="mb-4">
-                        <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Permit & Inspection Calendar</h2>
-                        <p className="text-sm text-muted-foreground mt-1">Visual timeline of permits and inspections</p>
-                      </div>
-                      <div data-tour="calendar-events">
-                        <PermitCalendar
-                          permits={filteredPermits}
-                          onEditPermit={handleEditPermit}
-                          onViewPermit={handleViewPermit}
-                          onCreatePermit={handleCreatePermit}
-                          userRole={user?.role}
-                        />
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-
-                  {/* Analytics Tab */}
-                  <TabsContent value="analytics" className="mt-0">
-                    <CardContent className="p-6">
-                      <div data-tour="analytics-charts">
-                        <PermitAnalytics permits={filteredPermits} detailed={true} />
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-
-                  {/* Reports Tab */}
-                  <TabsContent value="reports" className="mt-0">
-                    <CardContent className="p-6">
-                      <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Export Reports</h2>
-                        <p className="text-sm text-muted-foreground mt-1">Generate comprehensive permit and inspection reports</p>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-tour="reports-templates">
-                        <Button
-                          variant="outline"
-                          className="h-24 flex flex-col items-center justify-center space-y-2"
-                          onClick={() => setShowExportModal(true)}
-                        >
-                          <FileText className="h-8 w-8 text-[#003087] dark:text-blue-400" />
-                          <span>Permit Summary</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="h-24 flex flex-col items-center justify-center space-y-2"
-                          onClick={() => setShowExportModal(true)}
-                        >
-                          <BarChart3 className="h-8 w-8 text-[#003087] dark:text-blue-400" />
-                          <span>Analytics Report</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="h-24 flex flex-col items-center justify-center space-y-2"
-                          onClick={() => setShowExportModal(true)}
-                        >
-                          <CalendarDays className="h-8 w-8 text-[#003087] dark:text-blue-400" />
-                          <span>Inspection Log</span>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-                </Tabs>
-              </Card>
-            </>
-          )}
-        </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
-
-      {/* Modals */}
-      {showExportModal && hasExportAccess && (
-        <PermitExportModal permits={filteredPermits} onClose={() => setShowExportModal(false)} />
-      )}
-
-      {showPermitForm && hasCreateAccess && (
-        <PermitForm 
-          permit={selectedPermit} 
-          open={showPermitForm}
-          onSave={handleSavePermit} 
-          onClose={() => setShowPermitForm(false)}
-          userRole={user?.role}
-        />
-      )}
-    </div>
+    </>
   )
 } 
