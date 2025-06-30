@@ -281,46 +281,43 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            Staff Management
-            <Badge variant="outline" className="ml-2">
-              {ganttItems.length} assignments
-            </Badge>
-          </CardTitle>
-          
-          <div className="flex items-center gap-2">
-            <Select value={ganttViewMode} onValueChange={(value: any) => setGanttViewMode(value)}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">Weekly</SelectItem>
-                <SelectItem value="month">Monthly</SelectItem>
-                <SelectItem value="quarter">Quarterly</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {userRole === 'executive' && (
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                  <FileText className="h-4 w-4 mr-1" />
-                  PDF
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleExportExcel}>
-                  <Download className="h-4 w-4 mr-1" />
-                  Excel
-                </Button>
-              </div>
-            )}
-          </div>
+    <div className="w-full space-y-6">
+      {/* Header with Title and Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Staff Management</h3>
+          <Badge variant="outline" className="ml-2">
+            {ganttItems.length} assignments
+          </Badge>
         </div>
-      </CardHeader>
-
-      <CardContent>
+        
+        <div className="flex items-center gap-2">
+          <Select value={ganttViewMode} onValueChange={(value: any) => setGanttViewMode(value)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Weekly</SelectItem>
+              <SelectItem value="month">Monthly</SelectItem>
+              <SelectItem value="quarter">Quarterly</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {userRole === 'executive' && (
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <FileText className="h-4 w-4 mr-1" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                <Download className="h-4 w-4 mr-1" />
+                Excel
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
         {/* Filters */}
         <div className="flex items-center gap-4 mb-6 p-4 bg-muted/50 rounded-lg">
           <div className="flex items-center gap-2">
@@ -527,7 +524,6 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             <div className="text-xs">Try adjusting your filters</div>
           </div>
         )}
-      </CardContent>
 
       {/* Annotation Modal */}
       <Dialog open={annotationModal.isOpen} onOpenChange={(open) => setAnnotationModal(prev => ({ ...prev, isOpen: open }))}>
@@ -565,6 +561,6 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
           </div>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   )
 } 
