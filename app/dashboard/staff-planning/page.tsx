@@ -1,24 +1,51 @@
 'use client'
 
+import React, { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '@/context/auth-context'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
-import { Users, Calendar, AlertTriangle, TrendingUp, Building2, FileText, CheckCircle2, Clock } from 'lucide-react'
 import { AppHeader } from '@/components/layout/app-header'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { 
+  Users, 
+  Calendar, 
+  AlertTriangle, 
+  TrendingUp, 
+  Building2, 
+  FileText, 
+  CheckCircle2, 
+  Clock,
+  Home,
+  RefreshCw,
+  Download,
+  Plus,
+  DollarSign,
+  BarChart3
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 // Import role-specific components
 import { ExecutiveStaffingView } from '@/components/staffing/ExecutiveStaffingView'
 import { ProjectExecutiveStaffingView } from '@/components/staffing/ProjectExecutiveStaffingView'
 import { ProjectManagerStaffingView } from '@/components/staffing/ProjectManagerStaffingView'
 
-// Import shared components
-import { StaffingOverview } from '@/components/staffing/StaffingOverview'
-import { SpcrManagement } from '@/components/staffing/SpcrManagement'
-
+// Import mock data for statistics
+import staffingData from '@/data/mock/staffing/staffing.json'
+import projectsData from '@/data/mock/projects.json'
+import spcrData from '@/data/mock/staffing/spcr.json'
 
 export default function StaffPlanningPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!user) {
     return (
@@ -31,211 +58,312 @@ export default function StaffPlanningPage() {
     )
   }
 
+  // Calculate role-specific statistics
+  const stats = useMemo(() => {
+    const totalStaff = staffingData.length
+    const assignedStaff = staffingData.filter(staff => staff.assignments && staff.assignments.length > 0).length
+    const utilization = totalStaff > 0 ? (assignedStaff / totalStaff) * 100 : 0
+    
+    const totalLaborCost = staffingData.reduce((sum, staff) => sum + (staff.laborRate || 0), 0)
+    const monthlyLaborCost = totalLaborCost * 40 * 4.33 // Weekly to monthly
+    
+    const pendingSpcrs = spcrData.filter(spcr => spcr.status === 'submitted').length
+    const approvedSpcrs = spcrData.filter(spcr => spcr.status === 'approved').length
+    
+    // Role-specific project counts
+    let projectCount = 0
+    let projectScope = "All Projects"
+    
+    switch (user.role) {
+      case 'executive':
+        projectCount = projectsData.length
+        projectScope = "Enterprise View"
+        break
+      case 'project-executive':
+        projectCount = 6
+        projectScope = "Portfolio View"
+        break
+      case 'project-manager':
+        projectCount = 1
+        projectScope = "Single Project"
+        break
+      default:
+        projectCount = projectsData.length
+        projectScope = "All Projects"
+    }
+
+    return {
+      totalStaff,
+      assignedStaff,
+      utilization,
+      monthlyLaborCost,
+      pendingSpcrs,
+      approvedSpcrs,
+      projectCount,
+      projectScope
+    }
+  }, [user.role, staffingData, spcrData, projectsData])
+
   const getPageTitle = () => {
     switch (user.role) {
       case 'executive':
-        return 'Global Staffing Management'
+        return 'Enterprise Staffing Management'
       case 'project-executive':
         return 'Portfolio Staffing Dashboard'
       case 'project-manager':
-        return 'Project Staffing Management'
+        return 'Project Team Management'
       default:
-        return 'Staffing Management'
+        return 'Staff Planning'
     }
   }
 
   const getPageDescription = () => {
     switch (user.role) {
       case 'executive':
-        return 'Comprehensive staffing oversight across all projects and resources'
+        return 'Comprehensive staffing oversight across all projects and resources with strategic planning capabilities'
       case 'project-executive':
-        return 'Manage staffing for your portfolio of projects with performance analytics'
+        return 'Manage staffing for your portfolio of projects with performance analytics and resource optimization'
       case 'project-manager':
-        return 'Detailed team management for your assigned project with responsibility tracking'
+        return 'Detailed team management for your assigned project with responsibility tracking and SPCR workflows'
       default:
-        return 'Staff planning and resource management'
+        return 'Staff planning and resource management system'
     }
   }
 
   const getRoleBadge = () => {
     switch (user.role) {
       case 'executive':
-        return <Badge variant="default" className="bg-purple-500">Executive</Badge>
+        return <Badge variant="default" className="bg-purple-600 hover:bg-purple-700">Executive</Badge>
       case 'project-executive':
-        return <Badge variant="default" className="bg-blue-500">Project Executive</Badge>
+        return <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">Project Executive</Badge>
       case 'project-manager':
-        return <Badge variant="default" className="bg-green-500">Project Manager</Badge>
+        return <Badge variant="default" className="bg-green-600 hover:bg-green-700">Project Manager</Badge>
       default:
         return <Badge variant="outline">{user.role}</Badge>
     }
   }
 
+  // Handle refresh
+  const handleRefresh = () => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Data Refreshed",
+        description: "Staffing data has been updated",
+      })
+    }, 1000)
+  }
+
+  // Handle export
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Staffing report is being prepared",
+    })
+  }
+
+  // Handle create SPCR
+  const handleCreateSpcr = () => {
+    toast({
+      title: "SPCR Creation",
+      description: "Redirecting to SPCR creation form",
+    })
+  }
+
+  // Statistics widgets
+  const StaffingWidgets = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium">Staff Utilization</span>
+          </div>
+          <div className="space-y-1">
+            <div className="text-2xl font-bold">{stats.utilization.toFixed(1)}%</div>
+            <div className="text-xs text-muted-foreground">
+              {stats.assignedStaff} of {stats.totalStaff} assigned
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="h-4 w-4 text-green-600" />
+            <span className="text-sm font-medium">Monthly Labor Cost</span>
+          </div>
+          <div className="space-y-1">
+            <div className="text-2xl font-bold">${(stats.monthlyLaborCost / 1000).toFixed(0)}K</div>
+            <div className="text-xs text-muted-foreground">
+              Including burden & benefits
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 className="h-4 w-4 text-purple-600" />
+            <span className="text-sm font-medium">Project Scope</span>
+          </div>
+          <div className="space-y-1">
+            <div className="text-2xl font-bold">{stats.projectCount}</div>
+            <div className="text-xs text-muted-foreground">
+              {stats.projectScope}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="h-4 w-4 text-orange-600" />
+            <span className="text-sm font-medium">SPCR Status</span>
+          </div>
+          <div className="space-y-1">
+            <div className="text-2xl font-bold">{stats.pendingSpcrs}</div>
+            <div className="text-xs text-muted-foreground">
+              {stats.approvedSpcrs} approved this month
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
   const renderRoleSpecificContent = () => {
     switch (user.role) {
       case 'executive':
-        return (
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="staffing">Staff Management</TabsTrigger>
-              <TabsTrigger value="spcr">SPCR Approvals</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview">
-              <StaffingOverview userRole={user.role} />
-            </TabsContent>
-
-            <TabsContent value="staffing">
-              <ExecutiveStaffingView />
-            </TabsContent>
-
-            <TabsContent value="spcr">
-              <SpcrManagement userRole={user.role} />
-            </TabsContent>
-          </Tabs>
-        )
-
+        return <ExecutiveStaffingView />
       case 'project-executive':
-        return (
-          <Tabs defaultValue="portfolio" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="portfolio">Portfolio Overview</TabsTrigger>
-              <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
-              <TabsTrigger value="spcr">SPCR Management</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="portfolio">
-              <div className="space-y-6">
-                <StaffingOverview userRole={user.role} />
-                <ProjectExecutiveStaffingView />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="analytics">
-              <ProjectExecutiveStaffingView />
-            </TabsContent>
-
-            <TabsContent value="spcr">
-              <SpcrManagement userRole={user.role} />
-            </TabsContent>
-          </Tabs>
-        )
-
+        return <ProjectExecutiveStaffingView />
       case 'project-manager':
-        return (
-          <Tabs defaultValue="team" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="team">Team Management</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="spcr">SPCRs</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="team">
-              <div className="space-y-6">
-                <StaffingOverview userRole={user.role} />
-                <ProjectManagerStaffingView />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="performance">
-              <ProjectManagerStaffingView />
-            </TabsContent>
-
-            <TabsContent value="spcr">
-              <SpcrManagement userRole={user.role} />
-            </TabsContent>
-          </Tabs>
-        )
-
+        return <ProjectManagerStaffingView />
       default:
         return (
-          <div className="space-y-6">
-            <StaffingOverview userRole={user.role} />
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Limited Access</h3>
-                  <p className="text-muted-foreground">
-                    Your current role has limited access to staffing management features. 
-                    Contact your administrator for additional permissions.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">Limited Access</h3>
+                <p className="text-muted-foreground">
+                  Your current role has limited access to staffing management features. 
+                  Contact your administrator for additional permissions.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* App Header */}
+    <>
       <AppHeader />
-      
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Page Header */}
-        <div className="mb-8">
+      <div className="space-y-6 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Dashboard
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Staff Planning</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Header Section */}
+        <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-foreground">{getPageTitle()}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{getPageTitle()}</h1>
+              <p className="text-muted-foreground mt-1">{getPageDescription()}</p>
+              <div className="flex items-center gap-4 mt-2">
                 {getRoleBadge()}
+                <Badge variant="outline" className="px-3 py-1">
+                  {stats.projectScope}
+                </Badge>
+                <Badge variant="secondary" className="px-3 py-1">
+                  {stats.totalStaff} Staff Members
+                </Badge>
               </div>
-              <p className="text-muted-foreground text-lg">{getPageDescription()}</p>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Card className="px-3 py-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium">Logged in as:</span>
-                  <span>{user.firstName} {user.lastName}</span>
-                </div>
-              </Card>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+              <Button variant="outline" onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              {(user.role === 'project-manager' || user.role === 'project-executive') && (
+                <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]" onClick={handleCreateSpcr}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create SPCR
+                </Button>
+              )}
             </div>
           </div>
+
+          {/* Statistics Widgets */}
+          <StaffingWidgets />
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
-          {renderRoleSpecificContent()}
-        </div>
+        {renderRoleSpecificContent()}
 
         {/* Help Section */}
-        <div className="mt-12 border-t pt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Need Help?
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <h4 className="font-medium mb-2">Getting Started</h4>
-                  <p className="text-muted-foreground">
-                    Learn how to use the staffing management features and understand your role-specific capabilities.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">SPCR Process</h4>
-                  <p className="text-muted-foreground">
-                    Understand the Staffing Plan Change Request workflow and approval process.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Support</h4>
-                  <p className="text-muted-foreground">
-                    Contact your system administrator for additional permissions or technical support.
-                  </p>
-                </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Staff Planning Guide
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Resource Planning
+                </h4>
+                <p className="text-muted-foreground">
+                  Optimize staff allocation across projects with data-driven insights and forecasting tools.
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  SPCR Workflow
+                </h4>
+                <p className="text-muted-foreground">
+                  Manage Staffing Plan Change Requests through the approval workflow with automated notifications.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Performance Analytics
+                </h4>
+                <p className="text-muted-foreground">
+                  Track team productivity, utilization rates, and cost management across your project portfolio.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </>
   )
 } 

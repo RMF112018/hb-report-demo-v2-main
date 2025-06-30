@@ -1,39 +1,60 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useAuth } from '@/context/auth-context'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 import { 
   Users, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
   TrendingUp, 
   AlertTriangle, 
   CheckCircle2, 
-  Clock,
   Building2,
   DollarSign,
   Calendar,
   UserCheck,
-  UserX,
-  Edit3,
-  Eye
+  Download,
+  RefreshCw,
+  Home,
+  ChevronDown,
+  ChevronUp,
+  BarChart3,
+  FileText,
+  Maximize,
+  Minimize,
+  Eye,
+  CheckCircle,
+  Clock,
+  XCircle
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+
+// Import components
+import { InteractiveStaffingGantt } from '@/app/dashboard/staff-planning/components/InteractiveStaffingGantt'
+import { EnhancedHBIInsights } from '@/components/cards/EnhancedHBIInsights'
+import { ExportModal } from '@/components/constraints/ExportModal'
 
 // Import mock data
 import staffingData from '@/data/mock/staffing/staffing.json'
 import projectsData from '@/data/mock/projects.json'
 import spcrData from '@/data/mock/staffing/spcr.json'
+import cashFlowData from '@/data/mock/financial/cash-flow.json'
 
+// Types
 interface StaffMember {
   id: string
   name: string
@@ -58,366 +79,429 @@ interface Project {
   active: boolean
 }
 
+interface SPCR {
+  id: string
+  type: string
+  status: 'draft' | 'submitted' | 'approved' | 'rejected'
+  projectId: number
+  position: string
+  requestedBy: string
+  submittedDate: string
+  targetStartDate: string
+  duration: number
+  justification: string
+  comments: Array<{
+    id: string
+    author: string
+    date: string
+    text: string
+  }>
+}
+
 export const ExecutiveStaffingView = () => {
+  const { user } = useAuth()
+  const { toast } = useToast()
+
+  // State management
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
   const [projects, setProjects] = useState<Project[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [positionFilter, setPositionFilter] = useState('all')
-  const [projectFilter, setProjectFilter] = useState('all')
-  const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
-  const [showStaffModal, setShowStaffModal] = useState(false)
+  const [spcrs, setSpcrs] = useState<SPCR[]>([])
+  const [activeTab, setActiveTab] = useState("overview")
+  const [spcrFilter, setSpcrFilter] = useState<'approved' | 'rejected' | 'pending'>('approved')
+  const [isOverviewExpanded, setIsOverviewExpanded] = useState(true)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
+  // Initialize data
   useEffect(() => {
     setStaffMembers(staffingData as StaffMember[])
     setProjects(projectsData as Project[])
+    setSpcrs(spcrData as SPCR[])
   }, [])
 
-  // Get unique positions for filter
-  const positions = useMemo(() => {
-    const uniquePositions = [...new Set(staffMembers.map(staff => staff.position))]
-    return uniquePositions.sort()
-  }, [staffMembers])
-
-  // Filter staff members
-  const filteredStaff = useMemo(() => {
-    return staffMembers.filter(staff => {
-      const matchesSearch = staff.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           staff.position.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      const matchesPosition = positionFilter === 'all' || staff.position === positionFilter
-      
-      const matchesProject = projectFilter === 'all' || 
-                            staff.assignments.some(assignment => 
-                              assignment.project_id.toString() === projectFilter
-                            )
-      
-      return matchesSearch && matchesPosition && matchesProject
-    })
-  }, [staffMembers, searchTerm, positionFilter, projectFilter])
-
-  // Calculate staff analytics
-  const staffAnalytics = useMemo(() => {
+  // Calculate overview analytics
+  const overviewAnalytics = useMemo(() => {
     const totalStaff = staffMembers.length
     const assignedStaff = staffMembers.filter(staff => staff.assignments.length > 0).length
-    const unassignedStaff = totalStaff - assignedStaff
     const utilizationRate = totalStaff > 0 ? (assignedStaff / totalStaff) * 100 : 0
     
+    // Labor cost calculations
     const totalLaborCost = staffMembers.reduce((sum, staff) => sum + staff.laborRate, 0)
-    const avgExperience = staffMembers.reduce((sum, staff) => sum + staff.experience, 0) / totalStaff
+    const weeklyLaborCost = totalLaborCost * 40
+    const monthlyLaborCost = weeklyLaborCost * 4.33
+    const burden = monthlyLaborCost * 0.35 // 35% burden rate
+    const totalMonthlyWithBurden = monthlyLaborCost + burden
     
-    const positionDistribution = staffMembers.reduce((acc, staff) => {
-      acc[staff.position] = (acc[staff.position] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
-
+    // Cash flow inflows (from first project as sample)
+    const firstProject = cashFlowData.projects[0]
+    const totalInflows = firstProject?.cashFlowData?.summary?.totalInflows || 0
+    const lastInflow = firstProject?.cashFlowData?.monthlyData?.[0]?.inflows?.total || 0
+    
+    // SPCR analytics
+    const approvedSpcrs = spcrs.filter(spcr => spcr.status === 'approved').length
+    const pendingSpcrs = spcrs.filter(spcr => spcr.status === 'submitted').length
+    
     return {
       totalStaff,
       assignedStaff,
-      unassignedStaff,
       utilizationRate,
-      totalLaborCost,
-      avgExperience,
-      positionDistribution
+      weeklyLaborCost,
+      monthlyLaborCost: totalMonthlyWithBurden,
+      burden,
+      totalInflows,
+      lastInflow,
+      approvedSpcrs,
+      pendingSpcrs
     }
-  }, [staffMembers])
+  }, [staffMembers, spcrs])
 
-  const getProjectName = (projectId: number) => {
-    const project = projects.find(p => p.project_id === projectId)
-    return project ? project.name : 'Unknown Project'
+  // Filter SPCRs based on selected filter
+  const filteredSpcrs = useMemo(() => {
+    switch (spcrFilter) {
+      case 'approved':
+        return spcrs.filter(spcr => spcr.status === 'approved')
+      case 'rejected':
+        return spcrs.filter(spcr => spcr.status === 'rejected')
+      case 'pending':
+        return spcrs.filter(spcr => spcr.status === 'submitted')
+      default:
+        return spcrs
+    }
+  }, [spcrs, spcrFilter])
+
+  // Handle export
+  const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string; filePath: string }) => {
+    setIsLoading(true)
+    // Simulate export process
+    setTimeout(() => {
+      setIsLoading(false)
+      setIsExportModalOpen(false)
+      toast({
+        title: "Export Successful",
+        description: `Staffing data exported as ${options.format.toUpperCase()}`,
+      })
+    }, 2000)
   }
 
-  const getStaffStatusBadge = (staff: StaffMember) => {
-    if (staff.assignments.length === 0) {
-      return <Badge variant="secondary">Unassigned</Badge>
-    }
-    
-    const activeAssignments = staff.assignments.filter(assignment => {
-      const endDate = new Date(assignment.endDate)
-      return endDate > new Date()
-    })
-    
-    if (activeAssignments.length === 0) {
-      return <Badge variant="outline">Available</Badge>
-    }
-    
-    return <Badge variant="default">Assigned</Badge>
+  // Handle refresh
+  const handleRefresh = () => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Data Refreshed",
+        description: "Staffing data has been updated",
+      })
+    }, 1000)
   }
 
-  const handleReassignStaff = (staff: StaffMember) => {
-    setSelectedStaff(staff)
-    setShowStaffModal(true)
+  // Toggle fullscreen
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen)
+  }
+
+  // HBI Insights config for staffing
+  const staffingInsights = [
+    {
+      id: "staff-1",
+      type: "alert",
+      severity: "high",
+      title: "Critical Staffing Gap",
+      text: "Senior Project Manager shortage across 3 active projects by Q2 2025.",
+      action: "Accelerate hiring or consider contractor augmentation.",
+      confidence: 94,
+      relatedMetrics: ["Staff Utilization", "Project Delivery", "Resource Planning"]
+    },
+    {
+      id: "staff-2",
+      type: "opportunity",
+      severity: "medium", 
+      title: "Cross-Training Opportunity",
+      text: "AI identifies 5 junior staff ready for advanced role transitions.",
+      action: "Implement structured mentoring and certification programs.",
+      confidence: 87,
+      relatedMetrics: ["Career Development", "Skills Matrix", "Knowledge Transfer"]
+    },
+    {
+      id: "staff-3",
+      type: "performance",
+      severity: "low",
+      title: "Utilization Optimization",
+      text: "Current staffing efficiency at 89% - exceeding industry benchmark.",
+      action: "Maintain current allocation strategy and monitor for seasonal adjustments.",
+      confidence: 92,
+      relatedMetrics: ["Utilization Rate", "Productivity", "Cost Control"]
+    }
+  ]
+
+  const getSpcrStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'rejected':
+        return <XCircle className="h-4 w-4 text-red-600" />
+      case 'submitted':
+        return <Clock className="h-4 w-4 text-yellow-600" />
+      default:
+        return <FileText className="h-4 w-4 text-muted-foreground" />
+    }
+  }
+
+  const getSpcrStatusBadge = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <Badge variant="default" className="bg-green-100 text-green-800">Approved</Badge>
+      case 'rejected':
+        return <Badge variant="destructive">Rejected</Badge>
+      case 'submitted':
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Pending</Badge>
+      default:
+        return <Badge variant="outline">Draft</Badge>
+    }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Analytics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Staff Utilization</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Assigned: {staffAnalytics.assignedStaff}</span>
-                <span>Available: {staffAnalytics.unassignedStaff}</span>
-              </div>
-              <Progress value={staffAnalytics.utilizationRate} className="h-2" />
-              <div className="text-xs text-muted-foreground">
-                {staffAnalytics.utilizationRate.toFixed(1)}% utilization rate
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
+      {/* Header with Breadcrumbs */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
+                  <Home className="h-4 w-4" />
+                  Dashboard
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard/staff-planning">Staff Planning</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbPage>Executive View</BreadcrumbPage>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Labor Analytics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Weekly Cost: ${(staffAnalytics.totalLaborCost * 40).toLocaleString()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Avg Experience: {staffAnalytics.avgExperience.toFixed(1)} years</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Position Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              {Object.entries(staffAnalytics.positionDistribution)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 3)
-                .map(([position, count]) => (
-                  <div key={position} className="flex justify-between text-xs">
-                    <span className="truncate">{position}</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoading}
+          >
+            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            Refresh
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsExportModalOpen(true)}
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleFullScreen}
+          >
+            {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
 
-      {/* Staff Management */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Staff Management
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Building2 className="h-4 w-4 mr-1" />
-                Bulk Reassign
-              </Button>
-              <Button variant="outline" size="sm">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                Analytics
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* Filters */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search staff..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-            </div>
-            
-            <Select value={positionFilter} onValueChange={setPositionFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by position" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Positions</SelectItem>
-                {positions.map(position => (
-                  <SelectItem key={position} value={position}>
-                    {position}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* Segmented Control */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="assignments">Assignments</TabsTrigger>
+          <TabsTrigger value="spcr">SPCR Review</TabsTrigger>
+        </TabsList>
 
-            <Select value={projectFilter} onValueChange={setProjectFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by project" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Projects</SelectItem>
-                {projects.filter(p => p.active).map(project => (
-                  <SelectItem key={project.project_id} value={project.project_id.toString()}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Staff Table */}
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Staff Member</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Experience</TableHead>
-                  <TableHead>Current Assignment</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Labor Rate</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredStaff.map((staff) => (
-                  <TableRow key={staff.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback>
-                            {staff.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{staff.name}</div>
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* Overview Collapsible Section */}
+          <Collapsible open={isOverviewExpanded} onOpenChange={setIsOverviewExpanded}>
+            <Card>
+              <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Staffing Overview
+                    </CardTitle>
+                    {isOverviewExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                  </div>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium">Staff Utilization</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold">{overviewAnalytics.utilizationRate.toFixed(1)}%</div>
+                          <Progress value={overviewAnalytics.utilizationRate} className="h-2" />
                           <div className="text-xs text-muted-foreground">
-                            {staff.strengths.slice(0, 2).join(', ')}
+                            {overviewAnalytics.assignedStaff} of {overviewAnalytics.totalStaff} assigned
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{staff.position}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <span>{staff.experience} yrs</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {staff.assignments.length > 0 ? (
-                        <div className="text-sm">
-                          <div className="font-medium">
-                            {getProjectName(staff.assignments[0].project_id)}
-                          </div>
-                          <div className="text-muted-foreground">
-                            {staff.assignments[0].role}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">Unassigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {getStaffStatusBadge(staff)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div>${staff.laborRate}/hr</div>
-                        <div className="text-muted-foreground text-xs">
-                          Bill: ${staff.billableRate}/hr
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleReassignStaff(staff)}
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                      </CardContent>
+                    </Card>
 
-      {/* Staff Assignment Modal */}
-      <Dialog open={showStaffModal} onOpenChange={setShowStaffModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Reassign Staff Member</DialogTitle>
-          </DialogHeader>
-          {selectedStaff && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarFallback>
-                    {selectedStaff.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">{selectedStaff.name}</div>
-                  <div className="text-sm text-muted-foreground">{selectedStaff.position}</div>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium">New Project</label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select project" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {projects.filter(p => p.active).map(project => (
-                        <SelectItem key={project.project_id} value={project.project_id.toString()}>
-                          {project.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium">Role</label>
-                  <Input placeholder="e.g., Project Manager" />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-sm font-medium">Start Date</label>
-                    <Input type="date" />
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DollarSign className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium">Monthly Labor Cost</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">${(overviewAnalytics.monthlyLaborCost / 1000).toFixed(0)}K</div>
+                          <div className="text-xs text-muted-foreground">
+                            +${(overviewAnalytics.burden / 1000).toFixed(0)}K burden
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="h-4 w-4 text-purple-600" />
+                          <span className="text-sm font-medium">Cash Inflow</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">${(overviewAnalytics.totalInflows / 1000000).toFixed(1)}M</div>
+                          <div className="text-xs text-muted-foreground">
+                            Last: ${(overviewAnalytics.lastInflow / 1000).toFixed(0)}K
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="h-4 w-4 text-orange-600" />
+                          <span className="text-sm font-medium">SPCR Status</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">{overviewAnalytics.approvedSpcrs}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {overviewAnalytics.pendingSpcrs} pending review
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
+
+                  {/* HBI Insights */}
                   <div>
-                    <label className="text-sm font-medium">End Date</label>
-                    <Input type="date" />
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-blue-600" />
+                      HBI Staffing Insights
+                    </h3>
+                    <EnhancedHBIInsights config={staffingInsights} cardId="staffing-executive" />
                   </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        </TabsContent>
+
+        {/* Assignments Tab */}
+        <TabsContent value="assignments" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Interactive Staffing Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InteractiveStaffingGantt />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SPCR Review Tab */}
+        <TabsContent value="spcr" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Staff Planning Change Requests (SPCR)
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Tabs value={spcrFilter} onValueChange={(value: any) => setSpcrFilter(value)} className="w-auto">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="approved">Approved</TabsTrigger>
+                      <TabsTrigger value="pending">Pending</TabsTrigger>
+                      <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowStaffModal(false)}>
-                  Cancel
-                </Button>
-                <Button>
-                  Assign
-                </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredSpcrs.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No {spcrFilter} SPCRs found
+                  </div>
+                ) : (
+                  filteredSpcrs.map((spcr) => (
+                    <Card key={spcr.id} className="border-l-4 border-l-blue-500">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              {getSpcrStatusIcon(spcr.status)}
+                              <span className="font-medium">{spcr.type}</span>
+                              {getSpcrStatusBadge(spcr.status)}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              <div>Position: {spcr.position}</div>
+                              <div>Requested by: {spcr.requestedBy}</div>
+                              <div>Target Start: {new Date(spcr.targetStartDate).toLocaleDateString()}</div>
+                              <div>Duration: {spcr.duration} weeks</div>
+                            </div>
+                            <div className="text-sm">
+                              <strong>Justification:</strong> {spcr.justification}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={isExportModalOpen}
+        onOpenChange={setIsExportModalOpen}
+        onExport={handleExportSubmit}
+        defaultFileName="staffing-export"
+      />
     </div>
   )
 } 

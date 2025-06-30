@@ -1,0 +1,124 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🧠 Cursor Rules: Enhanced Financial Hub (Budget, Cash Flow, Forecasting, Change Orders, Retention)
+
+---
+
+## 🎯 GOALS
+
+- Modernize and unify the user experience across all Financial Hub modules
+- Standardize layout, interactions, and component controls
+- Improve data presentation clarity and reporting utility
+- Refactor existing files — **no new routes are to be created**
+- Ensure compatibility with Tailwind, shadcn/ui, dark/light themes
+
+---
+
+## 🧱 GLOBAL LAYOUT EXPECTATIONS
+
+- Refactor all financial hub modules to:
+  - Match layout structure of `app/dashboard/constraints-log/page.tsx`
+  - Collapse all KPI card containers and HBI insights panels
+  - Include full-screen toggle on all core modules:
+    - Budget Analysis
+    - Cash Flow
+    - Budget Snapshot (formerly Forecast)
+    - Change Orders
+    - Retention
+
+---
+
+## 📊 BUDGET ANALYSIS MODULE
+
+### 🧩 Layout Refactor
+- Collapse KPI section and insights container
+- Eliminate second-level tab UI and replace with:
+  - Sidebar nav OR
+  - Horizontal segmented button toggle (shadcn/ui)
+
+### 📈 Data Panel Enhancements
+- Add fullscreen toggle
+- Ensure filtering, sorting, and exports are accessible via top bar
+
+---
+
+## 💰 BUDGET SNAPSHOT (FORMERLY FORECAST)
+
+### 📁 Refactor Forecasting.tsx
+- Rename UI display from "Forecast" to **Budget Snapshot**
+- Replace current forecasting chart view with a read-only budget table
+- Source data from `data/mock/financial/budget.json`
+
+### 📊 Table Specifications
+- Headers and fields (ordered):
+  - `Cost Code`: Cost Code Tier 3 (row label), sub-labeled with Cost Type (string)
+  - `Original Budget`: `original_budget_amount` ($USD)
+  - `Modifications`: `budget_modifications` ($USD)
+  - `Approved Changes`: `approved_cos` ($USD)
+  - `Revised Budget`: `revised_budget` ($USD)
+  - `Pending Changes`: `pending_budget_changes` ($USD)
+  - `Projected Budget`: `projected_budget` ($USD)
+  - `Committed Costs`: `committed_costs` ($USD)
+  - `Direct Costs`: `direct_costs` ($USD)
+  - `JTD Costs`: `jtd_costs` ($USD)
+  - `Pending Cost Changes`: `pending_cost_changes` ($USD)
+  - `Projected Costs`: `projected_costs` ($USD)
+  - `Forecast to Complete`: `forecast_to_complete` ($USD)
+  - `Est at Completion`: `estimated_completion` ($USD)
+  - `Projected Over Under`: `projected_over_under` ($USD)
+
+### 📋 Table UX Requirements
+- Column widths:
+  - `Cost Code`: wide enough to prevent wrapping
+  - Remaining columns: equal width, no text wrapping
+- Sorting:
+  - Default: `Cost Code`, A–Z
+- Export:
+  - Enable export to PDF and Excel
+
+---
+
+## 🧠 INSIGHTS PANEL
+
+- HBI insight panel in each module should be collapsible
+- Tailwind/shadcn compliant UI with fade animation and tooltip support
+
+---
+
+## 🔁 COMPONENTS TO BUILD/REFINE
+
+- `BudgetSnapshotTable.tsx`
+- FullscreenToggle.tsx (shared control if not global)
+- `useFinancialHubStore.ts` (if needed for state persistence)
+- CollapseWrapper.tsx for KPI + Insights (reusable)
+
+---
+
+## 📁 MOCK DATA
+
+- Use `budget.json` from `/data/mock/financial/`
+- Format all values as USD with commas and two decimals
+- Use existing `project_id` field to filter if needed
+
+---
+
+## 📦 STORAGE
+
+- LocalStorage optional for filters/export states (for demo phase)
+- Align with existing `productivity` module storage pattern
+
+---
+
+## 🎨 THEMING & ACCESSIBILITY
+
+- All modules must:
+  - Support light/dark mode toggle
+  - Use `lucide-react` icons where applicable
+  - Follow `shadcn/ui` accessibility defaults (keyboard, ARIA)
+
+---
+
+# END OF FINANCIAL HUB RULE SET
