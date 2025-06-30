@@ -174,7 +174,7 @@ export default function StaffPlanningPage() {
   // Statistics widgets
   const StaffingWidgets = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card>
+      <Card data-tour="utilization-widget">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-4 w-4 text-blue-600" />
@@ -189,7 +189,7 @@ export default function StaffPlanningPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="labor-cost-widget">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="h-4 w-4 text-green-600" />
@@ -204,7 +204,7 @@ export default function StaffPlanningPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="project-scope-widget">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <Building2 className="h-4 w-4 text-purple-600" />
@@ -219,7 +219,7 @@ export default function StaffPlanningPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="spcr-widget">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <FileText className="h-4 w-4 text-orange-600" />
@@ -267,7 +267,7 @@ export default function StaffPlanningPage() {
       <AppHeader />
       <div className="space-y-6 p-6">
         {/* Breadcrumb Navigation */}
-        <Breadcrumb>
+        <Breadcrumb data-tour="breadcrumb-nav">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
@@ -283,12 +283,12 @@ export default function StaffPlanningPage() {
         </Breadcrumb>
 
         {/* Header Section */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4" data-tour="staffing-header">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">{getPageTitle()}</h1>
               <p className="text-muted-foreground mt-1">{getPageDescription()}</p>
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-4 mt-2" data-tour="role-badges">
                 {getRoleBadge()}
                 <Badge variant="outline" className="px-3 py-1">
                   {stats.projectScope}
@@ -298,7 +298,7 @@ export default function StaffPlanningPage() {
                 </Badge>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" data-tour="action-controls">
               <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
                 Refresh
@@ -321,10 +321,12 @@ export default function StaffPlanningPage() {
         </div>
 
         {/* Main Content */}
-        {renderRoleSpecificContent()}
+        <div data-tour="role-content">
+          {renderRoleSpecificContent()}
+        </div>
 
         {/* Help Section */}
-        <Card>
+        <Card data-tour="help-section">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />

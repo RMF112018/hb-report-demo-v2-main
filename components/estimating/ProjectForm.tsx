@@ -204,7 +204,7 @@ export default function ProjectForm({ open, onOpenChange, project, onSave, mode 
   return (
     <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-5xl h-[90vh] flex flex-col z-[100]">
+      <DialogContent className="max-w-[60vw] h-[90vh] flex flex-col z-[100]">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             {mode === 'create' ? 'New Project Opportunity' : 'Edit Project'}

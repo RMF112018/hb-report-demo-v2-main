@@ -34,3 +34,6 @@ data/mock/logs/daily-log.json
 
 # macOS
 .DS_Store
+
+# previous build
+/hb-report-mvp-wireFrame-main

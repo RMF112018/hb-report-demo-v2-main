@@ -38,7 +38,7 @@
         "id": "schedule-monitor",
         "type": "schedule-monitor",
         "title": "Schedule Monitor",
-        "size": "medium",
+        "size": "large",
         "position": { "x": 0, "y": 1 },
         "visible": true
       },
@@ -54,7 +54,7 @@
         "id": "critical-dates",
         "type": "critical-dates",
         "title": "Critical Dates",
-        "size": "medium",
+        "size": "large",
         "position": { "x": 9, "y": 1 },
         "visible": true
       },

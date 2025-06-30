@@ -34,41 +34,41 @@ const getCardCategory = (cardType: string): 'financial' | 'operational' | 'analy
   return 'project' // default
 }
 
-const getCategoryTheme = (category: string) => {
+const getCategoryTheme = (category: 'financial' | 'operational' | 'analytics' | 'project' | 'schedule') => {
   const themes = {
     financial: {
-      border: 'border-green-200/60 dark:border-green-800/60',
-      shadow: 'shadow-green-100/50 dark:shadow-green-900/30',
-      gradient: 'from-green-50/80 via-emerald-50/40 to-green-50/80 dark:from-green-950/20 dark:via-emerald-950/10 dark:to-green-950/20',
-      accent: 'border-l-4 border-l-green-500 dark:border-l-green-400'
+      gradient: "from-green-50/90 to-emerald-50/90 dark:from-green-950/50 dark:to-emerald-950/50",
+      border: "border-green-200/60 dark:border-green-700/60",
+      shadow: "shadow-green-200/20 dark:shadow-green-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-green-500/50 dark:before:border-green-400/50 before:pointer-events-none"
     },
     operational: {
-      border: 'border-orange-200/60 dark:border-orange-800/60',
-      shadow: 'shadow-orange-100/50 dark:shadow-orange-900/30', 
-      gradient: 'from-orange-50/80 via-amber-50/40 to-orange-50/80 dark:from-orange-950/20 dark:via-amber-950/10 dark:to-orange-950/20',
-      accent: 'border-l-4 border-l-orange-500 dark:border-l-orange-400'
+      gradient: "from-orange-50/90 to-red-50/90 dark:from-orange-950/50 dark:to-red-950/50",
+      border: "border-orange-200/60 dark:border-orange-700/60",
+      shadow: "shadow-orange-200/20 dark:shadow-orange-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-orange-500/50 dark:before:border-orange-400/50 before:pointer-events-none"
     },
     analytics: {
-      border: 'border-purple-200/60 dark:border-purple-800/60',
-      shadow: 'shadow-purple-100/50 dark:shadow-purple-900/30',
-      gradient: 'from-purple-50/80 via-indigo-50/40 to-purple-50/80 dark:from-purple-950/20 dark:via-indigo-950/10 dark:to-purple-950/20',
-      accent: 'border-l-4 border-l-purple-500 dark:border-l-purple-400'
+      gradient: "from-purple-50/90 to-indigo-50/90 dark:from-purple-950/50 dark:to-indigo-950/50",
+      border: "border-purple-200/60 dark:border-purple-700/60",
+      shadow: "shadow-purple-200/20 dark:shadow-purple-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-purple-500/50 dark:before:border-purple-400/50 before:pointer-events-none"
     },
     project: {
-      border: 'border-blue-200/60 dark:border-blue-800/60',
-      shadow: 'shadow-blue-100/50 dark:shadow-blue-900/30',
-      gradient: 'from-blue-50/80 via-indigo-50/40 to-blue-50/80 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-blue-950/20',
-      accent: 'border-l-4 border-l-blue-500 dark:border-l-blue-400'
+      gradient: "from-blue-50/90 to-cyan-50/90 dark:from-blue-950/50 dark:to-cyan-950/50",
+      border: "border-blue-200/60 dark:border-blue-700/60",
+      shadow: "shadow-blue-200/20 dark:shadow-blue-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-blue-500/50 dark:before:border-blue-400/50 before:pointer-events-none"
     },
     schedule: {
-      border: 'border-cyan-200/60 dark:border-cyan-800/60',
-      shadow: 'shadow-cyan-100/50 dark:shadow-cyan-900/30',
-      gradient: 'from-cyan-50/80 via-sky-50/40 to-cyan-50/80 dark:from-cyan-950/20 dark:via-sky-950/10 dark:to-cyan-950/20',
-      accent: 'border-l-4 border-l-cyan-500 dark:border-l-cyan-400'
+      gradient: "from-amber-50/90 to-yellow-50/90 dark:from-amber-950/50 dark:to-yellow-950/50",
+      border: "border-amber-200/60 dark:border-amber-700/60",
+      shadow: "shadow-amber-200/20 dark:shadow-amber-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-amber-500/50 dark:before:border-amber-400/50 before:pointer-events-none"
     }
   }
   
-  return themes[category as keyof typeof themes] || themes.project
+  return themes[category] || themes.project
 }
 
 export const DashboardCardWrapper = ({
@@ -80,92 +80,106 @@ export const DashboardCardWrapper = ({
   isEditing = false,
   isCompact = false
 }: DashboardCardWrapperProps) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const [showActions, setShowActions] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   
   const category = getCardCategory(card.type)
   const theme = getCategoryTheme(category)
   
+  const toggleActions = () => {
+    setShowActions(!showActions)
+  }
+  
   return (
     <div
       className={cn(
-        // Base structure
-        "group relative rounded-xl transition-all duration-300 ease-out",
-        // Background with category theming
+        // Enhanced base structure with better borders
+        "group relative rounded-xl transition-all duration-300 ease-out cursor-pointer",
+        // Enhanced background with better contrast
         `bg-gradient-to-br ${theme.gradient}`,
-        // Enhanced borders and shadows
+        // Better border contrast for both light and dark modes
         `border-2 ${theme.border}`,
-        `shadow-lg hover:shadow-xl ${theme.shadow}`,
-        // Category accent border
+        // Enhanced shadows with better depth - removed hover shadow changes
+        `shadow-lg ${theme.shadow}`,
+        // More pronounced category accent
         theme.accent,
-        // Hover and interaction states
-        "hover:scale-[1.02] hover:-translate-y-1",
-        // Edit mode styling
-        isEditing && "ring-2 ring-primary/20 ring-offset-2 ring-offset-background",
-        // Focus states
-        "focus-within:ring-2 focus-within:ring-primary/30 focus-within:ring-offset-2",
-        // Compact sizing
+        // Removed hover scale effects to prevent scroll interference
+        // Enhanced edit mode styling
+        isEditing && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background/50",
+        // Better focus states
+        "focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2",
+        // Improved sizing
         isCompact ? "min-h-[280px]" : "min-h-[320px]",
         dragHandleClass
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onClick={toggleActions}
     >
-      {/* Card Controls Overlay */}
+      {/* Enhanced Card Controls Overlay - always visible in edit mode */}
       {isEditing && (
-        <div className={cn(
-          "absolute -top-2 -right-2 z-20 flex gap-1 transition-all duration-200",
-          isHovered ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        )}>
+        <div className="absolute -top-2 -right-2 z-20 flex gap-1 transition-all duration-200 opacity-100 scale-100">
           <Button
             size="sm"
             variant="secondary"
-            className="h-6 w-6 p-0 bg-background/90 backdrop-blur-sm shadow-md border border-border/60"
-            onClick={() => onConfigure?.(card.id)}
+            className="h-6 w-6 p-0 bg-background/95 backdrop-blur-sm shadow-lg border-2 border-border/60 hover:bg-accent/80"
+            onClick={(e) => {
+              e.stopPropagation()
+              onConfigure?.(card.id)
+            }}
           >
-            <Settings2 className="h-3 w-3" />
+            <Settings2 className="h-3 w-3 text-foreground" />
           </Button>
           <Button
             size="sm"
             variant="destructive"
-            className="h-6 w-6 p-0 bg-destructive/90 backdrop-blur-sm shadow-md"
-            onClick={() => onRemove?.(card.id)}
+            className="h-6 w-6 p-0 bg-destructive/95 backdrop-blur-sm shadow-lg hover:bg-destructive/80"
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemove?.(card.id)
+            }}
           >
-            <X className="h-3 w-3" />
+            <X className="h-3 w-3 text-destructive-foreground" />
           </Button>
         </div>
       )}
       
-      {/* Drag Handle */}
+      {/* Enhanced Drag Handle - always visible in edit mode */}
       {isEditing && (
-        <div className={cn(
-          "absolute top-2 right-2 z-10 transition-all duration-200 cursor-move",
-          isHovered ? "opacity-100" : "opacity-60"
-        )}>
-          <div className="p-1 rounded bg-background/40 backdrop-blur-sm">
+        <div className="absolute top-2 right-2 z-10 transition-all duration-200 cursor-move opacity-100">
+          <div className="p-1 rounded bg-background/60 backdrop-blur-sm border border-border/40">
             <Move className="h-3 w-3 text-muted-foreground" />
           </div>
         </div>
       )}
       
-      {/* Card Actions Menu (Non-edit mode) */}
+      {/* Enhanced Card Actions Menu - show/hide on click */}
       {!isEditing && (
         <div className={cn(
           "absolute top-3 right-3 z-10 transition-all duration-200",
-          isHovered ? "opacity-100" : "opacity-0"
+          showActions ? "opacity-100" : "opacity-60"
         )}>
-          <DropdownMenu>
+          <DropdownMenu open={showActions} onOpenChange={setShowActions}>
             <DropdownMenuTrigger asChild>
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-7 w-7 p-0 bg-background/60 backdrop-blur-sm hover:bg-background/80"
+                className="h-7 w-7 p-0 bg-background/80 backdrop-blur-sm hover:bg-background/90 border border-border/30"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowActions(!showActions)
+                }}
               >
-                <MoreVertical className="h-3 w-3" />
+                <MoreVertical className="h-3 w-3 text-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={() => setIsExpanded(!isExpanded)}>
+            <DropdownMenuContent align="end" className="w-40 bg-popover/95 backdrop-blur-sm border-2 border-border/50">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsExpanded(!isExpanded)
+                  setShowActions(false)
+                }} 
+                className="text-foreground hover:bg-accent/80"
+              >
                 {isExpanded ? (
                   <>
                     <Minimize2 className="h-3 w-3 mr-2" />
@@ -178,7 +192,14 @@ export const DashboardCardWrapper = ({
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onConfigure?.(card.id)}>
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onConfigure?.(card.id)
+                  setShowActions(false)
+                }} 
+                className="text-foreground hover:bg-accent/80"
+              >
                 <Settings2 className="h-3 w-3 mr-2" />
                 Configure
               </DropdownMenuItem>
@@ -187,13 +208,13 @@ export const DashboardCardWrapper = ({
         </div>
       )}
       
-      {/* Enhanced content wrapper with better padding and overflow handling */}
+      {/* Enhanced content wrapper */}
       <div className={cn(
         "relative h-full rounded-xl overflow-hidden",
-        // Add subtle inner shadow for depth
-        "shadow-inner shadow-black/5",
-        // Expanded state styling
-        isExpanded && "fixed inset-4 z-50 bg-background/95 backdrop-blur-md shadow-2xl"
+        // Better inner depth
+        "shadow-inner shadow-black/5 dark:shadow-white/5",
+        // Enhanced expanded state
+        isExpanded && "fixed inset-4 z-50 bg-background/98 backdrop-blur-lg shadow-2xl border-2 border-border/50"
       )}>
         {children}
       </div>

@@ -147,9 +147,12 @@ const getCardColSpan = (card: DashboardCard): string => {
   switch (card.type) {
     case "enhanced-hbi-insights":
     case "market-intelligence":
+    case "bd-opportunities": // 2 sizes larger than standard
       return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"; // 2x width consistently
     case "portfolio-overview":
     case "financial-review-panel":
+    case "schedule-monitor": // 1 size wider than standard
+    case "critical-dates": // 1 size wider than standard
       return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3"; // 1.5x width (3/2=1.5 ratio)
     case "staffing-distribution":
     case "pipeline-analytics":
@@ -274,46 +277,46 @@ export function DashboardGrid({
 
       {/* Focused Card Modal */}
       <Dialog open={!!focusedCard} onOpenChange={() => handleCardUnfocus()}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] w-fit h-fit p-0 overflow-hidden">
+        <DialogContent className="max-w-[60vw] max-h-[90vh] w-fit h-fit p-0 overflow-hidden border-2 border-border/50 shadow-2xl backdrop-blur-sm">
           {focusedCard && (
             <>
-              <DialogHeader className="px-6 py-4 border-b border-border">
+              <DialogHeader className="px-6 py-4 border-b border-border/50 bg-card/95 backdrop-blur-sm">
                 <DialogTitle className="flex items-center justify-between">
-                                     <div className="flex items-center gap-3">
-                     {/* Card Icon - All Types */}
-                     {focusedCard.type === "portfolio-overview" && <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "enhanced-hbi-insights" && <Brain className="h-5 w-5 text-purple-600" />}
-                     {focusedCard.type === "financial-review-panel" && <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "pipeline-analytics" && <Target className="h-5 w-5 text-orange-600" />}
-                     {focusedCard.type === "market-intelligence" && <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />}
-                     {focusedCard.type === "project-overview" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "schedule-performance" && <Calendar className="h-5 w-5 text-orange-600" />}
-                     {focusedCard.type === "financial-status" && <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />}
-                     {focusedCard.type === "general-conditions" && <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "contingency-analysis" && <Shield className="h-5 w-5 text-purple-600" />}
-                     {focusedCard.type === "cash-flow" && <Droplets className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />}
-                     {focusedCard.type === "procurement" && <Package className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
-                     {focusedCard.type === "draw-forecast" && <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
-                     {focusedCard.type === "quality-control" && <Eye className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
-                     {focusedCard.type === "safety" && <AlertTriangleIcon className="h-5 w-5 text-red-600 dark:text-red-400" />}
-                     {focusedCard.type === "staffing-distribution" && <Users className="h-5 w-5 text-orange-600" />}
-                     {focusedCard.type === "change-order-analysis" && <FileText className="h-5 w-5 text-orange-600" />}
-                     {focusedCard.type === "closeout" && <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
-                     {focusedCard.type === "startup" && <Play className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
-                     {focusedCard.type === "critical-dates" && <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "field-reports" && <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />}
-                     {focusedCard.type === "rfi" && <MessageSquare className="h-5 w-5 text-orange-600" />}
-                     {focusedCard.type === "submittal" && <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
-                     {focusedCard.type === "health" && <Heart className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />}
-                     {focusedCard.type === "schedule-monitor" && <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     {focusedCard.type === "bd-opportunities" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
-                     <span className="text-lg font-semibold">{focusedCard.title}</span>
-                   </div>
+                  <div className="flex items-center gap-3">
+                    {/* Enhanced card icons with better contrast */}
+                    {focusedCard.type === "portfolio-overview" && <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "enhanced-hbi-insights" && <Brain className="h-5 w-5 text-purple-600 dark:text-purple-300" />}
+                    {focusedCard.type === "financial-review-panel" && <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "pipeline-analytics" && <Target className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
+                    {focusedCard.type === "market-intelligence" && <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-300" />}
+                    {focusedCard.type === "project-overview" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "schedule-performance" && <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
+                    {focusedCard.type === "financial-status" && <DollarSign className="h-5 w-5 text-green-600 dark:text-green-300" />}
+                    {focusedCard.type === "general-conditions" && <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "contingency-analysis" && <Shield className="h-5 w-5 text-purple-600 dark:text-purple-300" />}
+                    {focusedCard.type === "cash-flow" && <Droplets className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />}
+                    {focusedCard.type === "procurement" && <Package className="h-5 w-5 text-amber-600 dark:text-amber-300" />}
+                    {focusedCard.type === "draw-forecast" && <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />}
+                    {focusedCard.type === "quality-control" && <Eye className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
+                    {focusedCard.type === "safety" && <AlertTriangleIcon className="h-5 w-5 text-red-600 dark:text-red-300" />}
+                    {focusedCard.type === "staffing-distribution" && <Users className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
+                    {focusedCard.type === "change-order-analysis" && <FileText className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
+                    {focusedCard.type === "closeout" && <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />}
+                    {focusedCard.type === "startup" && <Play className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
+                    {focusedCard.type === "critical-dates" && <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "field-reports" && <FileText className="h-5 w-5 text-green-600 dark:text-green-300" />}
+                    {focusedCard.type === "rfi" && <MessageSquare className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
+                    {focusedCard.type === "submittal" && <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
+                    {focusedCard.type === "health" && <Heart className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />}
+                    {focusedCard.type === "schedule-monitor" && <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    {focusedCard.type === "bd-opportunities" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    <span className="text-lg font-semibold text-foreground">{focusedCard.title}</span>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleCardUnfocus}
-                    className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="h-8 w-8 p-0 hover:bg-muted/80 dark:hover:bg-muted/60"
                     title="Close focus view"
                   >
                     <Minimize2 className="h-4 w-4" />
@@ -321,8 +324,8 @@ export function DashboardGrid({
                 </DialogTitle>
               </DialogHeader>
               
-              {/* Focused Card Content */}
-              <div className="p-6 max-h-[80vh] overflow-y-auto">
+              {/* Enhanced modal content with better background */}
+              <div className="p-6 max-h-[80vh] overflow-y-auto bg-background/50 backdrop-blur-sm">
                 <div className="min-w-[600px] min-h-[400px]">
                   <CardContent card={focusedCard} isCompact={false} userRole={userRole} />
                 </div>

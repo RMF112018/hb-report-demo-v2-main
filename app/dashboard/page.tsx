@@ -330,12 +330,12 @@ function DashboardContent({ user }: { user: any }) {
           </div>
 
           {/* Dashboard Controls Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-tour="dashboard-controls">
             <div className="flex items-center gap-3">
               {/* Dashboard Selector */}
-              <Popover open={dashboardPopoverOpen} onOpenChange={setDashboardPopoverOpen} data-tour="dashboard-selector">
+              <Popover open={dashboardPopoverOpen} onOpenChange={setDashboardPopoverOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2" data-tour="dashboard-selector">
                     <LayoutDashboard className="h-4 w-4" />
                     <span>{currentDashboard?.name || 'Select Dashboard'}</span>
                     <ChevronDown className="h-4 w-4" />

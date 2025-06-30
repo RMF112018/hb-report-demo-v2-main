@@ -21,357 +21,430 @@ import {
   BarChart3,
   CheckCircle,
   XCircle,
-  RefreshCw
+  RefreshCw,
+  ChevronDown,
+  ArrowRight,
+  Package,
+  ShieldCheck,
+  Zap,
+  Activity
 } from "lucide-react"
-import { BuyoutRecord } from "@/types/procurement"
-import type { ProcurementStats } from "./ProcurementWidgets"
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { cn } from "@/lib/utils"
 
 interface HbiProcurementInsightsProps {
-  buyouts: BuyoutRecord[]
-  stats: ProcurementStats
+  procurementStats: {
+    totalValue: number
+    activeProcurements: number
+    completedProcurements: number
+    pendingApprovals: number
+    linkedToBidTabs: number
+    avgCycleTime: number
+    complianceRate: number
+    totalRecords: number
+  }
+  className?: string
 }
 
 interface ProcurementInsight {
   id: string
-  type: "opportunity" | "risk" | "trend" | "recommendation"
-  category: "cost" | "vendor" | "schedule" | "compliance" | "performance"
+  type: "cost-savings" | "vendor-risk" | "market-opportunity" | "compliance-alert" | "efficiency" | "forecast"
+  severity: "low" | "medium" | "high" | "critical"
   title: string
-  description: string
-  impact: "low" | "medium" | "high" | "critical"
+  text: string
+  action: string
   confidence: number
-  actionItems: string[]
-  potentialSavings?: number
-  riskMitigation?: string[]
+  impact: string
+  relatedMetrics: string[]
+  project_id?: string
 }
 
-export function HbiProcurementInsights({ buyouts, stats }: HbiProcurementInsightsProps) {
-  const [activeInsight, setActiveInsight] = useState<string | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
+export function HbiProcurementInsights({ procurementStats, className }: HbiProcurementInsightsProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedInsight, setSelectedInsight] = useState<string | null>(null)
+  const [showAll, setShowAll] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
-  // Generate insights based on procurement data
-  const generateInsights = (): ProcurementInsight[] => {
-    const insights: ProcurementInsight[] = []
-
-    // Cost optimization insights
-    if (stats.avgSavings < 5) {
-      insights.push({
-        id: "cost-optimization",
-        type: "opportunity",
-        category: "cost",
-        title: "Cost Optimization Opportunity",
-        description: `Current average savings of ${stats.avgSavings.toFixed(1)}% is below industry benchmark of 8-12%. Consider implementing more competitive bidding processes.`,
-        impact: "high",
-        confidence: 87,
-        actionItems: [
-          "Expand vendor pool for competitive bidding",
-          "Implement value engineering workshops",
-          "Review and optimize procurement processes",
-          "Consider bulk purchasing agreements"
-        ],
-        potentialSavings: stats.totalValue * 0.03
-      })
+  // Procurement-specific AI insights
+  const procurementInsights: ProcurementInsight[] = [
+    {
+      id: "proc-insight-1",
+      type: "cost-savings",
+      severity: "high",
+      title: "Bulk Purchasing Opportunity",
+      text: "AI identifies 23% cost reduction through consolidated material orders across 3 projects.",
+      action: "Coordinate purchasing schedules and negotiate volume discounts with steel suppliers.",
+      confidence: 94,
+      impact: "$340K potential savings",
+      relatedMetrics: ["Material Costs", "Volume Discounts", "Project Coordination"],
+      project_id: "multiple"
+    },
+    {
+      id: "proc-insight-2",
+      type: "vendor-risk",
+      severity: "critical",
+      title: "Vendor Performance Alert",
+      text: "AMERICAN LEAK DETECTION showing 15% schedule slippage across recent projects.",
+      action: "Implement performance improvement plan and consider backup vendors.",
+      confidence: 89,
+      impact: "3-week potential delay",
+      relatedMetrics: ["Vendor Performance", "Schedule Risk", "Quality Metrics"],
+      project_id: "TW-2024"
+    },
+    {
+      id: "proc-insight-3",
+      type: "market-opportunity",
+      severity: "medium",
+      title: "Market Price Advantage",
+      text: "Current concrete prices 8% below market forecast for Q2 2025.",
+      action: "Accelerate concrete procurement for upcoming phases to lock in savings.",
+      confidence: 87,
+      impact: "$125K cost avoidance",
+      relatedMetrics: ["Market Pricing", "Commodity Trends", "Procurement Timing"],
+      project_id: "global"
+    },
+    {
+      id: "proc-insight-4",
+      type: "compliance-alert",
+      severity: "medium",
+      title: "Insurance Verification Gap",
+      text: "2 active subcontractors have insurance expiring within 30 days.",
+      action: "Initiate insurance renewal process and implement automated tracking.",
+      confidence: 96,
+      impact: "Compliance risk",
+      relatedMetrics: ["Insurance Compliance", "Contract Status", "Risk Management"],
+      project_id: "multiple"
+    },
+    {
+      id: "proc-insight-5",
+      type: "efficiency",
+      severity: "low",
+      title: "Bid Tab Integration Success",
+      text: "92% of new procurement records successfully linked to estimating bid tabs.",
+      action: "Continue current integration practices and train team on remaining 8%.",
+      confidence: 98,
+      impact: "Improved accuracy",
+      relatedMetrics: ["Data Integration", "Process Efficiency", "Team Performance"],
+      project_id: "global"
+    },
+    {
+      id: "proc-insight-6",
+      type: "forecast",
+      severity: "high",
+      title: "Supply Chain Disruption Risk",
+      text: "Predictive models indicate 35% risk of steel delivery delays in March.",
+      action: "Diversify suppliers and advance steel orders by 2 weeks.",
+      confidence: 83,
+      impact: "Schedule protection",
+      relatedMetrics: ["Supply Chain", "Material Availability", "Schedule Impact"],
+      project_id: "global"
     }
+  ]
 
-    // Vendor performance insight
-    if (stats.complianceRate < 90) {
-      insights.push({
-        id: "vendor-compliance",
-        type: "risk",
-        category: "compliance",
-        title: "Vendor Compliance Risk",
-        description: `Compliance rate of ${stats.complianceRate.toFixed(1)}% indicates potential vendor performance issues. This could impact project delivery and quality.`,
-        impact: "high",
-        confidence: 92,
-        actionItems: [
-          "Conduct vendor performance reviews",
-          "Implement compliance monitoring system",
-          "Provide vendor training and support",
-          "Update vendor qualification criteria"
-        ],
-        riskMitigation: [
-          "Implement weekly compliance checks",
-          "Establish clear performance metrics",
-          "Create vendor improvement plans"
-        ]
-      })
-    }
+  const visibleInsights = showAll ? procurementInsights : procurementInsights.slice(0, 4)
+  const avgConfidence = Math.round(
+    procurementInsights.reduce((sum, insight) => sum + insight.confidence, 0) / procurementInsights.length
+  )
+  const criticalCount = procurementInsights.filter(insight => insight.severity === "critical" || insight.severity === "high").length
+  const opportunityCount = procurementInsights.filter(insight => insight.type === "cost-savings" || insight.type === "market-opportunity").length
 
-    // Schedule performance insight
-    if (stats.onTimeDelivery < 85) {
-      insights.push({
-        id: "schedule-performance",
-        type: "risk",
-        category: "schedule",
-        title: "Schedule Performance Concern",
-        description: `On-time delivery rate of ${stats.onTimeDelivery.toFixed(1)}% may impact project timelines. Consider improving vendor coordination and monitoring.`,
-        impact: "medium",
-        confidence: 78,
-        actionItems: [
-          "Implement milestone tracking system",
-          "Improve vendor communication protocols",
-          "Review and optimize delivery schedules",
-          "Establish contingency plans"
-        ]
-      })
-    }
-
-    // Vendor concentration risk
-    const vendorConcentration = buyouts.reduce((acc, buyout) => {
-      acc[buyout.vendorName] = (acc[buyout.vendorName] || 0) + buyout.currentAmount
-      return acc
-    }, {} as Record<string, number>)
-
-    const topVendorPercentage = Math.max(...Object.values(vendorConcentration)) / stats.totalValue * 100
-    if (topVendorPercentage > 30) {
-      insights.push({
-        id: "vendor-concentration",
-        type: "risk",
-        category: "vendor",
-        title: "Vendor Concentration Risk",
-        description: `High concentration with single vendor (${topVendorPercentage.toFixed(1)}% of total value) creates supply chain risk. Consider diversification.`,
-        impact: "medium",
-        confidence: 85,
-        actionItems: [
-          "Identify alternative vendors",
-          "Implement vendor diversification strategy",
-          "Negotiate backup supplier agreements",
-          "Monitor vendor financial health"
-        ]
-      })
-    }
-
-    // Positive trend insight
-    if (stats.avgSavings > 8) {
-      insights.push({
-        id: "cost-performance",
-        type: "opportunity",
-        category: "performance",
-        title: "Strong Cost Performance",
-        description: `Excellent average savings of ${stats.avgSavings.toFixed(1)}% exceeds industry benchmarks. Consider expanding successful strategies.`,
-        impact: "medium",
-        confidence: 94,
-        actionItems: [
-          "Document successful procurement strategies",
-          "Share best practices across projects",
-          "Expand successful vendor relationships",
-          "Mentor other project teams"
-        ]
-      })
-    }
-
-    return insights
-  }
-
-  const insights = generateInsights()
-
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "critical": return "bg-red-100 text-red-800 border-red-200"
-      case "high": return "bg-orange-100 text-orange-800 border-orange-200"
-      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "low": return "bg-blue-100 text-blue-800 border-blue-200"
-      default: return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
-
-  const getTypeIcon = (type: string) => {
+  const getInsightIcon = (type: string) => {
     switch (type) {
-      case "opportunity": return <TrendingUp className="h-4 w-4" />
-      case "risk": return <AlertTriangle className="h-4 w-4" />
-      case "trend": return <BarChart3 className="h-4 w-4" />
-      case "recommendation": return <Lightbulb className="h-4 w-4" />
-      default: return <Brain className="h-4 w-4" />
+      case "cost-savings":
+        return <DollarSign className="h-3 w-3" />
+      case "vendor-risk":
+        return <AlertTriangle className="h-3 w-3" />
+      case "market-opportunity":
+        return <TrendingUp className="h-3 w-3" />
+      case "compliance-alert":
+        return <ShieldCheck className="h-3 w-3" />
+      case "efficiency":
+        return <Target className="h-3 w-3" />
+      case "forecast":
+        return <BarChart3 className="h-3 w-3" />
+      default:
+        return <Sparkles className="h-3 w-3" />
     }
   }
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "cost": return <DollarSign className="h-4 w-4" />
-      case "vendor": return <Users className="h-4 w-4" />
-      case "schedule": return <Clock className="h-4 w-4" />
-      case "compliance": return <Shield className="h-4 w-4" />
-      case "performance": return <Target className="h-4 w-4" />
-      default: return <Brain className="h-4 w-4" />
+  const getInsightColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return "border-red-300 bg-red-50 dark:bg-red-950/30 hover:bg-red-100"
+      case "high":
+        return "border-orange-200 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100"
+      case "medium":
+        return "border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30 hover:bg-yellow-100"
+      case "low":
+        return "border-green-200 bg-green-50 dark:bg-green-950/30 hover:bg-green-100"
+      default:
+        return "border-border bg-muted/50"
     }
   }
 
-  const handleRefresh = () => {
-    setRefreshing(true)
-    setTimeout(() => setRefreshing(false), 1500)
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return "text-red-700 bg-red-100 border-red-200"
+      case "high":
+        return "text-orange-700 bg-orange-100 border-orange-200"
+      case "medium":
+        return "text-yellow-700 bg-yellow-100 border-yellow-200"
+      case "low":
+        return "text-green-700 bg-green-100 border-green-200"
+      default:
+        return "text-muted-foreground bg-muted"
+    }
   }
 
   return (
-    <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg">
-              <Brain className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              HBI Procurement Insights
-            </span>
-            <Badge variant="outline" className="ml-2 border-purple-300 text-purple-700">
-              <Sparkles className="h-3 w-3 mr-1" />
-              AI-Powered
-            </Badge>
-          </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="border-purple-200 hover:bg-purple-50"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-        </div>
-        <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-          AI-powered insights to optimize procurement performance and identify opportunities
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="insights" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/50 dark:bg-gray-800/50">
-            <TabsTrigger value="insights" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Insights
-            </TabsTrigger>
-            <TabsTrigger value="opportunities" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Opportunities
-            </TabsTrigger>
-            <TabsTrigger value="risks" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Risks
-            </TabsTrigger>
-          </TabsList>
+    <div className={cn("w-full", className)}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border-purple-200">
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-[#FF6B35]" />
+                  <span>HBI Procurement Insights</span>
+                  <Badge className="bg-purple-600 text-white border-purple-600 text-xs">
+                    <Activity className="h-3 w-3 mr-1" />
+                    AI Powered
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-purple-700">
+                    {avgConfidence}% Confidence
+                  </Badge>
+                  <ChevronDown className={cn("h-4 w-4 transition-transform text-[#FF6B35]", isOpen && "rotate-180")} />
+                </div>
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
 
-          <TabsContent value="insights" className="mt-4">
-            <div className="space-y-4">
-              {insights.map((insight) => (
-                <Card key={insight.id} className="border border-purple-200 bg-white/70 dark:bg-gray-800/70 hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {getTypeIcon(insight.type)}
-                          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{insight.title}</h3>
-                          <Badge variant="outline" className={getImpactColor(insight.impact)}>
-                            {insight.impact}
-                          </Badge>
-                          <Badge variant="outline" className="text-purple-600 border-purple-300">
-                            {insight.confidence}% confidence
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          {insight.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <div className="flex items-center gap-1">
-                            {getCategoryIcon(insight.category)}
-                            <span className="capitalize">{insight.category}</span>
-                          </div>
-                          {insight.potentialSavings && (
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="h-3 w-3" />
-                              <span>Potential savings: ${insight.potentialSavings.toLocaleString()}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setActiveInsight(activeInsight === insight.id ? null : insight.id)}
-                        className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                      >
-                        <ChevronRight className={`h-4 w-4 transition-transform ${activeInsight === insight.id ? "rotate-90" : ""}`} />
-                      </Button>
+          <CollapsibleContent>
+            <CardContent 
+              className="relative"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* AI Stats Header */}
+              <div className="mb-4 p-3 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-lg border border-purple-200">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200">
+                    <div className="font-bold text-lg text-red-700">{criticalCount}</div>
+                    <div className="text-xs text-red-600">Critical/High</div>
+                  </div>
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200">
+                    <div className="font-bold text-lg text-green-700">{opportunityCount}</div>
+                    <div className="text-xs text-green-600">Opportunities</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200">
+                    <div className="font-bold text-lg text-blue-700">
+                      {procurementInsights.filter(i => i.type === "forecast").length}
                     </div>
-                    
-                    {activeInsight === insight.id && (
-                      <div className="mt-4 pt-4 border-t border-purple-200">
-                        <div className="space-y-3">
-                          <div>
-                            <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Action Items:</h4>
-                            <ul className="space-y-1">
-                              {insight.actionItems.map((item, index) => (
-                                <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                  <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                  {item}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          {insight.riskMitigation && (
-                            <div>
-                              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Risk Mitigation:</h4>
-                              <ul className="space-y-1">
-                                {insight.riskMitigation.map((item, index) => (
-                                  <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <Shield className="h-3 w-3 text-blue-500 mt-0.5 flex-shrink-0" />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <div className="text-xs text-blue-600">Forecasts</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Insights List */}
+              <div className="space-y-3">
+                {visibleInsights.map((insight) => (
+                  <div
+                    key={insight.id}
+                    className={cn(
+                      "p-3 rounded-lg border cursor-pointer transition-all duration-200 shadow-sm",
+                      getInsightColor(insight.severity),
+                      selectedInsight === insight.id && "ring-2 ring-purple-400"
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+                    onClick={() => setSelectedInsight(selectedInsight === insight.id ? null : insight.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        {getInsightIcon(insight.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-sm text-foreground leading-tight">
+                            {insight.title}
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <Badge className={cn("text-xs px-2 py-0.5", getSeverityColor(insight.severity))}>
+                              {insight.severity}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {insight.confidence}%
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-foreground mb-2 leading-snug">
+                          {insight.text}
+                        </p>
 
-          <TabsContent value="opportunities" className="mt-4">
-            <div className="space-y-4">
-              {insights.filter(insight => insight.type === "opportunity").map((insight) => (
-                <Card key={insight.id} className="border border-green-200 bg-green-50/50 dark:bg-green-950/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                      <h3 className="font-semibold text-green-900 dark:text-green-100">{insight.title}</h3>
-                      {insight.potentialSavings && (
-                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
-                          ${insight.potentialSavings.toLocaleString()} potential savings
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      {insight.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span className="font-medium text-purple-700">{insight.impact}</span>
+                          <span>{insight.project_id === "global" ? "All Projects" : insight.project_id}</span>
+                        </div>
 
-          <TabsContent value="risks" className="mt-4">
-            <div className="space-y-4">
-              {insights.filter(insight => insight.type === "risk").map((insight) => (
-                <Card key={insight.id} className="border border-red-200 bg-red-50/50 dark:bg-red-950/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <h3 className="font-semibold text-red-900 dark:text-red-100">{insight.title}</h3>
-                      <Badge variant="outline" className={getImpactColor(insight.impact)}>
-                        {insight.impact} impact
-                      </Badge>
+                        {selectedInsight === insight.id && (
+                          <div className="mt-3 p-3 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-lg border border-white/50">
+                            <div className="space-y-2">
+                              <div className="flex items-start gap-2">
+                                <ArrowRight className="h-3 w-3 text-purple-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-sm text-foreground font-medium">
+                                  {insight.action}
+                                </p>
+                              </div>
+                              <div className="mt-2 pt-2 border-t border-purple-200">
+                                <p className="text-xs text-muted-foreground mb-1">Related Metrics:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {insight.relatedMetrics.map((metric, index) => (
+                                    <Badge key={index} variant="secondary" className="text-xs">
+                                      {metric}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-red-700 dark:text-red-300">
-                      {insight.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+                  </div>
+                ))}
+              </div>
+
+              {/* Show More/Less Button */}
+              {procurementInsights.length > 4 && (
+                <div className="mt-4 pt-3 border-t border-purple-200">
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="w-full text-sm text-purple-600 hover:text-purple-800 flex items-center justify-center gap-2 font-medium py-2 rounded-lg hover:bg-white/50 transition-colors"
+                  >
+                    <span>{showAll ? "Show Less" : `+${procurementInsights.length - 4} More Insights`}</span>
+                    <ChevronDown className={cn("h-4 w-4 transition-transform", showAll && "rotate-180")} />
+                  </button>
+                </div>
+              )}
+
+              {/* Hover Drill-Down Overlay */}
+              {isHovered && (
+                <div className="absolute inset-0 bg-purple-900/95 backdrop-blur-sm rounded-lg p-4 text-white transition-all duration-300 ease-in-out overflow-y-auto z-10">
+                  <div className="h-full">
+                    <h3 className="text-lg font-medium mb-3 text-center">Procurement AI Intelligence Deep Dive</h3>
+                    
+                    <div className="grid grid-cols-2 gap-4 h-[calc(100%-60px)]">
+                      {/* AI Performance Metrics */}
+                      <div className="space-y-4">
+                        <div className="bg-white/10 rounded-lg p-3">
+                          <h4 className="font-semibold mb-2 flex items-center">
+                            <Brain className="w-4 h-4 mr-2" />
+                            Procurement AI Analytics
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Model Accuracy:</span>
+                              <span className="font-medium text-purple-300">{avgConfidence}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Vendor Risk Prediction:</span>
+                              <span className="font-medium text-green-400">91.2%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Cost Optimization:</span>
+                              <span className="font-medium text-blue-400">$465K identified</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Market Intelligence:</span>
+                              <span className="font-medium text-yellow-400">Real-time</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/10 rounded-lg p-3">
+                          <h4 className="font-semibold mb-2 flex items-center">
+                            <Zap className="w-4 h-4 mr-2" />
+                            Active Monitoring
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Vendor Performance:</span>
+                                                             <span className="font-medium text-green-400">{procurementStats.totalRecords || 12} tracked</span>
+                            </div>
+                            <div className="text-xs text-purple-200">Last updated: 5 minutes ago</div>
+                            <div className="flex justify-between">
+                              <span>Market Trends:</span>
+                              <span className="font-medium text-blue-400">15 indicators</span>
+                            </div>
+                            <div className="text-xs text-purple-200">Price volatility alerts active</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Procurement Intelligence */}
+                      <div className="space-y-4">
+                        <div className="bg-white/10 rounded-lg p-3">
+                          <h4 className="font-semibold mb-2 flex items-center">
+                            <Target className="w-4 h-4 mr-2" />
+                            Procurement Intelligence
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Cost Savings:</span>
+                              <span className="font-medium text-green-400">
+                                {procurementInsights.filter(i => i.type === 'cost-savings').length} identified
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Risk Alerts:</span>
+                              <span className="font-medium text-red-400">
+                                {procurementInsights.filter(i => i.type === 'vendor-risk').length} active
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Compliance:</span>
+                              <span className="font-medium text-yellow-400">
+                                {procurementInsights.filter(i => i.type === 'compliance-alert').length} monitoring
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-white/10 rounded-lg p-3">
+                          <h4 className="font-semibold mb-2 flex items-center">
+                            <Activity className="w-4 h-4 mr-2" />
+                            Strategic Recommendations
+                          </h4>
+                          <div className="text-sm">
+                            <p className="font-medium mb-2">Priority Actions:</p>
+                            <ul className="text-xs space-y-1 list-disc list-inside text-purple-200">
+                              <li>Address {criticalCount} critical procurement risks</li>
+                              <li>Capitalize on {opportunityCount} cost optimization opportunities</li>
+                              <li>Monitor market trends for strategic timing</li>
+                              <li>Enhance vendor performance tracking</li>
+                            </ul>
+                            
+                            <div className="pt-2 mt-2 border-t border-white/20">
+                              <p className="text-xs text-purple-200">
+                                                                 AI analyzing {procurementStats.totalRecords || 'multiple'} procurement records 
+                                with {avgConfidence}% confidence across vendor performance, 
+                                market intelligence, and cost optimization patterns.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+    </div>
   )
 } 

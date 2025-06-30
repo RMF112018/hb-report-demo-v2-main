@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, TrendingUp, TrendingDown, Percent, BarChart3, ChevronRight, CreditCard } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, Percent, BarChart3, ChevronRight, CreditCard, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 interface FinancialStatusCardProps {
   config?: any;
@@ -13,7 +14,7 @@ interface FinancialStatusCardProps {
 }
 
 export default function FinancialStatusCard({ config, span, isCompact, userRole }: FinancialStatusCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -110,12 +111,12 @@ export default function FinancialStatusCard({ config, span, isCompact, userRole 
     return variance >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
   };
 
+  const toggleDetails = () => {
+    setShowDetails(!showDetails);
+  };
+
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-green-50/80 to-emerald-50/80 dark:from-green-950/40 dark:to-emerald-950/40 overflow-hidden relative transition-all duration-300 backdrop-blur-sm"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="h-full flex flex-col bg-gradient-to-br from-green-50/80 to-emerald-50/80 dark:from-green-950/40 dark:to-emerald-950/40 overflow-hidden relative transition-all duration-300 backdrop-blur-sm">
       {/* Enhanced Header Stats */}
       <div className="flex-shrink-0 p-3 sm:p-4 lg:p-5 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-green-200/60 dark:border-green-800/60 shadow-sm">
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
@@ -131,7 +132,7 @@ export default function FinancialStatusCard({ config, span, isCompact, userRole 
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
+      <div className="flex-1 p-2 sm:p-2.5 lg:p-2.5 space-y-4 overflow-y-auto">
         {/* Contract Value */}
         <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-green-200 dark:border-green-800">
           <div className="flex items-center gap-2 mb-2">
@@ -187,7 +188,7 @@ export default function FinancialStatusCard({ config, span, isCompact, userRole 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               {getProfitChangeIcon(data.profitVariance)}
-              <span className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getProfitChangeColor(data.profitVariance)}`}>
+              <span className={`text-sm sm:text-base lg:text-lg font-medium ${getProfitChangeColor(data.profitVariance)}`}>
                 {formatCurrency(data.profitVariance)}
               </span>
             </div>
@@ -197,86 +198,63 @@ export default function FinancialStatusCard({ config, span, isCompact, userRole 
           </div>
         </div>
 
-        {/* Financial Health */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-green-200 dark:border-green-800">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <span className="text-sm font-medium text-foreground">Financial Health</span>
-          </div>
-          <div className="space-y-2">
-            <Progress value={data.profitHealthScore} className="h-2" />
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Portfolio Score</span>
-              <Badge className="bg-green-100 text-green-700">{data.profitHealthScore}%</Badge>
-            </div>
-          </div>
+        {/* Details Toggle Button */}
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleDetails}
+            className="text-xs border-green-200 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950/50"
+          >
+            <Eye className="h-3 w-3 mr-1" />
+            {showDetails ? 'Hide Details' : 'Show Details'}
+          </Button>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-green-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
+      {/* Click-triggered Detail Overlay */}
+      {showDetails && (
+        <div className="absolute inset-0 bg-green-900/96 dark:bg-green-950/96 backdrop-blur-sm p-2 sm:p-3 flex flex-col justify-center text-white animate-in fade-in duration-200">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">Financial Deep Dive</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <ChevronRight className="h-4 w-4 text-green-200" />
+                <span className="font-semibold text-sm text-green-100">Financial Deep Dive</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleDetails}
+                className="h-6 w-6 p-0 text-green-200 hover:text-white"
+              >
+                ×
+              </Button>
             </div>
             
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-green-200">Top Performer:</span>
-                <span className="font-medium text-green-300">{data.drillDown.topProfitProject}</span>
+              <div className="flex justify-between border-b border-green-700/30 pb-1">
+                <span className="text-green-200">Cash Flow Positive:</span>
+                <span className="font-medium text-green-100">{data.drillDown.cashFlow.positive} Projects</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-green-700/30 pb-1">
+                <span className="text-green-200">Outstanding Billing:</span>
+                <span className="font-medium text-green-100">{formatCurrency(data.drillDown.billing.outstanding)}</span>
+              </div>
+              <div className="flex justify-between border-b border-green-700/30 pb-1">
+                <span className="text-green-200">Collection Rate:</span>
+                <span className="font-medium text-green-100">{formatPercentage(data.drillDown.billing.collected)}</span>
+              </div>
+              <div className="flex justify-between border-b border-green-700/30 pb-1">
+                <span className="text-green-200">Change Orders:</span>
+                <span className="font-medium text-green-100">{data.drillDown.changeOrders.approved} Approved ({formatCurrency(data.drillDown.changeOrders.value)})</span>
+              </div>
+              <div className="flex justify-between border-b border-green-700/30 pb-1">
                 <span className="text-green-200">Working Capital:</span>
-                <span className="font-medium">{formatCurrency(data.drillDown.workingCapital)}</span>
+                <span className="font-medium text-green-100">{formatCurrency(data.drillDown.workingCapital)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-green-200">Days Sales Outstanding:</span>
-                <span className="font-medium">{data.drillDown.dso} days</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-green-200">Collection Rate:</span>
-                <span className="font-medium text-green-300">{data.drillDown.billing.collected}%</span>
-              </div>
-            </div>
-
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-green-700">
-              <div className="flex items-center gap-1 mb-2">
-                <CreditCard className="h-3 w-3" />
-                <span className="text-xs font-medium text-green-200">Cash Flow Status</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="text-center">
-                  <div className="font-bold text-green-300">{data.drillDown.cashFlow.positive}</div>
-                  <div className="text-green-300">Positive</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-yellow-300">{data.drillDown.cashFlow.neutral}</div>
-                  <div className="text-green-300">Neutral</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-red-300">{data.drillDown.cashFlow.negative}</div>
-                  <div className="text-green-300">Negative</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-green-700">
-              <div className="text-xs font-medium text-green-200 mb-2">Billing Analysis</div>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-green-300">Outstanding:</span>
-                  <span>{formatCurrency(data.drillDown.billing.outstanding)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-green-300">Overdue:</span>
-                  <span className="text-red-300">{formatCurrency(data.drillDown.billing.overdue)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-green-300">Change Orders:</span>
-                  <span>{data.drillDown.changeOrders.approved} approved, {data.drillDown.changeOrders.pending} pending</span>
-                </div>
+                <span className="font-medium text-green-100">{data.drillDown.dso} days</span>
               </div>
             </div>
           </div>

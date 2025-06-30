@@ -3,10 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Heart, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Shield, Clock, DollarSign } from "lucide-react"
+import { Heart, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Shield, Clock, DollarSign, Eye } from "lucide-react"
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
 import type { DashboardCard } from "@/types/dashboard"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 
 interface HealthCardProps {
   card: DashboardCard
@@ -25,7 +26,7 @@ const HEALTH_COLORS = [
 ]
 
 export function HealthCard({ card, config, span, isCompact, userRole }: HealthCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   // Mock data based on role
   const getRoleBasedData = () => {
@@ -180,8 +181,6 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
   return (
     <div 
       className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border-cyan-200 dark:border-cyan-800 dark:border-cyan-800 hover:shadow-xl transition-all duration-300 h-full">
         <CardHeader className="pb-3">
@@ -263,11 +262,24 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
               </div>
             </div>
           </div>
+
+          {/* Details Toggle Button */}
+          <div className="flex justify-center pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDetails(!showDetails)}
+              className="text-xs border-cyan-200 dark:border-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-950/50"
+            >
+              <Eye className="h-3 w-3 mr-1" />
+              {showDetails ? 'Hide Details' : 'Show Details'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Hover Drill-down */}
-      {isHovered && (
+      {showDetails && (
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border border-cyan-200 dark:border-cyan-800 rounded-lg shadow-2xl z-10 overflow-auto">
           <div className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4">
             <div className="flex items-center justify-between border-b border-cyan-200 dark:border-cyan-800 pb-2">
@@ -280,6 +292,14 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                 <Badge className={`${healthGradeColor} bg-card border-cyan-200 dark:border-cyan-800`}>
                   {data.healthGrade}
                 </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDetails(false)}
+                  className="h-6 w-6 p-0 text-cyan-600 dark:text-cyan-400 hover:text-foreground"
+                >
+                  ×
+                </Button>
               </div>
             </div>
 

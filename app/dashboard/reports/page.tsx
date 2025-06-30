@@ -694,7 +694,7 @@ export default function ReportsPage() {
 
       {/* Report Creator Dialog */}
       <Dialog open={showReportCreator} onOpenChange={setShowReportCreator}>
-        <DialogContent className="!w-[95vw] !max-w-[95vw] !h-[95vh] !max-h-[95vh] p-0 overflow-hidden">
+                    <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
           <div className="flex flex-col h-full">
             <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
               <DialogTitle>
@@ -720,7 +720,7 @@ export default function ReportsPage() {
 
       {/* Report Viewer Dialog */}
       <Dialog open={showReportViewer} onOpenChange={setShowReportViewer}>
-        <DialogContent className="!w-[90vw] !max-w-[90vw] !h-[95vh] !max-h-[95vh] p-0 overflow-hidden">
+                    <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
           <div className="flex flex-col h-full">
             <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
               <DialogTitle>{selectedReport?.name}</DialogTitle>
