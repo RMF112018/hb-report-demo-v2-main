@@ -142,20 +142,20 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
   }
 };
 
-// Define card widths - some cards span multiple columns
+// Define card widths - uses enhanced grid system for precise fractional sizing
 const getCardColSpan = (card: DashboardCard): string => {
   switch (card.type) {
     case "enhanced-hbi-insights":
     case "market-intelligence":
-      return "sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // These cards are 2x width on larger screens
+      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"; // 2x width consistently
     case "portfolio-overview":
     case "financial-review-panel":
-      return "sm:col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // 1.5x width - spans 2 columns on larger screens
+      return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3"; // 1.5x width (3/2=1.5 ratio)
     case "staffing-distribution":
     case "pipeline-analytics":
-      return "sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // 2x width - spans 2 columns on larger screens
+      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"; // 2x width consistently
     default:
-      return "col-span-1"; // Standard single column width
+      return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // Standard width (base unit)
   }
 };
 
@@ -236,12 +236,12 @@ export function DashboardGrid({
           "relative",
           // Improved grid structure with consistent row sizing
           "grid auto-rows-max",
-          // Better responsive breakpoints - original structure
-          "grid-cols-1",                    // Mobile: 1 column
-          "sm:grid-cols-2",                 // Small tablet: 2 columns  
-          "lg:grid-cols-3",                 // Large tablet/small desktop: 3 columns
-          "xl:grid-cols-4",                 // Desktop: 4 columns
-          "2xl:grid-cols-5",                // Large desktop: 5 columns
+          // Enhanced responsive breakpoints to support fractional widths
+          "grid-cols-2",                    // Mobile: 2 columns (allows for 1.5x = 3 spans)
+          "sm:grid-cols-4",                 // Small tablet: 4 columns  
+          "lg:grid-cols-6",                 // Large tablet/small desktop: 6 columns
+          "xl:grid-cols-8",                 // Desktop: 8 columns
+          "2xl:grid-cols-10",               // Large desktop: 10 columns
           // Consistent spacing - same horizontal and vertical
           spacingClass
         )}>
