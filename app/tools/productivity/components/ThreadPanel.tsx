@@ -53,7 +53,7 @@ export const ThreadPanel = ({ thread, task, className }: ThreadPanelProps) => {
   }, [messages])
 
   const getUserById = (userId: string): User | undefined => {
-    return users.find(u => u.id === userId)
+    return users[userId]
   }
 
   const getUserInitials = (userId: string): string => {
