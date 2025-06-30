@@ -52,11 +52,13 @@ export const ThreadPanel = ({ thread, task, className }: ThreadPanelProps) => {
     scrollToBottom()
   }, [messages])
 
-  const getUserById = (userId: string): User | undefined => {
+  const getUserById = (userId: string | undefined): User | undefined => {
+    if (!userId) return undefined
     return users[userId]
   }
 
-  const getUserInitials = (userId: string): string => {
+  const getUserInitials = (userId: string | undefined): string => {
+    if (!userId) return 'UN' // Default initials for undefined/null userId
     const user = getUserById(userId)
     if (!user) return userId.slice(0, 2).toUpperCase()
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase()
