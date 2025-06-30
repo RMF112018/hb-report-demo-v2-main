@@ -201,7 +201,7 @@ export const ProductivityPopover = ({
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[420px] p-0 shadow-2xl border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg" 
+        className="w-[480px] p-0 shadow-2xl border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg" 
         align="end"
         sideOffset={12}
       >
@@ -338,7 +338,7 @@ export const ProductivityPopover = ({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
                                 <h5 className={cn(
-                                  "text-sm truncate max-w-[200px]",
+                                  "text-sm truncate max-w-[280px]",
                                   isUnread 
                                     ? "font-semibold text-gray-900 dark:text-gray-100" 
                                     : "font-medium text-gray-800 dark:text-gray-200"
@@ -366,7 +366,7 @@ export const ProductivityPopover = ({
                               )}
                               
                               {lastMessage && (
-                                <p className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[280px]">
+                                <p className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[350px]">
                                   <span className="font-medium text-gray-700 dark:text-gray-300">
                                     {lastSender?.name || 'Someone'}:
                                   </span>{' '}
@@ -460,7 +460,7 @@ export const ProductivityPopover = ({
                             
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[200px]">
+                                <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[280px]">
                                   {task.title}
                                 </h5>
                                 <div className="flex items-center space-x-1">
