@@ -39,7 +39,6 @@ import { AppHeader } from "@/components/layout/app-header";
 import FinancialOverview from "@/components/financial-hub/FinancialOverview";
 import BudgetAnalysis from "@/components/financial-hub/BudgetAnalysis";
 import CashFlowAnalysis from "@/components/financial-hub/CashFlowAnalysis";
-import Forecasting from "@/components/financial-hub/Forecasting";
 import { PayApplication } from "@/components/financial-hub/PayApplication";
 
 import ChangeManagement from "@/components/financial-hub/ChangeManagement";
@@ -133,13 +132,6 @@ export default function FinancialHubPage() {
       icon: PieChart,
       description: "Real-time cost tracking and expense categorization",
       component: CostTracking,
-    },
-    {
-      id: "forecasting",
-      label: "Forecasting",
-      icon: TrendingUp,
-      description: "Financial forecasting and predictive analytics",
-      component: Forecasting,
     },
     {
       id: "pay-authorization",

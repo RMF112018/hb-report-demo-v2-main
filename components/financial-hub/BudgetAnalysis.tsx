@@ -22,12 +22,39 @@ import {
   Building2,
   FileText,
   Zap,
+  TableIcon,
+  Search,
+  Filter,
+  Download,
+  SortAsc,
+  SortDesc,
+  ArrowUpDown,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FullscreenToggle } from "@/components/ui/fullscreen-toggle";
+import { CollapseWrapper } from "@/components/ui/collapse-wrapper";
+import { useFinancialHubStore } from "@/hooks/use-financial-hub-store";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AreaChart,
   Area,
@@ -48,9 +75,38 @@ import {
   Scatter,
 } from "recharts";
 
+// Import budget data
+import budgetData from "@/data/mock/financial/budget.json";
+
 interface BudgetAnalysisProps {
   userRole: string;
   projectData: any;
+}
+
+// Budget item interface
+interface BudgetItem {
+  project_id: number;
+  "Sub Job": string;
+  "Cost Code Tier 1": string;
+  "Cost Code Tier 2": string;
+  "Cost Code Tier 3": string;
+  "Cost Type": string;
+  "Budget Code": string;
+  "Budget Code Description": string;
+  "Original Budget Amount": number;
+  "Budget Modifications": number;
+  "Approved COs": number;
+  "Revised Budget": number;
+  "Pending Budget Changes": number;
+  "Projected Budget": number;
+  "Committed Costs": number;
+  "Direct Costs": number;
+  "Job to Date Costs": number;
+  "Pending Cost Changes": number;
+  "Projected Costs": number;
+  "Forecast To Complete": number;
+  "Estimated Cost at Completion": number;
+  "Projected over Under": number;
 }
 
 // Enhanced role-based budget data with realistic scaling
@@ -185,70 +241,32 @@ const monthlyPerformance = [
   { month: "Aug", budgeted: 12100000, actual: 11600000, forecast: 11900000, variance: 500000, cpi: 1.04 },
 ];
 
-// Risk factors and insights
-const budgetRisks = [
-  {
-    category: "Material Cost Escalation",
-    impact: "high",
-    probability: 0.7,
-    potentialCost: 2500000,
-    mitigation: "Lock in supplier contracts, bulk purchasing"
-  },
-  {
-    category: "Schedule Delays",
-    impact: "medium", 
-    probability: 0.4,
-    potentialCost: 1200000,
-    mitigation: "Enhanced project controls, resource optimization"
-  },
-  {
-    category: "Change Order Volume",
-    impact: "medium",
-    probability: 0.6,
-    potentialCost: 1800000,
-    mitigation: "Improved design documentation, stakeholder alignment"
-  },
-  {
-    category: "Weather Impact",
-    impact: "low",
-    probability: 0.3,
-    potentialCost: 600000,
-    mitigation: "Seasonal planning, contingency buffers"
-  }
-];
+type ViewMode = "overview" | "categories" | "variance" | "budget";
 
-// Cost control metrics
-const costControlMetrics = [
-  { metric: "Budget Adherence", current: 96.2, target: 95.0, trend: "improving" },
-  { metric: "Change Order Control", current: 2.1, target: 3.0, trend: "stable" },
-  { metric: "Cost Forecast Accuracy", current: 94.8, target: 92.0, trend: "improving" },
-  { metric: "Contingency Utilization", current: 23.5, target: 30.0, trend: "controlled" }
-];
+type SortField = keyof BudgetItem;
+type SortDirection = "asc" | "desc";
 
-/**
- * Budget Analysis Component
- *
- * Provides comprehensive budget analysis including:
- * - Real-time budget vs actual performance tracking
- * - Cost category breakdown and variance analysis
- * - Predictive cost modeling and risk assessment
- * - Role-based data views and insights
- *
- * @param userRole - Current user role for data filtering
- * @param projectData - Project context data
- */
 export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysisProps) {
-  const [selectedTimeframe, setSelectedTimeframe] = useState("YTD");
-  const [viewMode, setViewMode] = useState<"summary" | "detailed" | "forecast">("summary");
+  const { isFullscreen, toggleFullscreen } = useFinancialHubStore();
+  
+  const [viewMode, setViewMode] = useState<ViewMode>("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>("Budget Code");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  // Filter budget data to single project (2525840 - Palm Beach Luxury Estate)
+  const filteredBudgetData = useMemo(() => {
+    return (budgetData as BudgetItem[]).filter(item => item.project_id === 2525840);
+  }, []);
 
   // Get role-based budget data
-  const budgetData = getRoleBasedBudgetData(userRole);
+  const summaryData = getRoleBasedBudgetData(userRole);
 
   // Calculate key performance indicators
-  const budgetUtilization = (budgetData.totalActualCosts / budgetData.totalRevisedBudget) * 100;
-  const remainingBudget = budgetData.totalRevisedBudget - budgetData.totalActualCosts;
-  const projectedVariance = budgetData.totalRevisedBudget - budgetData.totalEstimatedAtCompletion;
-  const changeOrderImpact = (budgetData.changeOrderTotal / budgetData.totalOriginalBudget) * 100;
+  const budgetUtilization = (summaryData.totalActualCosts / summaryData.totalRevisedBudget) * 100;
+  const remainingBudget = summaryData.totalRevisedBudget - summaryData.totalActualCosts;
+  const projectedVariance = summaryData.totalRevisedBudget - summaryData.totalEstimatedAtCompletion;
+  const changeOrderImpact = (summaryData.changeOrderTotal / summaryData.totalOriginalBudget) * 100;
 
   // Performance status
   const getPerformanceStatus = (variance: number) => {
@@ -260,163 +278,138 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
   const performanceStatus = getPerformanceStatus(projectedVariance);
 
   // Risk level assessment
-  const riskLevel = budgetData.costPerformanceIndex < 0.95 ? "high" : 
-                   budgetData.costPerformanceIndex < 1.05 ? "medium" : "low";
+  const riskLevel = summaryData.costPerformanceIndex < 0.95 ? "high" : 
+                   summaryData.costPerformanceIndex < 1.05 ? "medium" : "low";
 
-  return (
-    <div className="space-y-6">
-      {/* Key Performance Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Budget</CardTitle>
-            <Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
-              ${(budgetData.totalRevisedBudget / 1000000).toFixed(1)}M
-            </div>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400">
-              Original: ${(budgetData.totalOriginalBudget / 1000000).toFixed(1)}M
-            </p>
-          </CardContent>
-        </Card>
+  // Budget table search and sort functionality
+  const processedBudgetData = useMemo(() => {
+    let data = [...filteredBudgetData];
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Actual Costs</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              ${(budgetData.totalActualCosts / 1000000).toFixed(1)}M
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              {budgetUtilization.toFixed(1)}% utilized
-            </p>
-          </CardContent>
-        </Card>
+    // Apply search filter
+    if (searchTerm) {
+      data = data.filter(item =>
+        item["Budget Code"].toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item["Budget Code Description"].toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item["Cost Code Tier 1"].toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item["Cost Code Tier 2"].toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-        <Card className={`bg-gradient-to-br ${projectedVariance >= 0 ? 
-          "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800" : 
-          "from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800"}`}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className={`text-sm font-medium ${projectedVariance >= 0 ? 
-              "text-green-700 dark:text-green-300" : 
-              "text-red-700 dark:text-red-300"}`}>
-              Budget Variance
-            </CardTitle>
-            {projectedVariance >= 0 ? 
-              <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" /> :
-              <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
-            }
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${projectedVariance >= 0 ? 
-              "text-green-900 dark:text-green-100" : 
-              "text-red-900 dark:text-red-100"}`}>
-              {projectedVariance >= 0 ? '+' : ''}${(projectedVariance / 1000000).toFixed(1)}M
-            </div>
-            <p className={`text-xs ${projectedVariance >= 0 ? 
-              "text-green-600 dark:text-green-400" : 
-              "text-red-600 dark:text-red-400"}`}>
-              {((projectedVariance / budgetData.totalRevisedBudget) * 100).toFixed(1)}% vs budget
-            </p>
-          </CardContent>
-        </Card>
+    // Apply sorting
+    data.sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+      
+      if (sortDirection === "asc") {
+        return aStr.localeCompare(bStr);
+      } else {
+        return bStr.localeCompare(aStr);
+      }
+    });
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">CPI Score</CardTitle>
-            <Target className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-              {budgetData.costPerformanceIndex.toFixed(2)}
-            </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">
-              {budgetData.costPerformanceIndex > 1 ? 'Under' : 'Over'} budget performance
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+    return data;
+  }, [filteredBudgetData, searchTerm, sortField, sortDirection]);
 
-      {/* HBI Budget Intelligence */}
-      <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
-            <Zap className="h-5 w-5" />
-            HBI Budget Intelligence
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="flex items-start gap-3">
-              <performanceStatus.icon className={`h-5 w-5 mt-0.5 ${performanceStatus.color}`} />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Budget Status</p>
-                <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  Currently tracking {performanceStatus.status} budget with CPI of {budgetData.costPerformanceIndex.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Percent className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Completion Rate</p>
-                <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  {(budgetData.completionPercentage * 100).toFixed(1)}% complete with optimal resource utilization
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Risk Level</p>
-                <Badge variant={riskLevel === "high" ? "destructive" : riskLevel === "medium" ? "secondary" : "default"}>
-                  {riskLevel.toUpperCase()}
-                </Badge>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Building2 className="h-5 w-5 text-indigo-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Portfolio Scope</p>
-                <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                  Analyzing {budgetData.projectCount} project{budgetData.projectCount > 1 ? 's' : ''} totaling ${(budgetData.totalRevisedBudget / 1000000).toFixed(0)}M
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
-      {/* Main Analysis Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="categories" className="flex items-center gap-2">
-            <Layers className="h-4 w-4" />
-            Categories
-          </TabsTrigger>
-          <TabsTrigger value="variance" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Variance
-          </TabsTrigger>
-          <TabsTrigger value="forecast" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Forecast
-          </TabsTrigger>
-          <TabsTrigger value="controls" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Controls
-          </TabsTrigger>
-        </TabsList>
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
-        <TabsContent value="overview" className="space-y-6">
+  const exportToCSV = () => {
+    const headers = [
+      "Budget Code",
+      "Description",
+      "Cost Code Tier 1",
+      "Cost Code Tier 2", 
+      "Cost Type",
+      "Original Budget",
+      "Budget Modifications",
+      "Approved COs",
+      "Revised Budget",
+      "Committed Costs",
+      "Job to Date Costs",
+      "Forecast to Complete",
+      "Estimated at Completion",
+      "Projected Over/Under"
+    ];
+
+    const csvContent = [
+      headers.join(","),
+      ...processedBudgetData.map(item => [
+        `"${item["Budget Code"]}"`,
+        `"${item["Budget Code Description"]}"`,
+        `"${item["Cost Code Tier 1"]}"`,
+        `"${item["Cost Code Tier 2"]}"`,
+        `"${item["Cost Type"]}"`,
+        item["Original Budget Amount"],
+        item["Budget Modifications"],
+        item["Approved COs"],
+        item["Revised Budget"],
+        item["Committed Costs"],
+        item["Job to Date Costs"],
+        item["Forecast To Complete"],
+        item["Estimated Cost at Completion"],
+        item["Projected over Under"]
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "budget_analysis.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const ViewToggle = () => (
+    <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+      {[
+        { key: "overview", label: "Overview", icon: BarChart3 },
+        { key: "categories", label: "Categories", icon: Layers },
+        { key: "variance", label: "Variance", icon: TrendingUp },
+        { key: "budget", label: "Budget Detail", icon: TableIcon }
+      ].map((item) => (
+        <Button
+          key={item.key}
+          variant={viewMode === item.key ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setViewMode(item.key as ViewMode)}
+          className="flex items-center gap-2"
+        >
+          <item.icon className="h-4 w-4" />
+          {item.label}
+        </Button>
+      ))}
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (viewMode) {
+      case "overview":
+        return (
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Budget Performance Chart */}
             <Card className="lg:col-span-2">
@@ -471,7 +464,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Burn Rate</p>
-                      <p className="text-lg font-semibold">${(budgetData.totalActualCosts / 8 / 1000000).toFixed(1)}M/mo</p>
+                      <p className="text-lg font-semibold">${(summaryData.totalActualCosts / 8 / 1000000).toFixed(1)}M/mo</p>
                     </div>
                   </div>
                 </div>
@@ -492,10 +485,10 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Cost Performance Index</span>
                     <div className="flex items-center gap-2">
-                      <Badge variant={budgetData.costPerformanceIndex >= 1 ? "default" : "destructive"}>
-                        {budgetData.costPerformanceIndex.toFixed(2)}
+                      <Badge variant={summaryData.costPerformanceIndex >= 1 ? "default" : "destructive"}>
+                        {summaryData.costPerformanceIndex.toFixed(2)}
                       </Badge>
-                      {budgetData.costPerformanceIndex >= 1 ? 
+                      {summaryData.costPerformanceIndex >= 1 ? 
                         <TrendingUp className="h-4 w-4 text-green-600" /> :
                         <TrendingDown className="h-4 w-4 text-red-600" />
                       }
@@ -505,10 +498,10 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Schedule Performance Index</span>
                     <div className="flex items-center gap-2">
-                      <Badge variant={budgetData.schedulePerformanceIndex >= 1 ? "default" : "secondary"}>
-                        {budgetData.schedulePerformanceIndex.toFixed(2)}
+                      <Badge variant={summaryData.schedulePerformanceIndex >= 1 ? "default" : "secondary"}>
+                        {summaryData.schedulePerformanceIndex.toFixed(2)}
                       </Badge>
-                      {budgetData.schedulePerformanceIndex >= 1 ? 
+                      {summaryData.schedulePerformanceIndex >= 1 ? 
                         <TrendingUp className="h-4 w-4 text-green-600" /> :
                         <TrendingDown className="h-4 w-4 text-yellow-600" />
                       }
@@ -527,9 +520,11 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        );
 
-        <TabsContent value="categories" className="space-y-6">
+      case "categories":
+        return (
+          <div className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Category Breakdown Chart */}
             <Card>
@@ -643,9 +638,11 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </div>
+        );
 
-        <TabsContent value="variance" className="space-y-6">
+      case "variance":
+        return (
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Variance Analysis Chart */}
             <Card className="lg:col-span-2">
@@ -689,13 +686,13 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                   <LineChart data={monthlyPerformance}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
-                    <YAxis domain={[0.95, 1.1]} tickFormatter={(value) => value.toFixed(2)} />
+                    <YAxis domain={[0.8, 1.2]} />
                     <Tooltip formatter={(value: number) => value.toFixed(2)} />
                     <Line 
                       type="monotone" 
                       dataKey="cpi" 
                       stroke="#3b82f6" 
-                      strokeWidth={3}
+                      strokeWidth={2}
                       name="CPI"
                     />
                   </LineChart>
@@ -703,192 +700,410 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
               </CardContent>
             </Card>
 
-            {/* Top Variances */}
+            {/* Risk Factors */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Top Variances
+                  Risk Assessment
                 </CardTitle>
-                <CardDescription>Categories with highest budget variances</CardDescription>
+                <CardDescription>Budget risk factors and impact analysis</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {budgetCategories
-                    .sort((a, b) => Math.abs(b.variancePercent) - Math.abs(a.variancePercent))
-                    .slice(0, 4)
-                    .map((category, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div>
-                          <p className="font-medium">{category.category}</p>
-                          <p className="text-sm text-muted-foreground">
-                            ${(category.variance / 1000000).toFixed(1)}M variance
-                          </p>
-                        </div>
-                        <Badge variant={category.variancePercent >= 0 ? "default" : "destructive"}>
-                          {category.variancePercent >= 0 ? '+' : ''}{category.variancePercent.toFixed(1)}%
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Overall Risk Level</span>
+                    <Badge variant={riskLevel === "high" ? "destructive" : riskLevel === "medium" ? "secondary" : "default"}>
+                      {riskLevel.toUpperCase()}
                         </Badge>
                       </div>
-                    ))}
+                  <div className="space-y-2">
+                    <div className="text-sm text-muted-foreground">Key Risk Factors:</div>
+                    <ul className="text-sm space-y-1">
+                      <li>• Material cost escalation: Medium impact</li>
+                      <li>• Schedule delays: Low impact</li>
+                      <li>• Labor shortage: Medium impact</li>
+                      <li>• Change order frequency: Low impact</li>
+                    </ul>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        );
 
-        <TabsContent value="forecast" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Risk Assessment */}
+      case "budget":
+        return (
+          <div className="space-y-6">
+            {/* Budget Table Controls */}
             <Card>
               <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
                 <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  Budget Risk Assessment
+                      <TableIcon className="h-5 w-5 text-blue-600" />
+                      Budget Detail - Palm Beach Luxury Estate
                 </CardTitle>
-                <CardDescription>Potential budget risks and impact analysis</CardDescription>
+                    <CardDescription>
+                      Detailed budget breakdown with {processedBudgetData.length} line items
+                    </CardDescription>
+                  </div>
+                  <Button onClick={exportToCSV} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {budgetRisks.map((risk, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">{risk.category}</span>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={risk.impact === "high" ? "destructive" : risk.impact === "medium" ? "secondary" : "default"}>
-                            {risk.impact}
+                {/* Search and Filter Controls */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Search budget codes, descriptions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Badge variant="secondary" className="whitespace-nowrap">
+                    {processedBudgetData.length} items
                           </Badge>
-                          <span className="text-muted-foreground">${(risk.potentialCost / 1000000).toFixed(1)}M</span>
                         </div>
+
+                {/* Budget Data Table */}
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[150px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Budget Code")}
+                          >
+                            Budget Code
+                            {sortField === "Budget Code" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="min-w-[200px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Cost Code Tier 1")}
+                          >
+                            Cost Code
+                            {sortField === "Cost Code Tier 1" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[80px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Cost Type")}
+                          >
+                            Type
+                            {sortField === "Cost Type" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Original Budget Amount")}
+                          >
+                            Original Budget
+                            {sortField === "Original Budget Amount" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Budget Modifications")}
+                          >
+                            Modifications
+                            {sortField === "Budget Modifications" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Revised Budget")}
+                          >
+                            Revised Budget
+                            {sortField === "Revised Budget" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Job to Date Costs")}
+                          >
+                            Actual Costs
+                            {sortField === "Job to Date Costs" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Forecast To Complete")}
+                          >
+                            To Complete
+                            {sortField === "Forecast To Complete" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("Projected over Under")}
+                          >
+                            Variance
+                            {sortField === "Projected over Under" && (
+                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {processedBudgetData.slice(0, 50).map((item, index) => (
+                        <TableRow key={index} className="hover:bg-muted/50">
+                          <TableCell className="font-mono text-xs">
+                            {item["Budget Code"]}
+                          </TableCell>
+                          <TableCell className="max-w-[200px]">
+                            <div className="space-y-1">
+                              <div className="font-medium text-sm">{item["Cost Code Tier 1"]}</div>
+                              <div className="text-xs text-muted-foreground truncate">
+                                {item["Cost Code Tier 2"]}
                       </div>
-                      <Progress value={risk.probability * 100} className="h-2" />
-                      <p className="text-xs text-muted-foreground">{risk.mitigation}</p>
                     </div>
-                  ))}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {item["Cost Type"]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            {formatCurrency(item["Original Budget Amount"])}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            <span className={item["Budget Modifications"] >= 0 ? "text-green-600" : "text-red-600"}>
+                              {item["Budget Modifications"] >= 0 ? "+" : ""}{formatCurrency(item["Budget Modifications"])}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-medium">
+                            {formatCurrency(item["Revised Budget"])}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            {formatCurrency(item["Job to Date Costs"])}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            {formatCurrency(item["Forecast To Complete"])}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            <span className={item["Projected over Under"] >= 0 ? "text-green-600" : "text-red-600"}>
+                              {item["Projected over Under"] >= 0 ? "+" : ""}{formatCurrency(item["Projected over Under"])}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Forecast Accuracy */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-green-600" />
-                  Forecast Performance
-                </CardTitle>
-                <CardDescription>Budget forecasting accuracy metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">94.8%</div>
-                    <p className="text-sm text-muted-foreground">Forecast Accuracy</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-xl font-semibold">${(budgetData.totalEstimatedAtCompletion / 1000000).toFixed(1)}M</div>
-                      <p className="text-xs text-muted-foreground">Est. at Completion</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-semibold">${(budgetData.totalForecastToComplete / 1000000).toFixed(1)}M</div>
-                      <p className="text-xs text-muted-foreground">Forecast to Complete</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Projected Completion */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-purple-600" />
-                Project Completion Forecast
-              </CardTitle>
-              <CardDescription>Projected budget performance at completion</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-3">
-                <div className="text-center p-4 bg-muted/30 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    ${(budgetData.totalRevisedBudget / 1000000).toFixed(1)}M
-                  </div>
-                  <p className="text-sm text-muted-foreground">Total Budget</p>
-                </div>
-                <div className="text-center p-4 bg-muted/30 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
-                    ${(budgetData.totalEstimatedAtCompletion / 1000000).toFixed(1)}M
-                  </div>
-                  <p className="text-sm text-muted-foreground">Estimated at Completion</p>
-                </div>
-                <div className="text-center p-4 bg-muted/30 rounded-lg">
-                  <div className={`text-2xl font-bold ${projectedVariance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {projectedVariance >= 0 ? '+' : ''}${(projectedVariance / 1000000).toFixed(1)}M
-                  </div>
-                  <p className="text-sm text-muted-foreground">Projected Variance</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="controls" className="space-y-6">
-          {/* Cost Control Metrics */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {costControlMetrics.map((metric, index) => (
-              <Card key={index}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">{metric.metric}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {metric.current.toFixed(1)}%
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Target: {metric.target.toFixed(1)}%</span>
-                    <Badge variant={metric.trend === "improving" ? "default" : "secondary"}>
-                      {metric.trend}
+                {processedBudgetData.length > 50 && (
+                  <div className="mt-4 text-center">
+                    <Badge variant="secondary">
+                      Showing first 50 of {processedBudgetData.length} items
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                )}
+              </CardContent>
+            </Card>
           </div>
+        );
 
-          {/* Control Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-indigo-600" />
-                Budget Control Actions
-              </CardTitle>
-              <CardDescription>Recommended actions for budget optimization</CardDescription>
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`space-y-6 ${isFullscreen.budgetAnalysis ? 'fixed inset-0 z-[9999] bg-background p-6 overflow-auto' : ''}`}>
+      {/* Controls Bar */}
+      <div className="flex items-center justify-between">
+        <ViewToggle />
+        <FullscreenToggle
+          isFullscreen={isFullscreen.budgetAnalysis}
+          onToggle={() => toggleFullscreen('budgetAnalysis')}
+        />
+      </div>
+
+      {/* Collapsible KPI Metrics */}
+      <CollapseWrapper
+        title="Key Performance Metrics"
+        subtitle="Real-time budget performance indicators"
+        defaultCollapsed={false}
+      >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Budget</CardTitle>
+              <Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              </CardHeader>
+              <CardContent>
+              <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+                ${(summaryData.totalRevisedBudget / 1000000).toFixed(1)}M
+                  </div>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                Original: ${(summaryData.totalOriginalBudget / 1000000).toFixed(1)}M
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Actual Costs</CardTitle>
+              <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-                  <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">Performing Well</h4>
-                  <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
-                    <li>• Cost performance index above target</li>
-                    <li>• Change order control within limits</li>
-                    <li>• Forecast accuracy exceeding expectations</li>
-                  </ul>
+              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                ${(summaryData.totalActualCosts / 1000000).toFixed(1)}M
+                    </div>
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                {budgetUtilization.toFixed(1)}% utilized
+              </p>
+              </CardContent>
+            </Card>
+
+          <Card className={`bg-gradient-to-br ${projectedVariance >= 0 ? 
+            "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800" : 
+            "from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800"}`}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className={`text-sm font-medium ${projectedVariance >= 0 ? 
+                "text-green-700 dark:text-green-300" : 
+                "text-red-700 dark:text-red-300"}`}>
+                Budget Variance
+              </CardTitle>
+              {projectedVariance >= 0 ? 
+                <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" /> :
+                <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
+              }
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${projectedVariance >= 0 ? 
+                "text-green-900 dark:text-green-100" : 
+                "text-red-900 dark:text-red-100"}`}>
+                    {projectedVariance >= 0 ? '+' : ''}${(projectedVariance / 1000000).toFixed(1)}M
+                  </div>
+              <p className={`text-xs ${projectedVariance >= 0 ? 
+                "text-green-600 dark:text-green-400" : 
+                "text-red-600 dark:text-red-400"}`}>
+                {((projectedVariance / summaryData.totalRevisedBudget) * 100).toFixed(1)}% vs budget
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">CPI Score</CardTitle>
+              <Target className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                </CardHeader>
+                <CardContent>
+              <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                {summaryData.costPerformanceIndex.toFixed(2)}
+                  </div>
+              <p className="text-xs text-purple-600 dark:text-purple-400">
+                {summaryData.costPerformanceIndex > 1 ? 'Under' : 'Over'} budget performance
+              </p>
+                </CardContent>
+              </Card>
+          </div>
+      </CollapseWrapper>
+
+      {/* Collapsible HBI Intelligence */}
+      <CollapseWrapper
+        title="HBI Budget Intelligence"
+        subtitle="AI-powered insights and analysis"
+        defaultCollapsed={true}
+      >
+        <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
+          <CardContent className="pt-6">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="flex items-start gap-3">
+                <performanceStatus.icon className={`h-5 w-5 mt-0.5 ${performanceStatus.color}`} />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Budget Status</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Currently tracking {performanceStatus.status} budget with CPI of {summaryData.costPerformanceIndex.toFixed(2)}
+                  </p>
                 </div>
-                
-                <div className="p-4 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
-                  <h4 className="font-medium text-amber-800 dark:text-amber-200 mb-2">Attention Needed</h4>
-                  <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1">
-                    <li>• Material cost escalation monitoring</li>
-                    <li>• Schedule performance improvement</li>
-                    <li>• Enhanced change order documentation</li>
-                  </ul>
+              </div>
+              <div className="flex items-start gap-3">
+                <Percent className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Completion Rate</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    {(summaryData.completionPercentage * 100).toFixed(1)}% complete with optimal resource utilization
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Risk Level</p>
+                  <Badge variant={riskLevel === "high" ? "destructive" : riskLevel === "medium" ? "secondary" : "default"}>
+                    {riskLevel.toUpperCase()}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Building2 className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Portfolio Scope</p>
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                    Analyzing {summaryData.projectCount} project{summaryData.projectCount > 1 ? 's' : ''} totaling ${(summaryData.totalRevisedBudget / 1000000).toFixed(0)}M
+                  </p>
+                </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+      </CollapseWrapper>
+
+      {/* Main Content Area */}
+      {renderContent()}
     </div>
   );
-} 
+}

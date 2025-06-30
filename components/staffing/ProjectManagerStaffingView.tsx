@@ -143,7 +143,7 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
   }
 
   const pendingSpcrs = spcrData.filter(spcr => 
-    spcr.projectId === projectId && spcr.status === 'draft'
+    spcr.project_id === projectId && spcr.status === 'draft'
   ).length
 
   // PM-specific insights
@@ -181,7 +181,7 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
   ]
 
   return (
-    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-50 bg-background p-6 overflow-auto")}>
+    <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-[9999] bg-background p-6 overflow-auto")}>
 
 
       {/* Project Header */}
