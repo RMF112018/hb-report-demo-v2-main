@@ -157,20 +157,21 @@ export const AppHeader = () => {
     }
   }, [selectedDepartment])
 
-  // Before the `tools` useMemo, add a helper function to determine the dashboard path:
+  // Helper function to determine the dashboard path based on user role
   const getDashboardPath = useCallback(() => {
     if (!user) return "/dashboard" // Default or loading state
+    
+    // All users go to the main dashboard which handles role-specific content
+    // The main dashboard page dynamically loads appropriate content based on user role
     switch (user.role) {
-      case "admin":
-        return "/dashboard/admin"
       case "executive":
-        return "/dashboard/exec"
       case "project-executive":
-        return "/dashboard/px"
       case "project-manager":
-        return "/dashboard/pm"
+      case "estimator":
+      case "admin":
+        return "/dashboard"
       default:
-        return "/dashboard" // Fallback for other roles or operations
+        return "/dashboard" // Fallback for any other roles
     }
   }, [user])
 
