@@ -418,17 +418,7 @@ export const ExecutiveStaffingView = () => {
 
         {/* Assignments Tab */}
         <TabsContent value="assignments" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Interactive Staffing Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <InteractiveStaffingGantt />
-            </CardContent>
-          </Card>
+          <InteractiveStaffingGantt />
         </TabsContent>
 
         {/* SPCR Review Tab */}
