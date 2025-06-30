@@ -194,7 +194,7 @@ export const TaskBoard = ({
     }
 
     return (
-      <Badge variant="outline" className={cn('text-xs mb-2', typeColors[task.linkedTo.type])}>
+      <Badge variant="outline" className={cn('text-xs', typeColors[task.linkedTo.type])}>
         <ExternalLink className="w-2 h-2 mr-1" />
         {getFeatureDisplayName(task.linkedTo.type)}
       </Badge>
@@ -232,19 +232,20 @@ export const TaskBoard = ({
       <Card
         key={task.id}
         className={cn(
-          'mb-3 cursor-pointer transition-all duration-200 hover:shadow-md border-l-4',
+          'cursor-pointer transition-all duration-200 hover:shadow-md border-l-4',
           getPriorityColor(task.priority),
           selectedTask?.id === task.id && 'ring-2 ring-blue-500'
         )}
         onClick={() => setSelectedTask(task)}
       >
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <div className="flex items-center space-x-2">
+        <CardContent className="p-3">
+          {/* Header with title and status */}
+          <div className="flex items-start justify-between mb-2 gap-2">
+            <div className="flex items-start space-x-2 min-w-0 flex-1">
               {getPriorityIcon(task.priority)}
-              <h4 className="font-medium text-sm line-clamp-2">{task.title}</h4>
+              <h4 className="font-medium text-sm line-clamp-2 flex-1">{task.title}</h4>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 shrink-0">
               {overdue && (
                 <AlertCircle className="w-4 h-4 text-red-500" />
               )}
@@ -252,10 +253,16 @@ export const TaskBoard = ({
                 value={task.status}
                 onValueChange={(value) => handleStatusChange(task, value as Task['status'])}
               >
-                <SelectTrigger className="w-auto h-6 text-xs px-2">
-                  <Badge variant="outline" className={getStatusColor(task.status)}>
-                    {task.status}
-                  </Badge>
+                <SelectTrigger className="w-auto h-7 text-xs px-3 border-none shadow-none">
+                  <span className={cn(
+                    'px-2 py-1 rounded-full text-xs font-medium',
+                    getStatusColor(task.status)
+                  )}>
+                    {task.status === 'in-progress' ? 'In Progress' : 
+                     task.status === 'todo' ? 'To Do' :
+                     task.status === 'completed' ? 'Done' : 
+                     'Blocked'}
+                  </span>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todo">To Do</SelectItem>
@@ -267,27 +274,32 @@ export const TaskBoard = ({
             </div>
           </div>
 
-          {getLinkedEntityBadge(task)}
+          {/* Linked entity badge */}
+          <div className="mb-2">
+            {getLinkedEntityBadge(task)}
+          </div>
 
+          {/* Description */}
           {task.description && (
             <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
               {task.description}
             </p>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Avatar className="w-6 h-6">
+          {/* Footer with assignee and metadata */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 min-w-0">
+              <Avatar className="w-6 h-6 shrink-0">
                 <AvatarFallback className="text-xs">
                   {getUserInitials(task.assignedTo)}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground truncate">
                 {user?.name || `User ${task.assignedTo}`}
               </span>
             </div>
 
-            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-3 text-xs text-muted-foreground shrink-0">
               {commentsCount > 0 && (
                 <div className="flex items-center space-x-1">
                   <MessageSquare className="w-3 h-3" />
@@ -296,7 +308,7 @@ export const TaskBoard = ({
               )}
               <div className="flex items-center space-x-1">
                 <Calendar className="w-3 h-3" />
-                <span className={overdue ? 'text-red-500' : ''}>
+                <span className={overdue ? 'text-red-500 font-medium' : ''}>
                   {task.dueDate ? format(task.dueDate, 'MMM d') : 'No date'}
                 </span>
               </div>
@@ -309,19 +321,19 @@ export const TaskBoard = ({
 
   const renderColumn = (status: Task['status'], title: string, tasks: Task[]) => {
     return (
-      <div className="flex-1 min-w-80">
-        <Card className="h-full">
-          <CardHeader className="pb-4">
+      <div className="flex-1 min-w-0">
+        <Card>
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center">
                 <CheckSquare className="w-4 h-4 mr-2" />
                 {title}
               </CardTitle>
-              <Badge variant="secondary">{tasks.length}</Badge>
+              <Badge variant="secondary" className="shrink-0">{tasks.length}</Badge>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <ScrollArea className="h-96">
+            <div className="space-y-3">
               {tasks.map(renderTaskCard)}
               {tasks.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
@@ -329,25 +341,23 @@ export const TaskBoard = ({
                   <p className="text-xs">No {title.toLowerCase()} tasks</p>
                 </div>
               )}
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       </div>
     )
   }
 
-
-
   return (
-    <div className={cn('h-full', className)}>
+    <div className={cn('h-full flex flex-col', className)}>
       {/* Header with Filters */}
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 space-y-4 shrink-0">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Task Board</h2>
           <Badge variant="outline">{filteredTasks.length} tasks</Badge>
         </div>
 
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -358,48 +368,71 @@ export const TaskBoard = ({
             />
           </div>
 
-          <Select value={filterUser} onValueChange={setFilterUser}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by user" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Users</SelectItem>
-              {Object.values(users).map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Select value={filterUser} onValueChange={setFilterUser}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Filter by user" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                {Object.values(users).map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select value={filterFeature} onValueChange={setFilterFeature}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by feature" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Features</SelectItem>
-              {getFeatureTypes().map((type) => (
-                <SelectItem key={type} value={type}>
-                  {getFeatureDisplayName(type)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select value={filterFeature} onValueChange={setFilterFeature}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Filter by feature" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Features</SelectItem>
+                {getFeatureTypes().map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {getFeatureDisplayName(type)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
       {/* Kanban Board */}
-      <div className="grid grid-cols-12 gap-6 h-full">
-        <div className="col-span-8">
-          <div className="flex space-x-4 h-full">
+      <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0 overflow-hidden">
+        {/* Task Columns */}
+        <div className="flex-1 min-w-0 overflow-auto">
+          {/* Mobile: Vertical stack */}
+          <div className="flex flex-col gap-4 sm:hidden">
             {renderColumn('todo', 'To Do', tasksByStatus.todo)}
             {renderColumn('in-progress', 'In Progress', tasksByStatus['in-progress'])}
             {renderColumn('blocked', 'Blocked', tasksByStatus.blocked)}
             {renderColumn('completed', 'Done', tasksByStatus.completed)}
           </div>
+          
+          {/* Desktop: Horizontal layout */}
+          <div className="hidden sm:block">
+            <div className="flex gap-4 items-start">
+              <div className="flex-1 min-w-64">
+                {renderColumn('todo', 'To Do', tasksByStatus.todo)}
+              </div>
+              <div className="flex-1 min-w-64">
+                {renderColumn('in-progress', 'In Progress', tasksByStatus['in-progress'])}
+              </div>
+              <div className="flex-1 min-w-64">
+                {renderColumn('blocked', 'Blocked', tasksByStatus.blocked)}
+              </div>
+              <div className="flex-1 min-w-64">
+                {renderColumn('completed', 'Done', tasksByStatus.completed)}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="col-span-4">
+        {/* Task Detail Panel */}
+        <div className="w-full lg:w-96 shrink-0">
           <ThreadPanel task={selectedTask || undefined} />
         </div>
       </div>
@@ -433,4 +466,4 @@ export const TaskBoard = ({
       </Dialog>
     </div>
   )
-} 
+}
