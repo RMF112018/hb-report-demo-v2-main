@@ -14,16 +14,18 @@ import {
   Download, 
   ZoomIn, 
   ZoomOut,
-  DragHandleDots2,
+  GripVertical,
   Search,
   SortAsc,
   SortDesc,
   FileText,
   User,
+  Users,
   Building,
   Plus,
   MessageSquare,
-  Save
+  Save,
+  Trash2
 } from 'lucide-react'
 import { useStaffingStore, type StaffMember, type Project } from '../store/useStaffingStore'
 import { format, addDays, differenceInDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns'
@@ -33,16 +35,20 @@ interface InteractiveStaffingGanttProps {
   isReadOnly?: boolean
 }
 
-// Position color mapping for visual consistency
-const POSITION_COLORS: Record<string, string> = {
-  'Project Manager': 'bg-blue-500',
-  'Superintendent': 'bg-green-500', 
-  'Foreman': 'bg-yellow-500',
-  'Safety Manager': 'bg-red-500',
-  'Quality Manager': 'bg-purple-500',
-  'Field Engineer': 'bg-indigo-500',
-  'Assistant Superintendent': 'bg-teal-500',
-  'Project Engineer': 'bg-orange-500',
+// Base position types with distinct colors
+const BASE_POSITION_COLORS: Record<string, string> = {
+  'Project Executive': 'bg-violet-600',
+  'Project Manager': 'bg-blue-600',
+  'Superintendent': 'bg-green-600',
+  'Project Administrator': 'bg-cyan-600',
+  'Project Accountant': 'bg-amber-600',
+  'Project Engineer': 'bg-indigo-600',
+  'Field Engineer': 'bg-emerald-600',
+  'Safety Manager': 'bg-red-600',
+  'Quality Manager': 'bg-purple-600',
+  'Foreman': 'bg-orange-600',
+  'Estimator': 'bg-pink-600',
+  'Scheduler': 'bg-slate-600',
 }
 
 interface GanttItem {
@@ -59,6 +65,24 @@ interface AnnotationModal {
   isOpen: boolean
   item: GanttItem | null
   annotation: string
+}
+
+interface AssignmentData {
+  id: string
+  project_id: number | ''
+  startDate: string
+  endDate: string
+  position: string
+  comments: string
+}
+
+interface AssignmentModal {
+  isOpen: boolean
+  staffMember: StaffMember | null
+  assignments: AssignmentData[]
+  isEdit: boolean
+  selectedPosition: string
+  step: 'position' | 'staff' | 'assignments'
 }
 
 export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> = ({
@@ -83,6 +107,25 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     isOpen: false,
     item: null,
     annotation: ''
+  })
+  
+  const [assignmentModal, setAssignmentModal] = useState<AssignmentModal>({
+    isOpen: false,
+    staffMember: null,
+    assignments: [],
+    isEdit: false,
+    selectedPosition: '',
+    step: 'position'
+  })
+  
+  // Helper function to create new assignment
+  const createNewAssignment = (position = '', project_id: number | '' = ''): AssignmentData => ({
+    id: `assignment-${Date.now()}-${Math.random()}`,
+    project_id,
+    startDate: format(new Date(), 'yyyy-MM-dd'),
+    endDate: format(addDays(new Date(), 30), 'yyyy-MM-dd'),
+    position,
+    comments: ''
   })
 
   // Calculate date range based on view mode
@@ -270,14 +313,229 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     setAnnotationModal({ isOpen: false, item: null, annotation: '' })
   }
 
+  // Assignment management handlers
+  const handleCreateAssignment = () => {
+    if (userRole !== 'executive') return
+    
+    setAssignmentModal({
+      isOpen: true,
+      staffMember: null,
+      assignments: [],
+      isEdit: false,
+      selectedPosition: '',
+      step: 'position'
+    })
+  }
+
+  const handleEditStaffAssignment = (staffMember: StaffMember) => {
+    if (userRole !== 'executive') return
+    
+    // Convert existing assignments to modal format
+    const existingAssignments = staffMember.assignments.map((assignment, index) => ({
+      id: `existing-${index}`,
+      project_id: assignment.project_id,
+      startDate: format(new Date(assignment.startDate), 'yyyy-MM-dd'),
+      endDate: format(new Date(assignment.endDate), 'yyyy-MM-dd'),
+      position: staffMember.position,
+      comments: ''
+    }))
+    
+    setAssignmentModal({
+      isOpen: true,
+      staffMember,
+      assignments: existingAssignments.length > 0 ? existingAssignments : [createNewAssignment(staffMember.position)],
+      isEdit: true,
+      selectedPosition: staffMember.position,
+      step: 'assignments'
+    })
+  }
+
+  // Assignment manipulation within modal
+  const addAssignment = () => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      assignments: [...prev.assignments, createNewAssignment(prev.staffMember?.position || '')]
+    }))
+  }
+
+  const removeAssignment = (assignmentId: string) => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      assignments: prev.assignments.filter(a => a.id !== assignmentId)
+    }))
+  }
+
+  const updateAssignment = (assignmentId: string, updates: Partial<AssignmentData>) => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      assignments: prev.assignments.map(a => 
+        a.id === assignmentId ? { ...a, ...updates } : a
+      )
+    }))
+  }
+
+  // Position and staff selection handlers
+  const handlePositionSelect = (position: string) => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      selectedPosition: position,
+      step: 'staff'
+    }))
+  }
+
+  const handleStaffMemberSelect = (staffMemberId: string) => {
+    const staffMember = staffMembers.find(s => s.id === staffMemberId)
+    if (staffMember) {
+      setAssignmentModal(prev => ({
+        ...prev,
+        staffMember,
+        assignments: [createNewAssignment(prev.selectedPosition)],
+        step: 'assignments'
+      }))
+    }
+  }
+
+  const goBackToStaffSelection = () => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      staffMember: null,
+      assignments: [],
+      step: 'staff'
+    }))
+  }
+
+  const goBackToPositionSelection = () => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      staffMember: null,
+      assignments: [],
+      selectedPosition: '',
+      step: 'position'
+    }))
+  }
+
+  // Get staff members filtered by position
+  const getFilteredStaffMembers = (position: string) => {
+    return staffMembers.filter(staff => staff.position === position)
+  }
+
+  const handleSaveAssignment = () => {
+    // Validate all assignments
+    const validAssignments = assignmentModal.assignments.filter(assignment => 
+      assignment.project_id && assignment.startDate && assignment.endDate && assignment.position
+    )
+
+    if (validAssignments.length === 0) {
+      return
+    }
+
+    // Convert assignments to store format
+    const storeAssignments = validAssignments.map(assignment => ({
+      project_id: Number(assignment.project_id),
+      role: assignment.position.substring(0, 2).toUpperCase(),
+      startDate: new Date(assignment.startDate).toISOString(),
+      endDate: new Date(assignment.endDate).toISOString(),
+      comments: assignment.comments
+    }))
+
+    if (assignmentModal.staffMember) {
+      // Update existing staff member
+      const updatedStaffMember = { 
+        ...assignmentModal.staffMember,
+        assignments: storeAssignments,
+        // Update position to the most recent assignment's position
+        position: validAssignments[validAssignments.length - 1].position
+      }
+      
+      // Update store
+      updateStaffAssignment(updatedStaffMember.id, updatedStaffMember)
+    } else {
+      // For new assignments without a specific staff member, we would need to implement staff creation
+      // This would require additional UI to select/create staff members
+      console.log('New staff member creation not implemented yet')
+    }
+
+    // Close modal
+    setAssignmentModal({
+      isOpen: false,
+      staffMember: null,
+      assignments: [],
+      isEdit: false,
+      selectedPosition: '',
+      step: 'position'
+    })
+  }
+
+  // Calculate financial metrics
+  const calculateFinancialMetrics = (staffMember: StaffMember | null, projectId: number | '') => {
+    if (!staffMember || !projectId) return null
+    
+    const project = projects.find(p => p.project_id === Number(projectId))
+    if (!project) return null
+
+    const laborRate = staffMember.laborRate
+    const laborBurden = laborRate * 0.35 // 35% burden rate
+    const totalLaborCost = laborRate + laborBurden
+    const billableRate = staffMember.billableRate
+    const margin = ((billableRate - totalLaborCost) / billableRate) * 100
+
+    return {
+      laborRate,
+      laborBurden,
+      totalLaborCost,
+      billableRate,
+      margin,
+      project
+    }
+  }
+
   const SortIcon = ({ field }: { field: typeof sortField }) => {
     if (sortField !== field) return null
     return sortDirection === 'asc' ? <SortAsc className="h-3 w-3" /> : <SortDesc className="h-3 w-3" />
   }
 
-  // Get position color for staff member
+  // Extract base position type from full position name
+  const getBasePositionType = (position: string): string => {
+    // Remove level indicators (I, II, III)
+    let baseType = position.replace(/\s+(I{1,3}|IV|V)$/, '')
+    
+    // Handle special prefixes
+    if (baseType.includes('Senior ')) {
+      baseType = baseType.replace('Senior ', '')
+    }
+    if (baseType.includes('Assistant ')) {
+      baseType = baseType.replace('Assistant ', '')
+    }
+    if (baseType.includes('General ')) {
+      baseType = baseType.replace('General ', '')
+    }
+    
+    return baseType
+  }
+
+  // Get position color for staff member based on base position type
   const getPositionColor = (position: string): string => {
-    return POSITION_COLORS[position] || 'bg-gray-500'
+    const baseType = getBasePositionType(position)
+    
+    // First try exact match with base type
+    if (BASE_POSITION_COLORS[baseType]) {
+      return BASE_POSITION_COLORS[baseType]
+    }
+    
+    // Try direct match (for positions that don't need base type extraction)
+    if (BASE_POSITION_COLORS[position]) {
+      return BASE_POSITION_COLORS[position]
+    }
+    
+    // Generate consistent fallback color for unmapped positions
+    const fallbackColors = [
+      'bg-teal-600', 'bg-rose-600', 'bg-lime-600', 'bg-sky-600', 
+      'bg-fuchsia-600', 'bg-yellow-600', 'bg-gray-600', 'bg-stone-600'
+    ]
+    
+    // Use position string hash to get consistent color
+    const hash = position.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    return fallbackColors[hash % fallbackColors.length]
   }
 
   return (
@@ -304,7 +562,23 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             </SelectContent>
           </Select>
           
-          {userRole === 'executive' && (
+          {userRole === 'executive' && !isReadOnly && (
+            <div className="flex items-center gap-1">
+              <Button variant="default" size="sm" onClick={handleCreateAssignment}>
+                <Plus className="h-4 w-4 mr-1" />
+                Create Assignment
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <FileText className="h-4 w-4 mr-1" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                <Download className="h-4 w-4 mr-1" />
+                Excel
+              </Button>
+            </div>
+          )}
+          {userRole === 'executive' && isReadOnly && (
             <div className="flex items-center gap-1">
               <Button variant="outline" size="sm" onClick={handleExportPDF}>
                 <FileText className="h-4 w-4 mr-1" />
@@ -427,15 +701,26 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   >
                     <div className="w-48 flex items-center gap-2">
                       {userRole === 'executive' && !isReadOnly && (
-                        <DragHandleDots2 
-                          className="h-4 w-4 text-gray-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+                        <div
+                          className="cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
                           draggable
                           onDragStart={() => handleDragStart(item)}
-                        />
+                        >
+                          <GripVertical className="h-4 w-4 text-gray-400" />
+                        </div>
                       )}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {item.staffMember.name}
-                      </span>
+                      {userRole === 'executive' && !isReadOnly ? (
+                        <button
+                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate cursor-pointer"
+                          onClick={() => handleEditStaffAssignment(item.staffMember)}
+                        >
+                          {item.staffMember.name}
+                        </button>
+                      ) : (
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                          {item.staffMember.name}
+                        </span>
+                      )}
                     </div>
                     <div className="w-44 flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
@@ -459,7 +744,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                         left: `${calculatePosition(item.startDate)}%`,
                         width: `${calculateWidth(item.startDate, item.endDate)}%`,
                       }}
-                      onClick={() => handleAddAnnotation(item)}
+                      onClick={() => userRole === 'executive' && !isReadOnly ? handleEditStaffAssignment(item.staffMember) : handleAddAnnotation(item)}
                     >
                       <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium opacity-0 group-hover/bar:opacity-100 transition-opacity">
                         {differenceInDays(item.endDate, item.startDate)}d
@@ -499,15 +784,22 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   <span className="text-xs text-gray-600 dark:text-gray-400">Has Annotation</span>
                 </div>
                 {/* Position Legend */}
-                {Object.entries(POSITION_COLORS).slice(0, 4).map(([position, color]) => (
-                  <div key={position} className="flex items-center gap-1">
-                    <div className={`w-3 h-3 ${color} rounded`}></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">{position}</span>
-                  </div>
-                ))}
+                {(() => {
+                  // Get unique base position types from current data
+                  const baseTypes = [...new Set(uniquePositions.map(pos => getBasePositionType(pos)))]
+                    .sort()
+                    .slice(0, 8) // Show up to 8 base types
+                  
+                  return baseTypes.map((baseType) => (
+                    <div key={baseType} className="flex items-center gap-1">
+                      <div className={`w-3 h-3 ${getPositionColor(baseType)} rounded`}></div>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{baseType}</span>
+                    </div>
+                  ))
+                })()}
                 {userRole === 'executive' && !isReadOnly && (
                   <div className="flex items-center gap-2">
-                    <DragHandleDots2 className="h-3 w-3 text-gray-400" />
+                    <GripVertical className="h-3 w-3 text-gray-400" />
                     <span className="text-xs text-gray-600 dark:text-gray-400">Drag to Reassign</span>
                   </div>
                 )}
@@ -557,6 +849,327 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                 <Save className="h-4 w-4 mr-1" />
                 Save Annotation
               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assignment Modal */}
+      <Dialog open={assignmentModal.isOpen} onOpenChange={(open) => setAssignmentModal(prev => ({ ...prev, isOpen: open }))}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {assignmentModal.isEdit ? 'Edit Staff Assignments' : 
+               assignmentModal.step === 'position' ? 'Select Position' :
+               assignmentModal.step === 'staff' ? 'Select Staff Member' :
+               'Create Staff Assignments'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Step 1: Position Selection */}
+            {assignmentModal.step === 'position' && !assignmentModal.isEdit && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select Position Type</label>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Choose the position type you want to assign someone to.
+                  </p>
+                  <Select 
+                    value={assignmentModal.selectedPosition} 
+                    onValueChange={handlePositionSelect}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Search or select a position..." />
+                    </SelectTrigger>
+                    <SelectContent className="z-[99999]">
+                      {uniquePositions.map(position => (
+                        <SelectItem key={position} value={position}>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 ${getPositionColor(position)} rounded`}></div>
+                            {position}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Staff Member Selection */}
+            {assignmentModal.step === 'staff' && !assignmentModal.isEdit && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Button variant="outline" size="sm" onClick={goBackToPositionSelection}>
+                    ← Back to Position
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 ${getPositionColor(assignmentModal.selectedPosition)} rounded`}></div>
+                    <span className="font-medium">{assignmentModal.selectedPosition}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select Staff Member</label>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Choose which {assignmentModal.selectedPosition.toLowerCase()} to assign.
+                  </p>
+                  
+                  {(() => {
+                    const filteredStaff = getFilteredStaffMembers(assignmentModal.selectedPosition)
+                    
+                    if (filteredStaff.length === 0) {
+                      return (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <div className="text-sm">No staff members found for this position</div>
+                        </div>
+                      )
+                    }
+                    
+                    return (
+                      <Select 
+                        value={assignmentModal.staffMember?.id || ''} 
+                        onValueChange={handleStaffMemberSelect}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Search or select a staff member..." />
+                        </SelectTrigger>
+                        <SelectContent className="z-[99999]">
+                          {filteredStaff.map(staff => (
+                            <SelectItem key={staff.id} value={staff.id}>
+                              <div className="flex items-center justify-between w-full">
+                                <span>{staff.name}</span>
+                                <div className="text-xs text-muted-foreground ml-2">
+                                  {staff.experience}y exp • ${staff.laborRate}/hr
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Assignment Details (or Edit Mode) */}
+            {(assignmentModal.step === 'assignments' || assignmentModal.isEdit) && (
+              <>
+                {!assignmentModal.isEdit && (
+                  <div className="flex items-center gap-2 mb-4">
+                    <Button variant="outline" size="sm" onClick={goBackToStaffSelection}>
+                      ← Back to Staff
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 ${getPositionColor(assignmentModal.selectedPosition)} rounded`}></div>
+                      <span className="font-medium">{assignmentModal.staffMember?.name}</span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-sm text-muted-foreground">{assignmentModal.selectedPosition}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Staff Member Selection (Edit Mode Only) */}
+                {assignmentModal.isEdit && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Staff Member</label>
+                    <Select 
+                      value={assignmentModal.staffMember?.id || ''} 
+                      onValueChange={(value) => {
+                        const staff = staffMembers.find(s => s.id === value)
+                        if (staff) {
+                          setAssignmentModal(prev => ({
+                            ...prev,
+                            staffMember: staff,
+                            assignments: prev.assignments.map(a => ({ ...a, position: staff.position }))
+                          }))
+                        }
+                      }}
+                      disabled={assignmentModal.isEdit}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select staff member" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[99999]">
+                        {staffMembers.map(staff => (
+                          <SelectItem key={staff.id} value={staff.id}>
+                            {staff.name} - {staff.position}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Assignments List */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-lg font-medium">Assignments ({assignmentModal.assignments.length})</h4>
+                    <Button onClick={addAssignment} size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Assignment
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {assignmentModal.assignments.map((assignment, index) => (
+                      <div key={assignment.id} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium">Assignment {index + 1}</h5>
+                          {assignmentModal.assignments.length > 1 && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => removeAssignment(assignment.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Remove
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Position */}
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Position</label>
+                                                    <Select 
+                          value={assignment.position} 
+                          onValueChange={(value) => updateAssignment(assignment.id, { position: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select position" />
+                          </SelectTrigger>
+                          <SelectContent className="z-[99999]">
+                            {uniquePositions.map(position => (
+                              <SelectItem key={position} value={position}>
+                                {position}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                          </div>
+
+                          {/* Project */}
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Project</label>
+                                                    <Select 
+                          value={assignment.project_id.toString()} 
+                          onValueChange={(value) => updateAssignment(assignment.id, { project_id: Number(value) })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select project" />
+                          </SelectTrigger>
+                          <SelectContent className="z-[99999]">
+                            {projects.map(project => (
+                              <SelectItem key={project.project_id} value={project.project_id.toString()}>
+                                {project.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                          </div>
+                        </div>
+
+                        {/* Date Range */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Start Date</label>
+                            <Input
+                              type="date"
+                              value={assignment.startDate}
+                              onChange={(e) => updateAssignment(assignment.id, { startDate: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">End Date</label>
+                            <Input
+                              type="date"
+                              value={assignment.endDate}
+                              onChange={(e) => updateAssignment(assignment.id, { endDate: e.target.value })}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Comments */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Comments</label>
+                          <Textarea
+                            placeholder="Add any notes about this assignment..."
+                            value={assignment.comments}
+                            onChange={(e) => updateAssignment(assignment.id, { comments: e.target.value })}
+                            rows={2}
+                          />
+                        </div>
+
+                        {/* Financial Information */}
+                        {assignmentModal.staffMember && assignment.project_id && (
+                          <div className="p-3 bg-muted/50 rounded-lg">
+                            <h6 className="text-sm font-medium mb-2">Financial Information</h6>
+                            {(() => {
+                              const metrics = calculateFinancialMetrics(assignmentModal.staffMember, assignment.project_id)
+                              if (!metrics) return null
+                              
+                                                          return (
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <div className="text-muted-foreground">Labor Rate</div>
+                                  <div className="font-medium">${metrics.laborRate.toFixed(2)}/hr</div>
+                                </div>
+                                <div>
+                                  <div className="text-muted-foreground">Labor Burden (35%)</div>
+                                  <div className="font-medium">${metrics.laborBurden.toFixed(2)}/hr</div>
+                                </div>
+                                <div>
+                                  <div className="text-muted-foreground">Total Labor Cost</div>
+                                  <div className="font-medium">${metrics.totalLaborCost.toFixed(2)}/hr</div>
+                                </div>
+                                <div>
+                                  <div className="text-muted-foreground">Billable Rate</div>
+                                  <div className="font-medium text-blue-600 dark:text-blue-400">${metrics.billableRate.toFixed(2)}/hr</div>
+                                </div>
+                                <div className="col-span-2">
+                                  <div className="text-muted-foreground">Profit Margin</div>
+                                  <div className={`font-medium ${metrics.margin > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {metrics.margin.toFixed(1)}% (${(metrics.billableRate - metrics.totalLaborCost).toFixed(2)}/hr)
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setAssignmentModal({
+                  isOpen: false,
+                  staffMember: null,
+                  assignments: [],
+                  isEdit: false,
+                  selectedPosition: '',
+                  step: 'position'
+                })}
+              >
+                Cancel
+              </Button>
+              
+              {/* Show Save button only on assignment step */}
+              {(assignmentModal.step === 'assignments' || assignmentModal.isEdit) && (
+                <Button onClick={handleSaveAssignment}>
+                  <Save className="h-4 w-4 mr-1" />
+                  Save Assignments ({assignmentModal.assignments.filter(a => a.project_id && a.position).length})
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>

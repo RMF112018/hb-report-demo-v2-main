@@ -90,7 +90,7 @@ export interface StaffingState {
 
 export interface StaffingActions {
   // Data actions
-  updateStaffAssignment: (staffId: string, assignment: StaffMember['assignments'][0]) => void
+  updateStaffAssignment: (staffId: string, updatedStaff: StaffMember) => void
   createSPCR: (spcr: Omit<SPCR, 'id' | 'createdAt' | 'updatedAt'>) => void
   updateSPCR: (id: string, updates: Partial<SPCR>) => void
   addSPCRComment: (spcrId: string, comment: SPCR['comments'][0]) => void
@@ -165,12 +165,10 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
         spcrViewFilter: 'approved', // Default to Approved for executive view
 
         // Actions
-        updateStaffAssignment: (staffId, assignment) => {
+        updateStaffAssignment: (staffId, updatedStaff) => {
           set((state) => ({
             staffMembers: state.staffMembers.map(staff =>
-              staff.id === staffId
-                ? { ...staff, assignments: [...staff.assignments, assignment] }
-                : staff
+              staff.id === staffId ? updatedStaff : staff
             )
           }))
         },
