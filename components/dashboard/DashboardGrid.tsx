@@ -148,6 +148,12 @@ const getCardColSpan = (card: DashboardCard): string => {
     case "enhanced-hbi-insights":
     case "market-intelligence":
       return "sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // These cards are 2x width on larger screens
+    case "portfolio-overview":
+    case "financial-review-panel":
+      return "sm:col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // 1.5x width - spans 2 columns on larger screens
+    case "staffing-distribution":
+    case "pipeline-analytics":
+      return "sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"; // 2x width - spans 2 columns on larger screens
     default:
       return "col-span-1"; // Standard single column width
   }
