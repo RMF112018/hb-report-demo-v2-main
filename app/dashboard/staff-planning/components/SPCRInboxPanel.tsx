@@ -34,7 +34,7 @@ interface SPCRInboxPanelProps {
 interface ActionModal {
   isOpen: boolean
   spcr: SPCR | null
-  action: 'approve' | 'reject' | 'view'
+  action: 'approve' | 'reject' | 'view' | 'implement' | 'close-reject'
   comment: string
 }
 
@@ -77,8 +77,12 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
       case 'rejected':
         spcrs = spcrs.filter(spcr => ['pe-rejected', 'final-rejected'].includes(spcr.workflowStage))
         break
+      case 'closed':
+        spcrs = spcrs.filter(spcr => spcr.workflowStage === 'closed')
+        break
       default:
-        // 'all' - show all
+        // 'all' - show all except closed (which are hidden by default)
+        spcrs = spcrs.filter(spcr => spcr.workflowStage !== 'closed')
         break
     }
 
@@ -89,7 +93,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
   // Calculate counts for filter options
   const spcrCounts = useMemo(() => {
     return {
-      total: allSPCRs.length,
+      total: allSPCRs.filter(s => s.workflowStage !== 'closed').length, // Exclude closed from total
       pending: allSPCRs.filter(s => {
         if (userRole === 'project-executive') return s.workflowStage === 'pe-review'
         if (userRole === 'executive') return s.workflowStage === 'executive-review'
@@ -97,6 +101,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
       }).length,
       approved: allSPCRs.filter(s => ['pe-approved', 'final-approved'].includes(s.workflowStage)).length,
       rejected: allSPCRs.filter(s => ['pe-rejected', 'final-rejected'].includes(s.workflowStage)).length,
+      closed: allSPCRs.filter(s => s.workflowStage === 'closed').length,
       needsAction: allSPCRs.filter(s => 
         (userRole === 'project-executive' && s.workflowStage === 'pe-review') ||
         (userRole === 'executive' && s.workflowStage === 'executive-review')
@@ -127,6 +132,8 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
         return <Badge variant="default" className="bg-green-500">Final Approved</Badge>
       case 'final-rejected':
         return <Badge variant="destructive">Final Rejected</Badge>
+      case 'closed':
+        return <Badge variant="outline" className="border-gray-500 text-gray-600">Closed</Badge>
       default:
         return <Badge variant="outline">{spcr.workflowStage}</Badge>
     }
@@ -146,7 +153,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
   }
 
   // Handle SPCR action
-  const handleSPCRAction = (spcr: SPCR, action: 'approve' | 'reject' | 'view') => {
+  const handleSPCRAction = (spcr: SPCR, action: 'approve' | 'reject' | 'view' | 'implement' | 'close-reject') => {
     setActionModal({
       isOpen: true,
       spcr,
@@ -177,7 +184,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
         newWorkflowStage = 'final-approved'
         newStatus = 'approved'
       }
-    } else {
+    } else if (action === 'reject') {
       if (userRole === 'project-executive') {
         newWorkflowStage = 'pe-rejected'
         newStatus = 'rejected'
@@ -185,6 +192,14 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
         newWorkflowStage = 'final-rejected'
         newStatus = 'rejected'
       }
+    } else if (action === 'implement') {
+      // Executive implementing an approved SPCR
+      newWorkflowStage = 'closed'
+      newStatus = 'approved'
+    } else if (action === 'close-reject') {
+      // Executive rejecting an approved SPCR post-approval
+      newWorkflowStage = 'closed'
+      newStatus = 'rejected'
     }
 
     // Update SPCR
@@ -218,21 +233,24 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
         ...baseOptions,
         { value: 'pending', label: 'In Progress', count: spcrCounts.pending },
         { value: 'approved', label: 'Approved', count: spcrCounts.approved },
-        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected }
+        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected },
+        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
       ]
     } else if (userRole === 'project-executive') {
       return [
         { value: 'pending', label: 'Awaiting Review', count: spcrCounts.pending },
         ...baseOptions,
         { value: 'approved', label: 'Approved by Me', count: spcrCounts.approved },
-        { value: 'rejected', label: 'Rejected by Me', count: spcrCounts.rejected }
+        { value: 'rejected', label: 'Rejected by Me', count: spcrCounts.rejected },
+        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
       ]
     } else {
       return [
+        { value: 'approved', label: 'Approved', count: spcrCounts.approved }, // Default view for executives
         { value: 'pending', label: 'Awaiting Review', count: spcrCounts.pending },
         ...baseOptions,
-        { value: 'approved', label: 'Approved', count: spcrCounts.approved },
-        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected }
+        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected },
+        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
       ]
     }
   }
@@ -269,7 +287,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
 
       <CardContent className="space-y-4">
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
             <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{spcrCounts.pending}</div>
             <div className="text-xs text-blue-600 dark:text-blue-400">Pending</div>
@@ -281,6 +299,10 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
           <div className="text-center p-3 bg-red-50 dark:bg-red-950/50 rounded-lg">
             <div className="text-xl font-bold text-red-600 dark:text-red-400">{spcrCounts.rejected}</div>
             <div className="text-xs text-red-600 dark:text-red-400">Rejected</div>
+          </div>
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-950/50 rounded-lg">
+            <div className="text-xl font-bold text-gray-600 dark:text-gray-400">{spcrCounts.closed}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">Closed</div>
           </div>
           <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-950/50 rounded-lg">
             <div className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{spcrCounts.needsAction}</div>
@@ -378,6 +400,30 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             Reject
+                          </Button>
+                        </>
+                      )}
+
+                      {/* Executive final actions on approved SPCRs */}
+                      {userRole === 'executive' && ['pe-approved', 'final-approved'].includes(spcr.workflowStage) && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSPCRAction(spcr, 'implement')}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Implement
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSPCRAction(spcr, 'close-reject')}
+                            className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Close & Reject
                           </Button>
                         </>
                       )}

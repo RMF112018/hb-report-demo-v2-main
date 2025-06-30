@@ -29,9 +29,11 @@ export default function ExecutiveStaffingPage() {
   const totalStaffCount = staffMembers.length
   const activeProjects = projects.filter(p => p.active).length
   
-  // Mock financial metrics
+  // Mock financial metrics - live labor cost vs contract inflow comparison
   const totalContractValue = projects.reduce((sum, p) => sum + p.contract_value, 0)
+  const monthlyLaborCost = staffMembers.reduce((sum, staff) => sum + (staff.laborRate * 40 * 4.33), 0) // Monthly cost
   const quarterlyGrowth = 12.5 // Mock percentage
+  const laborToContractRatio = ((monthlyLaborCost * 12) / totalContractValue) * 100 // Annual labor as % of contract value
 
   const headerActions = (
     <div className="flex items-center gap-2">
@@ -85,8 +87,8 @@ export default function ExecutiveStaffingPage() {
               </span>
             </div>
             <div className="text-sm text-muted-foreground">Contract Value</div>
-            <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-              +{quarterlyGrowth}% vs LQ
+            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              Labor: ${(monthlyLaborCost / 1000).toFixed(0)}K/mo ({laborToContractRatio.toFixed(1)}%)
             </div>
           </CardContent>
         </Card>

@@ -33,6 +33,18 @@ interface InteractiveStaffingGanttProps {
   isReadOnly?: boolean
 }
 
+// Position color mapping for visual consistency
+const POSITION_COLORS: Record<string, string> = {
+  'Project Manager': 'bg-blue-500',
+  'Superintendent': 'bg-green-500', 
+  'Foreman': 'bg-yellow-500',
+  'Safety Manager': 'bg-red-500',
+  'Quality Manager': 'bg-purple-500',
+  'Field Engineer': 'bg-indigo-500',
+  'Assistant Superintendent': 'bg-teal-500',
+  'Project Engineer': 'bg-orange-500',
+}
+
 interface GanttItem {
   id: string
   staffMember: StaffMember
@@ -263,13 +275,18 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     return sortDirection === 'asc' ? <SortAsc className="h-3 w-3" /> : <SortDesc className="h-3 w-3" />
   }
 
+  // Get position color for staff member
+  const getPositionColor = (position: string): string => {
+    return POSITION_COLORS[position] || 'bg-gray-500'
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            {userRole === 'executive' ? 'Interactive' : 'Read-Only'} Staffing Timeline
+            Staff Management
             <Badge variant="outline" className="ml-2">
               {ganttItems.length} assignments
             </Badge>
@@ -364,9 +381,9 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             {/* Timeline Header */}
             <div className="relative border-b border-gray-200 dark:border-gray-700 pb-4">
               <div className="flex">
-                <div className="w-80 flex-shrink-0 grid grid-cols-3 gap-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+                <div className="w-96 flex-shrink-0 grid grid-cols-3 gap-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-1 rounded"
+                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
                     onClick={() => handleSort('name')}
                   >
                     <User className="h-4 w-4" />
@@ -374,14 +391,14 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                     <SortIcon field="name" />
                   </button>
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-1 rounded"
+                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
                     onClick={() => handleSort('position')}
                   >
                     Position
                     <SortIcon field="position" />
                   </button>
                   <button 
-                    className="flex items-center gap-1 hover:bg-muted/50 p-1 rounded"
+                    className="flex items-center gap-1 hover:bg-muted/50 p-2 rounded"
                     onClick={() => handleSort('project')}
                   >
                     <Building className="h-4 w-4" />
@@ -407,7 +424,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                 <div key={item.id} className="flex items-center group">
                   {/* Staff Info */}
                   <div 
-                    className="w-80 flex-shrink-0 grid grid-cols-3 gap-2 pr-4"
+                    className="w-96 flex-shrink-0 grid grid-cols-3 gap-4 pr-4"
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, item.staffMember.id)}
                   >
@@ -419,14 +436,17 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                           onDragStart={() => handleDragStart(item)}
                         />
                       )}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {item.staffMember.name}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {item.staffMember.position}
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {item.staffMember.position}
+                      </span>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
                       {item.project.name}
                     </div>
                   </div>
@@ -437,7 +457,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                     
                     {/* Assignment Bar */}
                     <div
-                      className="absolute inset-y-1 rounded bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors cursor-pointer group/bar"
+                      className={`absolute inset-y-1 rounded ${getPositionColor(item.staffMember.position)} hover:opacity-80 transition-opacity cursor-pointer group/bar`}
                       style={{
                         left: `${calculatePosition(item.startDate)}%`,
                         width: `${calculateWidth(item.startDate, item.endDate)}%`,
@@ -472,19 +492,22 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
             {/* Legend */}
             <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-red-500 rounded"></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400">Today</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">Assignment</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <MessageSquare className="h-3 w-3 text-yellow-500" />
                   <span className="text-xs text-gray-600 dark:text-gray-400">Has Annotation</span>
                 </div>
+                {/* Position Legend */}
+                {Object.entries(POSITION_COLORS).slice(0, 4).map(([position, color]) => (
+                  <div key={position} className="flex items-center gap-1">
+                    <div className={`w-3 h-3 ${color} rounded`}></div>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">{position}</span>
+                  </div>
+                ))}
                 {userRole === 'executive' && !isReadOnly && (
                   <div className="flex items-center gap-2">
                     <DragHandleDots2 className="h-3 w-3 text-gray-400" />

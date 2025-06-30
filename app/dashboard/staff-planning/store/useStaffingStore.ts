@@ -46,7 +46,7 @@ export interface SPCR {
   budget: number
   explanation: string
   status: 'pending' | 'approved' | 'rejected'
-  workflowStage: 'submitted' | 'pe-review' | 'pe-approved' | 'pe-rejected' | 'executive-review' | 'final-approved' | 'final-rejected' | 'withdrawn'
+  workflowStage: 'submitted' | 'pe-review' | 'pe-approved' | 'pe-rejected' | 'executive-review' | 'final-approved' | 'final-rejected' | 'withdrawn' | 'closed'
   createdBy: string
   createdAt: string
   updatedAt: string
@@ -85,7 +85,7 @@ export interface StaffingState {
   
   // View State
   ganttViewMode: 'week' | 'month' | 'quarter'
-  spcrViewFilter: 'all' | 'pending' | 'approved' | 'rejected'
+  spcrViewFilter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed'
 }
 
 export interface StaffingActions {
@@ -110,7 +110,7 @@ export interface StaffingActions {
   
   // View actions
   setGanttViewMode: (mode: 'week' | 'month' | 'quarter') => void
-  setSPCRViewFilter: (filter: 'all' | 'pending' | 'approved' | 'rejected') => void
+  setSPCRViewFilter: (filter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed') => void
   
   // Utility functions
   getStaffByProject: (projectId: number) => StaffMember[]
@@ -162,7 +162,7 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
         selectedProject: null,
         spcrDraft: null,
         ganttViewMode: 'month',
-        spcrViewFilter: 'all',
+        spcrViewFilter: 'approved', // Default to Approved for executive view
 
         // Actions
         updateStaffAssignment: (staffId, assignment) => {
