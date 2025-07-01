@@ -9,6 +9,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Add output configuration for better Vercel support
+  output: 'standalone',
+  // Optimize for static generation where possible
+  experimental: {
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+  },
   // Ensure static files are served correctly
   async rewrites() {
     return [
@@ -27,6 +33,23 @@ const nextConfig = {
           {
             key: 'Content-Type',
             value: 'application/json',
+          },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
         ],
       },

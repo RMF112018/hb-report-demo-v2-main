@@ -44,10 +44,22 @@ export default function LoginPage() {
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
   })
-  const { login } = useAuth()
+  const { login, isLoading: authIsLoading, isClient } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const { startTour, isTourAvailable, resetTourState } = useTour()
+
+  // Show loading screen during SSR/hydration
+  if (!isClient || authIsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   const features = [
     {
@@ -152,47 +164,51 @@ export default function LoginPage() {
 
   // Auto-start tour and welcome message for new visitors
   useEffect(() => {
-    if (typeof window !== 'undefined' && isTourAvailable) {
-      // Check if user has disabled tours permanently
-      const hasDisabledTours = localStorage.getItem('hb-tour-available') === 'false'
-      
-      if (hasDisabledTours) {
-        console.log('Tours disabled by user preference')
-        return
-      }
+    if (typeof window !== 'undefined' && isTourAvailable && isClient) {
+      try {
+        // Check if user has disabled tours permanently
+        const hasDisabledTours = localStorage.getItem('hb-tour-available') === 'false'
+        
+        if (hasDisabledTours) {
+          console.log('Tours disabled by user preference')
+          return
+        }
 
-      // Session-based tracking to ensure one-time display
-      const hasShownWelcome = sessionStorage.getItem('hb-welcome-shown')
-      const hasShownTour = sessionStorage.getItem('hb-tour-shown-login-demo-accounts')
-      
-      console.log('Tour auto-start check:', {
-        isTourAvailable,
-        hasShownWelcome,
-        hasShownTour,
-        hasDisabledTours
-      })
-      
-      // Show welcome toast once per session
-      if (!hasShownWelcome) {
-        setTimeout(() => {
-          toast({
-            title: "Welcome to HB Report Demo! 👋",
-            description: "Interactive tours are available to help you explore the platform.",
-            duration: 6000,
-          })
-          sessionStorage.setItem('hb-welcome-shown', 'true')
-        }, 1000)
-      }
-      
-      // Auto-start login tour once per session
-      if (!hasShownTour) {
-        setTimeout(() => {
-          console.log('Auto-starting login tour...')
-          startTour('login-demo-accounts', true) // true indicates auto-start
-        }, 3000)
+        // Session-based tracking to ensure one-time display
+        const hasShownWelcome = sessionStorage.getItem('hb-welcome-shown')
+        const hasShownTour = sessionStorage.getItem('hb-tour-shown-login-demo-accounts')
+        
+        console.log('Tour auto-start check:', {
+          isTourAvailable,
+          hasShownWelcome,
+          hasShownTour,
+          hasDisabledTours
+        })
+        
+        // Show welcome toast once per session
+        if (!hasShownWelcome) {
+          setTimeout(() => {
+            toast({
+              title: "Welcome to HB Report Demo! 👋",
+              description: "Interactive tours are available to help you explore the platform.",
+              duration: 6000,
+            })
+            sessionStorage.setItem('hb-welcome-shown', 'true')
+          }, 1000)
+        }
+        
+        // Auto-start login tour once per session
+        if (!hasShownTour) {
+          setTimeout(() => {
+            console.log('Auto-starting login tour...')
+            startTour('login-demo-accounts', true) // true indicates auto-start
+          }, 3000)
+        }
+      } catch (error) {
+        console.error('Error with storage access:', error)
       }
     }
-  }, [isTourAvailable, startTour, toast])
+  }, [isTourAvailable, startTour, toast, isClient])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
