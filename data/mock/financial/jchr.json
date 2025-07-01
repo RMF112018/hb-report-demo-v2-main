@@ -1,5 +1,161 @@
 [
   {
+    "project_id": 2525804,
+    "project_name": "HB Report Demo Project",
+    "jobCostItems": [
+      {
+        "costCode": "1000.10-01-571.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.EROSION & SEDIMENT CONTROL.Materials",
+        "budgetAmount": 1850000.00,
+        "actualCost": 1925000.00,
+        "commitments": 1800000.00,
+        "variance": 75000.00,
+        "percentComplete": 65.2,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.10-01-515.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.TEMPORARY FENCE.Materials",
+        "budgetAmount": 125000.00,
+        "actualCost": 118000.00,
+        "commitments": 120000.00,
+        "variance": -7000.00,
+        "percentComplete": 89.5,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.10-01-744.LBN",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.TRASH REMOVAL.Labor Burden",
+        "budgetAmount": 85000.00,
+        "actualCost": 92000.00,
+        "commitments": 88000.00,
+        "variance": 7000.00,
+        "percentComplete": 78.3,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-03-010.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.CONCRETE WORK.Materials",
+        "budgetAmount": 2500000.00,
+        "actualCost": 2450000.00,
+        "commitments": 2520000.00,
+        "variance": -50000.00,
+        "percentComplete": 92.1,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-06-410.SUB",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.CUSTOM CABINETS.Subcontractor",
+        "budgetAmount": 750000.00,
+        "actualCost": 825000.00,
+        "commitments": 780000.00,
+        "variance": 75000.00,
+        "percentComplete": 85.7,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-15-800.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.AIR DISTRIBUTION.Materials",
+        "budgetAmount": 425000.00,
+        "actualCost": 395000.00,
+        "commitments": 430000.00,
+        "variance": -30000.00,
+        "percentComplete": 73.8,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-08-225.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.INSTALLATION DOORS & HDWE.Materials",
+        "budgetAmount": 320000.00,
+        "actualCost": 335000.00,
+        "commitments": 325000.00,
+        "variance": 15000.00,
+        "percentComplete": 95.2,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-02-100.LBN",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.SITE REMEDIATION.Labor Burden",
+        "budgetAmount": 180000.00,
+        "actualCost": 175000.00,
+        "commitments": 185000.00,
+        "variance": -5000.00,
+        "percentComplete": 68.9,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-09-970.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.COATINGS FOR STEEL.Materials",
+        "budgetAmount": 95000.00,
+        "actualCost": 102000.00,
+        "commitments": 98000.00,
+        "variance": 7000.00,
+        "percentComplete": 82.4,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "1000.15-13-710.MAT",
+        "description": "1000 - HB REPORT DEMO PROJECT-CONSTR.SECURITY SYSTEMS.Materials",
+        "budgetAmount": 275000.00,
+        "actualCost": 268000.00,
+        "commitments": 280000.00,
+        "variance": -7000.00,
+        "percentComplete": 91.3,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "2000.20-01-100.LAB",
+        "description": "2000 - HB REPORT DEMO PROJECT-CONSTR.EXCAVATION LABOR.Labor",
+        "budgetAmount": 650000.00,
+        "actualCost": 685000.00,
+        "commitments": 640000.00,
+        "variance": 35000.00,
+        "percentComplete": 76.5,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "2000.20-02-200.SUB",
+        "description": "2000 - HB REPORT DEMO PROJECT-CONSTR.ELECTRICAL WORK.Subcontractor",
+        "budgetAmount": 1200000.00,
+        "actualCost": 1150000.00,
+        "commitments": 1220000.00,
+        "variance": -50000.00,
+        "percentComplete": 88.7,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "2000.20-03-300.SUB",
+        "description": "2000 - HB REPORT DEMO PROJECT-CONSTR.PLUMBING WORK.Subcontractor",
+        "budgetAmount": 850000.00,
+        "actualCost": 890000.00,
+        "commitments": 860000.00,
+        "variance": 40000.00,
+        "percentComplete": 93.2,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "3000.30-01-100.OVH",
+        "description": "3000 - HB REPORT DEMO PROJECT-CONSTR.PROJECT MANAGEMENT.Overhead",
+        "budgetAmount": 350000.00,
+        "actualCost": 375000.00,
+        "commitments": 350000.00,
+        "variance": 25000.00,
+        "percentComplete": 45.8,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      },
+      {
+        "costCode": "3000.30-02-200.OVH",
+        "description": "3000 - HB REPORT DEMO PROJECT-CONSTR.QUALITY CONTROL.Overhead",
+        "budgetAmount": 125000.00,
+        "actualCost": 118000.00,
+        "commitments": 130000.00,
+        "variance": -7000.00,
+        "percentComplete": 62.4,
+        "lastUpdated": "2025-01-27T14:41:42Z"
+      }
+    ]
+  },
+  {
     "project_id": 2525840,
     "project_name": "Palm Beach Luxury Estate",
     "jobCostItems": [
