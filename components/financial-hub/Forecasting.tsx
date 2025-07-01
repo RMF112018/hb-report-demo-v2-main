@@ -794,8 +794,8 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             </div>
           </td>
           <td className="p-1 text-xs">
-            <Badge variant={record.forecast_method === 'HBI Forecast' ? 'default' : 'outline'} 
-                   className={record.forecast_method === 'HBI Forecast' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200' : ''}>
+            <Badge variant={record.forecast_method === 'HBI Forecast' ? 'default' : 'secondary'} 
+                   className={record.forecast_method === 'HBI Forecast' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 border-0' : 'border-0'}>
               Actual / Remaining Forecast
             </Badge>
           </td>
@@ -879,7 +879,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         <tr className="border-b bg-muted/20">
           <td className="p-2"></td>
           <td className="p-1 text-xs">
-            <Badge variant="secondary">Previous Forecast</Badge>
+            <Badge variant="secondary" className="border-0">Previous Forecast</Badge>
           </td>
           <td className="p-1 text-xs text-muted-foreground">{formatCurrency(record.budget * 0.95)}</td>
           <td className="p-1 text-xs text-muted-foreground">{formatCurrency(record.cost_to_complete * 1.05)}</td>
@@ -902,7 +902,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         <tr className="border-b bg-muted/10">
           <td className="p-2"></td>
           <td className="p-1 text-xs">
-            <Badge variant="outline">Variance</Badge>
+            <Badge variant="secondary" className="border-0">Variance</Badge>
           </td>
           <td className="p-1 text-xs font-medium text-green-600">{formatCurrency(record.budget * 0.05)}</td>
           <td className="p-1 text-xs font-medium text-red-600">{formatCurrency(record.cost_to_complete * -0.05)}</td>
