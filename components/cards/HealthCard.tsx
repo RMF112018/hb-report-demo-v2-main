@@ -3,11 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Heart, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Shield, Clock, DollarSign, Eye } from "lucide-react"
+import { Heart, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Shield, Clock, DollarSign, Activity, Brain, Zap, Target } from "lucide-react"
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
 import type { DashboardCard } from "@/types/dashboard"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 
 interface HealthCardProps {
   card: DashboardCard
@@ -26,7 +26,49 @@ const HEALTH_COLORS = [
 ]
 
 export function HealthCard({ card, config, span, isCompact, userRole }: HealthCardProps) {
-  const [showDetails, setShowDetails] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'health') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'health',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card.id]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'health',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
 
   // Mock data based on role
   const getRoleBasedData = () => {
@@ -132,6 +174,7 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           criticalProjects: 1,
           totalRiskExposure: 5240000,
           avgStakeholderSatisfaction: 82.9,
+          avgProjectHealth: 79.4,
           companyReputation: 87.2
         }
       }
@@ -141,301 +184,314 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
   }
 
   const data = getRoleBasedData()
-  const healthGradeColor = data.overallHealth >= 90 ? 'text-green-600 dark:text-green-400 dark:text-green-400' : 
-                          data.overallHealth >= 80 ? 'text-blue-600 dark:text-blue-400 dark:text-blue-400' : 
-                          data.overallHealth >= 70 ? 'text-yellow-600 dark:text-yellow-400 dark:text-yellow-400' : 'text-red-600 dark:text-red-400 dark:text-red-400'
+  const role = userRole || 'project-manager'
+  
+  const healthGradeColor = data.overallHealth >= 90 ? 'text-green-600 dark:text-green-400' : 
+                          data.overallHealth >= 80 ? 'text-blue-600 dark:text-blue-400' : 
+                          data.overallHealth >= 70 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
 
+  // Color-coded radar data with health-based colors
   const radarData = Object.entries(data.healthDimensions).map(([key, value]) => ({
     dimension: key.charAt(0).toUpperCase() + key.slice(1),
     value: value,
-    fullMark: 100
+    fullMark: 100,
+    color: value >= 90 ? '#10b981' : value >= 80 ? '#3b82f6' : value >= 70 ? '#f59e0b' : '#ef4444'
   }))
 
   const getTrendIcon = (direction: string) => {
     switch (direction) {
       case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400 dark:text-green-400" />
+        return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
       case 'down':
-        return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400 dark:text-red-400" />
+        return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
         return <div className="h-4 w-4 rounded-full bg-muted-foreground" />
     }
   }
 
   const getHealthColor = (health: number) => {
-    if (health >= 90) return 'text-green-600 dark:text-green-400 dark:text-green-400'
-    if (health >= 80) return 'text-blue-600 dark:text-blue-400 dark:text-blue-400'
-    if (health >= 70) return 'text-yellow-600 dark:text-yellow-400 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400 dark:text-red-400'
+    if (health >= 90) return 'text-green-600 dark:text-green-400'
+    if (health >= 80) return 'text-blue-600 dark:text-blue-400'
+    if (health >= 70) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-red-600 dark:text-red-400'
   }
 
-  const getHealthBadge = (health: number) => {
-    if (health >= 90) return <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Excellent</Badge>
-    if (health >= 80) return <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">Good</Badge>
-    if (health >= 70) return <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">Fair</Badge>
-    return <Badge className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">Poor</Badge>
+  const getHealthBgColor = (health: number) => {
+    if (health >= 90) return '#10b981'
+    if (health >= 80) return '#3b82f6'
+    if (health >= 70) return '#f59e0b'
+    return '#ef4444'
   }
 
-  const role = userRole || 'project-manager'
+  // Count critical health dimensions (below 80%)
+  const criticalDimensions = Object.values(data.healthDimensions).filter(v => v < 80).length
+  const healthyDimensions = Object.values(data.healthDimensions).filter(v => v >= 90).length
 
   return (
     <div 
       className="relative h-full"
+      data-tour="health-card"
     >
-      <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border-cyan-200 dark:border-cyan-800 dark:border-cyan-800 hover:shadow-xl transition-all duration-300 h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-              {card.title}
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* Health Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+              <Activity className="h-3 w-3 mr-1" />
+              Health Monitor
+            </Badge>
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              {data.overallHealth.toFixed(0)}% Overall Health
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 ml-auto">
               {getTrendIcon(data.trendDirection)}
-              <Badge className={`${healthGradeColor} bg-card dark:bg-card border-cyan-200 dark:border-cyan-800 dark:border-cyan-800`}>
+              <Badge className={cn("text-xs", healthGradeColor, "bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500")}>
                 {data.healthGrade}
               </Badge>
             </div>
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          {/* Health Score Circle */}
-          <div className="text-center">
-            <div className="relative inline-block">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900 dark:to-blue-900 flex items-center justify-center border-4 border-cyan-200 dark:border-cyan-800 dark:border-cyan-700">
-                <div className="text-center">
-                  <div className={`text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium ${healthGradeColor}`}>{data.overallHealth.toFixed(0)}</div>
-                  <div className="text-xs text-muted-foreground">Health</div>
-                </div>
-              </div>
-              <div className="absolute -bottom-1 -right-1">
-                {getTrendIcon(data.trendDirection)}
-              </div>
+          </div>
+          
+          {/* Compact Stats - Darker Background */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-green-700 dark:text-green-400">{healthyDimensions}</div>
+              <div className="text-xs text-green-600 dark:text-green-400">Excellent</div>
             </div>
-            <div className="mt-2 text-xs text-muted-foreground">
-              {data.trendDirection === 'up' ? '+' : data.trendDirection === 'down' ? '-' : '±'}{Math.abs(data.trendValue)}% vs last month
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-red-700 dark:text-red-400">{criticalDimensions}</div>
+              <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-blue-700 dark:text-blue-400">
+                {Math.abs(data.trendValue).toFixed(1)}%
+              </div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">Trend</div>
             </div>
           </div>
+        </div>
 
-          {/* Health Dimensions */}
-          <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-1.5 sm:p-2 lg:p-2.5">
-            <h4 className="font-semibold mb-2 text-foreground text-sm">Health Dimensions</h4>
+        {/* Health Content */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-3">
+            {/* Health Score Circle */}
+            <div className="text-center">
+              <div className="relative inline-block">
+                <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center border-3 border-gray-300 dark:border-gray-500">
+                  <div className="text-center">
+                    <div className={cn("text-lg font-bold", healthGradeColor)}>{data.overallHealth.toFixed(0)}</div>
+                    <div className="text-xs text-muted-foreground">Health</div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1">
+                  {getTrendIcon(data.trendDirection)}
+                </div>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {data.trendDirection === 'up' ? '+' : data.trendDirection === 'down' ? '-' : '±'}{Math.abs(data.trendValue)}% vs last month
+              </div>
+            </div>
+
+            {/* Top Health Dimensions */}
             <div className="space-y-2">
               {Object.entries(data.healthDimensions).slice(0, 4).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground capitalize">{key}</span>
-                  <div className="flex items-center gap-2 flex-1 ml-2">
-                    <Progress value={value} className="h-1 flex-1" />
-                    <span className={`text-xs font-semibold ${getHealthColor(value)} min-w-[2rem]`}>
-                      {value.toFixed(0)}
+                <div key={key} className="flex items-center justify-between p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2 h-2 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: getHealthBgColor(value) }}
+                    />
+                    <span className="text-xs text-muted-foreground capitalize font-medium">{key}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Progress value={value} className="h-1.5 w-16" />
+                    <span className={cn("text-xs font-semibold min-w-[2rem]", getHealthColor(value))}>
+                      {(value ?? 0).toFixed(0)}%
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-2">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                Schedule
-              </div>
-              <div className="font-semibold text-cyan-600 dark:text-cyan-400 text-sm">
-                {role === 'project-manager' ? 
-                  `${data.keyMetrics?.scheduleVariance > 0 ? '+' : ''}${data.keyMetrics?.scheduleVariance} days` :
-                  `${data.keyMetrics?.avgScheduleVariance > 0 ? '+' : ''}${data.keyMetrics?.avgScheduleVariance} avg`
-                }
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-2">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <DollarSign className="h-3 w-3" />
-                Budget
-              </div>
-              <div className="font-semibold text-cyan-600 dark:text-cyan-400 text-sm">
-                {role === 'project-manager' ? 
-                  `${data.keyMetrics?.budgetVariance > 0 ? '+' : ''}${data.keyMetrics?.budgetVariance}%` :
-                  `${data.keyMetrics?.avgBudgetVariance > 0 ? '+' : ''}${data.keyMetrics?.avgBudgetVariance}% avg`
-                }
-              </div>
-            </div>
-          </div>
-
-          {/* Details Toggle Button */}
-          <div className="flex justify-center pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowDetails(!showDetails)}
-              className="text-xs border-cyan-200 dark:border-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-950/50"
-            >
-              <Eye className="h-3 w-3 mr-1" />
-              {showDetails ? 'Hide Details' : 'Show Details'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Hover Drill-down */}
-      {showDetails && (
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border border-cyan-200 dark:border-cyan-800 rounded-lg shadow-2xl z-10 overflow-auto">
-          <div className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4">
-            <div className="flex items-center justify-between border-b border-cyan-200 dark:border-cyan-800 pb-2">
-              <h3 className="font-semibold text-foreground flex items-center gap-2">
-                <Heart className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                Health Analytics
-              </h3>
-              <div className="flex items-center gap-2">
-                {getTrendIcon(data.trendDirection)}
-                <Badge className={`${healthGradeColor} bg-card border-cyan-200 dark:border-cyan-800`}>
-                  {data.healthGrade}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowDetails(false)}
-                  className="h-6 w-6 p-0 text-cyan-600 dark:text-cyan-400 hover:text-foreground"
-                >
-                  ×
-                </Button>
-              </div>
-            </div>
-
-            {/* Health Radar */}
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 text-foreground">Health Dimensions</h4>
-              <div className="h-40">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData}>
-                    <PolarGrid stroke="#bfdbfe" />
-                    <PolarAngleAxis dataKey="dimension" fontSize={10} />
-                    <PolarRadiusAxis domain={[0, 100]} tick={false} />
-                    <Radar
-                      name="Health"
-                      dataKey="value"
-                      stroke="#0891b2"
-                      fill="#0891b2"
-                      fillOpacity={0.3}
-                      strokeWidth={2}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #bfdbfe',
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Health Trend */}
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 text-foreground">Health Trend</h4>
-              <div className="h-32">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data.healthTrend}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#bfdbfe" />
-                    <XAxis dataKey="month" fontSize={10} stroke="#0891b2" />
-                    <YAxis domain={[60, 100]} fontSize={10} stroke="#0891b2" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'white', 
-                        border: '1px solid #bfdbfe',
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }} 
-                    />
-                    <Line type="monotone" dataKey="overall" stroke="#0891b2" strokeWidth={3} name="Overall Health" />
-                    <Line type="monotone" dataKey="schedule" stroke="hsl(var(--chart-1))" strokeWidth={2} name="Schedule" />
-                    <Line type="monotone" dataKey="budget" stroke="hsl(var(--chart-3))" strokeWidth={2} name="Budget" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Role-specific details */}
-            {role === 'project-executive' && 'portfolioBreakdown' in data && (
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 text-foreground">Portfolio Health</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {data.portfolioBreakdown.map((project: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center p-2 rounded bg-white/40 dark:bg-black/40 border border-cyan-100">
-                      <div>
-                        <div className="text-sm font-medium text-foreground">{project.project}</div>
-                        <div className="text-xs text-muted-foreground">
-                          S: {project.schedule}% | B: {project.budget}% | Q: {project.quality}%
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`text-sm font-semibold ${getHealthColor(project.health)}`}>
-                          {project.health.toFixed(0)}%
-                        </div>
-                        {getTrendIcon(project.trend)}
-                      </div>
-                    </div>
-                  ))}
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className="text-sm font-medium text-foreground">
+                  {role === 'executive' ? ((data as any).companyMetrics?.avgProjectHealth ?? 0).toFixed(0) : 
+                   role === 'project-executive' ? ((data as any).keyMetrics?.projectHealth ?? data.overallHealth).toFixed(0) : 
+                   data.overallHealth.toFixed(0)}%
                 </div>
+                <div className="text-xs text-muted-foreground">Project Health</div>
               </div>
-            )}
-
-            {role === 'project-manager' && 'alerts' in data && (
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 text-foreground">Health Alerts</h4>
-                <div className="space-y-2 max-h-36 overflow-y-auto">
-                  {data.alerts.map((alert: any, index: number) => (
-                    <div key={index} className="flex items-start gap-2 p-2 rounded bg-white/40 dark:bg-black/40 border border-cyan-100">
-                      <div className="flex-shrink-0 mt-1">
-                        {alert.type === 'warning' && <AlertTriangle className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />}
-                        {alert.type === 'success' && <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-400" />}
-                        {alert.type === 'info' && <Shield className="h-3 w-3 text-blue-600 dark:text-blue-400" />}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-foreground">{alert.category}</div>
-                        <div className="text-xs text-muted-foreground">{alert.message}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-cyan-600 dark:text-cyan-400">
-                  {role === 'executive' ? data.companyMetrics?.healthyProjects : 
-                   role === 'project-executive' ? data.keyMetrics?.onTrackProjects : 
-                   data.keyMetrics?.qualityScore.toFixed(0)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {role === 'executive' ? 'Healthy' : 
-                   role === 'project-executive' ? 'On Track' : 'Quality Score'}
-                </div>
-              </div>
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-cyan-600 dark:text-cyan-400">
-                  {role === 'executive' ? data.companyMetrics?.atRiskProjects : 
-                   role === 'project-executive' ? data.keyMetrics?.criticalProjects : 
-                   data.keyMetrics?.safetyDays}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {role === 'executive' ? 'At Risk' : 
-                   role === 'project-executive' ? 'Critical' : 'Safety Days'}
-                </div>
-              </div>
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-cyan-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-cyan-600 dark:text-cyan-400">
-                  {role === 'executive' ? data.companyMetrics?.avgStakeholderSatisfaction.toFixed(0) : 
-                   role === 'project-executive' ? data.keyMetrics?.stakeholderSatisfaction.toFixed(0) : 
-                   data.keyMetrics?.stakeholderSatisfaction.toFixed(0)}
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className="text-sm font-medium text-foreground">
+                  {role === 'executive' ? ((data as any).companyMetrics?.avgStakeholderSatisfaction ?? 0).toFixed(0) : 
+                   role === 'project-executive' ? ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0) : 
+                   ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0)}%
                 </div>
                 <div className="text-xs text-muted-foreground">Satisfaction</div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+          <div className="h-full">
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Health Analytics Deep Dive</h3>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+              {/* Health Radar */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Target className="w-4 h-4 mr-2" />
+                    Health Dimensions
+                  </h4>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={radarData}>
+                        <PolarGrid stroke="#ffffff40" />
+                        <PolarAngleAxis dataKey="dimension" fontSize={9} fill="white" />
+                        <PolarRadiusAxis domain={[0, 100]} tick={false} />
+                        <Radar
+                          name="Health"
+                          dataKey="value"
+                          stroke="#60a5fa"
+                          fill="#60a5fa"
+                          fillOpacity={0.3}
+                          strokeWidth={2}
+                        />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            border: '1px solid #ffffff40',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            color: 'white'
+                          }}
+                          formatter={(value: number) => [`${value.toFixed(1)}%`, 'Health']}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Color-coded dimension indicators */}
+                  <div className="grid grid-cols-2 gap-1 text-xs mt-2">
+                    {radarData.map((item) => (
+                      <div key={item.dimension} className="flex items-center gap-1">
+                        <div 
+                          className="w-2 h-2 rounded-full flex-shrink-0" 
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-white truncate">{item.dimension}: {item.value.toFixed(0)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Brain className="w-4 h-4 mr-2" />
+                    Health Metrics
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Overall Health:</span>
+                      <span className="font-medium text-blue-300">{data.overallHealth.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Health Grade:</span>
+                      <span className="font-medium text-green-400">{data.healthGrade}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Trend Direction:</span>
+                      <span className={cn("font-medium", 
+                        data.trendDirection === 'up' ? 'text-green-400' : 
+                        data.trendDirection === 'down' ? 'text-red-400' : 'text-yellow-400'
+                      )}>
+                        {data.trendDirection === 'up' ? 'Improving' : 
+                         data.trendDirection === 'down' ? 'Declining' : 'Stable'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Monthly Change:</span>
+                      <span className="font-medium text-purple-300">{data.trendValue > 0 ? '+' : ''}{data.trendValue}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Health Trend */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Activity className="w-4 h-4 mr-2" />
+                    Health Trend
+                  </h4>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={data.healthTrend}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                        <XAxis dataKey="month" fontSize={9} stroke="white" />
+                        <YAxis domain={[60, 100]} fontSize={9} stroke="white" />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(0,0,0,0.8)', 
+                            border: '1px solid #ffffff40',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            color: 'white'
+                          }} 
+                        />
+                        <Line type="monotone" dataKey="overall" stroke="#60a5fa" strokeWidth={3} name="Overall Health" />
+                        <Line type="monotone" dataKey="schedule" stroke="#10b981" strokeWidth={2} name="Schedule" />
+                        <Line type="monotone" dataKey="budget" stroke="#f59e0b" strokeWidth={2} name="Budget" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Health Summary
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span>Excellent (90%+):</span>
+                      <span className="font-medium text-green-400">{healthyDimensions} dimensions</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Good (80-89%):</span>
+                      <span className="font-medium text-blue-400">
+                        {Object.values(data.healthDimensions).filter(v => v >= 80 && v < 90).length} dimensions
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Needs Attention:</span>
+                      <span className="font-medium text-red-400">{criticalDimensions} dimensions</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Project Status:</span>
+                      <span className="font-medium text-purple-300">
+                        {role === 'project-manager' ? ((data as any).projectName ?? 'Project View') : 
+                         role === 'project-executive' ? 'Portfolio View' : 'Company View'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

@@ -70,6 +70,7 @@ interface DashboardGridProps {
   onLayoutChange?: (layout: any[]) => void;
   onCardRemove?: (cardId: string) => void;
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void;
+  onDrillDown?: (cardId: string, cardType: string) => void;
   onCardAdd?: () => void;
   onSave?: () => void;
   onReset?: () => void;
@@ -167,6 +168,7 @@ export function DashboardGrid({
   onLayoutChange,
   onCardRemove,
   onCardConfigure,
+  onDrillDown,
   isEditing = false,
   isCompact = false,
   spacingClass = "gap-6",
@@ -256,6 +258,7 @@ export function DashboardGrid({
                 isCompact={isCompact}
                 onCardRemove={onCardRemove}
                 onCardConfigure={onCardConfigure}
+                onDrillDown={onDrillDown}
                 onCardFocus={handleCardFocus}
                 height={getCardHeight(card, isCompact)}
                 userRole={userRole}
@@ -283,34 +286,34 @@ export function DashboardGrid({
               <DialogHeader className="px-6 py-4 border-b border-border/50 bg-card/95 backdrop-blur-sm">
                 <DialogTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {/* Enhanced card icons with better contrast */}
-                    {focusedCard.type === "portfolio-overview" && <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "enhanced-hbi-insights" && <Brain className="h-5 w-5 text-purple-600 dark:text-purple-300" />}
-                    {focusedCard.type === "financial-review-panel" && <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "pipeline-analytics" && <Target className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
-                    {focusedCard.type === "market-intelligence" && <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-300" />}
-                    {focusedCard.type === "project-overview" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "schedule-performance" && <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
-                    {focusedCard.type === "financial-status" && <DollarSign className="h-5 w-5 text-green-600 dark:text-green-300" />}
-                    {focusedCard.type === "general-conditions" && <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "contingency-analysis" && <Shield className="h-5 w-5 text-purple-600 dark:text-purple-300" />}
-                    {focusedCard.type === "cash-flow" && <Droplets className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />}
-                    {focusedCard.type === "procurement" && <Package className="h-5 w-5 text-amber-600 dark:text-amber-300" />}
-                    {focusedCard.type === "draw-forecast" && <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />}
-                    {focusedCard.type === "quality-control" && <Eye className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
-                    {focusedCard.type === "safety" && <AlertTriangleIcon className="h-5 w-5 text-red-600 dark:text-red-300" />}
-                    {focusedCard.type === "staffing-distribution" && <Users className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
-                    {focusedCard.type === "change-order-analysis" && <FileText className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
-                    {focusedCard.type === "closeout" && <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />}
-                    {focusedCard.type === "startup" && <Play className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
-                    {focusedCard.type === "critical-dates" && <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "field-reports" && <FileText className="h-5 w-5 text-green-600 dark:text-green-300" />}
-                    {focusedCard.type === "rfi" && <MessageSquare className="h-5 w-5 text-orange-600 dark:text-orange-300" />}
-                    {focusedCard.type === "submittal" && <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
-                    {focusedCard.type === "health" && <Heart className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />}
-                    {focusedCard.type === "schedule-monitor" && <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    {focusedCard.type === "bd-opportunities" && <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
-                    <span className="text-lg font-semibold text-foreground">{focusedCard.title}</span>
+                    {/* Enhanced card icons with standardized color */}
+                    {focusedCard.type === "portfolio-overview" && <Briefcase className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "enhanced-hbi-insights" && <Brain className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "financial-review-panel" && <BarChart3 className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "pipeline-analytics" && <Target className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "market-intelligence" && <TrendingUp className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "project-overview" && <Building2 className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "schedule-performance" && <Calendar className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "financial-status" && <DollarSign className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "general-conditions" && <Wrench className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "contingency-analysis" && <Shield className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "cash-flow" && <Droplets className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "procurement" && <Package className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "draw-forecast" && <BarChart3 className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "quality-control" && <Eye className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "safety" && <AlertTriangleIcon className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "staffing-distribution" && <Users className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "change-order-analysis" && <FileText className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "closeout" && <ClipboardCheck className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "startup" && <Play className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "critical-dates" && <CalendarDays className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "field-reports" && <FileText className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "rfi" && <MessageSquare className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "submittal" && <FileText className="h-5 w-5" style={{color: '#FA4616'}} />}
+
+                    {focusedCard.type === "schedule-monitor" && <Calendar className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type === "bd-opportunities" && <Building2 className="h-5 w-5" style={{color: '#FA4616'}} />}
+                    {focusedCard.type !== "health" && <span className="text-lg font-semibold text-foreground">{focusedCard.title}</span>}
                   </div>
                   <Button
                     variant="ghost"
@@ -344,6 +347,7 @@ interface SortableCardProps {
   isCompact: boolean;
   onCardRemove?: (cardId: string) => void;
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void;
+  onDrillDown?: (cardId: string, cardType: string) => void;
   onCardFocus?: (card: DashboardCard) => void;
   height: number | "auto";
   userRole?: string;
@@ -355,6 +359,7 @@ function SortableCard({
   isCompact,
   onCardRemove,
   onCardConfigure,
+  onDrillDown,
   onCardFocus,
   height,
   userRole,
@@ -394,63 +399,13 @@ function SortableCard({
         card={card}
         onRemove={onCardRemove}
         onConfigure={onCardConfigure}
+        onDrillDown={onDrillDown}
         isEditing={isEditing}
         isCompact={isCompact}
         dragHandleClass="h-full"
       >
         <div className="h-full">
-          {/* Enhanced card header with better typography and spacing */}
-          <div className="px-4 sm:px-5 lg:px-6 py-3 sm:py-4 border-b border-border/30 bg-muted/20 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground text-sm sm:text-base lg:text-lg truncate pr-2">
-                {card.title}
-              </h3>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {/* Focus/Expand Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCardFocus?.(card);
-                  }}
-                  className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent/60"
-                  title="Focus card"
-                >
-                  <Maximize2 className="h-3 w-3 text-muted-foreground" />
-                </Button>
-                {/* Card type icon with better sizing */}
-                {card.type === "portfolio-overview" && <Briefcase className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "enhanced-hbi-insights" && <Brain className="h-4 w-4 text-purple-600" />}
-                {card.type === "financial-review-panel" && <BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "pipeline-analytics" && <Target className="h-4 w-4 text-orange-600" />}
-                {card.type === "market-intelligence" && <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />}
-                {card.type === "project-overview" && <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "schedule-performance" && <Calendar className="h-4 w-4 text-orange-600" />}
-                {card.type === "financial-status" && <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />}
-                {card.type === "general-conditions" && <Wrench className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "contingency-analysis" && <Shield className="h-4 w-4 text-purple-600" />}
-                {card.type === "cash-flow" && <Droplets className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />}
-                {card.type === "procurement" && <Package className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
-                {card.type === "draw-forecast" && <BarChart3 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
-                {card.type === "quality-control" && <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
-                {card.type === "safety" && <AlertTriangleIcon className="h-4 w-4 text-red-600 dark:text-red-400" />}
-                {card.type === "staffing-distribution" && <Users className="h-4 w-4 text-orange-600" />}
-                {card.type === "change-order-analysis" && <FileText className="h-4 w-4 text-orange-600" />}
-                {card.type === "closeout" && <ClipboardCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
-                {card.type === "startup" && <Play className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
-                {card.type === "critical-dates" && <CalendarDays className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "field-reports" && <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />}
-                {card.type === "rfi" && <MessageSquare className="h-4 w-4 text-orange-600" />}
-                {card.type === "submittal" && <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
-                {card.type === "health" && <Heart className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />}
-                {card.type === "schedule-monitor" && <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-                {card.type === "bd-opportunities" && <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />}
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced card content area */}
+          {/* Enhanced card content area - header removed since DashboardCardWrapper handles it */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="p-2 sm:p-3 lg:p-4 h-full">
               <CardContent card={card} isCompact={isCompact} userRole={userRole} />
@@ -499,21 +454,21 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
     case "draw-forecast":
       return <DrawForecastCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "quality-control":
-      return <QualityControlCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <QualityControlCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "safety":
-      return <SafetyCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <SafetyCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "staffing-distribution":
       return <StaffingDistributionCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "change-order-analysis":
-      return <ChangeOrderAnalysisCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <ChangeOrderAnalysisCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "closeout":
-      return <CloseoutCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <CloseoutCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "startup":
-      return <StartupCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <StartupCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "critical-dates":
-      return <CriticalDatesCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <CriticalDatesCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "field-reports":
-      return <FieldReportsCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
+      return <FieldReportsCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "rfi":
       return <RFICard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />;
     case "submittal":

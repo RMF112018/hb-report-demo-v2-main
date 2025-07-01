@@ -1,20 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle, Clock, AlertCircle, FileCheck, Building2, ClipboardCheck, Users, CalendarCheck, ChevronRight, TrendingUp, Target, Award, FileText, Shield, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import type { DashboardCard } from "@/types/dashboard"
 
 interface CloseoutCardProps {
+  card: DashboardCard
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function CloseoutCard({ config, span, isCompact, userRole }: CloseoutCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function CloseoutCard({ card, config, span, isCompact, userRole }: CloseoutCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'closeout') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'closeout',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card.id]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'closeout',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -199,280 +243,256 @@ export default function CloseoutCard({ config, span, isCompact, userRole }: Clos
 
   return (
     <div 
-      className="h-full flex flex-col bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/30 dark:to-blue-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="relative h-full"
+      data-tour="closeout-card"
     >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-indigo-200 dark:border-indigo-800">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getStatusColor(data.overallCompletion)}`}>
-              {formatPercentage(data.overallCompletion)}
-            </div>
-            <div className="text-xs text-indigo-600 dark:text-indigo-400">Complete</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getRiskColor(data.riskLevel)}`}>{data.criticalItems}</div>
-            <div className="text-xs text-muted-foreground">Critical</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
-        {/* Status Overview */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-indigo-200 dark:border-indigo-800">
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* Closeout Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
-            <ClipboardCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-sm font-medium text-foreground">Closeout Status</span>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="w-20 h-20">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={15}
-                    outerRadius={35}
-                    dataKey="value"
-                  >
-                    {statusData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={statusData[index].color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+              <ClipboardCheck className="h-3 w-3 mr-1" />
+              Closeout Monitor
+            </Badge>
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              {formatPercentage(data.overallCompletion)} Complete
             </div>
-            <div className="flex-1 grid grid-cols-3 gap-1 text-xs">
-              <div className="text-center p-2 bg-green-50 dark:bg-green-950/30 rounded">
-                <div className="font-bold text-green-600 dark:text-green-400">{data.completedItems}</div>
-                <div className="text-muted-foreground">Complete</div>
+            <div className="flex items-center gap-1 ml-auto">
+              <div className={`text-sm font-medium ${getRiskColor(data.riskLevel)}`}>
+                {data.riskLevel}
               </div>
-              <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-950/30 rounded">
-                <div className="font-bold text-yellow-600 dark:text-yellow-400">{data.pendingItems}</div>
-                <div className="text-muted-foreground">Pending</div>
-              </div>
-              <div className="text-center p-2 bg-red-50 dark:bg-red-950/30 rounded">
-                <div className="font-bold text-red-600 dark:text-red-400">{data.criticalItems}</div>
-                <div className="text-muted-foreground">Critical</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Progress by Category */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-indigo-200 dark:border-indigo-800">
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-sm font-medium text-foreground">Category Progress</span>
-          </div>
-          <div className="space-y-2">
-            {data.categories.slice(0, 3).map((category) => (
-              <div key={category.name} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{category.name}</span>
-                  <span className="font-medium">{formatPercentage(category.completion)}</span>
-                </div>
-                <Progress value={category.completion} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-indigo-200 dark:border-indigo-800">
-          <div className="flex items-center gap-2 mb-2">
-            <CalendarCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-sm font-medium text-foreground">Timeline</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Est. Completion</span>
-              <Badge variant="outline" className="text-xs">{data.daysToCompletion} days</Badge>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Current Phase</span>
-              <Badge className={`${getStatusBadge(data.overallCompletion)} text-xs`}>
-                {data.projectPhase}
+              <Badge className="bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-xs">
+                {data.daysToCompletion}d
               </Badge>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Last Activity</span>
-              <span className="font-medium">{data.lastActivity}</span>
+          </div>
+          
+          {/* Compact Stats - Darker Background */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-green-700 dark:text-green-400">{data.completedItems}</div>
+              <div className="text-xs text-green-600 dark:text-green-400">Complete</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-yellow-700 dark:text-yellow-400">{data.pendingItems}</div>
+              <div className="text-xs text-yellow-600 dark:text-yellow-400">Pending</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-red-700 dark:text-red-400">{data.criticalItems}</div>
+              <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-indigo-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col text-white animate-in fade-in duration-200 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-lg">Closeout Deep Dive</span>
+        {/* Closeout Content */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-3">
+            {/* Status Overview */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <ClipboardCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-sm font-medium text-foreground">Closeout Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-16">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={12}
+                        outerRadius={28}
+                        dataKey="value"
+                      >
+                        {statusData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={statusData[index].color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex-1 grid grid-cols-3 gap-1 text-xs">
+                  <div className="text-center p-1.5 bg-green-50 dark:bg-green-950/30 rounded border border-green-200 dark:border-green-700">
+                    <div className="font-bold text-green-600 dark:text-green-400">{data.completedItems}</div>
+                    <div className="text-muted-foreground">Complete</div>
+                  </div>
+                  <div className="text-center p-1.5 bg-yellow-50 dark:bg-yellow-950/30 rounded border border-yellow-200 dark:border-yellow-700">
+                    <div className="font-bold text-yellow-600 dark:text-yellow-400">{data.pendingItems}</div>
+                    <div className="text-muted-foreground">Pending</div>
+                  </div>
+                  <div className="text-center p-1.5 bg-red-50 dark:bg-red-950/30 rounded border border-red-200 dark:border-red-700">
+                    <div className="font-bold text-red-600 dark:text-red-400">{data.criticalItems}</div>
+                    <div className="text-muted-foreground">Critical</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            {/* Categories Breakdown */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <FileCheck className="w-4 h-4 mr-2" />
-                Category Details
-              </h4>
-              <div className="space-y-2 text-xs">
-                {data.categories.map((cat) => (
-                  <div key={cat.name} className="flex justify-between items-center">
-                    <span className="text-indigo-200">{cat.name}:</span>
-                    <div className="text-right">
-                      <div className="font-medium">{cat.completed}/{cat.total} • {formatPercentage(cat.completion)}</div>
-                      {cat.critical > 0 && (
-                        <div className="text-red-300">⚠ {cat.critical} critical</div>
-                      )}
+
+            {/* Progress by Category */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-sm font-medium text-foreground">Category Progress</span>
+              </div>
+              <div className="space-y-2">
+                {data.categories.slice(0, 3).map((category) => (
+                  <div key={category.name} className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">{category.name}</span>
+                      <span className="font-medium">{formatPercentage(category.completion)}</span>
                     </div>
+                    <Progress value={category.completion} className="h-2" />
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Visual Progress Chart */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Category Completion
-              </h4>
-              <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData}>
-                    <Bar dataKey="completion" fill="hsl(var(--chart-1))" radius={[2, 2, 0, 0]} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#c7d2fe' }} />
-                    <YAxis tick={{ fontSize: 10, fill: '#c7d2fe' }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        border: 'none', 
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+            {/* Key Metrics */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-sm font-medium text-foreground">Timeline</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Est. Completion</span>
+                  <Badge variant="outline" className="text-xs">{data.daysToCompletion} days</Badge>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Current Phase</span>
+                  <Badge className={`${getStatusBadge(data.overallCompletion)} text-xs border border-gray-300 dark:border-gray-600`}>
+                    {data.projectPhase}
+                  </Badge>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Last Activity</span>
+                  <span className="font-medium">{data.lastActivity}</span>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Project Details or Portfolio View */}
-            {userRole === 'project-manager' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project: {data.drillDown.projectDetails?.name}
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-indigo-200">CO Target:</span>
-                    <span className="font-medium">{data.drillDown.projectDetails?.coDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-indigo-200">Punch List:</span>
-                    <span className="font-medium">{data.drillDown.projectDetails?.punchListItems} items</span>
-                  </div>
-                  <div className="pt-2 border-t border-indigo-700">
-                    <div className="text-indigo-200 mb-1">Critical Tasks:</div>
-                    {data.drillDown.criticalTasks?.map((task, index) => (
-                      <div key={index} className="text-indigo-300 text-xs">
-                        • {task.task} {task.daysOverdue > 0 && `(${task.daysOverdue}d overdue)`}
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-indigo-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+          <div className="h-full">
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Closeout Deep Dive</h3>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+              {/* Categories Breakdown */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <FileCheck className="w-4 h-4 mr-2" />
+                    Category Details
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {data.categories.map((cat) => (
+                      <div key={cat.name} className="flex justify-between items-center">
+                        <span className="text-indigo-200">{cat.name}:</span>
+                        <div className="text-right">
+                          <div className="font-medium">{cat.completed}/{cat.total}</div>
+                          {cat.critical > 0 && (
+                            <div className="text-red-300 text-xs">⚠ {cat.critical} critical</div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            ) : userRole === 'project-executive' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project Status (6 Projects)
-                </h4>
-                <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                  {data.drillDown.projectPerformance?.map((project, index) => (
-                    <div key={index} className="flex justify-between items-center border-b border-indigo-800 pb-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-indigo-200">{project.project}</div>
-                        <div className="text-indigo-300">{formatPercentage(project.completion)} • {project.phase}</div>
-                        {project.critical > 0 && (
-                          <div className="text-red-300">⚠ {project.critical} critical items</div>
-                        )}
-                      </div>
-                      <Badge className={`text-xs ${
-                        project.status === 'Excellent' ? 'bg-green-200 text-green-800' :
-                        project.status === 'Good' ? 'bg-blue-200 text-blue-800' :
-                        project.status === 'Attention' ? 'bg-yellow-200 text-yellow-800' :
-                        'bg-red-200 text-red-800'
-                      }`}>
-                        {project.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  Portfolio Risks
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {(data.drillDown.portfolioRisks || []).map((risk, index) => (
-                    <div key={index} className="text-indigo-300">• {risk}</div>
-                  ))}
-                </div>
-              </div>
-            )}
 
-            {/* Additional Project Executive Section */}
-            {userRole === 'project-executive' && (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <CalendarCheck className="w-4 h-4 mr-2" />
-                  Upcoming Deadlines
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {data.drillDown.upcomingDeadlines?.map((deadline, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <div className="font-medium text-indigo-200">{deadline.project}</div>
-                        <div className="text-indigo-300">{deadline.milestone}</div>
-                      </div>
-                      <span className="text-yellow-300 text-xs">{deadline.dueDate}</span>
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <CalendarCheck className="w-4 h-4 mr-2" />
+                    Status Metrics
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Overall Progress:</span>
+                      <span className="font-medium text-indigo-300">{formatPercentage(data.overallCompletion)}</span>
                     </div>
-                  ))}
+                    <div className="flex justify-between">
+                      <span>Current Phase:</span>
+                      <span className="font-medium text-yellow-300">{data.projectPhase}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Risk Level:</span>
+                      <span className="font-medium text-purple-300">{data.riskLevel}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Days to Target:</span>
+                      <span className="font-medium text-green-400">{data.daysToCompletion} days</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Key Insights */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <Award className="w-4 h-4 mr-2" />
-                Key Insights
-              </h4>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-indigo-200">Overall Health:</span>
-                  <Badge className={`${getStatusColor(data.overallCompletion)} bg-white/20 dark:bg-black/20 text-xs`}>
-                    {data.overallCompletion >= 90 ? 'Excellent' : data.overallCompletion >= 75 ? 'Good' : 'Needs Attention'}
-                  </Badge>
+              {/* Charts and Details */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Category Completion
+                  </h4>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={categoryData}>
+                        <Bar dataKey="completion" fill="hsl(var(--chart-1))" radius={[2, 2, 0, 0]} />
+                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#c7d2fe' }} />
+                        <YAxis tick={{ fontSize: 10, fill: '#c7d2fe' }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(0,0,0,0.8)', 
+                            border: 'none', 
+                            borderRadius: '6px',
+                            fontSize: '12px'
+                          }}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-indigo-200">Risk Level:</span>
-                  <span className={`font-medium ${getRiskColor(data.riskLevel)}`}>{data.riskLevel}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-indigo-200">Days to Target:</span>
-                  <span className="font-medium">{data.daysToCompletion} days</span>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Award className="w-4 h-4 mr-2" />
+                    Key Insights
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Overall Health:</span>
+                      <span className="font-medium text-indigo-300">
+                        {data.overallCompletion >= 90 ? 'Excellent' : data.overallCompletion >= 75 ? 'Good' : 'Needs Attention'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Total Items:</span>
+                      <span className="font-medium text-green-400">{data.totalItems} total</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Critical Items:</span>
+                      <span className="font-medium text-red-400">{data.criticalItems} need attention</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Last Update:</span>
+                      <span className="font-medium text-blue-300">{data.lastActivity}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

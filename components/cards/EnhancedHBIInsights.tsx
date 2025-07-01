@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Sparkles,
@@ -36,7 +36,49 @@ interface EnhancedHBIInsightsProps {
 export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps) {
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDrillDown, setShowDrillDown] = useState(false);
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === cardId || event.detail.cardType === 'enhanced-hbi-insights') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: cardId,
+            cardType: 'enhanced-hbi-insights',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [cardId]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: cardId,
+        cardType: 'enhanced-hbi-insights',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
 
   // Handle both array and object config formats
   const insights = Array.isArray(config) ? config : [];
@@ -202,111 +244,107 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
   return (
     <div 
       className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       data-tour="hbi-insights"
     >
-      <div className="h-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 overflow-hidden">
-      {/* AI Stats Header */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-purple-200">
-        <div className="flex items-center justify-between mb-1 sm:mb-1.5 lg:mb-2">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-purple-600 text-white border-purple-600 text-xs">
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* AI Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
               <Activity className="h-3 w-3 mr-1" />
               AI Powered
             </Badge>
-            <div className="text-sm text-purple-700 font-medium">
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
               {avgConfidence}% Avg Confidence
             </div>
           </div>
-        </div>
-        
-        {/* Compact Stats */}
-        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-            <div className="font-bold text-lg text-red-700">{highSeverityCount}</div>
-            <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
-          </div>
-          <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="font-bold text-lg text-green-700">
-              {displayInsights.filter((i) => i.type === "opportunity").length}
+          
+          {/* Compact Stats */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+              <div className="font-bold text-lg text-red-700">{highSeverityCount}</div>
+              <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
             </div>
-            <div className="text-xs text-green-600 dark:text-green-400">Opportunities</div>
-          </div>
-          <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-            <div className="font-bold text-lg text-blue-700">
-              {displayInsights.filter((i) => i.type === "forecast").length}
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+              <div className="font-bold text-lg text-green-700">
+                {displayInsights.filter((i) => i.type === "opportunity").length}
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400">Opportunities</div>
             </div>
-            <div className="text-xs text-blue-600 dark:text-blue-400">Forecasts</div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+              <div className="font-bold text-lg text-blue-700">
+                {displayInsights.filter((i) => i.type === "forecast").length}
+              </div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">Forecasts</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Insights List */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
-        <div className="space-y-2">
-          {visibleInsights.map((insight) => (
-            <div
-              key={insight.id}
-              className={cn(
-                "p-2 rounded-lg border cursor-pointer transition-all duration-200 shadow-sm",
-                getInsightColor(insight.severity),
-                selectedInsight === insight.id && "ring-2 ring-purple-400"
-              )}
-              onClick={() => setSelectedInsight(selectedInsight === insight.id ? null : insight.id)}
-            >
-              <div className="flex items-start gap-2">
-                <div className="flex-shrink-0 mt-0.5">
-                  {getInsightIcon(insight.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-semibold text-sm text-foreground leading-tight">
-                      {insight.title}
-                    </h4>
-                    <Badge className={cn("text-xs px-2 py-0.5", getSeverityColor(insight.severity))}>
-                      {insight.confidence}%
-                    </Badge>
+        {/* Insights List */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-2">
+            {visibleInsights.map((insight) => (
+              <div
+                key={insight.id}
+                className={cn(
+                  "p-2 rounded-lg border cursor-pointer transition-all duration-200 shadow-sm",
+                  getInsightColor(insight.severity),
+                  selectedInsight === insight.id && "ring-2 ring-purple-400"
+                )}
+                onClick={() => setSelectedInsight(selectedInsight === insight.id ? null : insight.id)}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {getInsightIcon(insight.type)}
                   </div>
-                  
-                  <p className="text-sm text-foreground mb-1 leading-snug">
-                    {insight.text}
-                  </p>
-
-                  {selectedInsight === insight.id && (
-                    <div className="mt-2 p-2 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-lg border border-white/50 dark:border-black/50">
-                      <div className="flex items-start gap-2">
-                        <ArrowRight className="h-3 w-3 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-foreground font-medium">
-                          {insight.action}
-                        </p>
-                      </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h4 className="font-semibold text-sm text-foreground leading-tight">
+                        {insight.title}
+                      </h4>
+                      <Badge className={cn("text-xs px-2 py-0.5", getSeverityColor(insight.severity))}>
+                        {insight.confidence}%
+                      </Badge>
                     </div>
-                  )}
+                    
+                    <p className="text-sm text-foreground mb-1 leading-snug">
+                      {insight.text}
+                    </p>
+
+                    {selectedInsight === insight.id && (
+                      <div className="mt-2 p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                        <div className="flex items-start gap-2">
+                          <ArrowRight className="h-3 w-3 mt-0.5 flex-shrink-0" style={{color: '#FA4616'}} />
+                          <p className="text-sm text-foreground font-medium">
+                            {insight.action}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Show More/Less Button */}
+        {displayInsights.length > 4 && (
+          <div className="flex-shrink-0 p-1.5 sm:p-2 lg:p-2.5 border-t border-gray-200 dark:border-gray-600">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center justify-center gap-2 font-medium py-1"
+            >
+              <span>{showAll ? "Show Less" : `+${displayInsights.length - 4} More Insights`}</span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", showAll && "rotate-180")} />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Show More/Less Button */}
-      {displayInsights.length > 4 && (
-        <div className="flex-shrink-0 p-1.5 sm:p-2 lg:p-2.5 border-t border-purple-200 bg-white/60 dark:bg-black/60">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="w-full text-sm text-purple-600 hover:text-purple-800 flex items-center justify-center gap-2 font-medium py-1"
-          >
-            <span>{showAll ? "Show Less" : `+${displayInsights.length - 4} More Insights`}</span>
-            <ChevronDown className={cn("h-4 w-4 transition-transform", showAll && "rotate-180")} />
-          </button>
-        </div>
-      )}
-      </div>
-
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-purple-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">AI Intelligence Deep Analysis</h3>
             
@@ -433,6 +471,16 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
                   </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

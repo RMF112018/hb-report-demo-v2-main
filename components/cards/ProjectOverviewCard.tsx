@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Calendar, DollarSign, TrendingUp, ChevronRight, MapPin, Eye } from "lucide-react";
+import { Building2, Calendar, DollarSign, TrendingUp, ChevronRight, MapPin, Eye, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -103,15 +103,15 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-blue-950/60 dark:to-indigo-950/60 overflow-hidden relative transition-all duration-300 backdrop-blur-sm border border-blue-200/40 dark:border-blue-800/40">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden relative transition-all duration-300 backdrop-blur-sm border border-gray-300 dark:border-gray-500">
       {/* Enhanced Header with better contrast */}
-      <div className="flex-shrink-0 p-3 sm:p-4 lg:p-5 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-blue-200/60 dark:border-blue-800/60 shadow-sm">
+      <div className="flex-shrink-0 p-3 sm:p-4 lg:p-5 bg-gray-200 dark:bg-gray-600 backdrop-blur-md border-b border-gray-300 dark:border-gray-500 shadow-sm">
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
-          <div className="text-center p-2 rounded-lg bg-blue-50/90 dark:bg-blue-950/50 border-2 border-blue-200/50 dark:border-blue-800/50">
+          <div className="text-center p-2 rounded-lg bg-gray-300 dark:bg-gray-500 border-2 border-gray-400 dark:border-gray-400">
             <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-700 dark:text-blue-300">{data.totalProjects}</div>
             <div className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-200 mt-1">Total Projects</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-green-50/90 dark:bg-green-950/50 border-2 border-green-200/50 dark:border-green-800/50">
+          <div className="text-center p-2 rounded-lg bg-gray-300 dark:bg-gray-500 border-2 border-gray-400 dark:border-gray-400">
             <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-700 dark:text-green-300">{data.activeProjects}</div>
             <div className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-200 mt-1">Active</div>
           </div>
@@ -119,66 +119,63 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
       </div>
 
       {/* Enhanced Content with better contrast */}
-      <div className="flex-1 p-3 sm:p-4 lg:p-5 space-y-3 sm:space-y-4 lg:space-y-5 overflow-y-auto">
-        {/* Contract Value with enhanced styling */}
-        <div className="bg-white/90 dark:bg-black/90 rounded-xl p-3 sm:p-4 border-2 border-blue-200/60 dark:border-blue-800/60 shadow-sm backdrop-blur-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-300" />
+      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+        {/* Contract Values - Improved spacing */}
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-2 border border-gray-300 dark:border-gray-500 mb-2 sm:mb-3 lg:mb-2 sm:mb-2 lg:mb-3">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+            <Building2 className="h-4 w-4 text-foreground" />
             <span className="text-sm font-medium text-foreground">Portfolio Value</span>
-          </div>
-          <div className="text-sm sm:text-base lg:text-lg font-bold text-foreground">
-            {formatCurrency(data.totalContractValue)}
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Avg: {formatCurrency(data.avgProjectSize)}
-          </div>
-        </div>
-
-        {/* Project Types with better contrast */}
-        <div className="bg-white/80 dark:bg-black/80 rounded-lg p-2 sm:p-3 border-2 border-blue-200/50 dark:border-blue-800/50">
-          <div className="flex items-center gap-2 mb-2">
-            <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-300" />
-            <span className="text-sm font-medium text-foreground">Project Types</span>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">New Construction</span>
-              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.newConstruction}</Badge>
+              <span className="text-muted-foreground">Total Contracted</span>
+              <span className="font-medium text-foreground">{formatCurrency(data.totalContractValue)}</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Renovation</span>
-              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.renovation}</Badge>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Expansion</span>
-              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.expansion}</Badge>
+              <span className="text-muted-foreground">Remaining Work</span>
+              <span className="font-medium text-foreground">{formatCurrency(data.remainingContractValue)}</span>
             </div>
           </div>
         </div>
 
-        {/* Recent Activity with enhanced contrast */}
-        <div className="bg-white/80 dark:bg-black/80 rounded-lg p-2 sm:p-3 border-2 border-blue-200/50 dark:border-blue-800/50">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-300" />
-            <span className="text-sm font-medium text-foreground">This Month</span>
+        {/* Status Distribution - Improved styling */}
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-2 border border-gray-300 dark:border-gray-500 mb-2 sm:mb-3 lg:mb-2 sm:mb-2 lg:mb-3">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+            <BarChart3 className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Project Status</span>
           </div>
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-300" />
-            <span className="text-sm text-foreground">{data.completedThisMonth} Completed</span>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 text-center">
+            <div className="p-1.5 sm:p-2 lg:p-1 sm:p-1.5 lg:p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
+              <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-green-700 dark:text-green-400">{data.onScheduleProjects}</div>
+              <div className="text-xs text-green-600 dark:text-green-300">On Track</div>
+            </div>
+            <div className="p-1.5 sm:p-2 lg:p-1 sm:p-1.5 lg:p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
+              <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-yellow-700 dark:text-yellow-400">{data.atRiskProjects}</div>
+              <div className="text-xs text-yellow-600 dark:text-yellow-300">At Risk</div>
+            </div>
+            <div className="p-1.5 sm:p-2 lg:p-1 sm:p-1.5 lg:p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
+              <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-red-700 dark:text-red-400">{data.behindScheduleProjects}</div>
+              <div className="text-xs text-red-600 dark:text-red-300">Behind</div>
+            </div>
           </div>
         </div>
 
-        {/* Details Toggle Button */}
-        <div className="flex justify-center pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleDetails}
-            className="text-xs border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/50"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </Button>
+        {/* Financial Summary - Improved layout */}
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-2 border border-gray-300 dark:border-gray-500">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+            <DollarSign className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Financial Health</span>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-1 sm:p-1.5 lg:p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
+              <div className="text-sm font-bold text-green-700 dark:text-green-400">{formatPercentage(data.avgProfitMargin)}</div>
+              <div className="text-xs text-green-600 dark:text-green-300">Avg Margin</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-1 sm:p-1.5 lg:p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
+              <div className="text-sm font-bold text-blue-700 dark:text-blue-400">{data.overallHealthScore}</div>
+              <div className="text-xs text-blue-600 dark:text-blue-300">Health Score</div>
+            </div>
+          </div>
         </div>
       </div>
 

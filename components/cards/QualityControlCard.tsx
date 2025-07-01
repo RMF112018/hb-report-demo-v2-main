@@ -1,19 +1,51 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle, AlertTriangle, ChevronRight, Eye, FileText, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle, AlertTriangle, ChevronRight, Eye, FileText, MapPin, Brain, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
+interface DashboardCard {
+  id: string;
+  type: string;
+  title: string;
+  config?: any;
+}
+
 interface QualityControlCardProps {
+  card: DashboardCard;
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function QualityControlCard({ config, span, isCompact, userRole }: QualityControlCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function QualityControlCard({ card, config, span, isCompact, userRole }: QualityControlCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+  
+  // Listen for drill-down events
+  useEffect(() => {
+    const handleCardDrillDown = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(true);
+      }
+    };
+
+    const handleCardDrillDownStateChange = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(event.detail.isOpen);
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+    window.addEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+      window.removeEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+    };
+  }, [card.id]);
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -119,21 +151,35 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
   };
 
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-emerald-200 dark:border-emerald-800">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getPassRateColor(data.passRate)}`}>{formatPercentage(data.passRate)}</div>
-            <div className="text-xs text-emerald-600 dark:text-emerald-400">Pass Rate</div>
+    <div className="h-full flex flex-col bg-transparent overflow-hidden relative">
+      {/* Header Section with Badge */}
+      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 pb-3 border-b border-gray-200 dark:border-gray-600">
+        <div className="flex items-center gap-2 mb-3">
+          <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Quality Control Monitor
+          </Badge>
+        </div>
+
+        {/* Compact Stats */}
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getPassRateColor(data.passRate)}`}>
+              {formatPercentage(data.passRate)}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Pass Rate</div>
           </div>
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getStatusColor(data.openInspections, data.totalInspections)}`}>{data.openInspections}</div>
-            <div className="text-xs text-green-600 dark:text-green-400">Open</div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getStatusColor(data.openInspections, data.totalInspections)}`}>
+              {data.openInspections}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Open</div>
+          </div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-red-700 dark:text-red-400">
+              {data.criticalIssues}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Critical</div>
           </div>
         </div>
       </div>
@@ -141,7 +187,7 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
       {/* Content */}
       <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
         {/* Inspection Status */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <Eye className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span className="text-sm font-medium text-foreground">Inspection Status</span>
@@ -159,7 +205,7 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
         </div>
 
         {/* Quality Performance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span className="text-sm font-medium text-foreground">Quality Performance</span>
@@ -182,7 +228,7 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
 
         {/* Critical Issues */}
         {data.criticalIssues > 0 && (
-          <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-medium text-foreground">Critical Issues</span>
@@ -199,7 +245,7 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
         )}
 
         {/* Trade Performance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span className="text-sm font-medium text-foreground">By Trade</span>
@@ -215,7 +261,7 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
         </div>
 
         {/* Resolution Performance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span className="text-sm font-medium text-foreground">Resolution Metrics</span>
@@ -235,15 +281,28 @@ export default function QualityControlCard({ config, span, isCompact, userRole }
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {/* Event-Driven Drill-Down Overlay */}
+      {showDrillDown && (
         <div className="absolute inset-0 bg-emerald-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">Quality Control Analysis</span>
+              <span className="font-semibold text-lg">Quality Control Analysis</span>
             </div>
-            
+            <button
+              onClick={() => {
+                setShowDrillDown(false);
+                window.dispatchEvent(new CustomEvent('cardDrillDownStateChange', { 
+                  detail: { cardId: card.id, isOpen: false } 
+                }));
+              }}
+              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-3">
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-emerald-200">Top Performer:</span>

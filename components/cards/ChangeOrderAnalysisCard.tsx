@@ -1,20 +1,64 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FileText, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, DollarSign, Percent, ChevronRight, Calculator, Target, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import type { DashboardCard } from "@/types/dashboard"
 
 interface ChangeOrderAnalysisCardProps {
+  card: DashboardCard
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function ChangeOrderAnalysisCard({ config, span, isCompact, userRole }: ChangeOrderAnalysisCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function ChangeOrderAnalysisCard({ card, config, span, isCompact, userRole }: ChangeOrderAnalysisCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'change-order-analysis') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'change-order-analysis',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card.id]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'change-order-analysis',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -235,280 +279,256 @@ export default function ChangeOrderAnalysisCard({ config, span, isCompact, userR
 
   return (
     <div 
-      className="h-full flex flex-col bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="relative h-full"
+      data-tour="change-order-analysis-card"
     >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-orange-200">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-orange-700">{formatPercentage(data.changeOrderRatio)}</div>
-            <div className="text-xs text-orange-600">CO Ratio</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getRiskColor(data.riskLevel)}`}>{data.impactScore}</div>
-            <div className="text-xs text-muted-foreground">Impact Score</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
-        {/* CO Status Overview */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* Change Order Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
-            <FileText className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Change Order Status</span>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="w-20 h-20">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={15}
-                    outerRadius={35}
-                    dataKey="value"
-                  >
-                    {statusData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={statusData[index].color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+              <FileText className="h-3 w-3 mr-1" />
+              Change Order Analysis
+            </Badge>
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              {formatPercentage(data.changeOrderRatio)} Ratio
             </div>
-            <div className="flex-1 grid grid-cols-3 gap-1 text-xs">
-              <div className="text-center p-2 bg-green-50 dark:bg-green-950/30 rounded">
-                <div className="font-bold text-green-600 dark:text-green-400">{data.approved}</div>
-                <div className="text-muted-foreground">Approved</div>
+            <div className="flex items-center gap-1 ml-auto">
+              <div className={`text-sm font-medium ${getRiskColor(data.riskLevel)}`}>
+                {data.riskLevel}
               </div>
-              <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-950/30 rounded">
-                <div className="font-bold text-yellow-600 dark:text-yellow-400">{data.pending}</div>
-                <div className="text-muted-foreground">Pending</div>
-              </div>
-              <div className="text-center p-2 bg-red-50 dark:bg-red-950/30 rounded">
-                <div className="font-bold text-red-600 dark:text-red-400">{data.rejected}</div>
-                <div className="text-muted-foreground">Rejected</div>
-              </div>
+              <Badge className="bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-xs">
+                {getGrade(data.changeOrderRatio)}
+              </Badge>
+            </div>
+          </div>
+          
+          {/* Compact Stats - Darker Background */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-orange-700 dark:text-orange-400">{data.approved}</div>
+              <div className="text-xs text-orange-600 dark:text-orange-400">Approved</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-amber-700 dark:text-amber-400">{data.pending}</div>
+              <div className="text-xs text-amber-600 dark:text-amber-400">Pending</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-red-700 dark:text-red-400">{data.rejected}</div>
+              <div className="text-xs text-red-600 dark:text-red-400">Rejected</div>
             </div>
           </div>
         </div>
 
-        {/* Financial Impact */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Financial Impact</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Total Value</span>
-              <span className="font-medium">{formatCurrency(data.totalValue)}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Approved</span>
-              <span className="font-medium text-green-600 dark:text-green-400">{formatCurrency(data.approvedValue)}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Pending</span>
-              <span className="font-medium text-yellow-600 dark:text-yellow-400">{formatCurrency(data.pendingValue)}</span>
-            </div>
-            <div className="text-center mt-2">
-              <div className={`inline-block px-1.5 sm:px-2 lg:px-2.5 py-1 rounded-lg ${getGradeColor(data.changeOrderRatio)}`}>
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium">{getGrade(data.changeOrderRatio)}</div>
-                <div className="text-xs">Performance Grade</div>
+        {/* Change Order Content */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-3">
+            {/* CO Status Overview */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-foreground">Change Order Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-16">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={12}
+                        outerRadius={28}
+                        dataKey="value"
+                      >
+                        {statusData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={statusData[index].color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex-1 grid grid-cols-3 gap-1 text-xs">
+                  <div className="text-center p-1.5 bg-green-50 dark:bg-green-950/30 rounded border border-green-200 dark:border-green-700">
+                    <div className="font-bold text-green-600 dark:text-green-400">{data.approved}</div>
+                    <div className="text-muted-foreground">Approved</div>
+                  </div>
+                  <div className="text-center p-1.5 bg-yellow-50 dark:bg-yellow-950/30 rounded border border-yellow-200 dark:border-yellow-700">
+                    <div className="font-bold text-yellow-600 dark:text-yellow-400">{data.pending}</div>
+                    <div className="text-muted-foreground">Pending</div>
+                  </div>
+                  <div className="text-center p-1.5 bg-red-50 dark:bg-red-950/30 rounded border border-red-200 dark:border-red-700">
+                    <div className="font-bold text-red-600 dark:text-red-400">{data.rejected}</div>
+                    <div className="text-muted-foreground">Rejected</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Performance Metrics */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Performance</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Approval Rate</span>
-              <span className="font-medium">{formatPercentage(data.approvalRate)}</span>
+            {/* Financial Impact */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-foreground">Financial Impact</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Total Value</span>
+                  <span className="font-medium">{formatCurrency(data.totalValue)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Approved</span>
+                  <span className="font-medium text-green-600 dark:text-green-400">{formatCurrency(data.approvedValue)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Pending</span>
+                  <span className="font-medium text-yellow-600 dark:text-yellow-400">{formatCurrency(data.pendingValue)}</span>
+                </div>
+                <div className="text-center mt-2">
+                  <div className={`inline-block px-2 py-1 rounded-lg border ${getGradeColor(data.changeOrderRatio)} border-gray-300 dark:border-gray-600`}>
+                    <div className="text-sm font-medium">{getGrade(data.changeOrderRatio)}</div>
+                    <div className="text-xs">Grade</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <Progress value={data.approvalRate} className="h-2" />
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Avg Processing</span>
-              <Badge variant="outline" className="text-xs">{data.averageProcessingTime} days</Badge>
+
+            {/* Performance Metrics */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-foreground">Performance</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Approval Rate</span>
+                  <span className="font-medium">{formatPercentage(data.approvalRate)}</span>
+                </div>
+                <Progress value={data.approvalRate} className="h-2" />
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Avg Processing</span>
+                  <Badge variant="outline" className="text-xs">{data.averageProcessingTime} days</Badge>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col text-white animate-in fade-in duration-200 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-lg">Change Order Deep Dive</span>
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+          <div className="h-full">
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Change Order Deep Dive</h3>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+              {/* Categories Breakdown */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Calculator className="w-4 h-4 mr-2" />
+                    By Category
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {data.drillDown.byCategory.map((cat) => (
+                      <div key={cat.name} className="flex justify-between items-center">
+                        <span className="text-orange-200">{cat.name}:</span>
+                        <div className="text-right">
+                          <div className="font-medium">{cat.count} COs</div>
+                          <div className="text-orange-300 text-xs">Avg: {cat.avgDays} days</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Financial Metrics
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Total Value:</span>
+                      <span className="font-medium text-orange-300">{formatCurrency(data.totalValue)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Contract Ratio:</span>
+                      <span className="font-medium text-yellow-300">{formatPercentage(data.changeOrderRatio)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Grade:</span>
+                      <span className="font-medium text-green-400">{getGrade(data.changeOrderRatio)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Risk Level:</span>
+                      <span className="font-medium text-purple-300">{data.riskLevel}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trends and Details */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    6-Month Trend
+                  </h4>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={data.drillDown.timeline}>
+                        <Bar dataKey="submitted" fill="hsl(var(--chart-3))" radius={[2, 2, 0, 0]} />
+                        <Bar dataKey="approved" fill="hsl(var(--chart-1))" radius={[2, 2, 0, 0]} />
+                        <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(var(--border))' }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(0,0,0,0.8)', 
+                            border: 'none', 
+                            borderRadius: '6px',
+                            fontSize: '12px'
+                          }}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Key Insights
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Contract Impact:</span>
+                      <span className="font-medium text-orange-300">{formatPercentage(data.changeOrderRatio)} of contract</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Approval Rate:</span>
+                      <span className="font-medium text-green-400">{formatPercentage(data.approvalRate)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Top Category:</span>
+                      <span className="font-medium text-yellow-300">{data.drillDown.byCategory[0].name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Processing Time:</span>
+                      <span className="font-medium text-blue-300">{data.averageProcessingTime} days avg</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            {/* Categories Breakdown */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <Calculator className="w-4 h-4 mr-2" />
-                By Category
-              </h4>
-              <div className="space-y-2 text-xs">
-                {data.drillDown.byCategory.map((cat) => (
-                  <div key={cat.name} className="flex justify-between items-center">
-                    <span className="text-orange-200">{cat.name}:</span>
-                    <div className="text-right">
-                      <div className="font-medium">{cat.count} COs • {formatCurrency(cat.value)}</div>
-                      <div className="text-orange-300">Avg: {cat.avgDays} days</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Trends */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                6-Month Trend
-              </h4>
-              <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.drillDown.timeline}>
-                    <Bar dataKey="submitted" fill="hsl(var(--chart-3))" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="approved" fill="hsl(var(--chart-1))" radius={[2, 2, 0, 0]} />
-                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(var(--border))' }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        border: 'none', 
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Project Performance or Portfolio Risks */}
-            {userRole === 'project-manager' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project: {data.drillDown.projectDetails?.name}
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-orange-200">Completion:</span>
-                    <span className="font-medium">{data.drillDown.projectDetails?.completion}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-orange-200">Largest CO:</span>
-                    <span className="font-medium">{formatCurrency(data.drillDown.topChangeOrder.value)}</span>
-                  </div>
-                  <div className="pt-2 border-t border-orange-700">
-                    <div className="text-orange-200 mb-1">Current Risks:</div>
-                    {data.drillDown.risks?.map((risk, index) => (
-                      <div key={index} className="text-orange-300 text-xs">• {risk}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : userRole === 'project-executive' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project Performance (6 Projects)
-                </h4>
-                <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                  {data.drillDown.projectPerformance?.map((project, index) => (
-                    <div key={index} className="flex justify-between items-center border-b border-orange-800 pb-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-orange-200">{project.project}</div>
-                        <div className="text-orange-300">{project.cos} COs • {formatPercentage(project.ratio)} ratio</div>
-                      </div>
-                      <Badge className={`text-xs ${
-                        project.status === 'High' ? 'bg-red-200 text-red-800' :
-                        project.status === 'Medium' ? 'bg-yellow-200 text-yellow-800' :
-                        'bg-green-200 text-green-800'
-                      }`}>
-                        {project.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  Portfolio Risks
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {data.drillDown.portfolioRisks?.map((risk, index) => (
-                    <div key={index} className="text-orange-300">• {risk}</div>
-                  )) || data.drillDown.risks?.map((risk, index) => (
-                    <div key={index} className="text-orange-300">• {risk}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Additional Project Executive Section */}
-            {userRole === 'project-executive' && (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Clock className="w-4 h-4 mr-2" />
-                  Critical CO Status
-                </h4>
-                <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-orange-200">Highest Value CO:</span>
-                    <div className="text-right">
-                      <div className="font-medium">{formatCurrency(data.drillDown.topChangeOrder.value)}</div>
-                      <div className="text-orange-300">{data.drillDown.topChangeOrder.project}</div>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-orange-700">
-                    <div className="text-orange-200 mb-1">Portfolio Risks:</div>
-                    {data.drillDown.risks?.slice(0, 2).map((risk, index) => (
-                      <div key={index} className="text-orange-300 text-xs">• {risk}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Key Insights */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Key Insights
-              </h4>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-orange-200">Contract Impact:</span>
-                  <span className="font-medium">{formatPercentage(data.changeOrderRatio)} of contract value</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-orange-200">Risk Level:</span>
-                  <Badge className={`${getRiskColor(data.riskLevel)} bg-white/20 dark:bg-black/20 text-xs`}>
-                    {data.riskLevel}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-orange-200">Top Category:</span>
-                  <span className="font-medium">{data.drillDown.byCategory[0].name}</span>
-                </div>
-              </div>
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-orange-700 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

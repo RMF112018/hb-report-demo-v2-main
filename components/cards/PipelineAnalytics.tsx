@@ -14,8 +14,10 @@ import {
   MapPin,
   Clock,
   Trophy,
-  X
+  X,
+  Brain
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   ResponsiveContainer,
   FunnelChart,
@@ -55,7 +57,7 @@ const COLORS = {
 const STAGE_COLORS = ["hsl(var(--chart-4))", "hsl(var(--chart-3))", "hsl(var(--chart-2))", "hsl(var(--chart-1))"];
 
 export function PipelineAnalytics({ config = {}, span, isCompact = false }: PipelineAnalyticsProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDrillDown, setShowDrillDown] = useState(false);
   
   const analytics = useMemo(() => {
     // Aggregate all pipeline data
@@ -142,11 +144,28 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
   return (
     <div 
       className="relative h-full overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Drill Down Button - positioned outside overlay coverage */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowDrillDown(!showDrillDown);
+        }}
+        className={cn(
+          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+          showDrillDown 
+            ? "bg-orange-600 text-white shadow-md" 
+            : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
+        )}
+      >
+        <Brain className="h-3 w-3" />
+        {showDrillDown ? "Close Analysis" : "Drill Down"}
+      </button>
+
       <div className="h-full overflow-y-auto">
         <div className="p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-6">
+          {/* Empty space for button */}
+          <div></div>
           {/* Key Metrics Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
@@ -318,8 +337,8 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {/* Click-Based Drill-Down Overlay */}
+      {showDrillDown && (
         <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
           <div className="h-full">
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Pipeline Deep Analysis</h3>

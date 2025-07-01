@@ -64,7 +64,7 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
   const [isOpen, setIsOpen] = useState(false)
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
 
   // Procurement-specific AI insights
   const procurementInsights: ProcurementInsight[] = [
@@ -216,7 +216,24 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-purple-700">
                     {avgConfidence}% Confidence
-            </Badge>
+                  </Badge>
+                  {isOpen && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDrillDown(!showDrillDown);
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-md transition-all duration-200",
+                        showDrillDown 
+                          ? "bg-purple-600 text-white shadow-md" 
+                          : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50"
+                      )}
+                    >
+                      <Brain className="h-3 w-3" />
+                      {showDrillDown ? "Close" : "Drill Down"}
+                    </button>
+                  )}
                   <ChevronDown className={cn("h-4 w-4 transition-transform text-[#FF6B35]", isOpen && "rotate-180")} />
                 </div>
           </CardTitle>
@@ -226,8 +243,6 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
           <CollapsibleContent>
             <CardContent 
               className="relative"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
             >
               {/* AI Stats Header */}
               <div className="mb-4 p-3 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-lg border border-purple-200">
@@ -330,8 +345,8 @@ export function HbiProcurementInsights({ procurementStats, className }: HbiProcu
                 </div>
               )}
 
-              {/* Hover Drill-Down Overlay */}
-              {isHovered && (
+              {/* Click-Based Drill-Down Overlay */}
+              {showDrillDown && (
                 <div className="absolute inset-0 bg-purple-900/95 backdrop-blur-sm rounded-lg p-4 text-white transition-all duration-300 ease-in-out overflow-y-auto z-10">
                   <div className="h-full">
                     <h3 className="text-lg font-medium mb-3 text-center">Procurement AI Intelligence Deep Dive</h3>
