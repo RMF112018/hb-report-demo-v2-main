@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { GitBranch, TrendingUp, Clock, CheckCircle, XCircle, DollarSign, FileText, Plus, Calendar, AlertTriangle } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { GitBranch, TrendingUp, Clock, CheckCircle, XCircle, DollarSign, FileText, Plus, Calendar, AlertTriangle, Shield, Target, Activity, Zap } from "lucide-react";
+
+// Import exposure analysis data
+import changeEventsData from "@/data/mock/financial/change-events.json";
+import pcoData from "@/data/mock/financial/pco.json";
+import pccoData from "@/data/mock/financial/pcco.json";
+import ccoData from "@/data/mock/financial/cco.json";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -146,6 +152,57 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
   };
 
   const data = getChangeOrderData();
+
+  // Exposure Analysis Calculations
+  const exposureAnalysis = useMemo(() => {
+    const projectId = 2525840;
+    
+    // Filter data by project ID
+    const changeEvents = changeEventsData.filter(event => event.project_id === projectId);
+    const pcos = pcoData.filter(pco => pco.project_id === projectId);
+    const pccos = pccoData.filter(pcco => pcco.project_id === projectId);
+    const ccos = ccoData.filter(cco => cco.project_id === projectId);
+    
+    // Calculate totals
+    const totalChangeEvents = changeEvents.reduce((sum, event) => sum + event.latest_price, 0);
+    const totalPendingPCOs = pcos.filter(pco => pco.status !== "Approved").reduce((sum, pco) => sum + pco.amount, 0);
+    const totalApprovedPCCOs = pccos.filter(pcco => pcco.status === "Approved").reduce((sum, pcco) => sum + pcco.amount, 0);
+    const totalExecutedCCOs = ccos.filter(cco => cco.status === "Approved").reduce((sum, cco) => sum + cco.amount, 0);
+    
+    // Exposure calculations
+    const totalIdentifiedExposure = totalChangeEvents + totalPendingPCOs;
+    const unapprovedExposure = totalIdentifiedExposure - totalApprovedPCCOs;
+    const ownerSubcontractorDelta = totalApprovedPCCOs - totalExecutedCCOs;
+    const deltaPercentage = totalExecutedCCOs > 0 ? (ownerSubcontractorDelta / totalExecutedCCOs) * 100 : 0;
+    
+    // Risk scorecard metrics
+    const totalPCOValue = pcos.reduce((sum, pco) => sum + pco.amount, 0);
+    const pendingPCOValue = pcos.filter(pco => pco.status !== "Approved").reduce((sum, pco) => sum + pco.amount, 0);
+    const percentPendingValue = totalPCOValue > 0 ? (pendingPCOValue / totalPCOValue) * 100 : 0;
+    
+    const avgDaysToExecution = 14; // Mock calculated value
+    const unlinkedPCOPercentage = 25; // Mock calculated value
+    const largestOpenExposure = Math.max(...pcos.filter(pco => pco.status !== "Approved").map(pco => pco.amount));
+    
+    return {
+      changeEvents,
+      pcos,
+      pccos,
+      ccos,
+      totalChangeEvents,
+      totalPendingPCOs,
+      totalApprovedPCCOs,
+      totalExecutedCCOs,
+      totalIdentifiedExposure,
+      unapprovedExposure,
+      ownerSubcontractorDelta,
+      deltaPercentage,
+      percentPendingValue,
+      avgDaysToExecution,
+      unlinkedPCOPercentage,
+      largestOpenExposure
+    };
+  }, []);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -577,6 +634,229 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
             </div>
           </CardContent>
         </Card>
+      </CollapseWrapper>
+
+      {/* Exposure Analysis Section */}
+      <CollapseWrapper
+        title="Contract Change Risk Exposure Analysis"
+        subtitle="Risk metrics for change orders and commitments"
+        defaultCollapsed={false}
+      >
+        <div className="space-y-6">
+          {/* Owner vs Subcontractor Delta */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Total Approved PCCOs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {formatCurrency(exposureAnalysis.totalApprovedPCCOs)}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Prime Contract Changes</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 border-green-200 dark:border-green-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Total Executed CCOs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(exposureAnalysis.totalExecutedCCOs)}
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">Commitment Changes</p>
+              </CardContent>
+            </Card>
+
+            <Card className={`bg-gradient-to-br border-2 ${
+              Math.abs(exposureAnalysis.deltaPercentage) > 10 
+                ? 'from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/30 border-red-300 dark:border-red-700' 
+                : Math.abs(exposureAnalysis.deltaPercentage) > 5
+                ? 'from-yellow-50 to-yellow-100 dark:from-yellow-950/50 dark:to-yellow-900/30 border-yellow-300 dark:border-yellow-700'
+                : 'from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30 border-emerald-300 dark:border-emerald-700'
+            }`}>
+              <CardHeader className="pb-3">
+                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${
+                  Math.abs(exposureAnalysis.deltaPercentage) > 10 
+                    ? 'text-red-700 dark:text-red-300' 
+                    : Math.abs(exposureAnalysis.deltaPercentage) > 5
+                    ? 'text-yellow-700 dark:text-yellow-300'
+                    : 'text-emerald-700 dark:text-emerald-300'
+                }`}>
+                  <AlertTriangle className="h-4 w-4" />
+                  Owner vs Sub Delta
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${
+                  Math.abs(exposureAnalysis.deltaPercentage) > 10 
+                    ? 'text-red-900 dark:text-red-100' 
+                    : Math.abs(exposureAnalysis.deltaPercentage) > 5
+                    ? 'text-yellow-900 dark:text-yellow-100'
+                    : 'text-emerald-900 dark:text-emerald-100'
+                }`}>
+                  {exposureAnalysis.ownerSubcontractorDelta >= 0 ? '+' : ''}{formatCurrency(exposureAnalysis.ownerSubcontractorDelta)}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <p className={`text-xs ${
+                    Math.abs(exposureAnalysis.deltaPercentage) > 10 
+                      ? 'text-red-600 dark:text-red-400' 
+                      : Math.abs(exposureAnalysis.deltaPercentage) > 5
+                      ? 'text-yellow-600 dark:text-yellow-400'
+                      : 'text-emerald-600 dark:text-emerald-400'
+                  }`}>
+                    {Math.abs(exposureAnalysis.deltaPercentage).toFixed(1)}% variance
+                  </p>
+                  <Badge variant={
+                    Math.abs(exposureAnalysis.deltaPercentage) > 10 ? "destructive" : 
+                    Math.abs(exposureAnalysis.deltaPercentage) > 5 ? "secondary" : "default"
+                  } className="text-xs">
+                    {Math.abs(exposureAnalysis.deltaPercentage) > 10 ? "🔴 High Risk" : 
+                     Math.abs(exposureAnalysis.deltaPercentage) > 5 ? "🟡 Medium Risk" : "🟢 Low Risk"}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Unapproved Exposure */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-purple-600" />
+                Unapproved Exposure Analysis
+              </CardTitle>
+              <CardDescription>Identified vs approved change exposure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-4">
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-xl font-bold text-blue-600">
+                    {formatCurrency(exposureAnalysis.totalChangeEvents)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Change Events</p>
+                </div>
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-xl font-bold text-orange-600">
+                    {formatCurrency(exposureAnalysis.totalPendingPCOs)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Pending PCOs</p>
+                </div>
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-xl font-bold text-green-600">
+                    {formatCurrency(exposureAnalysis.totalIdentifiedExposure)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Total Identified</p>
+                </div>
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className={`text-xl font-bold ${
+                    exposureAnalysis.unapprovedExposure > 50000 ? 'text-red-600' : 
+                    exposureAnalysis.unapprovedExposure > 25000 ? 'text-yellow-600' : 'text-green-600'
+                  }`}>
+                    {formatCurrency(exposureAnalysis.unapprovedExposure)}
+                  </div>
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <p className="text-sm text-muted-foreground">Unapproved</p>
+                    <Badge variant={
+                      exposureAnalysis.unapprovedExposure > 50000 ? "destructive" : 
+                      exposureAnalysis.unapprovedExposure > 25000 ? "secondary" : "default"
+                    } className="text-xs">
+                      {exposureAnalysis.unapprovedExposure > 50000 ? "🔴" : 
+                       exposureAnalysis.unapprovedExposure > 25000 ? "🟡" : "🟢"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk Scorecard */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-indigo-600" />
+                Risk Scorecard
+              </CardTitle>
+              <CardDescription>Key risk indicators and metrics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">% Change Dollars Pending</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatCurrency(exposureAnalysis.totalPendingPCOs)} of {formatCurrency(exposureAnalysis.totalPendingPCOs + exposureAnalysis.totalApprovedPCCOs)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-orange-600">
+                        {exposureAnalysis.percentPendingValue.toFixed(1)}%
+                      </div>
+                      <Badge variant={exposureAnalysis.percentPendingValue > 30 ? "destructive" : "secondary"} className="text-xs">
+                        {exposureAnalysis.percentPendingValue > 30 ? "High" : "Moderate"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">Avg Days PCO to PCCO</p>
+                      <p className="text-xs text-muted-foreground">Processing time</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-blue-600">
+                        {exposureAnalysis.avgDaysToExecution} days
+                      </div>
+                      <Badge variant={exposureAnalysis.avgDaysToExecution > 21 ? "destructive" : "default"} className="text-xs">
+                        {exposureAnalysis.avgDaysToExecution > 21 ? "Slow" : "Good"}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">% PCOs Unlinked to PCCO</p>
+                      <p className="text-xs text-muted-foreground">Process gaps</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-purple-600">
+                        {exposureAnalysis.unlinkedPCOPercentage}%
+                      </div>
+                      <Badge variant={exposureAnalysis.unlinkedPCOPercentage > 20 ? "destructive" : "secondary"} className="text-xs">
+                        {exposureAnalysis.unlinkedPCOPercentage > 20 ? "Poor" : "Fair"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">Largest Open Exposure</p>
+                      <p className="text-xs text-muted-foreground">Single item risk</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-red-600">
+                        {formatCurrency(exposureAnalysis.largestOpenExposure)}
+                      </div>
+                      <Badge variant={exposureAnalysis.largestOpenExposure > 30000 ? "destructive" : "secondary"} className="text-xs">
+                        {exposureAnalysis.largestOpenExposure > 30000 ? "High" : "Moderate"}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </CollapseWrapper>
 
       {/* Main Content Area */}
