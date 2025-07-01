@@ -19,7 +19,14 @@ import {
   Home,
   RefreshCw,
   Download,
-  Settings
+  Settings,
+  AlertTriangle,
+  Calendar,
+  TrendingDown,
+  Clock,
+  CheckCircle2,
+  Percent,
+  Unlock
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -233,6 +240,179 @@ export default function FinancialHubPage() {
     }).format(value);
   };
 
+  // Get dynamic KPIs based on active tab
+  const getDynamicKPIs = (activeTab: string) => {
+    const baseData = getSummaryData();
+    
+    // Core KPIs that are always present
+    const coreKPIs = [
+      {
+        icon: Building2,
+        value: formatCurrency(baseData.totalContractValue),
+        label: "Contract Value",
+        color: "blue"
+      },
+      {
+        icon: TrendingUp,
+        value: `${baseData.profitMargin}%`,
+        label: "Profit Margin",
+        color: "purple"
+      },
+      {
+        icon: BarChart3,
+        value: `${baseData.healthScore}%`,
+        label: "Financial Health",
+        color: "red"
+      }
+    ];
+
+    // Module-specific KPIs
+    const moduleKPIs: Record<string, any[]> = {
+      "overview": [
+        {
+          icon: DollarSign,
+          value: formatCurrency(baseData.netCashFlow),
+          label: "Net Cash Flow",
+          color: "green"
+        },
+        {
+          icon: CheckCircle,
+          value: baseData.pendingApprovals,
+          label: "Pending Approvals",
+          color: "amber"
+        }
+      ],
+      "budget-analysis": [
+        {
+          icon: Calculator,
+          value: formatCurrency(baseData.totalContractValue * 0.87),
+          label: "Budget Used",
+          color: "green"
+        },
+        {
+          icon: AlertTriangle,
+          value: "3.2%",
+          label: "Budget Variance",
+          color: "amber"
+        }
+      ],
+      "cash-flow": [
+        {
+          icon: DollarSign,
+          value: formatCurrency(baseData.netCashFlow),
+          label: "Net Cash Flow",
+          color: "green"
+        },
+        {
+          icon: Calendar,
+          value: "45 Days",
+          label: "Avg Collection",
+          color: "amber"
+        }
+      ],
+      "cost-tracking": [
+        {
+          icon: PieChart,
+          value: formatCurrency(baseData.totalContractValue * 0.82),
+          label: "Costs Incurred",
+          color: "green"
+        },
+        {
+          icon: TrendingDown,
+          value: "2.1%",
+          label: "Cost Savings",
+          color: "amber"
+        }
+      ],
+      "pay-authorization": [
+        {
+          icon: Receipt,
+          value: formatCurrency(2280257.60),
+          label: "Latest Pay App",
+          color: "green"
+        },
+        {
+          icon: Clock,
+          value: "3 Days",  
+          label: "Avg Processing",
+          color: "amber"
+        }
+      ],
+      "pay-authorizations": [
+        {
+          icon: FileText,
+          value: baseData.pendingApprovals,
+          label: "Pending Authorizations",
+          color: "green"
+        },
+        {
+          icon: CheckCircle2,
+          value: "98.2%",
+          label: "Approval Rate",
+          color: "amber"
+        }
+      ],
+      "change-management": [
+        {
+          icon: GitBranch,
+          value: formatCurrency(baseData.totalContractValue * 0.12),
+          label: "Change Orders",
+          color: "green"
+        },
+        {
+          icon: Percent,
+          value: "8.4%",
+          label: "Change Rate",
+          color: "amber"
+        }
+      ],
+      "contract-management": [
+        {
+          icon: Building2,
+          value: "24",
+          label: "Active Contracts",
+          color: "green"
+        },
+        {
+          icon: Calendar,
+          value: "186 Days",
+          label: "Avg Duration",
+          color: "amber"
+        }
+      ],
+      "retention-management": [
+        {
+          icon: Banknote,
+          value: formatCurrency(baseData.totalContractValue * 0.05),
+          label: "Total Retention",
+          color: "green"
+        },
+        {
+          icon: Unlock,
+          value: "12",
+          label: "Ready for Release",
+          color: "amber"
+        }
+      ],
+      "ar-aging": [
+        {
+          icon: CreditCard,
+          value: formatCurrency(baseData.totalContractValue * 0.15),
+          label: "Total AR",
+          color: "green"
+        },
+        {
+          icon: Clock,
+          value: "28 Days",
+          label: "Avg Age",
+          color: "amber"
+        }
+      ]
+    };
+
+    return [...coreKPIs, ...(moduleKPIs[activeTab] || [])];
+  };
+
   return (
     <>
       <AppHeader />
@@ -289,68 +469,34 @@ export default function FinancialHubPage() {
             </div>
           </div>
 
-          {/* Statistics Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4" data-tour="financial-hub-quick-stats">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
-                  <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {formatCurrency(summaryData.totalContractValue)}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">Contract Value</div>
-              </CardContent>
-            </Card>
+        </div>
 
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
-                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {formatCurrency(summaryData.netCashFlow)}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">Net Cash Flow</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400 mr-2" />
-                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {summaryData.profitMargin}%
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">Profit Margin</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <CheckCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mr-2" />
-                  <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                    {summaryData.pendingApprovals}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">Pending Approvals</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <BarChart3 className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
-                  <span className="text-2xl font-bold text-red-600 dark:text-red-400">
-                    {summaryData.healthScore}%
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">Financial Health</div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Dynamic KPI Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4" data-tour="financial-hub-dynamic-kpis">
+          {getDynamicKPIs(activeTab).map((kpi, index) => {
+            const IconComponent = kpi.icon;
+            const colorClasses = {
+              blue: "text-blue-600 dark:text-blue-400",
+              green: "text-green-600 dark:text-green-400", 
+              purple: "text-purple-600 dark:text-purple-400",
+              red: "text-red-600 dark:text-red-400",
+              amber: "text-amber-600 dark:text-amber-400"
+            };
+            
+            return (
+              <Card key={index}>
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <IconComponent className={`h-5 w-5 ${colorClasses[kpi.color as keyof typeof colorClasses]} mr-2`} />
+                    <span className={`text-2xl font-bold ${colorClasses[kpi.color as keyof typeof colorClasses]}`}>
+                      {kpi.value}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">{kpi.label}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Financial Modules */}
