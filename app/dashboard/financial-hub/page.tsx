@@ -31,7 +31,8 @@ import {
   Activity,
   Shield,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Bot
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,7 +58,7 @@ import PayAuthorizations from "@/components/financial-hub/PayAuthorizations";
 
 import ChangeManagement from "@/components/financial-hub/ChangeManagement";
 import CostTracking from "@/components/financial-hub/CostTracking";
-import ContractManagement from "@/components/financial-hub/ContractManagement";
+import Forecasting from "@/components/financial-hub/Forecasting";
 import RetentionManagement from "@/components/financial-hub/RetentionManagement";
 
 interface FinancialModuleTab {
@@ -169,12 +170,11 @@ export default function FinancialHubPage() {
       component: ChangeManagement,
     },
     {
-      id: "contract-management",
-      label: "Contracts",
-      icon: Building2,
-      description: "Contract value tracking and commitment management",
-      component: ContractManagement,
-      requiredRoles: ["executive", "project-executive", "admin"],
+      id: "forecasting",
+      label: "Forecasting",
+      icon: Calendar,
+      description: "AI-powered financial forecasting with GC & GR and Draw analysis",
+      component: Forecasting,
     },
     {
       id: "retention-management",
@@ -503,36 +503,36 @@ export default function FinancialHubPage() {
           color: "yellow"
         }
       ],
-      "contract-management": [
-        {
-          icon: Building2,
-          value: "24",
-          label: "Active Contracts",
-          color: "green"
-        },
+      "forecasting": [
         {
           icon: Calendar,
-          value: "186 Days",
-          label: "Avg Duration",
-          color: "amber"
-        },
-        {
-          icon: DollarSign,
           value: formatCurrency(baseData.totalContractValue * 0.95),
-          label: "Total Contract Value",
+          label: "Total Forecast",
           color: "blue"
         },
         {
+          icon: TrendingUp,
+          value: "94.2%",
+          label: "HBI Accuracy",
+          color: "green"
+        },
+        {
           icon: CheckCircle,
-          value: "22",
-          label: "On Track",
-          color: "emerald"
+          value: "18",
+          label: "Cost Codes",
+          color: "purple"
         },
         {
           icon: AlertTriangle,
-          value: "2",
-          label: "At Risk",
-          color: "yellow"
+          value: formatCurrency(baseData.totalContractValue * 0.05),
+          label: "Forecast Variance",
+          color: "amber"
+        },
+        {
+          icon: Bot,
+          value: "12",
+          label: "AI Forecasts",
+          color: "indigo"
         }
       ],
       "retention-management": [

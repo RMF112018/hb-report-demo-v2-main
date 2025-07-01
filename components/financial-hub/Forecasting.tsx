@@ -301,7 +301,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
   const [forecastData, setForecastData] = useState<ForecastRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
   const [showHBIDialog, setShowHBIDialog] = useState(false);
-  const [hbiExplanation, setHBIExplanation] = useState<any>(null);
+  const [hbiExplanation, setHbiExplanation] = useState<any>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   // Chat functionality state
@@ -1070,58 +1070,21 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         )}
       </Card>
 
-      {/* Table Toggle and Summary */}
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-            <Target className="h-5 w-5" />
-            Forecast Summary - {activeTable.toUpperCase()}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <Tabs value={activeTable} onValueChange={(value) => setActiveTable(value as "gcgr" | "draw")}>
-              <TabsList>
-                <TabsTrigger value="gcgr" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  GC & GR
-                </TabsTrigger>
-                <TabsTrigger value="draw" className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Draw
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            
-            <div className="grid gap-4 md:grid-cols-4">
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-                  {formatCurrency(calculateTotals.budget)}
-                </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400">Total Budget</p>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-purple-900 dark:text-purple-100">
-                  {formatCurrency(calculateTotals.estimated_at_completion)}
-                </div>
-                <p className="text-xs text-purple-600 dark:text-purple-400">Est. at Completion</p>
-              </div>
-              <div className="text-center">
-                <div className={`text-lg font-bold ${calculateTotals.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(calculateTotals.variance)}
-                </div>
-                <p className="text-xs text-muted-foreground">Total Variance</p>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                  {filteredData.length}
-                </div>
-                <p className="text-xs text-muted-foreground">Cost Codes</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Table Selection */}
+      <div className="flex items-center justify-center">
+        <Tabs value={activeTable} onValueChange={(value) => setActiveTable(value as "gcgr" | "draw")}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="gcgr" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              GC & GR Forecast
+            </TabsTrigger>
+            <TabsTrigger value="draw" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Draw Forecast
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Interactive Forecast Table */}
       <Card className={isFullscreen ? 'fixed inset-4 z-[130] overflow-auto' : ''}>
