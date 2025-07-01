@@ -799,20 +799,14 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               Actual / Remaining Forecast
             </Badge>
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.budget)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.budget)}
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.cost_to_complete)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.cost_to_complete)}
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.estimated_at_completion)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.estimated_at_completion)}
           </td>
           <td className={`p-1 text-xs font-medium ${record.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatCurrency(record.variance)}
