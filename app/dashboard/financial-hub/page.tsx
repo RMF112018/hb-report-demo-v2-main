@@ -55,6 +55,7 @@ import CashFlowAnalysis from "@/components/financial-hub/CashFlowAnalysis";
 import { PayApplication } from "@/components/financial-hub/PayApplication";
 import ARAgingCard from "@/components/financial-hub/ARAgingCard";
 import PayAuthorizations from "@/components/financial-hub/PayAuthorizations";
+import JCHRCard from "@/components/financial-hub/JCHRCard";
 
 import ChangeManagement from "@/components/financial-hub/ChangeManagement";
 import CostTracking from "@/components/financial-hub/CostTracking";
@@ -133,6 +134,13 @@ export default function FinancialHubPage() {
       icon: Calculator,
       description: "Detailed budget tracking, variance analysis, and performance metrics",
       component: BudgetAnalysis,
+    },
+    {
+      id: "jchr",
+      label: "JCHR",
+      icon: Receipt,
+      description: "Job Cost History Report with detailed cost breakdown and analysis",
+      component: JCHRCard,
     },
     {
       id: "ar-aging",
@@ -245,7 +253,7 @@ export default function FinancialHubPage() {
     }).format(value);
   };
 
-  // Get dynamic KPIs based on active tab (5-8 cards per tab)
+  // Get dynamic KPIs based on active tab (max 8 widgets: 3 core + 5 module-specific)
   const getDynamicKPIs = (activeTab: string) => {
     const baseData = getSummaryData();
     
@@ -604,10 +612,45 @@ export default function FinancialHubPage() {
           label: "Average Age",
           color: "yellow"
         }
+      ],
+      "jchr": [
+        {
+          icon: DollarSign,
+          value: formatCurrency(baseData.totalContractValue * 0.78),
+          label: "Total Cost to Date",
+          color: "green"
+        },
+        {
+          icon: Calculator,
+          value: formatCurrency(baseData.totalContractValue * 0.12),
+          label: "Current Period Spend",
+          color: "amber"
+        },
+        {
+          icon: Percent,
+          value: "78.1%",
+          label: "% Budget Spent",
+          color: "indigo"
+        },
+        {
+          icon: TrendingUp,
+          value: "+1.8%",
+          label: "Variance to Budget",
+          color: "yellow"
+        },
+        {
+          icon: Activity,
+          value: "99%",
+          label: "Financial Health",
+          color: "emerald"
+        }
       ]
     };
 
-    return [...coreKPIs, ...(moduleKPIs[activeTab] || [])];
+    // Get module-specific KPIs and limit to 5 additional widgets (3 core + 5 = 8 total max)
+    const moduleSpecificKPIs = (moduleKPIs[activeTab] || []).slice(0, 5);
+    
+    return [...coreKPIs, ...moduleSpecificKPIs];
   };
 
   return (
@@ -668,15 +711,9 @@ export default function FinancialHubPage() {
 
         </div>
 
-        {/* Dynamic KPI Widgets */}
+        {/* Dynamic KPI Widgets - Tab Specific */}
         <div 
-          className={`grid gap-4 ${(() => {
-            const kpiCount = getDynamicKPIs(activeTab).length;
-            if (kpiCount <= 5) return "grid-cols-1 md:grid-cols-5";
-            if (kpiCount === 6) return "grid-cols-1 md:grid-cols-6";
-            if (kpiCount === 7) return "grid-cols-1 md:grid-cols-7";
-            return "grid-cols-1 md:grid-cols-8";
-          })()}`}
+          className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
           data-tour="financial-hub-dynamic-kpis"
         >
           {getDynamicKPIs(activeTab).map((kpi, index) => {
@@ -693,7 +730,7 @@ export default function FinancialHubPage() {
             };
             
             return (
-              <Card key={index} className="hover:shadow-md transition-shadow">
+              <Card key={`${kpi.label}-${index}`} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center mb-2">
                     <IconComponent className={`h-5 w-5 ${colorClasses[kpi.color as keyof typeof colorClasses]} mr-2`} />
@@ -710,20 +747,24 @@ export default function FinancialHubPage() {
 
         {/* Financial Modules */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        {/* Tab Navigation */}
-        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 h-12 bg-muted border-border" data-tour="financial-hub-navigation">
-          {availableModules.map((module) => (
-            <TabsTrigger
-              key={module.id}
-              value={module.id}
-              className="flex items-center gap-2 text-xs font-medium px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
-              data-tour={`financial-hub-tab-${module.id}`}
-            >
-              <module.icon className="h-3 w-3" />
-              <span className="hidden sm:inline">{module.label}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Scrollable Tab Navigation */}
+        <div className="relative w-full" data-tour="financial-hub-navigation">
+          <div className="overflow-x-auto scrollbar-hide">
+            <TabsList className="inline-flex w-max min-w-full h-12 bg-muted border-border p-1">
+              {availableModules.map((module) => (
+                <TabsTrigger
+                  key={module.id}
+                  value={module.id}
+                  className="flex items-center gap-2 text-xs font-medium px-3 py-2 whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground min-w-fit transition-all duration-200 hover:bg-background/50"
+                  data-tour={`financial-hub-tab-${module.id}`}
+                >
+                  <module.icon className="h-3 w-3 flex-shrink-0" />
+                  <span className="hidden sm:inline">{module.label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        </div>
 
         {/* Tab Content */}
         {availableModules.map((module) => {

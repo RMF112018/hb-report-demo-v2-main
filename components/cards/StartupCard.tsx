@@ -449,7 +449,7 @@ export default function StartupCard({ card, config, span, isCompact, userRole }:
                       </div>
                       <div className="flex justify-between">
                         <span>Contract Value:</span>
-                        <span className="font-medium text-purple-300">{formatCurrency(data.drillDown.projectDetails?.contractValue)}</span>
+                        <span className="font-medium text-purple-300">{formatCurrency(data.drillDown.projectDetails?.contractValue || 0)}</span>
                       </div>
                       <div className="pt-2 border-t border-white/20">
                         <div className="text-sm font-medium mb-1">Critical Tasks:</div>

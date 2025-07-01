@@ -6,6 +6,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  swcMinify: false, // Disable SWC minification to avoid potential issues
   images: {
     unoptimized: true,
   },

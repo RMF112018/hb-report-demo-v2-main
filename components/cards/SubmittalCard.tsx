@@ -365,7 +365,7 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
               <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-1.5 sm:p-2 lg:p-2.5">
                 <h4 className="font-semibold mb-2 text-foreground">Pending Submittals</h4>
                 <div className="space-y-2 max-h-36 overflow-y-auto">
-                  {data.pendingDetails.map((submittal: any, index: number) => (
+                  {(data as any).pendingDetails?.map((submittal: any, index: number) => (
                     <div key={index} className="flex justify-between items-center p-2 rounded bg-white/40 dark:bg-black/40 border border-emerald-100">
                       <div>
                         <div className="text-sm font-medium text-foreground">{submittal.submittalNumber}</div>

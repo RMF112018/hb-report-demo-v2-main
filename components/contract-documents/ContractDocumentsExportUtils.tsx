@@ -2,6 +2,9 @@
 
 import type { ContractDocumentsStats } from "./ContractDocumentsWidgets"
 
+// Re-export the type for other components
+export type { ContractDocumentsStats }
+
 export interface ContractDocument {
   id: string
   name: string
