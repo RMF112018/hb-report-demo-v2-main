@@ -1,9 +1,9 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { X, Move, Settings2, MoreVertical, Maximize2, Minimize2 } from 'lucide-react'
+import { X, Move, Settings2, MoreVertical, Maximize2, Minimize2, ChevronRight, TrendingUp, Briefcase, Brain, BarChart3, Target, Building2, Calendar, DollarSign, Wrench, Shield, Droplets, Package, Eye, AlertTriangle as AlertTriangleIcon, Users, FileText, ClipboardCheck, Play, CalendarDays, MessageSquare, Heart } from 'lucide-react'
 import { DashboardCard } from '@/types/dashboard'
-import { ReactNode, useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
@@ -12,6 +12,7 @@ interface DashboardCardWrapperProps {
   children: ReactNode
   onRemove?: (id: string) => void
   onConfigure?: (id: string) => void
+  onDrillDown?: (id: string, cardType: string) => void
   dragHandleClass?: string
   isEditing?: boolean
   isCompact?: boolean
@@ -37,38 +38,98 @@ const getCardCategory = (cardType: string): 'financial' | 'operational' | 'analy
 const getCategoryTheme = (category: 'financial' | 'operational' | 'analytics' | 'project' | 'schedule') => {
   const themes = {
     financial: {
-      gradient: "from-green-50/90 to-emerald-50/90 dark:from-green-950/50 dark:to-emerald-950/50",
-      border: "border-green-200/60 dark:border-green-700/60",
-      shadow: "shadow-green-200/20 dark:shadow-green-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-green-500/50 dark:before:border-green-400/50 before:pointer-events-none"
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
+      border: "border-gray-200 dark:border-gray-600",
+      shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
     },
     operational: {
-      gradient: "from-orange-50/90 to-red-50/90 dark:from-orange-950/50 dark:to-red-950/50",
-      border: "border-orange-200/60 dark:border-orange-700/60",
-      shadow: "shadow-orange-200/20 dark:shadow-orange-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-orange-500/50 dark:before:border-orange-400/50 before:pointer-events-none"
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
+      border: "border-gray-200 dark:border-gray-600",
+      shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
     },
     analytics: {
-      gradient: "from-purple-50/90 to-indigo-50/90 dark:from-purple-950/50 dark:to-indigo-950/50",
-      border: "border-purple-200/60 dark:border-purple-700/60",
-      shadow: "shadow-purple-200/20 dark:shadow-purple-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-purple-500/50 dark:before:border-purple-400/50 before:pointer-events-none"
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
+      border: "border-gray-200 dark:border-gray-600",
+      shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
     },
     project: {
-      gradient: "from-blue-50/90 to-cyan-50/90 dark:from-blue-950/50 dark:to-cyan-950/50",
-      border: "border-blue-200/60 dark:border-blue-700/60",
-      shadow: "shadow-blue-200/20 dark:shadow-blue-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-blue-500/50 dark:before:border-blue-400/50 before:pointer-events-none"
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
+      border: "border-gray-200 dark:border-gray-600",
+      shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
     },
     schedule: {
-      gradient: "from-amber-50/90 to-yellow-50/90 dark:from-amber-950/50 dark:to-yellow-950/50",
-      border: "border-amber-200/60 dark:border-amber-700/60",
-      shadow: "shadow-amber-200/20 dark:shadow-amber-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-amber-500/50 dark:before:border-amber-400/50 before:pointer-events-none"
+      gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
+      border: "border-gray-200 dark:border-gray-600",
+      shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
+      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
     }
   }
   
   return themes[category] || themes.project
+}
+
+// Get card-specific icon
+const getCardIcon = (cardType: string) => {
+  switch (cardType) {
+    case "portfolio-overview":
+      return <Briefcase className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "enhanced-hbi-insights":
+      return <Brain className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "financial-review-panel":
+      return <BarChart3 className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "pipeline-analytics":
+      return <Target className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "market-intelligence":
+      return <TrendingUp className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "project-overview":
+      return <Building2 className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "schedule-performance":
+      return <Calendar className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "financial-status":
+      return <DollarSign className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "general-conditions":
+      return <Wrench className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "contingency-analysis":
+      return <Shield className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "cash-flow":
+      return <Droplets className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "procurement":
+      return <Package className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "draw-forecast":
+      return <BarChart3 className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "quality-control":
+      return <Eye className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "safety":
+      return <AlertTriangleIcon className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "staffing-distribution":
+      return <Users className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "change-order-analysis":
+      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "closeout":
+      return <ClipboardCheck className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "startup":
+      return <Play className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "critical-dates":
+      return <CalendarDays className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "field-reports":
+      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "rfi":
+      return <MessageSquare className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "submittal":
+      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "health":
+      return <Heart className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "schedule-monitor":
+      return <Calendar className="h-4 w-4" style={{color: '#FA4616'}} />
+    case "bd-opportunities":
+      return <Building2 className="h-4 w-4" style={{color: '#FA4616'}} />
+    default:
+      return <TrendingUp className="h-4 w-4" style={{color: '#FA4616'}} />
+  }
 }
 
 export const DashboardCardWrapper = ({
@@ -76,12 +137,15 @@ export const DashboardCardWrapper = ({
   children,
   onRemove,
   onConfigure,
+  onDrillDown,
   dragHandleClass,
   isEditing = false,
   isCompact = false
 }: DashboardCardWrapperProps) => {
   const [showActions, setShowActions] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
+  const [isDrillDownActive, setIsDrillDownActive] = useState(false)
   
   const category = getCardCategory(card.type)
   const theme = getCategoryTheme(category)
@@ -89,6 +153,47 @@ export const DashboardCardWrapper = ({
   const toggleActions = () => {
     setShowActions(!showActions)
   }
+
+  const handleDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    // For specific card types, dispatch custom event to let the card handle its own drill down
+    if (card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout') {
+      const newState = !isDrillDownActive
+      setIsDrillDownActive(newState)
+      
+      const event = new CustomEvent('cardDrillDown', { 
+        detail: { 
+          cardId: card.id, 
+          cardType: card.type,
+          action: newState ? 'show' : 'hide'
+        } 
+      })
+      window.dispatchEvent(event)
+      return
+    }
+    
+    if (onDrillDown) {
+      onDrillDown(card.id, card.type)
+    } else {
+      setShowDrillDown(true)
+    }
+  }
+
+  // Listen for drill down state changes from the card itself
+  React.useEffect(() => {
+    const handleDrillDownStateChange = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id && event.detail.cardType === card.type) {
+        setIsDrillDownActive(event.detail.isActive)
+      }
+    }
+
+    window.addEventListener('cardDrillDownStateChange', handleDrillDownStateChange as EventListener)
+    
+    return () => {
+      window.removeEventListener('cardDrillDownStateChange', handleDrillDownStateChange as EventListener)
+    }
+  }, [card.id, card.type])
   
   return (
     <div
@@ -114,6 +219,68 @@ export const DashboardCardWrapper = ({
       )}
       onClick={toggleActions}
     >
+      {/* Card Header with Title and Drill Down Button */}
+      <div className="absolute top-4 left-4 right-16 z-20">
+        <div className="flex items-center gap-2 mb-1">
+          {/* Card Icon */}
+          {getCardIcon(card.type)}
+          {/* Card Title */}
+          <h3 className="text-sm font-semibold text-foreground truncate">
+            {card.title || card.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+          </h3>
+        </div>
+        {/* Drill Down Button - closer to title */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-2 text-xs hover:bg-transparent z-[70]"
+          onClick={handleDrillDown}
+        >
+          <span className="mr-1">
+                  {(card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'field-reports' || card.type === 'critical-dates' || card.type === 'safety' || card.type === 'quality-control' || card.type === 'rfi' || card.type === 'submittal') && isDrillDownActive ? 'Hide Drill Down' : 
+                   card.type === 'enhanced-hbi-insights' ? 'View HBI Insights' :
+                   card.type === 'health' ? 'View Health Details' :
+                   card.type === 'startup' ? 'View Startup Details' :
+                   card.type === 'schedule-monitor' ? 'View Schedule Details' :
+                   card.type === 'change-order-analysis' ? 'View Change Order Details' :
+                   card.type === 'closeout' ? 'View Closeout Details' :
+                   card.type === 'field-reports' ? 'View Field Reports Details' :
+                   card.type === 'critical-dates' ? 'View Critical Dates Details' :
+                   card.type === 'safety' ? 'View Safety Details' :
+                   card.type === 'quality-control' ? 'View Quality Control Details' :
+                   card.type === 'rfi' ? 'View RFI Details' :
+                   card.type === 'submittal' ? 'View Submittal Details' :
+                   'View Details'}
+          </span>
+          <ChevronRight className="h-3 w-3" style={{ color: '#FA4616' }} />
+        </Button>
+      </div>
+
+      {/* Drill Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-sm rounded-xl flex items-center justify-center">
+          <div className="text-center p-6">
+            <div className="h-12 w-12 mx-auto mb-4 flex items-center justify-center">
+              {React.cloneElement(getCardIcon(card.type), { className: "h-12 w-12", style: { color: '#FA4616' } })}
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">
+              {card.title || card.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Details
+            </h3>
+            <p className="text-gray-300 mb-6">Detailed analytics and insights would appear here</p>
+            <Button
+              variant="secondary"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDrillDown(false)
+              }}
+              className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+      
       {/* Enhanced Card Controls Overlay - always visible in edit mode */}
       {isEditing && (
         <div className="absolute -top-2 -right-2 z-20 flex gap-1 transition-all duration-200 opacity-100 scale-100">
@@ -158,19 +325,19 @@ export const DashboardCardWrapper = ({
           showActions ? "opacity-100" : "opacity-60"
         )}>
           <DropdownMenu open={showActions} onOpenChange={setShowActions}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 w-7 p-0 bg-background/80 backdrop-blur-sm hover:bg-background/90 border border-border/30"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowActions(!showActions)
-                }}
-              >
-                <MoreVertical className="h-3 w-3 text-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-9 w-9 p-0 bg-gray-100 dark:bg-gray-700 backdrop-blur-sm hover:bg-gray-200 dark:hover:bg-gray-600"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowActions(!showActions)
+              }}
+            >
+              <MoreVertical className="h-4 w-4 text-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40 bg-popover/95 backdrop-blur-sm border-2 border-border/50">
               <DropdownMenuItem 
                 onClick={(e) => {
@@ -210,9 +377,7 @@ export const DashboardCardWrapper = ({
       
       {/* Enhanced content wrapper */}
       <div className={cn(
-        "relative h-full rounded-xl overflow-hidden",
-        // Better inner depth
-        "shadow-inner shadow-black/5 dark:shadow-white/5",
+        "relative h-full rounded-xl overflow-hidden pt-16", // Added top padding for header
         // Enhanced expanded state
         isExpanded && "fixed inset-4 z-50 bg-background/98 backdrop-blur-lg shadow-2xl border-2 border-border/50"
       )}>

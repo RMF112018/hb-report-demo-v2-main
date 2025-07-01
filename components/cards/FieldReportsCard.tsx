@@ -1,21 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Users, Calendar, ChevronRight, TrendingUp, Target, Award, Building2, AlertTriangle, CheckCircle, Clock, User, BarChart3 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, Users, Calendar, ChevronRight, TrendingUp, Target, Award, Building2, AlertTriangle, CheckCircle, Clock, User, BarChart3, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
 
+interface DashboardCard {
+  id: string;
+  type: string;
+  title: string;
+  config?: any;
+}
+
 interface FieldReportsCardProps {
+  card: DashboardCard;
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function FieldReportsCard({ config, span, isCompact, userRole }: FieldReportsCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function FieldReportsCard({ card, config, span, isCompact, userRole }: FieldReportsCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+  
+  // Listen for drill-down events
+  useEffect(() => {
+    const handleCardDrillDown = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(true);
+      }
+    };
+
+    const handleCardDrillDownStateChange = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(event.detail.isOpen);
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+    window.addEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+      window.removeEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+    };
+  }, [card.id]);
   
   // Calculate business days since start of month
   const getBusinessDaysSinceMonthStart = () => {
@@ -262,23 +293,31 @@ export default function FieldReportsCard({ config, span, isCompact, userRole }: 
   const weeklyData = data.weeklyTrends || [];
 
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950/30 dark:to-teal-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-green-200 dark:border-green-800">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden relative">
+      {/* Header Section with Badge */}
+      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 pb-3 border-b border-gray-200 dark:border-gray-600">
+        <div className="flex items-center gap-2 mb-3">
+          <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+            <FileText className="w-3 h-3 mr-1" />
+            Field Reports Monitor
+          </Badge>
+        </div>
+
+        {/* Compact Stats */}
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
             <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getCompletionColor(data.completionRate)}`}>
               {formatPercentage(data.completionRate)}
             </div>
-            <div className="text-xs text-green-600 dark:text-green-400">Completion Rate</div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Completion</div>
           </div>
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-green-700">{data.submittedReports}/{data.totalReports}</div>
-            <div className="text-xs text-muted-foreground">Reports</div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-green-700 dark:text-green-400">{data.submittedReports}</div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Submitted</div>
+          </div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-red-700 dark:text-red-400">{data.totalReports - data.submittedReports}</div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Missing</div>
           </div>
         </div>
       </div>
@@ -286,7 +325,7 @@ export default function FieldReportsCard({ config, span, isCompact, userRole }: 
       {/* Content */}
       <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
         {/* Completion Overview */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-green-200 dark:border-green-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
             <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
             <span className="text-sm font-medium text-foreground">Report Status</span>
@@ -332,7 +371,7 @@ export default function FieldReportsCard({ config, span, isCompact, userRole }: 
         </div>
 
         {/* Progress Tracking */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-green-200 dark:border-green-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <Target className="h-4 w-4 text-green-600 dark:text-green-400" />
             <span className="text-sm font-medium text-foreground">Progress</span>
@@ -351,7 +390,7 @@ export default function FieldReportsCard({ config, span, isCompact, userRole }: 
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-green-200 dark:border-green-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
             <span className="text-sm font-medium text-foreground">Recent Activity</span>
@@ -391,15 +430,28 @@ export default function FieldReportsCard({ config, span, isCompact, userRole }: 
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {/* Event-Driven Drill-Down Overlay */}
+      {showDrillDown && (
         <div className="absolute inset-0 bg-green-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col text-white animate-in fade-in duration-200 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <ChevronRight className="h-4 w-4" />
               <span className="font-semibold text-lg">Field Reports Analysis</span>
             </div>
-            
+            <button
+              onClick={() => {
+                setShowDrillDown(false);
+                window.dispatchEvent(new CustomEvent('cardDrillDownStateChange', { 
+                  detail: { cardId: card.id, isOpen: false } 
+                }));
+              }}
+              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
             {/* Weekly Trends Chart */}
             <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
               <h4 className="font-semibold mb-2 flex items-center text-sm">

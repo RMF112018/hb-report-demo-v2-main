@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
+import { Users, TrendingUp, AlertCircle, CheckCircle, Brain } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Import the JSON data
 import staffingData from "@/data/mock/staffing/staffing.json";
@@ -24,7 +25,7 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
   isCompact = false,
   userRole = "executive"
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDrillDown, setShowDrillDown] = useState(false);
 
   // Process staffing data by role
   const staffingByRole = staffingData.reduce((acc: any, person: any) => {
@@ -71,10 +72,27 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
   return (
     <div 
       className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Drill Down Button - positioned outside overlay coverage */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowDrillDown(!showDrillDown);
+        }}
+        className={cn(
+          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+          showDrillDown 
+            ? "bg-orange-600 text-white shadow-md" 
+            : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
+        )}
+      >
+        <Brain className="h-3 w-3" />
+        {showDrillDown ? "Close Analysis" : "Drill Down"}
+      </button>
+
       <div className="h-full bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 rounded-lg">
+        {/* Empty space for button */}
+        <div className="mb-2"></div>
         {/* Header Metrics */}
         <div className="grid grid-cols-4 gap-1 sm:gap-1.5 lg:gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
           <div className="text-center">
@@ -169,8 +187,8 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {/* Click-Based Drill-Down Overlay */}
+      {showDrillDown && (
         <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
           <div className="h-full">
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Staffing Deep Dive Analysis</h3>

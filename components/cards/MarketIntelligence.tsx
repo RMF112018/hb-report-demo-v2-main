@@ -198,22 +198,27 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
     <div 
       className="relative h-full overflow-hidden"
     >
+      {/* Drill Down Button - positioned outside overlay coverage */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowDrillDown(!showDrillDown);
+        }}
+        className={cn(
+          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+          showDrillDown 
+            ? "bg-indigo-600 text-white shadow-md" 
+            : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
+        )}
+      >
+        <Brain className="h-3 w-3" />
+        {showDrillDown ? "Close Analysis" : "Drill Down"}
+      </button>
+
       <div className="h-full overflow-y-auto">
         <div className="p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-6">
-          <div className="flex justify-end">
-            <button
-              onClick={() => setShowDrillDown(!showDrillDown)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
-                showDrillDown 
-                  ? "bg-indigo-600 text-white shadow-md" 
-                  : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
-              )}
-            >
-              <Brain className="h-3 w-3" />
-              {showDrillDown ? "Close Analysis" : "Drill Down"}
-            </button>
-          </div>
+          {/* Empty space for button */}
+          <div></div>
           {/* Key Metrics Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">

@@ -1,12 +1,12 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { FileText, Clock, CheckCircle, AlertCircle, TrendingUp, XCircle, Calendar } from "lucide-react"
+import { FileText, Clock, CheckCircle, AlertCircle, TrendingUp, XCircle, Calendar, X } from "lucide-react"
 import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import type { DashboardCard } from "@/types/dashboard"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface SubmittalCardProps {
   card: DashboardCard
@@ -19,7 +19,29 @@ interface SubmittalCardProps {
 const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-2))', 'hsl(var(--chart-5))']
 
 export function SubmittalCard({ card, config, span, isCompact, userRole }: SubmittalCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false)
+
+  useEffect(() => {
+    const handleDrillDown = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setIsDrillDownOpen(true)
+        // Dispatch state change event
+        window.dispatchEvent(new CustomEvent('cardDrillDownStateChange', {
+          detail: { cardId: card.id, isOpen: true }
+        }))
+      }
+    }
+
+    window.addEventListener('cardDrillDown', handleDrillDown as EventListener)
+    return () => window.removeEventListener('cardDrillDown', handleDrillDown as EventListener)
+  }, [card.id])
+
+  const handleCloseDrillDown = () => {
+    setIsDrillDownOpen(false)
+    window.dispatchEvent(new CustomEvent('cardDrillDownStateChange', {
+      detail: { cardId: card.id, isOpen: false }
+    }))
+  }
 
   // Mock data based on role
   const getRoleBasedData = () => {
@@ -160,41 +182,40 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
   const role = userRole || 'project-manager'
 
   return (
-    <div 
-      className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 border-emerald-200 dark:border-emerald-800 hover:shadow-xl transition-all duration-300 h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              {card.title}
-            </div>
-            <Badge className={`${gradeColor} bg-card border-emerald-200 dark:border-emerald-800`}>
-              Grade {performanceGrade}
+    <div className="relative h-full">
+      <div className="bg-transparent border-0 h-full flex flex-col">
+        {/* Header Section */}
+        <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2">
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs font-medium px-2 py-1">
+              <FileText className="h-3 w-3 mr-1" />
+              Submittal Monitor
             </Badge>
-          </CardTitle>
-        </CardHeader>
+          </div>
+          <Badge className={`${gradeColor} bg-card border-gray-300 dark:border-gray-600`}>
+            Grade {performanceGrade}
+          </Badge>
+        </div>
         
-        <CardContent className="space-y-4">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100">
-              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-emerald-600 dark:text-emerald-400">{data.totalSubmittals}</div>
-              <div className="text-xs text-muted-foreground">Total Submittals</div>
-              <div className="text-xs text-emerald-600 dark:text-emerald-400">{data.pendingSubmittals} pending</div>
+        <div className="flex-1 p-3 space-y-4 overflow-auto">
+          {/* Compact Stats */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-lg sm:text-xl lg:text-2xl font-medium text-emerald-600 dark:text-emerald-400">{data.totalSubmittals}</div>
+              <div className="text-xs text-muted-foreground">Total</div>
             </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100">
-              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-emerald-600 dark:text-emerald-400">{data.avgReviewDays}</div>
-              <div className="text-xs text-muted-foreground">Avg Review Time</div>
-              <div className="text-xs text-emerald-600 dark:text-emerald-400">Target: {data.targetReviewDays} days</div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-lg sm:text-xl lg:text-2xl font-medium text-emerald-600 dark:text-emerald-400">{data.pendingSubmittals}</div>
+              <div className="text-xs text-muted-foreground">Pending</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-lg sm:text-xl lg:text-2xl font-medium text-emerald-600 dark:text-emerald-400">{data.avgReviewDays}</div>
+              <div className="text-xs text-muted-foreground">Avg Days</div>
             </div>
           </div>
 
           {/* Status Chart */}
-          <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-1.5 sm:p-2 lg:p-2.5">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-1.5 sm:p-2 lg:p-2.5">
             <h4 className="font-semibold mb-2 text-foreground">Status Overview</h4>
             <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
@@ -219,11 +240,11 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
           </div>
 
           {/* Performance Score */}
-          <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-1.5 sm:p-2 lg:p-2.5">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-1.5 sm:p-2 lg:p-2.5">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-foreground">Schedule Compliance</span>
               <div className="text-right">
-                <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${gradeColor}`}>{data.scheduleCompliance.toFixed(1)}%</div>
+                <div className={`text-sm sm:text-base lg:text-lg font-medium ${gradeColor}`}>{data.scheduleCompliance.toFixed(1)}%</div>
                 <div className="text-xs text-muted-foreground">{approvalRate.toFixed(1)}% approval rate</div>
               </div>
             </div>
@@ -232,14 +253,14 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
 
           {/* Review Time vs Target */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-2">
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 Avg Review Time
               </div>
               <div className="font-semibold text-emerald-600 dark:text-emerald-400">{data.avgReviewDays} days</div>
             </div>
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-2">
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <AlertCircle className="h-3 w-3" />
                 Overdue
@@ -247,21 +268,29 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
               <div className="font-semibold text-emerald-600 dark:text-emerald-400">{data.overdue}</div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Hover Drill-down */}
-      {isHovered && (
+      {/* Event-driven Drill-down */}
+      {isDrillDownOpen && (
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg shadow-2xl z-10 overflow-auto">
-          <div className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4">
+          <div className="p-2 sm:p-2.5 lg:p-2.5 space-y-4">
             <div className="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2">
               <h3 className="font-semibold text-foreground flex items-center gap-2">
                 <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 Submittal Analytics
               </h3>
-              <Badge className={`${gradeColor} bg-card border-emerald-200 dark:border-emerald-800`}>
-                Grade {performanceGrade}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge className={`${gradeColor} bg-card border-emerald-200 dark:border-emerald-800`}>
+                  Grade {performanceGrade}
+                </Badge>
+                <button
+                  onClick={handleCloseDrillDown}
+                  className="p-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 rounded-full transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {/* Review Trend */}
@@ -357,15 +386,15 @@ export function SubmittalCard({ card, config, span, isCompact, userRole }: Submi
             {/* Summary Stats */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{data.rejectedSubmittals}</div>
+                <div className="text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{data.rejectedSubmittals}</div>
                 <div className="text-xs text-muted-foreground">Rejected</div>
               </div>
               <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{approvalRate.toFixed(0)}%</div>
+                <div className="text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{approvalRate.toFixed(0)}%</div>
                 <div className="text-xs text-muted-foreground">Approval Rate</div>
               </div>
               <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-emerald-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{data.categoryBreakdown.length}</div>
+                <div className="text-sm sm:text-base lg:text-lg font-medium text-emerald-600 dark:text-emerald-400">{data.categoryBreakdown.length}</div>
                 <div className="text-xs text-muted-foreground">Categories</div>
               </div>
             </div>

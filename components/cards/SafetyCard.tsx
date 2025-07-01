@@ -1,20 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import { Shield, AlertTriangle, ChevronRight, Clock, Users, TrendingDown, Eye } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Shield, AlertTriangle, ChevronRight, Clock, Users, TrendingDown, Eye, CheckCircle, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from "recharts";
+
+interface DashboardCard {
+  id: string;
+  type: string;
+  title: string;
+  config?: any;
+}
 
 interface SafetyCardProps {
+  card: DashboardCard;
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function SafetyCard({ config, span, isCompact, userRole }: SafetyCardProps) {
-  const [showDetails, setShowDetails] = useState(false);
+export default function SafetyCard({ card, config, span, isCompact, userRole }: SafetyCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+  
+  // Listen for drill-down events
+  useEffect(() => {
+    const handleCardDrillDown = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(true);
+      }
+    };
+
+    const handleCardDrillDownStateChange = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id) {
+        setShowDrillDown(event.detail.isOpen);
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+    window.addEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('cardDrillDown', handleCardDrillDown as EventListener);
+      window.removeEventListener('cardDrillDownStateChange', handleCardDrillDownStateChange as EventListener);
+    };
+  }, [card.id]);
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -29,6 +61,8 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
           atRiskItems: 3,
           incidentRate: 0.0,
           daysWithoutIncident: 124,
+          oshaCompliance: 96.8,
+          trainingCurrent: 94.2,
           tradeBreakdown: {
             concrete: 12,
             electrical: 8,
@@ -55,6 +89,8 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
           atRiskItems: 12,
           incidentRate: 0.8,
           daysWithoutIncident: 45,
+          oshaCompliance: 92.3,
+          trainingCurrent: 89.7,
           tradeBreakdown: {
             concrete: 52,
             electrical: 38,
@@ -83,6 +119,8 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
           atRiskItems: 25,
           incidentRate: 1.2,
           daysWithoutIncident: 28,
+          oshaCompliance: 88.9,
+          trainingCurrent: 85.4,
           tradeBreakdown: {
             concrete: 85,
             electrical: 72,
@@ -108,8 +146,8 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
 
   const data = getDataByRole();
 
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`;
+  const formatPercentage = (value: number | undefined) => {
+    return `${(value ?? 0).toFixed(1)}%`;
   };
 
   const getSafetyScoreColor = (score: number) => {
@@ -130,53 +168,72 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
     return "text-red-600 dark:text-red-400";
   };
 
+  const chartData = [
+    { name: "Safety Score", value: data.safetyScore },
+    { name: "Incident Rate", value: data.incidentRate },
+    { name: "Days Without Incident", value: data.daysWithoutIncident },
+    { name: "At Risk Items", value: data.atRiskItems },
+    { name: "Safety Trend", value: data.safetyScore },
+  ];
+
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 overflow-hidden relative transition-all duration-300"
-    >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-red-200 dark:border-red-800">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getSafetyScoreColor(data.safetyScore)}`}>{formatPercentage(data.safetyScore)}</div>
-            <div className="text-xs text-red-600 dark:text-red-400">Safety Score</div>
+    <div className="h-full flex flex-col bg-transparent overflow-hidden relative">
+      {/* Header Section with Badge */}
+      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 pb-3 border-b border-gray-200 dark:border-gray-600">
+        <div className="flex items-center gap-2 mb-3">
+          <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+            <Shield className="w-3 h-3 mr-1" />
+            Safety Monitor
+          </Badge>
+        </div>
+
+        {/* Compact Stats */}
+        <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getSafetyScoreColor(data.safetyScore)}`}>
+              {formatPercentage(data.safetyScore)}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Safety Score</div>
           </div>
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getIncidentRateColor(data.incidentRate)}`}>{data.incidentRate}</div>
-            <div className="text-xs text-orange-600">Incident Rate</div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getIncidentRateColor(data.incidentRate)}`}>
+              {data.incidentRate}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">Incident Rate</div>
+          </div>
+          <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-center">
+            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getRiskLevelColor(data.atRiskItems)}`}>
+              {data.atRiskItems}
+            </div>
+            <div className="text-xs text-muted-foreground dark:text-gray-400">At Risk</div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
-        {/* Incident Tracking */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-red-200 dark:border-red-800">
+      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto space-y-2">
+        {/* Chart */}
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
-            <Shield className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <span className="text-sm font-medium text-foreground">Incident Tracking</span>
+            <Shield className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Safety Trend</span>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Days Without Incident</span>
-              <span className={`font-medium ${data.daysWithoutIncident >= 90 ? 'text-green-600 dark:text-green-400' : data.daysWithoutIncident >= 30 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
-                {data.daysWithoutIncident}
-              </span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Incident Rate</span>
-              <Badge className={`${getIncidentRateColor(data.incidentRate) === 'text-green-600 dark:text-green-400' ? 'bg-green-100 text-green-700' : 
-                getIncidentRateColor(data.incidentRate) === 'text-yellow-600 dark:text-yellow-400' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                {data.incidentRate}%
-              </Badge>
-            </div>
+          <div className="h-24 sm:h-32">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#dc2626" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Safety Score */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-red-200 dark:border-red-800">
+        {/* Safety Performance */}
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <Users className="h-4 w-4 text-foreground" />
             <span className="text-sm font-medium text-foreground">Safety Performance</span>
           </div>
           <div className="space-y-2">
@@ -192,122 +249,105 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
         </div>
 
         {/* At Risk Items */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-red-200 dark:border-red-800">
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <span className="text-sm font-medium text-foreground">At Risk Items</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getRiskLevelColor(data.atRiskItems)}`}>
-              {data.atRiskItems}
-            </div>
-            <Badge className={`${getRiskLevelColor(data.atRiskItems) === 'text-green-600 dark:text-green-400' ? 'bg-green-100 text-green-700' : 
-              getRiskLevelColor(data.atRiskItems) === 'text-yellow-600 dark:text-yellow-400' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-              {data.atRiskItems <= 5 ? 'Low Risk' : data.atRiskItems <= 15 ? 'Medium Risk' : 'High Risk'}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Inspection Status */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-red-200 dark:border-red-800">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <span className="text-sm font-medium text-foreground">Inspections</span>
+            <AlertTriangle className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Risk Assessment</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="text-center p-2 bg-green-50 dark:bg-green-950/30 rounded border border-green-200 dark:border-green-800">
-              <div className="text-sm font-bold text-green-700">{data.closedInspections}</div>
-              <div className="text-xs text-green-600 dark:text-green-400">Closed</div>
+            <div className="text-center p-2 bg-gray-300 dark:bg-gray-700 rounded border border-gray-400 dark:border-gray-600">
+              <div className="text-sm font-bold text-red-700 dark:text-red-400">{data.atRiskItems}</div>
+              <div className="text-xs text-red-600 dark:text-red-300">At Risk Items</div>
             </div>
-            <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-950/30 rounded border border-yellow-200 dark:border-yellow-800">
-              <div className="text-sm font-bold text-yellow-700">{data.openInspections}</div>
-              <div className="text-xs text-yellow-600 dark:text-yellow-400">Open</div>
+            <div className="text-center p-2 bg-gray-300 dark:bg-gray-700 rounded border border-gray-400 dark:border-gray-600">
+              <Badge className={`${getRiskLevelColor(data.atRiskItems) === 'text-green-600 dark:text-green-400' ? 'bg-green-100 text-green-700' : 
+                getRiskLevelColor(data.atRiskItems) === 'text-yellow-600 dark:text-yellow-400' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                {data.atRiskItems <= 5 ? 'Low Risk' : data.atRiskItems <= 15 ? 'Medium Risk' : 'High Risk'}
+              </Badge>
             </div>
           </div>
         </div>
 
-        {/* Trade Safety Performance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-red-200 dark:border-red-800">
+        {/* Compliance Status */}
+        <div className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <span className="text-sm font-medium text-foreground">By Trade</span>
+            <CheckCircle className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Compliance</span>
           </div>
           <div className="space-y-1">
-            {Object.entries(data.tradeBreakdown).slice(0, 5).map(([trade, count]) => (
-              <div key={trade} className="flex justify-between text-xs">
-                <span className="text-muted-foreground capitalize">{trade}</span>
-                <Badge variant="outline" className="text-xs">{count}</Badge>
-              </div>
-            ))}
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">OSHA Compliance</span>
+              <span className={`font-medium ${data.oshaCompliance >= 95 ? 'text-green-600 dark:text-green-400' : 
+                data.oshaCompliance >= 80 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                {formatPercentage(data.oshaCompliance)}
+              </span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">Training Current</span>
+              <span className={`font-medium ${data.trainingCurrent >= 95 ? 'text-green-600 dark:text-green-400' : 
+                data.trainingCurrent >= 80 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                {formatPercentage(data.trainingCurrent)}
+              </span>
+            </div>
           </div>
-        </div>
-
-        {/* Details Toggle Button */}
-        <div className="flex justify-center pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-xs border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-950/50"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </Button>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {showDetails && (
-        <div className="absolute inset-0 bg-red-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <div className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4" />
-                <span className="font-semibold text-sm">Safety Analysis</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDetails(false)}
-                className="h-6 w-6 p-0 text-red-200 hover:text-white"
-              >
-                ×
-              </Button>
+      {/* Event-Driven Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-semibold text-lg">Safety Analysis</span>
             </div>
-            
+            <button
+              onClick={() => {
+                setShowDrillDown(false);
+                window.dispatchEvent(new CustomEvent('cardDrillDownStateChange', { 
+                  detail: { cardId: card.id, isOpen: false } 
+                }));
+              }}
+              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-3">
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-red-200">Safest Trade:</span>
+                <span className="text-gray-200">Safest Trade:</span>
                 <span className="font-medium text-green-300">{data.drillDown.safestTrade.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-red-200">Score:</span>
+                <span className="text-gray-200">Score:</span>
                 <span className="font-medium">{formatPercentage(data.drillDown.safestTrade.score)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-red-200">Needs Focus:</span>
+                <span className="text-gray-200">Needs Focus:</span>
                 <span className="font-medium text-red-300">{data.drillDown.riskiestTrade.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-red-200">Score:</span>
+                <span className="text-gray-200">Score:</span>
                 <span className="font-medium">{formatPercentage(data.drillDown.riskiestTrade.score)}</span>
               </div>
             </div>
 
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-red-700">
-              <div className="text-xs font-medium text-red-200 mb-2">Safety Status</div>
+            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-gray-700">
+              <div className="text-xs font-medium text-gray-200 mb-2">Safety Status</div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-red-300">Last Incident:</span>
+                  <span className="text-gray-300">Last Incident:</span>
                   <span className="font-medium">{data.drillDown.lastIncident}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-red-300">Trend:</span>
+                  <span className="text-gray-300">Trend:</span>
                   <span className="font-medium">{data.drillDown.safetyTrend}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-red-300">Upcoming Audits:</span>
-                  <span className="font-medium text-red-300">{data.drillDown.upcomingAudits} scheduled</span>
+                  <span className="text-gray-300">Upcoming Audits:</span>
+                  <span className="font-medium text-gray-300">{data.drillDown.upcomingAudits} scheduled</span>
                 </div>
               </div>
             </div>

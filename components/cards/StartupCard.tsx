@@ -1,20 +1,65 @@
 "use client";
 
-import { useState } from "react";
-import { Play, Clock, AlertCircle, FileCheck, Building2, ClipboardCheck, Users, CalendarCheck, ChevronRight, TrendingUp, Target, Award, FileText, Shield, Wrench, Settings, Users2, Clipboard } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Play, Clock, AlertCircle, FileCheck, Building2, ClipboardCheck, Users, CalendarCheck, ChevronRight, TrendingUp, Target, Award, FileText, Shield, Wrench, Settings, Users2, Clipboard, Activity, Brain, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import type { DashboardCard } from "@/types/dashboard";
+import { cn } from "@/lib/utils";
 
 interface StartupCardProps {
+  card: DashboardCard;
   config?: any;
   span?: any;
   isCompact?: boolean;
   userRole?: string;
 }
 
-export default function StartupCard({ config, span, isCompact, userRole }: StartupCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function StartupCard({ card, config, span, isCompact, userRole }: StartupCardProps) {
+  const [showDrillDown, setShowDrillDown] = useState(false);
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'startup') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'startup',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card.id]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'startup',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -170,9 +215,9 @@ export default function StartupCard({ config, span, isCompact, userRole }: Start
   };
 
   const getStatusBadge = (completion: number) => {
-    if (completion >= 90) return "bg-green-100 text-green-700";
-    if (completion >= 75) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
+    if (completion >= 90) return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
+    if (completion >= 75) return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300";
+    return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300";
   };
 
   const getRiskColor = (risk: string) => {
@@ -201,280 +246,302 @@ export default function StartupCard({ config, span, isCompact, userRole }: Start
 
   return (
     <div 
-      className="h-full flex flex-col bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="relative h-full"
+      data-tour="startup-card"
     >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-emerald-200 dark:border-emerald-800">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getStatusColor(data.overallCompletion)}`}>
-              {formatPercentage(data.overallCompletion)}
-            </div>
-            <div className="text-xs text-emerald-600 dark:text-emerald-400">Ready</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-emerald-700">{data.daysToMobilization}</div>
-            <div className="text-xs text-muted-foreground">Days to Mob</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
-        {/* Status Overview */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* Startup Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
-            <Play className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-sm font-medium text-foreground">Startup Status</span>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="w-20 h-20">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={15}
-                    outerRadius={35}
-                    dataKey="value"
-                  >
-                    {statusData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={statusData[index].color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+              <Activity className="h-3 w-3 mr-1" />
+              Startup Monitor
+            </Badge>
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              {formatPercentage(data.overallCompletion)} Ready
             </div>
-            <div className="flex-1 grid grid-cols-3 gap-1 text-xs">
-              <div className="text-center p-2 bg-green-50 dark:bg-green-950/30 rounded">
-                <div className="font-bold text-green-600 dark:text-green-400">{data.completedItems}</div>
-                <div className="text-muted-foreground">Complete</div>
-              </div>
-              <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-950/30 rounded">
-                <div className="font-bold text-yellow-600 dark:text-yellow-400">{data.pendingItems}</div>
-                <div className="text-muted-foreground">Pending</div>
-              </div>
-              <div className="text-center p-2 bg-red-50 dark:bg-red-950/30 rounded">
-                <div className="font-bold text-red-600 dark:text-red-400">{data.criticalItems}</div>
-                <div className="text-muted-foreground">Critical</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Progress by Category */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-sm font-medium text-foreground">Category Progress</span>
-          </div>
-          <div className="space-y-2">
-            {data.categories.slice(0, 3).map((category) => (
-              <div key={category.name} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{category.name}</span>
-                  <span className="font-medium">{formatPercentage(category.completion)}</span>
-                </div>
-                <Progress value={category.completion} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-emerald-200 dark:border-emerald-800">
-          <div className="flex items-center gap-2 mb-2">
-            <CalendarCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-sm font-medium text-foreground">Timeline</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Est. Mobilization</span>
-              <Badge variant="outline" className="text-xs">{data.daysToMobilization} days</Badge>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Current Phase</span>
-              <Badge className={`${getStatusBadge(data.overallCompletion)} text-xs`}>
-                {data.projectPhase}
+            <div className="flex items-center gap-1 ml-auto">
+              <Badge className={cn("text-xs", getRiskColor(data.riskLevel), "bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500")}>
+                {data.riskLevel} Risk
               </Badge>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Last Activity</span>
-              <span className="font-medium">{data.lastActivity}</span>
+          </div>
+          
+          {/* Compact Stats - Darker Background */}
+          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-green-700 dark:text-green-400">{data.completedItems}</div>
+              <div className="text-xs text-green-600 dark:text-green-400">Complete</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-red-700 dark:text-red-400">{data.criticalItems}</div>
+              <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="font-bold text-lg text-blue-700 dark:text-blue-400">{data.daysToMobilization}</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">Days to Mob</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Startup Content */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-3">
+            {/* Status Overview */}
+            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <Play className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm font-medium text-foreground">Status Overview</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-16">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={12}
+                        outerRadius={28}
+                        dataKey="value"
+                      >
+                        {statusData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={statusData[index].color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex-1 text-xs space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total Items:</span>
+                    <span className="font-medium">{data.totalItems}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Pending:</span>
+                    <span className="font-medium text-yellow-600 dark:text-yellow-400">{data.pendingItems}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phase:</span>
+                    <span className="font-medium">{data.projectPhase}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Progress */}
+            <div className="space-y-2">
+              {data.categories.slice(0, 4).map((category) => (
+                <div key={category.name} className="flex items-center justify-between p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2 h-2 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: category.completion >= 90 ? '#10b981' : category.completion >= 75 ? '#f59e0b' : '#ef4444' }}
+                    />
+                    <span className="text-xs text-muted-foreground font-medium">{category.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Progress value={category.completion} className="h-1.5 w-16" />
+                    <span className={cn("text-xs font-semibold min-w-[2rem]", getStatusColor(category.completion))}>
+                      {formatPercentage(category.completion)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className={cn("text-sm font-medium", getStatusColor(data.overallCompletion))}>
+                  {formatPercentage(data.overallCompletion)}
+                </div>
+                <div className="text-xs text-muted-foreground">Completion</div>
+              </div>
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className="text-sm font-medium text-foreground">
+                  {data.lastActivity}
+                </div>
+                <div className="text-xs text-muted-foreground">Last Activity</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-emerald-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col text-white animate-in fade-in duration-200 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-lg">Startup Deep Dive</span>
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+          <div className="h-full">
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Startup Analytics Deep Dive</h3>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+              {/* Category Breakdown */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Target className="w-4 h-4 mr-2" />
+                    Category Progress
+                  </h4>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={categoryData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                        <XAxis dataKey="name" fontSize={9} stroke="white" />
+                        <YAxis domain={[0, 100]} fontSize={9} stroke="white" />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            border: '1px solid #ffffff40',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            color: 'white'
+                          }}
+                        />
+                        <Bar dataKey="completion" fill="#60a5fa" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Brain className="w-4 h-4 mr-2" />
+                    Startup Metrics
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Overall Completion:</span>
+                      <span className="font-medium text-blue-300">{formatPercentage(data.overallCompletion)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Risk Level:</span>
+                      <span className={cn("font-medium", getRiskColor(data.riskLevel))}>{data.riskLevel}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Days to Mobilization:</span>
+                      <span className="font-medium text-green-400">{data.daysToMobilization} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Current Phase:</span>
+                      <span className="font-medium text-purple-300">{data.projectPhase}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Details or Portfolio View */}
+              <div className="space-y-4">
+                {userRole === 'project-manager' ? (
+                  <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                    <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                      <Building2 className="w-4 h-4 mr-2" />
+                      Project Details
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Project:</span>
+                        <span className="font-medium text-blue-300">{data.drillDown.projectDetails?.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Mobilization:</span>
+                        <span className="font-medium text-green-400">{data.drillDown.projectDetails?.mobDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Contract Value:</span>
+                        <span className="font-medium text-purple-300">{formatCurrency(data.drillDown.projectDetails?.contractValue)}</span>
+                      </div>
+                      <div className="pt-2 border-t border-white/20">
+                        <div className="text-sm font-medium mb-1">Critical Tasks:</div>
+                        {data.drillDown.criticalTasks?.map((task, index) => (
+                          <div key={index} className="text-xs text-red-300">
+                            • {task.task} {task.daysOverdue > 0 && `(${task.daysOverdue}d overdue)`}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : userRole === 'project-executive' ? (
+                  <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                    <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                      <Building2 className="w-4 h-4 mr-2" />
+                      Portfolio Status
+                    </h4>
+                    <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
+                      {data.drillDown.projectPerformance?.slice(0, 4).map((project, index) => (
+                        <div key={index} className="flex justify-between items-center border-b border-white/20 pb-1">
+                          <div className="flex-1">
+                            <div className="font-medium text-blue-300">{project.project}</div>
+                            <div className="text-white/70">{formatPercentage(project.completion)} • {project.phase}</div>
+                          </div>
+                          <Badge className={cn("text-xs", 
+                            project.status === 'Excellent' ? 'bg-green-200 text-green-800' :
+                            project.status === 'Good' ? 'bg-blue-200 text-blue-800' :
+                            project.status === 'Attention' ? 'bg-yellow-200 text-yellow-800' :
+                            'bg-red-200 text-red-800'
+                          )}>
+                            {project.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                    <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      Portfolio Metrics
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Avg Mobilization:</span>
+                        <span className="font-medium text-blue-300">{data.drillDown.portfolioMetrics?.avgMobilizationTime} days</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>On-Time Startups:</span>
+                        <span className="font-medium text-green-400">{data.drillDown.portfolioMetrics?.onTimeStartups}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Permit Success:</span>
+                        <span className="font-medium text-purple-300">{data.drillDown.portfolioMetrics?.permitSuccess}%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Key Insights
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Startup Health:</span>
+                      <span className={cn("font-medium", getStatusColor(data.overallCompletion))}>
+                        {data.overallCompletion >= 90 ? 'Excellent' : data.overallCompletion >= 75 ? 'Good' : 'Needs Attention'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Critical Items:</span>
+                      <span className="font-medium text-red-400">{data.criticalItems} items</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Completion Rate:</span>
+                      <span className="font-medium text-green-400">{Math.round((data.completedItems / data.totalItems) * 100)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            {/* Categories Breakdown */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <Clipboard className="w-4 h-4 mr-2" />
-                Category Details
-              </h4>
-              <div className="space-y-2 text-xs">
-                {data.categories.map((cat) => (
-                  <div key={cat.name} className="flex justify-between items-center">
-                    <span className="text-emerald-200">{cat.name}:</span>
-                    <div className="text-right">
-                      <div className="font-medium">{cat.completed}/{cat.total} • {formatPercentage(cat.completion)}</div>
-                      {cat.critical > 0 && (
-                        <div className="text-red-300">⚠ {cat.critical} critical</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Visual Progress Chart */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Category Completion
-              </h4>
-              <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData}>
-                    <Bar dataKey="completion" fill="hsl(var(--chart-1))" radius={[2, 2, 0, 0]} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                    <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(0,0,0,0.8)', 
-                        border: 'none', 
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Project Details or Portfolio View */}
-            {userRole === 'project-manager' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project: {data.drillDown.projectDetails?.name}
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-emerald-200">Mob Target:</span>
-                    <span className="font-medium">{data.drillDown.projectDetails?.mobDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-emerald-200">Contract Value:</span>
-                    <span className="font-medium">{formatCurrency(data.drillDown.projectDetails?.contractValue)}</span>
-                  </div>
-                  <div className="pt-2 border-t border-emerald-700">
-                    <div className="text-emerald-200 mb-1">Critical Tasks:</div>
-                    {data.drillDown.criticalTasks?.map((task, index) => (
-                      <div key={index} className="text-emerald-300 text-xs">
-                        • {task.task} {task.daysOverdue > 0 && `(${task.daysOverdue}d overdue)`}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : userRole === 'project-executive' ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project Status (6 Projects)
-                </h4>
-                <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                  {data.drillDown.projectPerformance?.map((project, index) => (
-                    <div key={index} className="flex justify-between items-center border-b border-emerald-800 pb-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-emerald-200">{project.project}</div>
-                        <div className="text-emerald-300">{formatPercentage(project.completion)} • {project.phase}</div>
-                        {project.critical > 0 && (
-                          <div className="text-red-300">⚠ {project.critical} critical items</div>
-                        )}
-                      </div>
-                      <Badge className={`text-xs ${
-                        project.status === 'Excellent' ? 'bg-green-200 text-green-800' :
-                        project.status === 'Good' ? 'bg-blue-200 text-blue-800' :
-                        project.status === 'Attention' ? 'bg-yellow-200 text-yellow-800' :
-                        'bg-red-200 text-red-800'
-                      }`}>
-                        {project.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  Portfolio Risks
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {(data.drillDown.portfolioRisks || []).map((risk, index) => (
-                    <div key={index} className="text-emerald-300">• {risk}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Additional Project Executive Section */}
-            {userRole === 'project-executive' && (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <CalendarCheck className="w-4 h-4 mr-2" />
-                  Upcoming Milestones
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {data.drillDown.upcomingDeadlines?.map((deadline, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <div className="font-medium text-emerald-200">{deadline.project}</div>
-                        <div className="text-emerald-300">{deadline.milestone}</div>
-                      </div>
-                      <span className="text-yellow-300 text-xs">{deadline.dueDate}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Key Insights */}
-            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 flex items-center text-sm">
-                <Award className="w-4 h-4 mr-2" />
-                Key Insights
-              </h4>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-emerald-200">Startup Health:</span>
-                  <Badge className={`${getStatusColor(data.overallCompletion)} bg-white/20 dark:bg-black/20 text-xs`}>
-                    {data.overallCompletion >= 90 ? 'Excellent' : data.overallCompletion >= 75 ? 'Good' : 'Needs Attention'}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-emerald-200">Risk Level:</span>
-                  <span className={`font-medium ${getRiskColor(data.riskLevel)}`}>{data.riskLevel}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-emerald-200">Days to Mobilize:</span>
-                  <span className="font-medium">{data.daysToMobilization} days</span>
-                </div>
-              </div>
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

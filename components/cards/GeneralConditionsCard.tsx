@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, TrendingUp, TrendingDown, Calculator, Target, ChevronRight, Settings } from "lucide-react";
+import { Wrench, TrendingUp, TrendingDown, Calculator, Target, ChevronRight, Settings, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from "recharts";
 
 interface GeneralConditionsCardProps {
   config?: any;
@@ -120,14 +121,19 @@ export default function GeneralConditionsCard({ config, span, isCompact, userRol
     return variance < 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
   };
 
+  const chartData = [
+    { name: 'Original', value: data.originalGCEstimate },
+    { name: 'Current', value: data.currentGCEstimate },
+  ];
+
   return (
     <div 
-      className="h-full flex flex-col bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 overflow-hidden relative transition-all duration-300"
+      className="h-full flex flex-col bg-transparent overflow-hidden relative transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-blue-200 dark:border-blue-800">
+      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 backdrop-blur-sm border-b border-gray-300 dark:border-gray-500">
         <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
           <div className="text-center">
             <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-green-700">{formatPercentage(data.avgSavingsPercent)}</div>
@@ -141,29 +147,29 @@ export default function GeneralConditionsCard({ config, span, isCompact, userRol
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
-        {/* GC Estimate Comparison */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto space-y-2">
+        {/* Cost Chart */}
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
           <div className="flex items-center gap-2 mb-2">
-            <Calculator className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-foreground">GC Estimates</span>
+            <BarChart3 className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">Cost Overview</span>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Original</span>
-              <span className="font-medium">{formatCurrency(data.originalGCEstimate)}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Current</span>
-              <span className="font-medium">{formatCurrency(data.currentGCEstimate)}</span>
-            </div>
+          <div className="h-24 sm:h-32">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Variance Analysis */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
           <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Target className="h-4 w-4 text-foreground" />
             <span className="text-sm font-medium text-foreground">Variance Analysis</span>
           </div>
           <div className="flex items-center justify-between">
@@ -183,17 +189,17 @@ export default function GeneralConditionsCard({ config, span, isCompact, userRol
         </div>
 
         {/* Project Performance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
           <div className="flex items-center gap-2 mb-2">
-            <Wrench className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Wrench className="h-4 w-4 text-foreground" />
             <span className="text-sm font-medium text-foreground">Project Performance</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="text-center p-2 bg-green-50 dark:bg-green-950/30 rounded border border-green-200 dark:border-green-800">
+            <div className="text-center p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
               <div className="text-sm font-bold text-green-700">{data.projectsWithSavings}</div>
               <div className="text-xs text-green-600 dark:text-green-400">Under Budget</div>
             </div>
-            <div className="text-center p-2 bg-red-50 dark:bg-red-950/30 rounded border border-red-200 dark:border-red-800">
+            <div className="text-center p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
               <div className="text-sm font-bold text-red-700">{data.projectsOverBudget}</div>
               <div className="text-xs text-red-600 dark:text-red-400">Over Budget</div>
             </div>
@@ -201,9 +207,9 @@ export default function GeneralConditionsCard({ config, span, isCompact, userRol
         </div>
 
         {/* Total Impact */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingDown className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <TrendingDown className="h-4 w-4 text-foreground" />
             <span className="text-sm font-medium text-foreground">Total Impact</span>
           </div>
           <div className="text-center">
@@ -211,71 +217,48 @@ export default function GeneralConditionsCard({ config, span, isCompact, userRol
               {formatCurrency(data.totalSavings)}
             </div>
             <div className="text-xs text-muted-foreground">Total Portfolio Savings</div>
-            <Badge className="bg-green-100 text-green-700 text-xs mt-1">
+            <Badge className="bg-gray-300 dark:bg-gray-500 text-green-700 text-xs mt-1">
               {formatPercentage((Math.abs(data.gcVariance) / data.originalGCEstimate) * 100)} Reduction
             </Badge>
           </div>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
+      {/* Hover Drill-Down Overlay - using gray theme */}
       {isHovered && (
-        <div className="absolute inset-0 bg-blue-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-3 flex flex-col justify-center text-white animate-in fade-in duration-200 z-10">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">GC Cost Breakdown</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <ChevronRight className="h-4 w-4" style={{ color: '#FA4616' }} />
+                <span className="font-semibold text-sm">GC/GR Deep Analysis</span>
+              </div>
             </div>
             
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-blue-200">Best Performer:</span>
-                <span className="font-medium text-green-300">{data.drillDown.topSavingsProject}</span>
+              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                <span className="text-gray-200">Original GC Budget:</span>
+                <span className="font-medium">{formatCurrency(data.originalGCEstimate)}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                <span className="text-gray-200">Current GC Forecast:</span>
+                <span className="font-medium">{formatCurrency(data.currentGCEstimate)}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                <span className="text-gray-200">Projects Under Budget:</span>
+                <span className="font-medium text-green-400">{data.projectsWithSavings}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                <span className="text-gray-200">Projects Over Budget:</span>
+                <span className="font-medium text-red-400">{data.projectsOverBudget}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                <span className="text-gray-200">Utilization Rate:</span>
+                <span className="font-medium">{data.gcUtilizationRate}%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-blue-200">Needs Attention:</span>
-                <span className="font-medium text-red-300">{data.drillDown.biggestOverrun}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-200">Cost per Sq Ft:</span>
-                <span className="font-medium">${data.drillDown.avgCostPerSqFt}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-200">Industry Benchmark:</span>
-                <span className="font-medium text-green-300">${data.drillDown.benchmarkComparison} (17% better)</span>
-              </div>
-            </div>
-
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-blue-700">
-              <div className="flex items-center gap-1 mb-2">
-                <Settings className="h-3 w-3" />
-                <span className="text-xs font-medium text-blue-200">Category Analysis</span>
-              </div>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-blue-300">Supervision:</span>
-                  <span className="text-green-300">{formatCurrency(Math.abs(data.drillDown.categories.supervision.variance))} saved</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-blue-300">Equipment:</span>
-                  <span className="text-green-300">{formatCurrency(Math.abs(data.drillDown.categories.equipment.variance))} saved</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-blue-300">Temporary:</span>
-                  <span className="text-green-300">{formatCurrency(Math.abs(data.drillDown.categories.temporary.variance))} saved</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-blue-700">
-              <div className="text-xs font-medium text-blue-200 mb-2">Key Efficiency Gains</div>
-              <div className="space-y-1">
-                {data.drillDown.efficiencyGains.map((gain, index) => (
-                  <div key={index} className="text-xs flex items-center gap-2">
-                    <div className="w-1 h-1 bg-blue-300 rounded-full"></div>
-                    <span>{gain}</span>
-                  </div>
-                ))}
+                <span className="text-gray-200">Net Savings:</span>
+                <span className="font-medium text-green-400">{formatCurrency(Math.abs(data.gcVariance))}</span>
               </div>
             </div>
           </div>

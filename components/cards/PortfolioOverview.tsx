@@ -124,23 +124,28 @@ export default function PortfolioOverview({ config, span, isCompact = false }: P
     <div 
       className="relative h-full"
     >
+      {/* Drill Down Button - positioned outside overlay coverage */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowDrillDown(!showDrillDown);
+        }}
+        className={cn(
+          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+          showDrillDown 
+            ? "bg-blue-600 text-white shadow-md" 
+            : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50"
+        )}
+      >
+        <Brain className="h-3 w-3" />
+        {showDrillDown ? "Close Analysis" : "Drill Down"}
+      </button>
+
       <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 overflow-hidden">
       {/* Key Metrics Header */}
       <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-blue-200 dark:border-blue-800">
-        <div className="flex justify-end mb-2">
-          <button
-            onClick={() => setShowDrillDown(!showDrillDown)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
-              showDrillDown 
-                ? "bg-blue-600 text-white shadow-md" 
-                : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-            )}
-          >
-            <Brain className="h-3 w-3" />
-            {showDrillDown ? "Close Analysis" : "Drill Down"}
-          </button>
-        </div>
+        {/* Empty space for button */}
+        <div className="mb-2"></div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
