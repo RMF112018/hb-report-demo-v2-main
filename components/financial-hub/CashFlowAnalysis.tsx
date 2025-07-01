@@ -189,7 +189,206 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
       case "overview":
         return (
           <div className="space-y-6">
-            {/* Cash Flow Performance Chart */}
+            {/* 1. Owner vs Vendor Payment Trends (Chart) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-purple-600" />
+                  Owner vs Vendor Payment Trends
+                </CardTitle>
+                <CardDescription>Visual comparison of payment flows over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <ComposedChart data={ownerVendorComparison}>
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis dataKey="month" />
+                    <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
+                    <Bar dataKey="ownerPayments" fill="#10b981" name="Owner Payments" />
+                    <Bar dataKey="vendorSubPayments" fill="#ef4444" name="Vendor/Sub Payments" />
+                    <Line 
+                      type="monotone" 
+                      dataKey="netDelta" 
+                      stroke="#8b5cf6" 
+                      strokeWidth={3}
+                      name="Net Delta"
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* 2. Payment Timing Analysis */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Timer className="h-5 w-5 text-orange-600" />
+                    Payment Timing Metrics
+                  </CardTitle>
+                  <CardDescription>Average processing and delay times</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                          {paymentTimingMetrics.averageOwnerDelayDays}
+                        </div>
+                        <p className="text-sm text-muted-foreground">Days</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Avg Owner Payment Delay
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                          {paymentTimingMetrics.averageVendorPaymentLagDays}
+                        </div>
+                        <p className="text-sm text-muted-foreground">Days</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Avg Vendor Payment Lag
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {paymentTimingMetrics.onTimePaymentRate}%
+                      </div>
+                      <p className="text-sm text-muted-foreground">On-Time Payment Rate</p>
+                      <Progress value={paymentTimingMetrics.onTimePaymentRate} className="mt-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 3. Payment Performance Insights */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-indigo-600" />
+                    Payment Performance Insights
+                  </CardTitle>
+                  <CardDescription>Key insights and recommendations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <HandCoins className="h-5 w-5 text-indigo-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Cash Flow Gap</p>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                          {paymentTimingMetrics.averageOwnerDelayDays - paymentTimingMetrics.averageVendorPaymentLagDays} day gap between receiving owner payments and paying vendors
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Clock className="h-5 w-5 text-indigo-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Payment Efficiency</p>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                          {paymentTimingMetrics.onTimePaymentRate >= 80 ? 'Good' : 'Needs Improvement'} payment performance with {paymentTimingMetrics.onTimePaymentRate}% on-time rate
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Working Capital Impact</p>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+                          Payment timing affects working capital by approximately {formatCurrency(workingCapital * 0.15)} monthly
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* 4. Monthly Owner vs Vendor Payments Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  Monthly Owner vs Vendor Payments
+                </CardTitle>
+                <CardDescription>
+                  Comparison of owner payments received vs vendor/subcontractor payments made
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left p-3 font-medium">Month</th>
+                        <th className="text-right p-3 font-medium">Owner Payments</th>
+                        <th className="text-right p-3 font-medium">Vendor/Sub Payments</th>
+                        <th className="text-right p-3 font-medium">Net Delta</th>
+                        <th className="text-right p-3 font-medium">% Variance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ownerVendorComparison.map((row, index) => (
+                        <tr 
+                          key={index} 
+                          className={`border-b border-border/50 ${
+                            row.isSignificantSpread ? 'bg-amber-50 dark:bg-amber-950/20' : ''
+                          }`}
+                        >
+                          <td className="p-3 font-medium">{row.month}</td>
+                          <td className="p-3 text-right text-green-600 dark:text-green-400">
+                            {formatCurrency(row.ownerPayments)}
+                          </td>
+                          <td className="p-3 text-right text-red-600 dark:text-red-400">
+                            {formatCurrency(row.vendorSubPayments)}
+                          </td>
+                          <td className={`p-3 text-right font-medium ${
+                            row.netDelta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                          }`}>
+                            {row.netDelta >= 0 ? '+' : ''}{formatCurrency(row.netDelta)}
+                          </td>
+                          <td className={`p-3 text-right font-medium ${
+                            row.percentVariance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                          }`}>
+                            {row.percentVariance >= 0 ? '+' : ''}{row.percentVariance.toFixed(1)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Summary Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.ownerPayments, 0))}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Total Owner Payments</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.vendorSubPayments, 0))}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Total Vendor/Sub Payments</p>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-2xl font-bold ${
+                      ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0) >= 0 
+                        ? 'text-green-600 dark:text-green-400' 
+                        : 'text-red-600 dark:text-red-400'
+                    }`}>
+                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0))}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Net Delta</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rest remains unchanged - Cash Flow Performance Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -288,15 +487,6 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <TrendingUp className="h-4 w-4 text-green-600" /> :
                           <TrendingDown className="h-4 w-4 text-yellow-600" />
                         }
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Forecast Accuracy</span>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={forecastAccuracy >= 0.9 ? "default" : "secondary"}>
-                          {(forecastAccuracy * 100).toFixed(1)}%
-                        </Badge>
                       </div>
                     </div>
                     
@@ -653,220 +843,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
         </Card>
       </CollapseWrapper>
 
-      {/* Owner vs Vendor Cash Flow Comparison */}
-      <CollapseWrapper
-        title="Owner vs Vendor Cash Flow Analysis"
-        subtitle="Comparative analysis of owner inflows vs vendor/subcontractor outflows"
-        defaultCollapsed={false}
-      >
-        <div className="space-y-6">
-          {/* Comparison Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                Monthly Owner vs Vendor Payments
-              </CardTitle>
-              <CardDescription>
-                Comparison of owner payments received vs vendor/subcontractor payments made
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left p-3 font-medium">Month</th>
-                      <th className="text-right p-3 font-medium">Owner Payments</th>
-                      <th className="text-right p-3 font-medium">Vendor/Sub Payments</th>
-                      <th className="text-right p-3 font-medium">Net Delta</th>
-                      <th className="text-right p-3 font-medium">% Variance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ownerVendorComparison.map((row, index) => (
-                      <tr 
-                        key={index} 
-                        className={`border-b border-border/50 ${
-                          row.isSignificantSpread ? 'bg-amber-50 dark:bg-amber-950/20' : ''
-                        }`}
-                      >
-                        <td className="p-3 font-medium">{row.month}</td>
-                        <td className="p-3 text-right text-green-600 dark:text-green-400">
-                          {formatCurrency(row.ownerPayments)}
-                        </td>
-                        <td className="p-3 text-right text-red-600 dark:text-red-400">
-                          {formatCurrency(row.vendorSubPayments)}
-                        </td>
-                        <td className={`p-3 text-right font-medium ${
-                          row.netDelta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                        }`}>
-                          {row.netDelta >= 0 ? '+' : ''}{formatCurrency(row.netDelta)}
-                        </td>
-                        <td className={`p-3 text-right font-medium ${
-                          row.percentVariance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                        }`}>
-                          {row.percentVariance >= 0 ? '+' : ''}{row.percentVariance.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              {/* Summary Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.ownerPayments, 0))}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Total Owner Payments</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                    {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.vendorSubPayments, 0))}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Total Vendor/Sub Payments</p>
-                </div>
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${
-                    ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0) >= 0 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-red-600 dark:text-red-400'
-                  }`}>
-                    {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0))}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Net Delta</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Visual Chart for Owner vs Vendor */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-purple-600" />
-                Owner vs Vendor Payment Trends
-              </CardTitle>
-              <CardDescription>Visual comparison of payment flows over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart data={ownerVendorComparison}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="month" />
-                  <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
-                  <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
-                  <Bar dataKey="ownerPayments" fill="#10b981" name="Owner Payments" />
-                  <Bar dataKey="vendorSubPayments" fill="#ef4444" name="Vendor/Sub Payments" />
-                  <Line 
-                    type="monotone" 
-                    dataKey="netDelta" 
-                    stroke="#8b5cf6" 
-                    strokeWidth={3}
-                    name="Net Delta"
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-      </CollapseWrapper>
-
-      {/* Payment Timing Analysis */}
-      <CollapseWrapper
-        title="Payment Timing Analysis"
-        subtitle="Analysis of payment delays and processing times"
-        defaultCollapsed={false}
-      >
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Payment Timing Metrics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Timer className="h-5 w-5 text-orange-600" />
-                Payment Timing Metrics
-              </CardTitle>
-              <CardDescription>Average processing and delay times</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
-                      {paymentTimingMetrics.averageOwnerDelayDays}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Days</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Avg Owner Payment Delay
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                      {paymentTimingMetrics.averageVendorPaymentLagDays}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Days</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Avg Vendor Payment Lag
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {paymentTimingMetrics.onTimePaymentRate}%
-                  </div>
-                  <p className="text-sm text-muted-foreground">On-Time Payment Rate</p>
-                  <Progress value={paymentTimingMetrics.onTimePaymentRate} className="mt-2" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Payment Performance Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-indigo-600" />
-                Payment Performance Insights
-              </CardTitle>
-              <CardDescription>Key insights and recommendations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <HandCoins className="h-5 w-5 text-indigo-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Cash Flow Gap</p>
-                    <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                      {paymentTimingMetrics.averageOwnerDelayDays - paymentTimingMetrics.averageVendorPaymentLagDays} day gap between receiving owner payments and paying vendors
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-indigo-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Payment Efficiency</p>
-                    <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                      {paymentTimingMetrics.onTimePaymentRate >= 80 ? 'Good' : 'Needs Improvement'} payment performance with {paymentTimingMetrics.onTimePaymentRate}% on-time rate
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Working Capital Impact</p>
-                    <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                      Payment timing affects working capital by approximately {formatCurrency(workingCapital * 0.15)} monthly
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </CollapseWrapper>
 
       {/* Main Content Area */}
       {renderContent()}

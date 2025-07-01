@@ -367,12 +367,6 @@ export default function FinancialHubPage() {
           value: "45 Days",
           label: "Avg Collection",
           color: "amber"
-        },
-        {
-          icon: Activity,
-          value: "94.2%",
-          label: "Forecast Accuracy",
-          color: "emerald"
         }
       ],
       "cost-tracking": [
