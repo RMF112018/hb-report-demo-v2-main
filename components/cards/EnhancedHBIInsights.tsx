@@ -227,7 +227,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
             )}
           >
             <Brain className="h-3 w-3" />
-            {showDrillDown ? "Close Analysis" : "Drill Down"}
+            {showDrillDown ? "Hide Drill Down" : "Drill Down"}
           </button>
         </div>
         
@@ -314,7 +314,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
       )}
       </div>
 
-      {/* Hover Drill-Down Overlay */}
+      {/* Click-Based Drill-Down Overlay */}
       {showDrillDown && (
         <div className="absolute inset-0 bg-purple-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
           <div className="h-full">
