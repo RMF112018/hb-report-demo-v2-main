@@ -192,48 +192,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         </Button>
       </div>
 
-      {/* Summary Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800">
-          <CardContent className="p-4 text-center">
-            <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {formatCurrency(totals.total_ar)}
-            </div>
-            <div className="text-sm text-blue-600 dark:text-blue-400">Total AR</div>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 border-green-200 dark:border-green-800">
-          <CardContent className="p-4 text-center">
-            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
-              {formatCurrency(totals.current)}
-            </div>
-            <div className="text-sm text-green-600 dark:text-green-400">Current</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/50 dark:to-yellow-900/30 border-yellow-200 dark:border-yellow-800">
-          <CardContent className="p-4 text-center">
-            <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
-              {formatCurrency(totals.days_1_30 + totals.days_31_60)}
-            </div>
-            <div className="text-sm text-yellow-600 dark:text-yellow-400">1-60 Days</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/30 border-red-200 dark:border-red-800">
-          <CardContent className="p-4 text-center">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-red-900 dark:text-red-100">
-              {formatCurrency(totals.days_60_plus)}
-            </div>
-            <div className="text-sm text-red-600 dark:text-red-400">60+ Days</div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* AR Aging Table */}
       <Card>

@@ -536,58 +536,7 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
         />
       </div>
 
-      {/* Collapsible KPI Metrics */}
-      <CollapseWrapper
-        title="Change Order Metrics"
-        subtitle="Real-time change order performance indicators"
-        defaultCollapsed={false}
-      >
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Approved</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-900 dark:text-green-100">{data.approved}</div>
-              <div className="text-xs text-green-600 dark:text-green-400">{formatCurrency(data.approvedValue)}</div>
-            </CardContent>
-          </Card>
 
-          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 border-yellow-200 dark:border-yellow-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">{data.pending}</div>
-              <div className="text-xs text-yellow-600 dark:text-yellow-400">{formatCurrency(data.pendingValue)}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300">Rejected</CardTitle>
-              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-900 dark:text-red-100">{data.rejected}</div>
-              <div className="text-xs text-red-600 dark:text-red-400">Denied requests</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Value</CardTitle>
-              <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{formatCurrency(data.totalValue)}</div>
-              <div className="text-xs text-blue-600 dark:text-blue-400">All change orders</div>
-            </CardContent>
-          </Card>
-        </div>
-      </CollapseWrapper>
 
       {/* Collapsible HBI Intelligence */}
       <CollapseWrapper
