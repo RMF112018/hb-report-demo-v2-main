@@ -678,13 +678,15 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     onSave, 
     type = 'text', 
     className = '', 
-    options = null 
+    options = null,
+    isWeight = false
   }: { 
     value: any; 
     onSave: (value: any) => void; 
     type?: 'text' | 'number' | 'select' | 'date';
     className?: string;
     options?: { value: string; label: string }[] | null;
+    isWeight?: boolean;
   }) => {
     const fieldKey = `${type}-${value}`;
     const isEditing = editingField === fieldKey;
@@ -726,6 +728,28 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         );
       }
       
+      if (isWeight) {
+        return (
+          <div className="flex items-center gap-2 w-32">
+            <Slider
+              value={[editValue]}
+              onValueChange={(value) => setEditValue(value[0])}
+              min={1}
+              max={10}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-xs font-medium w-4 text-center">{editValue}</span>
+            <Button size="sm" onClick={handleSave} className="h-6 w-6 p-0">
+              <CheckCircle className="h-3 w-3" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCancel} className="h-6 w-6 p-0">
+              ✕
+            </Button>
+          </div>
+        );
+      }
+      
       return (
         <div className="flex items-center gap-1">
           <Input
@@ -754,7 +778,9 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         className={`flex items-center gap-1 cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group ${className}`}
         onClick={() => setEditingField(fieldKey)}
       >
-        <span className="text-xs">{type === 'number' && typeof value === 'number' ? formatCurrency(value) : value}</span>
+        <span className="text-xs">
+          {type === 'number' && typeof value === 'number' && !isWeight ? formatCurrency(value) : value}
+        </span>
         <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
       </div>
     );
@@ -858,6 +884,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               value={record.weight}
               onSave={(value) => updateRecord(record.id, 'weight', value)}
               type="number"
+              isWeight={true}
             />
           </td>
           {monthlyColumns.map(month => (
