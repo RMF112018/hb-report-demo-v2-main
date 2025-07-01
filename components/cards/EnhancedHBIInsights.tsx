@@ -36,7 +36,7 @@ interface EnhancedHBIInsightsProps {
 export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps) {
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDrillDown, setShowDrillDown] = useState(false);
 
   // Handle both array and object config formats
   const insights = Array.isArray(config) ? config : [];
@@ -202,8 +202,6 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
   return (
     <div 
       className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       data-tour="hbi-insights"
     >
       <div className="h-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 overflow-hidden">
@@ -219,6 +217,18 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
               {avgConfidence}% Avg Confidence
             </div>
           </div>
+          <button
+            onClick={() => setShowDrillDown(!showDrillDown)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+              showDrillDown 
+                ? "bg-purple-600 text-white shadow-md" 
+                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50"
+            )}
+          >
+            <Brain className="h-3 w-3" />
+            {showDrillDown ? "Close Analysis" : "Drill Down"}
+          </button>
         </div>
         
         {/* Compact Stats */}
@@ -305,7 +315,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
       </div>
 
       {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {showDrillDown && (
         <div className="absolute inset-0 bg-purple-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
           <div className="h-full">
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">AI Intelligence Deep Analysis</h3>
