@@ -40,6 +40,7 @@ import FinancialOverview from "@/components/financial-hub/FinancialOverview";
 import BudgetAnalysis from "@/components/financial-hub/BudgetAnalysis";
 import CashFlowAnalysis from "@/components/financial-hub/CashFlowAnalysis";
 import { PayApplication } from "@/components/financial-hub/PayApplication";
+import ARAgingCard from "@/components/financial-hub/ARAgingCard";
 
 import ChangeManagement from "@/components/financial-hub/ChangeManagement";
 import CostTracking from "@/components/financial-hub/CostTracking";
@@ -162,6 +163,13 @@ export default function FinancialHubPage() {
       icon: Banknote,
       description: "Retention tracking and release management",
       component: RetentionManagement,
+    },
+    {
+      id: "ar-aging",
+      label: "AR Aging",
+      icon: CreditCard,
+      description: "Accounts receivable aging analysis and collection management",
+      component: ARAgingCard,
     },
   ];
 
