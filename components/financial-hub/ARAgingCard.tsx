@@ -155,104 +155,89 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
   // Get row styling based on aging status
   const getRowStyling = (item: ARAgingItem) => {
     if (item.days_60_plus > 0) {
-      return "bg-red-50 border-l-4 border-l-red-500"; // Red highlight for 60+ days
+      return "bg-red-50 dark:bg-red-950/20 border-l-4 border-l-red-500 dark:border-l-red-400"; // Red highlight for 60+ days
     }
     if (item.days_1_30 > 0 || item.days_31_60 > 0) {
-      return "bg-yellow-50 border-l-4 border-l-yellow-500"; // Yellow highlight for 1-60 days
+      return "bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-l-yellow-500 dark:border-l-yellow-400"; // Yellow highlight for 1-60 days
     }
     return ""; // Default styling
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Card */}
+      {/* Controls and Export */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search project, manager, or comments..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="px-3 py-1">
+              {processedARData.length} Record{processedARData.length !== 1 ? 's' : ''}
+            </Badge>
+            <Badge variant="outline" className="px-3 py-1 bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+              DEMO
+            </Badge>
+          </div>
+        </div>
+        <Button variant="outline" onClick={exportToCSV} size="sm">
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+
+      {/* Summary Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-4 text-center">
+            <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+              {formatCurrency(totals.total_ar)}
+            </div>
+            <div className="text-sm text-blue-600 dark:text-blue-400">Total AR</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 border-green-200 dark:border-green-800">
+          <CardContent className="p-4 text-center">
+            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+              {formatCurrency(totals.current)}
+            </div>
+            <div className="text-sm text-green-600 dark:text-green-400">Current</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/50 dark:to-yellow-900/30 border-yellow-200 dark:border-yellow-800">
+          <CardContent className="p-4 text-center">
+            <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+              {formatCurrency(totals.days_1_30 + totals.days_31_60)}
+            </div>
+            <div className="text-sm text-yellow-600 dark:text-yellow-400">1-60 Days</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/30 border-red-200 dark:border-red-800">
+          <CardContent className="p-4 text-center">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-red-900 dark:text-red-100">
+              {formatCurrency(totals.days_60_plus)}
+            </div>
+            <div className="text-sm text-red-600 dark:text-red-400">60+ Days</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* AR Aging Table */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-                Accounts Receivable Aging – Project 2525840
-              </CardTitle>
-              <CardDescription>
-                AR aging analysis for Palm Beach Luxury Estate project
-              </CardDescription>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary" className="px-3 py-1">
-                  {processedARData.length} Record{processedARData.length !== 1 ? 's' : ''}
-                </Badge>
-                <Badge variant="outline" className="px-3 py-1 bg-blue-50 text-blue-600 border-blue-200">
-                  DEMO
-                </Badge>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={exportToCSV} size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent>
-          {/* Search Controls */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search project, manager, or comments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          {/* Summary Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardContent className="p-4 text-center">
-                <DollarSign className="h-5 w-5 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-900">
-                  {formatCurrency(totals.total_ar)}
-                </div>
-                <div className="text-sm text-blue-600">Total AR</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-              <CardContent className="p-4 text-center">
-                <TrendingUp className="h-5 w-5 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-900">
-                  {formatCurrency(totals.current)}
-                </div>
-                <div className="text-sm text-green-600">Current</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
-              <CardContent className="p-4 text-center">
-                <Clock className="h-5 w-5 text-yellow-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-yellow-900">
-                  {formatCurrency(totals.days_1_30 + totals.days_31_60)}
-                </div>
-                <div className="text-sm text-yellow-600">1-60 Days</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-              <CardContent className="p-4 text-center">
-                <AlertCircle className="h-5 w-5 text-red-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-red-900">
-                  {formatCurrency(totals.days_60_plus)}
-                </div>
-                <div className="text-sm text-red-600">60+ Days</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* AR Aging Table */}
+        <CardContent className="p-6">
           <div className="rounded-md border">
             <div className="overflow-auto max-h-[600px]">
               <Table>
@@ -299,17 +284,17 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
                         {formatCurrency(item.current)}
                       </TableCell>
                       <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_1_30 > 0 ? "text-yellow-600 font-medium" : ""}>
+                        <span className={item.days_1_30 > 0 ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""}>
                           {formatCurrency(item.days_1_30)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_31_60 > 0 ? "text-yellow-600 font-medium" : ""}>
+                        <span className={item.days_31_60 > 0 ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""}>
                           {formatCurrency(item.days_31_60)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_60_plus > 0 ? "text-red-600 font-bold" : ""}>
+                        <span className={item.days_60_plus > 0 ? "text-red-600 dark:text-red-400 font-bold" : ""}>
                           {formatCurrency(item.days_60_plus)}
                         </span>
                       </TableCell>
@@ -336,17 +321,17 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
                       {formatCurrency(totals.current)}
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_1_30 > 0 ? "text-yellow-600" : ""}>
+                      <span className={totals.days_1_30 > 0 ? "text-yellow-600 dark:text-yellow-400" : ""}>
                         {formatCurrency(totals.days_1_30)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_31_60 > 0 ? "text-yellow-600" : ""}>
+                      <span className={totals.days_31_60 > 0 ? "text-yellow-600 dark:text-yellow-400" : ""}>
                         {formatCurrency(totals.days_31_60)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_60_plus > 0 ? "text-red-600" : ""}>
+                      <span className={totals.days_60_plus > 0 ? "text-red-600 dark:text-red-400" : ""}>
                         {formatCurrency(totals.days_60_plus)}
                       </span>
                     </TableCell>
