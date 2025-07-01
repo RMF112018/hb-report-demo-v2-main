@@ -299,7 +299,7 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                 <XAxis dataKey="month" />
                 <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
                 <Tooltip
-                  formatter={(value: number) => [`$${(value / 1000).toFixed(0)}K`, ""]}
+                  formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]}
                   labelFormatter={(label) => `Month: ${label}`}
                 />
                 <Area
@@ -349,7 +349,7 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="category" />
                 <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
-                <Tooltip formatter={(value: number) => [`$${(value / 1000).toFixed(0)}K`, ""]} />
+                <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]} />
                 <Bar dataKey="budgeted" fill="#94a3b8" name="Budgeted" />
                 <Bar dataKey="actual" fill="#3b82f6" name="Actual" />
               </BarChart>

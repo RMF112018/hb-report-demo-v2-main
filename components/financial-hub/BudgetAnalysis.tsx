@@ -427,7 +427,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip 
-                      formatter={(value: number) => [`$${(value / 1000000).toFixed(1)}M`, ""]}
+                      formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]}
                       labelFormatter={(label) => `Month: ${label}`}
                     />
                     <Bar dataKey="budgeted" fill="#3b82f6" name="Budgeted" opacity={0.6} />
@@ -551,7 +551,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="mt-4 space-y-2">
@@ -583,7 +583,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis type="number" tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
                     <YAxis dataKey="category" type="category" width={100} />
-                    <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                     <Bar dataKey="budgeted" fill="#3b82f6" name="Budgeted" />
                     <Bar dataKey="actual" fill="#10b981" name="Actual" />
                   </BarChart>
@@ -659,7 +659,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(value: number) => `$${(value / 1000).toFixed(0)}K`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]} />
                     <Line 
                       type="monotone" 
                       dataKey="variance" 
@@ -687,7 +687,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis domain={[0.8, 1.2]} />
-                    <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                    <Tooltip formatter={(value: number, name: string) => [value.toFixed(2), name]} />
                     <Line 
                       type="monotone" 
                       dataKey="cpi" 

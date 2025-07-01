@@ -493,6 +493,97 @@ export const projectManagerStaffingTour: TourDefinition = {
   ]
 }
 
+// Financial Hub Tour Definition
+export const financialHubTour: TourDefinition = {
+  id: 'financial-hub-overview',
+  name: 'Financial Hub Tour',
+  description: 'Complete guide to financial management and analysis tools',
+  page: 'financial-hub',
+  steps: [
+    {
+      id: 'financial-welcome',
+      title: 'Welcome to the Financial Hub!',
+      content: 'The Financial Hub is your central command center for all financial management and analysis. Access comprehensive tools for budget tracking, cash flow analysis, and financial reporting.',
+      target: '[data-tour="financial-hub-header"]',
+      placement: 'center',
+      nextButton: 'Start Tour',
+      showSkip: true
+    },
+    {
+      id: 'quick-stats',
+      title: 'Financial Overview',
+      content: 'These key financial metrics provide an at-a-glance view of your project\'s financial health:<br/><br/>• <strong>Contract Value</strong> - Total project value<br/>• <strong>Net Cash Flow</strong> - Current cash position<br/>• <strong>Profit Margin</strong> - Project profitability<br/>• <strong>Pending Approvals</strong> - Items awaiting approval<br/>• <strong>Financial Health</strong> - Overall score',
+      target: '[data-tour="financial-hub-quick-stats"]',
+      placement: 'bottom',
+      nextButton: 'Continue'
+    },
+    {
+      id: 'module-navigation',
+      title: 'Financial Modules',
+      content: 'Navigate between different financial management modules. Each tab provides specialized tools and insights:<br/><br/>• <strong>Overview</strong> - Dashboard summary<br/>• <strong>Budget Analysis</strong> - Detailed budget tracking<br/>• <strong>Cash Flow</strong> - Liquidity management<br/>• <strong>Cost Tracking</strong> - Real-time cost monitoring<br/>• <strong>Pay Applications</strong> - AIA payment processing',
+      target: '[data-tour="financial-hub-navigation"]',
+      placement: 'top',
+      nextButton: 'Next'
+    },
+    {
+      id: 'overview-module',
+      title: 'Financial Overview Module',
+      content: 'The Overview module provides a comprehensive dashboard with key metrics, cash flow trends, and budget comparisons. This is your starting point for understanding overall financial performance.',
+      target: '[data-tour="financial-hub-content-overview"]',
+      placement: 'left',
+      nextButton: 'Continue'
+    },
+    {
+      id: 'budget-analysis',
+      title: 'Budget Analysis Module',
+      content: 'Dive deep into budget performance with detailed variance analysis, category breakdowns, and forecast tracking. Monitor budget utilization and identify areas for optimization.',
+      target: '[data-tour="financial-hub-tab-budget-analysis"]',
+      placement: 'bottom',
+      nextButton: 'Next'
+    },
+    {
+      id: 'cash-flow-module',
+      title: 'Cash Flow Management',
+      content: 'Monitor cash inflows, outflows, and liquidity positions. Use forecasting tools to plan for future cash needs and maintain healthy working capital.',
+      target: '[data-tour="financial-hub-tab-cash-flow"]',
+      placement: 'bottom',
+      nextButton: 'Continue'
+    },
+    {
+      id: 'cost-tracking',
+      title: 'Real-time Cost Tracking',
+      content: 'Track costs in real-time across all categories. Monitor commitments, actual expenses, and pending costs to maintain budget control.',
+      target: '[data-tour="financial-hub-tab-cost-tracking"]',
+      placement: 'bottom',
+      nextButton: 'Next'
+    },
+    {
+      id: 'pay-applications',
+      title: 'Pay Application Processing',
+      content: 'Generate and manage formal AIA G702/G703 payment applications. Track submission status, approval workflows, and payment receipts.',
+      target: '[data-tour="financial-hub-tab-pay-authorization"]',
+      placement: 'bottom',
+      nextButton: 'Continue'
+    },
+    {
+      id: 'change-orders',
+      title: 'Change Order Management',
+      content: 'Track change orders and their financial impact. Monitor pending changes, approved modifications, and their effect on project budgets.',
+      target: '[data-tour="financial-hub-tab-change-management"]',
+      placement: 'bottom',
+      nextButton: 'Next'
+    },
+    {
+      id: 'financial-insights',
+      title: 'HBI Financial Intelligence',
+      content: 'The Financial Hub integrates AI-powered insights to help you:<br/><br/>• Identify budget variances and their causes<br/>• Predict cash flow trends<br/>• Optimize payment timing<br/>• Flag potential financial risks<br/>• Suggest cost-saving opportunities',
+      target: '[data-tour="financial-hub-content-overview"]',
+      placement: 'center',
+      nextButton: 'Complete Tour'
+    }
+  ]
+}
+
 // Export all tour definitions
 export const TOUR_DEFINITIONS: TourDefinition[] = [
   loginTour,
@@ -500,7 +591,8 @@ export const TOUR_DEFINITIONS: TourDefinition[] = [
   executiveStaffingTour,
   projectExecutiveStaffingTour,
   projectManagerStaffingTour,
-  // Note: Other tour definitions (scheduler, financial-hub, etc.) should be moved here
+  financialHubTour,
+  // Note: Other tour definitions (scheduler, etc.) should be moved here
   // from the original tour-context.tsx file. For brevity, I'm showing the pattern with just these.
 ]
 

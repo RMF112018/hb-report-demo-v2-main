@@ -596,10 +596,12 @@ export const useTourPositioning = ({ target, placement, isActive }: UseTourPosit
   useEffect(() => {
     if (!targetElement || !isActive) return
 
-    // Optimize observer scope
-    const observeTarget = targetElement.closest('[data-tour-container]') || 
-                          targetElement.parentElement || 
-                          document.body
+    // Optimize observer scope with proper null checks
+    const observeTarget = (targetElement instanceof HTMLElement && targetElement.closest) 
+      ? (targetElement.closest('[data-tour-container]') || 
+         targetElement.parentElement || 
+         document.body)
+      : document.body
 
     observerRef.current = new MutationObserver((mutations) => {
       const shouldUpdate = mutations.some(mutation => {

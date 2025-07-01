@@ -63,6 +63,7 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
     const pageToTourMap: Record<string, string> = {
       '/login': 'login-demo-accounts',
       '/dashboard': 'dashboard-overview',
+      '/dashboard/financial-hub': 'financial-hub-overview',
       '/dashboard/staff-planning': 'executive-staffing-overview',
       '/dashboard/staff-planning/executive': 'executive-staffing-overview',
       '/dashboard/staff-planning/project-executive': 'project-executive-staffing-overview',
@@ -86,7 +87,13 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
       if (!tour.page) continue
       
       // Check if current path contains the tour's page
-      if (pathSegments.includes(tour.page) || pathname.includes(`/${tour.page}`)) {
+      // Handle both exact matches and nested paths (e.g., financial-hub within dashboard)
+      const tourPageSegments = tour.page.split('-')
+      const matchesPath = pathSegments.includes(tour.page) || 
+                         pathname.includes(`/${tour.page}`) ||
+                         tourPageSegments.every(segment => pathSegments.includes(segment))
+      
+      if (matchesPath) {
         // Verify role permissions if specified
         if (!tour.userRoles || (user?.role && tour.userRoles.includes(user.role))) {
           tourLogger.debug('Found path-segment tour', { tourId: tour.id, tourPage: tour.page, pathname })
@@ -200,6 +207,7 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
       // Customize button text based on tour type
       if (selectedTour.id.includes('login')) return 'Take Login Tour'
       if (selectedTour.id.includes('dashboard')) return 'Take Dashboard Tour'
+      if (selectedTour.id.includes('financial-hub')) return 'Take Financial Hub Tour'
       if (selectedTour.id.includes('staffing')) return 'Take Staffing Tour'
     }
     

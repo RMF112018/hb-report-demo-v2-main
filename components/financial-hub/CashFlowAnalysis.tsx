@@ -252,7 +252,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip 
-                      formatter={(value: number) => [`$${(value / 1000000).toFixed(2)}M`, ""]}
+                      formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]}
                       labelFormatter={(label) => `Month: ${label}`}
                     />
                     <Area 
@@ -301,7 +301,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
-                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
                       <Line 
                         type="monotone" 
                         dataKey="workingCapital" 
@@ -400,7 +400,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="mt-4 space-y-2">
@@ -435,7 +435,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
-                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
                       <Area 
                         type="monotone" 
                         dataKey="inflows" 
@@ -481,7 +481,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="mt-4 space-y-2">
@@ -516,7 +516,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
-                      <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(2)}M`} />
+                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
                       <Area 
                         type="monotone" 
                         dataKey="outflows" 
@@ -551,7 +551,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
-                    <Tooltip formatter={(value: number) => [`$${(value / 1000000).toFixed(2)}M`, ""]} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
                     <Area 
                       type="monotone" 
                       dataKey="cumulative" 
