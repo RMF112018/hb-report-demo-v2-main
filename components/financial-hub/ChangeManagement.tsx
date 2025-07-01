@@ -542,7 +542,7 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
       <CollapseWrapper
         title="HBI Change Management Intelligence"
         subtitle="AI-powered change order insights and analysis"
-        defaultCollapsed={true}
+        defaultCollapsed={false}
       >
         <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
           <CardContent className="pt-6">

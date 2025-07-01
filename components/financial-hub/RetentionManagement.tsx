@@ -514,7 +514,7 @@ export default function RetentionManagement({ userRole, projectData }: Retention
       <CollapseWrapper
         title="HBI Retention Intelligence"
         subtitle="AI-powered retention insights and analysis"
-        defaultCollapsed={true}
+        defaultCollapsed={false}
       >
         <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
           <CardContent className="pt-6">
