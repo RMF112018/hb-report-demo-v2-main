@@ -23,7 +23,7 @@ export interface Constraint {
  * Project interface containing constraints
  */
 export interface ConstraintProject {
-  project_id: string
+  project_id: number
   name: string
   department: string
   constraints: Constraint[]
@@ -49,6 +49,7 @@ export interface ConstraintFilters {
   status: string
   category: string
   assigned: string
+  project: string
   dateRange: {
     start: Date | null
     end: Date | null

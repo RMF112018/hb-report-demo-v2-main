@@ -872,7 +872,7 @@ export default function TradePartnersPage() {
         {/* Scorecard Modal */}
         {selectedPartner && (
           <Dialog open={showScorecardModal} onOpenChange={setShowScorecardModal}>
-            <DialogContent className="w-[80vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
+            <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
               <div style={{ zIndex: 9999 }}>
                 <DialogHeader>
                   <DialogTitle className="text-[#003087] dark:text-white">
@@ -888,7 +888,7 @@ export default function TradePartnersPage() {
         {/* Reviews Modal */}
         {selectedPartner && (
           <Dialog open={showReviewsModal} onOpenChange={setShowReviewsModal}>
-            <DialogContent className="w-[70vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
+            <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
               <div style={{ zIndex: 9999 }}>
                 <DialogHeader>
                   <DialogTitle className="text-[#003087] dark:text-white">

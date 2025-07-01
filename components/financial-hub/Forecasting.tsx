@@ -301,7 +301,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
   const [forecastData, setForecastData] = useState<ForecastRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
   const [showHBIDialog, setShowHBIDialog] = useState(false);
-  const [hbiExplanation, setHBIExplanation] = useState<any>(null);
+  const [hbiExplanation, setHbiExplanation] = useState<any>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   // Chat functionality state
@@ -678,13 +678,15 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     onSave, 
     type = 'text', 
     className = '', 
-    options = null 
+    options = null,
+    isWeight = false
   }: { 
     value: any; 
     onSave: (value: any) => void; 
     type?: 'text' | 'number' | 'select' | 'date';
     className?: string;
     options?: { value: string; label: string }[] | null;
+    isWeight?: boolean;
   }) => {
     const fieldKey = `${type}-${value}`;
     const isEditing = editingField === fieldKey;
@@ -726,6 +728,28 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         );
       }
       
+      if (isWeight) {
+        return (
+          <div className="flex items-center gap-2 w-32">
+            <Slider
+              value={[editValue]}
+              onValueChange={(value) => setEditValue(value[0])}
+              min={1}
+              max={10}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-xs font-medium w-4 text-center">{editValue}</span>
+            <Button size="sm" onClick={handleSave} className="h-6 w-6 p-0">
+              <CheckCircle className="h-3 w-3" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCancel} className="h-6 w-6 p-0">
+              ✕
+            </Button>
+          </div>
+        );
+      }
+      
       return (
         <div className="flex items-center gap-1">
           <Input
@@ -754,7 +778,9 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         className={`flex items-center gap-1 cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group ${className}`}
         onClick={() => setEditingField(fieldKey)}
       >
-        <span className="text-xs">{type === 'number' && typeof value === 'number' ? formatCurrency(value) : value}</span>
+        <span className="text-xs">
+          {type === 'number' && typeof value === 'number' && !isWeight ? formatCurrency(value) : value}
+        </span>
         <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
       </div>
     );
@@ -794,25 +820,19 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             </div>
           </td>
           <td className="p-1 text-xs">
-            <Badge variant={record.forecast_method === 'HBI Forecast' ? 'default' : 'outline'} 
-                   className={record.forecast_method === 'HBI Forecast' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200' : ''}>
+            <Badge variant={record.forecast_method === 'HBI Forecast' ? 'default' : 'secondary'} 
+                   className={record.forecast_method === 'HBI Forecast' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 border-0' : 'border-0'}>
               Actual / Remaining Forecast
             </Badge>
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.budget)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.budget)}
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.cost_to_complete)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.cost_to_complete)}
           </td>
-          <td className="p-1">
-            <div className="w-24 h-8 px-2 py-1 bg-muted/50 rounded border text-xs flex items-center text-muted-foreground">
-              {formatCurrency(record.estimated_at_completion)}
-            </div>
+          <td className="p-1 text-xs text-muted-foreground">
+            {formatCurrency(record.estimated_at_completion)}
           </td>
           <td className={`p-1 text-xs font-medium ${record.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatCurrency(record.variance)}
@@ -864,6 +884,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               value={record.weight}
               onSave={(value) => updateRecord(record.id, 'weight', value)}
               type="number"
+              isWeight={true}
             />
           </td>
           {monthlyColumns.map(month => (
@@ -885,7 +906,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         <tr className="border-b bg-muted/20">
           <td className="p-2"></td>
           <td className="p-1 text-xs">
-            <Badge variant="secondary">Previous Forecast</Badge>
+            <Badge variant="secondary" className="border-0">Previous Forecast</Badge>
           </td>
           <td className="p-1 text-xs text-muted-foreground">{formatCurrency(record.budget * 0.95)}</td>
           <td className="p-1 text-xs text-muted-foreground">{formatCurrency(record.cost_to_complete * 1.05)}</td>
@@ -908,7 +929,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         <tr className="border-b bg-muted/10">
           <td className="p-2"></td>
           <td className="p-1 text-xs">
-            <Badge variant="outline">Variance</Badge>
+            <Badge variant="secondary" className="border-0">Variance</Badge>
           </td>
           <td className="p-1 text-xs font-medium text-green-600">{formatCurrency(record.budget * 0.05)}</td>
           <td className="p-1 text-xs font-medium text-red-600">{formatCurrency(record.cost_to_complete * -0.05)}</td>
@@ -1070,58 +1091,21 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         )}
       </Card>
 
-      {/* Table Toggle and Summary */}
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-            <Target className="h-5 w-5" />
-            Forecast Summary - {activeTable.toUpperCase()}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <Tabs value={activeTable} onValueChange={(value) => setActiveTable(value as "gcgr" | "draw")}>
-              <TabsList>
-                <TabsTrigger value="gcgr" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  GC & GR
-                </TabsTrigger>
-                <TabsTrigger value="draw" className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Draw
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            
-            <div className="grid gap-4 md:grid-cols-4">
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-                  {formatCurrency(calculateTotals.budget)}
-                </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400">Total Budget</p>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-purple-900 dark:text-purple-100">
-                  {formatCurrency(calculateTotals.estimated_at_completion)}
-                </div>
-                <p className="text-xs text-purple-600 dark:text-purple-400">Est. at Completion</p>
-              </div>
-              <div className="text-center">
-                <div className={`text-lg font-bold ${calculateTotals.variance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(calculateTotals.variance)}
-                </div>
-                <p className="text-xs text-muted-foreground">Total Variance</p>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                  {filteredData.length}
-                </div>
-                <p className="text-xs text-muted-foreground">Cost Codes</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Table Selection */}
+      <div className="flex items-center justify-center">
+        <Tabs value={activeTable} onValueChange={(value) => setActiveTable(value as "gcgr" | "draw")}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="gcgr" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              GC & GR Forecast
+            </TabsTrigger>
+            <TabsTrigger value="draw" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Draw Forecast
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Interactive Forecast Table */}
       <Card className={isFullscreen ? 'fixed inset-4 z-[130] overflow-auto' : ''}>

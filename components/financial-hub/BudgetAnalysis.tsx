@@ -46,6 +46,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from "@/components/ui/table";
 import {
   DropdownMenu,
@@ -253,6 +254,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("Budget Code");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [isBudgetTableFullscreen, setIsBudgetTableFullscreen] = useState(false);
 
   // Filter budget data to single project (2525840 - Palm Beach Luxury Estate)
   const filteredBudgetData = useMemo(() => {
@@ -288,10 +290,9 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
     // Apply search filter
     if (searchTerm) {
       data = data.filter(item =>
-        item["Budget Code"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item["Budget Code Description"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item["Cost Code Tier 1"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item["Cost Code Tier 2"].toLowerCase().includes(searchTerm.toLowerCase())
+        item["Cost Code Tier 3"].toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item["Cost Type"].toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item["Budget Code Description"].toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -316,6 +317,41 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
 
     return data;
   }, [filteredBudgetData, searchTerm, sortField, sortDirection]);
+
+  // Calculate totals for currency columns
+  const columnTotals = useMemo(() => {
+    return processedBudgetData.reduce((totals, item) => ({
+      originalBudget: totals.originalBudget + item["Original Budget Amount"],
+      budgetModifications: totals.budgetModifications + item["Budget Modifications"],
+      approvedCOs: totals.approvedCOs + item["Approved COs"],
+      revisedBudget: totals.revisedBudget + item["Revised Budget"],
+      pendingBudgetChanges: totals.pendingBudgetChanges + item["Pending Budget Changes"],
+      projectedBudget: totals.projectedBudget + item["Projected Budget"],
+      committedCosts: totals.committedCosts + item["Committed Costs"],
+      directCosts: totals.directCosts + item["Direct Costs"],
+      jtdCosts: totals.jtdCosts + item["Job to Date Costs"],
+      pendingCostChanges: totals.pendingCostChanges + item["Pending Cost Changes"],
+      projectedCosts: totals.projectedCosts + item["Projected Costs"],
+      forecastToComplete: totals.forecastToComplete + item["Forecast To Complete"],
+      estimatedAtCompletion: totals.estimatedAtCompletion + item["Estimated Cost at Completion"],
+      projectedOverUnder: totals.projectedOverUnder + item["Projected over Under"]
+    }), {
+      originalBudget: 0,
+      budgetModifications: 0,
+      approvedCOs: 0,
+      revisedBudget: 0,
+      pendingBudgetChanges: 0,
+      projectedBudget: 0,
+      committedCosts: 0,
+      directCosts: 0,
+      jtdCosts: 0,
+      pendingCostChanges: 0,
+      projectedCosts: 0,
+      forecastToComplete: 0,
+      estimatedAtCompletion: 0,
+      projectedOverUnder: 0
+    });
+  }, [processedBudgetData]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -427,7 +463,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip 
-                      formatter={(value: number) => [`$${(value / 1000000).toFixed(1)}M`, ""]}
+                      formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]}
                       labelFormatter={(label) => `Month: ${label}`}
                     />
                     <Bar dataKey="budgeted" fill="#3b82f6" name="Budgeted" opacity={0.6} />
@@ -551,7 +587,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="mt-4 space-y-2">
@@ -583,7 +619,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis type="number" tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
                     <YAxis dataKey="category" type="category" width={100} />
-                    <Tooltip formatter={(value: number) => `$${(value / 1000000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
                     <Bar dataKey="budgeted" fill="#3b82f6" name="Budgeted" />
                     <Bar dataKey="actual" fill="#10b981" name="Actual" />
                   </BarChart>
@@ -659,7 +695,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(value: number) => `$${(value / 1000).toFixed(0)}K`} />
+                    <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]} />
                     <Line 
                       type="monotone" 
                       dataKey="variance" 
@@ -687,7 +723,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis domain={[0.8, 1.2]} />
-                    <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                    <Tooltip formatter={(value: number, name: string) => [value.toFixed(2), name]} />
                     <Line 
                       type="monotone" 
                       dataKey="cpi" 
@@ -736,22 +772,28 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
         return (
           <div className="space-y-6">
             {/* Budget Table Controls */}
-            <Card>
+            <Card className={isBudgetTableFullscreen ? 'fixed inset-0 z-[9999] bg-background overflow-auto p-6' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2">
                       <TableIcon className="h-5 w-5 text-blue-600" />
                       Budget Detail - Palm Beach Luxury Estate
-                </CardTitle>
+                    </CardTitle>
                     <CardDescription>
                       Detailed budget breakdown with {processedBudgetData.length} line items
                     </CardDescription>
                   </div>
-                  <Button onClick={exportToCSV} variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export CSV
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button onClick={exportToCSV} variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export CSV
+                    </Button>
+                    <FullscreenToggle
+                      isFullscreen={isBudgetTableFullscreen}
+                      onToggle={() => setIsBudgetTableFullscreen(!isBudgetTableFullscreen)}
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -760,7 +802,7 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                   <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
-                      placeholder="Search budget codes, descriptions..."
+                      placeholder="Search cost codes, types, descriptions..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -768,178 +810,337 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                   </div>
                   <Badge variant="secondary" className="whitespace-nowrap">
                     {processedBudgetData.length} items
-                          </Badge>
-                        </div>
+                  </Badge>
+                </div>
 
                 {/* Budget Data Table */}
                 <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[150px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Budget Code")}
-                          >
-                            Budget Code
-                            {sortField === "Budget Code" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="min-w-[200px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Cost Code Tier 1")}
-                          >
-                            Cost Code
-                            {sortField === "Cost Code Tier 1" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="w-[80px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Cost Type")}
-                          >
-                            Type
-                            {sortField === "Cost Type" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Original Budget Amount")}
-                          >
-                            Original Budget
-                            {sortField === "Original Budget Amount" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Budget Modifications")}
-                          >
-                            Modifications
-                            {sortField === "Budget Modifications" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Revised Budget")}
-                          >
-                            Revised Budget
-                            {sortField === "Revised Budget" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Job to Date Costs")}
-                          >
-                            Actual Costs
-                            {sortField === "Job to Date Costs" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Forecast To Complete")}
-                          >
-                            To Complete
-                            {sortField === "Forecast To Complete" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 font-semibold"
-                            onClick={() => handleSort("Projected over Under")}
-                          >
-                            Variance
-                            {sortField === "Projected over Under" && (
-                              sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {processedBudgetData.slice(0, 50).map((item, index) => (
-                        <TableRow key={index} className="hover:bg-muted/50">
-                          <TableCell className="font-mono text-xs">
-                            {item["Budget Code"]}
+                  <div className={`overflow-auto ${isBudgetTableFullscreen ? 'max-h-[calc(100vh-200px)]' : 'max-h-[calc(100vh-300px)]'}`}>
+                    <Table>
+                      <TableHeader className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b-2 border-border/50 shadow-lg">
+                        <TableRow className="bg-background/95 backdrop-blur-md">
+                          <TableHead className="min-w-[200px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Cost Code Tier 3")}
+                            >
+                              Cost Code
+                              {sortField === "Cost Code Tier 3" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Original Budget Amount")}
+                            >
+                              Original Budget
+                              {sortField === "Original Budget Amount" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Budget Modifications")}
+                            >
+                              Modifications
+                              {sortField === "Budget Modifications" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Approved COs")}
+                            >
+                              Approved COs
+                              {sortField === "Approved COs" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Revised Budget")}
+                            >
+                              Revised Budget
+                              {sortField === "Revised Budget" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Pending Budget Changes")}
+                            >
+                              Pending Budget Changes
+                              {sortField === "Pending Budget Changes" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Projected Budget")}
+                            >
+                              Projected Budget
+                              {sortField === "Projected Budget" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Committed Costs")}
+                            >
+                              Committed Costs
+                              {sortField === "Committed Costs" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Direct Costs")}
+                            >
+                              Direct Costs
+                              {sortField === "Direct Costs" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Job to Date Costs")}
+                            >
+                              JTD Costs
+                              {sortField === "Job to Date Costs" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Pending Cost Changes")}
+                            >
+                              Pending Cost Changes
+                              {sortField === "Pending Cost Changes" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Projected Costs")}
+                            >
+                              Projected Costs
+                              {sortField === "Projected Costs" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Forecast To Complete")}
+                            >
+                              Forecast to Complete
+                              {sortField === "Forecast To Complete" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Estimated Cost at Completion")}
+                            >
+                              Est. at Completion
+                              {sortField === "Estimated Cost at Completion" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 font-semibold"
+                              onClick={() => handleSort("Projected over Under")}
+                            >
+                              Projected Over Under
+                              {sortField === "Projected over Under" && (
+                                sortDirection === "asc" ? <SortAsc className="ml-2 h-4 w-4" /> : <SortDesc className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {processedBudgetData.slice(0, 50).map((item, index) => (
+                          <TableRow key={index} className="hover:bg-muted/50">
+                            <TableCell className="max-w-[200px]">
+                              <div className="space-y-1">
+                                <div className="font-medium text-sm">{item["Cost Code Tier 3"]}</div>
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {item["Cost Type"]}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Original Budget Amount"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              <span className={item["Budget Modifications"] >= 0 ? "text-green-600" : "text-red-600"}>
+                                {item["Budget Modifications"] >= 0 ? "+" : ""}{formatCurrency(item["Budget Modifications"])}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              <span className={item["Approved COs"] >= 0 ? "text-green-600" : "text-red-600"}>
+                                {item["Approved COs"] >= 0 ? "+" : ""}{formatCurrency(item["Approved COs"])}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm font-medium">
+                              {formatCurrency(item["Revised Budget"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              <span className={item["Pending Budget Changes"] >= 0 ? "text-green-600" : "text-red-600"}>
+                                {item["Pending Budget Changes"] >= 0 ? "+" : ""}{formatCurrency(item["Pending Budget Changes"])}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Projected Budget"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Committed Costs"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Direct Costs"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Job to Date Costs"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              <span className={item["Pending Cost Changes"] >= 0 ? "text-green-600" : "text-red-600"}>
+                                {item["Pending Cost Changes"] >= 0 ? "+" : ""}{formatCurrency(item["Pending Cost Changes"])}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Projected Costs"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Forecast To Complete"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              {formatCurrency(item["Estimated Cost at Completion"])}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-sm">
+                              <span className={item["Projected over Under"] >= 0 ? "text-green-600" : "text-red-600"}>
+                                {item["Projected over Under"] >= 0 ? "+" : ""}{formatCurrency(item["Projected over Under"])}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow className="bg-muted/50 font-semibold">
+                          <TableCell className="font-bold">Total</TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.originalBudget)}
                           </TableCell>
-                          <TableCell className="max-w-[200px]">
-                            <div className="space-y-1">
-                              <div className="font-medium text-sm">{item["Cost Code Tier 1"]}</div>
-                              <div className="text-xs text-muted-foreground truncate">
-                                {item["Cost Code Tier 2"]}
-                      </div>
-                    </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs">
-                              {item["Cost Type"]}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            {formatCurrency(item["Original Budget Amount"])}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            <span className={item["Budget Modifications"] >= 0 ? "text-green-600" : "text-red-600"}>
-                              {item["Budget Modifications"] >= 0 ? "+" : ""}{formatCurrency(item["Budget Modifications"])}
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            <span className={columnTotals.budgetModifications >= 0 ? "text-green-600" : "text-red-600"}>
+                              {columnTotals.budgetModifications >= 0 ? "+" : ""}{formatCurrency(columnTotals.budgetModifications)}
                             </span>
                           </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-medium">
-                            {formatCurrency(item["Revised Budget"])}
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            <span className={columnTotals.approvedCOs >= 0 ? "text-green-600" : "text-red-600"}>
+                              {columnTotals.approvedCOs >= 0 ? "+" : ""}{formatCurrency(columnTotals.approvedCOs)}
+                            </span>
                           </TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            {formatCurrency(item["Job to Date Costs"])}
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.revisedBudget)}
                           </TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            {formatCurrency(item["Forecast To Complete"])}
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            <span className={columnTotals.pendingBudgetChanges >= 0 ? "text-green-600" : "text-red-600"}>
+                              {columnTotals.pendingBudgetChanges >= 0 ? "+" : ""}{formatCurrency(columnTotals.pendingBudgetChanges)}
+                            </span>
                           </TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            <span className={item["Projected over Under"] >= 0 ? "text-green-600" : "text-red-600"}>
-                              {item["Projected over Under"] >= 0 ? "+" : ""}{formatCurrency(item["Projected over Under"])}
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.projectedBudget)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.committedCosts)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.directCosts)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.jtdCosts)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            <span className={columnTotals.pendingCostChanges >= 0 ? "text-green-600" : "text-red-600"}>
+                              {columnTotals.pendingCostChanges >= 0 ? "+" : ""}{formatCurrency(columnTotals.pendingCostChanges)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.projectedCosts)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.forecastToComplete)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            {formatCurrency(columnTotals.estimatedAtCompletion)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm font-bold">
+                            <span className={columnTotals.projectedOverUnder >= 0 ? "text-green-600" : "text-red-600"}>
+                              {columnTotals.projectedOverUnder >= 0 ? "+" : ""}{formatCurrency(columnTotals.projectedOverUnder)}
                             </span>
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableFooter>
+                    </Table>
+                  </div>
                 </div>
 
                 {processedBudgetData.length > 50 && (
@@ -960,103 +1161,19 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
   };
 
   return (
-    <div className={`space-y-6 ${isFullscreen.budgetAnalysis ? 'fixed inset-0 z-[9999] bg-background p-6 overflow-auto' : ''}`}>
+    <div className="space-y-6">
       {/* Controls Bar */}
       <div className="flex items-center justify-between">
         <ViewToggle />
-        <FullscreenToggle
-          isFullscreen={isFullscreen.budgetAnalysis}
-          onToggle={() => toggleFullscreen('budgetAnalysis')}
-        />
       </div>
 
-      {/* Collapsible KPI Metrics */}
-      <CollapseWrapper
-        title="Key Performance Metrics"
-        subtitle="Real-time budget performance indicators"
-        defaultCollapsed={false}
-      >
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Budget</CardTitle>
-              <Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              </CardHeader>
-              <CardContent>
-              <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
-                ${(summaryData.totalRevisedBudget / 1000000).toFixed(1)}M
-                  </div>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                Original: ${(summaryData.totalOriginalBudget / 1000000).toFixed(1)}M
-              </p>
-            </CardContent>
-          </Card>
 
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Actual Costs</CardTitle>
-              <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                ${(summaryData.totalActualCosts / 1000000).toFixed(1)}M
-                    </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                {budgetUtilization.toFixed(1)}% utilized
-              </p>
-              </CardContent>
-            </Card>
-
-          <Card className={`bg-gradient-to-br ${projectedVariance >= 0 ? 
-            "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800" : 
-            "from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 border-red-200 dark:border-red-800"}`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className={`text-sm font-medium ${projectedVariance >= 0 ? 
-                "text-green-700 dark:text-green-300" : 
-                "text-red-700 dark:text-red-300"}`}>
-                Budget Variance
-              </CardTitle>
-              {projectedVariance >= 0 ? 
-                <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" /> :
-                <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
-              }
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${projectedVariance >= 0 ? 
-                "text-green-900 dark:text-green-100" : 
-                "text-red-900 dark:text-red-100"}`}>
-                    {projectedVariance >= 0 ? '+' : ''}${(projectedVariance / 1000000).toFixed(1)}M
-                  </div>
-              <p className={`text-xs ${projectedVariance >= 0 ? 
-                "text-green-600 dark:text-green-400" : 
-                "text-red-600 dark:text-red-400"}`}>
-                {((projectedVariance / summaryData.totalRevisedBudget) * 100).toFixed(1)}% vs budget
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">CPI Score</CardTitle>
-              <Target className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                </CardHeader>
-                <CardContent>
-              <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                {summaryData.costPerformanceIndex.toFixed(2)}
-                  </div>
-              <p className="text-xs text-purple-600 dark:text-purple-400">
-                {summaryData.costPerformanceIndex > 1 ? 'Under' : 'Over'} budget performance
-              </p>
-                </CardContent>
-              </Card>
-          </div>
-      </CollapseWrapper>
 
       {/* Collapsible HBI Intelligence */}
       <CollapseWrapper
         title="HBI Budget Intelligence"
         subtitle="AI-powered insights and analysis"
-        defaultCollapsed={true}
+        defaultCollapsed={false}
       >
         <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
           <CardContent className="pt-6">

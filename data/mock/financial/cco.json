@@ -1,0 +1,22 @@
+[
+  {
+    "project_id": 2525840,
+    "contract": "Subcontract #1003",
+    "title": "HVAC Scope Increase",
+    "contract_company": "Elite Mechanical Inc.",
+    "reviewer": "Lopez, Boris",
+    "amount": 37300.0,
+    "date_initiated": "2025-06-07",
+    "status": "Approved"
+  },
+  {
+    "project_id": 2525840,
+    "contract": "Subcontract #1004",
+    "title": "Fire Protection Mod",
+    "contract_company": "FireSafe Systems LLC",
+    "reviewer": "Mistry, Milan",
+    "amount": 16900.0,
+    "date_initiated": "2025-06-14",
+    "status": "Approved"
+  }
+]

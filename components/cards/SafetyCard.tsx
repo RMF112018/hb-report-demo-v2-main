@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, AlertTriangle, ChevronRight, Clock, Users, TrendingDown } from "lucide-react";
+import { Shield, AlertTriangle, ChevronRight, Clock, Users, TrendingDown, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 interface SafetyCardProps {
   config?: any;
@@ -13,7 +14,7 @@ interface SafetyCardProps {
 }
 
 export default function SafetyCard({ config, span, isCompact, userRole }: SafetyCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -132,8 +133,6 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
   return (
     <div 
       className="h-full flex flex-col bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Header Stats */}
       <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-red-200 dark:border-red-800">
@@ -242,15 +241,38 @@ export default function SafetyCard({ config, span, isCompact, userRole }: Safety
             ))}
           </div>
         </div>
+
+        {/* Details Toggle Button */}
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-xs border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-950/50"
+          >
+            <Eye className="h-3 w-3 mr-1" />
+            {showDetails ? 'Hide Details' : 'Show Details'}
+          </Button>
+        </div>
       </div>
 
       {/* Hover Drill-Down Overlay */}
-      {isHovered && (
+      {showDetails && (
         <div className="absolute inset-0 bg-red-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">Safety Analysis</span>
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
+              <div className="flex items-center gap-2">
+                <ChevronRight className="h-4 w-4" />
+                <span className="font-semibold text-sm">Safety Analysis</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDetails(false)}
+                className="h-6 w-6 p-0 text-red-200 hover:text-white"
+              >
+                ×
+              </Button>
             </div>
             
             <div className="space-y-2 text-xs">

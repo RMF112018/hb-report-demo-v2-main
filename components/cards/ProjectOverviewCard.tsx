@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Calendar, DollarSign, TrendingUp, ChevronRight, MapPin } from "lucide-react";
+import { Building2, Calendar, DollarSign, TrendingUp, ChevronRight, MapPin, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ProjectOverviewCardProps {
   config?: any;
@@ -12,7 +13,7 @@ interface ProjectOverviewCardProps {
 }
 
 export default function ProjectOverviewCard({ config, span, isCompact, userRole }: ProjectOverviewCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   
   // Role-based data filtering
   const getDataByRole = () => {
@@ -97,35 +98,35 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
     }).format(value);
   };
 
+  const toggleDetails = () => {
+    setShowDetails(!showDetails);
+  };
+
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 overflow-hidden relative transition-all duration-300 backdrop-blur-sm"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Enhanced Header Stats with better hierarchy */}
-      <div className="flex-shrink-0 p-3 sm:p-4 lg:p-5 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-blue-200/60 dark:border-blue-800/60 shadow-sm">
+    <div className="h-full flex flex-col bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-blue-950/60 dark:to-indigo-950/60 overflow-hidden relative transition-all duration-300 backdrop-blur-sm border border-blue-200/40 dark:border-blue-800/40">
+      {/* Enhanced Header with better contrast */}
+      <div className="flex-shrink-0 p-3 sm:p-4 lg:p-5 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-blue-200/60 dark:border-blue-800/60 shadow-sm">
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
-          <div className="text-center p-2 rounded-lg bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/40 dark:border-blue-800/40">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-700 dark:text-blue-400">{data.totalProjects}</div>
-            <div className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-300 mt-1">Total Projects</div>
+          <div className="text-center p-2 rounded-lg bg-blue-50/90 dark:bg-blue-950/50 border-2 border-blue-200/50 dark:border-blue-800/50">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-700 dark:text-blue-300">{data.totalProjects}</div>
+            <div className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-200 mt-1">Total Projects</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-green-50/80 dark:bg-green-950/40 border border-green-200/40 dark:border-green-800/40">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-700 dark:text-green-400">{data.activeProjects}</div>
-            <div className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-300 mt-1">Active</div>
+          <div className="text-center p-2 rounded-lg bg-green-50/90 dark:bg-green-950/50 border-2 border-green-200/50 dark:border-green-800/50">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-700 dark:text-green-300">{data.activeProjects}</div>
+            <div className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-200 mt-1">Active</div>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Content with better spacing */}
+      {/* Enhanced Content with better contrast */}
       <div className="flex-1 p-3 sm:p-4 lg:p-5 space-y-3 sm:space-y-4 lg:space-y-5 overflow-y-auto">
-        {/* Contract Value Summary with enhanced styling */}
-        <div className="bg-white/80 dark:bg-black/80 rounded-xl p-3 sm:p-4 border border-blue-200/60 dark:border-blue-800/60 shadow-sm backdrop-blur-sm">
+        {/* Contract Value with enhanced styling */}
+        <div className="bg-white/90 dark:bg-black/90 rounded-xl p-3 sm:p-4 border-2 border-blue-200/60 dark:border-blue-800/60 shadow-sm backdrop-blur-sm">
           <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-300" />
             <span className="text-sm font-medium text-foreground">Portfolio Value</span>
           </div>
-          <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-foreground">
+          <div className="text-sm sm:text-base lg:text-lg font-bold text-foreground">
             {formatCurrency(data.totalContractValue)}
           </div>
           <div className="text-xs text-muted-foreground">
@@ -133,103 +134,97 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
           </div>
         </div>
 
-        {/* Project Types */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+        {/* Project Types with better contrast */}
+        <div className="bg-white/80 dark:bg-black/80 rounded-lg p-2 sm:p-3 border-2 border-blue-200/50 dark:border-blue-800/50">
           <div className="flex items-center gap-2 mb-2">
-            <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-300" />
             <span className="text-sm font-medium text-foreground">Project Types</span>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">New Construction</span>
-              <Badge variant="outline" className="text-xs">{data.projectTypes.newConstruction}</Badge>
+              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.newConstruction}</Badge>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">Renovation</span>
-              <Badge variant="outline" className="text-xs">{data.projectTypes.renovation}</Badge>
+              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.renovation}</Badge>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">Expansion</span>
-              <Badge variant="outline" className="text-xs">{data.projectTypes.expansion}</Badge>
+              <Badge variant="outline" className="text-xs border-blue-200 dark:border-blue-700 text-foreground">{data.projectTypes.expansion}</Badge>
             </div>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-blue-200 dark:border-blue-800">
+        {/* Recent Activity with enhanced contrast */}
+        <div className="bg-white/80 dark:bg-black/80 rounded-lg p-2 sm:p-3 border-2 border-blue-200/50 dark:border-blue-800/50">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-300" />
             <span className="text-sm font-medium text-foreground">This Month</span>
           </div>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
+            <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-300" />
             <span className="text-sm text-foreground">{data.completedThisMonth} Completed</span>
           </div>
         </div>
+
+        {/* Details Toggle Button */}
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleDetails}
+            className="text-xs border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+          >
+            <Eye className="h-3 w-3 mr-1" />
+            {showDetails ? 'Hide Details' : 'Show Details'}
+          </Button>
+        </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-blue-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
+      {/* Click-triggered Detail Overlay */}
+      {showDetails && (
+        <div className="absolute inset-0 bg-blue-900/96 dark:bg-blue-950/96 backdrop-blur-sm p-2 sm:p-3 flex flex-col justify-center text-white animate-in fade-in duration-200 border border-blue-700/50">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">Portfolio Deep Dive</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <ChevronRight className="h-4 w-4 text-blue-200" />
+                <span className="font-semibold text-sm text-blue-100">Portfolio Deep Dive</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleDetails}
+                className="h-6 w-6 p-0 text-blue-200 hover:text-white"
+              >
+                ×
+              </Button>
             </div>
             
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-blue-700/30 pb-1">
                 <span className="text-blue-200">Largest Project:</span>
-                <span className="font-medium">{data.drillDown.largestProject.name}</span>
+                <span className="font-medium text-blue-100">{data.drillDown.largestProject.name}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-blue-700/30 pb-1">
                 <span className="text-blue-200">Value:</span>
-                <span className="font-medium">{formatCurrency(data.drillDown.largestProject.value)}</span>
+                <span className="font-medium text-blue-100">{formatCurrency(data.drillDown.largestProject.value)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-blue-700/30 pb-1">
                 <span className="text-blue-200">Risk Projects:</span>
-                <span className="font-medium text-yellow-300">{data.drillDown.riskProjects}</span>
+                <span className="font-medium text-yellow-200">{data.drillDown.riskProjects}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b border-blue-700/30 pb-1">
                 <span className="text-blue-200">Upcoming Milestones:</span>
-                <span className="font-medium">{data.drillDown.upcomingMilestones}</span>
+                <span className="font-medium text-blue-100">{data.drillDown.upcomingMilestones}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-blue-200">Avg Duration:</span>
-                <span className="font-medium">{data.drillDown.avgDuration} months</span>
+                <span className="font-medium text-blue-100">{data.drillDown.avgDuration} months</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-blue-200">On-Time Performance:</span>
-                <span className="font-medium text-green-300">{data.drillDown.onTimePct}%</span>
-              </div>
-            </div>
-
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-blue-700">
-              <div className="flex items-center gap-1 mb-2">
-                <MapPin className="h-3 w-3" />
-                <span className="text-xs font-medium text-blue-200">Regional Distribution</span>
-              </div>
-              <div className="grid grid-cols-3 gap-1 text-xs">
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.regionBreakdown.north}</div>
-                  <div className="text-blue-300">North FL</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.regionBreakdown.central}</div>
-                  <div className="text-blue-300">Central FL</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.regionBreakdown.spaceCoast}</div>
-                  <div className="text-blue-300">Space Coast</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.regionBreakdown.southeast}</div>
-                  <div className="text-blue-300">Southeast FL</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.regionBreakdown.southwest}</div>
-                  <div className="text-blue-300">Southwest FL</div>
-                </div>
+                <span className="font-medium text-blue-100">{data.drillDown.onTimePct}%</span>
               </div>
             </div>
           </div>

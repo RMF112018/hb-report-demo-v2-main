@@ -33,6 +33,7 @@ import { EnhancedConstraintTable } from "@/components/constraints/EnhancedConstr
 import { ConstraintForm } from "@/components/constraints/ConstraintForm"
 import { ConstraintExportUtils } from "@/components/constraints/ExportUtils"
 import { ExportModal } from "@/components/constraints/ExportModal"
+import { ProjectConstraintsSummary } from "@/components/constraints/ProjectConstraintsSummary"
 import { 
   Plus, 
   RefreshCw, 
@@ -74,6 +75,7 @@ export default function ConstraintsLogPage() {
     status: "all",
     category: "all",
     assigned: "all",
+    project: "all",
     dateRange: { start: null, end: null },
   })
 
@@ -120,6 +122,16 @@ export default function ConstraintsLogPage() {
     // Apply assignee filter
     if (filters.assigned !== "all") {
       filtered = filtered.filter((c) => c.assigned === filters.assigned)
+    }
+
+    // Apply project filter
+    if (filters.project !== "all") {
+      const projectId = parseInt(filters.project)
+      const selectedProject = projects.find(p => p.project_id === projectId)
+      if (selectedProject) {
+        const selectedProjectConstraintIds = selectedProject.constraints.map(c => c.id)
+        filtered = filtered.filter((c) => selectedProjectConstraintIds.includes(c.id))
+      }
     }
 
     // Apply date range filter
@@ -241,6 +253,16 @@ export default function ConstraintsLogPage() {
       title: "Bulk Action",
       description: `${action} applied to ${constraintIds.length} constraints`,
     })
+  }
+
+  // Handle project selection for filtering
+  const handleProjectSelect = (projectId: string) => {
+    setFilters(prev => ({ ...prev, project: projectId }))
+  }
+
+  // Handle clearing project filter
+  const handleClearProjectFilter = () => {
+    setFilters(prev => ({ ...prev, project: "all" }))
   }
 
   const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string; filePath: string }) => {
@@ -476,6 +498,18 @@ export default function ConstraintsLogPage() {
             <div data-tour="overview-hbi-insights">
               <HbiInsightsPanel constraints={allConstraints} />
             </div>
+
+            {/* Project Constraints Summary - Executive and Project Executive only */}
+            {(user?.role === "executive" || user?.role === "project-executive") && (
+              <div data-tour="project-constraints-summary">
+                <ProjectConstraintsSummary
+                  projects={projects}
+                  selectedProject={filters.project}
+                  onProjectSelect={handleProjectSelect}
+                  onClearFilter={handleClearProjectFilter}
+                />
+              </div>
+            )}
 
             {/* Gantt Chart */}
             <div data-tour="gantt-visualization">

@@ -408,10 +408,13 @@ export default function LoginPage() {
                   </div>
                   <div className="ml-3 lg:ml-4">
                     <h1 className={`font-bold tracking-tight ${isLargeScreen ? "text-2xl" : "text-xl"}`}>
-                      HEDRICK BROTHERS
+                      Hedrick Brothers Construction
                     </h1>
-                    <p className={`text-blue-200 font-medium ${isLargeScreen ? "text-base" : "text-sm"}`}>
-                      Construction Analytics Platform
+                    <p className={`text-blue-200 font-medium ${isLargeScreen ? "text-sm" : "text-xs"}`}>
+                      presents HB Report
+                    </p>
+                    <p className={`text-blue-100 font-normal ${isLargeScreen ? "text-base" : "text-sm"}`}>
+                      A Construction Analytics and Reporting Program
                     </p>
                   </div>
                 </div>
@@ -535,10 +538,11 @@ export default function LoginPage() {
                           <Building2 className="h-8 w-8 text-white" aria-hidden="true" />
                         </div>
                       </div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-[#003087] to-[#1e3a8a] bg-clip-text text-transparent mb-2">
-                        HEDRICK BROTHERS
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-[#003087] to-[#1e3a8a] bg-clip-text text-transparent mb-1">
+                        Hedrick Brothers Construction
                       </h1>
-                      <p className="text-gray-600 font-medium text-sm">Construction Analytics Platform</p>
+                      <p className="text-gray-600 font-medium text-sm mb-1">presents HB Report</p>
+                      <p className="text-gray-500 font-normal text-xs">A Construction Analytics and Reporting Program</p>
                     </div>
                   )}
 

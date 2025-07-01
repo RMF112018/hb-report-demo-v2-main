@@ -565,3 +565,234 @@ export interface SagePayment {
   checkNumber: string
   invoiceNumber: string
 }
+
+// Procurement Log Types for the New System
+
+export interface ProcurementLogRecord {
+  id: string
+  procore_commitment_id: string
+  project_id: string
+  
+  // Basic Information
+  commitment_title: string
+  commitment_number: string
+  vendor_name: string
+  vendor_contact: {
+    name: string
+    email: string
+    phone: string
+  }
+  
+  // CSI and Classification
+  csi_code: string
+  csi_description: string
+  contract_type: ContractType
+  procurement_method: ProcurementMethod
+  
+  // Financial Data
+  contract_amount: number
+  budget_amount: number
+  variance: number
+  variance_percentage: number
+  retainage_percent?: number
+  link_to_budget_item?: string
+  
+  // Status and Workflow
+  status: ProcurementStatus
+  compliance_status: ComplianceStatus
+  bonds_required: boolean
+  insurance_verified: boolean
+  executed?: boolean
+  
+  // Dates
+  start_date: string
+  completion_date: string
+  contract_date?: string
+  signed_contract_received_date?: string
+  issued_on_date?: string
+  
+  // Owner Approval
+  owner_approval_required?: boolean
+  owner_approval_status?: string
+  owner_meeting_required?: boolean
+  owner_meeting_date?: string
+  owner_approval_date?: string
+  
+  // Allowances
+  allowance_included?: boolean
+  total_contract_allowances?: number
+  allowance_reconciliation_total?: number
+  allowance_variance?: number
+  allowances?: AllowanceItem[]
+  
+  // Value Engineering
+  ve_offered?: boolean
+  total_ve_presented?: number
+  total_ve_accepted?: number
+  total_ve_rejected?: number
+  net_ve_savings?: number
+  ve_items?: ValueEngineeringItem[]
+  
+  // Long Lead Items
+  long_lead_included?: boolean
+  long_lead_released?: boolean
+  lead_items?: LongLeadItem[]
+  
+  // Workflow and Approvals
+  scope_review_meeting_date?: string
+  spm_review_date?: string
+  spm_approval_status?: string
+  px_review_date?: string
+  px_approval_status?: string
+  vp_review_date?: string
+  vp_approval_status?: string
+  
+  // Contract Execution
+  loi_sent_date?: string
+  loi_returned_date?: string
+  subcontract_agreement_sent_date?: string
+  fully_executed_sent_date?: string
+  
+  // Checklist Items
+  contract_status?: ChecklistStatus
+  schedule_a_status?: ChecklistStatus
+  schedule_b_status?: ChecklistStatus
+  exhibit_a_status?: ChecklistStatus
+  exhibit_b_status?: ChecklistStatus
+  exhibit_i_status?: ChecklistStatus
+  labor_rates_status?: ChecklistStatus
+  unit_rates_status?: ChecklistStatus
+  exhibits_status?: ChecklistStatus
+  schedule_of_values_status?: ChecklistStatus
+  p_and_p_bond_status?: ChecklistStatus
+  w_9_status?: ChecklistStatus
+  license_status?: ChecklistStatus
+  insurance_general_liability_status?: ChecklistStatus
+  insurance_auto_status?: ChecklistStatus
+  insurance_umbrella_liability_status?: ChecklistStatus
+  insurance_workers_comp_status?: ChecklistStatus
+  special_requirements_status?: ChecklistStatus
+  compliance_manager_status?: ChecklistStatus
+  scanned_returned_status?: ChecklistStatus
+  
+  // Team Assignments
+  project_manager?: string
+  project_executive?: string
+  project_assistant?: string
+  compliance_manager?: string
+  
+  // Compliance and Waivers
+  insurance_requirements_to_waive?: string[]
+  insurance_explanation?: string
+  insurance_risk_justification?: string
+  insurance_waiver_level?: string
+  licensing_waiver_level?: string
+  
+  // Additional Information
+  subcontract_scope?: string
+  employees_on_site?: string
+  procurement_notes?: string
+  additional_notes_comments?: string
+  
+  // Integration
+  bid_tab_link?: BidTabLink | null
+  milestones?: ProcurementMilestone[]
+  
+  // Audit Trail
+  created_at: string
+  updated_at: string
+  created_by: string
+}
+
+export interface BidTabLink {
+  bid_tab_id: string
+  csi_match: boolean
+  description_match: number // percentage match
+  linked_at?: string
+  verified_by?: string
+}
+
+export interface ProcurementMilestone {
+  name: string
+  date: string
+  status: "pending" | "in-progress" | "completed" | "overdue"
+  completed: boolean
+  notes?: string
+}
+
+export interface ProcurementStats {
+  totalValue: number
+  activeProcurements: number
+  completedProcurements: number
+  pendingApprovals: number
+  linkedToBidTabs: number
+  avgCycleTime: number
+  complianceRate: number
+  totalRecords: number
+}
+
+export interface ProcurementSyncLog {
+  id: string
+  sync_date: string
+  records_processed: number
+  records_created: number
+  records_updated: number
+  errors: string[]
+  duration_ms: number
+  initiated_by: string
+}
+
+export interface EstimatingBidTab {
+  id: string
+  project_id: string
+  trade_name: string
+  csi_code: string
+  csi_description: string
+  is_active: boolean
+  subtotal: number
+  created_at: string
+  updated_at: string
+}
+
+// New supporting interfaces for enhanced functionality
+export interface AllowanceItem {
+  id?: string
+  item: string
+  value: number
+  reconciliation_value: number
+  variance: number
+  status?: string
+  notes?: string
+}
+
+export interface ValueEngineeringItem {
+  id?: string
+  description: string
+  original_value: number
+  ve_value: number
+  savings: number
+  status: 'proposed' | 'accepted' | 'rejected' | 'pending'
+  date_proposed?: string
+  date_decided?: string
+  notes?: string
+}
+
+export interface LongLeadItem {
+  id?: string
+  item: string
+  lead_time: number
+  unit: 'days' | 'weeks' | 'months'
+  required_by?: string
+  procured: boolean
+  supplier?: string
+  status?: string
+  notes?: string
+}
+
+export type ChecklistStatus = 'N' | 'Y' | 'N/A' | 'P' // No, Yes, Not Applicable, Pending
+
+// Status and classification types
+export type ProcurementStatus = "planning" | "bidding" | "negotiation" | "awarded" | "active" | "completed" | "cancelled" | "pending_approval"
+export type ComplianceStatus = "compliant" | "warning" | "non-compliant"
+export type ContractType = "subcontract" | "material" | "equipment" | "service"
+export type ProcurementMethod = "competitive-bid" | "negotiated" | "sole-source" | "emergency"

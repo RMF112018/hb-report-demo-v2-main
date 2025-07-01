@@ -1,0 +1,290 @@
+[
+  {
+    "id": "proc-001",
+    "procore_commitment_id": "com-12345",
+    "project_id": "proj-001",
+    "commitment_title": "Structural Steel - Main Building",
+    "commitment_number": "C-001",
+    "vendor_name": "Acme Steel Fabricators",
+    "vendor_contact": {
+      "name": "John Smith",
+      "email": "john.smith@acmesteel.com",
+      "phone": "555-0123"
+    },
+    "csi_code": "05 12 00",
+    "csi_description": "Structural Steel Framing",
+    "contract_amount": 2850000,
+    "budget_amount": 2800000,
+    "variance": 50000,
+    "variance_percentage": 1.8,
+    "status": "active",
+    "procurement_method": "competitive-bid",
+    "contract_type": "subcontract",
+    "start_date": "2024-02-15",
+    "completion_date": "2024-08-30",
+    "milestones": [
+      {
+        "name": "Shop Drawings Approved",
+        "date": "2024-03-15",
+        "status": "completed",
+        "completed": true,
+        "notes": "Approved with minor revisions"
+      },
+      {
+        "name": "Steel Delivery - Phase 1",
+        "date": "2024-05-01",
+        "status": "in-progress",
+        "completed": false
+      }
+    ],
+    "bid_tab_link": {
+      "bid_tab_id": "bt-001",
+      "csi_match": true,
+      "description_match": 95,
+      "linked_at": "2024-01-15T10:30:00Z",
+      "verified_by": "estimator@company.com"
+    },
+    "compliance_status": "compliant",
+    "bonds_required": true,
+    "insurance_verified": true,
+    "created_at": "2024-01-10T08:00:00Z",
+    "updated_at": "2024-01-20T14:30:00Z",
+    "created_by": "pm@company.com",
+    "procurement_notes": "Performance bond required. Steel delivery coordinated with foundation completion."
+  },
+  {
+    "id": "proc-002",
+    "procore_commitment_id": "com-12346",
+    "project_id": "proj-001",
+    "commitment_title": "Concrete - Ready Mix Supply",
+    "commitment_number": "C-002",
+    "vendor_name": "Metro Concrete Supply",
+    "vendor_contact": {
+      "name": "Sarah Johnson",
+      "email": "sarah.j@metroconcrete.com",
+      "phone": "555-0124"
+    },
+    "csi_code": "03 30 00",
+    "csi_description": "Cast-in-Place Concrete",
+    "contract_amount": 1250000,
+    "budget_amount": 1300000,
+    "variance": -50000,
+    "variance_percentage": -3.8,
+    "status": "awarded",
+    "procurement_method": "competitive-bid",
+    "contract_type": "material",
+    "start_date": "2024-03-01",
+    "completion_date": "2024-09-15",
+    "milestones": [
+      {
+        "name": "Mix Design Approval",
+        "date": "2024-02-20",
+        "status": "completed",
+        "completed": true
+      },
+      {
+        "name": "First Pour - Foundations",
+        "date": "2024-03-15",
+        "status": "pending",
+        "completed": false
+      }
+    ],
+    "bid_tab_link": {
+      "bid_tab_id": "bt-002",
+      "csi_match": true,
+      "description_match": 88,
+      "linked_at": "2024-01-12T09:15:00Z",
+      "verified_by": "estimator@company.com"
+    },
+    "compliance_status": "compliant",
+    "bonds_required": false,
+    "insurance_verified": true,
+    "created_at": "2024-01-08T09:30:00Z",
+    "updated_at": "2024-01-18T16:45:00Z",
+    "created_by": "pm@company.com",
+    "procurement_notes": "Volume discounts negotiated for orders over 500 CY."
+  },
+  {
+    "id": "proc-003",
+    "procore_commitment_id": "com-12347",
+    "project_id": "proj-002",
+    "commitment_title": "HVAC System - Office Building",
+    "commitment_number": "C-003",
+    "vendor_name": "Climate Control Systems",
+    "vendor_contact": {
+      "name": "Mike Chen",
+      "email": "mike.chen@climatecs.com",
+      "phone": "555-0125"
+    },
+    "csi_code": "23 00 00",
+    "csi_description": "Heating, Ventilating, and Air Conditioning",
+    "contract_amount": 1850000,
+    "budget_amount": 1750000,
+    "variance": 100000,
+    "variance_percentage": 5.7,
+    "status": "negotiation",
+    "procurement_method": "negotiated",
+    "contract_type": "subcontract",
+    "start_date": "2024-04-01",
+    "completion_date": "2024-11-30",
+    "milestones": [
+      {
+        "name": "Equipment Submittal",
+        "date": "2024-03-01",
+        "status": "pending",
+        "completed": false
+      }
+    ],
+    "bid_tab_link": {
+      "bid_tab_id": "bt-003",
+      "csi_match": true,
+      "description_match": 92,
+      "linked_at": "2024-01-20T11:00:00Z",
+      "verified_by": "estimator@company.com"
+    },
+    "compliance_status": "warning",
+    "bonds_required": true,
+    "insurance_verified": false,
+    "created_at": "2024-01-15T10:00:00Z",
+    "updated_at": "2024-01-25T13:20:00Z",
+    "created_by": "pe@company.com",
+    "procurement_notes": "Insurance certificate pending. Performance bond required for equipment."
+  },
+  {
+    "id": "proc-004",
+    "procore_commitment_id": "com-12348",
+    "project_id": "proj-001",
+    "commitment_title": "Electrical - Power Distribution",
+    "commitment_number": "C-004",
+    "vendor_name": "PowerTech Electric",
+    "vendor_contact": {
+      "name": "Lisa Rodriguez",
+      "email": "lisa.r@powertechelectric.com",
+      "phone": "555-0126"
+    },
+    "csi_code": "26 05 00",
+    "csi_description": "Common Work Results for Electrical",
+    "contract_amount": 980000,
+    "budget_amount": 950000,
+    "variance": 30000,
+    "variance_percentage": 3.2,
+    "status": "bidding",
+    "procurement_method": "competitive-bid",
+    "contract_type": "subcontract",
+    "start_date": "2024-05-15",
+    "completion_date": "2024-10-30",
+    "milestones": [],
+    "bid_tab_link": null,
+    "compliance_status": "compliant",
+    "bonds_required": true,
+    "insurance_verified": true,
+    "created_at": "2024-01-12T14:00:00Z",
+    "updated_at": "2024-01-22T10:15:00Z",
+    "created_by": "pm@company.com",
+    "procurement_notes": "Bid packages sent to 5 qualified contractors. Proposals due February 15."
+  },
+  {
+    "id": "proc-005",
+    "procore_commitment_id": "com-12349",
+    "project_id": "proj-003",
+    "commitment_title": "Roofing - TPO Membrane System",
+    "commitment_number": "C-005",
+    "vendor_name": "Superior Roofing Solutions",
+    "vendor_contact": {
+      "name": "Tom Wilson",
+      "email": "tom.wilson@superiorroofing.com",
+      "phone": "555-0127"
+    },
+    "csi_code": "07 54 00",
+    "csi_description": "Thermoplastic Membrane Roofing",
+    "contract_amount": 485000,
+    "budget_amount": 500000,
+    "variance": -15000,
+    "variance_percentage": -3.0,
+    "status": "completed",
+    "procurement_method": "competitive-bid",
+    "contract_type": "subcontract",
+    "start_date": "2024-01-15",
+    "completion_date": "2024-03-30",
+    "milestones": [
+      {
+        "name": "Material Delivery",
+        "date": "2024-02-01",
+        "status": "completed",
+        "completed": true
+      },
+      {
+        "name": "Installation Complete",
+        "date": "2024-03-25",
+        "status": "completed",
+        "completed": true
+      },
+      {
+        "name": "Final Inspection",
+        "date": "2024-03-30",
+        "status": "completed",
+        "completed": true
+      }
+    ],
+    "bid_tab_link": {
+      "bid_tab_id": "bt-005",
+      "csi_match": true,
+      "description_match": 98,
+      "linked_at": "2024-01-05T15:30:00Z",
+      "verified_by": "estimator@company.com"
+    },
+    "compliance_status": "compliant",
+    "bonds_required": true,
+    "insurance_verified": true,
+    "created_at": "2024-01-02T08:00:00Z",
+    "updated_at": "2024-03-30T17:00:00Z",
+    "created_by": "pm@company.com",
+    "procurement_notes": "Project completed on time and under budget. 20-year warranty provided."
+  },
+  {
+    "id": "proc-006",
+    "procore_commitment_id": "com-12350",
+    "project_id": "proj-002",
+    "commitment_title": "Fire Protection - Sprinkler System",
+    "commitment_number": "C-006",
+    "vendor_name": "Guardian Fire Protection",
+    "vendor_contact": {
+      "name": "David Park",
+      "email": "david.park@guardianfire.com",
+      "phone": "555-0128"
+    },
+    "csi_code": "21 13 00",
+    "csi_description": "Wet-Pipe Sprinkler Systems",
+    "contract_amount": 325000,
+    "budget_amount": 315000,
+    "variance": 10000,
+    "variance_percentage": 3.2,
+    "status": "pending_approval",
+    "procurement_method": "competitive-bid",
+    "contract_type": "subcontract",
+    "start_date": "2024-06-01",
+    "completion_date": "2024-09-15",
+    "milestones": [
+      {
+        "name": "Permit Application",
+        "date": "2024-04-15",
+        "status": "pending",
+        "completed": false
+      }
+    ],
+    "bid_tab_link": {
+      "bid_tab_id": "bt-006",
+      "csi_match": true,
+      "description_match": 91,
+      "linked_at": "2024-01-25T12:45:00Z",
+      "verified_by": "estimator@company.com"
+    },
+    "compliance_status": "warning",
+    "bonds_required": true,
+    "insurance_verified": true,
+    "created_at": "2024-01-20T11:30:00Z",
+    "updated_at": "2024-01-26T09:00:00Z",
+    "created_by": "pe@company.com",
+    "procurement_notes": "Awaiting final approval from fire marshal. Bond paperwork in progress."
+  }
+] 

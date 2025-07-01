@@ -508,80 +508,13 @@ export default function RetentionManagement({ userRole, projectData }: Retention
         />
       </div>
 
-      {/* Collapsible KPI Metrics */}
-      <CollapseWrapper
-        title="Retention Metrics"
-        subtitle="Real-time retention performance indicators"
-        defaultCollapsed={false}
-      >
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Held</CardTitle>
-              <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {formatCurrency(summary.totalHeld)}
-              </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                {summary.contractorCount} contractors
-              </p>
-            </CardContent>
-          </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Total Released</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-900 dark:text-green-100">
-                {formatCurrency(summary.totalReleased)}
-              </div>
-              <p className="text-xs text-green-600 dark:text-green-400">
-                Completed releases
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Current Balance</CardTitle>
-              <DollarSign className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                {formatCurrency(summary.totalBalance)}
-              </div>
-              <p className="text-xs text-purple-600 dark:text-purple-400">
-                Active retention
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Standard Rate</CardTitle>
-              <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                {(summary.averageRate * 100).toFixed(1)}%
-              </div>
-              <p className="text-xs text-orange-600 dark:text-orange-400">
-                Industry standard
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </CollapseWrapper>
 
       {/* Collapsible HBI Intelligence */}
       <CollapseWrapper
         title="HBI Retention Intelligence"
         subtitle="AI-powered retention insights and analysis"
-        defaultCollapsed={true}
+        defaultCollapsed={false}
       >
         <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
           <CardContent className="pt-6">

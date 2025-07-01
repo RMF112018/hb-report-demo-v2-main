@@ -13,7 +13,7 @@ import { useTheme } from "next-themes"
 import { useProjectContext } from "@/context/project-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { TourControls } from "@/components/ui/tour"
+
 import projectsData from "@/data/mock/projects.json"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { Calendar, Users } from "lucide-react"
@@ -558,10 +558,12 @@ export const AppHeader = () => {
         {/* Left Section - Logo and Navigation */}
         <div className="flex items-center space-x-8">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
-              <span className="text-base font-bold text-[#1e3a8a]">HB</span>
-            </div>
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/images/hb_logo_white.png" 
+              alt="HB Logo" 
+              className="h-10 w-auto object-contain"
+            />
             <div className="flex flex-col">
               <span className="text-xl font-bold text-white leading-tight">HB Report</span>
               <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
@@ -723,9 +725,6 @@ export const AppHeader = () => {
                 {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
             )}
-
-            {/* Tour Controls */}
-            <TourControls className="text-white [&_button]:text-white [&_button]:hover:bg-white/20" />
 
             {/* Productivity */}
             <ProductivityPopover notifications={notifications} />

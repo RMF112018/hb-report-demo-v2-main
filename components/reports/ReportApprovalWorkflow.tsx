@@ -331,7 +331,7 @@ export function ReportApprovalWorkflow({ userRole, reports, onReportUpdate }: Re
 
       {/* Approval Dialog */}
       <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
-        <DialogContent className="!w-[85vw] !max-w-[85vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
           <div className="flex flex-col h-full">
             <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
               <DialogTitle>

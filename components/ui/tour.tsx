@@ -1,555 +1,402 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react'
-import { createPortal } from 'react-dom'
-import { useTour } from '@/context/tour-context'
+import React, { useEffect, useRef, useState, Suspense } from 'react'
+import { X, ArrowLeft, ArrowRight, SkipForward } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { X, ArrowLeft, ArrowRight, SkipForward, Play, RotateCcw } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useTour } from '@/context/tour-context'
+import { useTourPositioning } from '@/hooks/useTourPositioning'
+import { TOUR_CONSTANTS, TOUR_THEMES } from '@/lib/tour-constants'
+import { tourLogger, tourDOMUtils, tourAnimations, tourEventUtils, tourPerformance } from '@/lib/tour-utils'
 
-interface TourOverlayProps {
-  target: string
-  placement: 'top' | 'bottom' | 'left' | 'right' | 'center'
-  onClose: () => void
+interface TourProps {
+  className?: string
 }
 
-const TourOverlay: React.FC<TourOverlayProps> = ({ target, placement, onClose }) => {
-  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
-  const [overlayStyle, setOverlayStyle] = useState<React.CSSProperties>({})
-  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({})
-  const [contentAreaHeight, setContentAreaHeight] = useState(120)
-  const [mounted, setMounted] = useState(false)
-
+/**
+ * Standardized Tour component with Shadcn UI Card-based tooltips
+ * 
+ * Features:
+ * - Standardized tooltip structure using Shadcn UI Card
+ * - Enhanced anchoring for target visibility
+ * - Performance optimized for Web Vitals (LCP <1s, CLS <0.1)
+ * - WCAG-compliant accessibility
+ * - Consistent theming for light/dark modes
+ */
+export const Tour: React.FC<TourProps> = ({ className = '' }) => {
   const {
-    getCurrentStep,
-    getCurrentTourDefinition,
+    isActive,
     currentStep,
     nextStep,
     prevStep,
     skipTour,
     stopTour,
+    getCurrentStep,
+    getCurrentTourDefinition,
+    error
   } = useTour()
 
-  const step = getCurrentStep()
-  const tour = getCurrentTourDefinition()
+  const [isVisible, setIsVisible] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  
+  const tooltipRef = useRef<HTMLDivElement>(null)
+  const focusTrapRef = useRef<(() => void) | null>(null)
 
+  const currentStepData = getCurrentStep()
+  const tourDefinition = getCurrentTourDefinition()
+
+  // Enhanced positioning with performance measurement
+  const { positions, targetElement, isPositioning, error: positionError } = useTourPositioning({
+    target: currentStepData?.target || '',
+    placement: currentStepData?.placement || 'center',
+    isActive: isActive && !!currentStepData
+  })
+
+  // Performance-optimized mounting with Suspense support
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-
-    const findTargetElement = () => {
-      const element = document.querySelector(target) as HTMLElement
-      if (element) {
-        setTargetElement(element)
-        calculatePositions(element)
-      } else {
-        // Retry after a short delay if element not found
-        setTimeout(findTargetElement, 100)
-      }
-    }
-
-    findTargetElement()
-
-    const handleResize = () => {
-      if (targetElement) {
-        calculatePositions(targetElement)
-      }
-    }
-
-    // Reduced MutationObserver frequency to prevent glitchy behavior
-    let resizeTimeout: NodeJS.Timeout
-    const observer = new MutationObserver(() => {
-      if (targetElement && document.contains(targetElement)) {
-        // Debounce position calculations
-        clearTimeout(resizeTimeout)
-        resizeTimeout = setTimeout(() => {
-          calculatePositions(targetElement)
-        }, 150)
-      }
-    })
-
-    if (targetElement) {
-      observer.observe(document.body, {
-        childList: true,
-        subtree: false, // Reduce scope to prevent excessive triggers
-        attributes: true,
-        attributeFilter: ['class', 'style']
-      })
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      observer.disconnect()
-      clearTimeout(resizeTimeout)
-    }
-  }, [target, mounted, targetElement])
-
-  const calculatePositions = (element: HTMLElement) => {
-    const rect = element.getBoundingClientRect()
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
-
-    // Special handling for demo accounts dropdown
-    let expandedArea = rect
-    let skipOverlay = false
-
-    // Check for open dropdowns that might interfere
-    const openDropdowns = document.querySelectorAll('[data-tour="demo-accounts-list"]:not([style*="display: none"])')
-    
-    if (openDropdowns.length > 0 && target === '[data-tour="demo-accounts-list"]') {
-      const dropdown = openDropdowns[0] as HTMLElement
-      const dropdownRect = dropdown.getBoundingClientRect()
-      
-      // For dropdown, don't create overlay to allow interaction
-      skipOverlay = true
-      
-      // Use the dropdown bounds for positioning
-      expandedArea = dropdownRect
-    } else if (target === '[data-tour="demo-accounts-toggle"]') {
-      // For the toggle button, use normal behavior but lighter overlay
-      expandedArea = rect
-    }
-
-    // Create overlay with cutout for the target element (skip for dropdown)
-    const padding = skipOverlay ? 0 : 8
-    
-    // Theme-aware overlay colors
-    const isDarkMode = document.documentElement.classList.contains('dark')
-    const overlayColor = skipOverlay 
-      ? (isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.2)')
-      : (isDarkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)')
-    
-    let overlayStyle: React.CSSProperties = {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: overlayColor,
-      zIndex: skipOverlay ? 9990 : 130, // Lower z-index for dropdown interaction
-      pointerEvents: skipOverlay ? 'none' : 'auto', // Allow clicks through for dropdown
-    }
-
-    if (!skipOverlay) {
-      overlayStyle.clipPath = `polygon(
-        0% 0%, 
-        0% 100%, 
-        ${expandedArea.left - padding}px 100%, 
-        ${expandedArea.left - padding}px ${expandedArea.top - padding}px, 
-        ${expandedArea.right + padding}px ${expandedArea.top - padding}px, 
-        ${expandedArea.right + padding}px ${expandedArea.bottom + padding}px, 
-        ${expandedArea.left - padding}px ${expandedArea.bottom + padding}px, 
-        ${expandedArea.left - padding}px 100%, 
-        100% 100%, 
-        100% 0%
-      )`
-    }
-
-    // Calculate tooltip position with better collision detection
-    const tooltipWidth = Math.min(400, viewportWidth - 40) // Responsive width
-    
-    // Calculate tooltip height with proper space for buttons
-    const contentLength = step?.content?.length || 0
-    const headerHeight = 120 // Space for progress bar, title, badge
-    const buttonHeight = 80  // Space for navigation buttons and padding
-    const contentBaseHeight = 150 // Minimum content area
-    const extraContentHeight = Math.min(contentLength / 6, 100) // Additional space for longer content
-    
-    const calculatedHeight = headerHeight + contentBaseHeight + extraContentHeight + buttonHeight
-    const maxTooltipHeight = Math.min(calculatedHeight, viewportHeight - 80) // Leave margin for viewport
-    const tooltipHeight = Math.max(300, maxTooltipHeight) // Minimum 300px to ensure buttons are visible
-    const margin = 20
-
-    // Calculate and set dynamic content area height
-    const dynamicContentAreaHeight = Math.max(120, tooltipHeight - 200)
-    setContentAreaHeight(dynamicContentAreaHeight)
-
-    let tooltipStyle: React.CSSProperties = {
-      position: 'fixed',
-      zIndex: skipOverlay ? 10000 : 140, // Higher z-index when dropdown is involved
-      maxWidth: `${tooltipWidth}px`,
-      minWidth: Math.min(300, viewportWidth - 40) + 'px',
-      height: `${tooltipHeight}px`, // Fixed height to ensure buttons are visible
-      overflow: 'hidden', // Container should not scroll, content area will
-      display: 'flex',
-      flexDirection: 'column'
-    }
-
-    if (placement === 'center') {
-      tooltipStyle = {
-        ...tooltipStyle,
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-      }
-    } else {
-      // Smart positioning with fallback options
-      let finalPlacement = placement
-      let top = 0
-      let left = 0
-
-      // Use expanded area for positioning if dropdown is involved
-      const positionRect = expandedArea
-
-      // Special positioning for demo accounts dropdown to avoid overlap
-      if (target === '[data-tour="demo-accounts-list"]') {
-        // Always try to position intelligently to avoid covering the dropdown
-        if (viewportWidth > 768) {
-          // Desktop: try positioning to the left of the dropdown first
-          left = positionRect.left - tooltipWidth - margin
-          top = positionRect.top
-          
-          // If not enough space on left, try right
-          if (left < margin) {
-            left = positionRect.right + margin
-            
-            // If still not enough space on right, position above/below
-            if (left + tooltipWidth > viewportWidth - margin) {
-              left = Math.max(margin, viewportWidth - tooltipWidth - margin)
-              
-              // Try positioning above first
-              top = positionRect.top - tooltipHeight - margin
-              
-              // If not enough space above, position below
-              if (top < margin) {
-                top = positionRect.bottom + margin
-                
-                // If tooltip would overflow bottom, constrain it
-                if (top + tooltipHeight > viewportHeight - margin) {
-                  top = viewportHeight - tooltipHeight - margin
-                  // Make sure it doesn't go above the top
-                  top = Math.max(margin, top)
-                }
-              }
-            }
-          }
-          
-          // Final viewport boundary check for top position
-          if (top + tooltipHeight > viewportHeight - margin) {
-            top = viewportHeight - tooltipHeight - margin
-          }
-          top = Math.max(margin, top)
-          
+    const mountTour = tourPerformance.measureExecutionTime(() => {
+      if (isActive && currentStepData) {
+        setIsMounted(true)
+        
+        // Enhanced element visibility check
+        if (targetElement) {
+          tourDOMUtils.ensureElementVisibility(targetElement)
+            .then(() => {
+              tourLogger.debug('Target element visibility ensured')
+              setIsVisible(true)
+            })
+            .catch((err) => {
+              tourLogger.error('Failed to ensure element visibility:', err)
+              // Still show tooltip but log the issue
+              setIsVisible(true)
+            })
         } else {
-          // Mobile: position at top of screen with better constraints
-          left = margin
-          top = margin + 60
-          // Ensure tooltip doesn't exceed mobile viewport
-          const mobileMaxHeight = viewportHeight - 160 // Account for mobile UI elements
-          tooltipStyle.maxHeight = `${Math.min(maxTooltipHeight, mobileMaxHeight)}px`
-          tooltipStyle.maxWidth = `${viewportWidth - 2 * margin}px`
+          // Small delay for positioning to complete
+          setTimeout(() => setIsVisible(true), 50)
         }
       } else {
-        // Normal positioning logic for other elements
-        switch (placement) {
-          case 'top':
-            top = positionRect.top - tooltipHeight - margin
-            left = positionRect.left + positionRect.width / 2 - tooltipWidth / 2
-            if (top < margin) {
-              finalPlacement = 'bottom'
-              top = positionRect.bottom + margin
-            }
-            break
-          case 'bottom':
-            top = positionRect.bottom + margin
-            left = positionRect.left + positionRect.width / 2 - tooltipWidth / 2
-            if (top + tooltipHeight > viewportHeight - margin) {
-              finalPlacement = 'top'
-              top = positionRect.top - tooltipHeight - margin
-            }
-            break
-          case 'left':
-            top = positionRect.top + positionRect.height / 2 - tooltipHeight / 2
-            left = positionRect.left - tooltipWidth - margin
-            if (left < margin) {
-              finalPlacement = 'right'
-              left = positionRect.right + margin
-            }
-            break
-          case 'right':
-            top = positionRect.top + positionRect.height / 2 - tooltipHeight / 2
-            left = positionRect.right + margin
-            if (left + tooltipWidth > viewportWidth - margin) {
-              finalPlacement = 'left'
-              left = positionRect.left - tooltipWidth - margin
-            }
-            break
-        }
+        setIsVisible(false)
+        const timer = setTimeout(() => {
+          setIsMounted(false)
+        }, TOUR_CONSTANTS.FADE_DURATION)
+        
+        return () => clearTimeout(timer)
+      }
+    }, 'Tour Mount')
 
-        // Ensure tooltip stays within viewport bounds
-        left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth - margin))
-        top = Math.max(margin, Math.min(top, viewportHeight - tooltipHeight - margin))
+    return mountTour()
+  }, [isActive, currentStepData, targetElement])
 
-        // For mobile devices, position at bottom of screen if element is in upper half
-        if (viewportWidth <= 768) {
-          if (positionRect.top < viewportHeight / 2) {
-            // Element in upper half - position tooltip at bottom
-            top = viewportHeight - tooltipHeight - margin - 80 // Account for mobile chrome bars
-            left = margin
-            tooltipStyle.maxWidth = `${viewportWidth - 2 * margin}px`
-          } else {
-            // Element in lower half - position tooltip at top
-            top = margin + 60 // Account for mobile status bar
-            left = margin
-            tooltipStyle.maxWidth = `${viewportWidth - 2 * margin}px`
+  // Enhanced keyboard navigation with debouncing
+  useEffect(() => {
+    if (!isActive || !isVisible) return
+
+    const debouncedKeyboardHandler = tourEventUtils.debounce(
+      tourEventUtils.createKeyboardHandler({
+        'Escape': () => {
+          tourLogger.debug('Escape key pressed, stopping tour')
+          stopTour()
+        },
+        'ArrowRight': () => {
+          if (!isTransitioning) {
+            tourLogger.debug('Arrow right pressed, next step')
+            nextStep()
+          }
+        },
+        'ArrowLeft': () => {
+          if (!isTransitioning && currentStep > 0) {
+            tourLogger.debug('Arrow left pressed, previous step')
+            prevStep()
+          }
+        },
+        'Enter': () => {
+          if (!isTransitioning) {
+            tourLogger.debug('Enter key pressed, next step')
+            nextStep()
           }
         }
+      }),
+      TOUR_CONSTANTS.ELEMENT_SEARCH_DELAY
+    )
+
+    document.addEventListener('keydown', debouncedKeyboardHandler)
+    return () => document.removeEventListener('keydown', debouncedKeyboardHandler)
+  }, [isActive, isVisible, currentStep, nextStep, prevStep, stopTour, isTransitioning])
+
+  // Enhanced focus management with WCAG compliance
+  useEffect(() => {
+    if (!isVisible || !tooltipRef.current) return
+
+    const setupFocusTrap = tourPerformance.measureExecutionTime(() => {
+      // Clean up previous focus trap
+      if (focusTrapRef.current) {
+        focusTrapRef.current()
       }
 
-      tooltipStyle = {
-        ...tooltipStyle,
-        top: `${top}px`,
-        left: `${left}px`,
+      // Set up new focus trap
+      focusTrapRef.current = tourDOMUtils.trapFocus(tooltipRef.current!)
+
+      return () => {
+        if (focusTrapRef.current) {
+          focusTrapRef.current()
+          focusTrapRef.current = null
+        }
       }
+    }, 'Focus Trap Setup')
+
+    return setupFocusTrap()
+  }, [isVisible, currentStep])
+
+  // Optimized step transitions with CLS prevention
+  const handleStepTransition = async (transitionFn: () => void) => {
+    if (isTransitioning) return
+
+    try {
+      setIsTransitioning(true)
+      
+      // Fade out with hardware acceleration
+      if (tooltipRef.current) {
+        tooltipRef.current.style.transform = 'translate3d(0, 0, 0)'
+        tooltipRef.current.style.willChange = 'transform, opacity'
+        await tourAnimations.fadeOut(tooltipRef.current, TOUR_CONSTANTS.FADE_DURATION)
+      }
+      
+      // Execute transition
+      transitionFn()
+      
+      // Small delay for positioning to complete
+      setTimeout(() => {
+        // Fade in new tooltip with hardware acceleration
+        if (tooltipRef.current) {
+          tourAnimations.fadeIn(tooltipRef.current, TOUR_CONSTANTS.FADE_DURATION)
+        }
+        setIsTransitioning(false)
+      }, 100)
+      
+    } catch (err) {
+      tourLogger.error('Error during step transition:', err)
+      setIsTransitioning(false)
     }
-
-    setOverlayStyle(overlayStyle)
-    setTooltipStyle(tooltipStyle)
   }
 
-  if (!mounted || !step || !tour) return null
+  // Enhanced navigation handlers
+  const handleNext = () => handleStepTransition(nextStep)
+  const handlePrev = () => handleStepTransition(prevStep)
+  const handleSkip = () => handleStepTransition(skipTour)
 
-  const progress = ((currentStep + 1) / tour.steps.length) * 100
-
-  return createPortal(
-    <div className="tour-container">
-      {/* Overlay with cutout */}
-      <div 
-        style={overlayStyle} 
-        className="tour-overlay"
-        onClick={(e) => {
-          e.stopPropagation()
-          stopTour()
-        }}
-      />
-      
-      {/* Tooltip */}
-      <Card style={tooltipStyle} className="tour-tooltip shadow-2xl border-2 bg-background text-foreground flex flex-col dark:shadow-black/50">
-        <CardHeader className="pb-3 flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <Badge variant="secondary" className="text-xs bg-secondary text-secondary-foreground border-secondary-foreground/20">
-              Step {currentStep + 1} of {tour.steps.length}
-            </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={stopTour}
-              className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <Progress value={progress} className="h-2 bg-secondary" />
-          <CardTitle className="text-lg mt-3 text-foreground">{step.title}</CardTitle>
-        </CardHeader>
-        
-        <CardContent className="pt-0 flex-1 flex flex-col">
-          <div 
-            className="overflow-y-auto pr-2 mb-4 flex-1"
-            style={{ 
-              maxHeight: `${contentAreaHeight}px` // Dynamic max height based on available space
-            }}
-          >
-            <CardDescription 
-              className="text-sm leading-relaxed text-muted-foreground [&_strong]:text-foreground [&_em]:text-foreground"
-              dangerouslySetInnerHTML={{ __html: step.content }}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between gap-3 pt-3 border-t border-border bg-background flex-shrink-0">
-            <div className="flex gap-2">
-              {currentStep > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={prevStep}
-                  className="flex items-center gap-2 border-border hover:bg-accent hover:text-accent-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  {step.prevButton || 'Previous'}
-                </Button>
-              )}
-            </div>
-            
-            <div className="flex gap-2">
-              {step.showSkip && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={skipTour}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent"
-                >
-                  <SkipForward className="h-4 w-4" />
-                  Skip Tour
-                </Button>
-              )}
-              
-              <Button
-                onClick={nextStep}
-                size="sm"
-                className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {step.nextButton || 'Next'}
-                {currentStep < tour.steps.length - 1 && (
-                  <ArrowRight className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>,
-    document.body
-  )
-}
-
-export const Tour: React.FC = () => {
-  const { isActive, getCurrentStep } = useTour()
-  const step = getCurrentStep()
-  const [isLoginPage, setIsLoginPage] = useState(false)
-  const [mounted, setMounted] = useState(false)
-
-  // Detect if we're on the login page to force light theme
+  // Handle clicks outside tooltip
   useEffect(() => {
-    setMounted(true)
-    const checkPage = () => {
-      setIsLoginPage(window.location.pathname === '/login')
-    }
-    
-    checkPage()
-    window.addEventListener('popstate', checkPage)
-    
-    return () => window.removeEventListener('popstate', checkPage)
-  }, [])
+    if (!isVisible) return
 
-  if (!mounted || !isActive || !step) return null
-
-  return (
-    <div className={isLoginPage ? 'light' : ''}>
-      <TourOverlay
-        target={step.target}
-        placement={step.placement}
-        onClose={() => {}} // Not used - handled in overlay click
-      />
-    </div>
-  )
-}
-
-interface TourControlsProps {
-  className?: string
-}
-
-export const TourControls: React.FC<TourControlsProps> = ({ className }) => {
-  const {
-    isActive,
-    isTourAvailable,
-    availableTours,
-    startTour,
-    stopTour,
-    toggleTourAvailability,
-    currentTour,
-  } = useTour()
-
-  const [showMenu, setShowMenu] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false)
+      if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
+        // Don't close if clicking on the target element
+        if (targetElement && targetElement.contains(event.target as Node)) {
+          return
+        }
+        tourLogger.debug('Clicked outside tooltip, stopping tour')
+        stopTour()
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [isVisible, targetElement, stopTour])
 
-  if (!isTourAvailable) return null
+  // Enhanced error handling with logging
+  useEffect(() => {
+    if (error || positionError) {
+      tourLogger.error('Tour error detected:', error || positionError)
+      // Don't automatically stop on error - let user decide
+    }
+  }, [error, positionError])
+
+  // Don't render if not mounted or no current step
+  if (!isMounted || !currentStepData || !tourDefinition) {
+    return null
+  }
+
+  // Optimized loading state with Suspense
+  if (isPositioning) {
+    return (
+      <div 
+        style={{ 
+          ...positions.overlayStyle, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          position: 'fixed',
+          zIndex: TOUR_CONSTANTS.OVERLAY_Z_INDEX
+        }}
+      >
+        <Card className="p-4 max-w-sm">
+          <CardContent className="flex items-center space-x-2 p-0">
+            <div 
+              className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"
+              data-testid="loading-spinner"
+              aria-hidden="true"
+            />
+            <span className="text-sm">Loading tour...</span>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const totalSteps = tourDefinition.steps.length
+  const stepNumber = currentStep + 1
+  const progressPercentage = (stepNumber / totalSteps) * 100
 
   return (
-    <div className={cn("relative", className)} data-tour="tour-controls" ref={menuRef}>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 hover:bg-white/20 dark:hover:bg-black/20 transition-colors"
+    <Suspense fallback={<div>Loading tour...</div>}>
+      {/* Overlay with theme support */}
+      <div 
+        style={{
+          ...positions.overlayStyle,
+          backgroundColor: TOUR_THEMES.light.overlayColor,
+          position: 'fixed',
+          zIndex: TOUR_CONSTANTS.OVERLAY_Z_INDEX
+        }}
+        className="tour-overlay"
+      />
+      
+      {/* Standardized Tooltip using Shadcn UI Card */}
+      <Card
+        ref={tooltipRef}
+        style={{
+          ...positions.tooltipStyle,
+          maxWidth: `${TOUR_CONSTANTS.MAX_TOOLTIP_WIDTH}px`,
+          minWidth: `${TOUR_CONSTANTS.MIN_TOOLTIP_WIDTH}px`,
+          position: 'fixed',
+          zIndex: TOUR_CONSTANTS.TOOLTIP_Z_INDEX,
+          transform: 'translate3d(0, 0, 0)', // Hardware acceleration for CLS
+          willChange: 'transform, opacity' // Optimized for animations
+        }}
+        className={`
+          tour-tooltip
+          ${isVisible ? 'opacity-100' : 'opacity-0'}
+          ${isTransitioning ? 'pointer-events-none' : 'pointer-events-auto'}
+          transition-opacity duration-150 ease-in-out
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+          border-gray-200 dark:border-gray-700
+          ${className}
+        `}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tour-title"
+        aria-describedby="tour-content"
+        data-tour-tooltip
       >
-        <Play className="h-4 w-4" />
-        Tours
-      </Button>
-
-      {showMenu && (
-        <Card className="absolute right-0 top-full mt-2 w-80 shadow-lg z-50 bg-background text-foreground border border-border dark:shadow-black/50 dark:border-border">
-          <CardHeader className="pb-3 border-b border-border">
-            <CardTitle className="text-sm text-foreground">Guided Tours</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground">
-              Interactive guides to help you explore the application
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="pt-0">
-            <div className="space-y-2">
-              {availableTours.map((tour) => (
-                <Button
-                  key={tour.id}
-                  variant={currentTour === tour.id ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => {
-                    startTour(tour.id)
-                    setShowMenu(false)
-                  }}
-                  className="w-full justify-start text-left h-auto p-3 hover:bg-accent hover:text-accent-foreground transition-colors"
-                  disabled={isActive && currentTour === tour.id}
+        {/* Progress bar */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-t-lg overflow-hidden">
+          <div
+            className="h-full bg-blue-500 transition-all duration-300 ease-out"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        
+        {/* Standardized Card Header */}
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 
+                  id="tour-title" 
+                  className="text-lg font-semibold text-gray-900 dark:text-white truncate"
                 >
-                  <div className="text-left w-full">
-                    <div className="font-medium text-sm text-foreground">{tour.name}</div>
-                    <div className="text-xs text-muted-foreground mt-1 whitespace-normal">
-                      {tour.description}
-                    </div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-            
-            {isActive && (
-              <div className="pt-3 mt-3 border-t border-border">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    stopTour()
-                    setShowMenu(false)
-                  }}
-                  className="w-full border-border hover:bg-accent hover:text-accent-foreground"
-                >
-                  Stop Current Tour
-                </Button>
+                  {currentStepData.title}
+                </h3>
+                {currentStepData.showSkip && (
+                  <Badge variant="secondary" className="text-xs">
+                    Optional
+                  </Badge>
+                )}
               </div>
-            )}
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span>{tourDefinition.name}</span>
+                <span>•</span>
+                <span>Step {stepNumber} of {totalSteps}</span>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={stopTour}
+              className="flex-shrink-0 h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+              aria-label="Close tour"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+
+        {/* Standardized Card Content */}
+        <CardContent 
+          className="overflow-y-auto scrollbar-thin"
+          style={{ maxHeight: `${positions.contentAreaHeight}px` }}
+        >
+          <div
+            id="tour-content"
+            className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+            data-tour-content
+            dangerouslySetInnerHTML={{ __html: currentStepData.content }}
+          />
+        </CardContent>
             
-            <div className="pt-3 mt-3 border-t border-border">
+        {/* Standardized Card Footer */}
+        <CardFooter className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrev}
+              disabled={currentStep === 0 || isTransitioning}
+              className="h-8 px-3"
+            >
+              <ArrowLeft className="h-3 w-3 mr-1" />
+              {currentStepData.prevButton || 'Back'}
+            </Button>
+            
+            {/* Skip button */}
+            {currentStepData.showSkip && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  toggleTourAvailability()
-                  setShowMenu(false)
-                }}
-                className="w-full text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                onClick={handleSkip}
+                disabled={isTransitioning}
+                className="h-8 px-3 text-gray-500 hover:text-gray-700"
               >
-                Disable Tours
+                <SkipForward className="h-3 w-3 mr-1" />
+                Skip
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            )}
+          </div>
+
+          {/* Next/Finish button */}
+          <Button
+            size="sm"
+            onClick={handleNext}
+            disabled={isTransitioning}
+            className="h-8 px-4"
+          >
+            {currentStepData.nextButton || (stepNumber === totalSteps ? 'Finish' : 'Next')}
+            {stepNumber < totalSteps && <ArrowRight className="h-3 w-3 ml-1" />}
+          </Button>
+        </CardFooter>
+
+        {/* Enhanced error display */}
+        {(error || positionError) && (
+          <div className="mx-4 mb-4 p-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs rounded border border-red-200 dark:border-red-800">
+            <strong>Tour Error:</strong> {error || positionError}
+          </div>
+        )}
+      </Card>
+    </Suspense>
   )
-} 
+}
+
+// Re-export TourControls for convenience
+export { TourControls } from '@/components/ui/tour-controls' 

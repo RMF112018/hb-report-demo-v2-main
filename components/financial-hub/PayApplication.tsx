@@ -204,64 +204,7 @@ export function PayApplication({ userRole, projectData }: PayApplicationProps) {
         )}
       </div>
 
-      {/* Summary Cards */}
-      {summary && activeView === 'list' && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4" data-tour="pay-app-summary-cards">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-blue-200 dark:border-blue-800" data-tour="pay-app-total-applications">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Applications</p>
-                  <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{summary.totalApplications}</p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Across all projects</p>
-                </div>
-                <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 border-orange-200 dark:border-orange-800" data-tour="pay-app-pending-approval">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-orange-700 dark:text-orange-300">Pending Approval</p>
-                  <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{summary.pendingApproval}</p>
-                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Awaiting review</p>
-                </div>
-                <Clock className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 border-green-200 dark:border-green-800" data-tour="pay-app-approved-month">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700 dark:text-green-300">Approved This Month</p>
-                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">{summary.approvedThisMonth}</p>
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">Ready for payment</p>
-                </div>
-                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 border-purple-200 dark:border-purple-800" data-tour="pay-app-total-approved">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Total Approved</p>
-                  <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                    {formatCurrency(summary.totalAmountApproved)}
-                  </p>
-                  <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Current period</p>
-                </div>
-                <DollarSign className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       {/* HBI AI Insights */}
       {activeView === 'list' && (
