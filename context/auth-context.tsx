@@ -10,6 +10,8 @@ interface AuthContextType {
   user: DemoUser | null
   login: (email: string, password: string) => Promise<{ redirectTo: string }>
   logout: () => void
+  isLoading: boolean
+  isClient: boolean
 }
 
 const demoUsers: DemoUser[] = [
@@ -79,12 +81,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DemoUser | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
+  // Handle client-side hydration
   useEffect(() => {
-    const stored = localStorage.getItem('hb-demo-user')
-    if (stored) {
-      setUser(JSON.parse(stored))
+    setIsClient(true)
+    
+    // Only access localStorage after client-side hydration
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('hb-demo-user')
+        if (stored) {
+          const parsedUser = JSON.parse(stored)
+          setUser(parsedUser)
+        }
+      } catch (error) {
+        console.error('Error reading from localStorage:', error)
+        // Clear potentially corrupted data
+        localStorage.removeItem('hb-demo-user')
+      }
     }
+    
+    setIsLoading(false)
   }, [])
 
   const login = async (email: string, password: string): Promise<{ redirectTo: string }> => {
@@ -105,19 +124,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ? '/dashboard'
         : '/dashboard'
 
-    localStorage.setItem('hb-demo-user', JSON.stringify(match))
+    // Only use localStorage if we're on the client
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('hb-demo-user', JSON.stringify(match))
+      } catch (error) {
+        console.error('Error saving to localStorage:', error)
+      }
+    }
+    
     setUser(match)
-
     return { redirectTo }
   }
 
   const logout = () => {
-    localStorage.removeItem('hb-demo-user')
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('hb-demo-user')
+      } catch (error) {
+        console.error('Error removing from localStorage:', error)
+      }
+    }
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, isClient }}>
       {children}
     </AuthContext.Provider>
   )

@@ -11,6 +11,7 @@ import { Tour } from "@/components/ui/tour"
 import { TakeTourButton } from "@/components/TakeTourButton"
 import { AppHeader } from '@/components/layout/app-header'
 import { AppLayoutShell } from '@/components/layout/AppLayoutShell'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -56,20 +57,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <AuthProvider>
-          <TourProvider>
-            <ProjectProvider>
-              <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                <AppLayoutShell showHeader={false}>
-                  {children}
-                </AppLayoutShell>
-                <Tour />
-                <TakeTourButton />
-                <Toaster />
-              </ThemeProvider>
-            </ProjectProvider>
-          </TourProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <TourProvider>
+              <ProjectProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                  <AppLayoutShell showHeader={false}>
+                    {children}
+                  </AppLayoutShell>
+                  <Tour />
+                  <TakeTourButton />
+                  <Toaster />
+                </ThemeProvider>
+              </ProjectProvider>
+            </TourProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
