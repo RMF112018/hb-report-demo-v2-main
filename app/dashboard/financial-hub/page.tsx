@@ -41,6 +41,7 @@ import BudgetAnalysis from "@/components/financial-hub/BudgetAnalysis";
 import CashFlowAnalysis from "@/components/financial-hub/CashFlowAnalysis";
 import { PayApplication } from "@/components/financial-hub/PayApplication";
 import ARAgingCard from "@/components/financial-hub/ARAgingCard";
+import PayAuthorizations from "@/components/financial-hub/PayAuthorizations";
 
 import ChangeManagement from "@/components/financial-hub/ChangeManagement";
 import CostTracking from "@/components/financial-hub/CostTracking";
@@ -58,7 +59,7 @@ interface FinancialModuleTab {
 
 export default function FinancialHubPage() {
   const { user } = useAuth();
-  const { projectId, selectedProject } = useProjectContext();
+  const { projectId } = useProjectContext();
   const [activeTab, setActiveTab] = useState("overview");
 
   // Role-based data filtering helper
@@ -66,13 +67,13 @@ export default function FinancialHubPage() {
     if (!user) return { scope: "all", projectCount: 0, description: "All Projects" };
     
     // If a specific project is selected, show single project view
-    if (selectedProject) {
+    if (projectId && projectId !== 'all') {
       return {
         scope: "single",
         projectCount: 1,
-        description: `Project View: ${selectedProject.name}`,
-        projects: [selectedProject.name],
-        selectedProject
+        description: `Project View: Project ${projectId}`,
+        projects: [`Project ${projectId}`],
+        projectId
       };
     }
     
@@ -141,7 +142,13 @@ export default function FinancialHubPage() {
       description: "Generate and manage formal AIA G702/G703 payment applications",
       component: PayApplication,
     },
-
+    {
+      id: "pay-authorizations",
+      label: "Pay Authorization",
+      icon: FileText,
+      description: "Payment authorization workflow and approval management",
+      component: PayAuthorizations,
+    },
     {
       id: "change-management",
       label: "Change Orders",
