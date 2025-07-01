@@ -1,10 +1,9 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 import { useAuth } from './auth-context'
-import { TOUR_DEFINITIONS, TourStep, TourDefinition } from '@/data/tours/tour-definitions'
-import { TOUR_CONSTANTS } from '@/lib/tour-constants'
-import { tourLogger, tourStorage, tourErrorUtils } from '@/lib/tour-utils'
+import { TourStep, TourDefinition } from '@/data/tours/tour-definitions'
+import { tourLogger, tourStorage } from '@/lib/tour-utils'
 
 interface TourContextType {
   isActive: boolean
@@ -28,6 +27,146 @@ interface TourContextType {
 
 const TourContext = createContext<TourContextType | undefined>(undefined)
 
+// Simple tour definitions to avoid circular dependencies
+const SIMPLE_TOUR_DEFINITIONS: TourDefinition[] = [
+  {
+    id: 'login-demo-accounts',
+    name: 'Demo Account Login',
+    description: 'Learn how to use the demo accounts to explore the application',
+    page: 'login',
+    steps: [
+      {
+        id: 'demo-accounts-intro',
+        title: 'Welcome to HB-Report Demo',
+        content: 'Welcome to the HB-Report demo platform! This interactive demonstration showcases our comprehensive construction project management solution. Let\'s explore the demo accounts available to you.',
+        target: 'body',
+        placement: 'center',
+        nextButton: 'Start Tour'
+      },
+      {
+        id: 'demo-accounts-toggle',
+        title: 'Demo Accounts Access',
+        content: 'Click the "Demo Accounts" button to see all available demo user accounts. Each account demonstrates different role permissions and dashboard views.',
+        target: '[data-tour="demo-accounts-toggle"]',
+        placement: 'bottom',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'demo-accounts-list',
+        title: 'Choose Your Role',
+        content: 'Select from different user roles to experience the platform from various perspectives:<br/><br/>• <strong>Executive</strong> - High-level analytics and strategic overview<br/>• <strong>Project Manager</strong> - Detailed project control and management<br/>• <strong>Field Supervisor</strong> - Field operations and reporting<br/>• <strong>Estimator</strong> - Cost analysis and bidding tools',
+        target: '[data-tour="demo-accounts-list"]',
+        placement: 'left',
+        nextButton: 'Next'
+      },
+      {
+        id: 'role-based-experience',
+        title: 'Role-Based Experience',
+        content: 'Each demo account provides a customized experience with role-specific dashboards, tools, and permissions. This demonstrates how HB-Report adapts to different user needs and responsibilities.',
+        target: '[data-tour="demo-accounts-list"]',
+        placement: 'left',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'login-process',
+        title: 'Getting Started',
+        content: 'Simply click on any demo account to automatically log in and begin exploring. No passwords required for the demo! Each account contains realistic project data to showcase the platform\'s capabilities.',
+        target: '[data-tour="demo-accounts-list"]',
+        placement: 'left',
+        nextButton: 'Finish Tour'
+      }
+    ]
+  },
+  {
+    id: 'dashboard-overview',
+    name: 'Complete Dashboard Tour',
+    description: 'Comprehensive guide to all dashboard features and navigation elements',
+    page: 'dashboard',
+    steps: [
+      {
+        id: 'dashboard-welcome',
+        title: 'Welcome to Your Dashboard!',
+        content: 'This dashboard is customized for your role and provides the most relevant information and tools for your daily work. Let\'s explore all the features available to you.',
+        target: '[data-tour="dashboard-content"]',
+        placement: 'center',
+        nextButton: 'Start Tour'
+      },
+      {
+        id: 'environment-menu',
+        title: 'Environment Navigation',
+        content: 'Switch between different work environments:<br/><br/><strong>📊 Operations</strong> - Active project management<br/><strong>🏗️ Pre-Construction</strong> - Planning and estimation<br/><strong>📁 Archive</strong> - Completed projects<br/><br/>Each environment provides specialized tools and views for different phases of work.',
+        target: '[data-tour="environment-menu"]',
+        placement: 'bottom',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'projects-menu',
+        title: 'Project Selection',
+        content: 'Access and switch between your active projects. This dropdown shows all projects you have permissions to view and manage. Click to change your current project context.',
+        target: '[data-tour="projects-menu"]',
+        placement: 'bottom',
+        nextButton: 'Next'
+      },
+      {
+        id: 'tools-menu',
+        title: 'Tools & Utilities',
+        content: 'Access powerful tools and utilities for project management:<br/><br/>• Document management<br/>• Reporting tools<br/>• Import/export functions<br/>• Integration settings<br/>• Custom workflows',
+        target: '[data-tour="tools-menu"]',
+        placement: 'bottom',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'search-bar',
+        title: 'Global Search',
+        content: 'Quickly find projects, documents, contacts, or any information across the platform. Use keywords, project names, or specific data to locate what you need instantly.',
+        target: '[data-tour="search-bar"]',
+        placement: 'bottom',
+        nextButton: 'Next'
+      },
+      {
+        id: 'tours-menu',
+        title: 'Guided Tours',
+        content: 'Access interactive tours and help resources. Tours are contextual - different tours are available based on your current page and role permissions.',
+        target: '[data-tour="tour-controls"]',
+        placement: 'bottom',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'dashboard-selector',
+        title: 'Dashboard Views',
+        content: 'Switch between different dashboard layouts optimized for your role:<br/><br/>• Executive summary view<br/>• Detailed project controls<br/>• Financial overview<br/>• Custom layouts<br/><br/>Each view presents the most relevant information for your workflow.',
+        target: '[data-tour="dashboard-selector"]',
+        placement: 'left',
+        nextButton: 'Next'
+      },
+      {
+        id: 'dashboard-controls',
+        title: 'Dashboard Controls',
+        content: 'Customize your dashboard experience:<br/><br/><strong>✏️ Edit</strong> - Modify card layouts and content<br/><strong>📐 Layout</strong> - Adjust spacing and arrangement<br/><strong>⛶ Fullscreen</strong> - Maximize dashboard view<br/><br/>Make your dashboard work exactly how you need it.',
+        target: '[data-tour="dashboard-controls"]',
+        placement: 'right',
+        nextButton: 'Continue'
+      },
+      {
+        id: 'kpi-widgets',
+        title: 'Key Performance Indicators',
+        content: 'Monitor critical project metrics at a glance. These KPI widgets show real-time data for budget health, schedule performance, safety metrics, and other key indicators relevant to your role.',
+        target: '[data-tour="kpi-widgets"]',
+        placement: 'bottom',
+        nextButton: 'Next'
+      },
+      {
+        id: 'hbi-insights',
+        title: 'HB Intelligence Insights',
+        content: 'AI-powered insights and recommendations based on your project data. Get predictive analytics, risk assessments, and actionable recommendations to improve project outcomes.',
+        target: '[data-tour="hbi-insights"]',
+        placement: 'left',
+        nextButton: 'Finish Tour'
+      }
+    ]
+  }
+]
+
 export const TourProvider = ({ children }: { children: ReactNode }) => {
   const [isActive, setIsActive] = useState(false)
   const [currentTour, setCurrentTour] = useState<string | null>(null)
@@ -38,41 +177,30 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
   
   const { user } = useAuth()
 
-  // Load tour availability preference with error handling
+  // Load tour availability preference
   useEffect(() => {
-    const loadTourPreferences = async () => {
-      try {
-        const available = tourStorage.getTourAvailability()
+    try {
+      const available = tourStorage.getTourAvailability()
       setIsTourAvailable(available)
-        tourLogger.debug('Tour preferences loaded:', { available })
-      } catch (err) {
-        tourLogger.error('Failed to load tour preferences:', err)
-        setIsTourAvailable(true) // Default to true on error
-      }
+      tourLogger.debug('Tour preferences loaded:', { available })
+    } catch (err) {
+      tourLogger.error('Failed to load tour preferences:', err)
+      setIsTourAvailable(true)
     }
-
-    loadTourPreferences()
   }, [])
 
-  // Get available tours based on user role and current page with memoization
-  const availableTours = useMemo(() => {
-    try {
-      return TOUR_DEFINITIONS.filter(tour => {
+  // Get available tours based on user role
+  const availableTours = SIMPLE_TOUR_DEFINITIONS.filter(tour => {
     if (tour.userRoles && user) {
       return tour.userRoles.includes(user.role)
     }
     return true
   })
-    } catch (err) {
-      tourLogger.error('Error filtering available tours:', err)
-      return []
-    }
-  }, [user?.role])
 
-  // Memoized helper functions
+  // Helper functions
   const getCurrentTourDefinition = useCallback((): TourDefinition | null => {
     if (!currentTour) return null
-    return TOUR_DEFINITIONS.find(tour => tour.id === currentTour) || null
+    return SIMPLE_TOUR_DEFINITIONS.find(tour => tour.id === currentTour) || null
   }, [currentTour])
 
   const getCurrentStep = useCallback((): TourStep | null => {
@@ -81,7 +209,7 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
     return tour.steps[currentStep]
   }, [getCurrentTourDefinition, currentStep])
 
-  // Enhanced start tour function with better error handling and performance
+  // Start tour function
   const startTour = useCallback(async (tourId: string, isAutoStart: boolean = false) => {
     try {
       setIsLoading(true)
@@ -95,250 +223,98 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
         return
       }
 
-      // Validate tour exists
-      const tour = TOUR_DEFINITIONS.find(t => t.id === tourId)
+      const tour = SIMPLE_TOUR_DEFINITIONS.find(t => t.id === tourId)
       if (!tour) {
-        const errorMsg = `Tour not found: ${tourId}`
-        tourLogger.error(errorMsg)
+        const errorMsg = `Tour "${tourId}" not found`
         setError(errorMsg)
+        tourLogger.error(errorMsg)
         return
       }
 
-      // Validate tour definition
-      const validationErrors = tourErrorUtils.safeExecute(
-        () => {
-          // Simple validation - could be expanded
-          if (!tour.steps || tour.steps.length === 0) {
-            return ['Tour has no steps']
-          }
-          return []
-        },
-        ['Unknown validation error'],
-        'Tour validation failed'
-      )
-      
-      if ((await validationErrors).length > 0) {
-        const errorMsg = `Tour validation failed: ${(await validationErrors).join(', ')}`
-        tourLogger.error(errorMsg)
-        setError(errorMsg)
-        return
-      }
-      
-      // Mark as shown if auto-start
-      if (isAutoStart) {
-        tourStorage.markTourAsShown(tourId)
-    }
-    
-      // Start the tour
       setCurrentTour(tourId)
       setCurrentStep(0)
       setIsActive(true)
+
+      // Mark tour as shown in session
+      tourStorage.markTourAsShown(tourId)
       
-      tourLogger.info('Tour started successfully:', tourId)
+      tourLogger.info(`Tour "${tourId}" started successfully`)
     } catch (err) {
-      const errorMsg = `Failed to start tour: ${err}`
-      tourLogger.error(errorMsg, err)
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error starting tour'
       setError(errorMsg)
+      tourLogger.error('Error starting tour:', err)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  // Enhanced stop tour function
-  const stopTour = useCallback(async () => {
+  // Stop tour function
+  const stopTour = useCallback(() => {
     try {
-      tourLogger.info('Stopping tour:', currentTour)
-      
-    setIsActive(false)
-      
-      // Clean up any tour-specific DOM modifications
-      await tourErrorUtils.safeExecute(
-        () => {
-          // Close demo accounts dropdown if it was opened by tour
-          const button = document.querySelector('[data-tour="demo-accounts-toggle"]') as HTMLButtonElement
-          const dropdown = document.querySelector('[data-tour="demo-accounts-list"]')
-          if (button && dropdown) {
-            button.click()
-          }
-        },
-        undefined,
-        'Failed to clean up tour DOM modifications'
-      )
-
-      // Reset state after a delay to allow animations to complete
-      setTimeout(() => {
-    setCurrentTour(null)
-    setCurrentStep(0)
-        setError(null)
-      }, TOUR_CONSTANTS.TOUR_CLEANUP_DELAY)
-
-    } catch (err) {
-      tourLogger.error('Error stopping tour:', err)
-      // Force reset even if cleanup failed
-      setCurrentTour(null)
-      setCurrentStep(0)
-      setError(null)
-    }
-  }, [currentTour])
-
-  // Enhanced navigation functions with error handling
-  const nextStep = useCallback(async () => {
-    try {
-    const tour = getCurrentTourDefinition()
-    if (!tour) return
-
-    const step = getCurrentStep()
-      
-      // Execute step's onNext callback if it exists
-    if (step?.onNext) {
-        await tourErrorUtils.safeExecute(
-          () => step.onNext!(),
-          undefined,
-          'Error executing step onNext callback'
-        )
-    }
-
-    if (currentStep < tour.steps.length - 1) {
-      setCurrentStep(currentStep + 1)
-        tourLogger.debug('Advanced to next step:', currentStep + 1)
-    } else {
-        tourLogger.info('Tour completed')
-        await stopTour()
-    }
-    } catch (err) {
-      tourLogger.error('Error advancing to next step:', err)
-      setError('Failed to advance to next step')
-    }
-  }, [getCurrentTourDefinition, getCurrentStep, currentStep, stopTour])
-
-  const prevStep = useCallback(async () => {
-    try {
-    const step = getCurrentStep()
-      
-      // Execute step's onPrev callback if it exists
-    if (step?.onPrev) {
-        await tourErrorUtils.safeExecute(
-          () => step.onPrev!(),
-          undefined,
-          'Error executing step onPrev callback'
-        )
-    }
-
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-        tourLogger.debug('Returned to previous step:', currentStep - 1)
-      }
-    } catch (err) {
-      tourLogger.error('Error returning to previous step:', err)
-      setError('Failed to return to previous step')
-    }
-  }, [getCurrentStep, currentStep])
-
-  const skipTour = useCallback(async () => {
-    try {
-      tourLogger.info('Skipping tour:', currentTour)
-      
-    const step = getCurrentStep()
-      
-      // Execute step's onSkip callback if it exists
-    if (step?.onSkip) {
-        await tourErrorUtils.safeExecute(
-          () => step.onSkip!(),
-          undefined,
-          'Error executing step onSkip callback'
-        )
-      }
-
-      await stopTour()
-    } catch (err) {
-      tourLogger.error('Error skipping tour:', err)
-      // Force stop even if skip callback failed
-      await stopTour()
-  }
-  }, [getCurrentStep, currentTour, stopTour])
-
-  const goToStep = useCallback((stepIndex: number) => {
-    try {
-    const tour = getCurrentTourDefinition()
-    if (tour && stepIndex >= 0 && stepIndex < tour.steps.length) {
-      setCurrentStep(stepIndex)
-        tourLogger.debug('Jumped to step:', stepIndex)
-      } else {
-        tourLogger.warn('Invalid step index:', stepIndex)
-      }
-    } catch (err) {
-      tourLogger.error('Error jumping to step:', err)
-      setError('Failed to navigate to step')
-    }
-  }, [getCurrentTourDefinition])
-
-  const toggleTourAvailability = useCallback(() => {
-    try {
-    const newAvailability = !isTourAvailable
-    setIsTourAvailable(newAvailability)
-      tourStorage.setTourAvailability(newAvailability)
-    
-    if (!newAvailability && isActive) {
-      stopTour()
-    }
-      
-      tourLogger.info('Tour availability toggled:', newAvailability)
-    } catch (err) {
-      tourLogger.error('Error toggling tour availability:', err)
-      setError('Failed to update tour preferences')
-  }
-  }, [isTourAvailable, isActive, stopTour])
-
-  const resetTourState = useCallback(() => {
-    try {
-      tourLogger.info('Resetting all tour state')
-
-    setIsActive(false)
-    setCurrentTour(null)
-    setCurrentStep(0)
-      setError(null)
-      
-      // Clear all tour data
-      tourStorage.clearAllTourData()
-      setIsTourAvailable(true)
-      
-      tourLogger.info('Tour state reset complete')
-    } catch (err) {
-      tourLogger.error('Error resetting tour state:', err)
-      // Force reset critical state even if storage cleanup failed
+      tourLogger.info('Stopping tour:', { currentTour })
       setIsActive(false)
       setCurrentTour(null)
       setCurrentStep(0)
-      setIsTourAvailable(true)
+      setError(null)
+    } catch (err) {
+      tourLogger.error('Error stopping tour:', err)
     }
+  }, [currentTour])
+
+  // Navigation functions
+  const nextStep = useCallback(() => {
+    const tour = getCurrentTourDefinition()
+    if (!tour) return
+
+    const nextStepIndex = currentStep + 1
+    if (nextStepIndex >= tour.steps.length) {
+      stopTour()
+    } else {
+      setCurrentStep(nextStepIndex)
+      tourLogger.debug('Moved to next step:', { currentStep: nextStepIndex })
+    }
+  }, [currentStep, getCurrentTourDefinition, stopTour])
+
+  const prevStep = useCallback(() => {
+    if (currentStep > 0) {
+      const prevStepIndex = currentStep - 1
+      setCurrentStep(prevStepIndex)
+      tourLogger.debug('Moved to previous step:', { currentStep: prevStepIndex })
+    }
+  }, [currentStep])
+
+  const goToStep = useCallback((stepIndex: number) => {
+    const tour = getCurrentTourDefinition()
+    if (!tour || stepIndex < 0 || stepIndex >= tour.steps.length) return
+
+    setCurrentStep(stepIndex)
+    tourLogger.debug('Jumped to step:', { stepIndex })
+  }, [getCurrentTourDefinition])
+
+  const skipTour = useCallback(() => {
+    tourLogger.info('Tour skipped by user:', { currentTour })
+    stopTour()
+  }, [currentTour, stopTour])
+
+  // Toggle tour availability
+  const toggleTourAvailability = useCallback(() => {
+    const newAvailability = !isTourAvailable
+    setIsTourAvailable(newAvailability)
+    tourStorage.setTourAvailability(newAvailability)
+    tourLogger.info('Tour availability toggled:', { newAvailability })
+  }, [isTourAvailable])
+
+  // Reset tour state
+  const resetTourState = useCallback(() => {
+    setIsActive(false)
+    setCurrentTour(null)
+    setCurrentStep(0)
+    setError(null)
+    setIsLoading(false)
+    tourLogger.info('Tour state reset')
   }, [])
 
-  // Clear error after a delay
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError(null)
-      }, 5000) // Clear error after 5 seconds
-
-      return () => clearTimeout(timer)
-      }
-  }, [error])
-
-  // Debug logging for state changes
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      tourLogger.debug('Tour state changed:', {
-        isActive,
-        currentTour,
-        currentStep,
-        isTourAvailable,
-        availableToursCount: availableTours.length,
-        userRole: user?.role
-      })
-    }
-  }, [isActive, currentTour, currentStep, isTourAvailable, availableTours.length, user?.role])
-
-  const contextValue = useMemo(() => ({
+  const contextValue: TourContextType = {
     isActive,
     currentTour,
     currentStep,
@@ -356,25 +332,7 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
     resetTourState,
     isLoading,
     error
-  }), [
-        isActive,
-        currentTour,
-        currentStep,
-        availableTours,
-        startTour,
-        stopTour,
-        nextStep,
-        prevStep,
-        skipTour,
-        goToStep,
-        toggleTourAvailability,
-        isTourAvailable,
-        getCurrentTourDefinition,
-        getCurrentStep,
-        resetTourState,
-    isLoading,
-    error
-  ])
+  }
 
   return (
     <TourContext.Provider value={contextValue}>
@@ -385,7 +343,7 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
 
 export const useTour = (): TourContextType => {
   const context = useContext(TourContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useTour must be used within a TourProvider')
   }
   return context

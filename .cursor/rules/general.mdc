@@ -1,0 +1,93 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# HB Report – General Development Guidelines
+
+**Version:** `2.1`
+**git Branch:** `hb-demo-v2.1`
+
+> Cursor should assume version 2.1 by default for all generation, documentation, and file updates.
+
+---
+
+## 🎯 Application Purpose
+
+HB Report is a role-based construction intelligence platform designed to:
+- Centralize operational workflows from preconstruction through warranty
+- Integrate and summarize data from tools like Procore, Compass, and Autodesk
+- Streamline communication of critical metrics: financials, staffing, schedule, procurement, and field reporting
+
+---
+
+## 📁 File Organization & README Management
+
+### ✅ Centralized Documentation
+
+- All feature/module documentation should live in:  
+  **`/docs/readme/[feature-name].md`**
+
+### 🛠 Cursor MUST:
+- Automatically generate a README for any new tool, module, or dashboard page
+- Check for missing READMEs during code edits and generate them when absent
+- Use the feature/module name as the file name (e.g. `financial-hub.md`)
+- Include version and author metadata in each README
+
+### 📄 README Template Structure
+
+1. **Feature Name & Purpose**
+2. **User Roles Impacted**
+3. **Primary Data Structures**
+4. **Key UI Components**
+5. **API or Store Integration (if applicable)**
+6. **Known Issues or Limitations**
+7. **Future Improvements**
+8. **Last Updated / Author**
+
+---
+
+## 📝 In-Code Documentation Standards
+
+### ✅ Cursor MUST include:
+- JSDoc/TypeScript docblocks for **all exported functions and components**
+- Descriptions for each parameter and return type
+- Comment blocks to explain complex business logic or side effects
+- State slice annotations in Zustand stores (`/store`) explaining purpose of each state/action
+
+---
+
+## 🔧 Cursor Coding Rules
+
+- Use **Tailwind CSS** exclusively for styling
+- Use **`project_id`** consistently across all project-based filtering and logic
+- Prefer modular, reusable components—no copy/paste logic
+- Group route logic by user role or business function (e.g., `staff-planning/project-executive/page.tsx`)
+- Avoid adding new third-party dependencies unless explicitly approved
+- New files should be dropped in appropriate locations and registered if needed
+
+---
+
+## 🚀 Git Commit Policy
+
+Cursor must execute Git actions **at appropriate intervals** to ensure safe, trackable development:
+
+- **Auto-commit** any generated README or `.mdc` file changes
+- **Auto-commit** logical blocks of development (e.g., completing a new module or feature refactor)
+- Commit messages should be:
+  - `docs: add README for [feature-name]`
+  - `feat: scaffold [new-module-name]`
+  - `chore: auto-generate missing documentation for [feature]`
+
+All commits should be made to the **current working branch**, respecting in-progress feature work.
+
+---
+
+## 🚧 Additional Notes
+
+- This is a live demo environment. Many features are in active development or prototype stages.
+- All mock data is filtered using `project_id`, with consistent schema across data types.
+- User feedback is ongoing; changes should be documented clearly as the platform evolves.
+- This file governs documentation, code generation, and structure for version `2.1`.
+
+---

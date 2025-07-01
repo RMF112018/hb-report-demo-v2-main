@@ -8,6 +8,7 @@ import { TourProvider } from "@/context/tour-context"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Tour } from "@/components/ui/tour"
+import { TakeTourButton } from "@/components/TakeTourButton"
 import { AppHeader } from '@/components/layout/app-header'
 import { AppLayoutShell } from '@/components/layout/AppLayoutShell'
 
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {children}
                 </AppLayoutShell>
                 <Tour />
+                <TakeTourButton />
                 <Toaster />
               </ThemeProvider>
             </ProjectProvider>

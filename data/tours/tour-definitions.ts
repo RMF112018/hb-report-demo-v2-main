@@ -21,6 +21,47 @@ export interface TourDefinition {
   page?: string // Which page this tour is for
 }
 
+/**
+ * Validates all tour definitions to ensure they have valid selectors and placement values
+ * This is a basic validation that can be called during runtime
+ */
+const validateAllTourDefinitions = (tourDefinitions: TourDefinition[]) => {
+  const errors: string[] = []
+  
+  tourDefinitions.forEach((tour, tourIndex) => {
+    // Basic validation without external dependencies
+    if (!tour.id) errors.push(`Tour ${tourIndex + 1}: Missing tour ID`)
+    if (!tour.name) errors.push(`Tour ${tourIndex + 1}: Missing tour name`)
+    if (!tour.description) errors.push(`Tour ${tourIndex + 1}: Missing tour description`)
+    if (!tour.steps || tour.steps.length === 0) {
+      errors.push(`Tour "${tour.name}" (${tour.id}): No steps defined`)
+    } else {
+      // Validate each step
+      tour.steps.forEach((step, stepIndex) => {
+        if (!step.id) errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Missing step ID`)
+        if (!step.title) errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Missing step title`)
+        if (!step.content) errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Missing step content`)
+        if (!step.target) errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Missing target selector`)
+        if (!step.placement) {
+          errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Missing placement`)
+        } else {
+          // Validate placement values
+          const validPlacements = ['top', 'bottom', 'left', 'right', 'center']
+          if (!validPlacements.includes(step.placement)) {
+            errors.push(`Tour "${tour.name}", Step ${stepIndex + 1}: Invalid placement '${step.placement}'`)
+          }
+        }
+      })
+    }
+  })
+  
+  if (errors.length > 0 && process.env.NODE_ENV === 'development') {
+    console.warn('Tour definition validation warnings:', errors)
+  }
+  
+  return errors
+}
+
 // Login Tour Definition
 export const loginTour: TourDefinition = {
   id: 'login-demo-accounts',
@@ -461,4 +502,7 @@ export const TOUR_DEFINITIONS: TourDefinition[] = [
   projectManagerStaffingTour,
   // Note: Other tour definitions (scheduler, financial-hub, etc.) should be moved here
   // from the original tour-context.tsx file. For brevity, I'm showing the pattern with just these.
-] 
+]
+
+// Export validation function for external use
+export { validateAllTourDefinitions } 

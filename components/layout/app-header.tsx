@@ -13,7 +13,7 @@ import { useTheme } from "next-themes"
 import { useProjectContext } from "@/context/project-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { TourControls } from "@/components/ui/tour-controls"
+
 import projectsData from "@/data/mock/projects.json"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { Calendar, Users } from "lucide-react"
@@ -572,9 +572,6 @@ export const AppHeader = () => {
 
           {/* Navigation Pills */}
           <nav className="hidden lg:flex items-center space-x-2">
-            {/* Tour Controls */}
-            <TourControls className="text-white [&_button]:text-white [&_button]:hover:bg-white/20" />
-            
             {/* Department Picker */}
             <Button
               variant="ghost"

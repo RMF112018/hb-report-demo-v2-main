@@ -104,8 +104,8 @@ export const tourDOMUtils = {
 
   isElementInViewport: (element: HTMLElement): boolean => {
     const rect = element.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth
     
     return (
       rect.top >= 0 &&
@@ -117,8 +117,8 @@ export const tourDOMUtils = {
 
   isElementPartiallyVisible: (element: HTMLElement): boolean => {
     const rect = element.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth
     
     return (
       rect.bottom > 0 &&
@@ -128,125 +128,222 @@ export const tourDOMUtils = {
     )
   },
 
+  /**
+   * Enhanced element visibility function with comprehensive anchoring
+   * Ensures target elements are fully visible before showing tooltips
+   */
   ensureElementVisibility: async (element: HTMLElement): Promise<void> => {
-    // First check if element is already visible
-    if (tourDOMUtils.isElementInViewport(element)) {
-      tourLogger.debug('Element already in viewport')
-      return
-    }
-
-    // If partially visible, try scrolling it into full view
-    if (tourDOMUtils.isElementPartiallyVisible(element)) {
-      tourLogger.debug('Element partially visible, scrolling to center')
-      await tourDOMUtils.scrollElementIntoView(element, { block: 'center' })
-      return
-    }
-
-    // Element is not visible at all, need to find it
-    tourLogger.debug('Element not visible, attempting to locate and scroll')
+    tourLogger.debug('Ensuring element visibility for:', element)
     
-    // Try scrolling to the element's container first
-    const container = element.closest('[data-tour-container], .dashboard-content, main, .container')
-    if (container && container !== element) {
-      await tourDOMUtils.scrollElementIntoView(container as HTMLElement, { block: 'start' })
-      await new Promise(resolve => setTimeout(resolve, 200))
+    try {
+      // Performance measurement for visibility operations
+      return await tourPerformance.measureExecutionTime(async () => {
+        // First check if element is already visible
+        if (tourDOMUtils.isElementInViewport(element)) {
+          tourLogger.debug('Element already in viewport')
+          return
+        }
+
+        // Handle special cases for dropdowns and popovers
+        await tourDOMUtils.handleSpecialElements(element)
+
+        // If partially visible, try scrolling it into full view
+        if (tourDOMUtils.isElementPartiallyVisible(element)) {
+          tourLogger.debug('Element partially visible, scrolling to center')
+          await tourDOMUtils.scrollElementIntoView(element, { 
+            block: 'center',
+            inline: 'center'
+          })
+          
+          // Verify visibility after scroll
+          if (tourDOMUtils.isElementInViewport(element)) {
+            return
+          }
+        }
+
+        // Element is not visible at all, need comprehensive approach
+        tourLogger.debug('Element not visible, attempting comprehensive visibility strategy')
+        
+        // 1. Try expanding collapsed parent elements
+        await tourDOMUtils.expandParentContainers(element)
+        
+        // 2. Try scrolling to the element's container first
+        const container = element.closest('[data-tour-container], .dashboard-content, main, .container')
+        if (container && container !== element) {
+          await tourDOMUtils.scrollElementIntoView(container as HTMLElement, { block: 'start' })
+          await new Promise(resolve => setTimeout(resolve, TOUR_CONSTANTS.DASHBOARD_SCROLL_DELAY))
+        }
+
+        // 3. Now scroll to the actual element
+        await tourDOMUtils.scrollElementIntoView(element, { 
+          block: 'center',
+          inline: 'center'
+        })
+        
+        // 4. Final verification with retry mechanism
+        let retries = 3
+        while (retries > 0 && !tourDOMUtils.isElementPartiallyVisible(element)) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          await tourDOMUtils.scrollElementIntoView(element, { block: 'nearest' })
+          retries--
+        }
+        
+        if (!tourDOMUtils.isElementPartiallyVisible(element)) {
+          tourLogger.warn('Unable to ensure full element visibility after retries')
+        } else {
+          tourLogger.debug('Element visibility successfully ensured')
+        }
+      }, 'Element Visibility Ensure')
+    } catch (err) {
+      tourLogger.error('Error ensuring element visibility:', err)
+      throw err
+    }
+  },
+
+  /**
+   * Handle special element types like dropdowns, popovers, and modals
+   */
+  handleSpecialElements: async (element: HTMLElement): Promise<void> => {
+    // Check if element is inside a dropdown or popover
+    const dropdown = element.closest('[data-radix-popper-content-wrapper], .dropdown-menu, .popover')
+    if (dropdown) {
+      tourLogger.debug('Element is inside dropdown/popover, ensuring parent visibility')
+      
+      // Find the trigger element
+      const trigger = document.querySelector(`[aria-expanded="true"][data-tour], [aria-haspopup="true"][data-tour]`)
+      if (trigger) {
+        await tourDOMUtils.ensureElementVisibility(trigger as HTMLElement)
+      }
     }
 
-    // Now scroll to the actual element
-    await tourDOMUtils.scrollElementIntoView(element, { block: 'center' })
+    // Check if element is inside a tab panel
+    const tabPanel = element.closest('[role="tabpanel"]')
+    if (tabPanel) {
+      const tabId = tabPanel.getAttribute('aria-labelledby')
+      if (tabId) {
+        const tab = document.getElementById(tabId)
+        if (tab && tab.getAttribute('aria-selected') !== 'true') {
+          tourLogger.debug('Element is in inactive tab, attempting to activate')
+          tab.click()
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+    }
+
+    // Check if element is inside a collapsed accordion
+    const accordionContent = element.closest('[data-state="closed"], .accordion-content[data-state="closed"]')
+    if (accordionContent) {
+      const trigger = accordionContent.parentElement?.querySelector('[data-state="closed"]')
+      if (trigger) {
+        tourLogger.debug('Element is in collapsed accordion, attempting to expand')
+        ;(trigger as HTMLElement).click()
+        await new Promise(resolve => setTimeout(resolve, 300))
+      }
+    }
+  },
+
+  /**
+   * Expand parent containers that might be hiding the element
+   */
+  expandParentContainers: async (element: HTMLElement): Promise<void> => {
+    const parents = []
+    let parent = element.parentElement
+    
+    while (parent && parent !== document.body) {
+      parents.push(parent)
+      parent = parent.parentElement
+    }
+
+    for (const container of parents) {
+      // Check for hidden containers
+      if (container.style.display === 'none' || container.hidden) {
+        tourLogger.debug('Found hidden parent container, attempting to show')
+        container.style.display = ''
+        container.hidden = false
+      }
+
+      // Check for collapsed containers
+      if (container.classList.contains('collapsed') || container.getAttribute('aria-expanded') === 'false') {
+        const expandButton = container.querySelector('[aria-expanded="false"], .expand-button, .collapse-toggle')
+        if (expandButton) {
+          ;(expandButton as HTMLElement).click()
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+    }
   },
 
   findElementWithFallbacks: async (selector: string): Promise<HTMLElement | null> => {
     tourLogger.debug('Searching for element with fallbacks:', selector)
     
-    // Direct search first
-    let element = document.querySelector(selector) as HTMLElement
-    if (element) {
-      tourLogger.debug('Element found directly')
-      return element
-    }
-
-    // Check if we're looking for a data-tour attribute and use page-specific helpers
-    if (selector.includes('data-tour=')) {
-      const tourValue = selector.match(/data-tour="([^"]+)"/)?.[1]
-      if (tourValue) {
-        // Detect current page and use appropriate helper
-        const currentPath = window.location.pathname
-        
-        if (currentPath.includes('/staff-planning')) {
-          const staffingElement = await tourDOMUtils.findStaffingElement(tourValue)
-          if (staffingElement) {
-            tourLogger.debug('Element found with staffing helper:', tourValue)
-            return staffingElement
-          }
-        } else if (currentPath.includes('/dashboard')) {
-          const dashboardElement = await tourDOMUtils.findDashboardElement(tourValue)
-          if (dashboardElement) {
-            tourLogger.debug('Element found with dashboard helper:', tourValue)
-            return dashboardElement
-          }
-        }
-      }
-    }
-
-    // Try finding with attribute variations
-    const fallbackSelectors = tourDOMUtils.generateFallbackSelectors(selector)
-    
-    for (const fallbackSelector of fallbackSelectors) {
-      element = document.querySelector(fallbackSelector) as HTMLElement
+    // Performance measurement for element search
+    return await tourPerformance.measureExecutionTime(async () => {
+      // Direct search first
+      let element = document.querySelector(selector) as HTMLElement
       if (element) {
-        tourLogger.debug('Element found with fallback selector:', fallbackSelector)
+        tourLogger.debug('Element found directly')
         return element
       }
-    }
 
-    // Try scrolling through the page to find the element
-    const found = await tourDOMUtils.searchElementByScrolling(selector)
-    if (found) {
-      return found
-    }
-
-    return null
-  },
-
-  generateFallbackSelectors: (originalSelector: string): string[] => {
-    const fallbacks: string[] = []
-    
-    // If it's a data-tour selector, try variations
-    if (originalSelector.includes('data-tour=')) {
-      const tourValue = originalSelector.match(/data-tour="([^"]+)"/)?.[1]
-      if (tourValue) {
-        // Try with different quote styles
-        fallbacks.push(`[data-tour='${tourValue}']`)
-        // Try without quotes if simple value
-        if (!/[^\w-]/.test(tourValue)) {
-          fallbacks.push(`[data-tour=${tourValue}]`)
-        }
-        // Try partial matches
-        fallbacks.push(`[data-tour*="${tourValue}"]`)
-        // Try case variations
-        fallbacks.push(`[data-tour="${tourValue.toLowerCase()}"]`)
-        fallbacks.push(`[data-tour="${tourValue.toUpperCase()}"]`)
+      // Wait a bit for dynamic content
+      await new Promise(resolve => setTimeout(resolve, TOUR_CONSTANTS.ELEMENT_SEARCH_DELAY))
+      element = document.querySelector(selector) as HTMLElement
+      if (element) {
+        tourLogger.debug('Element found after delay')
+        return element
       }
-    }
 
-    // Try ID and class variations
-    if (originalSelector.includes('dashboard-selector')) {
-      fallbacks.push('#dashboard-selector', '.dashboard-selector', '[id*="dashboard-selector"]', '[class*="dashboard-selector"]')
-    }
-    if (originalSelector.includes('dashboard-controls')) {
-      fallbacks.push('#dashboard-controls', '.dashboard-controls', '[id*="dashboard-controls"]', '[class*="dashboard-controls"]')
-    }
-    if (originalSelector.includes('kpi-widgets')) {
-      fallbacks.push('#kpi-widgets', '.kpi-widgets', '[id*="kpi"]', '[class*="kpi"]')
-    }
-    if (originalSelector.includes('hbi-insights')) {
-      fallbacks.push('#hbi-insights', '.hbi-insights', '[id*="insights"]', '[class*="insights"]')
-    }
+      // Check if we're looking for a data-tour attribute and use page-specific helpers
+      if (selector.includes('data-tour=')) {
+        const tourValue = selector.match(/data-tour="([^"]+)"/)?.[1]
+        if (tourValue) {
+          // Detect current page and use appropriate helper
+          const currentPath = window.location.pathname
+          
+          if (currentPath.includes('/staff-planning')) {
+            const staffingElement = await tourDOMUtils.findStaffingElement(tourValue)
+            if (staffingElement) {
+              tourLogger.debug('Element found with staffing helper:', tourValue)
+              return staffingElement
+            }
+          } else if (currentPath.includes('/dashboard')) {
+            const dashboardElement = await tourDOMUtils.findDashboardElement(tourValue)
+            if (dashboardElement) {
+              tourLogger.debug('Element found with dashboard helper:', tourValue)
+              return dashboardElement
+            }
+          }
+        }
+      }
 
-    return fallbacks
+      // Try finding with attribute variations
+      const fallbackSelectors = tourDOMUtils.generateFallbackSelectors(selector)
+      
+      for (const fallbackSelector of fallbackSelectors) {
+        element = document.querySelector(fallbackSelector) as HTMLElement
+        if (element) {
+          tourLogger.debug('Element found with fallback selector:', fallbackSelector)
+          return element
+        }
+        
+        // Small delay between attempts
+        await new Promise(resolve => setTimeout(resolve, 10))
+      }
+
+      // Final fallback: try scrolling through the page to find the element
+      const found = await tourDOMUtils.searchElementByScrolling(selector)
+      if (found) {
+        return found
+      }
+
+      tourLogger.warn('Element not found with any selector variations:', selector)
+      return null
+    }, 'Element Search with Fallbacks')
   },
 
+  /**
+   * Search for element by scrolling through the page as a last resort
+   */
   searchElementByScrolling: async (selector: string): Promise<HTMLElement | null> => {
     tourLogger.debug('Searching element by scrolling:', selector)
     
@@ -287,62 +384,99 @@ export const tourDOMUtils = {
     return null
   },
 
-  findFocusableElements: (container: HTMLElement): HTMLElement[] => {
-    return Array.from(
-      container.querySelectorAll(TOUR_CONSTANTS.FOCUS_TRAP_SELECTOR)
-    ).filter((el): el is HTMLElement => {
-      const element = el as HTMLElement
-      return (
-        element.offsetWidth > 0 &&
-        element.offsetHeight > 0 &&
-        !element.disabled &&
-        element.tabIndex !== -1
-      )
-    })
-  },
-
-  trapFocus: (container: HTMLElement): (() => void) => {
-    const focusableElements = tourDOMUtils.findFocusableElements(container)
+  /**
+   * Enhanced fallback selector generation with more comprehensive variations
+   */
+  generateFallbackSelectors: (originalSelector: string): string[] => {
+    const fallbacks: string[] = []
     
-    if (focusableElements.length === 0) return () => {}
-    
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-    
-    const handleTabKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab') return
-      
-      if (event.shiftKey) {
-        if (document.activeElement === firstElement) {
-          event.preventDefault()
-          lastElement.focus()
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          event.preventDefault()
-          firstElement.focus()
-        }
+    // If it's a data-tour selector, try various formats
+    if (originalSelector.includes('data-tour=')) {
+      const tourValue = originalSelector.match(/data-tour="([^"]+)"/)?.[1]
+      if (tourValue) {
+        fallbacks.push(
+          `[data-tour="${tourValue}"]`,
+          `[data-tour='${tourValue}']`,
+          `*[data-tour="${tourValue}"]`,
+          `[data-testid="${tourValue}"]`,
+          `[data-cy="${tourValue}"]`,
+          `[id="${tourValue}"]`,
+          `[id*="${tourValue}"]`,
+          `.${tourValue}`,
+          `[class*="${tourValue}"]`,
+          `[aria-label*="${tourValue}"]`,
+          `[title*="${tourValue}"]`
+        )
       }
     }
     
-    // Focus first element
-    firstElement.focus()
+    // Generic fallbacks
+    fallbacks.push(
+      originalSelector.replace(/\[([^\]]+)\]/g, '*[$1]'), // Make attribute selectors more generic
+      originalSelector.replace(/"/g, "'"), // Try single quotes
+      originalSelector.toLowerCase(), // Try lowercase
+      originalSelector.replace(/\s+/g, ''), // Remove spaces
+      `${originalSelector}, ${originalSelector} *` // Include descendant elements
+    )
     
-    // Add event listener
-    container.addEventListener('keydown', handleTabKey)
-    
-    // Return cleanup function
-    return () => {
-      container.removeEventListener('keydown', handleTabKey)
-    }
+    return [...new Set(fallbacks)] // Remove duplicates
   },
 
-  // Dashboard-specific element helpers
+  /**
+   * Dashboard-specific element finding with enhanced logic and comprehensive mappings
+   */
   findDashboardElement: async (tourValue: string): Promise<HTMLElement | null> => {
     tourLogger.debug('Searching for dashboard element:', tourValue)
     
-    // Common dashboard element patterns
+    // Common dashboard element patterns with comprehensive selectors
     const dashboardMappings: Record<string, string[]> = {
+      'environment-menu': [
+        '[data-tour="environment-menu"]',
+        '.environment-menu',
+        '.environment-selector',
+        '[data-testid="environment-menu"]',
+        'nav .environment-dropdown',
+        '.header .environment-menu',
+        'button[aria-label*="environment"]',
+        'select[name*="environment"]'
+      ],
+      'projects-menu': [
+        '[data-tour="projects-menu"]',
+        '.projects-menu',
+        '.project-selector',
+        '[data-testid="projects-menu"]',
+        'nav .projects-dropdown',
+        '.header .projects-menu',
+        'button[aria-label*="project"]',
+        'select[name*="project"]'
+      ],
+      'tools-menu': [
+        '[data-tour="tools-menu"]',
+        '.tools-menu',
+        '.tools-dropdown',
+        '[data-testid="tools-menu"]',
+        'nav .tools-menu',
+        '.header .tools-menu',
+        'button[aria-label*="tools"]'
+      ],
+      'search-bar': [
+        '[data-tour="search-bar"]',
+        '.search-bar',
+        '.global-search',
+        '[data-testid="search-bar"]',
+        'input[type="search"]',
+        'input[placeholder*="search"]',
+        '.search-input',
+        '[role="searchbox"]'
+      ],
+      'tour-controls': [
+        '[data-tour="tour-controls"]',
+        '.tour-controls',
+        '.tours-menu',
+        '[data-testid="tour-controls"]',
+        'button[aria-label*="tour"]',
+        '.guided-tours'
+      ],
       'dashboard-selector': [
         '[data-tour="dashboard-selector"]',
         '.dashboard-selector',
@@ -353,7 +487,9 @@ export const tourDOMUtils = {
         // Popover-based selectors
         '[data-state="closed"] > button:has(svg)',
         'button:has(svg.lucide-layout-dashboard)',
-        'button:has(svg.lucide-chevron-down)'
+        'button:has(svg.lucide-chevron-down)',
+        'button[aria-expanded="false"]:has(svg)',
+        '.dashboard-view-selector'
       ],
       'dashboard-controls': [
         '[data-tour="dashboard-controls"]', 
@@ -361,28 +497,42 @@ export const tourDOMUtils = {
         '.dashboard-actions',
         '.dashboard-toolbar',
         '.control-panel',
-        '.dashboard-edit-controls'
+        '.dashboard-edit-controls',
+        '.dashboard-settings',
+        'button[aria-label*="edit"]',
+        'button[aria-label*="layout"]',
+        'button[aria-label*="fullscreen"]'
       ],
       'kpi-widgets': [
         '[data-tour="kpi-widgets"]',
         '.kpi-widgets',
         '.kpi-container',
         '.metrics-row',
-        '.dashboard-kpi'
+        '.dashboard-kpi',
+        '.kpi-row',
+        '.performance-indicators',
+        '.dashboard-metrics',
+        '.widget-kpi'
       ],
       'hbi-insights': [
         '[data-tour="hbi-insights"]',
         '.hbi-insights',
         '.insights-panel',
         '.ai-insights',
-        '.intelligence-panel'
+        '.intelligence-panel',
+        '.hb-intelligence',
+        '.insights-widget',
+        '.ai-recommendations'
       ],
       'dashboard-content': [
         '[data-tour="dashboard-content"]',
         '.dashboard-content',
         '.dashboard-grid',
         '.dashboard-layout',
-        'main .dashboard'
+        'main .dashboard',
+        '.dashboard-main',
+        '.dashboard-wrapper',
+        '.main-dashboard'
       ]
     }
 
@@ -393,9 +543,12 @@ export const tourDOMUtils = {
       return await tourDOMUtils.findDashboardSelectorElement(selectors)
     }
     
+    // For other dashboard elements, try each selector with fallbacks
     for (const selector of selectors) {
       const element = await tourDOMUtils.findElementWithFallbacks(selector)
       if (element) {
+        // Ensure dashboard elements are properly visible
+        await tourDOMUtils.ensureElementVisibility(element)
         return element
       }
     }
@@ -403,81 +556,106 @@ export const tourDOMUtils = {
     return null
   },
 
-  // Staffing page-specific element helpers
+  /**
+   * Staffing-specific element finding with comprehensive mappings
+   */
   findStaffingElement: async (tourValue: string): Promise<HTMLElement | null> => {
     tourLogger.debug('Searching for staffing element:', tourValue)
     
-    // Common staffing element patterns
+    // Common staffing element patterns with comprehensive selectors
     const staffingMappings: Record<string, string[]> = {
       'staffing-header': [
         '[data-tour="staffing-header"]',
         '.staffing-header',
         '.page-header',
         'h1:contains("Staffing")',
-        '.staff-planning-header'
+        '.staff-planning-header',
+        '.staffing-title',
+        '.page-title'
       ],
       'breadcrumb-nav': [
         '[data-tour="breadcrumb-nav"]',
         '.breadcrumb',
         'nav[aria-label="breadcrumb"]',
-        '.breadcrumb-nav'
+        '.breadcrumb-nav',
+        '.navigation-breadcrumb',
+        '.page-breadcrumb'
       ],
       'role-badges': [
         '[data-tour="role-badges"]',
         '.role-badges',
         '.badge-container',
-        '.role-indicators'
+        '.role-indicators',
+        '.user-role-badge',
+        '.staff-role-badges'
       ],
       'action-controls': [
         '[data-tour="action-controls"]',
         '.action-controls',
         '.page-actions',
         '.toolbar-actions',
-        '.control-buttons'
+        '.control-buttons',
+        '.staffing-actions',
+        '.staff-controls'
       ],
       'utilization-widget': [
         '[data-tour="utilization-widget"]',
         '.utilization-widget',
         '.staff-utilization',
-        '.utilization-card'
+        '.utilization-card',
+        '.utilization-metric',
+        '.staff-utilization-card'
       ],
       'labor-cost-widget': [
         '[data-tour="labor-cost-widget"]',
         '.labor-cost-widget',
         '.cost-widget',
-        '.monthly-cost'
+        '.monthly-cost',
+        '.labor-cost-card',
+        '.cost-metric'
       ],
       'project-scope-widget': [
         '[data-tour="project-scope-widget"]',
         '.project-scope-widget',
         '.scope-widget',
-        '.portfolio-widget'
+        '.portfolio-widget',
+        '.project-scope-card',
+        '.scope-metric'
       ],
       'spcr-widget': [
         '[data-tour="spcr-widget"]',
         '.spcr-widget',
         '.spcr-status',
-        '.staffing-requests'
+        '.staffing-requests',
+        '.spcr-card',
+        '.change-requests'
       ],
       'role-content': [
         '[data-tour="role-content"]',
         '.role-content',
         '.staffing-content',
-        '.main-content'
+        '.main-content',
+        '.staff-planning-content',
+        '.staffing-dashboard'
       ],
       'help-section': [
         '[data-tour="help-section"]',
         '.help-section',
         '.guide-section',
-        '.planning-guide'
+        '.planning-guide',
+        '.staffing-help',
+        '.user-guide'
       ]
     }
 
     const selectors = staffingMappings[tourValue] || [`[data-tour="${tourValue}"]`]
     
+    // Try each selector with fallbacks
     for (const selector of selectors) {
       const element = await tourDOMUtils.findElementWithFallbacks(selector)
       if (element) {
+        // Ensure staffing elements are properly visible
+        await tourDOMUtils.ensureElementVisibility(element)
         return element
       }
     }
@@ -485,7 +663,9 @@ export const tourDOMUtils = {
     return null
   },
 
-  // Enhanced dashboard selector finding with specific scrolling strategy
+  /**
+   * Enhanced dashboard selector finding with specific scrolling strategy
+   */
   findDashboardSelectorElement: async (selectors: string[]): Promise<HTMLElement | null> => {
     tourLogger.debug('Enhanced dashboard selector search starting')
     
@@ -499,6 +679,7 @@ export const tourDOMUtils = {
       const element = document.querySelector(selector) as HTMLElement
       if (element) {
         tourLogger.debug('Dashboard selector found with direct search:', selector)
+        await tourDOMUtils.ensureElementVisibility(element)
         return element
       }
     }
@@ -510,6 +691,7 @@ export const tourDOMUtils = {
       const element = document.querySelector(selector) as HTMLElement
       if (element) {
         tourLogger.debug('Dashboard selector found after wait:', selector)
+        await tourDOMUtils.ensureElementVisibility(element)
         return element
       }
     }
@@ -520,6 +702,8 @@ export const tourDOMUtils = {
       'button[aria-expanded]', // Buttons that can expand
       'button:has(svg.lucide-layout-dashboard)', // Buttons with dashboard icon
       'button:has(.lucide-layout-dashboard)', // Alternative class format
+      '[data-radix-popper-anchor]', // Radix popover anchors
+      'button[data-state="closed"]', // Closed popover triggers
     ]
     
     for (const selector of popoverSelectors) {
@@ -531,10 +715,13 @@ export const tourDOMUtils = {
           const hasRelevantContent = htmlElement.textContent?.toLowerCase().includes('dashboard') ||
                                    htmlElement.querySelector('svg.lucide-layout-dashboard') ||
                                    htmlElement.querySelector('.lucide-layout-dashboard') ||
-                                   htmlElement.closest('[data-tour="dashboard-selector"]')
+                                   htmlElement.closest('[data-tour="dashboard-selector"]') ||
+                                   htmlElement.getAttribute('aria-label')?.toLowerCase().includes('dashboard') ||
+                                   htmlElement.getAttribute('title')?.toLowerCase().includes('dashboard')
           
           if (hasRelevantContent) {
             tourLogger.debug('Dashboard selector found via popover search:', selector)
+            await tourDOMUtils.ensureElementVisibility(htmlElement)
             return htmlElement
           }
         }
@@ -543,8 +730,82 @@ export const tourDOMUtils = {
       }
     }
     
+    // Final fallback: search for any button in the header area that might be the dashboard selector
+    const headerButtons = document.querySelectorAll('.header button, .app-header button, nav button')
+    for (const button of headerButtons) {
+      const htmlButton = button as HTMLElement
+      // Look for buttons with dashboard-related content or icons
+      if (htmlButton.querySelector('svg') && 
+          (htmlButton.textContent?.toLowerCase().includes('view') ||
+           htmlButton.textContent?.toLowerCase().includes('dashboard') ||
+           htmlButton.getAttribute('aria-label')?.toLowerCase().includes('view'))) {
+        tourLogger.debug('Dashboard selector found via header button fallback')
+        await tourDOMUtils.ensureElementVisibility(htmlButton)
+        return htmlButton
+      }
+    }
+    
     tourLogger.debug('Dashboard selector not found after enhanced search')
     return null
+  },
+
+  /**
+   * Find focusable elements within a container with enhanced filtering
+   */
+  findFocusableElements: (container: HTMLElement): HTMLElement[] => {
+    return Array.from(
+      container.querySelectorAll(TOUR_CONSTANTS.FOCUS_TRAP_SELECTOR)
+    ).filter((el): el is HTMLElement => {
+      const element = el as HTMLElement
+      // Check if element has disabled property (form elements)
+      const isDisabled = 'disabled' in element ? (element as any).disabled : false
+      return (
+        element.offsetWidth > 0 &&
+        element.offsetHeight > 0 &&
+        !isDisabled &&
+        element.tabIndex !== -1
+      )
+    })
+  },
+
+  /**
+   * Enhanced focus trap with better accessibility
+   */
+  trapFocus: (container: HTMLElement): (() => void) => {
+    const focusableElements = tourDOMUtils.findFocusableElements(container)
+    
+    if (focusableElements.length === 0) return () => {}
+    
+    const firstFocusable = focusableElements[0]
+    const lastFocusable = focusableElements[focusableElements.length - 1]
+
+    const handleTabKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+
+      if (event.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstFocusable) {
+          event.preventDefault()
+          lastFocusable.focus()
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastFocusable) {
+          event.preventDefault()
+          firstFocusable.focus()
+        }
+      }
+    }
+
+    // Focus the first element initially
+    firstFocusable.focus()
+
+    container.addEventListener('keydown', handleTabKey)
+
+    // Return cleanup function
+    return () => {
+      container.removeEventListener('keydown', handleTabKey)
+    }
   }
 }
 
