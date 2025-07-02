@@ -17,6 +17,7 @@ export interface StaffMember {
   experience: number
   strengths: string[]
   weaknesses: string[]
+  discProfile?: string
   assignments: Array<{
     project_id: number
     role: string
@@ -84,7 +85,7 @@ export interface StaffingState {
   spcrDraft: Partial<SPCR> | null
   
   // View State
-  ganttViewMode: 'week' | 'month' | 'quarter'
+  ganttViewMode: 'week' | 'month' | 'quarter' | 'year'
   spcrViewFilter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed'
 }
 
@@ -109,7 +110,7 @@ export interface StaffingActions {
   clearSPCRDraft: () => void
   
   // View actions
-  setGanttViewMode: (mode: 'week' | 'month' | 'quarter') => void
+  setGanttViewMode: (mode: 'week' | 'month' | 'quarter' | 'year') => void
   setSPCRViewFilter: (filter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed') => void
   
   // Utility functions
