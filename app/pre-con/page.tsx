@@ -37,7 +37,9 @@ import {
   Activity,
   Eye,
   Percent,
-  ArrowLeft
+  ArrowLeft,
+  EllipsisVertical,
+  Maximize
 } from "lucide-react"
 import {
   Breadcrumb,
@@ -47,6 +49,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Progress } from "@/components/ui/progress"
 
 // Import data
@@ -69,6 +76,8 @@ export default function PreConstructionPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showNewOpportunityForm, setShowNewOpportunityForm] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Handle URL hash navigation
   useEffect(() => {
@@ -247,10 +256,23 @@ export default function PreConstructionPage() {
     setActiveTab('estimating')
   }
 
+  // Handle fullscreen toggle
+  const handleFullscreenToggle = () => {
+    setIsFullscreen(!isFullscreen)
+    setMoreMenuOpen(false)
+  }
+
+  // Handle export
+  const handleExport = () => {
+    // Export functionality would go here
+    console.log("Exporting pre-construction data...")
+    setMoreMenuOpen(false)
+  }
+
   return (
     <>
       <AppHeader />
-      <div className="space-y-6 p-6">
+      <div className="space-y-3 p-6">
         {/* Breadcrumb Navigation */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -267,54 +289,69 @@ export default function PreConstructionPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header Section */}
-        <div className="flex flex-col gap-4">
+        {/* Sticky Header Section */}
+        <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b pt-3 pb-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Pre-Construction Command Center</h1>
               <p className="text-muted-foreground mt-1">
                 Pipeline management, estimating, and business development intelligence suite
               </p>
-              <div className="flex items-center gap-4 mt-3">
-                <Badge variant="outline" className="px-3 py-1">
-                  {projectScope.description}
-                </Badge>
-                <Badge 
-                  variant="secondary" 
-                  className="px-3 py-1"
-                >
-                  {projectScope.projectCount} Active Projects
-                </Badge>
-                <Badge 
-                  variant="secondary" 
-                  className="px-3 py-1"
-                >
-                  {summaryStats.pipelineItems} Pipeline Items
-                </Badge>
-                <Badge 
-                  variant={summaryStats.pipelineHealth >= 75 ? "default" : summaryStats.pipelineHealth >= 50 ? "secondary" : "destructive"}
-                  className="px-3 py-1"
-                >
-                  Health: {summaryStats.pipelineHealth.toFixed(0)}%
-                </Badge>
-              </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button 
-                className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D04A1F] text-white"
-                onClick={handleNewOpportunity}
+              <Button
+                variant="outline"
+                onClick={handleFullscreenToggle}
               >
-                <Plus className="h-4 w-4 mr-2" />
-                New Opportunity
+                <Maximize className="h-4 w-4" />
               </Button>
+              
+              <Popover open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="px-2"
+                  >
+                    <EllipsisVertical className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48" align="end">
+                  <div className="space-y-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        handleRefresh()
+                        setMoreMenuOpen(false)
+                      }}
+                      disabled={isLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={handleExport}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Data
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        handleNewOpportunity()
+                        setMoreMenuOpen(false)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Opportunity
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
