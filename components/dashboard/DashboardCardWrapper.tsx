@@ -158,7 +158,7 @@ export const DashboardCardWrapper = ({
     e.stopPropagation()
     
     // For specific card types, dispatch custom event to let the card handle its own drill down
-    if (card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'bd-opportunities') {
+    if (card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'bd-opportunities' || card.type === 'market-intelligence' || card.type === 'portfolio-overview' || card.type === 'financial-review-panel' || card.type === 'staffing-distribution' || card.type === 'pipeline-analytics') {
       const newState = !isDrillDownActive
       setIsDrillDownActive(newState)
       
@@ -236,8 +236,8 @@ export const DashboardCardWrapper = ({
           className="h-6 px-2 text-xs hover:bg-transparent z-[70]"
           onClick={handleDrillDown}
         >
-          <span className="mr-1">
-                  {(card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'field-reports' || card.type === 'critical-dates' || card.type === 'safety' || card.type === 'quality-control' || card.type === 'rfi' || card.type === 'submittal' || card.type === 'bd-opportunities') && isDrillDownActive ? 'Hide Drill Down' : 
+                    <span className="mr-1">
+                  {(card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'field-reports' || card.type === 'critical-dates' || card.type === 'safety' || card.type === 'quality-control' || card.type === 'rfi' || card.type === 'submittal' || card.type === 'bd-opportunities' || card.type === 'market-intelligence' || card.type === 'portfolio-overview' || card.type === 'financial-review-panel' || card.type === 'staffing-distribution' || card.type === 'pipeline-analytics') && isDrillDownActive ? 'Hide Drill Down' :
                    card.type === 'enhanced-hbi-insights' ? 'View HBI Insights' :
                    card.type === 'health' ? 'View Health Details' :
                    card.type === 'startup' ? 'View Startup Details' :
@@ -251,6 +251,11 @@ export const DashboardCardWrapper = ({
                    card.type === 'rfi' ? 'View RFI Details' :
                    card.type === 'submittal' ? 'View Submittal Details' :
                    card.type === 'bd-opportunities' ? 'View BD Opportunities Details' :
+                   card.type === 'market-intelligence' ? 'View Market Intelligence Details' :
+                   card.type === 'portfolio-overview' ? 'View Portfolio Details' :
+                   card.type === 'financial-review-panel' ? 'View Financial Review Details' :
+                   card.type === 'staffing-distribution' ? 'View Staffing Details' :
+                   card.type === 'pipeline-analytics' ? 'View Pipeline Details' :
                    'View Details'}
           </span>
           <ChevronRight className="h-3 w-3" style={{ color: '#FA4616' }} />
