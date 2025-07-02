@@ -16,6 +16,28 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   ArrowLeft, 
   Building2, 
@@ -64,6 +86,12 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
   const { startTour, isTourAvailable } = useTour();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [reportSettingsOpen, setReportSettingsOpen] = useState(false);
+  const [reportSettings, setReportSettings] = useState({
+    'Financial Review': 15,
+    'PX Progress': 25,
+    'Owner Progress': 5
+  });
 
   const projectId = parseInt(params.projectId);
 
@@ -203,6 +231,47 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
   // Navigation handler for Open Issues card
   const handleOpenIssuesClick = () => {
     router.push(`/dashboard/constraints-log?project_id=${projectId}`);
+  };
+
+  // Utility function to calculate next due date
+  const getNextDueDate = (dayOfMonth: number) => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    let targetDate = new Date(currentYear, currentMonth, dayOfMonth);
+    
+    // If the target day has already passed this month, move to next month
+    if (currentDay > dayOfMonth) {
+      targetDate = new Date(currentYear, currentMonth + 1, dayOfMonth);
+    }
+    
+    return targetDate;
+  };
+
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  // Mock last submitted dates for demonstration
+  const mockLastSubmitted = {
+    'Financial Review': new Date('2025-06-15'),
+    'PX Progress': new Date('2025-06-20'),
+    'Owner Progress': new Date('2025-06-28')
+  };
+
+  // Handle report settings change
+  const handleReportSettingChange = (reportType: string, dayOfMonth: string) => {
+    setReportSettings(prev => ({
+      ...prev,
+      [reportType]: parseInt(dayOfMonth)
+    }));
   };
 
   if (isLoading) {
@@ -389,6 +458,80 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                       : 'Attention Needed'}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            {/* Project Reporting */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
+                <Dialog open={reportSettingsOpen} onOpenChange={setReportSettingsOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Project Report Settings</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Project Report</TableHead>
+                            <TableHead>Report Due Day</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => (
+                            <TableRow key={reportType}>
+                              <TableCell className="font-medium">{reportType}</TableCell>
+                              <TableCell>
+                                <Select
+                                  value={dayOfMonth.toString()}
+                                  onValueChange={(value) => handleReportSettingChange(reportType, value)}
+                                >
+                                  <SelectTrigger className="w-20">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                      <SelectItem key={day} value={day.toString()}>
+                                        {day}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground border-b pb-2">
+                  <span>Report</span>
+                  <span>Due Date</span>
+                  <span>Last Submitted</span>
+                </div>
+                
+                {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => {
+                  const nextDueDate = getNextDueDate(dayOfMonth);
+                  const lastSubmitted = mockLastSubmitted[reportType as keyof typeof mockLastSubmitted];
+                  
+                  return (
+                    <div key={reportType} className="grid grid-cols-3 gap-2 text-xs">
+                      <span className="font-medium text-foreground">{reportType}</span>
+                      <span className="text-muted-foreground">{formatDate(nextDueDate)}</span>
+                      <span className="text-muted-foreground">{formatDate(lastSubmitted)}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
