@@ -51,7 +51,9 @@ import {
   Share2,
   Upload,
   AlertCircle,
-  Activity
+  Activity,
+  ChevronDown,
+  Brain
 } from "lucide-react";
 
 // Mock data imports
@@ -65,6 +67,12 @@ import staffingData from "@/data/mock/staffing/staffing.json";
 
 // Components
 import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibraryViewer";
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface ProjectControlCenterPageProps {
   params: {
@@ -88,6 +96,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [reportSettingsOpen, setReportSettingsOpen] = useState(false);
+  const [hbiInsightsOpen, setHbiInsightsOpen] = useState(true);
   const [reportSettings, setReportSettings] = useState({
     'Financial Review': 15,
     'PX Progress': 25,
@@ -252,6 +261,143 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
       scheduleHealthData: currentProjectScheduleData,
     };
   }, [projectData]);
+
+  // Project-specific HBI insights using mock data
+  const projectInsights = useMemo(() => {
+    if (!projectData || !analyticsData) return [];
+
+    const insights = [];
+    
+    // Cash flow insights
+    if (projectData.cashFlow) {
+      const netCashFlow = analyticsData.netCashFlow;
+      if (netCashFlow < 0) {
+        insights.push({
+          id: `cash-flow-${projectId}`,
+          type: "risk",
+          severity: "high",
+          title: "Negative Cash Flow Detected",
+          text: `Project showing ${Math.abs(netCashFlow / 1000).toFixed(0)}K negative cash flow trend requiring immediate attention.`,
+          action: "Accelerate billing milestones and review payment terms with client.",
+          confidence: 94,
+          relatedMetrics: ["Cash Flow", "Billing Schedule", "Project Margins"],
+          project_id: projectId.toString(),
+        });
+      } else if (netCashFlow > 500000) {
+        insights.push({
+          id: `cash-positive-${projectId}`,
+          type: "opportunity",
+          severity: "medium",
+          title: "Strong Cash Flow Performance",
+          text: `Project generating ${(netCashFlow / 1000).toFixed(0)}K positive cash flow above projections.`,
+          action: "Consider accelerating optional scope items while cash position is strong.",
+          confidence: 91,
+          relatedMetrics: ["Cash Flow", "Project Performance", "Scope Management"],
+          project_id: projectId.toString(),
+        });
+      }
+    }
+
+    // Schedule health insights
+    if (analyticsData.scheduleHealthScore < 80) {
+      insights.push({
+        id: `schedule-health-${projectId}`,
+        type: "alert",
+        severity: "high",
+        title: "Schedule Health Below Threshold",
+        text: `Schedule health score of ${analyticsData.scheduleHealthScore}% indicates potential coordination issues.`,
+        action: "Implement weekly coordination meetings and review critical path activities.",
+        confidence: 89,
+        relatedMetrics: ["Schedule Health", "Critical Path", "Resource Coordination"],
+        project_id: projectId.toString(),
+      });
+    }
+
+    // Constraints insights
+    if (analyticsData.criticalIssues > 5) {
+      insights.push({
+        id: `constraints-${projectId}`,
+        type: "risk",
+        severity: "high",
+        title: "Critical Constraints Accumulating", 
+        text: `${analyticsData.criticalIssues} critical constraints identified requiring immediate resolution.`,
+        action: "Prioritize constraint resolution and implement daily constraint tracking.",
+        confidence: 96,
+        relatedMetrics: ["Constraints", "Project Risk", "Timeline Impact"],
+        project_id: projectId.toString(),
+      });
+    }
+
+    // Procurement insights
+    if (projectData.procurement && projectData.procurement.length > 0) {
+      const totalProcurementValue = projectData.procurement.reduce((sum, item) => sum + (item.committed_value || 0), 0);
+      const budgetUtilization = (totalProcurementValue / (analyticsData.contractValue || 1)) * 100;
+      
+      if (budgetUtilization > 85) {
+        insights.push({
+          id: `procurement-${projectId}`,
+          type: "alert",
+          severity: "medium",
+          title: "High Procurement Utilization",
+          text: `${budgetUtilization.toFixed(1)}% of budget committed through procurement contracts.`,
+          action: "Review remaining scope for potential cost optimization opportunities.",
+          confidence: 87,
+          relatedMetrics: ["Procurement", "Budget Utilization", "Cost Control"],
+          project_id: projectId.toString(),
+        });
+      }
+    }
+
+    // Completion forecast
+    if (analyticsData.percentComplete > 0) {
+      const daysElapsed = Math.floor((new Date().getTime() - new Date(analyticsData.startDate).getTime()) / (1000 * 3600 * 24));
+      const projectedDuration = (daysElapsed / analyticsData.percentComplete) * 100;
+      const scheduledDuration = Math.floor((new Date(projectData.project?.scheduled_completion || '2024-12-31').getTime() - new Date(analyticsData.startDate).getTime()) / (1000 * 3600 * 24));
+      
+      if (projectedDuration > scheduledDuration * 1.1) {
+        insights.push({
+          id: `completion-forecast-${projectId}`,
+          type: "forecast",
+          severity: "medium",
+          title: "Schedule Extension Likely",
+          text: `AI models predict ${Math.round(projectedDuration - scheduledDuration)} day extension based on current progress.`,
+          action: "Implement resource acceleration plan for critical path activities.",
+          confidence: 83,
+          relatedMetrics: ["Project Duration", "Progress Rate", "Critical Path"],
+          project_id: projectId.toString(),
+        });
+      } else if (projectedDuration < scheduledDuration * 0.95) {
+        insights.push({
+          id: `early-completion-${projectId}`,
+          type: "opportunity",
+          severity: "low",
+          title: "Early Completion Potential",
+          text: `Current progress indicates potential ${Math.round(scheduledDuration - projectedDuration)} day early completion.`,
+          action: "Consider advancing follow-on project activities or expanding scope.",
+          confidence: 78,
+          relatedMetrics: ["Project Duration", "Progress Rate", "Scope Opportunities"],
+          project_id: projectId.toString(),
+        });
+      }
+    }
+
+    // Performance insights
+    if (analyticsData.projectHealthScore >= 85) {
+      insights.push({
+        id: `performance-${projectId}`,
+        type: "performance",
+        severity: "low",
+        title: "Exceptional Project Performance",
+        text: `Project health score of ${analyticsData.projectHealthScore}% exceeds industry benchmarks.`,
+        action: "Document best practices for replication on future projects.",
+        confidence: 92,
+        relatedMetrics: ["Project Health", "Performance Metrics", "Best Practices"],
+        project_id: projectId.toString(),
+      });
+    }
+
+    return insights;
+  }, [projectData, analyticsData, projectId]);
 
   useEffect(() => {
     // Simulate loading
@@ -699,6 +845,46 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                 </div>
               </div>
             </div>
+
+            {/* HBI Project Insights */}
+            <Collapsible open={hbiInsightsOpen} onOpenChange={setHbiInsightsOpen}>
+              <div className="bg-card border border-border rounded-lg overflow-hidden">
+                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-purple-100 dark:bg-purple-900/20 p-2 rounded-lg">
+                      <Brain className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-lg text-foreground">
+                        HBI {project.name} Insights
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        AI-powered project intelligence and recommendations
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-muted-foreground">
+                      {projectInsights.length} insights
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+                      hbiInsightsOpen ? 'rotate-180' : ''
+                    }`} />
+                  </div>
+                </CollapsibleTrigger>
+                
+                <CollapsibleContent>
+                  <div className="border-t border-border">
+                    <div className="h-96">
+                      <EnhancedHBIInsights 
+                        config={projectInsights}
+                        cardId={`project-insights-${projectId}`}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
 
             {/* Main Document Library */}
             <SharePointLibraryViewer
