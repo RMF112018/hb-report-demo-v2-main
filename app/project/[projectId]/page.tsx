@@ -467,7 +467,11 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                 <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
                 <Dialog open={reportSettingsOpen} onOpenChange={setReportSettingsOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+                    >
                       <Settings className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
