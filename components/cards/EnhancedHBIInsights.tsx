@@ -261,17 +261,17 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
           
           {/* Compact Stats */}
           <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
               <div className="font-bold text-lg text-red-700">{highSeverityCount}</div>
               <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
             </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
               <div className="font-bold text-lg text-green-700">
                 {displayInsights.filter((i) => i.type === "opportunity").length}
               </div>
               <div className="text-xs text-green-600 dark:text-green-400">Opportunities</div>
             </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-500">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
               <div className="font-bold text-lg text-blue-700">
                 {displayInsights.filter((i) => i.type === "forecast").length}
               </div>
