@@ -50,7 +50,8 @@ import {
   Download,
   Share2,
   Upload,
-  AlertCircle
+  AlertCircle,
+  Activity
 } from "lucide-react";
 
 // Mock data imports
@@ -192,6 +193,32 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     const monthlyNetCashFlow = currentMonth?.netCashFlow || 0;
     const cashFlowTrend = monthlyNetCashFlow >= 0 ? 'positive' : 'negative';
 
+    // Schedule health metrics (mock data based on project_id patterns)
+    const scheduleHealthData = {
+      2525840: { logicIntegrity: 92, constraintValidity: 87, durationReasonableness: 78, resourceLoading: 85, calendarCompliance: 94, progressIntegrity: 89 },
+      2525841: { logicIntegrity: 88, constraintValidity: 91, durationReasonableness: 82, resourceLoading: 79, calendarCompliance: 96, progressIntegrity: 85 },
+      2525842: { logicIntegrity: 95, constraintValidity: 83, durationReasonableness: 86, resourceLoading: 91, calendarCompliance: 89, progressIntegrity: 92 }
+    };
+    
+    const currentProjectScheduleData = scheduleHealthData[projectId as keyof typeof scheduleHealthData] || 
+                                     scheduleHealthData[2525840]; // default fallback
+    
+    const scheduleHealthScore = Math.round(
+      (currentProjectScheduleData.logicIntegrity + 
+       currentProjectScheduleData.constraintValidity + 
+       currentProjectScheduleData.durationReasonableness + 
+       currentProjectScheduleData.resourceLoading + 
+       currentProjectScheduleData.calendarCompliance + 
+       currentProjectScheduleData.progressIntegrity) / 6
+    );
+    
+    const getScheduleHealthStatus = (score: number) => {
+      if (score >= 90) return "Excellent";
+      if (score >= 80) return "Good";
+      if (score >= 70) return "Fair";
+      return "Poor";
+    };
+
     return {
       foldersCount,
       totalFiles,
@@ -219,6 +246,10 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
       netCashFlow,
       monthlyNetCashFlow,
       cashFlowTrend,
+      // Schedule health metrics
+      scheduleHealthScore,
+      scheduleHealthStatus: getScheduleHealthStatus(scheduleHealthScore),
+      scheduleHealthData: currentProjectScheduleData,
     };
   }, [projectData]);
 
@@ -469,10 +500,11 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                   <DialogTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      size="sm" 
-                      className="h-6 w-6 p-0 hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+                      size="lg" 
+                      className="h-12 w-12 p-0 bg-transparent hover:bg-muted/30 relative z-50"
+                      title="Report Settings"
                     >
-                      <Settings className="h-4 w-4" />
+                      <Settings className="h-6 w-6 text-gray-700 dark:text-gray-300" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-md">
@@ -631,14 +663,38 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                 </div>
               </div>
               
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div 
+                className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
+                onClick={() => router.push('/dashboard/scheduler?tab=health-analysis')}
+                title="Click to view detailed schedule health analysis"
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Storage Usage</p>
-                    <p className="text-2xl font-bold text-foreground">{analyticsData?.storageUsed}</p>
+                    <p className="text-sm text-muted-foreground">Schedule Health</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-2xl font-bold text-foreground">{analyticsData?.scheduleHealthScore}%</p>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        analyticsData?.scheduleHealthScore >= 90 ? 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30' :
+                        analyticsData?.scheduleHealthScore >= 80 ? 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30' :
+                        analyticsData?.scheduleHealthScore >= 70 ? 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30' :
+                        'text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30'
+                      }`}>
+                        {analyticsData?.scheduleHealthStatus}
+                      </span>
+                    </div>
                   </div>
-                  <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded-lg">
-                    <Building2 className="h-5 w-5 text-blue-600" />
+                  <div className={`p-2 rounded-lg ${
+                    analyticsData?.scheduleHealthScore >= 90 ? 'bg-green-100 dark:bg-green-900/20' :
+                    analyticsData?.scheduleHealthScore >= 80 ? 'bg-blue-100 dark:bg-blue-900/20' :
+                    analyticsData?.scheduleHealthScore >= 70 ? 'bg-yellow-100 dark:bg-yellow-900/20' :
+                    'bg-red-100 dark:bg-red-900/20'
+                  }`}>
+                    <Activity className={`h-5 w-5 ${
+                      analyticsData?.scheduleHealthScore >= 90 ? 'text-green-600' :
+                      analyticsData?.scheduleHealthScore >= 80 ? 'text-blue-600' :
+                      analyticsData?.scheduleHealthScore >= 70 ? 'text-yellow-600' :
+                      'text-red-600'
+                    }`} />
                   </div>
                 </div>
               </div>
