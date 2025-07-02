@@ -3,9 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Calendar, Users, Star, MapPin, Clock, TrendingUp, Building2, ChevronRight } from "lucide-react"
+import { Calendar, Users, Star, MapPin, Clock, TrendingUp, Building2, ChevronRight, Activity, X } from "lucide-react"
 import type { DashboardCard } from "@/types/dashboard"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface BDOpportunitiesCardProps {
   card: DashboardCard
@@ -30,7 +30,49 @@ interface BDEvent {
 }
 
 export function BDOpportunitiesCard({ card, config, span, isCompact, userRole }: BDOpportunitiesCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'bd-opportunities') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'bd-opportunities',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card.id]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'bd-opportunities',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
 
   const getRoleBasedData = () => {
     const role = userRole || 'project-executive'
@@ -168,157 +210,229 @@ export function BDOpportunitiesCard({ card, config, span, isCompact, userRole }:
   return (
     <div 
       className="relative h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      data-tour="bd-opportunities-card"
     >
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800 dark:border-blue-800 hover:shadow-xl transition-all duration-300 h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              {card.title}
-            </div>
-            <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:border-blue-800">
-              {totalAvailable} Available
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        {/* BD Stats Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
+            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
+              <Activity className="h-3 w-3 mr-1" />
+              BD Opportunities
             </Badge>
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100">
-              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-600 dark:text-blue-400 dark:text-blue-400">{events.length}</div>
-              <div className="text-xs text-muted-foreground">Upcoming Events</div>
-              <div className="text-xs text-blue-600 dark:text-blue-400 dark:text-blue-400">{highPriorityEvents.length} high priority</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              {formatCurrency(totalPotentialValue)} Pipeline
             </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100">
-              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-600 dark:text-blue-400 dark:text-blue-400">{utilizationRate.toFixed(0)}%</div>
-              <div className="text-xs text-muted-foreground">Seat Utilization</div>
-              <div className="text-xs text-blue-600 dark:text-blue-400 dark:text-blue-400">{totalAvailable} of {totalSeats} available</div>
-            </div>
-          </div>
-
-          {/* Upcoming Events */}
-          <div className="bg-card/60 dark:bg-card/40 rounded-lg border border-blue-100 dark:border-blue-800 p-1.5 sm:p-2 lg:p-2.5">
-            <h4 className="font-semibold mb-2 text-foreground">Next 3 Events</h4>
-            <div className="space-y-2 max-h-32 overflow-y-auto">
-              {events.slice(0, 3).map((event) => (
-                <div key={event.id} className="flex justify-between items-center p-2 rounded bg-card/40 dark:bg-card/20 border border-blue-100 dark:border-blue-800">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{getEventIcon(event.type)}</span>
-                    <div>
-                      <div className="text-sm font-medium text-foreground">{event.name}</div>
-                      <div className="text-xs text-muted-foreground">{formatDate(event.date)}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-blue-600 dark:text-blue-400 dark:text-blue-400">
-                      {event.availableSeats}/{event.totalSeats}
-                    </div>
-                    <Badge className={`text-xs ${getPriorityColor(event.priority)}`}>
-                      {event.priority}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Pipeline Value */}
-          <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100 p-1.5 sm:p-2 lg:p-2.5">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-foreground">Pipeline Value</span>
-              <div className="text-right">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-blue-600 dark:text-blue-400">{formatCurrency(totalPotentialValue)}</div>
-                <div className="text-xs text-muted-foreground">Total opportunity</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-lg shadow-2xl z-10 overflow-auto">
-          <div className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4">
-            <div className="flex items-center justify-between border-b border-blue-200 dark:border-blue-800 pb-2">
-              <h3 className="font-semibold text-foreground flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                BD Opportunities Dashboard
-              </h3>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:border-blue-800">
-                {formatCurrency(totalPotentialValue)} Pipeline
+            <div className="flex items-center gap-1 ml-auto">
+              <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:border-blue-800 text-xs">
+                {totalAvailable} Available
               </Badge>
             </div>
+          </div>
+          
+          {/* Compact Stats */}
+          <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-600 dark:text-blue-400">{events.length}</div>
+              <div className="text-xs text-muted-foreground">Upcoming Events</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">{highPriorityEvents.length} high priority</div>
+            </div>
+            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-600 dark:text-blue-400">{utilizationRate.toFixed(0)}%</div>
+              <div className="text-xs text-muted-foreground">Seat Utilization</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">{totalAvailable} of {totalSeats} available</div>
+            </div>
+          </div>
+        </div>
 
-            {/* All Events */}
-            <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100 p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="font-semibold mb-2 text-foreground">All Upcoming Events</h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {events.map((event) => (
-                  <div key={event.id} className="p-1.5 sm:p-2 lg:p-2.5 rounded bg-white/40 dark:bg-black/40 border border-blue-100">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{getEventIcon(event.type)}</span>
-                        <div>
-                          <div className="text-sm font-medium text-foreground">{event.name}</div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-2">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(event.date)}
-                            <MapPin className="h-3 w-3" />
-                            {event.location}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <Badge className={`text-xs ${getPriorityColor(event.priority)}`}>
-                          {event.priority}
-                        </Badge>
-                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          {formatCurrency(event.potentialValue)}
-                        </div>
+        {/* BD Content */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-3">
+            {/* Next 3 Events */}
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-1.5 sm:p-2 lg:p-2.5">
+              <h4 className="font-semibold mb-2 text-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                Next 3 Events
+              </h4>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {events.slice(0, 3).map((event) => (
+                  <div key={event.id} className="flex justify-between items-center p-2 rounded bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{getEventIcon(event.type)}</span>
+                      <div>
+                        <div className="text-sm font-medium text-foreground">{event.name}</div>
+                        <div className="text-xs text-muted-foreground">{formatDate(event.date)}</div>
                       </div>
                     </div>
-                    
-                    <div className="text-xs text-muted-foreground mb-2">{event.description}</div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
-                          {event.totalSeats - event.availableSeats} attending, {event.availableSeats} available
-                        </span>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                        {event.availableSeats}/{event.totalSeats}
                       </div>
-                      <Progress 
-                        value={((event.totalSeats - event.availableSeats) / event.totalSeats) * 100} 
-                        className="w-16 h-2"
-                      />
+                      <Badge className={`text-xs ${getPriorityColor(event.priority)}`}>
+                        {event.priority}
+                      </Badge>
                     </div>
-                    
-                    {event.attendees.length > 0 && (
-                      <div className="mt-2 text-xs text-muted-foreground">
-                        <span className="font-medium">Attendees:</span> {event.attendees.join(', ')}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Pipeline Value */}
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-1.5 sm:p-2 lg:p-2.5">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  Pipeline Value
+                </span>
+                <div className="text-right">
+                  <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-blue-600 dark:text-blue-400">{formatCurrency(totalPotentialValue)}</div>
+                  <div className="text-xs text-muted-foreground">Total opportunity</div>
+                </div>
+              </div>
+            </div>
+
             {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-blue-600 dark:text-blue-400">{highPriorityEvents.length}</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className="text-sm font-medium text-foreground">{highPriorityEvents.length}</div>
                 <div className="text-xs text-muted-foreground">High Priority</div>
               </div>
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-blue-600 dark:text-blue-400">{utilizationRate.toFixed(0)}%</div>
-                <div className="text-xs text-muted-foreground">Utilization</div>
-              </div>
-              <div className="bg-white/60 dark:bg-black/60 rounded-lg border border-blue-100 p-2 text-center">
-                <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-blue-600 dark:text-blue-400">{events.filter(e => new Date(e.date) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length}</div>
+              <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+                <div className="text-sm font-medium text-foreground">{events.filter(e => new Date(e.date) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length}</div>
                 <div className="text-xs text-muted-foreground">This Week</div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Detailed Drill-Down Overlay */}
+      {showDrillDown && (
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+          <div className="h-full">
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">BD Opportunities Deep Analysis</h3>
+            
+            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+              {/* All Events */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Building2 className="w-4 h-4 mr-2" />
+                    All Upcoming Events
+                  </h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto text-sm">
+                    {events.map((event) => (
+                      <div key={event.id} className="p-1.5 rounded bg-white/20 dark:bg-black/20 border border-white/20 dark:border-black/20">
+                        <div className="flex justify-between items-start mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{getEventIcon(event.type)}</span>
+                            <div>
+                              <div className="text-xs font-medium text-white">{event.name}</div>
+                              <div className="text-xs text-blue-200 flex items-center gap-2">
+                                <Calendar className="h-2 w-2" />
+                                {formatDate(event.date)}
+                                <MapPin className="h-2 w-2" />
+                                {event.location}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-blue-300">{formatCurrency(event.potentialValue)}</div>
+                            <div className="text-xs text-white">{event.availableSeats}/{event.totalSeats} seats</div>
+                          </div>
+                        </div>
+                        
+                        <div className="text-xs text-blue-200 mb-1">{event.description}</div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="text-xs text-blue-300">
+                            {event.totalSeats - event.availableSeats} attending
+                          </div>
+                          <Progress 
+                            value={((event.totalSeats - event.availableSeats) / event.totalSeats) * 100} 
+                            className="w-12 h-1"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary Analytics */}
+              <div className="space-y-4">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Pipeline Analytics
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Total Pipeline Value:</span>
+                      <span className="font-medium text-green-400">{formatCurrency(totalPotentialValue)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>High Priority Events:</span>
+                      <span className="font-medium text-red-400">{highPriorityEvents.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Seat Utilization:</span>
+                      <span className="font-medium text-blue-400">{utilizationRate.toFixed(0)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>This Week Events:</span>
+                      <span className="font-medium text-yellow-400">{events.filter(e => new Date(e.date) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Users className="w-4 h-4 mr-2" />
+                    Event Types
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {['Golf', 'Dinner', 'Networking', 'Conference', 'Awards', 'Polo'].map(type => {
+                      const typeEvents = events.filter(e => e.type === type);
+                      if (typeEvents.length === 0) return null;
+                      return (
+                        <div key={type} className="flex justify-between">
+                          <span>{type}:</span>
+                          <span className="font-medium text-purple-300">{typeEvents.length} events</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                    <Star className="w-4 h-4 mr-2" />
+                    Key Insights
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-blue-200">
+                      <p className="font-medium mb-1">Recommendations:</p>
+                      <ul className="text-xs space-y-1 list-disc list-inside">
+                        <li>Focus on {highPriorityEvents.length} high priority events</li>
+                        <li>Current utilization rate: {utilizationRate.toFixed(0)}%</li>
+                        <li>Pipeline value: {formatCurrency(totalPotentialValue)}</li>
+                        <li>{events.filter(e => new Date(e.date) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length} events this week</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
