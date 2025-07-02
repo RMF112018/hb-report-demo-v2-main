@@ -52,7 +52,7 @@ type Story = StoryObj<typeof StaffPlanningPage>
 const mockUsers = {
   admin: {
     id: "user-admin",
-    email: "admin@hbreport.com",
+    email: "admin@hbintel.com",
     name: "Admin User",
     firstName: "Admin",
     lastName: "User",
@@ -60,7 +60,7 @@ const mockUsers = {
   },
   executive: {
     id: "user-exec",
-    email: "executive@hbreport.com",
+    email: "executive@hbintel.com",
     name: "Executive User",
     firstName: "Executive",
     lastName: "User",
@@ -68,7 +68,7 @@ const mockUsers = {
   },
   projectExecutive: {
     id: "emp-001",
-    email: "pe@hbreport.com",
+    email: "pe@hbintel.com",
     name: "Sarah Johnson",
     firstName: "Sarah",
     lastName: "Johnson",
@@ -76,7 +76,7 @@ const mockUsers = {
   },
   projectManager: {
     id: "emp-003",
-    email: "pm@hbreport.com",
+    email: "pm@hbintel.com",
     name: "Jennifer Liu",
     firstName: "Jennifer",
     lastName: "Liu",

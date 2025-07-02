@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { Search, Moon, Sun, ChevronDown, Building, Wrench, Briefcase, Archive } from "lucide-react"
+import { Search, Moon, Sun, ChevronDown, Building, Wrench, Archive } from "lucide-react"
 import { ProductivityPopover } from "./ProductivityPopover"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -45,7 +45,7 @@ export const AppHeader = () => {
   useEffect(() => {
     console.log("AppHeader: selectedDepartment changed to:", selectedDepartment)
   }, [selectedDepartment])
-  const [showDepartmentMenu, setShowDepartmentMenu] = useState(false)
+
   const [showProjectMenu, setShowProjectMenu] = useState(false)
   const [showToolMenu, setShowToolMenu] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -101,12 +101,10 @@ export const AppHeader = () => {
 
   // Refs for click outside detection
   const headerRef = useRef<HTMLElement>(null)
-  const departmentMenuRef = useRef<HTMLDivElement>(null)
   const projectMenuRef = useRef<HTMLDivElement>(null)
   const toolMenuRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
-  const departmentMenuContentRef = useRef<HTMLDivElement>(null)
   const projectMenuContentRef = useRef<HTMLDivElement>(null)
   const toolMenuContentRef = useRef<HTMLDivElement>(null)
 
@@ -275,10 +273,10 @@ export const AppHeader = () => {
 
       // Pre-Construction (filtered by department)
       {
-        name: "Estimating",
-        href: "/estimating",
+        name: "Pre-Construction Dashboard",
+        href: "/pre-con",
         category: "Pre-Construction",
-        description: "Cost estimation and analysis tools",
+        description: "Pre-construction command center and pipeline overview",
       },
       {
         name: "Business Development",
@@ -287,16 +285,32 @@ export const AppHeader = () => {
         description: "Lead generation and pursuit management",
       },
       {
-        name: "Preconstruction",
-        href: "/pre-con",
+        name: "Estimating",
+        href: "/estimating",
         category: "Pre-Construction",
-        description: "Pre-construction command center and pipeline overview",
+        description: "Cost estimation and analysis tools",
       },
       {
         name: "Innovation & Digital Services",
         href: "/tools/coming-soon",
         category: "Pre-Construction",
         description: "BIM, VDC, and digital construction technologies",
+      },
+
+      // Warranty
+      {
+        name: "Coming Soon",
+        href: "#",
+        category: "Warranty",
+        description: "Warranty management and tracking tools",
+      },
+
+      // Historical Projects
+      {
+        name: "Archive",
+        href: "#",
+        category: "Historical Projects",
+        description: "Access completed project archives and historical data - Coming Soon",
       },
     ],
     [getDashboardPath], // Add getDashboardPath to dependencies
@@ -351,10 +365,18 @@ export const AppHeader = () => {
     
     const filtered = tools.filter((tool) => {
       // Filter by department (if applicable)
-      const isDepartmentMatch =
-        selectedDepartment === "pre-construction"
-          ? tool.category === "Pre-Construction"
-          : tool.category !== "Pre-Construction"
+      let isDepartmentMatch = true
+      
+      if (selectedDepartment === "pre-construction") {
+        // Pre-construction department: only show Pre-Construction category tools
+        isDepartmentMatch = tool.category === "Pre-Construction"
+      } else if (selectedDepartment === "operations") {
+        // Operations department: show all categories (Core Tools, Pre-Construction, Financial Management, Field Management, Compliance, Warranty)
+        isDepartmentMatch = true
+      } else {
+        // Archive department: exclude Pre-Construction tools (handled separately in the UI)
+        isDepartmentMatch = tool.category !== "Pre-Construction"
+      }
 
       // Filter by role visibility
       const isRoleVisible = !tool.visibleRoles || (userRole && tool.visibleRoles.includes(userRole))
@@ -375,31 +397,7 @@ export const AppHeader = () => {
   // ... (getUserInitials, hasPreConAccess, getProjectStatusColor functions defined above)
 
   // Event handlers with debugging
-  const handleDepartmentChange = useCallback(
-    (department: string) => {
-      console.log("Department changed to:", department)
-      setSelectedDepartment(department)
-      setShowDepartmentMenu(false)
-      setShowProjectMenu(false)
-      setShowToolMenu(false)
-      setShowUserMenu(false)
 
-      // Navigate to department-specific dashboard
-      const targetPath = department === "operations" ? "/dashboard" : "/pre-con"
-      console.log("Navigating to:", targetPath)
-      router.push(targetPath)
-
-      // Dispatch custom event for other components
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("departmentChanged", {
-            detail: { department, timestamp: new Date().toISOString() },
-          }),
-        )
-      }
-    },
-    [router],
-  )
 
   const { projectId, setProjectId } = useProjectContext()
 
@@ -464,7 +462,6 @@ export const AppHeader = () => {
     (href: string) => {
       console.log("Tool navigation triggered:", href)
       setShowToolMenu(false)
-      setShowDepartmentMenu(false)
       setShowProjectMenu(false)
       setShowUserMenu(false)
 
@@ -485,7 +482,6 @@ export const AppHeader = () => {
 
   // Close all menus
   const closeAllMenus = useCallback(() => {
-    setShowDepartmentMenu(false)
     setShowProjectMenu(false)
     setShowToolMenu(false)
     setShowUserMenu(false)
@@ -495,16 +491,6 @@ export const AppHeader = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
-
-      // Check if click is outside department menu
-      if (
-        showDepartmentMenu &&
-        departmentMenuContentRef.current &&
-        !departmentMenuContentRef.current.contains(target) &&
-        !headerRef.current?.contains(target)
-      ) {
-        setShowDepartmentMenu(false)
-      }
 
       // Check if click is outside project menu
       if (
@@ -536,7 +522,7 @@ export const AppHeader = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [showDepartmentMenu, showProjectMenu, showToolMenu, showUserMenu])
+  }, [showProjectMenu, showToolMenu, showUserMenu])
 
   // Don't load saved project - always start with "Projects" default
   // useEffect(() => {
@@ -565,41 +551,13 @@ export const AppHeader = () => {
               className="h-10 w-auto object-contain"
             />
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-tight">HB Report</span>
+              <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
               <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
             </div>
           </div>
 
           {/* Navigation Pills */}
           <nav className="hidden lg:flex items-center space-x-2">
-            {/* Department Picker */}
-            <Button
-              variant="ghost"
-              size="default"
-              className={`gap-3 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
-                showDepartmentMenu ? "bg-white/20 shadow-md" : ""
-              } ${selectedDepartment !== "operations" ? "bg-white/10" : ""} rounded-lg font-medium`}
-              onClick={() => {
-                setShowDepartmentMenu(!showDepartmentMenu)
-                setShowProjectMenu(false)
-                setShowToolMenu(false)
-                setShowUserMenu(false)
-              }}
-              aria-label="Select department"
-              aria-expanded={showDepartmentMenu}
-              data-tour="environment-menu"
-            >
-              <Briefcase className="h-4 w-4" />
-              <span className="capitalize">
-                {selectedDepartment === "operations" 
-                  ? "Operations" 
-                  : selectedDepartment === "pre-construction" 
-                    ? "Pre-Construction" 
-                    : "Archive"
-                }
-              </span>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showDepartmentMenu ? "rotate-180" : ""}`} />
-            </Button>
 
             {/* Project Picker */}
             <Button
@@ -610,7 +568,6 @@ export const AppHeader = () => {
               } ${selectedProject !== "all" ? "bg-white/10" : ""} rounded-lg font-medium`}
               onClick={() => {
                 setShowProjectMenu(!showProjectMenu)
-                setShowDepartmentMenu(false)
                 setShowToolMenu(false)
                 setShowUserMenu(false)
               }}
@@ -648,7 +605,6 @@ export const AppHeader = () => {
               } rounded-lg font-medium`}
               onClick={() => {
                 setShowToolMenu(!showToolMenu)
-                setShowDepartmentMenu(false)
                 setShowProjectMenu(false)
                 setShowUserMenu(false)
               }}
@@ -738,7 +694,6 @@ export const AppHeader = () => {
                 className="h-11 px-3 text-white hover:bg-white/20 rounded-lg transition-all duration-200"
                 onClick={() => {
                   setShowUserMenu(!showUserMenu)
-                  setShowDepartmentMenu(false)
                   setShowProjectMenu(false)
                   setShowToolMenu(false)
                 }}
@@ -823,102 +778,14 @@ export const AppHeader = () => {
       </header>
 
       {/* Menu Overlay */}
-      {(showDepartmentMenu || showProjectMenu || showToolMenu) && (
+      {(showProjectMenu || showToolMenu) && (
         <div 
           className="fixed inset-0 top-20 z-[104] bg-black/20 backdrop-blur-sm"
           onClick={closeAllMenus}
         />
       )}
 
-      {/* Department Mega Menu */}
-      {showDepartmentMenu && (
-        <div
-          ref={departmentMenuContentRef}
-          className="fixed left-0 right-0 top-20 z-[105] border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-300"
-        >
-          <div className="mx-auto max-w-7xl px-8 py-10">
-            <div className="grid grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Operations</h3>
-                <button
-                  onClick={() => handleDepartmentChange("operations")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "operations"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "operations" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Building className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Operations Dashboard</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Project management and execution tools</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
 
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Pre-Construction</h3>
-                <button
-                  onClick={() => handleDepartmentChange("pre-construction")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "pre-construction"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "pre-construction" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Briefcase className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Pre-Construction Suite</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Estimating, VDC, and business development</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Archive</h3>
-                <button
-                  onClick={() => handleDepartmentChange("archive")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "archive"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "archive" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Archive className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Project Archive</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Completed and closed projects</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Project Mega Menu */}
       {showProjectMenu && (
@@ -1031,7 +898,7 @@ export const AppHeader = () => {
           ref={toolMenuContentRef}
           className="fixed left-0 right-0 top-20 z-[105] border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-2xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-300"
         >
-          <div className="mx-auto max-w-7xl px-8 py-8">
+          <div className="px-8 py-8">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -1125,8 +992,8 @@ export const AppHeader = () => {
                 </div>
               </div>
             ) : (
-              // Operations Tools - 4 Columns
-              <div className="grid grid-cols-4 gap-8">
+              // Operations Tools - 7 Categories in 4-Column Grid
+              <div className="grid grid-cols-4 gap-6">
                 {/* Column 1: Core Tools */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
@@ -1158,7 +1025,38 @@ export const AppHeader = () => {
                   </div>
                 </div>
 
-                {/* Column 2: Financial Management */}
+                {/* Column 2: Pre-Construction */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Pre-Construction</h3>
+                  </div>
+                  <div className="space-y-1">
+                    {filteredTools
+                      .filter((tool) => tool.category === "Pre-Construction")
+                      .map((tool) => (
+                        <button
+                          key={tool.href}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            console.log("Navigating to tool:", tool.name, "at", tool.href)
+                            handleToolNavigation(tool.href)
+                          }}
+                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                        >
+                          <div className="space-y-1">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                              {tool.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Column 3: Financial Management */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -1191,7 +1089,7 @@ export const AppHeader = () => {
                   </div>
                 </div>
 
-                {/* Column 3: Field Management */}
+                {/* Column 4: Field Management */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <div className="w-2 h-2 bg-hb-orange rounded-full"></div>
@@ -1222,7 +1120,7 @@ export const AppHeader = () => {
                   </div>
                 </div>
 
-                {/* Column 4: Compliance */}
+                {/* Column 5: Compliance */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -1237,6 +1135,78 @@ export const AppHeader = () => {
                           onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
+                            console.log("Navigating to tool:", tool.name, "at", tool.href)
+                            handleToolNavigation(tool.href)
+                          }}
+                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                        >
+                          <div className="space-y-1">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                              {tool.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Column 6: Warranty */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Warranty</h3>
+                  </div>
+                  <div className="space-y-1">
+                    {filteredTools
+                      .filter((tool) => tool.category === "Warranty")
+                      .map((tool) => (
+                        <button
+                          key={tool.href}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (tool.href === "#") {
+                              // Handle "Coming Soon" - no navigation
+                              console.log("Coming Soon tool clicked - no navigation")
+                              return
+                            }
+                            console.log("Navigating to tool:", tool.name, "at", tool.href)
+                            handleToolNavigation(tool.href)
+                          }}
+                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                        >
+                          <div className="space-y-1">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                              {tool.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Column 7: Historical Projects */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Historical Projects</h3>
+                  </div>
+                  <div className="space-y-1">
+                    {filteredTools
+                      .filter((tool) => tool.category === "Historical Projects")
+                      .map((tool) => (
+                        <button
+                          key={tool.href}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (tool.href === "#") {
+                              // Handle "Archive" - no navigation
+                              console.log("Archive tool clicked - no navigation")
+                              return
+                            }
                             console.log("Navigating to tool:", tool.name, "at", tool.href)
                             handleToolNavigation(tool.href)
                           }}

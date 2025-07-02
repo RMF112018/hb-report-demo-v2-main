@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Play } from 'lucide-react'
+import { Compass, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTour } from '@/context/tour-context'
 import { useAuth } from '@/context/auth-context'
@@ -14,14 +14,15 @@ interface TakeTourButtonProps {
 }
 
 /**
- * Floating "Take the Tour" button component
+ * Enhanced floating "Explore This Page" button component
  * 
  * Features:
- * - Fixed positioning in bottom-left corner
+ * - Fixed positioning in top-right corner for better visibility
  * - Page-specific tour detection using usePathname
  * - Intelligent tour selection based on page and user role
+ * - Engaging visual design with compass icon and pulsing animation
  * - WCAG compliant with proper aria labels and focus states
- * - Theme-aware styling for light/dark modes
+ * - High contrast colors for better visibility
  * - Minimal CLS with optimized rendering
  * 
  * @param className Optional additional CSS classes
@@ -41,11 +42,33 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
   const { user } = useAuth()
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
+  const [shouldPulse, setShouldPulse] = useState(false)
 
   // Handle component mounting to prevent hydration issues
   useEffect(() => {
     setMounted(true)
-  }, [])
+    
+    // Check if user is new to tours (for pulsing animation)
+    const checkNewUser = () => {
+      try {
+        const hasSeenTours = localStorage.getItem('hb-tours-completed')
+        const hasDisabledTours = localStorage.getItem('hb-tour-available') === 'false'
+        
+        // Pulse if user hasn't seen tours and tours aren't disabled
+        if (!hasSeenTours && !hasDisabledTours && isTourAvailable) {
+          setShouldPulse(true)
+          
+          // Stop pulsing after 10 seconds to avoid being annoying
+          setTimeout(() => setShouldPulse(false), 10000)
+        }
+      } catch (error) {
+        // Silently handle localStorage errors
+        tourLogger.debug('Error checking tour completion status', error)
+      }
+    }
+    
+    checkNewUser()
+  }, [isTourAvailable])
 
   // Don't render if tours are not available or not mounted
   if (!mounted || !isTourAvailable || availableTours.length === 0) {
@@ -200,32 +223,32 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
    * Gets appropriate button text based on tour availability and page
    */
   const getButtonText = (): string => {
-    if (isActive) return 'Stop Tour'
+    if (isActive) return 'Exit Tour'
     
     const selectedTour = getPageSpecificTour()
     if (selectedTour) {
-      // Customize button text based on tour type
-      if (selectedTour.id.includes('login')) return 'Take Login Tour'
-      if (selectedTour.id.includes('dashboard')) return 'Take Dashboard Tour'
-      if (selectedTour.id.includes('financial-hub')) return 'Take Financial Hub Tour'
-      if (selectedTour.id.includes('staffing')) return 'Take Staffing Tour'
+      // Customize button text based on tour type with engaging language
+      if (selectedTour.id.includes('login')) return 'Explore Login Options'
+      if (selectedTour.id.includes('dashboard')) return 'Explore Dashboard'
+      if (selectedTour.id.includes('financial-hub')) return 'Explore Financial Hub'
+      if (selectedTour.id.includes('staffing')) return 'Explore Staffing Tools'
     }
     
-    return 'Take the Tour'
+    return 'Explore This Page'
   }
 
   /**
    * Gets appropriate aria-label based on current state and available tour
    */
   const getAriaLabel = (): string => {
-    if (isActive) return 'Stop the current tour'
+    if (isActive) return 'Exit the current page tour'
     
     const selectedTour = getPageSpecificTour()
     if (selectedTour) {
-      return `Take the ${selectedTour.name} tour`
+      return `Start interactive tour: ${selectedTour.name}`
     }
     
-    return 'Take the tour'
+    return 'Start interactive tour of this page'
   }
 
   const buttonText = getButtonText()
@@ -238,34 +261,46 @@ export const TakeTourButton: React.FC<TakeTourButtonProps> = ({ className = '' }
       disabled={isLoading}
       aria-label={ariaLabel}
       className={`
-        fixed bottom-4 left-4 z-[10001] rounded-full px-6 py-3 shadow-lg
-        bg-white dark:bg-gray-800 
-        text-gray-900 dark:text-white
-        border border-gray-200 dark:border-gray-700
-        hover:bg-gray-50 dark:hover:bg-gray-700
-        focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800
-        transition-all duration-200 ease-in-out
-        transform hover:scale-105 active:scale-95
-        ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : ''}
+        fixed bottom-4 left-4 z-[10001] rounded-full px-4 py-2.5 shadow-xl
+        bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600
+        text-white font-semibold
+        border-0 
+        hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700
+        focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-900
+        transition-all duration-300 ease-out
+        transform hover:scale-105 active:scale-95 hover:shadow-2xl
+        ${isActive ? 'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' : ''}
+        ${shouldPulse && !isActive ? 'animate-pulse' : ''}
         ${className}
       `}
       size="sm"
       type="button"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         {isLoading ? (
-          <div 
-            className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"
+          <Loader2 
+            className="animate-spin h-4 w-4" 
             data-testid="loading-spinner"
             aria-hidden="true"
           />
+        ) : isActive ? (
+          <X 
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
         ) : (
-          <Play 
-            className={`h-4 w-4 ${isActive ? 'hidden' : ''}`}
+          <Compass 
+            className="h-4 w-4"
             aria-hidden="true"
           />
         )}
-        <span className="text-sm font-medium">{buttonText}</span>
+        <span className="text-sm font-semibold tracking-wide">{buttonText}</span>
+        {shouldPulse && !isActive && (
+          <div 
+            className="absolute -inset-1 bg-blue-400 rounded-full opacity-75 animate-ping" 
+            aria-hidden="true"
+          />
+        )}
       </div>
     </Button>
   )

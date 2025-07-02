@@ -16,8 +16,8 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "HB Report Platform | Hedrick Brothers Construction",
-  description: "Advanced construction analytics and project management platform for Hedrick Brothers Construction",
+  title: "HB Intel | Hedrick Brothers Construction",
+  description: "Construction Intelligence Platform",
   keywords: ["construction", "analytics", "project management", "reporting", "hedrick brothers"],
   authors: [{ name: "Hedrick Brothers Construction" }],
   creator: "Hedrick Brothers Construction",
@@ -29,10 +29,10 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://report.hedrickbrothers.com"),
   openGraph: {
-    title: "HB Report Platform | Construction Analytics",
-    description: "Advanced construction analytics and project management platform",
+    title: "HB Intel | Construction Analytics",
+    description: "Construction Intelligence Platform",
     url: "https://report.hedrickbrothers.com",
-    siteName: "HB Report Platform",
+    siteName: "HB Intel",
     locale: "en_US",
     type: "website",
   },
