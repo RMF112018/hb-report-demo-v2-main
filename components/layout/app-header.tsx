@@ -393,17 +393,19 @@ export const AppHeader = () => {
     console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole, "visible categories:", visibleCategories)
     
     const filtered = tools.filter((tool) => {
-      // Filter by department (if applicable)
+      // Filter by department and role - role-based filtering takes precedence
       let isDepartmentMatch = true
       
       if (selectedDepartment === "pre-construction") {
-        // Pre-construction department: only show Pre-Construction category tools
-        isDepartmentMatch = tool.category === "Pre-Construction"
+        // Pre-construction department: show role-based categories, with emphasis on pre-construction
+        // For estimators: show both Pre-Construction AND Compliance categories
+        // For others: prioritize Pre-Construction but respect role limitations
+        isDepartmentMatch = visibleCategories.includes(tool.category)
       } else if (selectedDepartment === "operations") {
         // Operations department: show categories based on role
         isDepartmentMatch = visibleCategories.includes(tool.category)
       } else {
-        // Archive department: exclude Pre-Construction tools (handled separately in the UI)
+        // Archive department: exclude Pre-Construction tools but include other role-visible categories
         isDepartmentMatch = tool.category !== "Pre-Construction" && visibleCategories.includes(tool.category)
       }
 
@@ -414,7 +416,7 @@ export const AppHeader = () => {
       
       // Enhanced debugging for estimator role
       if (userRole === "estimator") {
-        console.log("Tool:", tool.name, "Category:", tool.category, "Dept match:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude, "VisibleRoles:", tool.visibleRoles)
+        console.log("Tool:", tool.name, "Category:", tool.category, "Dept:", selectedDepartment, "Visible cats:", visibleCategories, "Dept match:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude)
       }
 
       return shouldInclude
