@@ -66,7 +66,7 @@ const mockTourDefinitions = [
     steps: [
       {
         id: 'welcome',
-        title: 'Welcome to HB Report Demo!',
+        title: 'Welcome to HB Intel Demo!',
         content: 'This guided tour will show you how to explore the application.',
         target: '.login-card',
         placement: 'center' as const,

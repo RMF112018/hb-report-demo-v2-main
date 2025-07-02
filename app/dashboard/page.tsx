@@ -4,7 +4,7 @@ import React from "react";
 import { useAuth } from "@/context/auth-context";
 import { useTour } from "@/context/tour-context";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DashboardLayout as DashboardLayoutComponent } from "@/components/dashboard/DashboardLayout";
 import { DashboardProvider, useDashboardContext } from "@/context/dashboard-context";
 import type { DashboardCard, DashboardLayout } from "@/types/dashboard";
@@ -19,7 +19,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, ChevronDown, LayoutDashboard, Layout, Maximize2, Minimize2, Home, RefreshCw } from "lucide-react";
+import { Plus, ChevronDown, LayoutDashboard, Layout, Maximize2, Minimize2, Home, RefreshCw, EllipsisVertical, ChevronRight } from "lucide-react";
 import { AppHeader } from "@/components/layout/app-header";
 
 // Mock data imports for cards
@@ -47,10 +47,12 @@ function DashboardContent({ user }: { user: any }) {
   } = useDashboardContext();
   const { startTour, isTourAvailable } = useTour();
   const [isEditing, setIsEditing] = useState(false);
-  const [dashboardPopoverOpen, setDashboardPopoverOpen] = useState(false);
-  const [layoutPopoverOpen, setLayoutPopoverOpen] = useState(false);
   const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [dashboardViewSubmenuOpen, setDashboardViewSubmenuOpen] = useState(false);
+  const [comingSoonPopoverOpen, setComingSoonPopoverOpen] = useState(false);
+  const ellipsisButtonRef = useRef<HTMLButtonElement>(null);
 
   const currentDashboard = dashboards.find(d => d.id === currentDashboardId);
 
@@ -162,12 +164,10 @@ function DashboardContent({ user }: { user: any }) {
 
   const handleDashboardSelect = (dashboardId: string) => {
     setCurrentDashboardId(dashboardId);
-    setDashboardPopoverOpen(false);
   };
 
   const handleLayoutDensityChange = (density: 'compact' | 'normal' | 'spacious') => {
     setLayoutDensity(density);
-    setLayoutPopoverOpen(false);
   };
 
   const toggleFullscreen = () => {
@@ -265,7 +265,7 @@ function DashboardContent({ user }: { user: any }) {
   return (
     <>
       <AppHeader />
-      <div className="space-y-6 p-6">
+      <div className="space-y-3 p-6">
         {/* Breadcrumb Navigation */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -282,166 +282,235 @@ function DashboardContent({ user }: { user: any }) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header Section */}
-        <div className="flex flex-col gap-4" data-tour="dashboard-page-header">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-              <p className="text-muted-foreground mt-1">
-                {currentDashboard?.description || 'Real-time insights and project management overview'}
-              </p>
-              <div className="flex items-center gap-4 mt-2">
-                <Badge variant="outline" className="px-3 py-1">
-                  {currentDashboard?.name || 'Loading...'}
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  {currentDashboard?.cards?.length || 0} Widgets
-                </Badge>
-                <Badge variant="outline" className="px-3 py-1 capitalize">
-                  {user?.role?.replace('-', ' ') || 'User'} View
-                </Badge>
+        {/* Header Section - Made Sticky */}
+        <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
+          <div className="flex flex-col gap-4 pt-3" data-tour="dashboard-page-header">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+                <p className="text-muted-foreground mt-1">
+                  {currentDashboard?.description || 'Real-time insights and project management overview'}
+                </p>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={() => window.location.reload()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <Button variant="outline" onClick={toggleFullscreen}>
-                {isFullscreen ? (
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={toggleFullscreen} data-tour="fullscreen-button">
+                  {isFullscreen ? (
+                    <>
+                      <Minimize2 className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                
+                {/* More Actions Menu */}
+                <Popover open={moreMenuOpen} onOpenChange={(open) => {
+                  setMoreMenuOpen(open);
+                  if (!open) {
+                    setDashboardViewSubmenuOpen(false);
+                  }
+                }}>
+                  <PopoverTrigger asChild>
+                    <Button ref={ellipsisButtonRef} variant="outline" size="sm" className="px-2" data-tour="more-actions-menu">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-0" align="end">
+                    <div className="p-1">
+                      <button
+                        onClick={() => {
+                          window.location.reload();
+                          setMoreMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                        Refresh
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditing(!isEditing);
+                          setMoreMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        {isEditing ? "Exit Edit" : "Edit Dashboard"}
+                      </button>
+                      
+                      {/* Dashboard View Submenu */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setDashboardViewSubmenuOpen(!dashboardViewSubmenuOpen)}
+                          className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center justify-between gap-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Layout className="h-4 w-4" />
+                            Layout Density
+                          </div>
+                          <ChevronRight className={`h-4 w-4 transition-transform ${dashboardViewSubmenuOpen ? 'rotate-90' : ''}`} />
+                        </button>
+                        
+                        {dashboardViewSubmenuOpen && (
+                          <div className="mt-1 ml-4 space-y-1">
+                            {[
+                              { value: 'compact' as const, label: 'Compact' },
+                              { value: 'normal' as const, label: 'Normal' },
+                              { value: 'spacious' as const, label: 'Spacious' }
+                            ].map(option => (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  handleLayoutDensityChange(option.value);
+                                  setDashboardViewSubmenuOpen(false);
+                                  setMoreMenuOpen(false);
+                                }}
+                                className={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex items-center gap-2 ${
+                                  layoutDensity === option.value
+                                    ? 'bg-primary/10 text-primary font-medium'
+                                    : 'hover:bg-muted text-muted-foreground'
+                                }`}
+                              >
+                                <div className={`w-2 h-2 rounded-full ${
+                                  layoutDensity === option.value ? 'bg-primary' : 'bg-transparent'
+                                }`} />
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="border-t border-border mt-2 pt-2">
+                        <button
+                          onClick={() => {
+                            setComingSoonPopoverOpen(true);
+                            setMoreMenuOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Create New Dashboard
+                        </button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                
+                                {/* Coming Soon Popover */}
+                {comingSoonPopoverOpen && (
                   <>
-                    <Minimize2 className="h-4 w-4 mr-2" />
-                    Exit Fullscreen
-                  </>
-                ) : (
-                  <>
-                    <Maximize2 className="h-4 w-4 mr-2" />
-                    Fullscreen
+                    <div 
+                      className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+                      onClick={() => setComingSoonPopoverOpen(false)}
+                    />
+                    <div className="fixed top-20 right-6 z-50 w-80 bg-white dark:bg-gray-950 border border-border rounded-lg shadow-lg">
+                      <div className="p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
+                            <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-foreground">Coming Soon</h3>
+                            <p className="text-xs text-muted-foreground">Dashboard Creation</p>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Create numerous dashboard views tailored to your profile with fully customizable layouts, advanced analytics, and personalized themes.
+                          </p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                              Custom widget arrangements
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                              Role-based analytics presets
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                              Branded themes and colors
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                              Shareable dashboard templates
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-border">
+                          <div className="flex items-center justify-between">
+                            <Badge variant="secondary" className="text-xs">
+                              Beta v2.2
+                            </Badge>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => setComingSoonPopoverOpen(false)}
+                            >
+                              Got it
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </>
                 )}
-              </Button>
-              <Button
-                variant={isEditing ? "default" : "outline"}
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                {isEditing ? "Exit Edit" : "Edit Dashboard"}
-              </Button>
-            </div>
-          </div>
-
-          {/* Dashboard Controls Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-tour="dashboard-controls">
-            <div className="flex items-center gap-3">
-              {/* Dashboard Selector */}
-              <Popover open={dashboardPopoverOpen} onOpenChange={setDashboardPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2" data-tour="dashboard-selector">
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>{currentDashboard?.name || 'Select Dashboard'}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-0" align="start">
-                  <div className="p-2">
-                    <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
-                      Available Dashboards
-                    </div>
-                    {dashboards.map(dashboard => (
-                      <button
-                        key={dashboard.id}
-                        onClick={() => handleDashboardSelect(dashboard.id)}
-                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                          currentDashboardId === dashboard.id
-                            ? 'bg-primary/10 text-primary font-medium'
-                            : 'hover:bg-muted text-muted-foreground'
-                        }`}
-                      >
-                        <div className="font-medium">{dashboard.name}</div>
-                        {dashboard.description && (
-                          <div className="text-xs text-muted-foreground mt-0.5">{dashboard.description}</div>
-                        )}
-                      </button>
-                    ))}
-                    <div className="border-t border-border mt-2 pt-2">
-                      <button
-                        onClick={() => {/* TODO: Add new dashboard */}}
-                        className="w-full text-left px-3 py-2 rounded text-sm text-primary hover:bg-primary/10 flex items-center gap-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add New Dashboard
-                      </button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Layout Density Selector */}
-              <Popover open={layoutPopoverOpen} onOpenChange={setLayoutPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Layout className="h-4 w-4" />
-                    <span className="hidden sm:inline">{layoutDensity.charAt(0).toUpperCase() + layoutDensity.slice(1)}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-0" align="start">
-                  <div className="p-2">
-                    <div className="text-sm font-medium text-foreground px-2 py-1 mb-1">
-                      Layout Density
-                    </div>
-                    {[
-                      { value: 'compact' as const, label: 'Compact', description: 'Dense layout' },
-                      { value: 'normal' as const, label: 'Normal', description: 'Balanced spacing' },
-                      { value: 'spacious' as const, label: 'Spacious', description: 'Generous spacing' }
-                    ].map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleLayoutDensityChange(option.value)}
-                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                          layoutDensity === option.value
-                            ? 'bg-primary/10 text-primary font-medium'
-                            : 'hover:bg-muted text-muted-foreground'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Edit Mode Controls */}
-            {isEditing && (
-              <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSave}
-                  className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                >
-                  Save Changes
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleReset}
-                  className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
-                >
-                  Reset to Default
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCardAdd}
-                  className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Widget
-                </Button>
               </div>
-            )}
+            </div>
+
+            {/* Dashboard Controls Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-tour="dashboard-controls">
+                           {/* Dashboard Tabs */}
+             <div className="flex items-center gap-1 border-b border-border" data-tour="dashboard-tabs">
+               {dashboards.map(dashboard => (
+                 <button
+                   key={dashboard.id}
+                   onClick={() => handleDashboardSelect(dashboard.id)}
+                   className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                     currentDashboardId === dashboard.id
+                       ? 'text-primary border-primary bg-primary/5'
+                       : 'text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50'
+                   }`}
+                 >
+                   {dashboard.name}
+                 </button>
+               ))}
+             </div>
+
+              {/* Edit Mode Controls */}
+              {isEditing && (
+                <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSave}
+                    className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleReset}
+                    className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
+                  >
+                    Reset to Default
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCardAdd}
+                    className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Widget
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

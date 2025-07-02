@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { Search, Moon, Sun, ChevronDown, Building, Wrench, Briefcase, Archive } from "lucide-react"
+import { Search, Moon, Sun, ChevronDown, Building, Wrench, Archive } from "lucide-react"
 import { ProductivityPopover } from "./ProductivityPopover"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -45,7 +45,7 @@ export const AppHeader = () => {
   useEffect(() => {
     console.log("AppHeader: selectedDepartment changed to:", selectedDepartment)
   }, [selectedDepartment])
-  const [showDepartmentMenu, setShowDepartmentMenu] = useState(false)
+
   const [showProjectMenu, setShowProjectMenu] = useState(false)
   const [showToolMenu, setShowToolMenu] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -101,12 +101,10 @@ export const AppHeader = () => {
 
   // Refs for click outside detection
   const headerRef = useRef<HTMLElement>(null)
-  const departmentMenuRef = useRef<HTMLDivElement>(null)
   const projectMenuRef = useRef<HTMLDivElement>(null)
   const toolMenuRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
-  const departmentMenuContentRef = useRef<HTMLDivElement>(null)
   const projectMenuContentRef = useRef<HTMLDivElement>(null)
   const toolMenuContentRef = useRef<HTMLDivElement>(null)
 
@@ -275,10 +273,10 @@ export const AppHeader = () => {
 
       // Pre-Construction (filtered by department)
       {
-        name: "Estimating",
-        href: "/estimating",
+        name: "Pre-Construction Dashboard",
+        href: "/pre-con",
         category: "Pre-Construction",
-        description: "Cost estimation and analysis tools",
+        description: "Pre-construction command center and pipeline overview",
       },
       {
         name: "Business Development",
@@ -287,16 +285,32 @@ export const AppHeader = () => {
         description: "Lead generation and pursuit management",
       },
       {
-        name: "Preconstruction",
-        href: "/pre-con",
+        name: "Estimating",
+        href: "/estimating",
         category: "Pre-Construction",
-        description: "Pre-construction command center and pipeline overview",
+        description: "Cost estimation and analysis tools",
       },
       {
         name: "Innovation & Digital Services",
         href: "/tools/coming-soon",
         category: "Pre-Construction",
         description: "BIM, VDC, and digital construction technologies",
+      },
+
+      // Warranty
+      {
+        name: "Coming Soon",
+        href: "#",
+        category: "Warranty",
+        description: "Warranty management and tracking tools",
+      },
+
+      // Historical Projects
+      {
+        name: "Archive",
+        href: "#",
+        category: "Historical Projects",
+        description: "Access completed project archives and historical data - Coming Soon",
       },
     ],
     [getDashboardPath], // Add getDashboardPath to dependencies
@@ -344,62 +358,76 @@ export const AppHeader = () => {
 
 
 
-  // Enhanced filtered tools with department-based and role-based filtering
+  // Role-based category visibility
+  const getVisibleCategories = useCallback(() => {
+    const userRole = user?.role?.toLowerCase?.() || user?.role // Ensure case-insensitive comparison
+    console.log("Determining visible categories for role:", userRole, "(original:", user?.role, ")")
+    
+    switch (userRole) {
+      case "executive":
+      case "project-executive":
+      case "admin":
+        // All categories visible
+        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
+      
+      case "project-manager":
+        // No Pre-Construction or Historical Projects
+        return ["Core Tools", "Financial Management", "Field Management", "Compliance", "Warranty"]
+      
+      case "estimator":
+        // Only Pre-Construction and Compliance - let's be extra explicit
+        console.log("ESTIMATOR ROLE DETECTED - returning Pre-Construction and Compliance categories")
+        return ["Pre-Construction", "Compliance"]
+      
+      default:
+        // Default to all categories for unknown roles
+        console.log("Unknown or missing role, defaulting to all categories")
+        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
+    }
+  }, [user])
+
+  // Enhanced filtered tools with role-based filtering (department context maintained for UI only)
   const filteredTools = useMemo(() => {
     const userRole = user?.role // Get current user's role
-    console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole)
+    const visibleCategories = getVisibleCategories()
+    console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole, "visible categories:", visibleCategories)
     
     const filtered = tools.filter((tool) => {
-      // Filter by department (if applicable)
-      const isDepartmentMatch =
-        selectedDepartment === "pre-construction"
-          ? tool.category === "Pre-Construction"
-          : tool.category !== "Pre-Construction"
+      // Always show all role-appropriate tools regardless of current page/department
+      // Department context is used only for UI presentation, not tool filtering
+      const isDepartmentMatch = visibleCategories.includes(tool.category)
 
-      // Filter by role visibility
+      // Filter by role visibility for individual tools
       const isRoleVisible = !tool.visibleRoles || (userRole && tool.visibleRoles.includes(userRole))
 
       const shouldInclude = isDepartmentMatch && isRoleVisible
-      if (selectedDepartment === "pre-construction") {
-        console.log("Tool:", tool.name, "Category:", tool.category, "Matches dept:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude)
+      
+      // Enhanced debugging for estimator role
+      if (userRole === "estimator") {
+        console.log("Tool:", tool.name, "Category:", tool.category, "Dept:", selectedDepartment, "Visible cats:", visibleCategories, "Dept match:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude)
       }
 
       return shouldInclude
     })
     
-    console.log("Filtered tools count:", filtered.length, "for department:", selectedDepartment)
+    console.log("Filtered tools count:", filtered.length, "for department:", selectedDepartment, "user role:", userRole)
+    
+    // Additional debugging for estimator role
+    if (userRole === "estimator") {
+      const complianceTools = filtered.filter(t => t.category === "Compliance")
+      const preconTools = filtered.filter(t => t.category === "Pre-Construction")
+      console.log("Estimator - Compliance tools:", complianceTools.length, complianceTools.map(t => t.name))
+      console.log("Estimator - Pre-Construction tools:", preconTools.length, preconTools.map(t => t.name))
+    }
+    
     return filtered
-  }, [selectedDepartment, tools, user]) // Add user to dependencies
+  }, [selectedDepartment, tools, user, getVisibleCategories]) // Add getVisibleCategories to dependencies
 
   // Utility functions
   // ... (getUserInitials, hasPreConAccess, getProjectStatusColor functions defined above)
 
   // Event handlers with debugging
-  const handleDepartmentChange = useCallback(
-    (department: string) => {
-      console.log("Department changed to:", department)
-      setSelectedDepartment(department)
-      setShowDepartmentMenu(false)
-      setShowProjectMenu(false)
-      setShowToolMenu(false)
-      setShowUserMenu(false)
 
-      // Navigate to department-specific dashboard
-      const targetPath = department === "operations" ? "/dashboard" : "/pre-con"
-      console.log("Navigating to:", targetPath)
-      router.push(targetPath)
-
-      // Dispatch custom event for other components
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("departmentChanged", {
-            detail: { department, timestamp: new Date().toISOString() },
-          }),
-        )
-      }
-    },
-    [router],
-  )
 
   const { projectId, setProjectId } = useProjectContext()
 
@@ -414,7 +442,14 @@ export const AppHeader = () => {
         localStorage.setItem("selectedProject", projectId)
       }
 
-      // Show informative modal with demo explanation
+      // Navigate to Project Control Center for specific projects
+      if (projectId !== "all" && !projectId.startsWith('all-')) {
+        console.log("Navigating to Project Control Center for project:", projectId)
+        router.push(`/project/${projectId}`)
+        return
+      }
+
+      // Show informative modal with demo explanation for "all" projects
       const getProjectDisplayInfo = () => {
         if (projectId === "all") {
           return {
@@ -457,14 +492,13 @@ export const AppHeader = () => {
         )
       }
     },
-    [projects, setProjectId, toast]
+    [projects, setProjectId, toast, router]
   )
 
   const handleToolNavigation = useCallback(
     (href: string) => {
       console.log("Tool navigation triggered:", href)
       setShowToolMenu(false)
-      setShowDepartmentMenu(false)
       setShowProjectMenu(false)
       setShowUserMenu(false)
 
@@ -485,7 +519,6 @@ export const AppHeader = () => {
 
   // Close all menus
   const closeAllMenus = useCallback(() => {
-    setShowDepartmentMenu(false)
     setShowProjectMenu(false)
     setShowToolMenu(false)
     setShowUserMenu(false)
@@ -495,16 +528,6 @@ export const AppHeader = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
-
-      // Check if click is outside department menu
-      if (
-        showDepartmentMenu &&
-        departmentMenuContentRef.current &&
-        !departmentMenuContentRef.current.contains(target) &&
-        !headerRef.current?.contains(target)
-      ) {
-        setShowDepartmentMenu(false)
-      }
 
       // Check if click is outside project menu
       if (
@@ -536,7 +559,7 @@ export const AppHeader = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [showDepartmentMenu, showProjectMenu, showToolMenu, showUserMenu])
+  }, [showProjectMenu, showToolMenu, showUserMenu])
 
   // Don't load saved project - always start with "Projects" default
   // useEffect(() => {
@@ -565,41 +588,13 @@ export const AppHeader = () => {
               className="h-10 w-auto object-contain"
             />
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-tight">HB Report</span>
+              <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
               <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
             </div>
           </div>
 
           {/* Navigation Pills */}
           <nav className="hidden lg:flex items-center space-x-2">
-            {/* Department Picker */}
-            <Button
-              variant="ghost"
-              size="default"
-              className={`gap-3 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
-                showDepartmentMenu ? "bg-white/20 shadow-md" : ""
-              } ${selectedDepartment !== "operations" ? "bg-white/10" : ""} rounded-lg font-medium`}
-              onClick={() => {
-                setShowDepartmentMenu(!showDepartmentMenu)
-                setShowProjectMenu(false)
-                setShowToolMenu(false)
-                setShowUserMenu(false)
-              }}
-              aria-label="Select department"
-              aria-expanded={showDepartmentMenu}
-              data-tour="environment-menu"
-            >
-              <Briefcase className="h-4 w-4" />
-              <span className="capitalize">
-                {selectedDepartment === "operations" 
-                  ? "Operations" 
-                  : selectedDepartment === "pre-construction" 
-                    ? "Pre-Construction" 
-                    : "Archive"
-                }
-              </span>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showDepartmentMenu ? "rotate-180" : ""}`} />
-            </Button>
 
             {/* Project Picker */}
             <Button
@@ -610,7 +605,6 @@ export const AppHeader = () => {
               } ${selectedProject !== "all" ? "bg-white/10" : ""} rounded-lg font-medium`}
               onClick={() => {
                 setShowProjectMenu(!showProjectMenu)
-                setShowDepartmentMenu(false)
                 setShowToolMenu(false)
                 setShowUserMenu(false)
               }}
@@ -648,7 +642,6 @@ export const AppHeader = () => {
               } rounded-lg font-medium`}
               onClick={() => {
                 setShowToolMenu(!showToolMenu)
-                setShowDepartmentMenu(false)
                 setShowProjectMenu(false)
                 setShowUserMenu(false)
               }}
@@ -738,7 +731,6 @@ export const AppHeader = () => {
                 className="h-11 px-3 text-white hover:bg-white/20 rounded-lg transition-all duration-200"
                 onClick={() => {
                   setShowUserMenu(!showUserMenu)
-                  setShowDepartmentMenu(false)
                   setShowProjectMenu(false)
                   setShowToolMenu(false)
                 }}
@@ -823,102 +815,14 @@ export const AppHeader = () => {
       </header>
 
       {/* Menu Overlay */}
-      {(showDepartmentMenu || showProjectMenu || showToolMenu) && (
+      {(showProjectMenu || showToolMenu) && (
         <div 
           className="fixed inset-0 top-20 z-[104] bg-black/20 backdrop-blur-sm"
           onClick={closeAllMenus}
         />
       )}
 
-      {/* Department Mega Menu */}
-      {showDepartmentMenu && (
-        <div
-          ref={departmentMenuContentRef}
-          className="fixed left-0 right-0 top-20 z-[105] border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-300"
-        >
-          <div className="mx-auto max-w-7xl px-8 py-10">
-            <div className="grid grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Operations</h3>
-                <button
-                  onClick={() => handleDepartmentChange("operations")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "operations"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "operations" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Building className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Operations Dashboard</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Project management and execution tools</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
 
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Pre-Construction</h3>
-                <button
-                  onClick={() => handleDepartmentChange("pre-construction")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "pre-construction"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "pre-construction" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Briefcase className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Pre-Construction Suite</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Estimating, VDC, and business development</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="border-b border-gray-200 dark:border-gray-700 pb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Archive</h3>
-                <button
-                  onClick={() => handleDepartmentChange("archive")}
-                  className={`group w-full text-left rounded-xl border p-6 transition-all duration-200 ${
-                    selectedDepartment === "archive"
-                      ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      selectedDepartment === "archive" 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
-                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
-                    }`}>
-                      <Archive className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">Project Archive</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Completed and closed projects</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Project Mega Menu */}
       {showProjectMenu && (
@@ -1031,7 +935,7 @@ export const AppHeader = () => {
           ref={toolMenuContentRef}
           className="fixed left-0 right-0 top-20 z-[105] border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 shadow-2xl backdrop-blur-lg animate-in slide-in-from-top-2 duration-300"
         >
-          <div className="mx-auto max-w-7xl px-8 py-8">
+          <div className="px-8 py-8">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -1057,38 +961,98 @@ export const AppHeader = () => {
             </div>
 
             {selectedDepartment === "pre-construction" ? (
-              // Pre-Construction Tools - Single Column
-              <div className="max-w-md">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-hb-blue rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Pre-Construction</h3>
+              // Pre-Construction Tools - Dynamic categories based on role (same as operations)
+              (() => {
+                const visibleCategories = getVisibleCategories()
+                const categoryConfig = [
+                  {
+                    name: "Core Tools",
+                    color: "bg-hb-blue",
+                    tools: filteredTools.filter((tool) => tool.category === "Core Tools")
+                  },
+                  {
+                    name: "Pre-Construction",
+                    color: "bg-indigo-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction")
+                  },
+                  {
+                    name: "Financial Management",
+                    color: "bg-green-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Financial Management")
+                  },
+                  {
+                    name: "Field Management",
+                    color: "bg-hb-orange",
+                    tools: filteredTools.filter((tool) => tool.category === "Field Management")
+                  },
+                  {
+                    name: "Compliance",
+                    color: "bg-purple-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Compliance")
+                  },
+                  {
+                    name: "Warranty",
+                    color: "bg-amber-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Warranty")
+                  },
+                  {
+                    name: "Historical Projects",
+                    color: "bg-slate-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects")
+                  }
+                ]
+                
+                const filteredCategories = categoryConfig.filter(category => 
+                  visibleCategories.includes(category.name) && category.tools.length > 0
+                )
+
+                const gridCols = filteredCategories.length <= 2 ? "grid-cols-2" : 
+                                filteredCategories.length <= 3 ? "grid-cols-3" : 
+                                filteredCategories.length <= 4 ? "grid-cols-4" : 
+                                "grid-cols-4"
+
+                return (
+                  <div className={`grid ${gridCols} gap-6`}>
+                    {filteredCategories.map((category) => (
+                      <div key={category.name} className="space-y-3">
+                        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                          <div className={`w-2 h-2 ${category.color} rounded-full`}></div>
+                          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                            {category.name}
+                          </h3>
+                        </div>
+                        <div className="space-y-1">
+                          {category.tools.map((tool) => (
+                            <button
+                              key={tool.href}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                if (tool.href === "#") {
+                                  console.log(`${tool.name} tool clicked - no navigation`)
+                                  return
+                                }
+                                console.log("Navigating to tool:", tool.name, "at", tool.href)
+                                handleToolNavigation(tool.href)
+                              }}
+                              className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                            >
+                              <div className="space-y-1">
+                                <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                                  {tool.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                  {tool.description}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Pre-Construction")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              </div>
+                )
+              })()
             ) : selectedDepartment === "archive" ? (
               // Archive Tools - Limited Options
               <div className="max-w-lg">
@@ -1125,134 +1089,109 @@ export const AppHeader = () => {
                 </div>
               </div>
             ) : (
-              // Operations Tools - 4 Columns
-              <div className="grid grid-cols-4 gap-8">
-                {/* Column 1: Core Tools */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-hb-blue rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Core Tools</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Core Tools")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
+              // Operations Tools - Dynamic categories based on role
+              (() => {
+                const visibleCategories = getVisibleCategories()
+                const categoryConfig = [
+                  {
+                    name: "Core Tools",
+                    color: "bg-hb-blue",
+                    tools: filteredTools.filter((tool) => tool.category === "Core Tools")
+                  },
+                  {
+                    name: "Pre-Construction",
+                    color: "bg-indigo-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction")
+                  },
+                  {
+                    name: "Financial Management",
+                    color: "bg-green-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Financial Management")
+                  },
+                  {
+                    name: "Field Management",
+                    color: "bg-hb-orange",
+                    tools: filteredTools.filter((tool) => tool.category === "Field Management")
+                  },
+                  {
+                    name: "Compliance",
+                    color: "bg-purple-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Compliance")
+                  },
+                  {
+                    name: "Warranty",
+                    color: "bg-amber-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Warranty")
+                  },
+                  {
+                    name: "Historical Projects",
+                    color: "bg-slate-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects")
+                  }
+                ]
+                
+                // Debug category filtering for estimator
+                if (user?.role === "estimator") {
+                  console.log("Estimator - All categories before filtering:", categoryConfig.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                  console.log("Estimator - Visible categories:", visibleCategories)
+                }
+                
+                const filteredCategories = categoryConfig.filter(category => 
+                  visibleCategories.includes(category.name) && category.tools.length > 0
+                )
+                
+                if (user?.role === "estimator") {
+                  console.log("Estimator - Final filtered categories:", filteredCategories.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                }
 
-                {/* Column 2: Financial Management */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                      Financial Management
-                    </h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Financial Management")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
+                const gridCols = filteredCategories.length <= 2 ? "grid-cols-2" : 
+                                filteredCategories.length <= 3 ? "grid-cols-3" : 
+                                filteredCategories.length <= 4 ? "grid-cols-4" : 
+                                "grid-cols-4"
 
-                {/* Column 3: Field Management */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-hb-orange rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Field Management</h3>
+                return (
+                  <div className={`grid ${gridCols} gap-6`}>
+                    {filteredCategories.map((category) => (
+                      <div key={category.name} className="space-y-3">
+                        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                          <div className={`w-2 h-2 ${category.color} rounded-full`}></div>
+                          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                            {category.name}
+                          </h3>
+                        </div>
+                        <div className="space-y-1">
+                          {category.tools.map((tool) => (
+                            <button
+                              key={tool.href}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                if (tool.href === "#") {
+                                  // Handle "Coming Soon" or "Archive" - no navigation
+                                  console.log(`${tool.name} tool clicked - no navigation`)
+                                  return
+                                }
+                                console.log("Navigating to tool:", tool.name, "at", tool.href)
+                                handleToolNavigation(tool.href)
+                              }}
+                              className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                            >
+                              <div className="space-y-1">
+                                <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                                  {tool.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                  {tool.description}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Field Management")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Column 4: Compliance */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Compliance</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Compliance")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              </div>
+                )
+              })()
             )}
           </div>
         </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
 import { useProjectContext } from "@/context/project-context";
+import { useSearchParams } from "next/navigation";
 import { 
   BarChart3, 
   DollarSign, 
@@ -74,7 +75,16 @@ interface FinancialModuleTab {
 export default function FinancialHubPage() {
   const { user } = useAuth();
   const { projectId } = useProjectContext();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Handle URL parameter for direct tab navigation
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   // Role-based data filtering helper
   const getProjectScope = () => {

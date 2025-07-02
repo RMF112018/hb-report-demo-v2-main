@@ -1,0 +1,88 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# 🧭 Ruleset: Project Control Center
+
+**File**: `.cursor/rules/project-control-center.mdc`
+
+---
+
+## I. 🧱 Architecture & Purpose
+
+### 1. Page Definition
+- Route: `app/project/[project_id]/page.tsx`
+- Purpose: A centralized project-specific workspace for interacting with all data tied to one project.
+
+### 2. Data Context
+- Driven by `project_id` passed via route params.
+- Loads project-specific data from @projects.json and related mock data files (e.g. forecasts, costs, reports).
+- Supports dark and light themes consistently with the dashboard layout.
+
+---
+
+## II. 🧭 Navigation
+
+### 1. App Header Integration
+- Clicking a project under the "Projects" dropdown in the header routes to `/project/[project_id]`.
+- The page serves as a landing point for deep-diving into:
+  - Financials
+  - Field Reports
+  - Procurement
+  - Forecasts
+  - Documentation (via SharePoint)
+
+---
+
+## III. 🎨 Layout & Styling
+
+### 1. Consistency with Dashboard
+- Uses the same layout components as the dashboard: `DashboardLayout`, `DashboardGrid`.
+- Cards support:
+  - Drag-resize
+  - Add/remove
+  - Grouping
+
+### 2. Theming
+- Fully supports Tailwind dark/light themes.
+- Use `bg-background`, `text-foreground`, and token-based colors.
+
+---
+
+## IV. 🔗 Microsoft Graph API Integration
+
+### 1. Purpose
+- Demonstrate real-world integration with SharePoint using Microsoft Graph API.
+- Let users view and interact with document libraries related to the selected project.
+
+### 2. Integration Guidelines
+- **Do NOT implement auth here** – the app will handle SSO authentication globally.
+- Use existing Graph session context for all Graph API requests.
+
+### 3. Document Library Viewer
+- Create `<SharePointLibraryViewer />` card.
+- Supports:
+  - Browsing project folder
+  - Viewing files
+  - Preview or download support
+
+### 4. Extendibility
+- **Note**: Encourage future use of Microsoft Graph connectors and endpoints including:
+  - Teams (project collaboration)
+  - Outlook/Calendar (meeting & milestone sync)
+  - OneDrive (per-user file view)
+  - Planner/Tasks (task-level drilldown)
+  - Lists (punchlist, procurement trackers)
+  - Excel (financials import/export)
+
+---
+
+## V. ⚙️ Cursor Instructions
+
+- You may propose the complete page layout and implementation approach.
+- Use shadcn/ui + Tailwind CSS.
+- Use `lib/msgraph.ts` and `hooks/useSharePointDocs.ts` for clean separation of concerns.
+- Fallback to mock JSON response if MS Graph connection is not available during development.
+- Ensure compatibility with HB Report architecture, layout strategy, and code conventions.

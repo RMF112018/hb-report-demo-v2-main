@@ -71,7 +71,7 @@ export const loginTour: TourDefinition = {
   steps: [
     {
       id: 'welcome',
-      title: 'Welcome to HB Report Demo!',
+      title: 'Welcome to HB Intel Demo!',
       content: 'This guided tour will show you how to explore the application with different user roles. Each role provides access to different features and dashboard layouts.',
       target: '.login-card',
       placement: 'center',
@@ -140,81 +140,65 @@ export const dashboardTour: TourDefinition = {
     {
       id: 'dashboard-welcome',
       title: 'Welcome to Your Dashboard!',
-      content: 'This dashboard is customized for your role and provides the most relevant information and tools for your daily work. Let\'s explore all the features available to you.',
+      content: 'This dashboard is customized for your role and provides the most relevant information and tools for your daily work. The layout is now streamlined with a sticky header for better navigation. Let\'s explore all the features available to you.',
       target: '[data-tour="dashboard-content"]',
       placement: 'center',
       nextButton: 'Start Tour'
     },
     {
-      id: 'environment-menu',
-      title: 'Environment Navigation',
-      content: 'Switch between different work environments:<br/><br/><strong>📊 Operations</strong> - Active project management<br/><strong>🏗️ Pre-Construction</strong> - Planning and estimation<br/><strong>📁 Archive</strong> - Completed projects<br/><br/>Each environment provides specialized tools and views for different phases of work.',
-      target: '[data-tour="environment-menu"]',
+      id: 'app-header',
+      title: 'Navigation Header',
+      content: 'The main navigation header provides access to different work environments:<br/><br/><strong>📊 Operations</strong> - Active project management<br/><strong>🏗️ Pre-Construction</strong> - Planning and estimation<br/><strong>📁 Archive</strong> - Completed projects<br/><br/>Plus project selection, tools, and global search functionality.',
+      target: '[data-tour="app-header"]',
       placement: 'bottom',
       nextButton: 'Continue'
     },
     {
-      id: 'projects-menu',
-      title: 'Project Selection',
-      content: 'Access and switch between your active projects. This dropdown shows all projects you have permissions to view and manage. Click to change your current project context.',
-      target: '[data-tour="projects-menu"]',
+      id: 'dashboard-page-header',
+      title: 'Dashboard Header',
+      content: 'The dashboard header stays visible as you scroll, providing quick access to key controls. Notice how it\'s positioned below the main navigation for optimal workflow.',
+      target: '[data-tour="dashboard-page-header"]',
       placement: 'bottom',
       nextButton: 'Next'
     },
     {
-      id: 'tools-menu',
-      title: 'Tools & Utilities',
-      content: 'Access powerful tools and utilities for project management:<br/><br/>• Document management<br/>• Reporting tools<br/>• Import/export functions<br/>• Integration settings<br/>• Custom workflows',
-      target: '[data-tour="tools-menu"]',
-      placement: 'bottom',
-      nextButton: 'Continue'
-    },
-    {
-      id: 'search-bar',
-      title: 'Global Search',
-      content: 'Quickly find projects, documents, contacts, or any information across the platform. Use keywords, project names, or specific data to locate what you need instantly.',
-      target: '[data-tour="search-bar"]',
-      placement: 'bottom',
-      nextButton: 'Next'
-    },
-    {
-      id: 'tours-menu',
-      title: 'Guided Tours',
-      content: 'Access interactive tours and help resources. Tours are contextual - different tours are available based on your current page and role permissions.',
-      target: '[data-tour="tour-controls"]',
-      placement: 'bottom',
-      nextButton: 'Continue'
-    },
-    {
-      id: 'dashboard-selector',
+      id: 'dashboard-tabs',
       title: 'Dashboard Views',
-      content: 'Switch between different dashboard layouts optimized for your role:<br/><br/>• Executive summary view<br/>• Detailed project controls<br/>• Financial overview<br/>• Custom layouts<br/><br/>Each view presents the most relevant information for your workflow.',
-      target: '[data-tour="dashboard-selector"]',
-      placement: 'left',
-      nextButton: 'Next'
-    },
-    {
-      id: 'dashboard-controls',
-      title: 'Dashboard Controls',
-      content: 'Customize your dashboard experience:<br/><br/><strong>✏️ Edit</strong> - Modify card layouts and content<br/><strong>📐 Layout</strong> - Adjust spacing and arrangement<br/><strong>⛶ Fullscreen</strong> - Maximize dashboard view<br/><br/>Make your dashboard work exactly how you need it.',
-      target: '[data-tour="dashboard-controls"]',
-      placement: 'right',
+      content: 'Switch between different dashboard layouts using these tabs. Each tab represents a specialized view optimized for different aspects of your role:<br/><br/>• <strong>Executive Overview</strong> - High-level metrics<br/>• <strong>Financial Review</strong> - Budget and cost analysis<br/>• <strong>Project Status</strong> - Current project health<br/><br/>Simply click any tab to switch views instantly.',
+      target: '[data-tour="dashboard-tabs"]',
+      placement: 'bottom',
       nextButton: 'Continue'
     },
     {
-      id: 'kpi-widgets',
-      title: 'Key Performance Indicators',
-      content: 'Monitor critical project metrics at a glance. These KPI widgets show real-time data for budget health, schedule performance, safety metrics, and other key indicators relevant to your role.',
-      target: '[data-tour="kpi-widgets"]',
+      id: 'fullscreen-control',
+      title: 'Fullscreen Mode',
+      content: 'Click this button to enter fullscreen mode for an immersive dashboard experience. Perfect for presentations or when you need to focus on the data without distractions.',
+      target: '[data-tour="fullscreen-button"]',
       placement: 'bottom',
       nextButton: 'Next'
     },
     {
-      id: 'hbi-insights',
-      title: 'HB Intelligence Insights',
-      content: 'AI-powered insights and recommendations based on your project data. Get predictive analytics, risk assessments, and actionable recommendations to improve project outcomes.',
-      target: '[data-tour="hbi-insights"]',
+      id: 'more-actions-menu',
+      title: 'More Actions',
+      content: 'The ellipsis menu (⋮) provides additional dashboard controls:<br/><br/><strong>🔄 Refresh</strong> - Update all dashboard data<br/><strong>✏️ Edit Dashboard</strong> - Customize layout and widgets<br/><strong>📐 Layout Density</strong> - Adjust spacing (Compact, Normal, Spacious)<br/><strong>➕ Create New Dashboard</strong> - Coming soon feature<br/><br/>These options keep the interface clean while providing powerful functionality.',
+      target: '[data-tour="more-actions-menu"]',
       placement: 'left',
+      nextButton: 'Continue'
+    },
+    {
+      id: 'dashboard-content',
+      title: 'Dynamic Dashboard Content',
+      content: 'The main dashboard area displays widgets and analytics cards based on your selected view. Content is dynamically loaded and optimized for your role and current context.',
+      target: '[data-tour="dashboard-content"]',
+      placement: 'top',
+      nextButton: 'Next'
+    },
+    {
+      id: 'edit-mode-preview',
+      title: 'Customization Features',
+      content: 'When you enter edit mode through the ellipsis menu, you can:<br/><br/>• Drag and drop widgets to reorganize<br/>• Resize cards for optimal viewing<br/>• Add or remove dashboard components<br/>• Save custom layouts<br/>• Reset to default configurations<br/><br/>Your dashboard becomes fully customizable to match your workflow.',
+      target: '[data-tour="dashboard-content"]',
+      placement: 'center',
       nextButton: 'Finish Tour'
     }
   ]

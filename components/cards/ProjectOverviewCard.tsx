@@ -25,7 +25,13 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
           activeProjects: 1,
           completedThisMonth: 0,
           totalContractValue: 57235491,
+          remainingContractValue: 35000000,
           avgProjectSize: 57235491,
+          avgProfitMargin: 12.5,
+          onScheduleProjects: 1,
+          atRiskProjects: 0,
+          behindScheduleProjects: 0,
+          overallHealthScore: 8.5,
           projectTypes: {
             newConstruction: 1,
             renovation: 0,
@@ -47,7 +53,13 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
           activeProjects: 5,
           completedThisMonth: 1,
           totalContractValue: 285480000,
+          remainingContractValue: 180000000,
           avgProjectSize: 40782857,
+          avgProfitMargin: 14.2,
+          onScheduleProjects: 4,
+          atRiskProjects: 1,
+          behindScheduleProjects: 0,
+          overallHealthScore: 7.8,
           projectTypes: {
             newConstruction: 4,
             renovation: 2,
@@ -69,7 +81,13 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
           activeProjects: 8,
           completedThisMonth: 2,
           totalContractValue: 485280000,
+          remainingContractValue: 320000000,
           avgProjectSize: 40440000,
+          avgProfitMargin: 16.8,
+          onScheduleProjects: 6,
+          atRiskProjects: 2,
+          behindScheduleProjects: 0,
+          overallHealthScore: 8.3,
           projectTypes: {
             newConstruction: 7,
             renovation: 3,
@@ -96,6 +114,14 @@ export default function ProjectOverviewCard({ config, span, isCompact, userRole 
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  const formatPercentage = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'percent',
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(value / 100);
   };
 
   const toggleDetails = () => {
