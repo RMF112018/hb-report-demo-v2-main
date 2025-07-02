@@ -80,81 +80,81 @@ export function BDOpportunitiesCard({ card, config, span, isCompact, userRole }:
     const baseEvents: BDEvent[] = [
       {
         id: 'bd-1',
-        name: 'Austin Builders Golf Outing',
+        name: 'Miami Beach Golf Classic',
         date: '2025-01-15',
-        location: 'Austin Country Club',
+        location: 'Doral Golf Resort & Spa',
         type: 'Golf',
         totalSeats: 4,
         availableSeats: 2,
         priority: 'High',
-        potentialValue: 2500000,
-        attendees: ['John Smith', 'Mike Davis'],
-        description: 'Annual golf tournament with major Austin developers and GCs'
+        potentialValue: 3200000,
+        attendees: ['Carlos Rodriguez', 'Maria Fernandez'],
+        description: 'Premier golf event with South Florida developers and luxury residential contractors'
       },
       {
         id: 'bd-2',
-        name: 'AGC Austin Chapter Dinner',
+        name: 'ABC Florida Chapter Gala',
         date: '2025-01-22',
-        location: 'Four Seasons Austin',
+        location: 'The Breakers Palm Beach',
         type: 'Dinner',
         totalSeats: 8,
         availableSeats: 3,
         priority: 'High',
-        potentialValue: 5000000,
-        attendees: ['Sarah Johnson', 'Tom Wilson', 'Alex Chen', 'Maria Rodriguez', 'David Kim'],
-        description: 'Quarterly AGC dinner with industry leaders and potential clients'
+        potentialValue: 6500000,
+        attendees: ['Isabella Martinez', 'Roberto Silva', 'Ana Gutierrez', 'Diego Morales', 'Sofia Delgado'],
+        description: 'Annual gala dinner with Florida construction leaders and luxury hospitality developers'
       },
       {
         id: 'bd-3',
-        name: 'Houston Polo Match',
+        name: 'Wellington Polo Championships',
         date: '2025-01-28',
-        location: 'Houston Polo Club',
+        location: 'International Polo Club Palm Beach',
         type: 'Polo',
         totalSeats: 6,
         availableSeats: 1,
         priority: 'Medium',
-        potentialValue: 3200000,
-        attendees: ['Robert Lee', 'Jennifer Liu', 'Mark Brown', 'Lisa Wang', 'Chris Taylor'],
-        description: 'Exclusive polo event with high-net-worth clients and investors'
+        potentialValue: 4800000,
+        attendees: ['Eduardo Herrera', 'Valentina Castro', 'Miguel Santos', 'Lucia Vega', 'Fernando Ramirez'],
+        description: 'Exclusive polo event with high-net-worth clients and luxury estate developers'
       },
       {
         id: 'bd-4',
-        name: 'Texas Construction Awards',
+        name: 'Florida Construction Excellence Awards',
         date: '2025-02-05',
-        location: 'Austin Convention Center',
+        location: 'Greater Fort Lauderdale Convention Center',
         type: 'Awards',
         totalSeats: 10,
         availableSeats: 4,
         priority: 'High',
-        potentialValue: 8000000,
-        attendees: ['Emily Foster', 'James Parker', 'Susan Davis', 'Michael Chang', 'Amanda White', 'Kevin Johnson'],
-        description: 'Annual awards ceremony recognizing excellence in Texas construction'
+        potentialValue: 9500000,
+        attendees: ['Carmen Jimenez', 'Ricardo Torres', 'Alejandra Moreno', 'Javier Mendez', 'Catalina Ruiz', 'Andres Vargas'],
+        description: 'Annual awards ceremony recognizing excellence in Florida construction and development'
       },
       {
         id: 'bd-5',
-        name: 'Dallas Networking Mixer',
+        name: 'Brickell Business Network Mixer',
         date: '2025-02-12',
-        location: 'The Joule Hotel',
+        location: 'Four Seasons Hotel Miami',
         type: 'Networking',
         totalSeats: 5,
         availableSeats: 2,
         priority: 'Medium',
-        potentialValue: 1800000,
-        attendees: ['Ryan Mitchell', 'Nicole Garcia', 'Brandon Lee'],
-        description: 'Monthly networking event for Dallas-area construction professionals'
+        potentialValue: 2800000,
+        attendees: ['Gabriela Pacheco', 'Santiago Navarro', 'Daniela Cruz'],
+        description: 'Monthly networking event for Miami commercial construction professionals'
       },
       {
         id: 'bd-6',
-        name: 'Commercial Real Estate Conference',
+        name: 'Southeast Florida Real Estate Summit',
         date: '2025-02-18',
-        location: 'Dallas Convention Center',
+        location: 'Fontainebleau Miami Beach',
         type: 'Conference',
         totalSeats: 12,
         availableSeats: 5,
         priority: 'High',
-        potentialValue: 12000000,
-        attendees: ['Daniel Torres', 'Rachel Adams', 'Andrew Kim', 'Stephanie Young', 'Jason Lee', 'Michelle Chen', 'Tyler Davis'],
-        description: 'Premier commercial real estate conference with developers and investors'
+        potentialValue: 15000000,
+        attendees: ['Mateo Guerrero', 'Esperanza Flores', 'Nicolas Cabrera', 'Camila Rios', 'Rafael Medina', 'Valeria Soto', 'Adrian Peña'],
+        description: 'Premier real estate conference with Southeast Florida developers, investors, and luxury resort contractors'
       }
     ]
 
