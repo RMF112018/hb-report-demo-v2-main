@@ -360,8 +360,8 @@ export const AppHeader = () => {
 
   // Role-based category visibility
   const getVisibleCategories = useCallback(() => {
-    const userRole = user?.role
-    console.log("Determining visible categories for role:", userRole)
+    const userRole = user?.role?.toLowerCase?.() || user?.role // Ensure case-insensitive comparison
+    console.log("Determining visible categories for role:", userRole, "(original:", user?.role, ")")
     
     switch (userRole) {
       case "executive":
@@ -375,11 +375,13 @@ export const AppHeader = () => {
         return ["Core Tools", "Financial Management", "Field Management", "Compliance", "Warranty"]
       
       case "estimator":
-        // Only Pre-Construction and Compliance
+        // Only Pre-Construction and Compliance - let's be extra explicit
+        console.log("ESTIMATOR ROLE DETECTED - returning Pre-Construction and Compliance categories")
         return ["Pre-Construction", "Compliance"]
       
       default:
         // Default to all categories for unknown roles
+        console.log("Unknown or missing role, defaulting to all categories")
         return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
     }
   }, [user])
