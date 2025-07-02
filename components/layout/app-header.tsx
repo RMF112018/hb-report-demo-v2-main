@@ -442,7 +442,14 @@ export const AppHeader = () => {
         localStorage.setItem("selectedProject", projectId)
       }
 
-      // Show informative modal with demo explanation
+      // Navigate to Project Control Center for specific projects
+      if (projectId !== "all" && !projectId.startsWith('all-')) {
+        console.log("Navigating to Project Control Center for project:", projectId)
+        router.push(`/project/${projectId}`)
+        return
+      }
+
+      // Show informative modal with demo explanation for "all" projects
       const getProjectDisplayInfo = () => {
         if (projectId === "all") {
           return {
@@ -485,7 +492,7 @@ export const AppHeader = () => {
         )
       }
     },
-    [projects, setProjectId, toast]
+    [projects, setProjectId, toast, router]
   )
 
   const handleToolNavigation = useCallback(
