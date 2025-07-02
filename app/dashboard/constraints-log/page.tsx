@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useAuth } from "@/context/auth-context"
+import { useSearchParams } from "next/navigation"
 import { AppHeader } from "@/components/layout/app-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -56,6 +57,7 @@ import type { Constraint, ConstraintProject, ConstraintStats, ConstraintFilters 
 export default function ConstraintsLogPage() {
   const { user } = useAuth()
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
   // State management
   const [projects] = useState<ConstraintProject[]>(constraintsData as ConstraintProject[])
@@ -69,7 +71,7 @@ export default function ConstraintsLogPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
 
-  // Filter state
+  // Filter state - Initialize with default values
   const [filters, setFilters] = useState<ConstraintFilters>({
     search: "",
     status: "all",
@@ -78,6 +80,14 @@ export default function ConstraintsLogPage() {
     project: "all",
     dateRange: { start: null, end: null },
   })
+
+  // Handle URL parameter after component mounts to avoid hydration issues
+  useEffect(() => {
+    const projectIdFromUrl = searchParams.get("project_id")
+    if (projectIdFromUrl) {
+      setFilters(prev => ({ ...prev, project: projectIdFromUrl }))
+    }
+  }, [searchParams])
 
   // Initialize constraints from all projects
   useEffect(() => {
