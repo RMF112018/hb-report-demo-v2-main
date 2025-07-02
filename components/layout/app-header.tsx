@@ -358,10 +358,37 @@ export const AppHeader = () => {
 
 
 
+  // Role-based category visibility
+  const getVisibleCategories = useCallback(() => {
+    const userRole = user?.role
+    console.log("Determining visible categories for role:", userRole)
+    
+    switch (userRole) {
+      case "executive":
+      case "project-executive":
+      case "admin":
+        // All categories visible
+        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
+      
+      case "project-manager":
+        // No Pre-Construction or Historical Projects
+        return ["Core Tools", "Financial Management", "Field Management", "Compliance", "Warranty"]
+      
+      case "estimator":
+        // Only Pre-Construction and Compliance
+        return ["Pre-Construction", "Compliance"]
+      
+      default:
+        // Default to all categories for unknown roles
+        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
+    }
+  }, [user])
+
   // Enhanced filtered tools with department-based and role-based filtering
   const filteredTools = useMemo(() => {
     const userRole = user?.role // Get current user's role
-    console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole)
+    const visibleCategories = getVisibleCategories()
+    console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole, "visible categories:", visibleCategories)
     
     const filtered = tools.filter((tool) => {
       // Filter by department (if applicable)
@@ -371,27 +398,38 @@ export const AppHeader = () => {
         // Pre-construction department: only show Pre-Construction category tools
         isDepartmentMatch = tool.category === "Pre-Construction"
       } else if (selectedDepartment === "operations") {
-        // Operations department: show all categories (Core Tools, Pre-Construction, Financial Management, Field Management, Compliance, Warranty)
-        isDepartmentMatch = true
+        // Operations department: show categories based on role
+        isDepartmentMatch = visibleCategories.includes(tool.category)
       } else {
         // Archive department: exclude Pre-Construction tools (handled separately in the UI)
-        isDepartmentMatch = tool.category !== "Pre-Construction"
+        isDepartmentMatch = tool.category !== "Pre-Construction" && visibleCategories.includes(tool.category)
       }
 
-      // Filter by role visibility
+      // Filter by role visibility for individual tools
       const isRoleVisible = !tool.visibleRoles || (userRole && tool.visibleRoles.includes(userRole))
 
       const shouldInclude = isDepartmentMatch && isRoleVisible
-      if (selectedDepartment === "pre-construction") {
-        console.log("Tool:", tool.name, "Category:", tool.category, "Matches dept:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude)
+      
+      // Enhanced debugging for estimator role
+      if (userRole === "estimator") {
+        console.log("Tool:", tool.name, "Category:", tool.category, "Dept match:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude, "VisibleRoles:", tool.visibleRoles)
       }
 
       return shouldInclude
     })
     
-    console.log("Filtered tools count:", filtered.length, "for department:", selectedDepartment)
+    console.log("Filtered tools count:", filtered.length, "for department:", selectedDepartment, "user role:", userRole)
+    
+    // Additional debugging for estimator role
+    if (userRole === "estimator") {
+      const complianceTools = filtered.filter(t => t.category === "Compliance")
+      const preconTools = filtered.filter(t => t.category === "Pre-Construction")
+      console.log("Estimator - Compliance tools:", complianceTools.length, complianceTools.map(t => t.name))
+      console.log("Estimator - Pre-Construction tools:", preconTools.length, preconTools.map(t => t.name))
+    }
+    
     return filtered
-  }, [selectedDepartment, tools, user]) // Add user to dependencies
+  }, [selectedDepartment, tools, user, getVisibleCategories]) // Add getVisibleCategories to dependencies
 
   // Utility functions
   // ... (getUserInitials, hasPreConAccess, getProjectStatusColor functions defined above)
@@ -992,237 +1030,109 @@ export const AppHeader = () => {
                 </div>
               </div>
             ) : (
-              // Operations Tools - 7 Categories in 4-Column Grid
-              <div className="grid grid-cols-4 gap-6">
-                {/* Column 1: Core Tools */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-hb-blue rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Core Tools</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Core Tools")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
+              // Operations Tools - Dynamic categories based on role
+              (() => {
+                const visibleCategories = getVisibleCategories()
+                const categoryConfig = [
+                  {
+                    name: "Core Tools",
+                    color: "bg-hb-blue",
+                    tools: filteredTools.filter((tool) => tool.category === "Core Tools")
+                  },
+                  {
+                    name: "Pre-Construction",
+                    color: "bg-indigo-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction")
+                  },
+                  {
+                    name: "Financial Management",
+                    color: "bg-green-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Financial Management")
+                  },
+                  {
+                    name: "Field Management",
+                    color: "bg-hb-orange",
+                    tools: filteredTools.filter((tool) => tool.category === "Field Management")
+                  },
+                  {
+                    name: "Compliance",
+                    color: "bg-purple-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Compliance")
+                  },
+                  {
+                    name: "Warranty",
+                    color: "bg-amber-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Warranty")
+                  },
+                  {
+                    name: "Historical Projects",
+                    color: "bg-slate-500",
+                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects")
+                  }
+                ]
+                
+                // Debug category filtering for estimator
+                if (user?.role === "estimator") {
+                  console.log("Estimator - All categories before filtering:", categoryConfig.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                  console.log("Estimator - Visible categories:", visibleCategories)
+                }
+                
+                const filteredCategories = categoryConfig.filter(category => 
+                  visibleCategories.includes(category.name) && category.tools.length > 0
+                )
+                
+                if (user?.role === "estimator") {
+                  console.log("Estimator - Final filtered categories:", filteredCategories.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                }
 
-                {/* Column 2: Pre-Construction */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Pre-Construction</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Pre-Construction")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
+                const gridCols = filteredCategories.length <= 2 ? "grid-cols-2" : 
+                                filteredCategories.length <= 3 ? "grid-cols-3" : 
+                                filteredCategories.length <= 4 ? "grid-cols-4" : 
+                                "grid-cols-4"
 
-                {/* Column 3: Financial Management */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                      Financial Management
-                    </h3>
+                return (
+                  <div className={`grid ${gridCols} gap-6`}>
+                    {filteredCategories.map((category) => (
+                      <div key={category.name} className="space-y-3">
+                        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                          <div className={`w-2 h-2 ${category.color} rounded-full`}></div>
+                          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                            {category.name}
+                          </h3>
+                        </div>
+                        <div className="space-y-1">
+                          {category.tools.map((tool) => (
+                            <button
+                              key={tool.href}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                if (tool.href === "#") {
+                                  // Handle "Coming Soon" or "Archive" - no navigation
+                                  console.log(`${tool.name} tool clicked - no navigation`)
+                                  return
+                                }
+                                console.log("Navigating to tool:", tool.name, "at", tool.href)
+                                handleToolNavigation(tool.href)
+                              }}
+                              className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
+                            >
+                              <div className="space-y-1">
+                                <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
+                                  {tool.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                  {tool.description}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Financial Management")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Column 4: Field Management */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-hb-orange rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Field Management</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Field Management")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Column 5: Compliance */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Compliance</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Compliance")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Column 6: Warranty */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Warranty</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Warranty")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            if (tool.href === "#") {
-                              // Handle "Coming Soon" - no navigation
-                              console.log("Coming Soon tool clicked - no navigation")
-                              return
-                            }
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Column 7: Historical Projects */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Historical Projects</h3>
-                  </div>
-                  <div className="space-y-1">
-                    {filteredTools
-                      .filter((tool) => tool.category === "Historical Projects")
-                      .map((tool) => (
-                        <button
-                          key={tool.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            if (tool.href === "#") {
-                              // Handle "Archive" - no navigation
-                              console.log("Archive tool clicked - no navigation")
-                              return
-                            }
-                            console.log("Navigating to tool:", tool.name, "at", tool.href)
-                            handleToolNavigation(tool.href)
-                          }}
-                          className="w-full text-left rounded-md border border-transparent p-2.5 transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm group"
-                        >
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
-                              {tool.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              </div>
+                )
+              })()
             )}
           </div>
         </div>
