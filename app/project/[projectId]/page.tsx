@@ -490,9 +490,9 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     <div className="min-h-screen bg-background">
       <AppHeader />
       
-      {/* SharePoint-style Header - Sticky */}
+      {/* SharePoint-style Header - Sticky, Responsive */}
       <div className="sticky top-16 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
-        <div className="px-4 sm:px-6 lg:px-8 py-3">
+        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
           <div className="max-w-[1920px] mx-auto">
             {/* Breadcrumb Navigation */}
             <Breadcrumb className="mb-3">
@@ -518,25 +518,25 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Site Title and Actions */}
+            {/* Site Title and Actions - Responsive */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold text-foreground">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
                   {project.name}
                 </h1>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs whitespace-nowrap">
                   {project.project_stage_name}
                 </Badge>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 <Button variant="ghost" size="sm" className="text-sm">
-                  <Share2 className="h-4 w-4 mr-1" />
-                  Share
+                  <Share2 className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Share</span>
                 </Button>
                 <Button variant="ghost" size="sm" className="text-sm">
-                  <Settings className="h-4 w-4 mr-1" />
-                  Settings
+                  <Settings className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Settings</span>
                 </Button>
               </div>
             </div>
@@ -544,14 +544,141 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         </div>
       </div>
 
-      {/* SharePoint-style Content Layout */}
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-12 gap-6">
-          
-          {/* Left Sidebar - Quick Access & Analytics */}
-          <div className="col-span-12 lg:col-span-3 space-y-6">
+      {/* SharePoint-style Content Layout - Responsive container */}
+      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Mobile Priority Cards - Show at top on small screens */}
+        <div className="block xl:hidden mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             
-            {/* Project Overview Card */}
+            {/* Project Overview Card - Mobile */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Project Overview</h3>
+              <div className="space-y-4">
+                {/* Description */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">PROJECT DESCRIPTION</p>
+                  <p className="text-xs text-foreground leading-relaxed line-clamp-3">
+                    {analyticsData?.nocDescription}
+                  </p>
+                </div>
+                
+                <div className="border-b border-border"></div>
+                
+                {/* Key Metrics */}
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Contract Value</span>
+                    <span className="font-medium">${(analyticsData?.contractValue / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Start Date</span>
+                    <span className="font-medium">{new Date(analyticsData?.startDate || '').toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">% Complete</span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-muted rounded-full h-2 w-12">
+                        <div 
+                          className="bg-primary rounded-full h-2 transition-all duration-300"
+                          style={{ width: `${analyticsData?.percentComplete || 0}%` }}
+                        />
+                      </div>
+                      <span className="font-medium text-xs">{analyticsData?.percentComplete}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Open Issues Analytics - Mobile */}
+            <div 
+              className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
+              onClick={handleOpenIssuesClick}
+              title="Click to view constraints log"
+            >
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Open Issues</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Open</span>
+                  <span className="font-medium">{analyticsData?.openIssues}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Critical</span>
+                  <span className="font-medium text-red-600">{analyticsData?.criticalIssues}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Overdue</span>
+                  <span className="font-medium text-orange-600">{analyticsData?.overdueIssues}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Recent (7 days)</span>
+                  <span className="font-medium">{analyticsData?.recentIssues}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className={`font-medium text-xs ${
+                    analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0 
+                      ? 'text-green-600' 
+                      : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
+                      ? 'text-red-600'
+                      : 'text-yellow-600'
+                  }`}>
+                    {analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0 
+                      ? 'Good' 
+                      : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
+                      ? 'Critical'
+                      : 'Attention Needed'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Project Reporting - Mobile */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0"
+                  title="Report Settings"
+                >
+                  <Settings className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2 text-xs font-medium text-muted-foreground border-b pb-2">
+                  <span>Report</span>
+                  <span>Due Date</span>
+                </div>
+                
+                {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => {
+                  const nextDueDate = getNextDueDate(dayOfMonth);
+                  
+                  return (
+                    <div key={reportType} className="grid grid-cols-2 gap-2 text-xs">
+                      <span className="font-medium text-foreground">{reportType.replace('Financial Review', 'Financial').replace('PX Progress', 'PX Prog').replace('Owner Progress', 'Owner')}</span>
+                      <span className="text-muted-foreground">{formatDate(nextDueDate)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Responsive Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          
+          {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
+            
+            {/* Project Overview Card - Desktop */}
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Project Overview</h3>
               <div className="space-y-4">
@@ -595,7 +722,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </div>
             </div>
 
-            {/* Open Issues Analytics */}
+            {/* Open Issues Analytics - Desktop */}
             <div 
               className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
               onClick={handleOpenIssuesClick}
@@ -638,7 +765,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </div>
             </div>
 
-            {/* Project Reporting */}
+            {/* Project Reporting - Desktop */}
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
@@ -740,13 +867,65 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </div>
             </div>
 
+            {/* Recent Activity - Moved from main content */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded">
+                    <Upload className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Daily report uploaded to 09-DailyReport</p>
+                    <p className="text-xs text-muted-foreground">by Lisa Garcia • 15 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-orange-100 dark:bg-orange-900/20 p-1 rounded">
+                    <FileText className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Safety inspection report added to 08-Safety</p>
+                    <p className="text-xs text-muted-foreground">by Mark Davis • 1 hour ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded">
+                    <Share2 className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Submittal package shared in 15-Submittal</p>
+                    <p className="text-xs text-muted-foreground">by Sarah Wilson • 2 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-100 dark:bg-purple-900/20 p-1 rounded">
+                    <AlertCircle className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">RFI response updated in 07-RFI</p>
+                    <p className="text-xs text-muted-foreground">by John Smith • 3 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-indigo-100 dark:bg-indigo-900/20 p-1 rounded">
+                    <Calendar className="h-4 w-4 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Meeting minutes uploaded to 06-Meeting</p>
+                    <p className="text-xs text-muted-foreground">by Emily Davis • 4 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Main Content Area */}
-          <div className="col-span-12 lg:col-span-9 space-y-6">
+          <div className="xl:col-span-9 space-y-4 lg:space-y-6">
             
-            {/* Activity Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Activity Summary Cards - Responsive grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-card border border-border rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -886,103 +1065,46 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </div>
             </Collapsible>
 
-            {/* Main Document Library */}
+            {/* Main Document Library - Responsive height */}
             <SharePointLibraryViewer
               projectId={projectId.toString()}
               projectName={project.name}
-              className="min-h-[600px]"
+              className="min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]"
             />
 
-            {/* Additional Analytics Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Recent Activity */}
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Activity</h3>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded">
-                      <Upload className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Daily report uploaded to 09-DailyReport</p>
-                      <p className="text-xs text-muted-foreground">by Lisa Garcia • 15 minutes ago</p>
-                    </div>
+            {/* Project Health - Single Card */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="font-semibold text-lg mb-4 text-foreground">Project Health</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Schedule Performance</span>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-green-500 h-2 w-16 rounded-full"></div>
+                    <span className="text-sm font-medium">On Track</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="bg-orange-100 dark:bg-orange-900/20 p-1 rounded">
-                      <FileText className="h-4 w-4 text-orange-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Safety inspection report added to 08-Safety</p>
-                      <p className="text-xs text-muted-foreground">by Mark Davis • 1 hour ago</p>
-                    </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Budget Performance</span>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-yellow-500 h-2 w-16 rounded-full"></div>
+                    <span className="text-sm font-medium">At Risk</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded">
-                      <Share2 className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Submittal package shared in 15-Submittal</p>
-                      <p className="text-xs text-muted-foreground">by Sarah Wilson • 2 hours ago</p>
-                    </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Quality Score</span>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-green-500 h-2 w-16 rounded-full"></div>
+                    <span className="text-sm font-medium">Excellent</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="bg-purple-100 dark:bg-purple-900/20 p-1 rounded">
-                      <AlertCircle className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">RFI response updated in 07-RFI</p>
-                      <p className="text-xs text-muted-foreground">by John Smith • 3 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="bg-indigo-100 dark:bg-indigo-900/20 p-1 rounded">
-                      <Calendar className="h-4 w-4 text-indigo-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Meeting minutes uploaded to 06-Meeting</p>
-                      <p className="text-xs text-muted-foreground">by Emily Davis • 4 hours ago</p>
-                    </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Team Productivity</span>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-blue-500 h-2 w-16 rounded-full"></div>
+                    <span className="text-sm font-medium">High</span>
                   </div>
                 </div>
               </div>
-
-              {/* Project Health */}
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h3 className="font-semibold text-lg mb-4 text-foreground">Project Health</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Schedule Performance</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-green-500 h-2 w-16 rounded-full"></div>
-                      <span className="text-sm font-medium">On Track</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Budget Performance</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-yellow-500 h-2 w-16 rounded-full"></div>
-                      <span className="text-sm font-medium">At Risk</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Quality Score</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-green-500 h-2 w-16 rounded-full"></div>
-                      <span className="text-sm font-medium">Excellent</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Team Productivity</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-blue-500 h-2 w-16 rounded-full"></div>
-                      <span className="text-sm font-medium">High</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
