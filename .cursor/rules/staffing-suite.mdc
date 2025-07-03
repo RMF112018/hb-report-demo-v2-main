@@ -7,128 +7,44 @@ alwaysApply: false
 
 ---
 
-## 🎯 GOALS
+## 🆕 Excel-Workflow Alignment Enhancements
 
-- Modernize the staffing suite **by refactoring existing components** — no new routes or pages
-- Improve interactivity, visibility, and usability across all staffing roles
-- Standardize layout and behaviors in line with `app/dashboard/constraints-log/page.tsx`
-- Ensure all modules work in light and dark mode
-- Support localStorage for demo interactivity and persistence
+### 📊 Assignment Table Enhancements
+- Refactor the current assignment table to group data by:
+  - 1️⃣ Project Executive
+  - 2️⃣ Then by Project (under each PE group)
+- Use expandable/collapsible group headers
+- Within each project group, show staff assignments sorted by start date
+
+---
+
+### 🧩 “Needing Assignment” Panel
+- Add a panel directly **below** the assignment table
+- Title: `"Needing Assignment"`
+- Filters:
+  - Position (dropdown or segmented control)
+- Logic:
+  - Show all employees who:
+    - Have a current assignment ending within **90 calendar days**
+    - AND have **no follow-up assignment** scheduled
+- Data Source: `staffing.json` assignment history
+- Bonus: Color indicators for urgency (e.g. red = <30 days, yellow = <60)
 
 ---
 
 ## 🧱 GLOBAL LAYOUT EXPECTATIONS
 
-- Refactor the following existing files:
-  - `ExecutiveStaffingView.tsx`
-  - `ProjectExecutiveStaffingView.tsx`
-  - `ProjectManagerStaffingView.tsx`
+- Light/Dark theme compliant (Tailwind tokens)
+- All logic wired to `useStaffingStore.ts`
+- Assignment + Needing Assignment panels live in same scrollable container
+- Ensure keyboard navigation works for grouping/filters
 
-Changes should:
-- Use the `constraints-log/page.tsx` layout structure
-- Remove nested tab rows; replace with segmented buttons or intelligent filters
-- Use collapsible panels where appropriate
-- Enable localStorage interaction during demo
+## 🔁 Persist Filters & View
+- Save selected position filter and panel open states to `localStorage`
+- Restore on page reload
 
----
-
-## 🧑‍💼 EXECUTIVE STAFFING VIEW
-
-- **Overview Panel Enhancements**:
-  - Show live labor cost vs. contract inflow comparison (aggregate from mock financials)
-  - Integrate HBI Staffing Insights using `EnhancedHBIInsights.tsx`
-
-- **Gantt Panel Enhancements**:
-  - Refactor or replace existing "Staff Management" panel with an interactive Gantt chart
-  - Features:
-    - Drag-and-drop assignment editing
-    - Sorting & filtering by project, position, employee
-    - Inline notations/comments
-    - Export to PDF and Excel
-    - LocalStorage persistence of filters
-
-- **SPCR Review**:
-  - Default view: Approved SPCRs only
-  - Toggle to reveal Rejected or Pending
+## 📦 MOCK DATA
+- `staffing.json` for employee data + assignments
+- `projects.json` to determine which Project Exec owns which project
 
 ---
-
-## 👷‍♂️ PROJECT EXECUTIVE STAFFING VIEW
-
-- **Navigation Restructure**:
-  - Flatten and simplify tab navigation
-  - Use segmented controls to toggle between views
-
-- **Gantt Chart**:
-  - Read-only version of Executive Gantt
-  - Filtered to only show assigned projects
-  - Supports sorting, filtering, and export
-
-- **SPCR Review Panel**:
-  - Show Pending SPCRs by default
-  - Include toggle for Approved and Rejected
-  - UI redesign to:
-    - Clearly display proposed changes
-    - Color-coded impact indicators
-    - Approve/Reject with optional comments
-    - Show labor/cost impact visually
-
-- **Labor vs Inflow Panel**:
-  - Compare labor cost vs. inflows for assigned projects
-  - Allow drill-down to single project level
-
----
-
-## 🧑‍🔧 PROJECT MANAGER STAFFING VIEW
-
-- **SPCR Creation Panel**:
-  - Display all SPCRs for the assigned project
-  - Panel to:
-    - Draft a new SPCR
-    - Preview labor/cost impact
-    - Submit to Project Executive
-
-- **Gantt Chart**:
-  - Read-only chart filtered to the single assigned project
-  - Align style and behavior with the Executive/PE Gantt components
-
----
-
-## 📦 STORAGE
-
-- Use localStorage for:
-  - SPCR drafts
-  - Gantt chart filters and view modes
-  - Panel open/closed states (if needed)
-
----
-
-## 📁 MOCK DATA
-
-- `staffing.json` (personnel, assignments, roles)
-- `spcr.json` (staffing plan change requests)
-- `projects.json` (project metadata)
-- `financial/` mock data (labor vs. contract inflow)
-
----
-
-## 🔧 COMPONENTS TO REFINE/REFACTOR
-
-- `InteractiveStaffingGantt.tsx` (Executive only)
-- `StaffTimelineChart.tsx` (read-only variant for PE and PM)
-- `SPCRInboxPanel.tsx`, `SPCRCreatorPanel.tsx`
-- `LaborVsRevenuePanel.tsx`
-- `useStaffingStore.ts` (centralized state + localStorage helpers)
-
----
-
-## 🎨 THEMING & ACCESSIBILITY
-
-- TailwindCSS + shadcn/ui only
-- Use `lucide-react` icons
-- Compliant with dark/light themes
-- All interactive elements must be keyboard navigable and use appropriate ARIA roles
-
----
-
-# END OF STAFFING RULE SET

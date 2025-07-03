@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { 
   Calendar, 
   Filter, 
@@ -25,10 +26,35 @@ import {
   Plus,
   MessageSquare,
   Save,
-  Trash2
+  Trash2,
+  ChevronDown,
+  ChevronRight,
+  AlertTriangle,
+  Clock,
+  Maximize,
+  Minimize
 } from 'lucide-react'
 import { useStaffingStore, type StaffMember, type Project } from '../store/useStaffingStore'
-import { format, addDays, differenceInDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns'
+import { 
+  format, 
+  addDays, 
+  addWeeks,
+  addMonths,
+  addQuarters,
+  addYears,
+  differenceInDays, 
+  startOfWeek, 
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  startOfQuarter,
+  endOfQuarter,
+  startOfYear,
+  endOfYear,
+  eachDayOfInterval, 
+  isAfter, 
+  isBefore 
+} from 'date-fns'
 
 interface InteractiveStaffingGanttProps {
   userRole: 'executive' | 'project-executive' | 'project-manager'
@@ -61,6 +87,25 @@ interface GanttItem {
   annotation?: string
 }
 
+interface GroupedGanttData {
+  projectExecutive: StaffMember
+  projects: {
+    project: Project
+    assignments: GanttItem[]
+  }[]
+}
+
+interface NeedingAssignmentItem {
+  staffMember: StaffMember
+  currentAssignment: {
+    project: Project
+    endDate: Date
+    daysUntilEnd: number
+  }
+  hasFollowUp: boolean
+  urgency: 'high' | 'medium' | 'low'
+}
+
 interface AnnotationModal {
   isOpen: boolean
   item: GanttItem | null
@@ -82,8 +127,50 @@ interface AssignmentModal {
   assignments: AssignmentData[]
   isEdit: boolean
   selectedPosition: string
-  step: 'position' | 'staff' | 'assignments'
+  selectedProject: number | null
+  selectedPositionGroup: string
+  searchMethod: 'all' | 'by-date' | null
+  searchDate: string
+  step: 'project' | 'position' | 'search-method' | 'staff' | 'assignments'
 }
+
+// Position group mappings as specified
+const POSITION_GROUPS = {
+  'Assistant Project Manager': {
+    title: 'Assistant Project Manager',
+    positions: ['Assistant Project Manager', 'Project Administrator']
+  },
+  'Project Accountant': {
+    title: 'Project Accountant', 
+    positions: ['Project Accountant']
+  },
+  'Project Executive': {
+    title: 'Project Executive',
+    positions: ['Project Executive']
+  },
+  'Senior Project Manager': {
+    title: 'Senior Project Manager',
+    positions: ['Senior Project Manager']
+  },
+  'Project Manager': {
+    title: 'Project Manager',
+    positions: ['Project Manager I', 'Project Manager II', 'Project Manager III', 'Project Manager']
+  },
+  'General Superintendent': {
+    title: 'General Superintendent',
+    positions: ['General Superintendent']
+  },
+  'Assistant Superintendent': {
+    title: 'Assistant Superintendent',
+    positions: ['Assistant Superintendent', 'Foreman']
+  },
+  'Superintendent': {
+    title: 'Superintendent',
+    positions: ['Superintendent I', 'Superintendent II', 'Superintendent III', 'Superintendent']
+  }
+} as const
+
+type PositionGroupKey = keyof typeof POSITION_GROUPS
 
 export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> = ({
   userRole,
@@ -103,6 +190,8 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
   const [sortField, setSortField] = useState<'name' | 'position' | 'project'>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [draggedItem, setDraggedItem] = useState<GanttItem | null>(null)
+  const [needingAssignmentFilter, setNeedingAssignmentFilter] = useState<string>('all')
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [annotationModal, setAnnotationModal] = useState<AnnotationModal>({
     isOpen: false,
     item: null,
@@ -115,120 +204,369 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     assignments: [],
     isEdit: false,
     selectedPosition: '',
+    selectedProject: null,
+    selectedPositionGroup: '',
+    searchMethod: null,
+    searchDate: '',
     step: 'position'
   })
+
+
+
+  // Save needing assignment filter to localStorage
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      localStorage.setItem('staffing-needing-filter', needingAssignmentFilter)
+    } catch (error) {
+      console.warn('Error saving needing assignment filter:', error)
+    }
+  }, [needingAssignmentFilter])
+
+  // Load needing assignment filter from localStorage on mount
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      const savedNeedingFilter = localStorage.getItem('staffing-needing-filter')
+      if (savedNeedingFilter) {
+        setNeedingAssignmentFilter(savedNeedingFilter)
+      }
+    } catch (error) {
+      console.warn('Error loading needing assignment filter:', error)
+    }
+  }, [])
+
+  // Handle escape key to exit fullscreen
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false)
+      }
+    }
+
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleEscape)
+      // Prevent body scroll when in fullscreen
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isFullscreen])
   
   // Helper function to create new assignment
   const createNewAssignment = (position = '', project_id: number | '' = ''): AssignmentData => ({
     id: `assignment-${Date.now()}-${Math.random()}`,
     project_id,
-    startDate: format(new Date(), 'yyyy-MM-dd'),
-    endDate: format(addDays(new Date(), 30), 'yyyy-MM-dd'),
+    startDate: '',
+    endDate: '',
     position,
     comments: ''
   })
 
+  // Helper function to get active projects
+  const getActiveProjects = useMemo(() => {
+    return projects.filter(project => project.active)
+  }, [projects])
+
+  // Helper function to get staff by position group
+  const getStaffByPositionGroup = useCallback((positionGroup: string): StaffMember[] => {
+    const groupData = POSITION_GROUPS[positionGroup as PositionGroupKey]
+    if (!groupData) return []
+    
+    return staffMembers.filter(staff => {
+      const positions = groupData.positions as readonly string[]
+      return positions.includes(staff.position)
+    })
+  }, [staffMembers])
+
+  // Helper function to get available staff by date
+  const getAvailableStaffByDate = useCallback((positionGroup: string, searchDate: string): StaffMember[] => {
+    if (!searchDate) return []
+    
+    const searchDateTime = new Date(searchDate)
+    const thirtyDaysBefore = new Date(searchDate)
+    thirtyDaysBefore.setDate(thirtyDaysBefore.getDate() - 30)
+    
+    const groupStaff = getStaffByPositionGroup(positionGroup)
+    
+    return groupStaff.filter(staff => {
+      // Check if staff has no assignment covering the selected date
+      const hasConflictingAssignment = staff.assignments.some(assignment => {
+        const startDate = new Date(assignment.startDate)
+        const endDate = new Date(assignment.endDate)
+        return searchDateTime >= startDate && searchDateTime <= endDate
+      })
+      
+      // Check if staff has a current assignment ending < 30 days before selected date
+      const hasRecentEndingAssignment = staff.assignments.some(assignment => {
+        const endDate = new Date(assignment.endDate)
+        return endDate >= thirtyDaysBefore && endDate <= searchDateTime
+      })
+      
+      // Return staff who either have no conflicting assignment OR have assignments ending within 30 days
+      return !hasConflictingAssignment || hasRecentEndingAssignment
+    })
+  }, [getStaffByPositionGroup])
+
   // Calculate date range based on view mode
   const dateRange = useMemo(() => {
     const now = new Date()
-    const start = startOfWeek(addDays(now, -30))
-    const end = endOfWeek(addDays(now, 90))
+    let start: Date, end: Date
+    
+    switch (ganttViewMode) {
+      case 'week':
+        // Show 12 weeks (3 months) - 4 weeks before, 8 weeks after
+        start = startOfWeek(addWeeks(now, -4))
+        end = endOfWeek(addWeeks(now, 8))
+        break
+      case 'month':
+        // Show 12 months - 2 months before, 10 months after
+        start = startOfMonth(addMonths(now, -2))
+        end = endOfMonth(addMonths(now, 10))
+        break
+      case 'quarter':
+        // Show 8 quarters (2 years) - 2 quarters before, 6 quarters after
+        start = startOfQuarter(addQuarters(now, -2))
+        end = endOfQuarter(addQuarters(now, 6))
+        break
+      case 'year':
+        // Show 5 years - 1 year before, 4 years after
+        start = startOfYear(addYears(now, -1))
+        end = endOfYear(addYears(now, 4))
+        break
+      default:
+        // Fallback to month view
+        start = startOfMonth(addMonths(now, -2))
+        end = endOfMonth(addMonths(now, 10))
+    }
+    
     return { start, end }
-  }, [])
+  }, [ganttViewMode])
 
   // Generate time periods for header
   const timePeriods = useMemo(() => {
     const { start, end } = dateRange
-    const days = eachDayOfInterval({ start, end })
+    const periods: Date[] = []
     
     switch (ganttViewMode) {
       case 'week':
-        return days.filter((_, index) => index % 7 === 0)
+        // Generate weekly periods
+        let weekStart = startOfWeek(start)
+        while (weekStart <= end) {
+          periods.push(weekStart)
+          weekStart = addWeeks(weekStart, 1)
+        }
+        break
       case 'month':
-        return days.filter(day => day.getDate() === 1)
+        // Generate monthly periods
+        let monthStart = startOfMonth(start)
+        while (monthStart <= end) {
+          periods.push(monthStart)
+          monthStart = addMonths(monthStart, 1)
+        }
+        break
       case 'quarter':
-        return days.filter(day => day.getDate() === 1 && day.getMonth() % 3 === 0)
+        // Generate quarterly periods
+        let quarterStart = startOfQuarter(start)
+        while (quarterStart <= end) {
+          periods.push(quarterStart)
+          quarterStart = addQuarters(quarterStart, 1)
+        }
+        break
+      case 'year':
+        // Generate yearly periods
+        let yearStart = startOfYear(start)
+        while (yearStart <= end) {
+          periods.push(yearStart)
+          yearStart = addYears(yearStart, 1)
+        }
+        break
       default:
-        return days.filter(day => day.getDate() === 1)
+        // Fallback to monthly
+        let defaultStart = startOfMonth(start)
+        while (defaultStart <= end) {
+          periods.push(defaultStart)
+          defaultStart = addMonths(defaultStart, 1)
+        }
     }
+    
+    return periods
   }, [dateRange, ganttViewMode])
 
-  // Convert staff data to Gantt items
-  const ganttItems = useMemo((): GanttItem[] => {
-    let items: GanttItem[] = []
-    
-    staffMembers.forEach((staff, staffIndex) => {
-      staff.assignments.forEach((assignment, assignmentIndex) => {
-        const project = projects.find(p => p.project_id === assignment.project_id)
+  // Get current active Project Executives for portfolio projects
+  const getCurrentPEsForProjects = useMemo(() => {
+    const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
+    const peToProjects = new Map<string, number[]>()
+    const today = new Date()
+
+    staffMembers.forEach(staff => {
+      if (staff.position === 'Project Executive') {
+        staff.assignments.forEach(assignment => {
+          if (portfolioProjects.includes(assignment.project_id) && assignment.role === 'PE') {
+            const assignmentEnd = new Date(assignment.endDate)
+            // Only include current/active assignments (not ended)
+            if (isAfter(assignmentEnd, today)) {
+              if (!peToProjects.has(staff.id)) {
+                peToProjects.set(staff.id, [])
+              }
+              peToProjects.get(staff.id)!.push(assignment.project_id)
+            }
+          }
+        })
+      }
+    })
+
+    return peToProjects
+  }, [staffMembers])
+
+  // Convert staff data to grouped Gantt structure
+  const groupedGanttData = useMemo((): GroupedGanttData[] => {
+    const peToProjectsMap = getCurrentPEsForProjects
+    const result: GroupedGanttData[] = []
+
+    peToProjectsMap.forEach((projectIds, peId) => {
+      const pe = staffMembers.find(s => s.id === peId)
+      if (!pe) return
+
+      const peData: GroupedGanttData = {
+        projectExecutive: pe,
+        projects: []
+      }
+
+      // Group by projects for this PE
+      projectIds.forEach(projectId => {
+        const project = projects.find(p => p.project_id === projectId)
         if (!project) return
 
-        // Apply project filter for Project Executive and Project Manager
-        if (userRole === 'project-executive') {
-          const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
-          if (!portfolioProjects.includes(assignment.project_id)) return
-        }
+        // Get all assignments for this project
+        const projectAssignments: GanttItem[] = []
         
-        if (userRole === 'project-manager' && assignment.project_id !== 2525840) return
-        
-        // Apply selected project filter
-        if (selectedProject && assignment.project_id !== selectedProject) return
+        staffMembers.forEach((staff, staffIndex) => {
+          staff.assignments.forEach((assignment, assignmentIndex) => {
+            if (assignment.project_id !== projectId) return
 
-        items.push({
-          id: `${staff.id}-${assignment.project_id}-${assignmentIndex}`,
-          staffMember: staff,
-          project,
-          startDate: new Date(assignment.startDate),
-          endDate: new Date(assignment.endDate),
-          position: staffIndex * 100 + assignmentIndex
+            // Apply role-based filtering
+            if (userRole === 'project-executive') {
+              const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
+              if (!portfolioProjects.includes(assignment.project_id)) return
+            }
+            
+            if (userRole === 'project-manager' && assignment.project_id !== 2525840) return
+            
+            // Apply selected project filter
+            if (selectedProject && assignment.project_id !== selectedProject) return
+
+            // Apply filters
+            if (ganttFilters.search) {
+              const searchLower = ganttFilters.search.toLowerCase()
+              const matchesSearch = staff.name.toLowerCase().includes(searchLower) ||
+                                  staff.position.toLowerCase().includes(searchLower) ||
+                                  project.name.toLowerCase().includes(searchLower)
+              if (!matchesSearch) return
+            }
+
+            if (ganttFilters.position !== 'all' && staff.position !== ganttFilters.position) return
+
+            if (ganttFilters.project !== 'all' && project.project_id.toString() !== ganttFilters.project) return
+
+            projectAssignments.push({
+              id: `${staff.id}-${assignment.project_id}-${assignmentIndex}`,
+              staffMember: staff,
+              project,
+              startDate: new Date(assignment.startDate),
+              endDate: new Date(assignment.endDate),
+              position: staffIndex * 100 + assignmentIndex
+            })
+          })
         })
+
+        // Sort assignments by start date within project
+        projectAssignments.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+
+        if (projectAssignments.length > 0) {
+          peData.projects.push({
+            project,
+            assignments: projectAssignments
+          })
+        }
+      })
+
+      if (peData.projects.length > 0) {
+        result.push(peData)
+      }
+    })
+
+    return result
+  }, [staffMembers, projects, ganttFilters, userRole, selectedProject, getCurrentPEsForProjects])
+
+
+
+  // Calculate staff needing assignments
+  const needingAssignments = useMemo((): NeedingAssignmentItem[] => {
+    const today = new Date()
+    const ninetyDaysFromNow = addDays(today, 90)
+    const result: NeedingAssignmentItem[] = []
+
+    staffMembers.forEach(staff => {
+      // Find current assignments ending within 90 days
+      staff.assignments.forEach(assignment => {
+        const endDate = new Date(assignment.endDate)
+        
+        // Check if assignment ends within 90 days and after today
+        if (isAfter(endDate, today) && isBefore(endDate, ninetyDaysFromNow)) {
+          const daysUntilEnd = differenceInDays(endDate, today)
+          
+          // Check if there's a follow-up assignment
+          const hasFollowUp = staff.assignments.some(otherAssignment => {
+            const otherStart = new Date(otherAssignment.startDate)
+            return isAfter(otherStart, endDate) || 
+                   (isAfter(otherStart, addDays(endDate, -7)) && assignment !== otherAssignment)
+          })
+
+          if (!hasFollowUp) {
+            const project = projects.find(p => p.project_id === assignment.project_id)
+            if (project) {
+              // Determine urgency
+              let urgency: 'high' | 'medium' | 'low' = 'low'
+              if (daysUntilEnd < 30) urgency = 'high'
+              else if (daysUntilEnd < 60) urgency = 'medium'
+
+              result.push({
+                staffMember: staff,
+                currentAssignment: {
+                  project,
+                  endDate,
+                  daysUntilEnd
+                },
+                hasFollowUp,
+                urgency
+              })
+            }
+          }
+        }
       })
     })
 
-    // Apply filters
-    if (ganttFilters.search) {
-      const searchLower = ganttFilters.search.toLowerCase()
-      items = items.filter(item =>
-        item.staffMember.name.toLowerCase().includes(searchLower) ||
-        item.staffMember.position.toLowerCase().includes(searchLower) ||
-        item.project.name.toLowerCase().includes(searchLower)
-      )
-    }
+    // Apply position filter
+    const filtered = needingAssignmentFilter === 'all' 
+      ? result 
+      : result.filter(item => item.staffMember.position === needingAssignmentFilter)
 
-    if (ganttFilters.position !== 'all') {
-      items = items.filter(item => item.staffMember.position === ganttFilters.position)
-    }
-
-    if (ganttFilters.project !== 'all') {
-      items = items.filter(item => item.project.project_id.toString() === ganttFilters.project)
-    }
-
-    // Apply sorting
-    items.sort((a, b) => {
-      let aValue: string, bValue: string
-      
-      switch (sortField) {
-        case 'name':
-          aValue = a.staffMember.name
-          bValue = b.staffMember.name
-          break
-        case 'position':
-          aValue = a.staffMember.position
-          bValue = b.staffMember.position
-          break
-        case 'project':
-          aValue = a.project.name
-          bValue = b.project.name
-          break
-        default:
-          return 0
-      }
-
-      const comparison = aValue.localeCompare(bValue)
-      return sortDirection === 'asc' ? comparison : -comparison
+    // Sort by urgency and days until end
+    return filtered.sort((a, b) => {
+      const urgencyOrder = { high: 0, medium: 1, low: 2 }
+      const urgencyCompare = urgencyOrder[a.urgency] - urgencyOrder[b.urgency]
+      if (urgencyCompare !== 0) return urgencyCompare
+      return a.currentAssignment.daysUntilEnd - b.currentAssignment.daysUntilEnd
     })
-
-    return items
-  }, [staffMembers, projects, ganttFilters, sortField, sortDirection, userRole, selectedProject])
+  }, [staffMembers, projects, needingAssignmentFilter])
 
   // Get unique positions and projects for filters
   const uniquePositions = useMemo(() => {
@@ -256,6 +594,8 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     const itemDays = differenceInDays(endDate, startDate)
     return Math.max(1, (itemDays / totalDays) * 100)
   }, [dateRange])
+
+
 
   // Drag handlers
   const handleDragStart = (item: GanttItem) => {
@@ -315,15 +655,17 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
   // Assignment management handlers
   const handleCreateAssignment = () => {
-    if (userRole !== 'executive') return
-    
     setAssignmentModal({
       isOpen: true,
       staffMember: null,
       assignments: [],
       isEdit: false,
       selectedPosition: '',
-      step: 'position'
+      selectedProject: null,
+      selectedPositionGroup: '',
+      searchMethod: null,
+      searchDate: '',
+      step: 'project'
     })
   }
 
@@ -346,6 +688,10 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
       assignments: existingAssignments.length > 0 ? existingAssignments : [createNewAssignment(staffMember.position)],
       isEdit: true,
       selectedPosition: staffMember.position,
+      selectedProject: null,
+      selectedPositionGroup: '',
+      searchMethod: null,
+      searchDate: '',
       step: 'assignments'
     })
   }
@@ -378,39 +724,90 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
   const handlePositionSelect = (position: string) => {
     setAssignmentModal(prev => ({
       ...prev,
-      selectedPosition: position,
-      step: 'staff'
+      selectedPositionGroup: position,
+      step: 'search-method'
+    }))
+  }
+  
+  const handleProjectSelect = (projectId: string) => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      selectedProject: Number(projectId),
+      step: 'position'
+    }))
+  }
+  
+  const handleSearchMethodSelect = (method: 'all' | 'by-date') => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      searchMethod: method,
+      step: method === 'all' ? 'staff' : 'search-method'
+    }))
+  }
+  
+  const handleSearchDateSelect = (date: string) => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      searchDate: date
     }))
   }
 
-  const handleStaffMemberSelect = (staffMemberId: string) => {
-    const staffMember = staffMembers.find(s => s.id === staffMemberId)
-    if (staffMember) {
+  const handleDateSearch = () => {
+    if (assignmentModal.searchDate) {
       setAssignmentModal(prev => ({
         ...prev,
-        staffMember,
-        assignments: [createNewAssignment(prev.selectedPosition)],
-        step: 'assignments'
+        step: 'staff'
       }))
     }
+  }
+
+  const handleStaffMemberSelect = (staffMemberId: string) => {
+    const staff = staffMembers.find(s => s.id === staffMemberId)
+    if (!staff) return
+
+    const initialAssignment = createNewAssignment(
+      staff.position,
+      assignmentModal.selectedProject || ''
+    )
+    
+    // Pre-fill start date if search by date was used
+    if (assignmentModal.searchMethod === 'by-date' && assignmentModal.searchDate) {
+      initialAssignment.startDate = assignmentModal.searchDate
+    }
+
+    setAssignmentModal(prev => ({
+      ...prev,
+      staffMember: staff,
+      assignments: [initialAssignment],
+      step: 'assignments'
+    }))
   }
 
   const goBackToStaffSelection = () => {
     setAssignmentModal(prev => ({
       ...prev,
-      staffMember: null,
-      assignments: [],
       step: 'staff'
+    }))
+  }
+
+  const goBackToSearchMethod = () => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      step: 'search-method'
     }))
   }
 
   const goBackToPositionSelection = () => {
     setAssignmentModal(prev => ({
       ...prev,
-      staffMember: null,
-      assignments: [],
-      selectedPosition: '',
       step: 'position'
+    }))
+  }
+  
+  const goBackToProjectSelection = () => {
+    setAssignmentModal(prev => ({
+      ...prev,
+      step: 'project'
     }))
   }
 
@@ -420,145 +817,120 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
   }
 
   const handleSaveAssignment = () => {
-    // Validate all assignments
-    const validAssignments = assignmentModal.assignments.filter(assignment => 
-      assignment.project_id && assignment.startDate && assignment.endDate && assignment.position
-    )
+    if (!assignmentModal.staffMember || assignmentModal.assignments.length === 0) return
 
-    if (validAssignments.length === 0) {
-      return
-    }
-
-    // Convert assignments to store format
-    const storeAssignments = validAssignments.map(assignment => ({
-      project_id: Number(assignment.project_id),
-      role: assignment.position.substring(0, 2).toUpperCase(),
-      startDate: new Date(assignment.startDate).toISOString(),
-      endDate: new Date(assignment.endDate).toISOString(),
-      comments: assignment.comments
+    // Convert modal assignments back to staff format
+    const updatedAssignments = assignmentModal.assignments.map(assignment => ({
+      project_id: assignment.project_id as number,
+      role: assignment.position === 'Project Executive' ? 'PE' : 'Staff',
+      startDate: `${assignment.startDate}T00:00:00Z`,
+      endDate: `${assignment.endDate}T23:59:59Z`
     }))
 
-    if (assignmentModal.staffMember) {
-      // Update existing staff member
-      const updatedStaffMember = { 
-        ...assignmentModal.staffMember,
-        assignments: storeAssignments,
-        // Update position to the most recent assignment's position
-        position: validAssignments[validAssignments.length - 1].position
-      }
-      
-      // Update store
-      updateStaffAssignment(updatedStaffMember.id, updatedStaffMember)
-    } else {
-      // For new assignments without a specific staff member, we would need to implement staff creation
-      // This would require additional UI to select/create staff members
-      console.log('New staff member creation not implemented yet')
+    const updatedStaff: StaffMember = {
+      ...assignmentModal.staffMember,
+      assignments: updatedAssignments
     }
 
-    // Close modal
+    updateStaffAssignment(assignmentModal.staffMember.id, updatedStaff)
     setAssignmentModal({
       isOpen: false,
       staffMember: null,
       assignments: [],
       isEdit: false,
       selectedPosition: '',
+      selectedProject: null,
+      selectedPositionGroup: '',
+      searchMethod: null,
+      searchDate: '',
       step: 'position'
     })
   }
 
-  // Calculate financial metrics
+  // Financial calculation helper
   const calculateFinancialMetrics = (staffMember: StaffMember | null, projectId: number | '') => {
     if (!staffMember || !projectId) return null
-    
-    const project = projects.find(p => p.project_id === Number(projectId))
-    if (!project) return null
 
     const laborRate = staffMember.laborRate
-    const laborBurden = laborRate * 0.35 // 35% burden rate
+    const laborBurden = laborRate * 0.35 // 35% burden
     const totalLaborCost = laborRate + laborBurden
     const billableRate = staffMember.billableRate
-    const margin = ((billableRate - totalLaborCost) / billableRate) * 100
 
     return {
       laborRate,
       laborBurden,
       totalLaborCost,
-      billableRate,
-      margin,
-      project
+      billableRate
     }
   }
 
+  // Helper components
   const SortIcon = ({ field }: { field: typeof sortField }) => {
     if (sortField !== field) return null
     return sortDirection === 'asc' ? <SortAsc className="h-3 w-3" /> : <SortDesc className="h-3 w-3" />
   }
 
-  // Extract base position type from full position name
   const getBasePositionType = (position: string): string => {
-    // Remove level indicators (I, II, III)
-    let baseType = position.replace(/\s+(I{1,3}|IV|V)$/, '')
-    
-    // Handle special prefixes
-    if (baseType.includes('Senior ')) {
-      baseType = baseType.replace('Senior ', '')
-    }
-    if (baseType.includes('Assistant ')) {
-      baseType = baseType.replace('Assistant ', '')
-    }
-    if (baseType.includes('General ')) {
-      baseType = baseType.replace('General ', '')
-    }
-    
-    return baseType
-  }
-
-  // Get position color for staff member based on base position type
-  const getPositionColor = (position: string): string => {
-    const baseType = getBasePositionType(position)
-    
-    // First try exact match with base type
-    if (BASE_POSITION_COLORS[baseType]) {
-      return BASE_POSITION_COLORS[baseType]
-    }
-    
-    // Try direct match (for positions that don't need base type extraction)
-    if (BASE_POSITION_COLORS[position]) {
-      return BASE_POSITION_COLORS[position]
-    }
-    
-    // Generate consistent fallback color for unmapped positions
-    const fallbackColors = [
-      'bg-teal-600', 'bg-rose-600', 'bg-lime-600', 'bg-sky-600', 
-      'bg-fuchsia-600', 'bg-yellow-600', 'bg-gray-600', 'bg-stone-600'
+    // Extract base position type for color mapping
+    const baseTypes = [
+      'Project Executive', 'Project Manager', 'Superintendent', 'Project Administrator',
+      'Project Accountant', 'Project Engineer', 'Field Engineer', 'Safety Manager',
+      'Quality Manager', 'Foreman', 'Estimator', 'Scheduler'
     ]
     
-    // Use position string hash to get consistent color
-    const hash = position.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return fallbackColors[hash % fallbackColors.length]
+    for (const baseType of baseTypes) {
+      if (position.includes(baseType)) {
+        return baseType
+      }
+    }
+    
+    // If no match found, return the original position
+    return position
+  }
+
+  const getPositionColor = (position: string): string => {
+    const baseType = getBasePositionType(position)
+    return BASE_POSITION_COLORS[baseType] || 'bg-gray-500'
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className={`w-full space-y-6 ${isFullscreen ? 'fixed inset-0 z-[9999] bg-background p-6 overflow-auto' : ''}`}>
       {/* Header with Title and Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Staff Management</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Staff Management {isFullscreen && '(Fullscreen)'}
+          </h3>
           <Badge variant="outline" className="ml-2">
-            {ganttItems.length} assignments
+            {groupedGanttData.length} assignments
           </Badge>
+          {isFullscreen && (
+            <Badge variant="secondary" className="ml-2">
+              Press Esc to exit
+            </Badge>
+          )}
         </div>
         
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title={isFullscreen ? "Exit Fullscreen (Esc)" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          </Button>
+          
           <Select value={ganttViewMode} onValueChange={(value: any) => setGanttViewMode(value)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[99999]">
               <SelectItem value="week">Weekly</SelectItem>
               <SelectItem value="month">Monthly</SelectItem>
               <SelectItem value="quarter">Quarterly</SelectItem>
+              <SelectItem value="year">Yearly</SelectItem>
             </SelectContent>
           </Select>
           
@@ -611,7 +983,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             <SelectTrigger className="w-48">
               <SelectValue placeholder="All Positions" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[99999]">
               <SelectItem value="all">All Positions</SelectItem>
               {uniquePositions.map(position => (
                 <SelectItem key={position} value={position}>
@@ -628,7 +1000,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             <SelectTrigger className="w-48">
               <SelectValue placeholder="All Projects" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[99999]">
               <SelectItem value="all">All Projects</SelectItem>
               {uniqueProjects.map(project => (
                 <SelectItem key={project.project_id} value={project.project_id.toString()}>
@@ -647,7 +1019,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
           </Button>
         </div>
 
-        {ganttItems.length > 0 ? (
+        {groupedGanttData.length > 0 ? (
           <div className="space-y-4">
             {/* Timeline Header */}
             <div className="relative border-b border-gray-200 dark:border-gray-700 pb-4">
@@ -681,7 +1053,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                     {timePeriods.map((period, index) => (
                       <div key={index} style={{ left: `${calculatePosition(period)}%` }} className="absolute">
-                        {format(period, ganttViewMode === 'week' ? "MMM dd" : ganttViewMode === 'month' ? "MMM yyyy" : "Qo yyyy")}
+                        {format(period, ganttViewMode === 'week' ? "MMM dd" : ganttViewMode === 'month' ? "MMM yyyy" : ganttViewMode === 'quarter' ? "Qo yyyy" : "yyyy")}
                       </div>
                     ))}
                   </div>
@@ -690,82 +1062,118 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
             </div>
 
             {/* Timeline Rows */}
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {ganttItems.map((item) => (
-                <div key={item.id} className="flex items-center group">
-                  {/* Staff Info */}
-                  <div 
-                    className="w-[600px] flex-shrink-0 flex gap-6 pr-4"
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, item.staffMember.id)}
-                  >
-                    <div className="w-48 flex items-center gap-2">
-                      {userRole === 'executive' && !isReadOnly && (
-                        <div
-                          className="cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-                          draggable
-                          onDragStart={() => handleDragStart(item)}
-                        >
-                          <GripVertical className="h-4 w-4 text-gray-400" />
+            <div className="space-y-2 h-[576px] overflow-y-auto">
+              {groupedGanttData.map((peData) => (
+                <div key={peData.projectExecutive.id}>
+                  {/* Project Executive Header */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium">{peData.projectExecutive.name}</span>
+                    <Badge variant="outline" className="ml-2">
+                      PE
+                    </Badge>
+                  </div>
+
+                  {/* Project Executive Projects */}
+                  <div className="ml-4">
+                    <div className="space-y-2">
+                      {peData.projects.map((projectData) => (
+                        <div key={projectData.project.project_id}>
+                          {/* Project Header */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Building className="h-4 w-4" />
+                            <span className="text-sm font-medium">{projectData.project.name}</span>
+                            <Badge variant="secondary" className="ml-2">
+                              {projectData.assignments.length} staff
+                            </Badge>
+                          </div>
+
+                          {/* Project Assignments */}
+                          <div className="ml-6">
+                            <div className="space-y-2">
+                              {projectData.assignments.map((item) => (
+                                <div key={item.id} className="flex items-center group">
+                                  {/* Staff Info */}
+                                  <div 
+                                    className="w-[600px] flex-shrink-0 flex gap-6 pr-4"
+                                    onDragOver={handleDragOver}
+                                    onDrop={(e) => handleDrop(e, item.staffMember.id)}
+                                  >
+                                    <div className="w-48 flex items-center gap-2">
+                                      {userRole === 'executive' && !isReadOnly && (
+                                        <div
+                                          className="cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+                                          draggable
+                                          onDragStart={() => handleDragStart(item)}
+                                        >
+                                          <GripVertical className="h-4 w-4 text-gray-400" />
+                                        </div>
+                                      )}
+                                      {userRole === 'executive' && !isReadOnly ? (
+                                        <button
+                                          className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate cursor-pointer"
+                                          onClick={() => handleEditStaffAssignment(item.staffMember)}
+                                        >
+                                          {item.staffMember.name}
+                                        </button>
+                                      ) : (
+                                        <span className="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                          {item.staffMember.name}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="w-44 flex items-center gap-2">
+                                      <div className={`w-2.5 h-2.5 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                                        {item.staffMember.position}
+                                      </span>
+                                    </div>
+                                    <div className="w-56 text-xs text-gray-600 dark:text-gray-400">
+                                      {item.project.name}
+                                    </div>
+                                  </div>
+
+                                  {/* Timeline Bar */}
+                                  <div className="flex-1 relative h-6">
+                                    <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded"></div>
+                                    
+                                    {/* Assignment Bar */}
+                                    <div
+                                      className={`absolute inset-y-1 rounded ${getPositionColor(item.staffMember.position)} hover:opacity-80 transition-opacity cursor-pointer group/bar`}
+                                      style={{
+                                        left: `${calculatePosition(item.startDate)}%`,
+                                        width: `${calculateWidth(item.startDate, item.endDate)}%`,
+                                      }}
+                                      onClick={() => userRole === 'executive' && !isReadOnly ? handleEditStaffAssignment(item.staffMember) : handleAddAnnotation(item)}
+                                    >
+                                      <div className="absolute inset-0 flex items-center justify-center text-white text-[10px] font-semibold opacity-0 group-hover/bar:opacity-100 transition-opacity">
+                                        {differenceInDays(item.endDate, item.startDate)}d
+                                      </div>
+                                      
+                                      {item.annotation && (
+                                        <MessageSquare className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 text-yellow-500" />
+                                      )}
+                                    </div>
+
+                                    {/* Today Line */}
+                                    <div
+                                      className="absolute top-0 bottom-0 w-0.5 bg-red-500 dark:bg-red-400 z-10"
+                                      style={{ left: `${calculatePosition(new Date())}%` }}
+                                    ></div>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="w-16 flex-shrink-0 text-right">
+                                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                      ${item.staffMember.laborRate}/hr
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      {userRole === 'executive' && !isReadOnly ? (
-                        <button
-                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate cursor-pointer"
-                          onClick={() => handleEditStaffAssignment(item.staffMember)}
-                        >
-                          {item.staffMember.name}
-                        </button>
-                      ) : (
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                          {item.staffMember.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="w-44 flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {item.staffMember.position}
-                      </span>
-                    </div>
-                    <div className="w-56 text-sm text-gray-600 dark:text-gray-400">
-                      {item.project.name}
-                    </div>
-                  </div>
-
-                  {/* Timeline Bar */}
-                  <div className="flex-1 relative h-8">
-                    <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded"></div>
-                    
-                    {/* Assignment Bar */}
-                    <div
-                      className={`absolute inset-y-1 rounded ${getPositionColor(item.staffMember.position)} hover:opacity-80 transition-opacity cursor-pointer group/bar`}
-                      style={{
-                        left: `${calculatePosition(item.startDate)}%`,
-                        width: `${calculateWidth(item.startDate, item.endDate)}%`,
-                      }}
-                      onClick={() => userRole === 'executive' && !isReadOnly ? handleEditStaffAssignment(item.staffMember) : handleAddAnnotation(item)}
-                    >
-                      <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium opacity-0 group-hover/bar:opacity-100 transition-opacity">
-                        {differenceInDays(item.endDate, item.startDate)}d
-                      </div>
-                      
-                      {item.annotation && (
-                        <MessageSquare className="absolute -top-1 -right-1 h-3 w-3 text-yellow-500" />
-                      )}
-                    </div>
-
-                    {/* Today Line */}
-                    <div
-                      className="absolute top-0 bottom-0 w-0.5 bg-red-500 dark:bg-red-400 z-10"
-                      style={{ left: `${calculatePosition(new Date())}%` }}
-                    ></div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="w-16 flex-shrink-0 text-right">
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      ${item.staffMember.laborRate}/hr
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -817,9 +1225,89 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
           </div>
         )}
 
+        {/* Needing Assignment Panel */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-500" />
+                Needing Assignment
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Select value={needingAssignmentFilter} onValueChange={setNeedingAssignmentFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Filter by position" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[99999]">
+                    <SelectItem value="all">All Positions</SelectItem>
+                    {uniquePositions.map(position => (
+                      <SelectItem key={position} value={position}>{position}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Badge variant="secondary">
+                  {needingAssignments.length} staff
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {needingAssignments.length > 0 ? (
+              <div className="space-y-3">
+                {needingAssignments.map((item, index) => {
+                  const urgencyColor = item.urgency === 'high' ? 'text-red-600 dark:text-red-400' :
+                                     item.urgency === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                                     'text-orange-600 dark:text-orange-400'
+                  
+                  const urgencyBg = item.urgency === 'high' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
+                                   item.urgency === 'medium' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800' :
+                                   'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+
+                  return (
+                    <div key={`${item.staffMember.id}-${index}`} className={`p-4 rounded-lg border ${urgencyBg}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${getPositionColor(item.staffMember.position)}`}></div>
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-gray-100">
+                              {item.staffMember.name}
+                            </div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                              {item.staffMember.position}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Current: {item.currentAssignment.project.name}
+                          </div>
+                          <div className={`text-sm font-medium ${urgencyColor}`}>
+                            <Clock className="h-3 w-3 inline mr-1" />
+                            Ends in {item.currentAssignment.daysUntilEnd} days
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {format(item.currentAssignment.endDate, 'MMM dd, yyyy')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <div className="text-sm">No staff needing assignments</div>
+                <div className="text-xs">All staff have follow-up assignments scheduled</div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
       {/* Annotation Modal */}
       <Dialog open={annotationModal.isOpen} onOpenChange={(open) => setAnnotationModal(prev => ({ ...prev, isOpen: open }))}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg z-[99999]">
           <DialogHeader>
             <DialogTitle>Add Assignment Annotation</DialogTitle>
           </DialogHeader>
@@ -856,37 +1344,39 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
       {/* Assignment Modal */}
       <Dialog open={assignmentModal.isOpen} onOpenChange={(open) => setAssignmentModal(prev => ({ ...prev, isOpen: open }))}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[99999]">
           <DialogHeader>
             <DialogTitle>
               {assignmentModal.isEdit ? 'Edit Staff Assignments' : 
-               assignmentModal.step === 'position' ? 'Select Position' :
+               assignmentModal.step === 'project' ? 'Select Project' :
+               assignmentModal.step === 'position' ? 'Select Position Group' :
+               assignmentModal.step === 'search-method' ? 'Choose Search Method' :
                assignmentModal.step === 'staff' ? 'Select Staff Member' :
                'Create Staff Assignments'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
-            {/* Step 1: Position Selection */}
-            {assignmentModal.step === 'position' && !assignmentModal.isEdit && (
+            {/* Step 1: Project Selection */}
+            {assignmentModal.step === 'project' && !assignmentModal.isEdit && (
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Select Position Type</label>
+                  <label className="text-sm font-medium mb-2 block">Select Project</label>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Choose the position type you want to assign someone to.
+                    Choose the project for this assignment. This will be used to determine billable rate context.
                   </p>
                   <Select 
-                    value={assignmentModal.selectedPosition} 
-                    onValueChange={handlePositionSelect}
+                    value={assignmentModal.selectedProject?.toString() || ''} 
+                    onValueChange={handleProjectSelect}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Search or select a position..." />
+                      <SelectValue placeholder="Search or select a project..." />
                     </SelectTrigger>
                     <SelectContent className="z-[99999]">
-                      {uniquePositions.map(position => (
-                        <SelectItem key={position} value={position}>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 ${getPositionColor(position)} rounded`}></div>
-                            {position}
+                      {getActiveProjects.map(project => (
+                        <SelectItem key={project.project_id} value={project.project_id.toString()}>
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{project.name}</span>
+                            <span className="text-xs text-muted-foreground">#{project.project_number} • ${project.contract_value.toLocaleString()}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -896,58 +1386,237 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
               </div>
             )}
 
-            {/* Step 2: Staff Member Selection */}
-            {assignmentModal.step === 'staff' && !assignmentModal.isEdit && (
+            {/* Step 2: Position Group Selection */}
+            {assignmentModal.step === 'position' && !assignmentModal.isEdit && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Button variant="outline" size="sm" onClick={goBackToProjectSelection}>
+                    ← Back to Project
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {getActiveProjects.find(p => p.project_id === assignmentModal.selectedProject)?.name}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select Position Group</label>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Choose the position group type you want to assign someone to.
+                  </p>
+                  <Select 
+                    value={assignmentModal.selectedPositionGroup} 
+                    onValueChange={handlePositionSelect}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Search or select a position group..." />
+                    </SelectTrigger>
+                    <SelectContent className="z-[99999]">
+                      {Object.entries(POSITION_GROUPS).map(([key, group]) => (
+                        <SelectItem key={key} value={key}>
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{group.title}</span>
+                            <span className="text-xs text-muted-foreground">
+                              Includes: {group.positions.join(', ')}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Search Method Selection */}
+            {assignmentModal.step === 'search-method' && !assignmentModal.isEdit && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Button variant="outline" size="sm" onClick={goBackToPositionSelection}>
                     ← Back to Position
                   </Button>
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 ${getPositionColor(assignmentModal.selectedPosition)} rounded`}></div>
-                    <span className="font-medium">{assignmentModal.selectedPosition}</span>
+                    <div className="text-sm text-muted-foreground">
+                      {POSITION_GROUPS[assignmentModal.selectedPositionGroup as PositionGroupKey]?.title}
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Choose Staff Search Method</label>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Select how you want to search for available staff members.
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div 
+                      className={`border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors ${
+                        assignmentModal.searchMethod === 'all' ? 'border-primary bg-primary/5' : ''
+                      }`}
+                      onClick={() => handleSearchMethodSelect('all')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center">
+                          {assignmentModal.searchMethod === 'all' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                        </div>
+                        <div>
+                          <div className="font-medium">Search All {POSITION_GROUPS[assignmentModal.selectedPositionGroup as PositionGroupKey]?.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            View all staff members in the selected position group
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors ${
+                        assignmentModal.searchMethod === 'by-date' ? 'border-primary bg-primary/5' : ''
+                      }`}
+                      onClick={() => setAssignmentModal(prev => ({ ...prev, searchMethod: 'by-date' }))}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center">
+                          {assignmentModal.searchMethod === 'by-date' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                        </div>
+                        <div>
+                          <div className="font-medium">Search by Assignment Start Date</div>
+                          <div className="text-sm text-muted-foreground">
+                            Find staff available for a specific start date
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {assignmentModal.searchMethod === 'by-date' && (
+                    <div className="mt-4">
+                      <label className="text-sm font-medium mb-2 block">Select Assignment Start Date</label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="date"
+                          value={assignmentModal.searchDate}
+                          onChange={(e) => handleSearchDateSelect(e.target.value)}
+                          className="flex-1"
+                          placeholder="Select start date..."
+                        />
+                        <Button 
+                          onClick={handleDateSearch}
+                          disabled={!assignmentModal.searchDate}
+                          className="px-6"
+                        >
+                          <Search className="h-4 w-4 mr-2" />
+                          Search
+                        </Button>
+                      </div>
+                      {assignmentModal.searchDate && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          This will show staff who are available on {new Date(assignmentModal.searchDate).toLocaleDateString()} 
+                          or have assignments ending within 30 days before this date.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Staff Member Selection */}
+            {assignmentModal.step === 'staff' && !assignmentModal.isEdit && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Button variant="outline" size="sm" onClick={goBackToSearchMethod}>
+                    ← Back to Search Method
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-muted-foreground">
+                      {POSITION_GROUPS[assignmentModal.selectedPositionGroup as PositionGroupKey]?.title}
+                    </div>
+                    <span className="text-muted-foreground">•</span>
+                    <div className="text-sm text-muted-foreground">
+                      {assignmentModal.searchMethod === 'all' ? 'All Staff' : `Available ${assignmentModal.searchDate}`}
+                    </div>
                   </div>
                 </div>
                 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Select Staff Member</label>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Choose which {assignmentModal.selectedPosition.toLowerCase()} to assign.
+                    Choose which staff member to assign from the {POSITION_GROUPS[assignmentModal.selectedPositionGroup as PositionGroupKey]?.title.toLowerCase()} group.
                   </p>
                   
                   {(() => {
-                    const filteredStaff = getFilteredStaffMembers(assignmentModal.selectedPosition)
+                    const availableStaff = assignmentModal.searchMethod === 'all' 
+                      ? getStaffByPositionGroup(assignmentModal.selectedPositionGroup)
+                      : getAvailableStaffByDate(assignmentModal.selectedPositionGroup, assignmentModal.searchDate)
                     
-                    if (filteredStaff.length === 0) {
+                    if (availableStaff.length === 0) {
                       return (
                         <div className="text-center py-8 text-muted-foreground">
                           <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          <div className="text-sm">No staff members found for this position</div>
+                          <div className="text-sm">
+                            {assignmentModal.searchMethod === 'all' 
+                              ? 'No staff members found for this position group'
+                              : 'No available staff found for the selected date'
+                            }
+                          </div>
                         </div>
                       )
                     }
                     
                     return (
-                      <Select 
-                        value={assignmentModal.staffMember?.id || ''} 
-                        onValueChange={handleStaffMemberSelect}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Search or select a staff member..." />
-                        </SelectTrigger>
-                        <SelectContent className="z-[99999]">
-                          {filteredStaff.map(staff => (
-                            <SelectItem key={staff.id} value={staff.id}>
-                              <div className="flex items-center justify-between w-full">
-                                <span>{staff.name}</span>
-                                <div className="text-xs text-muted-foreground ml-2">
-                                  {staff.experience}y exp • ${staff.laborRate}/hr
+                      <div className="border rounded-lg">
+                        {/* Staff Grid Header */}
+                        <div className="grid grid-cols-9 gap-4 p-3 bg-muted/50 text-sm font-medium border-b">
+                          <div>Staff Name</div>
+                          <div>Position</div>
+                          <div>Salary</div>
+                          <div>Burden</div>
+                          <div>Total Rate</div>
+                          <div>Billable Rate</div>
+                          <div>DISC</div>
+                          <div>Strengths</div>
+                          <div>Weaknesses</div>
+                        </div>
+                        
+                        {/* Staff Grid Rows */}
+                        <div className="max-h-96 overflow-y-auto">
+                          {availableStaff.map(staff => {
+                            const burden = staff.laborRate * 0.35 // 35% burden
+                            const totalRate = staff.laborRate + burden
+                            const selectedProject = getActiveProjects.find(p => p.project_id === assignmentModal.selectedProject)
+                            
+                            return (
+                              <div 
+                                key={staff.id} 
+                                className="grid grid-cols-9 gap-4 p-3 hover:bg-muted/30 cursor-pointer border-b transition-colors"
+                                onClick={() => handleStaffMemberSelect(staff.id)}
+                              >
+                                <div className="font-medium">{staff.name}</div>
+                                <div className="text-sm text-muted-foreground">{staff.position}</div>
+                                <div className="text-sm">${staff.laborRate.toFixed(2)}/hr</div>
+                                <div className="text-sm">${burden.toFixed(2)}/hr</div>
+                                <div className="text-sm font-medium">${totalRate.toFixed(2)}/hr</div>
+                                <div className="text-sm text-blue-600 dark:text-blue-400">${staff.billableRate.toFixed(2)}/hr</div>
+                                <div className="text-sm">
+                                  <Badge variant="outline" className="text-xs">
+                                    {staff.discProfile || 'N/A'}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {staff.strengths.slice(0, 2).join(', ')}
+                                  {staff.strengths.length > 2 && '...'}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {staff.weaknesses.slice(0, 2).join(', ')}
+                                  {staff.weaknesses.length > 2 && '...'}
                                 </div>
                               </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            )
+                          })}
+                        </div>
+                      </div>
                     )
                   })()}
                 </div>
@@ -1131,8 +1800,8 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                                 </div>
                                 <div className="col-span-2">
                                   <div className="text-muted-foreground">Profit Margin</div>
-                                  <div className={`font-medium ${metrics.margin > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {metrics.margin.toFixed(1)}% (${(metrics.billableRate - metrics.totalLaborCost).toFixed(2)}/hr)
+                                  <div className={`font-medium ${metrics.billableRate > metrics.totalLaborCost ? 'text-green-600' : 'text-red-600'}`}>
+                                    {(((metrics.billableRate - metrics.totalLaborCost) / metrics.billableRate) * 100).toFixed(1)}% (${(metrics.billableRate - metrics.totalLaborCost).toFixed(2)}/hr)
                                   </div>
                                 </div>
                               </div>
@@ -1157,6 +1826,10 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   assignments: [],
                   isEdit: false,
                   selectedPosition: '',
+                  selectedProject: null,
+                  selectedPositionGroup: '',
+                  searchMethod: null,
+                  searchDate: '',
                   step: 'position'
                 })}
               >

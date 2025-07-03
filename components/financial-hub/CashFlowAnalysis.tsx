@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from "react"
 import {
   DollarSign,
   TrendingUp,
@@ -23,18 +23,23 @@ import {
   HandCoins,
   Timer,
   Zap,
-} from "lucide-react";
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Bot,
+} from "lucide-react"
 
 // Import actual cash flow data
-import cashFlowDataImport from "@/data/mock/financial/cash-flow.json";
+import cashFlowDataImport from "@/data/mock/financial/cash-flow.json"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { FullscreenToggle } from "@/components/ui/fullscreen-toggle";
-import { CollapseWrapper } from "@/components/ui/collapse-wrapper";
-import { useFinancialHubStore } from "@/hooks/use-financial-hub-store";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { FullscreenToggle } from "@/components/ui/fullscreen-toggle"
+import { CollapseWrapper } from "@/components/ui/collapse-wrapper"
+import { useFinancialHubStore } from "@/hooks/use-financial-hub-store"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   AreaChart,
   Area,
@@ -51,22 +56,22 @@ import {
   Pie,
   Cell,
   ComposedChart,
-} from "recharts";
+} from "recharts"
 
 interface CashFlowAnalysisProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
 // Use imported cash flow data
-const cashFlowData = cashFlowDataImport;
+const cashFlowData = cashFlowDataImport
 
 // Advanced analytics data for insights
 const advancedMetrics = {
   forecastAccuracy: {
     current: 0.92,
     trend: "improving",
-    target: 0.95
+    target: 0.95,
   },
   liquidityRatio: 4.2,
   daysOfCashOnHand: 45,
@@ -74,22 +79,22 @@ const advancedMetrics = {
   riskFactors: [
     { factor: "Seasonal Fluctuations", impact: "medium", probability: 0.6 },
     { factor: "Payment Delays", impact: "high", probability: 0.3 },
-    { factor: "Cost Overruns", impact: "medium", probability: 0.4 }
-  ]
-};
+    { factor: "Cost Overruns", impact: "medium", probability: 0.4 },
+  ],
+}
 
 // Payment timing analysis metrics
 const paymentTimingMetrics = {
   averageOwnerDelayDays: 19,
   averageVendorPaymentLagDays: 11,
-  onTimePaymentRate: 82.5 // percentage
-};
+  onTimePaymentRate: 82.5, // percentage
+}
 
 const inflowBreakdown = [
   { name: "Owner Payments", value: 4719691.76, color: "#3b82f6", percentage: 88.2 },
   { name: "Change Orders", value: 10595.76, color: "#10b981", percentage: 0.2 },
   { name: "Other", value: 614351.98, color: "#f59e0b", percentage: 11.6 },
-];
+]
 
 const outflowBreakdown = [
   { name: "Subcontractors", value: 2023661.32, color: "#ef4444", percentage: 45.2 },
@@ -97,61 +102,62 @@ const outflowBreakdown = [
   { name: "Labor", value: 795880.88, color: "#06b6d4", percentage: 17.8 },
   { name: "Equipment", value: 530587.25, color: "#f97316", percentage: 11.9 },
   { name: "Overhead", value: 265293.62, color: "#84cc16", percentage: 5.9 },
-];
+]
 
-type ViewMode = "overview" | "inflow" | "outflow" | "forecast";
+type ViewMode = "overview" | "inflow" | "outflow" | "forecast"
 
 export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnalysisProps) {
-  const { isFullscreen, toggleFullscreen } = useFinancialHubStore();
-  
-  const [viewMode, setViewMode] = useState<ViewMode>("overview");
+  const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
+
+  const [viewMode, setViewMode] = useState<ViewMode>("overview")
+  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   // Get project-specific data
-  const projectCashFlow = cashFlowData.projects.find(p => p.project_id === 2525840) || cashFlowData.projects[0];
-  const summary = projectCashFlow.cashFlowData.summary;
-  const monthlyData = projectCashFlow.cashFlowData.monthlyData;
+  const projectCashFlow = cashFlowData.projects.find((p) => p.project_id === 2525840) || cashFlowData.projects[0]
+  const summary = projectCashFlow.cashFlowData.summary
+  const monthlyData = projectCashFlow.cashFlowData.monthlyData
 
   // Calculate Owner vs Vendor comparison data
   const ownerVendorComparison = useMemo(() => {
-    return monthlyData.map(month => {
-      const ownerPayments = month.inflows.ownerPayments;
-      const vendorSubPayments = month.outflows.subcontractorPayments + month.outflows.materialCosts;
-      const netDelta = ownerPayments - vendorSubPayments;
-      const percentVariance = vendorSubPayments > 0 ? ((netDelta / vendorSubPayments) * 100) : 0;
-      
+    return monthlyData.map((month) => {
+      const ownerPayments = month.inflows.ownerPayments
+      const vendorSubPayments = month.outflows.subcontractorPayments + month.outflows.materialCosts
+      const netDelta = ownerPayments - vendorSubPayments
+      const percentVariance = vendorSubPayments > 0 ? (netDelta / vendorSubPayments) * 100 : 0
+
       return {
         month: month.month,
         ownerPayments,
         vendorSubPayments,
         netDelta,
         percentVariance,
-        isSignificantSpread: Math.abs(percentVariance) > 20
-      };
-    });
-  }, [monthlyData]);
+        isSignificantSpread: Math.abs(percentVariance) > 20,
+      }
+    })
+  }, [monthlyData])
 
   // Calculate key metrics
-  const totalInflows = summary.totalInflows;
-  const totalOutflows = summary.totalOutflows;
-  const netCashFlow = summary.netCashFlow;
-  const workingCapital = summary.workingCapital;
-  const peakRequirement = summary.peakCashRequirement;
+  const totalInflows = summary.totalInflows
+  const totalOutflows = summary.totalOutflows
+  const netCashFlow = summary.netCashFlow
+  const workingCapital = summary.workingCapital
+  const peakRequirement = summary.peakCashRequirement
 
   // Calculate performance metrics
-  const cashFlowMargin = ((netCashFlow / totalInflows) * 100);
-  const averageMonthlyInflow = totalInflows / monthlyData.length;
-  const averageMonthlyOutflow = totalOutflows / monthlyData.length;
-  const forecastAccuracy = monthlyData.reduce((sum, m) => sum + m.forecastAccuracy, 0) / monthlyData.length;
+  const cashFlowMargin = (netCashFlow / totalInflows) * 100
+  const averageMonthlyInflow = totalInflows / monthlyData.length
+  const averageMonthlyOutflow = totalOutflows / monthlyData.length
+  const forecastAccuracy = monthlyData.reduce((sum, m) => sum + m.forecastAccuracy, 0) / monthlyData.length
 
   // Transform data for charts
-  const chartData = monthlyData.map(month => ({
+  const chartData = monthlyData.map((month) => ({
     month: month.month,
     inflows: month.inflows.total,
     outflows: month.outflows.total,
     net: month.netCashFlow,
     cumulative: month.cumulativeCashFlow,
-    workingCapital: month.workingCapital
-  }));
+    workingCapital: month.workingCapital,
+  }))
 
   const ViewToggle = () => (
     <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
@@ -159,7 +165,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
         { key: "overview", label: "Overview", icon: BarChart3 },
         { key: "inflow", label: "Inflows", icon: TrendingUp },
         { key: "outflow", label: "Outflows", icon: TrendingDown },
-        { key: "forecast", label: "Forecast", icon: Calendar }
+        { key: "forecast", label: "Forecast", icon: Calendar },
       ].map((item) => (
         <Button
           key={item.key}
@@ -173,16 +179,16 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
         </Button>
       ))}
     </div>
-  );
+  )
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   const renderContent = () => {
     switch (viewMode) {
@@ -207,13 +213,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
                     <Bar dataKey="ownerPayments" fill="#10b981" name="Owner Payments" />
                     <Bar dataKey="vendorSubPayments" fill="#ef4444" name="Vendor/Sub Payments" />
-                    <Line 
-                      type="monotone" 
-                      dataKey="netDelta" 
-                      stroke="#8b5cf6" 
-                      strokeWidth={3}
-                      name="Net Delta"
-                    />
+                    <Line type="monotone" dataKey="netDelta" stroke="#8b5cf6" strokeWidth={3} name="Net Delta" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -237,21 +237,17 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           {paymentTimingMetrics.averageOwnerDelayDays}
                         </div>
                         <p className="text-sm text-muted-foreground">Days</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Avg Owner Payment Delay
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">Avg Owner Payment Delay</p>
                       </div>
                       <div className="text-center">
                         <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                           {paymentTimingMetrics.averageVendorPaymentLagDays}
                         </div>
                         <p className="text-sm text-muted-foreground">Days</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Avg Vendor Payment Lag
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">Avg Vendor Payment Lag</p>
                       </div>
                     </div>
-                    
+
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                         {paymentTimingMetrics.onTimePaymentRate}%
@@ -279,7 +275,9 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <div>
                         <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Cash Flow Gap</p>
                         <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                          {paymentTimingMetrics.averageOwnerDelayDays - paymentTimingMetrics.averageVendorPaymentLagDays} day gap between receiving owner payments and paying vendors
+                          {paymentTimingMetrics.averageOwnerDelayDays -
+                            paymentTimingMetrics.averageVendorPaymentLagDays}{" "}
+                          day gap between receiving owner payments and paying vendors
                         </p>
                       </div>
                     </div>
@@ -288,16 +286,20 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <div>
                         <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Payment Efficiency</p>
                         <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                          {paymentTimingMetrics.onTimePaymentRate >= 80 ? 'Good' : 'Needs Improvement'} payment performance with {paymentTimingMetrics.onTimePaymentRate}% on-time rate
+                          {paymentTimingMetrics.onTimePaymentRate >= 80 ? "Good" : "Needs Improvement"} payment
+                          performance with {paymentTimingMetrics.onTimePaymentRate}% on-time rate
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <AlertTriangle className="h-5 w-5 text-indigo-600 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Working Capital Impact</p>
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+                          Working Capital Impact
+                        </p>
                         <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                          Payment timing affects working capital by approximately {formatCurrency(workingCapital * 0.15)} monthly
+                          Payment timing affects working capital by approximately{" "}
+                          {formatCurrency(workingCapital * 0.15)} monthly
                         </p>
                       </div>
                     </div>
@@ -331,10 +333,10 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     </thead>
                     <tbody>
                       {ownerVendorComparison.map((row, index) => (
-                        <tr 
-                          key={index} 
+                        <tr
+                          key={index}
                           className={`border-b border-border/50 ${
-                            row.isSignificantSpread ? 'bg-amber-50 dark:bg-amber-950/20' : ''
+                            row.isSignificantSpread ? "bg-amber-50 dark:bg-amber-950/20" : ""
                           }`}
                         >
                           <td className="p-3 font-medium">{row.month}</td>
@@ -344,22 +346,32 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <td className="p-3 text-right text-red-600 dark:text-red-400">
                             {formatCurrency(row.vendorSubPayments)}
                           </td>
-                          <td className={`p-3 text-right font-medium ${
-                            row.netDelta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                          }`}>
-                            {row.netDelta >= 0 ? '+' : ''}{formatCurrency(row.netDelta)}
+                          <td
+                            className={`p-3 text-right font-medium ${
+                              row.netDelta >= 0
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-red-600 dark:text-red-400"
+                            }`}
+                          >
+                            {row.netDelta >= 0 ? "+" : ""}
+                            {formatCurrency(row.netDelta)}
                           </td>
-                          <td className={`p-3 text-right font-medium ${
-                            row.percentVariance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                          }`}>
-                            {row.percentVariance >= 0 ? '+' : ''}{row.percentVariance.toFixed(1)}%
+                          <td
+                            className={`p-3 text-right font-medium ${
+                              row.percentVariance >= 0
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-red-600 dark:text-red-400"
+                            }`}
+                          >
+                            {row.percentVariance >= 0 ? "+" : ""}
+                            {row.percentVariance.toFixed(1)}%
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                
+
                 {/* Summary Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
                   <div className="text-center">
@@ -375,11 +387,13 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <p className="text-sm text-muted-foreground">Total Vendor/Sub Payments</p>
                   </div>
                   <div className="text-center">
-                    <div className={`text-2xl font-bold ${
-                      ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0) >= 0 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
+                    <div
+                      className={`text-2xl font-bold ${
+                        ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0) >= 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
                       {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0))}
                     </div>
                     <p className="text-sm text-muted-foreground">Net Delta</p>
@@ -403,35 +417,29 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]}
                       labelFormatter={(label) => `Month: ${label}`}
                     />
-                    <Area 
-                      type="monotone" 
-                      dataKey="inflows" 
+                    <Area
+                      type="monotone"
+                      dataKey="inflows"
                       stackId="1"
-                      stroke="#10b981" 
-                      fill="#10b981" 
+                      stroke="#10b981"
+                      fill="#10b981"
                       fillOpacity={0.6}
                       name="Inflows"
                     />
-                    <Area 
-                      type="monotone" 
-                      dataKey="outflows" 
+                    <Area
+                      type="monotone"
+                      dataKey="outflows"
                       stackId="2"
-                      stroke="#ef4444" 
-                      fill="#ef4444" 
+                      stroke="#ef4444"
+                      fill="#ef4444"
                       fillOpacity={0.6}
                       name="Outflows"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="net" 
-                      stroke="#3b82f6" 
-                      strokeWidth={3}
-                      name="Net Cash Flow"
-                    />
+                    <Line type="monotone" dataKey="net" stroke="#3b82f6" strokeWidth={3} name="Net Cash Flow" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -453,11 +461,13 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
-                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
-                      <Line 
-                        type="monotone" 
-                        dataKey="workingCapital" 
-                        stroke="#8b5cf6" 
+                      <Tooltip
+                        formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="workingCapital"
+                        stroke="#8b5cf6"
                         strokeWidth={3}
                         name="Working Capital"
                       />
@@ -483,13 +493,14 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                         <Badge variant={cashFlowMargin >= 10 ? "default" : "secondary"}>
                           {cashFlowMargin.toFixed(1)}%
                         </Badge>
-                        {cashFlowMargin >= 10 ? 
-                          <TrendingUp className="h-4 w-4 text-green-600" /> :
+                        {cashFlowMargin >= 10 ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
                           <TrendingDown className="h-4 w-4 text-yellow-600" />
-                        }
+                        )}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Liquidity Ratio</span>
                       <div className="flex items-center gap-2">
@@ -512,7 +523,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
               </Card>
             </div>
           </div>
-        );
+        )
 
       case "inflow":
         return (
@@ -543,7 +554,9 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
+                      <Tooltip
+                        formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]}
+                      />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="mt-4 space-y-2">
@@ -578,12 +591,14 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
-                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
-                      <Area 
-                        type="monotone" 
-                        dataKey="inflows" 
-                        stroke="#10b981" 
-                        fill="#10b981" 
+                      <Tooltip
+                        formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="inflows"
+                        stroke="#10b981"
+                        fill="#10b981"
                         fillOpacity={0.6}
                         name="Inflows"
                       />
@@ -593,7 +608,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
               </Card>
             </div>
           </div>
-        );
+        )
 
       case "outflow":
         return (
@@ -624,7 +639,9 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]} />
+                      <Tooltip
+                        formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(1)}M`, name]}
+                      />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="mt-4 space-y-2">
@@ -659,12 +676,14 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis dataKey="month" />
                       <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`} />
-                      <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
-                      <Area 
-                        type="monotone" 
-                        dataKey="outflows" 
-                        stroke="#ef4444" 
-                        fill="#ef4444" 
+                      <Tooltip
+                        formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="outflows"
+                        stroke="#ef4444"
+                        fill="#ef4444"
                         fillOpacity={0.6}
                         name="Outflows"
                       />
@@ -674,7 +693,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
               </Card>
             </div>
           </div>
-        );
+        )
 
       case "forecast":
         return (
@@ -695,21 +714,15 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
                     <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000000).toFixed(2)}M`, name]} />
-                    <Area 
-                      type="monotone" 
-                      dataKey="cumulative" 
-                      stroke="#8b5cf6" 
-                      fill="#8b5cf6" 
+                    <Area
+                      type="monotone"
+                      dataKey="cumulative"
+                      stroke="#8b5cf6"
+                      fill="#8b5cf6"
                       fillOpacity={0.3}
                       name="Cumulative Cash Flow"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="net" 
-                      stroke="#3b82f6" 
-                      strokeWidth={2}
-                      name="Net Cash Flow"
-                    />
+                    <Line type="monotone" dataKey="net" stroke="#3b82f6" strokeWidth={2} name="Net Cash Flow" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -731,7 +744,15 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       <div key={index} className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-medium">{risk.factor}</span>
-                          <Badge variant={risk.impact === "high" ? "destructive" : risk.impact === "medium" ? "secondary" : "default"}>
+                          <Badge
+                            variant={
+                              risk.impact === "high"
+                                ? "destructive"
+                                : risk.impact === "medium"
+                                ? "secondary"
+                                : "default"
+                            }
+                          >
                             {risk.impact}
                           </Badge>
                         </div>
@@ -762,7 +783,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                       </div>
                       <p className="text-sm text-muted-foreground">Current Accuracy</p>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center">
                         <div className="text-xl font-semibold">
@@ -782,71 +803,143 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
               </Card>
             </div>
           </div>
-        );
+        )
 
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   return (
-    <div className={`space-y-6 ${isFullscreen.cashFlow ? 'fixed inset-0 z-[9999] bg-background p-6 overflow-auto' : ''}`}>
+    <div
+      className={`space-y-6 ${isFullscreen.cashFlow ? "fixed inset-0 z-[9999] bg-background p-6 overflow-auto" : ""}`}
+    >
       {/* Controls Bar */}
       <div className="flex items-center justify-between">
         <ViewToggle />
-        <FullscreenToggle
-          isFullscreen={isFullscreen.cashFlow}
-          onToggle={() => toggleFullscreen('cashFlow')}
-        />
+        <FullscreenToggle isFullscreen={isFullscreen.cashFlow} onToggle={() => toggleFullscreen("cashFlow")} />
       </div>
 
+      {/* HBI Cash Flow Insights - General Analysis */}
+      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
+                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              HBI Cash Flow Insights
+              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                AI-Powered
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
+              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </Button>
+          </CardTitle>
+          {!isInsightsCollapsed && (
+            <CardDescription className="text-gray-600 dark:text-gray-400">
+              AI analysis and strategic recommendations for cash flow management
+            </CardDescription>
+          )}
+        </CardHeader>
+        {!isInsightsCollapsed && (
+          <CardContent className="space-y-4">
+            {/* Key AI Insights */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-orange-800 dark:text-orange-200">
+                  <strong>Liquidity Alert:</strong> Current burn rate of {formatCurrency(advancedMetrics.burnRate)}
+                  /month with {advancedMetrics.daysOfCashOnHand} days cash on hand. Monitor closely for working capital
+                  optimization.
+                </AlertDescription>
+              </Alert>
 
+              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800 dark:text-blue-200">
+                  <strong>Forecast Performance:</strong> {(forecastAccuracy * 100).toFixed(1)}% accuracy with{" "}
+                  {advancedMetrics.forecastAccuracy.trend} trend.
+                  {advancedMetrics.forecastAccuracy.current >= 0.9 ? "Excellent" : "Good"} predictive reliability.
+                </AlertDescription>
+              </Alert>
 
-      {/* Collapsible HBI Intelligence */}
-      <CollapseWrapper
-        title="HBI Cash Flow Intelligence"
-        subtitle="AI-powered cash flow insights and analysis"
-        defaultCollapsed={false}
-      >
-        <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 border-indigo-200 dark:border-indigo-800">
-          <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-indigo-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Liquidity Status</p>
-                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                    Strong liquidity ratio of {advancedMetrics.liquidityRatio} with {advancedMetrics.daysOfCashOnHand} days cash on hand
+              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800 dark:text-green-200">
+                  <strong>Liquidity Position:</strong> Strong liquidity ratio of {advancedMetrics.liquidityRatio}{" "}
+                  indicates healthy cash position.
+                  {advancedMetrics.liquidityRatio >= 3 ? "Excellent" : "Good"} financial stability.
+                </AlertDescription>
+              </Alert>
+            </div>
+
+            {/* Cash Flow Intelligence Summary */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <Bot className="h-4 w-4" />
+                Cash Flow Intelligence
+              </h4>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-sm">Cash Flow Optimization</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    HBI analysis shows {cashFlowMargin >= 10 ? "strong" : "moderate"} cash flow margin of{" "}
+                    {cashFlowMargin.toFixed(1)}%. Net cash flow trending at {formatCurrency(netCashFlow)} with{" "}
+                    {netCashFlow >= 0 ? "positive" : "negative"} momentum.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-sm">Risk Assessment</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {advancedMetrics.riskFactors.filter((r) => r.impact === "high").length} high-impact risks
+                    identified. Payment delays showing{" "}
+                    {(
+                      (advancedMetrics.riskFactors.find((r) => r.factor === "Payment Delays")?.probability || 0) * 100
+                    ).toFixed(0)}
+                    % probability.
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Activity className="h-5 w-5 text-indigo-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Forecast Accuracy</p>
-                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                    {(forecastAccuracy * 100).toFixed(1)}% accuracy with {advancedMetrics.forecastAccuracy.trend} trend
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Banknote className="h-5 w-5 text-indigo-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Burn Rate</p>
-                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
-                    Current burn rate: {formatCurrency(advancedMetrics.burnRate)}/month
-                  </p>
+
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">
+                        Interactive Cash Flow Analysis Available
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Use the view toggles above to explore inflow/outflow patterns, forecast accuracy, and risk factors
+                      for comprehensive cash flow management.
+                    </p>
+                  </div>
+                  <div className="text-2xl">💰</div>
                 </div>
               </div>
             </div>
           </CardContent>
-        </Card>
-      </CollapseWrapper>
-
-
+        )}
+      </Card>
 
       {/* Main Content Area */}
       {renderContent()}
     </div>
-  );
-} 
+  )
+}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
 import { useProjectContext } from "@/context/project-context";
+import { useSearchParams } from "next/navigation";
 import { 
   Calendar, 
   Monitor, 
@@ -56,7 +57,16 @@ interface SchedulerModuleTab {
 export default function SchedulerPage() {
   const { user } = useAuth();
   const { projectId, selectedProject } = useProjectContext();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Handle URL tab parameter for direct navigation
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['overview', 'schedule-monitor', 'health-analysis', 'look-ahead', 'generator'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   // Role-based data filtering helper
   const getProjectScope = () => {

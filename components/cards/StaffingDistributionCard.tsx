@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import staffingData from "@/data/mock/staffing/staffing.json";
 import spcrData from "@/data/mock/staffing/spcr.json";
 
 interface StaffingDistributionCardProps {
+  card?: { id: string; type: string; title: string };
   config?: any;
   span?: { cols: number; rows: number };
   isCompact?: boolean;
@@ -20,12 +21,59 @@ interface StaffingDistributionCardProps {
 }
 
 const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
+  card,
   config = {},
   span = { cols: 8, rows: 6 },
   isCompact = false,
   userRole = "executive"
 }) => {
   const [showDrillDown, setShowDrillDown] = useState(false);
+  
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    if (!card) return;
+    
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'staffing-distribution') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'staffing-distribution',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    if (!card) return;
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'staffing-distribution',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
 
   // Process staffing data by role
   const staffingByRole = staffingData.reduce((acc: any, person: any) => {
@@ -72,51 +120,33 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
   return (
     <div 
       className="relative h-full"
+      data-tour="staffing-distribution-card"
     >
-      {/* Drill Down Button - positioned outside overlay coverage */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowDrillDown(!showDrillDown);
-        }}
-        className={cn(
-          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
-          showDrillDown 
-            ? "bg-orange-600 text-white shadow-md" 
-            : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
-        )}
-      >
-        <Brain className="h-3 w-3" />
-        {showDrillDown ? "Close Analysis" : "Drill Down"}
-      </button>
-
-      <div className="h-full bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 rounded-lg">
-        {/* Empty space for button */}
-        <div className="mb-2"></div>
+      <div className="h-full bg-gray-200 dark:bg-gray-800 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 rounded-lg">
         {/* Header Metrics */}
         <div className="grid grid-cols-4 gap-1 sm:gap-1.5 lg:gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
           <div className="text-center">
-            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900">{staffingData.length}</div>
-            <div className="text-xs text-orange-600">Total Staff</div>
+            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-foreground">{staffingData.length}</div>
+            <div className="text-xs text-muted-foreground">Total Staff</div>
           </div>
           <div className="text-center">
-            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900">{utilizationRate}%</div>
-            <div className="text-xs text-orange-600">Utilization</div>
+            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-foreground">{utilizationRate}%</div>
+            <div className="text-xs text-muted-foreground">Utilization</div>
           </div>
           <div className="text-center">
-            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900">{spcrStats.total}</div>
-            <div className="text-xs text-orange-600">SPCRs Total</div>
+            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-foreground">{spcrStats.total}</div>
+            <div className="text-xs text-muted-foreground">SPCRs Total</div>
           </div>
           <div className="text-center">
-            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-700">{spcrStats.approved || 0}</div>
-            <div className="text-xs text-orange-600">SPCR Approved</div>
+            <div className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-700 dark:text-green-400">{spcrStats.approved || 0}</div>
+            <div className="text-xs text-muted-foreground">SPCR Approved</div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-120px)]">
           {/* Role Distribution Chart */}
-          <div className="bg-white/70 dark:bg-black/70 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-            <h4 className="text-sm font-semibold text-orange-900 mb-2">Staff by Role</h4>
+          <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
+            <h4 className="text-sm font-semibold text-foreground mb-2">Staff by Role</h4>
             <ResponsiveContainer width="100%" height="85%">
               <BarChart data={roleChartData} layout="horizontal">
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -130,8 +160,8 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
           {/* Experience & SPCR Status */}
           <div className="space-y-2">
             {/* Experience Distribution */}
-            <div className="bg-white/70 dark:bg-black/70 rounded-lg p-1.5 sm:p-2 lg:p-2.5 h-1/2">
-              <h4 className="text-sm font-semibold text-orange-900 mb-2">Experience Levels</h4>
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 h-1/2">
+              <h4 className="text-sm font-semibold text-foreground mb-2">Experience Levels</h4>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-foreground">Junior (≤5yr)</span>
@@ -154,8 +184,8 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
             </div>
 
             {/* SPCR Status */}
-            <div className="bg-white/70 dark:bg-black/70 rounded-lg p-1.5 sm:p-2 lg:p-2.5 h-1/2">
-              <h4 className="text-sm font-semibold text-orange-900 mb-2">SPCR Status</h4>
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 h-1/2">
+              <h4 className="text-sm font-semibold text-foreground mb-2">SPCR Status</h4>
               <div className="h-full">
                 <ResponsiveContainer width="100%" height="80%">
                   <PieChart>
@@ -189,8 +219,18 @@ const StaffingDistributionCard: React.FC<StaffingDistributionCardProps> = ({
 
       {/* Click-Based Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
+            {/* Close Button */}
+            <button
+              onClick={handleCloseDrillDown}
+              className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              aria-label="Close drill down"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Staffing Deep Dive Analysis</h3>
             
             <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -42,6 +42,7 @@ import {
 import marketIntelData from "@/data/mock/intel/marketIntel.json";
 
 interface MarketIntelligenceProps {
+  card?: { id: string; type: string; title: string };
   config?: any;
   span?: { cols: number; rows: number };
   isCompact?: boolean;
@@ -60,8 +61,54 @@ const COLORS = {
 
 const MARKET_COLORS = ["hsl(var(--chart-2))", "hsl(var(--chart-5))", "hsl(var(--chart-1))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "#06b6d4"];
 
-export function MarketIntelligence({ config = {}, span, isCompact = false }: MarketIntelligenceProps) {
+export function MarketIntelligence({ card, config = {}, span, isCompact = false }: MarketIntelligenceProps) {
   const [showDrillDown, setShowDrillDown] = useState(false);
+
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    if (!card) return;
+    
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'market-intelligence') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'market-intelligence',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    if (!card) return;
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'market-intelligence',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
   
   const analytics = useMemo(() => {
     // Aggregate market data by type and location
@@ -196,77 +243,59 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
 
   return (
     <div 
-      className="relative h-full overflow-hidden"
+      className="relative h-full"
+      data-tour="market-intelligence-card"
     >
-      {/* Drill Down Button - positioned outside overlay coverage */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowDrillDown(!showDrillDown);
-        }}
-        className={cn(
-          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
-          showDrillDown 
-            ? "bg-indigo-600 text-white shadow-md" 
-            : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
-        )}
-      >
-        <Brain className="h-3 w-3" />
-        {showDrillDown ? "Close Analysis" : "Drill Down"}
-      </button>
+      <div className="h-full flex flex-col bg-transparent overflow-hidden">
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
+          <div className="space-y-6">
+            {/* Key Metrics Row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Avg Market Growth</p>
+                    <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900 dark:text-blue-300">{analytics.avgMarketGrowth.toFixed(1)}%</p>
+                  </div>
+                  <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-purple-700 dark:text-purple-400">Market Share</p>
+                    <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900 dark:text-purple-300">{analytics.avgMarketShare.toFixed(1)}%</p>
+                  </div>
+                  <Target className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-600 dark:text-purple-400" />
+                </div>
+              </div>
+              
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-700 dark:text-green-400">Bid Success Rate</p>
+                    <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900 dark:text-green-300">{analytics.avgBidSuccess.toFixed(0)}%</p>
+                  </div>
+                  <Award className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-orange-700 dark:text-orange-400">Active Markets</p>
+                    <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900 dark:text-orange-300">{analytics.totalMarkets}</p>
+                  </div>
+                  <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-orange-600 dark:text-orange-400" />
+                </div>
+              </div>
+            </div>
 
-      <div className="h-full overflow-y-auto">
-        <div className="p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-6">
-          {/* Empty space for button */}
-          <div></div>
-          {/* Key Metrics Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-700">Avg Market Growth</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900">{analytics.avgMarketGrowth.toFixed(1)}%</p>
-                </div>
-                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/40 dark:to-purple-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-purple-700">Market Share</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900">{analytics.avgMarketShare.toFixed(1)}%</p>
-                </div>
-                <Target className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-600" />
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/40 dark:to-green-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Bid Success Rate</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900">{analytics.avgBidSuccess.toFixed(0)}%</p>
-                </div>
-                <Award className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/40 dark:to-orange-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-orange-700">Active Markets</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900">{analytics.totalMarkets}</p>
-                </div>
-                <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-orange-600" />
-              </div>
-            </div>
-          </div>
-
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            {/* Market Type Performance */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
+              {/* Market Type Performance */}
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Market Performance by Type
@@ -283,14 +312,12 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Growth vs Market Share Scatter */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+              {/* Growth vs Market Share Scatter */}
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-purple-600" />
+                  <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   Growth vs Market Position
                 </h3>
                 <div className="h-64">
@@ -304,20 +331,18 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                     </ScatterChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
 
-          {/* Trends Analysis */}
-          <Card>
-            <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            {/* Trends Analysis */}
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
                 <Zap className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 Market Trends Analysis
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
                 {analytics.topTrends.map((trend, index) => (
-                  <div key={index} className="bg-muted/50 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                  <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                     <div className="flex items-center justify-between mb-1 sm:mb-1.5 lg:mb-2">
                       <h4 className="font-medium text-foreground">{trend.category}</h4>
                       {getTrendIcon(trend.sentiment)}
@@ -351,19 +376,17 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Hot Markets */}
-          <Card>
-            <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            {/* Hot Markets */}
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-red-600 dark:text-red-400" />
                 High-Growth Markets
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
                 {analytics.topLocations.map((location, index) => (
-                  <div key={index} className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border">
+                  <div key={index} className="bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-foreground">{location.city}</h4>
                       <Badge variant="outline" className="text-xs">
@@ -386,12 +409,10 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Market Intelligence Summary */}
-          <Card>
-            <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            {/* Market Intelligence Summary */}
+            <div className="bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium flex items-center gap-2">
                   <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -402,27 +423,27 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                 </Badge>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900">{analytics.avgMarketGrowth.toFixed(1)}%</p>
-                  <p className="text-sm text-blue-700">Average Market Growth</p>
+                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900 dark:text-blue-300">{analytics.avgMarketGrowth.toFixed(1)}%</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-400">Average Market Growth</p>
                 </div>
-                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900">{analytics.avgMarketShare.toFixed(1)}%</p>
-                  <p className="text-sm text-purple-700">Average Market Share</p>
+                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900 dark:text-purple-300">{analytics.avgMarketShare.toFixed(1)}%</p>
+                  <p className="text-sm text-purple-700 dark:text-purple-400">Average Market Share</p>
                 </div>
-                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900">{analytics.avgBidSuccess.toFixed(0)}%</p>
-                  <p className="text-sm text-green-700">Average Bid Success</p>
+                <div className="text-center p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900 dark:text-green-300">{analytics.avgBidSuccess.toFixed(0)}%</p>
+                  <p className="text-sm text-green-700 dark:text-green-400">Average Bid Success</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Click-Based Drill-Down Overlay */}
+      {/* Detailed Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-green-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Market Intelligence Deep Dive</h3>
             
@@ -533,6 +554,16 @@ export function MarketIntelligence({ config = {}, span, isCompact = false }: Mar
                   </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Close Button */}
+            <div className="absolute bottom-4 right-4">
+              <button
+                onClick={handleCloseDrillDown}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

@@ -140,9 +140,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem('hb-demo-user')
+        // Clear all user-specific localStorage data
+        const keysToRemove = [
+          'hb-demo-user',              // User authentication data
+          'selectedProject',           // Selected project
+          'hb-forecast-data',          // Financial forecast data
+          'hb-forecast-acknowledgments', // Forecast acknowledgments
+          'hb-forecast-previous-methods', // Previous forecast methods
+          'hb-tours-completed',        // Completed tours
+          'hb-tour-available'          // Tour availability setting
+        ]
+        
+        // Remove predefined keys
+        keysToRemove.forEach(key => {
+          localStorage.removeItem(key)
+        })
+        
+        // Clear all report configuration data (keys starting with 'report-config-')
+        const allKeys = Object.keys(localStorage)
+        allKeys.forEach(key => {
+          if (key.startsWith('report-config-')) {
+            localStorage.removeItem(key)
+          }
+        })
+        
+        console.log('Cleared all user-specific localStorage data on logout')
       } catch (error) {
-        console.error('Error removing from localStorage:', error)
+        console.error('Error clearing localStorage on logout:', error)
       }
     }
     setUser(null)

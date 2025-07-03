@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -39,6 +39,7 @@ import {
 import pipelineData from "@/data/mock/precon/pipeline.json";
 
 interface PipelineAnalyticsProps {
+  card?: { id: string; type: string; title: string };
   config?: any;
   span?: { cols: number; rows: number };
   isCompact?: boolean;
@@ -56,8 +57,54 @@ const COLORS = {
 
 const STAGE_COLORS = ["hsl(var(--chart-4))", "hsl(var(--chart-3))", "hsl(var(--chart-2))", "hsl(var(--chart-1))"];
 
-export function PipelineAnalytics({ config = {}, span, isCompact = false }: PipelineAnalyticsProps) {
+export function PipelineAnalytics({ card, config = {}, span, isCompact = false }: PipelineAnalyticsProps) {
   const [showDrillDown, setShowDrillDown] = useState(false);
+  
+  // Listen for drill down events from DashboardCardWrapper
+  useEffect(() => {
+    if (!card) return;
+    
+    const handleDrillDownEvent = (event: CustomEvent) => {
+      if (event.detail.cardId === card.id || event.detail.cardType === 'pipeline-analytics') {
+        const shouldShow = event.detail.action === 'show'
+        setShowDrillDown(shouldShow)
+        
+        // Notify wrapper of state change
+        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+          detail: {
+            cardId: card.id,
+            cardType: 'pipeline-analytics',
+            isActive: shouldShow
+          }
+        })
+        window.dispatchEvent(stateEvent)
+      }
+    };
+
+    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
+    };
+  }, [card]);
+
+  // Function to handle closing the drill down overlay
+  const handleCloseDrillDown = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDrillDown(false)
+    
+    if (!card) return;
+    
+    // Notify wrapper that drill down is closed
+    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+      detail: {
+        cardId: card.id,
+        cardType: 'pipeline-analytics',
+        isActive: false
+      }
+    })
+    window.dispatchEvent(stateEvent)
+  }
   
   const analytics = useMemo(() => {
     // Aggregate all pipeline data
@@ -143,66 +190,48 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
 
   return (
     <div 
-      className="relative h-full overflow-hidden"
+      className="relative h-full overflow-hidden bg-gray-200 dark:bg-gray-800"
+      data-tour="pipeline-analytics-card"
     >
-      {/* Drill Down Button - positioned outside overlay coverage */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowDrillDown(!showDrillDown);
-        }}
-        className={cn(
-          "absolute top-2 right-2 z-[70] flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
-          showDrillDown 
-            ? "bg-orange-600 text-white shadow-md" 
-            : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
-        )}
-      >
-        <Brain className="h-3 w-3" />
-        {showDrillDown ? "Close Analysis" : "Drill Down"}
-      </button>
-
       <div className="h-full overflow-y-auto">
         <div className="p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-6">
-          {/* Empty space for button */}
-          <div></div>
           {/* Key Metrics Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-700">Total Pipeline</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900">{formatCurrency(analytics.totalValue)}</p>
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Pipeline</p>
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-blue-900 dark:text-blue-100">{formatCurrency(analytics.totalValue)}</p>
                 </div>
                 <Target className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/40 dark:to-green-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-700">Weighted Value</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900">{formatCurrency(analytics.totalWeightedValue)}</p>
+                  <p className="text-sm font-medium text-green-700 dark:text-green-300">Weighted Value</p>
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-green-900 dark:text-green-100">{formatCurrency(analytics.totalWeightedValue)}</p>
                 </div>
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-green-600 dark:text-green-400" />
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/40 dark:to-purple-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-700">Win Rate</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900">{analytics.winRate.toFixed(1)}%</p>
+                  <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Win Rate</p>
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-purple-900 dark:text-purple-100">{analytics.winRate.toFixed(1)}%</p>
                 </div>
                 <Trophy className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-purple-600" />
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/40 dark:to-orange-900/40 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-700">Active Projects</p>
-                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900">{analytics.projectCount}</p>
+                  <p className="text-sm font-medium text-orange-700 dark:text-orange-300">Active Projects</p>
+                  <p className="text-lg sm:text-xl lg:text-lg sm:text-xl lg:text-2xl font-medium text-orange-900 dark:text-orange-100">{analytics.projectCount}</p>
                 </div>
                 <Building2 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-orange-600" />
               </div>
@@ -212,40 +241,37 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
             {/* Pipeline Funnel */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  Pipeline Stages
-                </h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <FunnelChart>
-                      <Tooltip 
-                        formatter={(value: any, name: string) => [
-                          name === 'value' ? formatCurrency(value) : value,
-                          name === 'value' ? 'Value' : 'Count'
-                        ]}
-                      />
-                      <Funnel
-                        dataKey="value"
-                        data={analytics.funnelData}
-                        isAnimationActive
-                      >
-                        <LabelList position="center" fill="hsl(var(--background))" stroke="none" fontSize={12} />
-                        {analytics.funnelData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Funnel>
-                    </FunnelChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+              <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                Pipeline Stages
+              </h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <FunnelChart>
+                    <Tooltip 
+                      formatter={(value: any, name: string) => [
+                        name === 'value' ? formatCurrency(value) : value,
+                        name === 'value' ? 'Value' : 'Count'
+                      ]}
+                    />
+                    <Funnel
+                      dataKey="value"
+                      data={analytics.funnelData}
+                      isAnimationActive
+                    >
+                      <LabelList position="center" fill="hsl(var(--background))" stroke="none" fontSize={12} />
+                      {analytics.funnelData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Funnel>
+                  </FunnelChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
 
             {/* Division Breakdown */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-purple-600" />
                   Division Analysis
@@ -262,15 +288,13 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+            </div>
           </div>
 
           {/* Win/Loss Analysis */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
             {/* Recent Wins */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                   Recent Wins
@@ -288,36 +312,32 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+            </div>
 
             {/* Recent Losses */}
-            <Card>
-              <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
-                  <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  Recent Losses
-                </h3>
-                <div className="space-y-3">
-                  {analytics.recentLosses.map((loss, index) => (
-                    <div key={index} className="flex items-center justify-between p-1.5 sm:p-2 lg:p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg">
-                      <div>
-                        <p className="font-medium text-foreground">{loss.name}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {loss.division}
-                        </Badge>
-                      </div>
-                      <p className="font-semibold text-red-700">{formatCurrency(loss.value)}</p>
+            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+              <h3 className="text-sm sm:text-base lg:text-lg font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+                Recent Losses
+              </h3>
+              <div className="space-y-3">
+                {analytics.recentLosses.map((loss, index) => (
+                  <div key={index} className="flex items-center justify-between p-1.5 sm:p-2 lg:p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                    <div>
+                      <p className="font-medium text-foreground">{loss.name}</p>
+                      <Badge variant="outline" className="text-xs">
+                        {loss.division}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    <p className="font-semibold text-red-700">{formatCurrency(loss.value)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Conversion Rate Progress */}
-          <Card>
-            <CardContent className="p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+          <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
               <div className="flex items-center justify-between mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
                 <h3 className="text-sm sm:text-base lg:text-lg font-medium flex items-center gap-2">
                   <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -332,15 +352,24 @@ export function PipelineAnalytics({ config = {}, span, isCompact = false }: Pipe
                 <span>Total Pipeline: {formatCurrency(analytics.totalValue)}</span>
                 <span>Weighted Value: {formatCurrency(analytics.totalWeightedValue)}</span>
               </div>
-            </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
 
       {/* Click-Based Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
+            {/* Close Button */}
+            <button
+              onClick={handleCloseDrillDown}
+              className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              aria-label="Close drill down"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Pipeline Deep Analysis</h3>
             
             <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">

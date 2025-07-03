@@ -429,7 +429,7 @@ export const AppHeader = () => {
   // Event handlers with debugging
 
 
-  const { projectId, setProjectId } = useProjectContext()
+  const { projectId, projectName, setProjectId, clearProject } = useProjectContext()
 
   const handleProjectChange = useCallback(
     (projectId: string) => {
@@ -513,9 +513,13 @@ export const AppHeader = () => {
 
   const handleLogout = useCallback(() => {
     console.log("User logging out")
+    // Reset local state
+    setSelectedProject("all")
+    clearProject()
+    // Auth context will handle clearing all localStorage
     logout()
     router.push("/login")
-  }, [logout, router])
+  }, [logout, router, clearProject])
 
   // Close all menus
   const closeAllMenus = useCallback(() => {
@@ -561,15 +565,25 @@ export const AppHeader = () => {
     }
   }, [showProjectMenu, showToolMenu, showUserMenu])
 
-  // Don't load saved project - always start with "Projects" default
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     const savedProject = localStorage.getItem("selectedProject")
-  //     if (savedProject) {
-  //       setSelectedProject(savedProject)
-  //     }
-  //   }
-  // }, [])
+  // Restore saved project selection on mount and sync with context
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedProject = localStorage.getItem("selectedProject")
+      if (savedProject && savedProject !== "all") {
+        console.log("Restoring saved project:", savedProject)
+        setSelectedProject(savedProject)
+        setProjectId(savedProject) // Sync with context
+      }
+    }
+  }, [setProjectId])
+
+  // Sync header state with project context on initial load
+  useEffect(() => {
+    if (projectId && projectId !== "all" && projectId !== selectedProject) {
+      console.log("Syncing header with project context:", projectId)
+      setSelectedProject(projectId)
+    }
+  }, [projectId, selectedProject])
 
   return (
     <>
@@ -622,14 +636,15 @@ export const AppHeader = () => {
                   if (selectedProject === "all") {
                     return "Projects";
                   }
-                  return projects.find((p) => p.id === selectedProject)?.name || "Projects";
+                  // Use project name from context first, fallback to finding in projects array
+                  return projectName || projects.find((p) => p.id === selectedProject)?.name || "Projects";
                 })()}
               </span>
-                              {selectedProject !== "all" && (
-                  <Badge variant="secondary" className="ml-1 border-white/30 bg-white/20 text-xs text-white shadow-sm">
-                    {selectedProject.startsWith('all-') ? 'Stage Filter' : 'Filtered'}
-                  </Badge>
-                )}
+              {selectedProject !== "all" && (
+                <Badge variant="secondary" className="ml-1 border-white/30 bg-white/20 text-xs text-white shadow-sm">
+                  {selectedProject.startsWith('all-') ? 'Stage Filter' : 'Project Active'}
+                </Badge>
+              )}
               <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showProjectMenu ? "rotate-180" : ""}`} />
             </Button>
 
