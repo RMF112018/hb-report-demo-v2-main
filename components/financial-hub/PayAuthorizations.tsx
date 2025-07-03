@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
-import { 
-  CheckCircle, 
-  Clock, 
-  FileText, 
-  AlertTriangle, 
+import React, { useState, useEffect } from "react"
+import {
+  CheckCircle,
+  Clock,
+  FileText,
+  AlertTriangle,
   DollarSign,
   User,
   Calendar,
@@ -20,75 +20,83 @@ import {
   Save,
   X,
   Plus,
-  AlertCircle
-} from "lucide-react";
+  AlertCircle,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  Bot,
+  TrendingUp,
+  Target,
+  Info,
+} from "lucide-react"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageBoard } from "@/app/tools/productivity/components/MessageBoard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { MessageBoard } from "@/app/tools/productivity/components/MessageBoard"
 
 interface PayAuthorizationsProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
 interface PaymentAuthorization {
-  id: string;
-  projectId: string;
-  jobName: string;
-  payAppNumber: number;
-  periodThru: string;
-  dateReceived: string;
-  payAppValue: number;
-  amountReceived: number;
-  balanceDue: number;
-  invoiceNumber?: string;
-  invoicePeriodThru?: string;
-  invoiceDateReceived?: string;
-  invoiceValue?: number;
-  invoiceAmountReceived?: number;
-  invoiceBalanceDue?: number;
-  amountApprovedForPayment: number;
-  status: 'pending' | 'preliminary_approved' | 'final_approved' | 'rejected' | 'paid';
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  projectManager: string;
-  accountingContact: string;
+  id: string
+  projectId: string
+  jobName: string
+  payAppNumber: number
+  periodThru: string
+  dateReceived: string
+  payAppValue: number
+  amountReceived: number
+  balanceDue: number
+  invoiceNumber?: string
+  invoicePeriodThru?: string
+  invoiceDateReceived?: string
+  invoiceValue?: number
+  invoiceAmountReceived?: number
+  invoiceBalanceDue?: number
+  amountApprovedForPayment: number
+  status: "pending" | "preliminary_approved" | "final_approved" | "rejected" | "paid"
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+  projectManager: string
+  accountingContact: string
   compliance: {
-    correctProjectNumbers: boolean;
-    finalReleases: boolean;
-    finalReleasesNotes?: string;
-    timberscanApproved: boolean;
-    certificatesOnFile: boolean;
-    licensesOnFile: boolean;
-    executedPayApplications: boolean;
-  };
-  comments: string;
-  messageThreadId?: string;
+    correctProjectNumbers: boolean
+    finalReleases: boolean
+    finalReleasesNotes?: string
+    timberscanApproved: boolean
+    certificatesOnFile: boolean
+    licensesOnFile: boolean
+    executedPayApplications: boolean
+  }
+  comments: string
+  messageThreadId?: string
   approvalHistory: {
-    step: string;
-    status: string;
-    approvedBy: string;
-    approvedAt: string;
-    notes?: string;
-  }[];
+    step: string
+    status: string
+    approvedBy: string
+    approvedAt: string
+    notes?: string
+  }[]
 }
 
 export default function PayAuthorizations({ userRole, projectData }: PayAuthorizationsProps) {
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'review' | 'details'>('dashboard');
-  const [selectedAuthorization, setSelectedAuthorization] = useState<PaymentAuthorization | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showMessageThread, setShowMessageThread] = useState(false);
+  const [activeView, setActiveView] = useState<"dashboard" | "create" | "review" | "details">("dashboard")
+  const [selectedAuthorization, setSelectedAuthorization] = useState<PaymentAuthorization | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [showMessageThread, setShowMessageThread] = useState(false)
+  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   // Mock data - in real app this would come from API
   const [paymentAuthorizations, setPaymentAuthorizations] = useState<PaymentAuthorization[]>([
@@ -99,11 +107,11 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
       payAppNumber: 25,
       periodThru: "2025-04-30",
       dateReceived: "2025-06-19",
-      payAppValue: 2280257.60,
+      payAppValue: 2280257.6,
       amountReceived: 2280257.58,
       balanceDue: 0.02,
       amountApprovedForPayment: 2033723.98,
-      status: 'pending',
+      status: "pending",
       createdBy: "accounting@company.com",
       createdAt: "2025-06-19T10:00:00Z",
       updatedAt: "2025-06-19T10:00:00Z",
@@ -125,20 +133,20 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           status: "created",
           approvedBy: "Sarah Martinez",
           approvedAt: "2025-06-19T10:00:00Z",
-          notes: "Payment authorization created for Pay App #25"
-        }
-      ]
-    }
-  ]);
+          notes: "Payment authorization created for Pay App #25",
+        },
+      ],
+    },
+  ])
 
   const getPayAuthData = () => {
-    const pending = paymentAuthorizations.filter(p => p.status === 'pending').length;
-    const preliminaryApproved = paymentAuthorizations.filter(p => p.status === 'preliminary_approved').length;
-    const finalApproved = paymentAuthorizations.filter(p => p.status === 'final_approved').length;
-    const totalValue = paymentAuthorizations.reduce((sum, p) => sum + p.amountApprovedForPayment, 0);
+    const pending = paymentAuthorizations.filter((p) => p.status === "pending").length
+    const preliminaryApproved = paymentAuthorizations.filter((p) => p.status === "preliminary_approved").length
+    const finalApproved = paymentAuthorizations.filter((p) => p.status === "final_approved").length
+    const totalValue = paymentAuthorizations.reduce((sum, p) => sum + p.amountApprovedForPayment, 0)
     const pendingValue = paymentAuthorizations
-      .filter(p => p.status === 'pending' || p.status === 'preliminary_approved')
-      .reduce((sum, p) => sum + p.amountApprovedForPayment, 0);
+      .filter((p) => p.status === "pending" || p.status === "preliminary_approved")
+      .reduce((sum, p) => sum + p.amountApprovedForPayment, 0)
 
     return {
       pendingApprovals: pending,
@@ -146,83 +154,96 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
       finalApproved,
       totalRequests: paymentAuthorizations.length,
       approvedAmount: totalValue - pendingValue,
-      pendingAmount: pendingValue
-    };
-  };
+      pendingAmount: pendingValue,
+    }
+  }
 
-  const data = getPayAuthData();
+  const data = getPayAuthData()
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+  }
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      'pending': { label: 'Pending Review', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' },
-      'preliminary_approved': { label: 'Preliminary Approved', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
-      'final_approved': { label: 'Final Approved', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
-      'rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
-      'paid': { label: 'Paid', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300' }
-    };
+      pending: {
+        label: "Pending Review",
+        color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      },
+      preliminary_approved: {
+        label: "Preliminary Approved",
+        color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      },
+      final_approved: {
+        label: "Final Approved",
+        color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      },
+      rejected: { label: "Rejected", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" },
+      paid: { label: "Paid", color: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300" },
+    }
 
-    const config = statusConfig[status as keyof typeof statusConfig];
-    return (
-      <Badge className={`${config.color} border-0`}>
-        {config.label}
-      </Badge>
-    );
-  };
+    const config = statusConfig[status as keyof typeof statusConfig]
+    return <Badge className={`${config.color} border-0`}>{config.label}</Badge>
+  }
 
   const getWorkflowStep = (status: string) => {
     const steps = {
-      'pending': 1,
-      'preliminary_approved': 2,
-      'final_approved': 3,
-      'paid': 4
-    };
-    return steps[status as keyof typeof steps] || 1;
-  };
+      pending: 1,
+      preliminary_approved: 2,
+      final_approved: 3,
+      paid: 4,
+    }
+    return steps[status as keyof typeof steps] || 1
+  }
 
-  const ComplianceChecklistCard = ({ authorization, onUpdate }: { authorization: PaymentAuthorization, onUpdate: (updated: PaymentAuthorization) => void }) => {
-    const [localCompliance, setLocalCompliance] = useState(authorization.compliance);
-    const [notes, setNotes] = useState(authorization.compliance.finalReleasesNotes || '');
+  const ComplianceChecklistCard = ({
+    authorization,
+    onUpdate,
+  }: {
+    authorization: PaymentAuthorization
+    onUpdate: (updated: PaymentAuthorization) => void
+  }) => {
+    const [localCompliance, setLocalCompliance] = useState(authorization.compliance)
+    const [notes, setNotes] = useState(authorization.compliance.finalReleasesNotes || "")
 
     const handleComplianceChange = (field: keyof typeof localCompliance, value: boolean) => {
-      const updatedCompliance = { ...localCompliance, [field]: value };
-      setLocalCompliance(updatedCompliance);
-      
+      const updatedCompliance = { ...localCompliance, [field]: value }
+      setLocalCompliance(updatedCompliance)
+
       const updatedAuth = {
         ...authorization,
         compliance: updatedCompliance,
-        updatedAt: new Date().toISOString()
-      };
-      onUpdate(updatedAuth);
-    };
+        updatedAt: new Date().toISOString(),
+      }
+      onUpdate(updatedAuth)
+    }
 
     const handleNotesChange = (value: string) => {
-      setNotes(value);
+      setNotes(value)
       const updatedAuth = {
         ...authorization,
         compliance: { ...localCompliance, finalReleasesNotes: value },
-        updatedAt: new Date().toISOString()
-      };
-      onUpdate(updatedAuth);
-    };
+        updatedAt: new Date().toISOString(),
+      }
+      onUpdate(updatedAuth)
+    }
 
-    const allCompleted = Object.values(localCompliance).filter(v => typeof v === 'boolean').every(Boolean);
+    const allCompleted = Object.values(localCompliance)
+      .filter((v) => typeof v === "boolean")
+      .every(Boolean)
 
     return (
       <Card className="mt-6">
@@ -231,9 +252,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             <CheckSquare className="h-5 w-5" />
             TIMBERSCAN Compliance Verification
           </CardTitle>
-          <CardDescription>
-            Complete all items to avoid payment delays
-          </CardDescription>
+          <CardDescription>Complete all items to avoid payment delays</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!allCompleted && (
@@ -250,8 +269,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               <Checkbox
                 id="correctProjectNumbers"
                 checked={localCompliance.correctProjectNumbers}
-                onCheckedChange={(checked) => handleComplianceChange('correctProjectNumbers', checked as boolean)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                onCheckedChange={(checked) => handleComplianceChange("correctProjectNumbers", checked as boolean)}
+                disabled={!isEditing && userRole !== "project-manager"}
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="correctProjectNumbers" className="text-sm font-medium">
@@ -265,8 +284,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 <Checkbox
                   id="finalReleases"
                   checked={localCompliance.finalReleases}
-                  onCheckedChange={(checked) => handleComplianceChange('finalReleases', checked as boolean)}
-                  disabled={!isEditing && userRole !== 'project-manager'}
+                  onCheckedChange={(checked) => handleComplianceChange("finalReleases", checked as boolean)}
+                  disabled={!isEditing && userRole !== "project-manager"}
                 />
                 <div className="grid gap-1.5 leading-none">
                   <Label htmlFor="finalReleases" className="text-sm font-medium">
@@ -278,7 +297,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 placeholder="Enter details about final releases needed..."
                 value={notes}
                 onChange={(e) => handleNotesChange(e.target.value)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                disabled={!isEditing && userRole !== "project-manager"}
                 className="mt-2"
               />
             </div>
@@ -287,12 +306,14 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               <Checkbox
                 id="timberscanApproved"
                 checked={localCompliance.timberscanApproved}
-                onCheckedChange={(checked) => handleComplianceChange('timberscanApproved', checked as boolean)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                onCheckedChange={(checked) => handleComplianceChange("timberscanApproved", checked as boolean)}
+                disabled={!isEditing && userRole !== "project-manager"}
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="timberscanApproved" className="text-sm font-medium">
-                  Please confirm that ANY TIMBERSCAN items selected and/or items attached for payment for this funding have been APPROVED through TIMBERSCAN. The check run will occur AFTER ALL items have been approved and posted to Sage.
+                  Please confirm that ANY TIMBERSCAN items selected and/or items attached for payment for this funding
+                  have been APPROVED through TIMBERSCAN. The check run will occur AFTER ALL items have been approved and
+                  posted to Sage.
                 </Label>
               </div>
             </div>
@@ -301,12 +322,13 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               <Checkbox
                 id="certificatesOnFile"
                 checked={localCompliance.certificatesOnFile}
-                onCheckedChange={(checked) => handleComplianceChange('certificatesOnFile', checked as boolean)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                onCheckedChange={(checked) => handleComplianceChange("certificatesOnFile", checked as boolean)}
+                disabled={!isEditing && userRole !== "project-manager"}
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="certificatesOnFile" className="text-sm font-medium">
-                  Please confirm that you have CURRENT CERTIFICATES OF INSURANCE ON FILE for all payees for this check run.
+                  Please confirm that you have CURRENT CERTIFICATES OF INSURANCE ON FILE for all payees for this check
+                  run.
                 </Label>
               </div>
             </div>
@@ -315,8 +337,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               <Checkbox
                 id="licensesOnFile"
                 checked={localCompliance.licensesOnFile}
-                onCheckedChange={(checked) => handleComplianceChange('licensesOnFile', checked as boolean)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                onCheckedChange={(checked) => handleComplianceChange("licensesOnFile", checked as boolean)}
+                disabled={!isEditing && userRole !== "project-manager"}
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="licensesOnFile" className="text-sm font-medium">
@@ -329,8 +351,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               <Checkbox
                 id="executedPayApplications"
                 checked={localCompliance.executedPayApplications}
-                onCheckedChange={(checked) => handleComplianceChange('executedPayApplications', checked as boolean)}
-                disabled={!isEditing && userRole !== 'project-manager'}
+                onCheckedChange={(checked) => handleComplianceChange("executedPayApplications", checked as boolean)}
+                disabled={!isEditing && userRole !== "project-manager"}
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="executedPayApplications" className="text-sm font-medium">
@@ -350,17 +372,23 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           )}
         </CardContent>
       </Card>
-    );
-  };
+    )
+  }
 
-  const PaymentDetailsForm = ({ authorization, onUpdate }: { authorization: PaymentAuthorization, onUpdate: (updated: PaymentAuthorization) => void }) => {
-    const [formData, setFormData] = useState(authorization);
+  const PaymentDetailsForm = ({
+    authorization,
+    onUpdate,
+  }: {
+    authorization: PaymentAuthorization
+    onUpdate: (updated: PaymentAuthorization) => void
+  }) => {
+    const [formData, setFormData] = useState(authorization)
 
     const handleInputChange = (field: string, value: any) => {
-      const updated = { ...formData, [field]: value, updatedAt: new Date().toISOString() };
-      setFormData(updated);
-      onUpdate(updated);
-    };
+      const updated = { ...formData, [field]: value, updatedAt: new Date().toISOString() }
+      setFormData(updated)
+      onUpdate(updated)
+    }
 
     return (
       <Card>
@@ -377,7 +405,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                   <Input
                     id="projectId"
                     value={formData.projectId}
-                    onChange={(e) => handleInputChange('projectId', e.target.value)}
+                    onChange={(e) => handleInputChange("projectId", e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
@@ -387,7 +415,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     id="payAppNumber"
                     type="number"
                     value={formData.payAppNumber}
-                    onChange={(e) => handleInputChange('payAppNumber', parseInt(e.target.value))}
+                    onChange={(e) => handleInputChange("payAppNumber", parseInt(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -400,7 +428,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     id="periodThru"
                     type="date"
                     value={formData.periodThru}
-                    onChange={(e) => handleInputChange('periodThru', e.target.value)}
+                    onChange={(e) => handleInputChange("periodThru", e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
@@ -410,7 +438,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     id="dateReceived"
                     type="date"
                     value={formData.dateReceived}
-                    onChange={(e) => handleInputChange('dateReceived', e.target.value)}
+                    onChange={(e) => handleInputChange("dateReceived", e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
@@ -424,7 +452,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     type="number"
                     step="0.01"
                     value={formData.payAppValue}
-                    onChange={(e) => handleInputChange('payAppValue', parseFloat(e.target.value))}
+                    onChange={(e) => handleInputChange("payAppValue", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -435,7 +463,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     type="number"
                     step="0.01"
                     value={formData.amountReceived}
-                    onChange={(e) => handleInputChange('amountReceived', parseFloat(e.target.value))}
+                    onChange={(e) => handleInputChange("amountReceived", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -446,7 +474,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     type="number"
                     step="0.01"
                     value={formData.balanceDue}
-                    onChange={(e) => handleInputChange('balanceDue', parseFloat(e.target.value))}
+                    onChange={(e) => handleInputChange("balanceDue", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -459,8 +487,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                   <Label htmlFor="invoiceNumber">INVOICE #</Label>
                   <Input
                     id="invoiceNumber"
-                    value={formData.invoiceNumber || ''}
-                    onChange={(e) => handleInputChange('invoiceNumber', e.target.value)}
+                    value={formData.invoiceNumber || ""}
+                    onChange={(e) => handleInputChange("invoiceNumber", e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
@@ -469,8 +497,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                   <Input
                     id="invoicePeriodThru"
                     type="date"
-                    value={formData.invoicePeriodThru || ''}
-                    onChange={(e) => handleInputChange('invoicePeriodThru', e.target.value)}
+                    value={formData.invoicePeriodThru || ""}
+                    onChange={(e) => handleInputChange("invoicePeriodThru", e.target.value)}
                     disabled={!isEditing}
                   />
                 </div>
@@ -481,8 +509,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 <Input
                   id="invoiceDateReceived"
                   type="date"
-                  value={formData.invoiceDateReceived || ''}
-                  onChange={(e) => handleInputChange('invoiceDateReceived', e.target.value)}
+                  value={formData.invoiceDateReceived || ""}
+                  onChange={(e) => handleInputChange("invoiceDateReceived", e.target.value)}
                   disabled={!isEditing}
                 />
               </div>
@@ -494,8 +522,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     id="invoiceValue"
                     type="number"
                     step="0.01"
-                    value={formData.invoiceValue || ''}
-                    onChange={(e) => handleInputChange('invoiceValue', parseFloat(e.target.value))}
+                    value={formData.invoiceValue || ""}
+                    onChange={(e) => handleInputChange("invoiceValue", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -505,8 +533,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     id="invoiceAmountReceived"
                     type="number"
                     step="0.01"
-                    value={formData.invoiceAmountReceived || ''}
-                    onChange={(e) => handleInputChange('invoiceAmountReceived', parseFloat(e.target.value))}
+                    value={formData.invoiceAmountReceived || ""}
+                    onChange={(e) => handleInputChange("invoiceAmountReceived", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -517,7 +545,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     type="number"
                     step="0.01"
                     value={formData.invoiceBalanceDue || 0}
-                    onChange={(e) => handleInputChange('invoiceBalanceDue', parseFloat(e.target.value))}
+                    onChange={(e) => handleInputChange("invoiceBalanceDue", parseFloat(e.target.value))}
                     disabled={!isEditing}
                   />
                 </div>
@@ -528,7 +556,10 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           <Separator />
 
           <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            <Label htmlFor="amountApprovedForPayment" className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+            <Label
+              htmlFor="amountApprovedForPayment"
+              className="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+            >
               Amount Approved for Payment:
             </Label>
             <div className="mt-2">
@@ -537,7 +568,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 type="number"
                 step="0.01"
                 value={formData.amountApprovedForPayment}
-                onChange={(e) => handleInputChange('amountApprovedForPayment', parseFloat(e.target.value))}
+                onChange={(e) => handleInputChange("amountApprovedForPayment", parseFloat(e.target.value))}
                 disabled={!isEditing}
                 className="text-lg font-semibold bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700"
               />
@@ -548,17 +579,17 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           </div>
         </CardContent>
       </Card>
-    );
-  };
+    )
+  }
 
   const WorkflowProgress = ({ authorization }: { authorization: PaymentAuthorization }) => {
-    const currentStep = getWorkflowStep(authorization.status);
+    const currentStep = getWorkflowStep(authorization.status)
     const steps = [
-      { id: 1, name: 'Created', description: 'Payment authorization created' },
-      { id: 2, name: 'Under Review', description: 'Project Manager reviewing' },
-      { id: 3, name: 'Approved', description: 'Ready for payment' },
-      { id: 4, name: 'Paid', description: 'Payment released' }
-    ];
+      { id: 1, name: "Created", description: "Payment authorization created" },
+      { id: 2, name: "Under Review", description: "Project Manager reviewing" },
+      { id: 3, name: "Approved", description: "Ready for payment" },
+      { id: 4, name: "Paid", description: "Payment released" },
+    ]
 
     return (
       <Card>
@@ -569,17 +600,21 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           <div className="space-y-4">
             {steps.map((step) => (
               <div key={step.id} className="flex items-center space-x-4">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step.id <= currentStep 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-                    : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-                }`}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    step.id <= currentStep
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                      : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                  }`}
+                >
                   {step.id <= currentStep ? <CheckCircle className="w-4 h-4" /> : step.id}
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium ${
-                    step.id <= currentStep ? 'text-green-800 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'
-                  }`}>
+                  <p
+                    className={`text-sm font-medium ${
+                      step.id <= currentStep ? "text-green-800 dark:text-green-300" : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
                     {step.name}
                   </p>
                   <p className="text-xs text-muted-foreground">{step.description}</p>
@@ -589,51 +624,49 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           </div>
         </CardContent>
       </Card>
-    );
-  };
+    )
+  }
 
   const handleUpdateAuthorization = (updated: PaymentAuthorization) => {
-    setPaymentAuthorizations(prev => 
-      prev.map(auth => auth.id === updated.id ? updated : auth)
-    );
-    setSelectedAuthorization(updated);
-  };
+    setPaymentAuthorizations((prev) => prev.map((auth) => (auth.id === updated.id ? updated : auth)))
+    setSelectedAuthorization(updated)
+  }
 
-  const handleApprovalAction = (action: 'preliminary_approve' | 'final_approve' | 'reject') => {
-    if (!selectedAuthorization) return;
+  const handleApprovalAction = (action: "preliminary_approve" | "final_approve" | "reject") => {
+    if (!selectedAuthorization) return
 
     const statusMap = {
-      'preliminary_approve': 'preliminary_approved',
-      'final_approve': 'final_approved',
-      'reject': 'rejected'
-    };
+      preliminary_approve: "preliminary_approved",
+      final_approve: "final_approved",
+      reject: "rejected",
+    }
 
     const updatedAuth = {
       ...selectedAuthorization,
-      status: statusMap[action] as PaymentAuthorization['status'],
+      status: statusMap[action] as PaymentAuthorization["status"],
       updatedAt: new Date().toISOString(),
       approvalHistory: [
         ...selectedAuthorization.approvalHistory,
         {
-          step: action.replace('_', ' '),
+          step: action.replace("_", " "),
           status: statusMap[action],
           approvedBy: userRole,
           approvedAt: new Date().toISOString(),
-          notes: `Payment ${action.replace('_', ' ')} by ${userRole}`
-        }
-      ]
-    };
+          notes: `Payment ${action.replace("_", " ")} by ${userRole}`,
+        },
+      ],
+    }
 
-    handleUpdateAuthorization(updatedAuth);
-    setIsEditing(false);
-  };
+    handleUpdateAuthorization(updatedAuth)
+    setIsEditing(false)
+  }
 
-  if (activeView === 'details' && selectedAuthorization) {
+  if (activeView === "details" && selectedAuthorization) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <Button variant="ghost" onClick={() => setActiveView('dashboard')} className="mb-4">
+            <Button variant="ghost" onClick={() => setActiveView("dashboard")} className="mb-4">
               ← Back to Dashboard
             </Button>
             <div className="flex items-center gap-4">
@@ -642,7 +675,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {!isEditing && userRole === 'project-manager' && (
+            {!isEditing && userRole === "project-manager" && (
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit
@@ -660,10 +693,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 </Button>
               </>
             )}
-            <Button 
-              variant="outline" 
-              onClick={() => setShowMessageThread(!showMessageThread)}
-            >
+            <Button variant="outline" onClick={() => setShowMessageThread(!showMessageThread)}>
               <MessageSquare className="w-4 h-4 mr-2" />
               Comments
             </Button>
@@ -672,34 +702,25 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <PaymentDetailsForm 
-              authorization={selectedAuthorization} 
-              onUpdate={handleUpdateAuthorization}
-            />
-            
-            <ComplianceChecklistCard 
-              authorization={selectedAuthorization} 
-              onUpdate={handleUpdateAuthorization}
-            />
+            <PaymentDetailsForm authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
 
-            {userRole === 'project-manager' && selectedAuthorization.status === 'pending' && (
+            <ComplianceChecklistCard authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
+
+            {userRole === "project-manager" && selectedAuthorization.status === "pending" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Project Manager Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
-                    <Button 
-                      onClick={() => handleApprovalAction('preliminary_approve')}
+                    <Button
+                      onClick={() => handleApprovalAction("preliminary_approve")}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Preliminary Approval
                     </Button>
-                    <Button 
-                      variant="destructive"
-                      onClick={() => handleApprovalAction('reject')}
-                    >
+                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")}>
                       <X className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
@@ -708,7 +729,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               </Card>
             )}
 
-            {userRole === 'project-manager' && selectedAuthorization.status === 'preliminary_approved' && (
+            {userRole === "project-manager" && selectedAuthorization.status === "preliminary_approved" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Final Authorization</CardTitle>
@@ -718,17 +739,14 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
-                    <Button 
-                      onClick={() => handleApprovalAction('final_approve')}
+                    <Button
+                      onClick={() => handleApprovalAction("final_approve")}
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Final Approval
                     </Button>
-                    <Button 
-                      variant="destructive"
-                      onClick={() => handleApprovalAction('reject')}
-                    >
+                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")}>
                       <X className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
@@ -740,7 +758,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
           <div className="space-y-6">
             <WorkflowProgress authorization={selectedAuthorization} />
-            
+
             {showMessageThread && (
               <Card>
                 <CardHeader>
@@ -748,10 +766,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="h-96">
-                    <MessageBoard 
-                      selectedThreadId={selectedAuthorization.messageThreadId}
-                      className="h-full"
-                    />
+                    <MessageBoard selectedThreadId={selectedAuthorization.messageThreadId} className="h-full" />
                   </div>
                 </CardContent>
               </Card>
@@ -759,11 +774,119 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-6">
+      {/* HBI Accounts Payable Insights */}
+      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
+                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              HBI Accounts Payable Insights
+              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                AI-Powered
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
+              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </Button>
+          </CardTitle>
+          {!isInsightsCollapsed && (
+            <CardDescription className="text-gray-600 dark:text-gray-400">
+              AI-powered analysis and strategic recommendations for payment authorization workflow
+            </CardDescription>
+          )}
+        </CardHeader>
+        {!isInsightsCollapsed && (
+          <CardContent className="space-y-4">
+            {/* Key AI Insights */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+                <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-orange-800 dark:text-orange-200">
+                  <strong>Compliance Risk Alert:</strong> {data.pendingApprovals} payment authorizations require
+                  immediate attention to avoid payment delays.
+                </AlertDescription>
+              </Alert>
+
+              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800 dark:text-blue-200">
+                  <strong>Cash Flow Optimization:</strong> {formatCurrency(data.pendingAmount)} in pending
+                  authorizations can improve cash flow by 12% if processed this week.
+                </AlertDescription>
+              </Alert>
+
+              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800 dark:text-green-200">
+                  <strong>Process Efficiency:</strong> TIMBERSCAN integration showing 89% compliance rate with automated
+                  verification reducing processing time by 40%.
+                </AlertDescription>
+              </Alert>
+            </div>
+
+            {/* Payment Intelligence Summary */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <Bot className="h-4 w-4" />
+                Payment Authorization Intelligence
+              </h4>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-sm">Workflow Optimization</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    HBI identified potential 2.3-day reduction in payment processing time through automated compliance
+                    verification and parallel approval workflows.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-sm">Risk Mitigation</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Predictive analysis shows 94% reduction in payment delays through proactive compliance monitoring
+                    and early stakeholder notification.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">Smart Payment Prioritization</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      AI-powered ranking system prioritizes payment authorizations based on cash flow impact, vendor
+                      relationships, and project criticality.
+                    </p>
+                  </div>
+                  <div className="text-2xl">💰</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
       {/* Dashboard Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
@@ -794,7 +917,9 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(data.approvedAmount)}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {formatCurrency(data.approvedAmount)}
+            </div>
             <div className="text-xs text-muted-foreground">This period</div>
           </CardContent>
         </Card>
@@ -805,7 +930,9 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{formatCurrency(data.pendingAmount)}</div>
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+              {formatCurrency(data.pendingAmount)}
+            </div>
             <div className="text-xs text-muted-foreground">Requires authorization</div>
           </CardContent>
         </Card>
@@ -817,11 +944,9 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Payment Authorizations</CardTitle>
-              <CardDescription>
-                Manage payment approvals and workflow
-              </CardDescription>
+              <CardDescription>Manage payment approvals and workflow</CardDescription>
             </div>
-            <Button onClick={() => setActiveView('create')}>
+            <Button onClick={() => setActiveView("create")}>
               <Plus className="w-4 h-4 mr-2" />
               New Authorization
             </Button>
@@ -834,14 +959,16 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 key={auth.id}
                 className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
                 onClick={() => {
-                  setSelectedAuthorization(auth);
-                  setActiveView('details');
+                  setSelectedAuthorization(auth)
+                  setActiveView("details")
                 }}
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium">{auth.id} - Pay App #{auth.payAppNumber}</h4>
+                      <h4 className="font-medium">
+                        {auth.id} - Pay App #{auth.payAppNumber}
+                      </h4>
                       {getStatusBadge(auth.status)}
                     </div>
                     <p className="text-sm text-muted-foreground">{auth.jobName}</p>
@@ -860,5 +987,5 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
         </CardContent>
       </Card>
     </div>
-  );
-} 
+  )
+}

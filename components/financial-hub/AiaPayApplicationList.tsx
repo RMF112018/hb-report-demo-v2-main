@@ -7,16 +7,22 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Eye, Edit, Download, Send, Search } from "lucide-react"
+import { Eye, Edit, Download, Send, Search, Plus } from "lucide-react"
 import type { AiaPayApplication } from "@/types/aia-pay-application"
 
 interface AiaPayApplicationListProps {
   applications: AiaPayApplication[]
   onSelectApplication: (application: AiaPayApplication) => void
+  onCreateApplication: () => void
   onRefresh: () => void
 }
 
-export function AiaPayApplicationList({ applications, onSelectApplication, onRefresh }: AiaPayApplicationListProps) {
+export function AiaPayApplicationList({
+  applications,
+  onSelectApplication,
+  onCreateApplication,
+  onRefresh,
+}: AiaPayApplicationListProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("applicationNumber")
@@ -126,9 +132,19 @@ export function AiaPayApplicationList({ applications, onSelectApplication, onRef
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-foreground">Pay Applications</CardTitle>
-          <Button onClick={onRefresh} variant="outline" size="sm">
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={onCreateApplication}
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+              data-tour="pay-app-create-button"
+            >
+              <Plus className="h-4 w-4" />
+              New Application
+            </Button>
+            <Button onClick={onRefresh} variant="outline" size="sm">
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -193,11 +209,15 @@ export function AiaPayApplicationList({ applications, onSelectApplication, onRef
                   <TableCell className="font-medium text-foreground">#{application.applicationNumber}</TableCell>
                   <TableCell className="text-foreground">{formatDate(application.periodEndDate)}</TableCell>
                   <TableCell className="text-foreground">{application.contractorName}</TableCell>
-                  <TableCell className="text-right font-medium text-foreground">{formatCurrency(application.netAmountDue)}</TableCell>
+                  <TableCell className="text-right font-medium text-foreground">
+                    {formatCurrency(application.netAmountDue)}
+                  </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(application.status)}>{getStatusLabel(application.status)}</Badge>
                   </TableCell>
-                  <TableCell className="text-foreground">{application.submittedDate ? formatDate(application.submittedDate) : "-"}</TableCell>
+                  <TableCell className="text-foreground">
+                    {application.submittedDate ? formatDate(application.submittedDate) : "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
@@ -259,4 +279,4 @@ export function AiaPayApplicationList({ applications, onSelectApplication, onRef
       </CardContent>
     </Card>
   )
-} 
+}
