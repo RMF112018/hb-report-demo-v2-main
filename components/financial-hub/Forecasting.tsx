@@ -830,10 +830,15 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       >
         <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
         <span className="text-xs">
-          {isWeight 
-            ? value <= 3 ? "Front-Loaded" : value >= 8 ? "Back-Loaded" : "Even"
-            : type === "number" && typeof value === "number" ? formatCurrency(value) : value
-          }
+          {isWeight
+            ? value <= 3
+              ? "Front-Loaded"
+              : value >= 8
+              ? "Back-Loaded"
+              : "Even"
+            : type === "number" && typeof value === "number"
+            ? formatCurrency(value)
+            : value}
         </span>
       </div>
     )
@@ -1000,10 +1005,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                 <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </div>
               HBI Forecast Insights
-              <Badge
-                variant="secondary"
-                className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              >
+              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                 AI-Powered
               </Badge>
             </div>
@@ -1128,15 +1130,15 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               <Calendar className="h-5 w-5 text-indigo-600" />
               {activeTable === "gcgr" ? "GC & GR" : "Draw"} Forecast Table
             </div>
-                          <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="flex items-center"
-                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              >
-                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-              </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="flex items-center"
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+            >
+              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+            </Button>
           </CardTitle>
           <CardDescription>
             Interactive forecasting with monthly distribution and AI-powered predictions
@@ -1254,8 +1256,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             </table>
           </div>
         </CardContent>
-        </Card>
-      )}
+      </Card>
 
       {/* HBI AI Chat Interface - Interactive */}
       <Dialog open={showHBIChat} onOpenChange={handleModalClose}>
