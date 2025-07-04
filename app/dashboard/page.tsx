@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import React from "react";
-import { useAuth } from "@/context/auth-context";
-import { useTour } from "@/context/tour-context";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { DashboardLayout as DashboardLayoutComponent } from "@/components/dashboard/DashboardLayout";
-import { DashboardProvider, useDashboardContext } from "@/context/dashboard-context";
-import type { DashboardCard, DashboardLayout } from "@/types/dashboard";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import React from "react"
+import { useAuth } from "@/context/auth-context"
+import { useTour } from "@/context/tour-context"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, useRef } from "react"
+import { DashboardLayout as DashboardLayoutComponent } from "@/components/dashboard/DashboardLayout"
+import { DashboardProvider, useDashboardContext } from "@/context/dashboard-context"
+import type { DashboardCard, DashboardLayout } from "@/types/dashboard"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,13 +18,24 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Plus, ChevronDown, LayoutDashboard, Layout, Maximize2, Minimize2, Home, RefreshCw, EllipsisVertical, ChevronRight } from "lucide-react";
-import { AppHeader } from "@/components/layout/app-header";
+} from "@/components/ui/breadcrumb"
+import {
+  Plus,
+  ChevronDown,
+  LayoutDashboard,
+  Layout,
+  Maximize2,
+  Minimize2,
+  Home,
+  RefreshCw,
+  EllipsisVertical,
+  ChevronRight,
+} from "lucide-react"
+import { AppHeader } from "@/components/layout/app-header"
 
 // Mock data imports for cards
-import projectsData from "@/data/mock/projects.json";
-import cashFlowData from "@/data/mock/financial/cash-flow.json";
+import projectsData from "@/data/mock/projects.json"
+import cashFlowData from "@/data/mock/financial/cash-flow.json"
 
 /**
  * Modern Dashboard Page
@@ -38,188 +49,218 @@ import cashFlowData from "@/data/mock/financial/cash-flow.json";
  */
 
 function DashboardContent({ user }: { user: any }) {
-  const {
-    dashboards,
-    currentDashboardId,
-    setCurrentDashboardId,
-    updateDashboard,
-    loading,
-  } = useDashboardContext();
-  const { startTour, isTourAvailable } = useTour();
-  const [isEditing, setIsEditing] = useState(false);
-  const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [dashboardViewSubmenuOpen, setDashboardViewSubmenuOpen] = useState(false);
-  const [comingSoonPopoverOpen, setComingSoonPopoverOpen] = useState(false);
-  const ellipsisButtonRef = useRef<HTMLButtonElement>(null);
+  const { dashboards, currentDashboardId, setCurrentDashboardId, updateDashboard, loading } = useDashboardContext()
+  const { startTour, isTourAvailable } = useTour()
+  const [isEditing, setIsEditing] = useState(false)
+  const [layoutDensity, setLayoutDensity] = useState<"compact" | "normal" | "spacious">("normal")
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [dashboardViewSubmenuOpen, setDashboardViewSubmenuOpen] = useState(false)
+  const [comingSoonPopoverOpen, setComingSoonPopoverOpen] = useState(false)
+  const ellipsisButtonRef = useRef<HTMLButtonElement>(null)
 
-  const currentDashboard = dashboards.find(d => d.id === currentDashboardId);
+  const currentDashboard = dashboards.find((d) => d.id === currentDashboardId)
 
   // Auto-start dashboard tour for new visitors
   useEffect(() => {
-    if (typeof window !== 'undefined' && user && isTourAvailable) {
+    if (typeof window !== "undefined" && user && isTourAvailable) {
       // Check if user has disabled tours permanently
-      const hasDisabledTours = localStorage.getItem('hb-tour-available') === 'false'
-      
+      const hasDisabledTours = localStorage.getItem("hb-tour-available") === "false"
+
       if (hasDisabledTours) {
-        console.log('Tours disabled by user preference')
+        console.log("Tours disabled by user preference")
         return
       }
 
       // Session-based tracking for dashboard tour
-      const hasShownDashboardTour = sessionStorage.getItem('hb-tour-shown-dashboard-overview')
-      
-      console.log('Dashboard tour auto-start check:', {
+      const hasShownDashboardTour = sessionStorage.getItem("hb-tour-shown-dashboard-overview")
+
+      console.log("Dashboard tour auto-start check:", {
         isTourAvailable,
         hasShownDashboardTour,
         hasDisabledTours,
-        userRole: user?.role
+        userRole: user?.role,
       })
-      
+
       // Auto-start dashboard tour once per session
       if (!hasShownDashboardTour) {
         setTimeout(() => {
-          console.log('Auto-starting dashboard tour...')
-          startTour('dashboard-overview', true) // true indicates auto-start
+          console.log("Auto-starting dashboard tour...")
+          startTour("dashboard-overview", true) // true indicates auto-start
         }, 3000)
       }
     }
   }, [isTourAvailable, startTour, user])
 
   // Simplified data preparation
-  const stage4Projects = projectsData.filter(p => p.project_stage_id === 4);
-  const targetMonth = "2024-12";
-  const cashflowProject = cashFlowData.projects.find(p => 
-    stage4Projects.some(sp => sp.project_id === p.project_id)
-  );
-  const cashflowMonth = cashflowProject?.cashFlowData.monthlyData.find(m => m.month === targetMonth);
+  const stage4Projects = projectsData.filter((p) => p.project_stage_id === 4)
+  const targetMonth = "2024-12"
+  const cashflowProject = cashFlowData.projects.find((p) => stage4Projects.some((sp) => sp.project_id === p.project_id))
+  const cashflowMonth = cashflowProject?.cashFlowData.monthlyData.find((m) => m.month === targetMonth)
 
   // Simplified handlers
   const handleLayoutChange = (newLayout: any[]) => {
-    if (!currentDashboard) return;
-    
+    if (!currentDashboard) return
+
     // Update card order based on layout
-    const newCards = newLayout.map(layoutItem => {
-      const card = currentDashboard.cards.find(c => c.id === layoutItem.i);
-      return card ? { ...card } : null;
-    }).filter(Boolean) as DashboardCard[];
-    
+    const newCards = newLayout
+      .map((layoutItem) => {
+        const card = currentDashboard.cards.find((c) => c.id === layoutItem.i)
+        return card ? { ...card } : null
+      })
+      .filter(Boolean) as DashboardCard[]
+
     updateDashboard({
       ...currentDashboard,
       cards: newCards,
-    });
-  };
+    })
+  }
 
   const handleCardRemove = (cardId: string) => {
-    if (!currentDashboard) return;
-    const updatedCards = currentDashboard.cards.filter(card => card.id !== cardId);
+    if (!currentDashboard) return
+    const updatedCards = currentDashboard.cards.filter((card) => card.id !== cardId)
     updateDashboard({
       ...currentDashboard,
       cards: updatedCards,
-    });
-  };
+    })
+  }
 
   const handleCardConfigure = (cardId: string, configUpdate?: Partial<DashboardCard>) => {
-    if (!currentDashboard) return;
-    
+    if (!currentDashboard) return
+
     if (configUpdate) {
-      const updatedCards = currentDashboard.cards.map(card => 
+      const updatedCards = currentDashboard.cards.map((card) =>
         card.id === cardId ? { ...card, ...configUpdate } : card
-      );
+      )
       updateDashboard({
         ...currentDashboard,
         cards: updatedCards,
-      });
+      })
     } else {
-      console.log('Configure card:', cardId);
+      console.log("Configure card:", cardId)
     }
-  };
+  }
+
+  const handleCardSizeChange = (cardId: string, size: string) => {
+    if (!currentDashboard) return
+
+    // Define size mappings to span dimensions
+    const sizeToSpan = {
+      small: { cols: 2, rows: 2 },
+      medium: { cols: 4, rows: 4 },
+      large: { cols: 6, rows: 6 },
+      wide: { cols: 8, rows: 4 },
+      tall: { cols: 4, rows: 8 },
+      "extra-large": { cols: 8, rows: 8 },
+    }
+
+    const newSpan = sizeToSpan[size as keyof typeof sizeToSpan] || { cols: 4, rows: 4 }
+
+    const updatedCards = currentDashboard.cards.map((card) =>
+      card.id === cardId
+        ? {
+            ...card,
+            size: size as any,
+            span: newSpan,
+          }
+        : card
+    )
+
+    updateDashboard({
+      ...currentDashboard,
+      cards: updatedCards,
+    })
+
+    console.log(`Card ${cardId} resized to ${size}:`, newSpan)
+  }
 
   const handleCardAdd = () => {
-    if (!currentDashboard) return;
+    if (!currentDashboard) return
     const newCard: DashboardCard = {
       id: `card-${Date.now()}`,
-      type: 'placeholder',
-      title: 'New Card',
-      size: 'medium',
+      type: "placeholder",
+      title: "New Card",
+      size: "medium",
       position: { x: 0, y: 0 },
       span: { cols: 4, rows: 4 },
       visible: true,
-    };
+    }
     updateDashboard({
       ...currentDashboard,
       cards: [...currentDashboard.cards, newCard],
-    });
-  };
+    })
+  }
 
   const handleSave = () => {
-    console.log('Saving dashboard changes...');
-    setIsEditing(false);
-  };
+    console.log("Saving dashboard changes...")
+    setIsEditing(false)
+  }
 
   const handleReset = () => {
-    console.log('Resetting dashboard to template...');
-  };
+    console.log("Resetting dashboard to template...")
+  }
 
   const handleDashboardSelect = (dashboardId: string) => {
-    setCurrentDashboardId(dashboardId);
-  };
+    setCurrentDashboardId(dashboardId)
+  }
 
-  const handleLayoutDensityChange = (density: 'compact' | 'normal' | 'spacious') => {
-    setLayoutDensity(density);
-  };
+  const handleLayoutDensityChange = (density: "compact" | "normal" | "spacious") => {
+    setLayoutDensity(density)
+  }
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
+      document.documentElement.requestFullscreen()
+      setIsFullscreen(true)
     } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+      document.exitFullscreen()
+      setIsFullscreen(false)
     }
-  };
+  }
 
   // Listen for fullscreen changes
   React.useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
+  }, [])
 
   // Inject data into specific card types
   if (currentDashboard) {
-    currentDashboard.cards = currentDashboard.cards.map(card => {
+    currentDashboard.cards = currentDashboard.cards.map((card) => {
       switch (card.type) {
         case "financial-review-panel":
-          return { 
-            ...card, 
-            config: { 
-              ...card.config, 
-              panelProps: { 
+          return {
+            ...card,
+            config: {
+              ...card.config,
+              panelProps: {
                 forecastIndex: 8.75,
                 budgetHealth: 8.2,
                 cashflowData: cashflowMonth,
                 scheduleHealth: 9.1,
-                cashflowChartData: cashflowProject?.cashFlowData.monthlyData.map(m => ({ 
-                  name: m.month, 
-                  value: m.netCashFlow 
-                })) || [],
-                cashflowMetrics: cashflowMonth ? [
-                  { label: "Net Cash Flow", value: `$${cashflowMonth.netCashFlow.toLocaleString()}` },
-                  { label: "Inflows", value: `$${cashflowMonth.inflows.total.toLocaleString()}` },
-                  { label: "Outflows", value: `$${cashflowMonth.outflows.total.toLocaleString()}` },
-                ] : [],
+                cashflowChartData:
+                  cashflowProject?.cashFlowData.monthlyData.map((m) => ({
+                    name: m.month,
+                    value: m.netCashFlow,
+                  })) || [],
+                cashflowMetrics: cashflowMonth
+                  ? [
+                      { label: "Net Cash Flow", value: `$${cashflowMonth.netCashFlow.toLocaleString()}` },
+                      { label: "Inflows", value: `$${cashflowMonth.inflows.total.toLocaleString()}` },
+                      { label: "Outflows", value: `$${cashflowMonth.outflows.total.toLocaleString()}` },
+                    ]
+                  : [],
                 scheduleMetrics: [
                   { label: "Delays", value: 0 },
                   { label: "Total Float", value: 6 },
-                ]
-              } 
-            } 
-          };
+                ],
+              },
+            },
+          }
         case "portfolio-overview":
           return {
             ...card,
@@ -232,13 +273,13 @@ function DashboardContent({ user }: { user: any }) {
               totalSqFt: 880000,
               totalValue: 75000000,
               netCashFlow: 12500000,
-              averageWorkingCapital: 4200000
-            }
-          };
+              averageWorkingCapital: 4200000,
+            },
+          }
         default:
-          return card;
+          return card
       }
-    });
+    })
   }
 
   if (loading) {
@@ -249,7 +290,7 @@ function DashboardContent({ user }: { user: any }) {
           <p className="text-gray-600">Loading dashboards...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!dashboards.length) {
@@ -259,7 +300,7 @@ function DashboardContent({ user }: { user: any }) {
           <p className="text-muted-foreground">No dashboards found.</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -289,7 +330,7 @@ function DashboardContent({ user }: { user: any }) {
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
                 <p className="text-muted-foreground mt-1">
-                  {currentDashboard?.description || 'Real-time insights and project management overview'}
+                  {currentDashboard?.description || "Real-time insights and project management overview"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -304,16 +345,25 @@ function DashboardContent({ user }: { user: any }) {
                     </>
                   )}
                 </Button>
-                
+
                 {/* More Actions Menu */}
-                <Popover open={moreMenuOpen} onOpenChange={(open) => {
-                  setMoreMenuOpen(open);
-                  if (!open) {
-                    setDashboardViewSubmenuOpen(false);
-                  }
-                }}>
+                <Popover
+                  open={moreMenuOpen}
+                  onOpenChange={(open) => {
+                    setMoreMenuOpen(open)
+                    if (!open) {
+                      setDashboardViewSubmenuOpen(false)
+                    }
+                  }}
+                >
                   <PopoverTrigger asChild>
-                    <Button ref={ellipsisButtonRef} variant="outline" size="sm" className="px-2" data-tour="more-actions-menu">
+                    <Button
+                      ref={ellipsisButtonRef}
+                      variant="outline"
+                      size="sm"
+                      className="px-2"
+                      data-tour="more-actions-menu"
+                    >
                       <EllipsisVertical className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
@@ -321,8 +371,8 @@ function DashboardContent({ user }: { user: any }) {
                     <div className="p-1">
                       <button
                         onClick={() => {
-                          window.location.reload();
-                          setMoreMenuOpen(false);
+                          window.location.reload()
+                          setMoreMenuOpen(false)
                         }}
                         className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
                       >
@@ -331,15 +381,15 @@ function DashboardContent({ user }: { user: any }) {
                       </button>
                       <button
                         onClick={() => {
-                          setIsEditing(!isEditing);
-                          setMoreMenuOpen(false);
+                          setIsEditing(!isEditing)
+                          setMoreMenuOpen(false)
                         }}
                         className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
                       >
                         <LayoutDashboard className="h-4 w-4" />
                         {isEditing ? "Exit Edit" : "Edit Dashboard"}
                       </button>
-                      
+
                       {/* Dashboard View Submenu */}
                       <div className="relative">
                         <button
@@ -350,44 +400,48 @@ function DashboardContent({ user }: { user: any }) {
                             <Layout className="h-4 w-4" />
                             Layout Density
                           </div>
-                          <ChevronRight className={`h-4 w-4 transition-transform ${dashboardViewSubmenuOpen ? 'rotate-90' : ''}`} />
+                          <ChevronRight
+                            className={`h-4 w-4 transition-transform ${dashboardViewSubmenuOpen ? "rotate-90" : ""}`}
+                          />
                         </button>
-                        
+
                         {dashboardViewSubmenuOpen && (
                           <div className="mt-1 ml-4 space-y-1">
                             {[
-                              { value: 'compact' as const, label: 'Compact' },
-                              { value: 'normal' as const, label: 'Normal' },
-                              { value: 'spacious' as const, label: 'Spacious' }
-                            ].map(option => (
+                              { value: "compact" as const, label: "Compact" },
+                              { value: "normal" as const, label: "Normal" },
+                              { value: "spacious" as const, label: "Spacious" },
+                            ].map((option) => (
                               <button
                                 key={option.value}
                                 onClick={() => {
-                                  handleLayoutDensityChange(option.value);
-                                  setDashboardViewSubmenuOpen(false);
-                                  setMoreMenuOpen(false);
+                                  handleLayoutDensityChange(option.value)
+                                  setDashboardViewSubmenuOpen(false)
+                                  setMoreMenuOpen(false)
                                 }}
                                 className={`w-full text-left px-3 py-2 rounded text-sm transition-colors flex items-center gap-2 ${
                                   layoutDensity === option.value
-                                    ? 'bg-primary/10 text-primary font-medium'
-                                    : 'hover:bg-muted text-muted-foreground'
+                                    ? "bg-primary/10 text-primary font-medium"
+                                    : "hover:bg-muted text-muted-foreground"
                                 }`}
                               >
-                                <div className={`w-2 h-2 rounded-full ${
-                                  layoutDensity === option.value ? 'bg-primary' : 'bg-transparent'
-                                }`} />
+                                <div
+                                  className={`w-2 h-2 rounded-full ${
+                                    layoutDensity === option.value ? "bg-primary" : "bg-transparent"
+                                  }`}
+                                />
                                 {option.label}
                               </button>
                             ))}
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="border-t border-border mt-2 pt-2">
                         <button
                           onClick={() => {
-                            setComingSoonPopoverOpen(true);
-                            setMoreMenuOpen(false);
+                            setComingSoonPopoverOpen(true)
+                            setMoreMenuOpen(false)
                           }}
                           className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
                         >
@@ -398,11 +452,11 @@ function DashboardContent({ user }: { user: any }) {
                     </div>
                   </PopoverContent>
                 </Popover>
-                
-                                {/* Coming Soon Popover */}
+
+                {/* Coming Soon Popover */}
                 {comingSoonPopoverOpen && (
                   <>
-                    <div 
+                    <div
                       className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
                       onClick={() => setComingSoonPopoverOpen(false)}
                     />
@@ -419,7 +473,8 @@ function DashboardContent({ user }: { user: any }) {
                         </div>
                         <div className="space-y-3">
                           <p className="text-sm text-muted-foreground leading-relaxed">
-                            Create numerous dashboard views tailored to your profile with fully customizable layouts, advanced analytics, and personalized themes.
+                            Create numerous dashboard views tailored to your profile with fully customizable layouts,
+                            advanced analytics, and personalized themes.
                           </p>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -445,11 +500,7 @@ function DashboardContent({ user }: { user: any }) {
                             <Badge variant="secondary" className="text-xs">
                               Beta v2.2
                             </Badge>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              onClick={() => setComingSoonPopoverOpen(false)}
-                            >
+                            <Button size="sm" variant="outline" onClick={() => setComingSoonPopoverOpen(false)}>
                               Got it
                             </Button>
                           </div>
@@ -462,23 +513,26 @@ function DashboardContent({ user }: { user: any }) {
             </div>
 
             {/* Dashboard Controls Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-tour="dashboard-controls">
-                           {/* Dashboard Tabs */}
-             <div className="flex items-center gap-1 border-b border-border" data-tour="dashboard-tabs">
-               {dashboards.map(dashboard => (
-                 <button
-                   key={dashboard.id}
-                   onClick={() => handleDashboardSelect(dashboard.id)}
-                   className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                     currentDashboardId === dashboard.id
-                       ? 'text-primary border-primary bg-primary/5'
-                       : 'text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50'
-                   }`}
-                 >
-                   {dashboard.name}
-                 </button>
-               ))}
-             </div>
+            <div
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              data-tour="dashboard-controls"
+            >
+              {/* Dashboard Tabs */}
+              <div className="flex items-center gap-1" data-tour="dashboard-tabs">
+                {dashboards.map((dashboard) => (
+                  <button
+                    key={dashboard.id}
+                    onClick={() => handleDashboardSelect(dashboard.id)}
+                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      currentDashboardId === dashboard.id
+                        ? "text-primary border-primary bg-primary/5"
+                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                    }`}
+                  >
+                    {dashboard.name}
+                  </button>
+                ))}
+              </div>
 
               {/* Edit Mode Controls */}
               {isEditing && (
@@ -517,11 +571,12 @@ function DashboardContent({ user }: { user: any }) {
         {/* Dashboard Content */}
         {currentDashboard && (
           <div data-tour="dashboard-content">
-            <DashboardLayoutComponent 
+            <DashboardLayoutComponent
               cards={currentDashboard.cards}
               onLayoutChange={handleLayoutChange}
               onCardRemove={handleCardRemove}
               onCardConfigure={handleCardConfigure}
+              onCardSizeChange={handleCardSizeChange}
               onCardAdd={handleCardAdd}
               onSave={handleSave}
               onReset={handleReset}
@@ -534,26 +589,26 @@ function DashboardContent({ user }: { user: any }) {
         )}
       </div>
     </>
-  );
+  )
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
-    if (user === undefined) return;
+    if (user === undefined) return
     if (user === null) {
-      router.push("/login");
-      return;
+      router.push("/login")
+      return
     }
-  }, [user, router]);
+  }, [user, router])
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <DashboardProvider userId={user.id} role={user.role}>
       <DashboardContent user={user} />
     </DashboardProvider>
-  );
+  )
 }

@@ -15,7 +15,12 @@ interface TourProps {
 }
 
 /**
- * Standardized Tour component with Shadcn UI Card-based tooltips
+ * @deprecated This component is deprecated in favor of TourModal
+ * 
+ * LEGACY: Standardized Tour component with Shadcn UI Card-based tooltips
+ * 
+ * This component has been replaced by TourModal which uses a modal-based approach
+ * instead of DOM positioning. This component is kept for compatibility during migration.
  * 
  * Features:
  * - Standardized tooltip structure using Shadcn UI Card

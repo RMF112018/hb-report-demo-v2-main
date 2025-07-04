@@ -35,7 +35,7 @@ import {
   AlertCircle,
   Bot,
 } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -697,24 +697,51 @@ export default function FinancialHubPage() {
           className="sticky top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border"
           data-tour="financial-hub-header"
         >
-          <div className="flex items-center justify-between py-4 px-6">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Financial Hub</h1>
-              <p className="text-muted-foreground mt-1">Comprehensive financial management and analysis suite</p>
+          <div className="flex flex-col gap-4 py-4 px-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Financial Hub</h1>
+                <p className="text-muted-foreground mt-1">Comprehensive financial management and analysis suite</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+                <Button variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Button variant="outline">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={() => window.location.reload()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+
+            {/* Financial Hub Controls Row */}
+            <div
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              data-tour="financial-hub-controls"
+            >
+              {/* Financial Hub Tabs */}
+              <div className="flex items-center gap-1" data-tour="financial-hub-navigation">
+                {availableModules.map((module) => (
+                  <button
+                    key={module.id}
+                    onClick={() => setActiveTab(module.id)}
+                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                      activeTab === module.id
+                        ? "text-primary border-primary bg-primary/5"
+                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                    }`}
+                    data-tour={`financial-hub-tab-${module.id}`}
+                  >
+                    <module.icon className="h-3 w-3 flex-shrink-0" />
+                    <span className="hidden sm:inline">{module.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -759,37 +786,15 @@ export default function FinancialHubPage() {
 
         {/* Financial Modules */}
         <div className="px-6 pb-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Scrollable Tab Navigation */}
-            <div className="relative w-full" data-tour="financial-hub-navigation">
-              <div className="overflow-x-auto scrollbar-hide">
-                <TabsList className="inline-flex w-max min-w-full h-12 bg-muted border-border p-1">
-                  {availableModules.map((module) => (
-                    <TabsTrigger
-                      key={module.id}
-                      value={module.id}
-                      className="flex items-center gap-2 text-xs font-medium px-3 py-2 whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground min-w-fit transition-all duration-200 hover:bg-background/50"
-                      data-tour={`financial-hub-tab-${module.id}`}
-                    >
-                      <module.icon className="h-3 w-3 flex-shrink-0" />
-                      <span className="hidden sm:inline">{module.label}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </div>
-            </div>
-
+          <div className="space-y-6">
             {/* Tab Content */}
             {availableModules.map((module) => {
               const ModuleComponent = module.component
 
+              if (module.id !== activeTab) return null
+
               return (
-                <TabsContent
-                  key={module.id}
-                  value={module.id}
-                  className="space-y-6"
-                  data-tour={`financial-hub-content-${module.id}`}
-                >
+                <div key={module.id} className="space-y-6" data-tour={`financial-hub-content-${module.id}`}>
                   {/* Module Header */}
                   <div
                     className="flex items-center gap-3 pb-4 border-b border-border"
@@ -809,10 +814,10 @@ export default function FinancialHubPage() {
                     userRole={projectScope.scope === "single" ? "project-manager" : user?.role || "executive"}
                     projectData={projectScope}
                   />
-                </TabsContent>
+                </div>
               )
             })}
-          </Tabs>
+          </div>
         </div>
       </div>
     </>

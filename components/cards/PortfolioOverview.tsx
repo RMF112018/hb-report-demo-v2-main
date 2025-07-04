@@ -1,14 +1,26 @@
-'use client'
+"use client"
 
-import { useEffect, useState, useMemo } from 'react'
-import { TrendingUp, DollarSign, Building2, Layers3, Users, Calendar, Briefcase, MapPin, Target, Award, Brain } from 'lucide-react'
-import { AreaChart } from '@/components/charts/AreaChart'
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import { CustomBarChart } from '@/components/charts/BarChart'
-import { cn } from '@/lib/utils'
+import { useEffect, useState, useMemo } from "react"
+import {
+  TrendingUp,
+  DollarSign,
+  Building2,
+  Layers3,
+  Users,
+  Calendar,
+  Briefcase,
+  MapPin,
+  Target,
+  Award,
+  Brain,
+} from "lucide-react"
+import { AreaChart } from "@/components/charts/AreaChart"
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { CustomBarChart } from "@/components/charts/BarChart"
+import { cn } from "@/lib/utils"
 
 interface PortfolioOverviewProps {
-  card?: { id: string; type: string; title: string };
+  card?: { id: string; type: string; title: string }
   config: {
     totalProjects: number
     activeProjects: number
@@ -32,7 +44,7 @@ interface PortfolioOverviewProps {
  */
 
 const formatCurrency = (value?: number, compact = true) => {
-  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0
+  const safeValue = typeof value === "number" && !isNaN(value) ? value : 0
   if (compact) {
     if (safeValue >= 1_000_000) return `$${(safeValue / 1_000_000).toFixed(1)}M`
     if (safeValue >= 1_000) return `$${(safeValue / 1_000).toFixed(1)}K`
@@ -42,30 +54,25 @@ const formatCurrency = (value?: number, compact = true) => {
 }
 
 const formatNumber = (value?: number) => {
-  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0
+  const safeValue = typeof value === "number" && !isNaN(value) ? value : 0
   return safeValue.toLocaleString()
 }
 
 // Custom Pie Chart Component without border/title
 function SimplePieChart({ data }: { data: any[] }) {
   const COLORS = [
-  'hsl(var(--chart-1))', 
-  'hsl(var(--chart-2))', 
-  'hsl(var(--chart-3))', 
-  'hsl(var(--chart-4))'
-]
-  
+    "#3b82f6", // Blue
+    "#10b981", // Green
+    "#f59e0b", // Amber
+    "#ef4444", // Red
+    "#8b5cf6", // Purple
+    "#06b6d4", // Cyan
+  ]
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={15}
-          outerRadius={40}
-          dataKey="value"
-        >
+        <Pie data={data} cx="50%" cy="50%" innerRadius={15} outerRadius={40} dataKey="value">
           {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
@@ -77,53 +84,53 @@ function SimplePieChart({ data }: { data: any[] }) {
 
 export default function PortfolioOverview({ card, config, span, isCompact = false }: PortfolioOverviewProps) {
   const [showDrillDown, setShowDrillDown] = useState(false)
-  
+
   // Listen for drill down events from DashboardCardWrapper
   useEffect(() => {
-    if (!card) return;
-    
+    if (!card) return
+
     const handleDrillDownEvent = (event: CustomEvent) => {
-      if (event.detail.cardId === card.id || event.detail.cardType === 'portfolio-overview') {
-        const shouldShow = event.detail.action === 'show'
+      if (event.detail.cardId === card.id || event.detail.cardType === "portfolio-overview") {
+        const shouldShow = event.detail.action === "show"
         setShowDrillDown(shouldShow)
-        
+
         // Notify wrapper of state change
-        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+        const stateEvent = new CustomEvent("cardDrillDownStateChange", {
           detail: {
             cardId: card.id,
-            cardType: 'portfolio-overview',
-            isActive: shouldShow
-          }
+            cardType: "portfolio-overview",
+            isActive: shouldShow,
+          },
         })
         window.dispatchEvent(stateEvent)
       }
-    };
+    }
 
-    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    
+    window.addEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+
     return () => {
-      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    };
-  }, [card]);
+      window.removeEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+    }
+  }, [card])
 
   // Function to handle closing the drill down overlay
   const handleCloseDrillDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowDrillDown(false)
-    
-    if (!card) return;
-    
+
+    if (!card) return
+
     // Notify wrapper that drill down is closed
-    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+    const stateEvent = new CustomEvent("cardDrillDownStateChange", {
       detail: {
         cardId: card.id,
-        cardType: 'portfolio-overview',
-        isActive: false
-      }
+        cardType: "portfolio-overview",
+        isActive: false,
+      },
     })
     window.dispatchEvent(stateEvent)
   }
-  
+
   const {
     totalProjects,
     activeProjects,
@@ -137,22 +144,28 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
   } = config
 
   // Mock trend data for the last 6 months
-  const trendData = useMemo(() => [
-    { name: 'Jan', value: 18, completed: 2 },
-    { name: 'Feb', value: 22, completed: 1 },
-    { name: 'Mar', value: 28, completed: 3 },
-    { name: 'Apr', value: 24, completed: 2 },
-    { name: 'May', value: 26, completed: 1 },
-    { name: 'Jun', value: totalProjects, completed: completedThisYear },
-  ], [totalProjects, completedThisYear])
+  const trendData = useMemo(
+    () => [
+      { name: "Jan", value: 18, completed: 2 },
+      { name: "Feb", value: 22, completed: 1 },
+      { name: "Mar", value: 28, completed: 3 },
+      { name: "Apr", value: 24, completed: 2 },
+      { name: "May", value: 26, completed: 1 },
+      { name: "Jun", value: totalProjects, completed: completedThisYear },
+    ],
+    [totalProjects, completedThisYear]
+  )
 
   // Project status distribution
-  const projectStatusData = useMemo(() => [
-    { name: 'Active', value: activeProjects, color: 'hsl(var(--chart-1))' },
-    { name: 'Planning', value: 3, color: 'hsl(var(--chart-3))' },
-    { name: 'On Hold', value: 2, color: 'hsl(var(--chart-4))' },
-    { name: 'Completed', value: completedThisYear, color: 'hsl(var(--chart-1))' },
-  ], [activeProjects, completedThisYear])
+  const projectStatusData = useMemo(
+    () => [
+      { name: "Active", value: activeProjects, color: "#3b82f6" }, // Blue
+      { name: "Planning", value: 3, color: "#f59e0b" }, // Amber
+      { name: "On Hold", value: 2, color: "#ef4444" }, // Red
+      { name: "Completed", value: completedThisYear, color: "#10b981" }, // Green
+    ],
+    [activeProjects, completedThisYear]
+  )
 
   // Determine layout based on span
   const isWide = span.cols >= 8
@@ -160,148 +173,157 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
   // Regional distribution data (Florida regions only)
   const regionalData = [
-    { region: 'Central FL', projects: 4, value: 89.2 },
-    { region: 'North FL', projects: 3, value: 67.8 },
-    { region: 'Southeast FL', projects: 2, value: 45.3 },
-    { region: 'Southwest FL', projects: 2, value: 38.9 },
-    { region: 'Space Coast', projects: 1, value: 23.5 }
+    { region: "Central FL", projects: 4, value: 89.2 },
+    { region: "North FL", projects: 3, value: 67.8 },
+    { region: "Southeast FL", projects: 2, value: 45.3 },
+    { region: "Southwest FL", projects: 2, value: 38.9 },
+    { region: "Space Coast", projects: 1, value: 23.5 },
   ]
 
   return (
-    <div 
-      className="relative h-full"
-      data-tour="portfolio-overview-card"
-    >
+    <div className="relative h-full" data-tour="portfolio-overview-card">
       <div className="h-full flex flex-col bg-transparent overflow-hidden">
-      {/* Key Metrics Header */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-1" />
-              <span className="text-xs font-medium text-muted-foreground">Total Projects</span>
+        {/* Key Metrics Header */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-1" />
+                <span className="text-xs font-medium text-muted-foreground">Total Projects</span>
+              </div>
+              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
+                {totalProjects}
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400">{activeProjects} active</div>
             </div>
-            <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">{totalProjects}</div>
-            <div className="text-xs text-green-600 dark:text-green-400">{activeProjects} active</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400 mr-1" />
-              <span className="text-xs font-medium text-muted-foreground">Portfolio Value</span>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400 mr-1" />
+                <span className="text-xs font-medium text-muted-foreground">Portfolio Value</span>
+              </div>
+              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
+                {formatCurrency(totalValue)}
+              </div>
+              <div className="text-xs text-muted-foreground">total value</div>
             </div>
-            <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">{formatCurrency(totalValue)}</div>
-            <div className="text-xs text-muted-foreground">total value</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mr-1" />
-              <span className="text-xs font-medium text-muted-foreground">Net Cash Flow</span>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mr-1" />
+                <span className="text-xs font-medium text-muted-foreground">Net Cash Flow</span>
+              </div>
+              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
+                {formatCurrency(netCashFlow)}
+              </div>
+              <div className="text-xs text-muted-foreground">this month</div>
             </div>
-            <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">{formatCurrency(netCashFlow)}</div>
-            <div className="text-xs text-muted-foreground">this month</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Layers3 className="h-4 w-4 text-purple-600 mr-1" />
-              <span className="text-xs font-medium text-muted-foreground">Total Sq Ft</span>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <Layers3 className="h-4 w-4 text-purple-600 mr-1" />
+                <span className="text-xs font-medium text-muted-foreground">Total Sq Ft</span>
+              </div>
+              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
+                {formatNumber(totalSqFt)}
+              </div>
+              <div className="text-xs text-muted-foreground">square feet</div>
             </div>
-            <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">{formatNumber(totalSqFt)}</div>
-            <div className="text-xs text-muted-foreground">square feet</div>
           </div>
         </div>
-      </div>
 
-      {/* Charts Section */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-hidden">
-        {isWide ? (
-          // Wide layout: side-by-side charts
-          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-full min-h-48">
-            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
-                Project Growth
-              </h4>
-              <div className="h-32">
-                <AreaChart data={trendData} color="hsl(var(--chart-2))" compact />
-              </div>
-            </div>
-            
-            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
-                Project Status
-              </h4>
-              <div className="h-32 flex items-center">
-                <div className="w-24 h-24">
-                  <SimplePieChart data={projectStatusData} />
+        {/* Charts Section */}
+        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-hidden">
+          {isWide ? (
+            // Wide layout: side-by-side charts
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-full min-h-48">
+              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                  <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
+                  Project Growth
+                </h4>
+                <div className="h-32">
+                  <AreaChart data={trendData} color="hsl(var(--chart-2))" compact />
                 </div>
-                <div className="flex-1 ml-4">
-                  <div className="grid grid-cols-1 gap-2 text-sm">
-                    {projectStatusData.map(item => (
-                      <div key={item.name} className="flex items-center">
-                        <div 
-                          className="w-3 h-3 rounded-full mr-3 flex-shrink-0" 
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-muted-foreground">{item.name}: {item.value}</span>
-                      </div>
-                    ))}
+              </div>
+
+              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                  <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
+                  Project Status
+                </h4>
+                <div className="h-32 flex items-center">
+                  <div className="w-24 h-24">
+                    <SimplePieChart data={projectStatusData} />
+                  </div>
+                  <div className="flex-1 ml-4">
+                    <div className="grid grid-cols-1 gap-2 text-sm">
+                      {projectStatusData.map((item) => (
+                        <div key={item.name} className="flex items-center">
+                          <div
+                            className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="text-muted-foreground">
+                            {item.name}: {item.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          // Narrow layout: stacked charts
-          <div className="space-y-4">
-            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
-                Growth Trend
-              </h4>
-              <div className="h-24">
-                <AreaChart data={trendData.slice(-4)} color="hsl(var(--chart-2))" compact />
+          ) : (
+            // Narrow layout: stacked charts
+            <div className="space-y-4">
+              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                  <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
+                  Growth Trend
+                </h4>
+                <div className="h-24">
+                  <AreaChart data={trendData.slice(-4)} color="hsl(var(--chart-2))" compact />
+                </div>
               </div>
-            </div>
-            
-            <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-              <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
-                Status Distribution
-              </h4>
-              <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2 text-sm">
-                {projectStatusData.map(item => (
-                  <div key={item.name} className="flex items-center">
-                    <div 
-                      className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-muted-foreground">{item.name}: {item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* Footer with additional metrics */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 text-sm">
-          <div className="flex items-center">
-            <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
-            <span className="text-muted-foreground">Avg Duration: </span>
-            <span className="font-semibold text-foreground ml-1">{averageDuration} days</span>
-          </div>
-          <div className="flex items-center">
-            <DollarSign className="h-4 w-4 text-muted-foreground mr-2" />
-            <span className="text-muted-foreground">Avg Contract: </span>
-            <span className="font-semibold text-foreground ml-1">{formatCurrency(averageContractValue)}</span>
-          </div>
+              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                  <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
+                  Status Distribution
+                </h4>
+                <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2 text-sm">
+                  {projectStatusData.map((item) => (
+                    <div key={item.name} className="flex items-center">
+                      <div
+                        className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-muted-foreground">
+                        {item.name}: {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Footer with additional metrics */}
+        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700">
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 text-sm">
+            <div className="flex items-center">
+              <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
+              <span className="text-muted-foreground">Avg Duration: </span>
+              <span className="font-semibold text-foreground ml-1">{averageDuration} days</span>
+            </div>
+            <div className="flex items-center">
+              <DollarSign className="h-4 w-4 text-muted-foreground mr-2" />
+              <span className="text-muted-foreground">Avg Contract: </span>
+              <span className="font-semibold text-foreground ml-1">{formatCurrency(averageContractValue)}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -319,8 +341,10 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Portfolio Deep Dive</h3>
-            
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">
+              Portfolio Deep Dive
+            </h3>
+
             <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
               {/* Regional Distribution */}
               <div className="space-y-4">
@@ -427,4 +451,4 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
       )}
     </div>
   )
-}  
+}

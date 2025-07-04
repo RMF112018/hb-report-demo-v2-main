@@ -1,12 +1,12 @@
 "use client"
 
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 // Import mock data
-import staffingData from '@/data/mock/staffing/staffing.json'
-import spcrData from '@/data/mock/staffing/spcr.json'
-import projectsData from '@/data/mock/projects.json'
+import staffingData from "@/data/mock/staffing/staffing.json"
+import spcrData from "@/data/mock/staffing/spcr.json"
+import projectsData from "@/data/mock/projects.json"
 
 export interface StaffMember {
   id: string
@@ -38,7 +38,7 @@ export interface Project {
 export interface SPCR {
   id: string
   project_id: number
-  type: 'increase' | 'decrease'
+  type: "increase" | "decrease"
   position: string
   startDate: string
   endDate: string
@@ -46,8 +46,17 @@ export interface SPCR {
   scheduleRef: string
   budget: number
   explanation: string
-  status: 'pending' | 'approved' | 'rejected'
-  workflowStage: 'submitted' | 'pe-review' | 'pe-approved' | 'pe-rejected' | 'executive-review' | 'final-approved' | 'final-rejected' | 'withdrawn' | 'closed'
+  status: "pending" | "approved" | "rejected"
+  workflowStage:
+    | "submitted"
+    | "pe-review"
+    | "pe-approved"
+    | "pe-rejected"
+    | "executive-review"
+    | "final-approved"
+    | "final-rejected"
+    | "withdrawn"
+    | "closed"
   createdBy: string
   createdAt: string
   updatedAt: string
@@ -56,7 +65,7 @@ export interface SPCR {
     author: string
     content: string
     timestamp: string
-    action?: 'approve' | 'reject' | 'forward'
+    action?: "approve" | "reject" | "forward"
   }>
 }
 
@@ -75,58 +84,79 @@ export interface StaffingState {
   staffMembers: StaffMember[]
   projects: Project[]
   spcrs: SPCR[]
-  
+
   // UI State
   ganttFilters: GanttFilters
   selectedStaffMember: StaffMember | null
   selectedProject: number | null
-  
+
   // SPCR Draft State
   spcrDraft: Partial<SPCR> | null
-  
+
+  // Project Setup State
+  projectSetupAllocations: { [roleId: string]: number }
+
   // View State
-  ganttViewMode: 'week' | 'month' | 'quarter' | 'year'
-  spcrViewFilter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed'
+  ganttViewMode: "week" | "month" | "quarter" | "year"
+  spcrViewFilter: "all" | "pending" | "approved" | "rejected" | "closed"
 }
 
 export interface StaffingActions {
   // Data actions
   updateStaffAssignment: (staffId: string, updatedStaff: StaffMember) => void
-  createSPCR: (spcr: Omit<SPCR, 'id' | 'createdAt' | 'updatedAt'>) => void
+  createSPCR: (spcr: Omit<SPCR, "id" | "createdAt" | "updatedAt">) => void
   updateSPCR: (id: string, updates: Partial<SPCR>) => void
-  addSPCRComment: (spcrId: string, comment: SPCR['comments'][0]) => void
-  
+  addSPCRComment: (
+    spcrId: string,
+    comment: {
+      id: string
+      author: string
+      content: string
+      timestamp: string
+      action?: "approve" | "reject" | "forward"
+    }
+  ) => void
+
   // Filter actions
   setGanttFilters: (filters: Partial<GanttFilters>) => void
   clearGanttFilters: () => void
-  
+
   // Selection actions
   setSelectedStaffMember: (member: StaffMember | null) => void
   setSelectedProject: (projectId: number | null) => void
-  
+
   // SPCR Draft actions
   setSPCRDraft: (draft: Partial<SPCR> | null) => void
   saveSPCRDraft: () => void
   clearSPCRDraft: () => void
-  
+
+  // Project Setup actions
+  setProjectSetupAllocation: (roleId: string, value: number) => void
+  clearProjectSetupAllocations: () => void
+  getProjectSetupAllocations: () => { [roleId: string]: number }
+
   // View actions
-  setGanttViewMode: (mode: 'week' | 'month' | 'quarter' | 'year') => void
-  setSPCRViewFilter: (filter: 'all' | 'pending' | 'approved' | 'rejected' | 'closed') => void
-  
+  setGanttViewMode: (mode: "week" | "month" | "quarter" | "year") => void
+  setSPCRViewFilter: (filter: "all" | "pending" | "approved" | "rejected" | "closed") => void
+
   // Utility functions
   getStaffByProject: (projectId: number) => StaffMember[]
   getSPCRsByProject: (projectId: number) => SPCR[]
-  getSPCRsByRole: (userRole: 'executive' | 'project-executive' | 'project-manager') => SPCR[]
+  getSPCRsByRole: (userRole: "executive" | "project-executive" | "project-manager") => SPCR[]
   calculateLaborCost: (staffIds: string[], weeklyHours?: number) => number
 }
 
 // Helper function to generate workflow stage
-const getWorkflowStage = (status: string): SPCR['workflowStage'] => {
+const getWorkflowStage = (status: string): SPCR["workflowStage"] => {
   switch (status) {
-    case 'pending': return 'pe-review'
-    case 'approved': return 'final-approved'
-    case 'rejected': return 'pe-rejected'
-    default: return 'submitted'
+    case "pending":
+      return "pe-review"
+    case "approved":
+      return "final-approved"
+    case "rejected":
+      return "pe-rejected"
+    default:
+      return "submitted"
   }
 }
 
@@ -134,10 +164,10 @@ const getWorkflowStage = (status: string): SPCR['workflowStage'] => {
 const initializeData = () => {
   const staff = (staffingData as StaffMember[]) || []
   const projects = (projectsData as Project[]) || []
-  const spcrs = (spcrData as any[]).map(spcr => ({
+  const spcrs = (spcrData as any[]).map((spcr) => ({
     ...spcr,
     workflowStage: getWorkflowStage(spcr.status),
-    comments: []
+    comments: [],
   })) as SPCR[]
 
   return { staff, projects, spcrs }
@@ -147,30 +177,29 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
   persist(
     (set, get) => {
       const { staff, projects, spcrs } = initializeData()
-      
+
       return {
         // Initial state
         staffMembers: staff,
         projects: projects,
         spcrs: spcrs,
         ganttFilters: {
-          search: '',
-          position: 'all',
-          project: 'all',
-          dateRange: { start: null, end: null }
+          search: "",
+          position: "all",
+          project: "all",
+          dateRange: { start: null, end: null },
         },
         selectedStaffMember: null,
         selectedProject: null,
         spcrDraft: null,
-        ganttViewMode: 'month',
-        spcrViewFilter: 'approved', // Default to Approved for executive view
+        ganttViewMode: "month",
+        spcrViewFilter: "approved", // Default to Approved for executive view
+        projectSetupAllocations: {},
 
         // Actions
         updateStaffAssignment: (staffId, updatedStaff) => {
           set((state) => ({
-            staffMembers: state.staffMembers.map(staff =>
-              staff.id === staffId ? updatedStaff : staff
-            )
+            staffMembers: state.staffMembers.map((staff) => (staff.id === staffId ? updatedStaff : staff)),
           }))
         },
 
@@ -180,53 +209,51 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
             ...spcrData,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            workflowStage: 'submitted',
-            comments: []
+            workflowStage: "submitted",
+            comments: [],
           }
-          
+
           set((state) => ({
-            spcrs: [...state.spcrs, newSPCR]
+            spcrs: [...state.spcrs, newSPCR],
           }))
         },
 
         updateSPCR: (id, updates) => {
           set((state) => ({
-            spcrs: state.spcrs.map(spcr =>
-              spcr.id === id
-                ? { ...spcr, ...updates, updatedAt: new Date().toISOString() }
-                : spcr
-            )
+            spcrs: state.spcrs.map((spcr) =>
+              spcr.id === id ? { ...spcr, ...updates, updatedAt: new Date().toISOString() } : spcr
+            ),
           }))
         },
 
         addSPCRComment: (spcrId, comment) => {
           set((state) => ({
-            spcrs: state.spcrs.map(spcr =>
+            spcrs: state.spcrs.map((spcr) =>
               spcr.id === spcrId
                 ? {
                     ...spcr,
                     comments: [...(spcr.comments || []), comment],
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                   }
                 : spcr
-            )
+            ),
           }))
         },
 
         setGanttFilters: (filters) => {
           set((state) => ({
-            ganttFilters: { ...state.ganttFilters, ...filters }
+            ganttFilters: { ...state.ganttFilters, ...filters },
           }))
         },
 
         clearGanttFilters: () => {
           set({
             ganttFilters: {
-              search: '',
-              position: 'all',
-              project: 'all',
-              dateRange: { start: null, end: null }
-            }
+              search: "",
+              position: "all",
+              project: "all",
+              dateRange: { start: null, end: null },
+            },
           })
         },
 
@@ -245,7 +272,7 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
         saveSPCRDraft: () => {
           const { spcrDraft, createSPCR } = get()
           if (spcrDraft && spcrDraft.project_id && spcrDraft.type && spcrDraft.position) {
-            createSPCR(spcrDraft as Omit<SPCR, 'id' | 'createdAt' | 'updatedAt'>)
+            createSPCR(spcrDraft as Omit<SPCR, "id" | "createdAt" | "updatedAt">)
             set({ spcrDraft: null })
           }
         },
@@ -262,41 +289,65 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
           set({ spcrViewFilter: filter })
         },
 
+        // Project Setup actions
+        setProjectSetupAllocation: (roleId, value) => {
+          set((state) => ({
+            projectSetupAllocations: { ...state.projectSetupAllocations, [roleId]: value },
+          }))
+        },
+
+        clearProjectSetupAllocations: () => {
+          set({ projectSetupAllocations: {} })
+        },
+
+        getProjectSetupAllocations: () => {
+          const { projectSetupAllocations } = get()
+          return projectSetupAllocations
+        },
+
         // Utility functions
         getStaffByProject: (projectId) => {
           const { staffMembers } = get()
-          return staffMembers.filter(staff =>
-            staff.assignments.some(assignment => assignment.project_id === projectId)
+          return staffMembers.filter((staff) =>
+            staff.assignments.some((assignment) => assignment.project_id === projectId)
           )
         },
 
         getSPCRsByProject: (projectId) => {
           const { spcrs } = get()
-          return spcrs.filter(spcr => spcr.project_id === projectId)
+          return spcrs.filter((spcr) => spcr.project_id === projectId)
         },
 
         getSPCRsByRole: (userRole) => {
           const { spcrs } = get()
-          
+
           switch (userRole) {
-            case 'project-manager':
+            case "project-manager":
               // PM sees SPCRs for their project (hardcoded to Palm Beach project)
-              return spcrs.filter(spcr => spcr.project_id === 2525840)
-            
-            case 'project-executive':
+              return spcrs.filter((spcr) => spcr.project_id === 2525840)
+
+            case "project-executive":
               // PE sees SPCRs for their portfolio (6 projects) that need PE review or they've acted on
               const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
-              return spcrs.filter(spcr => 
-                portfolioProjects.includes(spcr.project_id) && 
-                ['pe-review', 'pe-approved', 'pe-rejected', 'executive-review', 'final-approved', 'final-rejected'].includes(spcr.workflowStage)
+              return spcrs.filter(
+                (spcr) =>
+                  portfolioProjects.includes(spcr.project_id) &&
+                  [
+                    "pe-review",
+                    "pe-approved",
+                    "pe-rejected",
+                    "executive-review",
+                    "final-approved",
+                    "final-rejected",
+                  ].includes(spcr.workflowStage)
               )
-            
-            case 'executive':
+
+            case "executive":
               // Executive sees SPCRs that have been approved by PE or need final approval
-              return spcrs.filter(spcr => 
-                ['executive-review', 'final-approved', 'final-rejected'].includes(spcr.workflowStage)
+              return spcrs.filter((spcr) =>
+                ["executive-review", "final-approved", "final-rejected"].includes(spcr.workflowStage)
               )
-            
+
             default:
               return spcrs
           }
@@ -305,21 +356,21 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
         calculateLaborCost: (staffIds, weeklyHours = 40) => {
           const { staffMembers } = get()
           return staffMembers
-            .filter(staff => staffIds.includes(staff.id))
-            .reduce((total, staff) => total + (staff.laborRate * weeklyHours), 0)
-        }
+            .filter((staff) => staffIds.includes(staff.id))
+            .reduce((total, staff) => total + staff.laborRate * weeklyHours, 0)
+        },
       }
     },
     {
-      name: 'staffing-storage',
+      name: "staffing-storage",
       partialize: (state) => ({
         spcrs: state.spcrs,
         ganttFilters: state.ganttFilters,
         spcrDraft: state.spcrDraft,
         ganttViewMode: state.ganttViewMode,
         spcrViewFilter: state.spcrViewFilter,
-        selectedProject: state.selectedProject
-      })
+        selectedProject: state.selectedProject,
+      }),
     }
   )
-) 
+)

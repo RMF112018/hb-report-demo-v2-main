@@ -1,11 +1,49 @@
-'use client'
+"use client"
 
-import { cn } from '@/lib/utils'
-import { X, Move, Settings2, MoreVertical, Maximize2, Minimize2, ChevronRight, TrendingUp, Briefcase, Brain, BarChart3, Target, Building2, Calendar, DollarSign, Wrench, Shield, Droplets, Package, Eye, AlertTriangle as AlertTriangleIcon, Users, FileText, ClipboardCheck, Play, CalendarDays, MessageSquare, Heart } from 'lucide-react'
-import { DashboardCard } from '@/types/dashboard'
-import React, { ReactNode, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { cn } from "@/lib/utils"
+import {
+  X,
+  Move,
+  Settings2,
+  MoreVertical,
+  Maximize2,
+  Minimize2,
+  ChevronRight,
+  TrendingUp,
+  Briefcase,
+  Brain,
+  BarChart3,
+  Target,
+  Building2,
+  Calendar,
+  DollarSign,
+  Wrench,
+  Shield,
+  Droplets,
+  Package,
+  Eye,
+  AlertTriangle as AlertTriangleIcon,
+  Users,
+  FileText,
+  ClipboardCheck,
+  Play,
+  CalendarDays,
+  MessageSquare,
+  Heart,
+  Expand,
+  LayoutGrid,
+} from "lucide-react"
+import { DashboardCard } from "@/types/dashboard"
+import React, { ReactNode, useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
 
 interface DashboardCardWrapperProps {
   card: DashboardCard
@@ -13,62 +51,85 @@ interface DashboardCardWrapperProps {
   onRemove?: (id: string) => void
   onConfigure?: (id: string) => void
   onDrillDown?: (id: string, cardType: string) => void
+  onSizeChange?: (id: string, size: string) => void
   dragHandleClass?: string
   isEditing?: boolean
   isCompact?: boolean
 }
 
+// Define predefined card sizes
+const CARD_SIZES = [
+  { value: "small", label: "Small", description: "2x2 grid", cols: 2, rows: 2 },
+  { value: "medium", label: "Medium", description: "4x4 grid", cols: 4, rows: 4 },
+  { value: "large", label: "Large", description: "6x6 grid", cols: 6, rows: 6 },
+  { value: "wide", label: "Wide", description: "8x4 grid", cols: 8, rows: 4 },
+  { value: "tall", label: "Tall", description: "4x8 grid", cols: 4, rows: 8 },
+  { value: "extra-large", label: "Extra Large", description: "8x8 grid", cols: 8, rows: 8 },
+]
+
 // Define card categories for theming
-const getCardCategory = (cardType: string): 'financial' | 'operational' | 'analytics' | 'project' | 'schedule' => {
-  const financialCards = ['financial-status', 'cash-flow', 'financial-review-panel', 'procurement', 'draw-forecast', 'contingency-analysis']
-  const operationalCards = ['safety', 'quality-control', 'field-reports', 'staffing-distribution']
-  const analyticsCards = ['enhanced-hbi-insights', 'pipeline-analytics', 'market-intelligence']
-  const projectCards = ['project-overview', 'portfolio-overview', 'bd-opportunities']
-  const scheduleCards = ['schedule-performance', 'schedule-monitor', 'critical-dates']
-  
-  if (financialCards.includes(cardType)) return 'financial'
-  if (operationalCards.includes(cardType)) return 'operational'  
-  if (analyticsCards.includes(cardType)) return 'analytics'
-  if (projectCards.includes(cardType)) return 'project'
-  if (scheduleCards.includes(cardType)) return 'schedule'
-  
-  return 'project' // default
+const getCardCategory = (cardType: string): "financial" | "operational" | "analytics" | "project" | "schedule" => {
+  const financialCards = [
+    "financial-status",
+    "cash-flow",
+    "financial-review-panel",
+    "procurement",
+    "draw-forecast",
+    "contingency-analysis",
+  ]
+  const operationalCards = ["safety", "quality-control", "field-reports", "staffing-distribution"]
+  const analyticsCards = ["enhanced-hbi-insights", "pipeline-analytics", "market-intelligence"]
+  const projectCards = ["project-overview", "portfolio-overview", "bd-opportunities"]
+  const scheduleCards = ["schedule-performance", "schedule-monitor", "critical-dates"]
+
+  if (financialCards.includes(cardType)) return "financial"
+  if (operationalCards.includes(cardType)) return "operational"
+  if (analyticsCards.includes(cardType)) return "analytics"
+  if (projectCards.includes(cardType)) return "project"
+  if (scheduleCards.includes(cardType)) return "schedule"
+
+  return "project" // default
 }
 
-const getCategoryTheme = (category: 'financial' | 'operational' | 'analytics' | 'project' | 'schedule') => {
+const getCategoryTheme = (category: "financial" | "operational" | "analytics" | "project" | "schedule") => {
   const themes = {
     financial: {
       gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
       border: "border-gray-200 dark:border-gray-600",
       shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
+      accent:
+        "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none",
     },
     operational: {
       gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
       border: "border-gray-200 dark:border-gray-600",
       shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
+      accent:
+        "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none",
     },
     analytics: {
       gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
       border: "border-gray-200 dark:border-gray-600",
       shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
+      accent:
+        "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none",
     },
     project: {
       gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
       border: "border-gray-200 dark:border-gray-600",
       shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
+      accent:
+        "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none",
     },
     schedule: {
       gradient: "from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700",
       border: "border-gray-200 dark:border-gray-600",
       shadow: "shadow-gray-200/20 dark:shadow-gray-900/30",
-      accent: "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none"
-    }
+      accent:
+        "before:absolute before:inset-0 before:rounded-xl before:border-l-4 before:border-gray-300 dark:before:border-gray-500 before:pointer-events-none",
+    },
   }
-  
+
   return themes[category] || themes.project
 }
 
@@ -76,59 +137,59 @@ const getCategoryTheme = (category: 'financial' | 'operational' | 'analytics' | 
 const getCardIcon = (cardType: string) => {
   switch (cardType) {
     case "portfolio-overview":
-      return <Briefcase className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Briefcase className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "enhanced-hbi-insights":
-      return <Brain className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Brain className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "financial-review-panel":
-      return <BarChart3 className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <BarChart3 className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "pipeline-analytics":
-      return <Target className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Target className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "market-intelligence":
-      return <TrendingUp className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <TrendingUp className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "project-overview":
-      return <Building2 className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Building2 className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "schedule-performance":
-      return <Calendar className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Calendar className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "financial-status":
-      return <DollarSign className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <DollarSign className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "general-conditions":
-      return <Wrench className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Wrench className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "contingency-analysis":
-      return <Shield className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Shield className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "cash-flow":
-      return <Droplets className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Droplets className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "procurement":
-      return <Package className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Package className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "draw-forecast":
-      return <BarChart3 className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <BarChart3 className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "quality-control":
-      return <Eye className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Eye className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "safety":
-      return <AlertTriangleIcon className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <AlertTriangleIcon className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "staffing-distribution":
-      return <Users className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Users className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "change-order-analysis":
-      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <FileText className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "closeout":
-      return <ClipboardCheck className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <ClipboardCheck className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "startup":
-      return <Play className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Play className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "critical-dates":
-      return <CalendarDays className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <CalendarDays className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "field-reports":
-      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <FileText className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "rfi":
-      return <MessageSquare className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <MessageSquare className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "submittal":
-      return <FileText className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <FileText className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "health":
-      return <Heart className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Heart className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "schedule-monitor":
-      return <Calendar className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Calendar className="h-4 w-4" style={{ color: "#FA4616" }} />
     case "bd-opportunities":
-      return <Building2 className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <Building2 className="h-4 w-4" style={{ color: "#FA4616" }} />
     default:
-      return <TrendingUp className="h-4 w-4" style={{color: '#FA4616'}} />
+      return <TrendingUp className="h-4 w-4" style={{ color: "#FA4616" }} />
   }
 }
 
@@ -138,41 +199,55 @@ export const DashboardCardWrapper = ({
   onRemove,
   onConfigure,
   onDrillDown,
+  onSizeChange,
   dragHandleClass,
   isEditing = false,
-  isCompact = false
+  isCompact = false,
 }: DashboardCardWrapperProps) => {
   const [showActions, setShowActions] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showDrillDown, setShowDrillDown] = useState(false)
   const [isDrillDownActive, setIsDrillDownActive] = useState(false)
-  
+
   const category = getCardCategory(card.type)
   const theme = getCategoryTheme(category)
-  
+
   const toggleActions = () => {
     setShowActions(!showActions)
   }
 
   const handleDrillDown = (e: React.MouseEvent) => {
     e.stopPropagation()
-    
+
     // For specific card types, dispatch custom event to let the card handle its own drill down
-    if (card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'bd-opportunities' || card.type === 'market-intelligence' || card.type === 'portfolio-overview' || card.type === 'financial-review-panel' || card.type === 'staffing-distribution' || card.type === 'pipeline-analytics') {
+    if (
+      card.type === "enhanced-hbi-insights" ||
+      card.type === "health" ||
+      card.type === "startup" ||
+      card.type === "schedule-monitor" ||
+      card.type === "change-order-analysis" ||
+      card.type === "closeout" ||
+      card.type === "bd-opportunities" ||
+      card.type === "market-intelligence" ||
+      card.type === "portfolio-overview" ||
+      card.type === "financial-review-panel" ||
+      card.type === "staffing-distribution" ||
+      card.type === "pipeline-analytics"
+    ) {
       const newState = !isDrillDownActive
       setIsDrillDownActive(newState)
-      
-      const event = new CustomEvent('cardDrillDown', { 
-        detail: { 
-          cardId: card.id, 
+
+      const event = new CustomEvent("cardDrillDown", {
+        detail: {
+          cardId: card.id,
           cardType: card.type,
-          action: newState ? 'show' : 'hide'
-        } 
+          action: newState ? "show" : "hide",
+        },
       })
       window.dispatchEvent(event)
       return
     }
-    
+
     if (onDrillDown) {
       onDrillDown(card.id, card.type)
     } else {
@@ -188,13 +263,13 @@ export const DashboardCardWrapper = ({
       }
     }
 
-    window.addEventListener('cardDrillDownStateChange', handleDrillDownStateChange as EventListener)
-    
+    window.addEventListener("cardDrillDownStateChange", handleDrillDownStateChange as EventListener)
+
     return () => {
-      window.removeEventListener('cardDrillDownStateChange', handleDrillDownStateChange as EventListener)
+      window.removeEventListener("cardDrillDownStateChange", handleDrillDownStateChange as EventListener)
     }
   }, [card.id, card.type])
-  
+
   return (
     <div
       className={cn(
@@ -226,7 +301,7 @@ export const DashboardCardWrapper = ({
           {getCardIcon(card.type)}
           {/* Card Title */}
           <h3 className="text-sm font-semibold text-foreground truncate">
-            {card.title || card.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            {card.title || card.type.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
           </h3>
         </div>
         {/* Drill Down Button - closer to title */}
@@ -236,29 +311,66 @@ export const DashboardCardWrapper = ({
           className="h-6 px-2 text-xs hover:bg-transparent z-[70]"
           onClick={handleDrillDown}
         >
-                    <span className="mr-1">
-                  {(card.type === 'enhanced-hbi-insights' || card.type === 'health' || card.type === 'startup' || card.type === 'schedule-monitor' || card.type === 'change-order-analysis' || card.type === 'closeout' || card.type === 'field-reports' || card.type === 'critical-dates' || card.type === 'safety' || card.type === 'quality-control' || card.type === 'rfi' || card.type === 'submittal' || card.type === 'bd-opportunities' || card.type === 'market-intelligence' || card.type === 'portfolio-overview' || card.type === 'financial-review-panel' || card.type === 'staffing-distribution' || card.type === 'pipeline-analytics') && isDrillDownActive ? 'Hide Drill Down' :
-                   card.type === 'enhanced-hbi-insights' ? 'View HBI Insights' :
-                   card.type === 'health' ? 'View Health Details' :
-                   card.type === 'startup' ? 'View Startup Details' :
-                   card.type === 'schedule-monitor' ? 'View Schedule Details' :
-                   card.type === 'change-order-analysis' ? 'View Change Order Details' :
-                   card.type === 'closeout' ? 'View Closeout Details' :
-                   card.type === 'field-reports' ? 'View Field Reports Details' :
-                   card.type === 'critical-dates' ? 'View Critical Dates Details' :
-                   card.type === 'safety' ? 'View Safety Details' :
-                   card.type === 'quality-control' ? 'View Quality Control Details' :
-                   card.type === 'rfi' ? 'View RFI Details' :
-                   card.type === 'submittal' ? 'View Submittal Details' :
-                   card.type === 'bd-opportunities' ? 'View BD Opportunities Details' :
-                   card.type === 'market-intelligence' ? 'View Market Intelligence Details' :
-                   card.type === 'portfolio-overview' ? 'View Portfolio Details' :
-                   card.type === 'financial-review-panel' ? 'View Financial Review Details' :
-                   card.type === 'staffing-distribution' ? 'View Staffing Details' :
-                   card.type === 'pipeline-analytics' ? 'View Pipeline Details' :
-                   'View Details'}
+          <span className="mr-1">
+            {(card.type === "enhanced-hbi-insights" ||
+              card.type === "health" ||
+              card.type === "startup" ||
+              card.type === "schedule-monitor" ||
+              card.type === "change-order-analysis" ||
+              card.type === "closeout" ||
+              card.type === "field-reports" ||
+              card.type === "critical-dates" ||
+              card.type === "safety" ||
+              card.type === "quality-control" ||
+              card.type === "rfi" ||
+              card.type === "submittal" ||
+              card.type === "bd-opportunities" ||
+              card.type === "market-intelligence" ||
+              card.type === "portfolio-overview" ||
+              card.type === "financial-review-panel" ||
+              card.type === "staffing-distribution" ||
+              card.type === "pipeline-analytics") &&
+            isDrillDownActive
+              ? "Hide Drill Down"
+              : card.type === "enhanced-hbi-insights"
+              ? "View HBI Insights"
+              : card.type === "health"
+              ? "View Health Details"
+              : card.type === "startup"
+              ? "View Startup Details"
+              : card.type === "schedule-monitor"
+              ? "View Schedule Details"
+              : card.type === "change-order-analysis"
+              ? "View Change Order Details"
+              : card.type === "closeout"
+              ? "View Closeout Details"
+              : card.type === "field-reports"
+              ? "View Field Reports Details"
+              : card.type === "critical-dates"
+              ? "View Critical Dates Details"
+              : card.type === "safety"
+              ? "View Safety Details"
+              : card.type === "quality-control"
+              ? "View Quality Control Details"
+              : card.type === "rfi"
+              ? "View RFI Details"
+              : card.type === "submittal"
+              ? "View Submittal Details"
+              : card.type === "bd-opportunities"
+              ? "View BD Opportunities Details"
+              : card.type === "market-intelligence"
+              ? "View Market Intelligence Details"
+              : card.type === "portfolio-overview"
+              ? "View Portfolio Details"
+              : card.type === "financial-review-panel"
+              ? "View Financial Review Details"
+              : card.type === "staffing-distribution"
+              ? "View Staffing Details"
+              : card.type === "pipeline-analytics"
+              ? "View Pipeline Details"
+              : "View Details"}
           </span>
-          <ChevronRight className="h-3 w-3" style={{ color: '#FA4616' }} />
+          <ChevronRight className="h-3 w-3" style={{ color: "#FA4616" }} />
         </Button>
       </div>
 
@@ -267,10 +379,10 @@ export const DashboardCardWrapper = ({
         <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-sm rounded-xl flex items-center justify-center">
           <div className="text-center p-6">
             <div className="h-12 w-12 mx-auto mb-4 flex items-center justify-center">
-              {React.cloneElement(getCardIcon(card.type), { className: "h-12 w-12", style: { color: '#FA4616' } })}
+              {React.cloneElement(getCardIcon(card.type), { className: "h-12 w-12", style: { color: "#FA4616" } })}
             </div>
             <h3 className="text-xl font-bold text-white mb-2">
-              {card.title || card.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Details
+              {card.title || card.type.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())} Details
             </h3>
             <p className="text-gray-300 mb-6">Detailed analytics and insights would appear here</p>
             <Button
@@ -286,7 +398,7 @@ export const DashboardCardWrapper = ({
           </div>
         </div>
       )}
-      
+
       {/* Enhanced Card Controls Overlay - always visible in edit mode */}
       {isEditing && (
         <div className="absolute -top-2 -right-2 z-20 flex gap-1 transition-all duration-200 opacity-100 scale-100">
@@ -314,7 +426,7 @@ export const DashboardCardWrapper = ({
           </Button>
         </div>
       )}
-      
+
       {/* Enhanced Drag Handle - always visible in edit mode */}
       {isEditing && (
         <div className="absolute top-2 right-2 z-10 transition-all duration-200 cursor-move opacity-100">
@@ -323,34 +435,36 @@ export const DashboardCardWrapper = ({
           </div>
         </div>
       )}
-      
+
       {/* Enhanced Card Actions Menu - show/hide on click */}
       {!isEditing && (
-        <div className={cn(
-          "absolute top-3 right-3 z-10 transition-all duration-200",
-          showActions ? "opacity-100" : "opacity-60"
-        )}>
+        <div
+          className={cn(
+            "absolute top-3 right-3 z-10 transition-all duration-200",
+            showActions ? "opacity-100" : "opacity-60"
+          )}
+        >
           <DropdownMenu open={showActions} onOpenChange={setShowActions}>
-                      <DropdownMenuTrigger asChild>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-9 w-9 p-0 bg-gray-100 dark:bg-gray-700 backdrop-blur-sm hover:bg-gray-200 dark:hover:bg-gray-600"
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowActions(!showActions)
-              }}
-            >
-              <MoreVertical className="h-4 w-4 text-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 bg-popover/95 backdrop-blur-sm border-2 border-border/50">
-              <DropdownMenuItem 
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-9 w-9 p-0 bg-gray-100 dark:bg-gray-700 backdrop-blur-sm hover:bg-gray-200 dark:hover:bg-gray-600"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowActions(!showActions)
+                }}
+              >
+                <MoreVertical className="h-4 w-4 text-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 bg-popover/95 backdrop-blur-sm border-2 border-border/50">
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
                   setIsExpanded(!isExpanded)
                   setShowActions(false)
-                }} 
+                }}
                 className="text-foreground hover:bg-accent/80"
               >
                 {isExpanded ? (
@@ -365,43 +479,79 @@ export const DashboardCardWrapper = ({
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuItem 
+
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
                   onConfigure?.(card.id)
                   setShowActions(false)
-                }} 
+                }}
                 className="text-foreground hover:bg-accent/80"
               >
                 <Settings2 className="h-3 w-3 mr-2" />
                 Configure
               </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Card Size Selection */}
+              <DropdownMenuLabel className="text-xs font-medium text-muted-foreground px-2 py-1.5">
+                Card Size
+              </DropdownMenuLabel>
+
+              {CARD_SIZES.map((size) => (
+                <DropdownMenuItem
+                  key={size.value}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSizeChange?.(card.id, size.value)
+                    setShowActions(false)
+                  }}
+                  className={cn(
+                    "text-foreground hover:bg-accent/80 px-2 py-1.5",
+                    card.size === size.value && "bg-accent text-accent-foreground"
+                  )}
+                >
+                  <div className="flex items-center w-full">
+                    <LayoutGrid className="h-3 w-3 mr-2 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{size.label}</div>
+                      <div className="text-xs text-muted-foreground">{size.description}</div>
+                    </div>
+                    {card.size === size.value && <div className="w-2 h-2 rounded-full bg-primary ml-2 flex-shrink-0" />}
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       )}
-      
+
       {/* Enhanced content wrapper */}
-      <div className={cn(
-        "relative h-full rounded-xl overflow-hidden pt-16", // Added top padding for header
-        // Enhanced expanded state
-        isExpanded && "fixed inset-4 z-50 bg-background/98 backdrop-blur-lg shadow-2xl border-2 border-border/50"
-      )}>
+      <div
+        className={cn(
+          "relative h-full rounded-xl overflow-hidden pt-16", // Added top padding for header
+          // Enhanced expanded state
+          isExpanded && "fixed inset-4 z-50 bg-background/98 backdrop-blur-lg shadow-2xl border-2 border-border/50"
+        )}
+      >
         {children}
       </div>
-      
+
       {/* Category indicator */}
       <div className="absolute bottom-2 left-2 z-10">
-        <div className={cn(
-          "px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm",
-          "bg-background/60 text-foreground/70 border border-border/40"
-        )}>
+        <div
+          className={cn(
+            "px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm",
+            "bg-background/60 text-foreground/70 border border-border/40"
+          )}
+        >
           {category}
         </div>
       </div>
-      
+
       {/* Loading shimmer effect for empty states */}
-      {card.type === 'placeholder' && (
+      {card.type === "placeholder" && (
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
       )}
     </div>
