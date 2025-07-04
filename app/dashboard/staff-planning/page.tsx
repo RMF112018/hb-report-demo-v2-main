@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '@/context/auth-context'
+import { useRouter } from 'next/navigation'
 import { AppHeader } from '@/components/layout/app-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,7 +30,8 @@ import {
   Download,
   Plus,
   DollarSign,
-  BarChart3
+  BarChart3,
+  EllipsisVertical
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -44,8 +47,10 @@ import spcrData from '@/data/mock/staffing/spcr.json'
 
 export default function StaffPlanningPage() {
   const { user } = useAuth()
+  const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
 
   if (!user) {
     return (
@@ -107,11 +112,11 @@ export default function StaffPlanningPage() {
   const getPageTitle = () => {
     switch (user.role) {
       case 'executive':
-        return 'Enterprise Staffing Management'
+        return 'Portfolio Staffing Management'
       case 'project-executive':
         return 'Portfolio Staffing Dashboard'
       case 'project-manager':
-        return 'Project Team Management'
+        return 'Project Staffing Dashboard'
       default:
         return 'Staff Planning'
     }
@@ -169,6 +174,11 @@ export default function StaffPlanningPage() {
       title: "SPCR Creation",
       description: "Redirecting to SPCR creation form",
     })
+  }
+
+  // Handle create staffing plan
+  const handleCreateStaffingPlan = () => {
+    router.push('/dashboard/staff-planning/staffing-plan')
   }
 
   // Statistics widgets
@@ -282,42 +292,82 @@ export default function StaffPlanningPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header Section */}
-        <div className="flex flex-col gap-4" data-tour="staffing-header">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">{getPageTitle()}</h1>
-              <p className="text-muted-foreground mt-1">{getPageDescription()}</p>
-              <div className="flex items-center gap-4 mt-2" data-tour="role-badges">
-                {getRoleBadge()}
-                <Badge variant="outline" className="px-3 py-1">
-                  {stats.projectScope}
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  {stats.totalStaff} Staff Members
-                </Badge>
+        {/* Header Section - Made Sticky */}
+        <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
+          <div className="flex flex-col gap-4 pt-3" data-tour="staffing-header">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">{getPageTitle()}</h1>
+                <p className="text-muted-foreground mt-1">{getPageDescription()}</p>
+              </div>
+              <div className="flex items-center gap-3" data-tour="action-controls">
+                {(user.role === 'project-manager' || user.role === 'project-executive') && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-0" align="end">
+                      <div className="p-1">
+                        <button
+                          onClick={handleCreateStaffingPlan}
+                          className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                        >
+                          <Calendar className="h-4 w-4" />
+                          Staffing Plan
+                        </button>
+                        <button
+                          onClick={handleCreateSpcr}
+                          className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                        >
+                          <FileText className="h-4 w-4" />
+                          SPCR
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+                
+                {/* More Actions Menu */}
+                <Popover open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="px-2" data-tour="more-actions-menu">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-0" align="end">
+                    <div className="p-1">
+                      <button
+                        onClick={() => {
+                          handleRefresh();
+                          setMoreMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                        Refresh
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleExport();
+                          setMoreMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Export
+                      </button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
-            <div className="flex items-center gap-3" data-tour="action-controls">
-              <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button variant="outline" onClick={handleExport}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              {(user.role === 'project-manager' || user.role === 'project-executive') && (
-                <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]" onClick={handleCreateSpcr}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create SPCR
-                </Button>
-              )}
-            </div>
-          </div>
 
-          {/* Statistics Widgets */}
-          <StaffingWidgets />
+            {/* Statistics Widgets */}
+            <StaffingWidgets />
+          </div>
         </div>
 
         {/* Main Content */}

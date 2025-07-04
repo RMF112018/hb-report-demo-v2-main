@@ -1,15 +1,19 @@
 export interface TourStep {
   id: string
   title: string
-  content: string
-  target: string // CSS selector for the element to highlight
-  placement: 'top' | 'bottom' | 'left' | 'right' | 'center'
+  description: string // Updated from 'content' to 'description' for modal format
+  screenshotUrl: string // Path to pre-generated screenshot
+  highlightRect?: { x: number; y: number; width: number; height: number } // Optional highlight rectangle
   nextButton?: string
   prevButton?: string
   showSkip?: boolean
   onNext?: () => void
   onPrev?: () => void
   onSkip?: () => void
+  // Legacy fields for backward compatibility during migration
+  content?: string // @deprecated - use description instead
+  target?: string // @deprecated - not used in modal mode
+  placement?: 'top' | 'bottom' | 'left' | 'right' | 'center' // @deprecated - not used in modal mode
 }
 
 export interface TourDefinition {
@@ -62,7 +66,7 @@ const validateAllTourDefinitions = (tourDefinitions: TourDefinition[]) => {
   return errors
 }
 
-// Login Tour Definition
+// Login Tour Definition - Updated for Modal Format
 export const loginTour: TourDefinition = {
   id: 'login-demo-accounts',
   name: 'Demo Account Selection',
@@ -72,65 +76,38 @@ export const loginTour: TourDefinition = {
     {
       id: 'welcome',
       title: 'Welcome to HB Intel Demo!',
-      content: 'This guided tour will show you how to explore the application with different user roles. Each role provides access to different features and dashboard layouts.',
-      target: '.login-card',
-      placement: 'center',
+      description: 'This guided tour will show you how to explore the application with different user roles. Each role provides access to different features and dashboard layouts.',
+      screenshotUrl: '/tours/login/step-1.png',
       nextButton: 'Get Started',
       showSkip: true
     },
     {
       id: 'demo-accounts-button',
       title: 'Demo Account Access',
-      content: 'Click this button to see available demo accounts. Each account represents a different user role with specific permissions and dashboard configurations.<br/><br/><strong>Go ahead and click it now!</strong>',
-      target: '[data-tour="demo-accounts-toggle"]',
-      placement: 'left',
-      nextButton: 'Continue',
-      onNext: () => {
-        // Ensure demo accounts dropdown is open for next step
-        const button = document.querySelector('[data-tour="demo-accounts-toggle"]') as HTMLButtonElement
-        const dropdown = document.querySelector('[data-tour="demo-accounts-list"]')
-        
-        if (button && !dropdown) {
-          button.click()
-        }
-        
-        // Small delay to allow DOM to update
-        setTimeout(() => {
-          const newDropdown = document.querySelector('[data-tour="demo-accounts-list"]')
-          if (newDropdown) {
-            newDropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-          }
-        }, 300)
-      }
+      description: 'Click this button to see available demo accounts. Each account represents a different user role with specific permissions and dashboard configurations.<br/><br/><strong>Go ahead and click it now!</strong>',
+      screenshotUrl: '/tours/login/step-2.png',
+      highlightRect: { x: 1336, y: 616, width: 400, height: 44 },
+      nextButton: 'Continue'
     },
     {
       id: 'role-selection',
       title: 'Choose Your Role',
-      content: 'Each demo account represents a different user role with unique dashboard layouts and features.<br/><br/><strong>💼 Executive</strong> - Portfolio overview<br/><strong>👥 Project Executive</strong> - Multi-project management<br/><strong>📊 Project Manager</strong> - Detailed controls<br/><strong>🏗️ Estimator</strong> - Pre-construction focus<br/><strong>⚙️ Admin</strong> - System administration<br/><br/><em>Click any account to log in and explore!</em>',
-      target: '[data-tour="demo-accounts-list"]',
-      placement: 'left',
+      description: 'Each demo account represents a different user role with unique dashboard layouts and features.<br/><br/><strong>💼 Executive</strong> - Portfolio overview<br/><strong>👥 Project Executive</strong> - Multi-project management<br/><strong>📊 Project Manager</strong> - Detailed controls<br/><strong>🏗️ Estimator</strong> - Pre-construction focus<br/><strong>⚙️ Admin</strong> - System administration<br/><br/><em>Click any account to log in and explore!</em>',
+      screenshotUrl: '/tours/login/step-3.png',
+      highlightRect: { x: 1336, y: 616, width: 400, height: 178 },
       nextButton: 'Got it!'
     },
     {
       id: 'login-process',
       title: 'Automatic Login',
-      content: 'Once you select a demo account, you\'ll be automatically logged in and redirected to the appropriate dashboard for that role. The dashboard content and available tools will vary based on your selected role.',
-      target: '.login-form',
-      placement: 'right',
-      nextButton: 'Start Exploring',
-      onNext: () => {
-        // Close demo accounts dropdown if open
-        const button = document.querySelector('[data-tour="demo-accounts-toggle"]') as HTMLButtonElement
-        const dropdown = document.querySelector('[data-tour="demo-accounts-list"]')
-        if (button && dropdown) {
-          button.click()
-        }
-      }
+      description: 'Once you select a demo account, you\'ll be automatically logged in and redirected to the appropriate dashboard for that role. The dashboard content and available tools will vary based on your selected role.',
+      screenshotUrl: '/tours/login/step-4.png',
+      nextButton: 'Start Exploring'
     }
   ]
 }
 
-// Dashboard Tour Definition
+// Dashboard Tour Definition - Updated for Modal Format
 export const dashboardTour: TourDefinition = {
   id: 'dashboard-overview',
   name: 'Complete Dashboard Tour',
@@ -140,65 +117,65 @@ export const dashboardTour: TourDefinition = {
     {
       id: 'dashboard-welcome',
       title: 'Welcome to Your Dashboard!',
-      content: 'This dashboard is customized for your role and provides the most relevant information and tools for your daily work. The layout is now streamlined with a sticky header for better navigation. Let\'s explore all the features available to you.',
-      target: '[data-tour="dashboard-content"]',
-      placement: 'center',
+      description: 'This dashboard is customized for your role and provides the most relevant information and tools for your daily work. The layout is streamlined with a sticky header for better navigation.<br/><br/>Let\'s explore all the features available to you and learn how to maximize your productivity!',
+      screenshotUrl: '/tours/dashboard/step-1.png',
+      highlightRect: { x: 48, y: 280, width: 1824, height: 600 },
       nextButton: 'Start Tour'
     },
     {
       id: 'app-header',
       title: 'Navigation Header',
-      content: 'The main navigation header provides access to different work environments:<br/><br/><strong>📊 Operations</strong> - Active project management<br/><strong>🏗️ Pre-Construction</strong> - Planning and estimation<br/><strong>📁 Archive</strong> - Completed projects<br/><br/>Plus project selection, tools, and global search functionality.',
-      target: '[data-tour="app-header"]',
-      placement: 'bottom',
+      description: 'The main navigation header provides access to different work environments and core functionality:<br/><br/><strong>🏢 HB Intel Logo</strong> - Return to dashboard<br/><strong>📊 Projects Menu</strong> - Select and filter projects<br/><strong>🛠️ Tools Menu</strong> - Access all platform tools<br/><strong>🔍 Global Search</strong> - Find anything quickly<br/><strong>👤 User Menu</strong> - Profile and settings<br/><br/>Everything you need is right at your fingertips.',
+      screenshotUrl: '/tours/dashboard/step-2.png',
+      highlightRect: { x: 0, y: 0, width: 1920, height: 80 },
+      nextButton: 'Continue'
+    },
+    {
+      id: 'projects-menu',
+      title: 'Project Selection',
+      description: 'The Projects menu allows you to:<br/><br/>• <strong>Select specific projects</strong> to focus your dashboard<br/>• <strong>Filter by construction stage</strong> (Pre-construction, Construction, Close-out)<br/>• <strong>View project details</strong> and quick stats<br/>• <strong>Navigate to Project Control Center</strong> for detailed management<br/><br/>Your dashboard content dynamically updates based on your selection.',
+      screenshotUrl: '/tours/dashboard/step-3.png',
+      highlightRect: { x: 250, y: 80, width: 350, height: 300 },
+      nextButton: 'Next'
+    },
+    {
+      id: 'tools-menu',
+      title: 'Tools & Navigation',
+      description: 'Access the complete HB Intel platform through organized tool categories:<br/><br/><strong>🔧 Core Tools</strong> - Dashboard, Reports, Staffing<br/><strong>💰 Financial Management</strong> - Financial Hub, Procurement<br/><strong>🏗️ Field Management</strong> - Scheduler, Constraints, Field Reports<br/><strong>📋 Compliance</strong> - Contracts, Trade Partners<br/><br/>Tools are filtered based on your role and permissions.',
+      screenshotUrl: '/tours/dashboard/step-4.png',
+      highlightRect: { x: 650, y: 80, width: 400, height: 350 },
       nextButton: 'Continue'
     },
     {
       id: 'dashboard-page-header',
       title: 'Dashboard Header',
-      content: 'The dashboard header stays visible as you scroll, providing quick access to key controls. Notice how it\'s positioned below the main navigation for optimal workflow.',
-      target: '[data-tour="dashboard-page-header"]',
-      placement: 'bottom',
+      description: 'The dashboard header stays visible as you scroll, providing quick access to key controls:<br/><br/>• <strong>Breadcrumb navigation</strong> for easy back-navigation<br/>• <strong>Dashboard title and description</strong> for context<br/>• <strong>Fullscreen mode</strong> for presentations<br/>• <strong>More actions menu</strong> for advanced features<br/><br/>Notice how it\'s positioned below the main navigation for optimal workflow.',
+      screenshotUrl: '/tours/dashboard/step-5.png',
+      highlightRect: { x: 0, y: 80, width: 1920, height: 120 },
       nextButton: 'Next'
     },
     {
       id: 'dashboard-tabs',
       title: 'Dashboard Views',
-      content: 'Switch between different dashboard layouts using these tabs. Each tab represents a specialized view optimized for different aspects of your role:<br/><br/>• <strong>Executive Overview</strong> - High-level metrics<br/>• <strong>Financial Review</strong> - Budget and cost analysis<br/>• <strong>Project Status</strong> - Current project health<br/><br/>Simply click any tab to switch views instantly.',
-      target: '[data-tour="dashboard-tabs"]',
-      placement: 'bottom',
-      nextButton: 'Continue'
-    },
-    {
-      id: 'fullscreen-control',
-      title: 'Fullscreen Mode',
-      content: 'Click this button to enter fullscreen mode for an immersive dashboard experience. Perfect for presentations or when you need to focus on the data without distractions.',
-      target: '[data-tour="fullscreen-button"]',
-      placement: 'bottom',
-      nextButton: 'Next'
-    },
-    {
-      id: 'more-actions-menu',
-      title: 'More Actions',
-      content: 'The ellipsis menu (⋮) provides additional dashboard controls:<br/><br/><strong>🔄 Refresh</strong> - Update all dashboard data<br/><strong>✏️ Edit Dashboard</strong> - Customize layout and widgets<br/><strong>📐 Layout Density</strong> - Adjust spacing (Compact, Normal, Spacious)<br/><strong>➕ Create New Dashboard</strong> - Coming soon feature<br/><br/>These options keep the interface clean while providing powerful functionality.',
-      target: '[data-tour="more-actions-menu"]',
-      placement: 'left',
+      description: 'Switch between different dashboard layouts using these tabs. Each tab represents a specialized view optimized for different aspects of your role:<br/><br/>• <strong>Executive Overview</strong> - High-level metrics and KPIs<br/>• <strong>Financial Review</strong> - Budget and cost analysis<br/>• <strong>Project Status</strong> - Current project health<br/>• <strong>Operations</strong> - Daily management tools<br/><br/>Simply click any tab to switch views instantly.',
+      screenshotUrl: '/tours/dashboard/step-6.png',
+      highlightRect: { x: 48, y: 280, width: 600, height: 48 },
       nextButton: 'Continue'
     },
     {
       id: 'dashboard-content',
       title: 'Dynamic Dashboard Content',
-      content: 'The main dashboard area displays widgets and analytics cards based on your selected view. Content is dynamically loaded and optimized for your role and current context.',
-      target: '[data-tour="dashboard-content"]',
-      placement: 'top',
+      description: 'The main dashboard area displays widgets and analytics cards based on your selected view:<br/><br/>• <strong>Real-time data</strong> updates automatically<br/>• <strong>Interactive charts</strong> and visualizations<br/>• <strong>Customizable layout</strong> - drag and drop to reorganize<br/>• <strong>Role-specific content</strong> optimized for your workflow<br/><br/>Content is dynamically loaded and optimized for your role and current context.',
+      screenshotUrl: '/tours/dashboard/step-7.png',
+      highlightRect: { x: 48, y: 350, width: 1824, height: 500 },
       nextButton: 'Next'
     },
     {
-      id: 'edit-mode-preview',
-      title: 'Customization Features',
-      content: 'When you enter edit mode through the ellipsis menu, you can:<br/><br/>• Drag and drop widgets to reorganize<br/>• Resize cards for optimal viewing<br/>• Add or remove dashboard components<br/>• Save custom layouts<br/>• Reset to default configurations<br/><br/>Your dashboard becomes fully customizable to match your workflow.',
-      target: '[data-tour="dashboard-content"]',
-      placement: 'center',
+      id: 'customization-features',
+      title: 'Customization & Settings',
+      description: 'The More Actions menu (⋮) provides powerful customization options:<br/><br/><strong>🔄 Refresh</strong> - Update all dashboard data<br/><strong>✏️ Edit Dashboard</strong> - Customize layout and widgets<br/><strong>📐 Layout Density</strong> - Adjust spacing (Compact, Normal, Spacious)<br/><strong>➕ Create New Dashboard</strong> - Coming soon feature<br/><br/>You can:<br/>• Drag and drop widgets to reorganize<br/>• Resize cards for optimal viewing<br/>• Add or remove dashboard components<br/>• Save custom layouts<br/>• Reset to default configurations',
+      screenshotUrl: '/tours/dashboard/step-8.png',
+      highlightRect: { x: 1650, y: 120, width: 250, height: 200 },
       nextButton: 'Finish Tour'
     }
   ]
@@ -215,9 +192,8 @@ export const executiveStaffingTour: TourDefinition = {
     {
       id: 'staffing-welcome',
       title: 'Welcome to Enterprise Staffing',
-      content: 'As an Executive, you have comprehensive oversight of all staffing across the organization. This dashboard provides strategic insights into resource allocation, costs, and performance across all projects and departments.',
-      target: '[data-tour="staffing-header"]',
-      placement: 'center',
+      description: 'As an Executive, you have comprehensive oversight of all staffing across the organization. This dashboard provides strategic insights into resource allocation, costs, and performance across all projects and departments.',
+      screenshotUrl: '/tours/staffing/step-1.png',
       nextButton: 'Begin Tour'
     },
     {
@@ -306,9 +282,8 @@ export const projectExecutiveStaffingTour: TourDefinition = {
     {
       id: 'portfolio-welcome',
       title: 'Portfolio Staffing Dashboard',
-      content: 'Welcome to your Portfolio Staffing Dashboard! As a Project Executive, you manage staffing across multiple projects with focus on optimization and performance tracking.',
-      target: '[data-tour="staffing-header"]',
-      placement: 'center',
+      description: 'Welcome to your Portfolio Staffing Dashboard! As a Project Executive, you manage staffing across multiple projects with focus on optimization and performance tracking.',
+      screenshotUrl: '/tours/staffing/step-1.png',
       nextButton: 'Start Tour'
     },
     {
@@ -487,9 +462,8 @@ export const financialHubTour: TourDefinition = {
     {
       id: 'financial-welcome',
       title: 'Welcome to the Financial Hub!',
-      content: 'The Financial Hub is your central command center for all financial management and analysis. Access comprehensive tools for budget tracking, cash flow analysis, and financial reporting.',
-      target: '[data-tour="financial-hub-header"]',
-      placement: 'center',
+      description: 'The Financial Hub is your central command center for all financial management and analysis. Access comprehensive tools for budget tracking, cash flow analysis, and financial reporting.',
+      screenshotUrl: '/tours/financial-hub/step-1.png',
       nextButton: 'Start Tour',
       showSkip: true
     },

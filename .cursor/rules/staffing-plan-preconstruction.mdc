@@ -1,0 +1,80 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+name: staffing-plan-preconstruction
+description: >
+  Ruleset for implementing a digital preconstruction staffing planning tool
+  based on the legacy Excel workflow. The tool supports summary activity mapping,
+  Gantt chart visualization, and monthly role allocation, with optional dynamic linkage
+  to project schedule data.
+
+inputs:
+  - projects.json
+  - staffing.json
+  - schedule.json
+
+rules:
+  - id: activity-definition
+    description: >
+      Each summary activity must have a name, start date, and finish date.
+      Activities may optionally link to an existing schedule activity via activityId.
+    fields:
+      - name: string (required)
+      - startDate: date (required)
+      - endDate: date (required)
+      - linkedScheduleActivityId: string (optional)
+
+  - id: timeline-rendering
+    description: >
+      The horizontal timeline grid is dynamically generated from project start to end date,
+      as defined in projects.json. Months are shown as columns.
+
+  - id: gantt-visualization
+    description: >
+      A Gantt chart must be rendered to visually represent the staffing activities over time.
+      Each summary activity appears as a bar between its start and end date.
+      The Gantt chart must update if activity dates are changed or linked schedule activities are updated.
+
+  - id: staffing-matrix
+    description: >
+      A two-dimensional matrix (role x month) captures required staffing levels.
+      Each cell contains an integer value ≥ 0 representing the number of FTEs needed for that role in that month.
+    structure:
+      - rows: pulled from staffing.json roles
+      - columns: derived from month range of selected project
+
+  - id: linkage-logic
+    description: >
+      If a summary activity is linked to a schedule.json activity, the start and end dates
+      are auto-synced and dynamically updated if the source schedule changes.
+
+  - id: validation
+    description: >
+      All FTE values must be numeric and non-negative. Duplicate position labels must be de-duplicated or aggregated.
+
+  - id: output-format
+    description: >
+      The tool should be able to output the entire staffing plan as a JSON payload,
+      with options to export to Excel or PDF for reporting purposes.
+
+  - id: ui-integration
+    description: >
+      This tool must be accessible from the main staffing page via a new "Create" button.
+      When clicked, it opens a popover with two options: "Staffing Plan" and "SPCR".
+      "Staffing Plan" routes to the new planning tool. "SPCR" executes the original Create SPCR logic.
+      The existing "Create SPCR" button must be removed. This Create button must appear only for users
+      with roles 'project-executive' and 'project-manager'.
+
+outputs:
+  - JSON staffing plan payload
+  - Excel export (xlsx)
+  - PDF export
+
+ui:
+  - Tailwind CSS and Shadcn UI components
+  - Responsive design with light and dark theme support
+  - Activity editor and staffing grid with editable cells
+  - Gantt chart for activity duration visualization
+  - Create button with popover on staffing page for authorized users
