@@ -347,22 +347,46 @@ export default function ProcurementLogPage() {
       </CardHeader>
       <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3" data-tour="procurement-log-tabs">
-            <TabsTrigger value="log" className="flex items-center gap-2" data-tour="procurement-tab">
+          <div className="flex space-x-1 p-1 bg-muted rounded-lg mb-6" data-tour="procurement-log-tabs">
+            <button
+              onClick={() => setActiveTab("log")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "log"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-tour="procurement-tab"
+            >
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Procurement Log</span>
-            </TabsTrigger>
-            <TabsTrigger value="sync" className="flex items-center gap-2" data-tour="sync-tab">
+            </button>
+            <button
+              onClick={() => setActiveTab("sync")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "sync"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-tour="sync-tab"
+            >
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">Procore Sync</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2" data-tour="analytics-tab">
+            </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "analytics"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-tour="analytics-tab"
+            >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
 
-          <TabsContent value="log" className="mt-6">
+          <TabsContent value="log">
             <div className="space-y-6">
               {/* Search and Filters */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -429,7 +453,7 @@ export default function ProcurementLogPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="sync" className="mt-6">
+          <TabsContent value="sync">
             <ProcurementSyncPanel
               onSync={handleProcoreSync}
               isLoading={isLoading}
@@ -438,7 +462,7 @@ export default function ProcurementLogPage() {
             />
           </TabsContent>
 
-          <TabsContent value="analytics" className="mt-6">
+          <TabsContent value="analytics">
             <div className="space-y-6">
               <ProcurementStatsPanel stats={procurementStats} />
               <HbiProcurementInsights procurementStats={procurementStats} />
@@ -455,25 +479,24 @@ export default function ProcurementLogPage() {
       <div className="space-y-6 p-6">
         {!isFullScreen && (
           <>
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
-                    <Home className="h-3 w-3" />
-                    Dashboard
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Procurement Log</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            {/* Sticky Header with Breadcrumbs */}
+            <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-sm border-b pb-4">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                      <Home className="h-3 w-3" />
+                      Dashboard
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Procurement Log</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
 
-            {/* Header Section */}
-            <div className="flex flex-col gap-4" data-tour="procurement-log-page-header">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mt-4">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Procurement Log</h1>
                   <p className="text-muted-foreground mt-1">
@@ -499,73 +522,178 @@ export default function ProcurementLogPage() {
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Statistics Widgets */}
-              <div data-tour="procurement-log-quick-stats">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Total Value</p>
-                          <p className="text-2xl font-bold">
-                            {stats.totalValue.toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "USD",
-                              minimumFractionDigits: 0,
-                            })}
-                          </p>
-                        </div>
-                        <DollarSign className="h-8 w-8 text-[#FF6B35]" />
+            {/* Main Layout with Sidebar */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+              {/* Sidebar */}
+              <div className="xl:col-span-3 space-y-6">
+                {/* Quick Stats */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Stats</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-[#FF6B35]" />
+                        <span className="text-sm text-muted-foreground">Total Value</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Active</p>
-                          <p className="text-2xl font-bold">{procurementStats.activeProcurements}</p>
-                        </div>
-                        <Activity className="h-8 w-8 text-green-500" />
+                      <span className="font-semibold">
+                        {stats.totalValue.toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                          minimumFractionDigits: 0,
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Active</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                          <p className="text-2xl font-bold">{procurementStats.completedProcurements}</p>
-                        </div>
-                        <CheckCircle className="h-8 w-8 text-blue-500" />
+                      <span className="font-semibold">{procurementStats.activeProcurements}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">Completed</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Pending Approval</p>
-                          <p className="text-2xl font-bold">{procurementStats.pendingApprovals}</p>
-                        </div>
-                        <Clock className="h-8 w-8 text-orange-500" />
+                      <span className="font-semibold">{procurementStats.completedProcurements}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm text-muted-foreground">Pending</span>
                       </div>
-                    </CardContent>
-                  </Card>
+                      <span className="font-semibold">{procurementStats.pendingApprovals}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {dataScope.canCreate && (
+                      <Button
+                        onClick={() => setShowRecordForm(true)}
+                        className="w-full bg-[#FF6B35] hover:bg-[#E55A2B]"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Record
+                      </Button>
+                    )}
+                    {dataScope.canSync && (
+                      <Button variant="outline" onClick={handleProcoreSync} disabled={isLoading} className="w-full">
+                        <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                        Sync Procore
+                      </Button>
+                    )}
+                    <Button variant="outline" onClick={() => setIsExportModalOpen(true)} className="w-full">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Data
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Procurement Status */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Status Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary" className="text-xs">
+                        Planning
+                      </Badge>
+                      <span className="text-sm font-medium">
+                        {procurementRecords.filter((r) => r.status === "planning").length}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="default" className="text-xs bg-yellow-500">
+                        Bidding
+                      </Badge>
+                      <span className="text-sm font-medium">
+                        {procurementRecords.filter((r) => r.status === "bidding").length}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="default" className="text-xs bg-orange-500">
+                        Negotiation
+                      </Badge>
+                      <span className="text-sm font-medium">
+                        {procurementRecords.filter((r) => r.status === "negotiation").length}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="default" className="text-xs bg-green-500">
+                        Awarded
+                      </Badge>
+                      <span className="text-sm font-medium">
+                        {procurementRecords.filter((r) => r.status === "awarded").length}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Key Performance Metrics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Key Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Compliance Rate</span>
+                      </div>
+                      <span className="font-semibold">{stats.complianceRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">Vendors</span>
+                      </div>
+                      <span className="font-semibold">{stats.vendorCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Target className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm text-muted-foreground">Avg Cycle Time</span>
+                      </div>
+                      <span className="font-semibold">{procurementStats.avgCycleTime} days</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-[#FF6B35]" />
+                        <span className="text-sm text-muted-foreground">Avg Savings</span>
+                      </div>
+                      <span className="font-semibold">{stats.avgSavings.toFixed(1)}%</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content */}
+              <div className="xl:col-span-9">
+                {/* HBI Insights Panel */}
+                <div className="mb-6" data-tour="procurement-hbi-insights">
+                  <HbiProcurementInsights procurementStats={procurementStats} />
                 </div>
+
+                {/* Main Content Card */}
+                <ProcurementLogContentCard />
               </div>
             </div>
           </>
         )}
 
-        {/* HBI Insights Panel */}
-        <div data-tour="procurement-hbi-insights">
-          <HbiProcurementInsights procurementStats={procurementStats} />
-        </div>
-
-        {/* Main Content */}
-        <ProcurementLogContentCard />
+        {/* Fullscreen Content */}
+        {isFullScreen && <ProcurementLogContentCard />}
 
         {/* Record Form Modal */}
         <Dialog open={showRecordForm} onOpenChange={setShowRecordForm}>

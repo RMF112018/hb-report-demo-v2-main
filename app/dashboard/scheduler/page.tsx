@@ -25,6 +25,7 @@ import {
   RefreshCw,
   MoreVertical,
   Import,
+  Building2,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -248,25 +249,24 @@ export default function SchedulerPage() {
     <>
       <AppHeader />
       <div className="space-y-6 p-6">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
-                <Home className="h-3 w-3" />
-                Dashboard
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Scheduler</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        {/* Sticky Header with Breadcrumbs */}
+        <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-sm border-b pb-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                  <Home className="h-3 w-3" />
+                  Dashboard
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Scheduler</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        {/* Header Section */}
-        <div className="flex flex-col gap-4" data-tour="scheduler-page-header">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Scheduler</h1>
               <p className="text-muted-foreground mt-1">AI-powered project scheduling and optimization platform</p>
@@ -318,8 +318,8 @@ export default function SchedulerPage() {
             </div>
           </div>
 
-          {/* Statistics Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {/* Statistics Widgets - Single Row */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6" data-tour="scheduler-quick-stats">
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="flex items-center justify-center mb-2">
@@ -383,128 +383,194 @@ export default function SchedulerPage() {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4" data-tour="scheduler-quick-stats">
-          <Card className="p-4 border-border bg-card">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Total Activities</div>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {summaryData.totalActivities.toLocaleString()}
+        {/* Main Layout with Sidebar */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          {/* Sidebar */}
+          <div className="xl:col-span-3 space-y-6">
+            {/* Project Scope */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Project Scope</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm text-muted-foreground">View Type</span>
+                  </div>
+                  <Badge variant="outline">{projectScope.scope}</Badge>
                 </div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4 border-border bg-card">
-            <div className="flex items-center gap-3">
-              <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Critical Path</div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {formatDuration(summaryData.criticalPathDuration)}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-green-500" />
+                    <span className="text-sm text-muted-foreground">Projects</span>
+                  </div>
+                  <span className="font-semibold">{projectScope.projectCount}</span>
                 </div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4 border-border bg-card">
-            <div className="flex items-center gap-3">
-              <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Schedule Health</div>
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {summaryData.scheduleHealth}%
-                </div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4 border-border bg-card">
-            <div className="flex items-center gap-3">
-              {summaryData.currentVariance >= 0 ? (
-                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-              ) : (
-                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              )}
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Variance</div>
-                <div
-                  className={`text-2xl font-bold ${
-                    summaryData.currentVariance >= 0
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-orange-600 dark:text-orange-400"
-                  }`}
-                >
-                  {summaryData.currentVariance > 0 ? "+" : ""}
-                  {summaryData.currentVariance}d
-                </div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4 border-border bg-card">
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Milestones</div>
-                <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                  {summaryData.upcomingMilestones}
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
+                <div className="text-sm text-muted-foreground">{projectScope.description}</div>
+              </CardContent>
+            </Card>
 
-        {/* Scheduler Modules */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Tab Navigation */}
-          <div
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            data-tour="scheduler-controls"
-          >
-            <div className="flex items-center gap-1" data-tour="scheduler-tabs">
-              {availableModules.map((module) => (
-                <button
-                  key={module.id}
-                  onClick={() => setActiveTab(module.id)}
-                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                    activeTab === module.id
-                      ? "text-primary border-primary bg-primary/5"
-                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                  }`}
-                  data-tour={`${module.id}-tab`}
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => handleMenuItemClick("Import")}
                 >
-                  <module.icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{module.label}</span>
-                </button>
-              ))}
-            </div>
+                  <Import className="h-4 w-4 mr-2" />
+                  Import Schedule
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => handleMenuItemClick("Export")}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => handleMenuItemClick("Refresh")}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh Data
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => handleMenuItemClick("Settings")}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Schedule Health */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Schedule Health</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-green-500" />
+                    <span className="text-sm text-muted-foreground">Overall Health</span>
+                  </div>
+                  <span className="font-semibold text-green-600">{summaryData.scheduleHealth}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm text-muted-foreground">On Track</span>
+                  </div>
+                  <span className="font-semibold">78%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <span className="text-sm text-muted-foreground">At Risk</span>
+                  </div>
+                  <span className="font-semibold">15%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-red-500" />
+                    <span className="text-sm text-muted-foreground">Behind</span>
+                  </div>
+                  <span className="font-semibold">7%</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Key Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Key Metrics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-purple-500" />
+                    <span className="text-sm text-muted-foreground">Critical Path</span>
+                  </div>
+                  <span className="font-semibold">{formatDuration(summaryData.criticalPathDuration)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-amber-500" />
+                    <span className="text-sm text-muted-foreground">Variance</span>
+                  </div>
+                  <span className="font-semibold">{summaryData.currentVariance}d</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-[#FF6B35]" />
+                    <span className="text-sm text-muted-foreground">AI Score</span>
+                  </div>
+                  <span className="font-semibold">8.7/10</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Tab Content */}
-          {availableModules.map((module) => {
-            const ModuleComponent = module.component
+          {/* Main Content */}
+          <div className="xl:col-span-9">
+            {/* Scheduler Modules */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              {/* Tab Navigation */}
+              <div className="flex space-x-1 p-1 bg-muted rounded-lg" data-tour="scheduler-tabs">
+                {availableModules.map((module) => (
+                  <button
+                    key={module.id}
+                    onClick={() => setActiveTab(module.id)}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === module.id
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    data-tour={`${module.id}-tab`}
+                  >
+                    <module.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{module.label}</span>
+                  </button>
+                ))}
+              </div>
 
-            return (
-              <TabsContent key={module.id} value={module.id} className="space-y-6">
-                {/* Module Header */}
-                <div className="flex items-center gap-3 pb-4 border-b border-border">
-                  <div className="p-2 rounded-lg bg-primary/10 border-primary/20">
-                    <module.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-foreground">{module.label}</h2>
-                    <p className="text-sm text-muted-foreground">{module.description}</p>
-                  </div>
-                </div>
+              {/* Tab Content */}
+              {availableModules.map((module) => {
+                const ModuleComponent = module.component
 
-                {/* Module Content */}
-                <ModuleComponent
-                  userRole={projectScope.scope === "single" ? "project-manager" : user?.role || "executive"}
-                  projectData={projectScope}
-                />
-              </TabsContent>
-            )
-          })}
-        </Tabs>
+                return (
+                  <TabsContent key={module.id} value={module.id} className="space-y-6">
+                    {/* Module Header */}
+                    <div className="flex items-center gap-3 pb-4 border-b border-border">
+                      <div className="p-2 rounded-lg bg-primary/10 border-primary/20">
+                        <module.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-foreground">{module.label}</h2>
+                        <p className="text-sm text-muted-foreground">{module.description}</p>
+                      </div>
+                    </div>
+
+                    {/* Module Content */}
+                    <ModuleComponent
+                      userRole={projectScope.scope === "single" ? "project-manager" : user?.role || "executive"}
+                      projectData={projectScope}
+                    />
+                  </TabsContent>
+                )
+              })}
+            </Tabs>
+          </div>
+        </div>
       </div>
 
       {/* Info Modal */}

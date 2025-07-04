@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useAuth } from "@/context/auth-context"
-import { StandardPageLayout, createDashboardBreadcrumbs } from "@/components/layout/StandardPageLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -13,17 +12,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { 
-  FileText, 
-  Plus, 
-  Download, 
-  RefreshCw, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  TrendingUp, 
-  BarChart3, 
-  PieChart, 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+  FileText,
+  Plus,
+  Download,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  XCircle,
+  TrendingUp,
+  BarChart3,
+  PieChart,
   Activity,
   Eye,
   Edit3,
@@ -38,10 +45,17 @@ import {
   AlertTriangle,
   DollarSign,
   Building,
-  Timer
+  Timer,
+  Home,
+  Zap,
+  FileX,
+  FilePlus,
+  History,
+  Wrench,
 } from "lucide-react"
 import { format } from "date-fns"
 import { useToast } from "@/hooks/use-toast"
+import { AppHeader } from "@/components/layout/app-header"
 
 // Import report components
 import { ReportCreator } from "@/components/reports/ReportCreator"
@@ -133,7 +147,7 @@ export default function ReportsPage() {
       sections: 4,
       estimatedTime: "45 min",
       workflow: "PM → PE → Executive",
-      color: "bg-green-50 border-green-200 text-green-800"
+      color: "bg-green-50 border-green-200 text-green-800",
     },
     {
       id: "monthly-progress",
@@ -144,7 +158,7 @@ export default function ReportsPage() {
       sections: 12,
       estimatedTime: "60 min",
       workflow: "PM → PE → Published",
-      color: "bg-blue-50 border-blue-200 text-blue-800"
+      color: "bg-blue-50 border-blue-200 text-blue-800",
     },
     {
       id: "monthly-owner",
@@ -155,8 +169,8 @@ export default function ReportsPage() {
       sections: 6,
       estimatedTime: "30 min",
       workflow: "PM → PE → Client Distribution",
-      color: "bg-purple-50 border-purple-200 text-purple-800"
-    }
+      color: "bg-purple-50 border-purple-200 text-purple-800",
+    },
   ]
 
   // Initialize data
@@ -172,24 +186,26 @@ export default function ReportsPage() {
   const loadReports = async () => {
     try {
       setIsLoading(true)
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
       // Transform mock data
-      const transformedReports: Report[] = reportsData.reports.map(report => ({
+      const transformedReports: Report[] = reportsData.reports.map((report) => ({
         ...report,
-        projectName: projectsData.find(p => p.project_id.toString() === report.projectId)?.name || "Unknown Project"
+        type: report.type as "financial-review" | "monthly-progress" | "monthly-owner",
+        status: report.status as "draft" | "submitted" | "approved" | "rejected" | "published",
+        projectName: projectsData.find((p) => p.project_id.toString() === report.projectId)?.name || "Unknown Project",
       }))
 
       // Filter based on user role
       let userReports = transformedReports
       if (user?.role === "project-manager") {
-        userReports = transformedReports.filter(report => report.creatorId === user.id)
+        userReports = transformedReports.filter((report) => report.creatorId === user.id)
       } else if (user?.role === "project-executive") {
         // PEs see reports from their assigned projects
         const assignedProjects = ["1", "2", "3"] // Mock assigned projects
-        userReports = transformedReports.filter(report => assignedProjects.includes(report.projectId))
+        userReports = transformedReports.filter((report) => assignedProjects.includes(report.projectId))
       }
 
       setReports(userReports)
@@ -198,7 +214,7 @@ export default function ReportsPage() {
       toast({
         title: "Error",
         description: "Failed to load reports. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       })
     } finally {
       setIsLoading(false)
@@ -211,31 +227,32 @@ export default function ReportsPage() {
     // Search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
-      filtered = filtered.filter(report => 
-        report.name.toLowerCase().includes(search) ||
-        report.projectName.toLowerCase().includes(search) ||
-        report.creatorName.toLowerCase().includes(search)
+      filtered = filtered.filter(
+        (report) =>
+          report.name.toLowerCase().includes(search) ||
+          report.projectName.toLowerCase().includes(search) ||
+          report.creatorName.toLowerCase().includes(search)
       )
     }
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(report => report.status === statusFilter)
+      filtered = filtered.filter((report) => report.status === statusFilter)
     }
 
     // Type filter
     if (typeFilter !== "all") {
-      filtered = filtered.filter(report => report.type === typeFilter)
+      filtered = filtered.filter((report) => report.type === typeFilter)
     }
 
     // Project filter
     if (projectFilter !== "all") {
-      filtered = filtered.filter(report => report.projectId === projectFilter)
+      filtered = filtered.filter((report) => report.projectId === projectFilter)
     }
 
     // Date range filter
     if (dateRange.from || dateRange.to) {
-      filtered = filtered.filter(report => {
+      filtered = filtered.filter((report) => {
         const reportDate = new Date(report.createdAt)
         if (dateRange.from && reportDate < dateRange.from) return false
         if (dateRange.to && reportDate > dateRange.to) return false
@@ -249,11 +266,11 @@ export default function ReportsPage() {
   // Calculate dashboard statistics
   const stats = useMemo((): DashboardStats => {
     const total = reports.length
-    const pending = reports.filter(r => r.status === "submitted").length
-    const approved = reports.filter(r => r.status === "approved" || r.status === "published").length
-    const rejected = reports.filter(r => r.status === "rejected").length
-    
-    const thisMonth = reports.filter(r => {
+    const pending = reports.filter((r) => r.status === "submitted").length
+    const approved = reports.filter((r) => r.status === "approved" || r.status === "published").length
+    const rejected = reports.filter((r) => r.status === "rejected").length
+
+    const thisMonth = reports.filter((r) => {
       const reportDate = new Date(r.createdAt)
       const now = new Date()
       return reportDate.getMonth() === now.getMonth() && reportDate.getFullYear() === now.getFullYear()
@@ -262,7 +279,7 @@ export default function ReportsPage() {
     const processedReports = approved + rejected
     const approvalRate = processedReports > 0 ? Math.round((approved / processedReports) * 100) : 0
 
-    const overdue = reports.filter(r => {
+    const overdue = reports.filter((r) => {
       if (!r.dueDate || r.status === "approved" || r.status === "published") return false
       return new Date(r.dueDate) < new Date()
     }).length
@@ -276,7 +293,7 @@ export default function ReportsPage() {
       approvalRate,
       avgProcessingTime: 2.5,
       timeSaved: total * 4,
-      overdue
+      overdue,
     }
   }, [reports])
 
@@ -285,7 +302,7 @@ export default function ReportsPage() {
     return reports
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
       .slice(0, 8)
-      .map(report => {
+      .map((report) => {
         let type: RecentActivity["type"] = "created"
         let icon = <FileText className="h-4 w-4 text-blue-500" />
 
@@ -312,7 +329,7 @@ export default function ReportsPage() {
           projectName: report.projectName,
           userName: report.creatorName,
           timestamp: report.updatedAt,
-          icon
+          icon,
         }
       })
   }, [reports])
@@ -320,7 +337,7 @@ export default function ReportsPage() {
   // Get user role specific project scope
   const getProjectScope = () => {
     if (!user) return { description: "All Reports" }
-    
+
     switch (user.role) {
       case "project-manager":
         return { description: "My Reports" }
@@ -357,7 +374,7 @@ export default function ReportsPage() {
     await loadReports()
     toast({
       title: "Success",
-      description: "Reports refreshed successfully"
+      description: "Reports refreshed successfully",
     })
   }
 
@@ -406,335 +423,511 @@ export default function ReportsPage() {
   const availableTabs = getTabsForRole()
 
   return (
-    <StandardPageLayout
-      title="Reports Dashboard"
-      description="Generate, manage, and distribute construction project reports with AI-powered insights"
-      breadcrumbs={createDashboardBreadcrumbs("Reports")}
-      badges={[
-        { label: projectScope.description, variant: "outline" },
-        { label: `${stats.totalReports} Total Reports`, variant: "secondary" },
-        ...(stats.overdue > 0 ? [{ label: `${stats.overdue} Overdue`, variant: "destructive" as const }] : [])
-      ]}
-      actions={
-        <>
-          <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          {user?.role === "project-manager" && (
-            <Button onClick={() => handleCreateReport()} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Report
-            </Button>
-          )}
-        </>
-      }
-    >
-      {/* Main Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          {availableTabs.includes("overview") && <TabsTrigger value="overview">Overview</TabsTrigger>}
-          {availableTabs.includes("create") && <TabsTrigger value="create">Create</TabsTrigger>}
-          {availableTabs.includes("templates") && <TabsTrigger value="templates">Templates</TabsTrigger>}
-          {availableTabs.includes("approval") && <TabsTrigger value="approval">Approval</TabsTrigger>}
-          {availableTabs.includes("my-reports") && <TabsTrigger value="my-reports">My Reports</TabsTrigger>}
-          {availableTabs.includes("reports") && <TabsTrigger value="reports">Reports</TabsTrigger>}
-          {availableTabs.includes("analytics") && <TabsTrigger value="analytics">Analytics</TabsTrigger>}
-        </TabsList>
+    <>
+      <AppHeader />
+      <div className="space-y-3 p-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="flex items-center gap-1">
+                <Home className="h-3 w-3" />
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Reports</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{stats.totalReports}</div>
-                <p className="text-xs text-muted-foreground">+{stats.thisMonth} this month</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pendingApproval}</div>
-                <p className="text-xs text-muted-foreground">Avg {stats.avgProcessingTime} days to process</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Approval Rate</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.approvalRate}%</div>
-                <Progress value={stats.approvalRate} className="mt-2" />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Time Saved</CardTitle>
-                <Timer className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.timeSaved}h</div>
-                <p className="text-xs text-muted-foreground">Through automation</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* HBI Intelligence Panel */}
-          <Card className="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-950 dark:to-purple-900 border-indigo-200 dark:border-indigo-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
-                <Brain className="h-5 w-5" />
-                HBI Report Intelligence
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-indigo-600" />
-                    <span className="font-medium text-indigo-800 dark:text-indigo-200">Smart Insights</span>
-                  </div>
-                  <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
-                    <li>• {stats.pendingApproval} reports await approval - avg processing time trending down</li>
-                    <li>• Financial reviews show 15% faster completion with new templates</li>
-                    <li>• Owner reports have 95% approval rate when photos are included</li>
-                    <li>• Schedule section accuracy improved 23% with automated data integration</li>
-                  </ul>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Target className="h-4 w-4 text-indigo-600" />
-                    <span className="font-medium text-indigo-800 dark:text-indigo-200">Recommendations</span>
-                  </div>
-                  <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
-                    <li>• Schedule monthly progress reports for the 3rd business day</li>
-                    <li>• Include financial forecast memo in all owner reports</li>
-                    <li>• Set up automated reminders 3 days before report due dates</li>
-                    <li>• Consider batch processing for faster approvals</li>
-                  </ul>
-                </div>
+        {/* Header Section - Made Sticky */}
+        <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
+          <div className="flex flex-col gap-4 pt-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Reports Dashboard</h1>
+                <p className="text-muted-foreground mt-1">
+                  Generate, manage, and distribute construction project reports with AI-powered insights
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+                <Button variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                {user?.role === "project-manager" && (
+                  <Button onClick={() => handleCreateReport()} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Report
+                  </Button>
+                )}
+              </div>
+            </div>
 
-          {/* Charts and Activity */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Report Status Distribution */}
+            {/* Badges and Stats */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline">{projectScope.description}</Badge>
+              <Badge variant="secondary">{stats.totalReports} Total Reports</Badge>
+              {stats.overdue > 0 && <Badge variant="destructive">{stats.overdue} Overdue</Badge>}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content with Sidebar Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          {/* Sidebar - Hidden on mobile, shown on xl+ */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4">
+            {/* Report Overview */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <PieChart className="h-5 w-5" />
-                  Report Status Distribution
+                  <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  Report Overview
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
-                      <span className="text-sm">Approved</span>
-                    </div>
-                    <span className="text-sm font-medium">{stats.approved}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full"></div>
-                      <span className="text-sm">Pending</span>
-                    </div>
-                    <span className="text-sm font-medium">{stats.pendingApproval}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-rose-500 dark:bg-rose-400 rounded-full"></div>
-                      <span className="text-sm">Rejected</span>
-                    </div>
-                    <span className="text-sm font-medium">{stats.rejected}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-slate-500 dark:bg-slate-400 rounded-full"></div>
-                      <span className="text-sm">Draft</span>
-                    </div>
-                    <span className="text-sm font-medium">{reports.filter(r => r.status === "draft").length}</span>
-                  </div>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Reports</span>
+                  <span className="font-medium">{stats.totalReports}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Pending Approval</span>
+                  <span className="font-medium text-yellow-600">{stats.pendingApproval}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Approved</span>
+                  <span className="font-medium text-green-600">{stats.approved}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Approval Rate</span>
+                  <span className="font-medium text-blue-600">{stats.approvalRate}%</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Quick Actions */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Recent Activity
+                  <Zap className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  Quick Actions
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.slice(0, 6).map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">{activity.icon}</div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-foreground">
-                          {activity.type === "created" && `${activity.userName} created "${activity.reportName}"`}
-                          {activity.type === "submitted" && `${activity.userName} submitted "${activity.reportName}"`}
-                          {activity.type === "approved" && `"${activity.reportName}" was approved`}
-                          {activity.type === "rejected" && `"${activity.reportName}" was rejected`}
-                          {activity.type === "distributed" && `"${activity.reportName}" was distributed`}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {activity.projectName} • {formatTimeAgo(activity.timestamp)}
-                        </p>
+              <CardContent className="space-y-3">
+                {user?.role === "project-manager" && (
+                  <Button className="w-full justify-start" variant="outline" onClick={() => handleCreateReport()}>
+                    <FilePlus className="h-4 w-4 mr-2" />
+                    Create Report
+                  </Button>
+                )}
+                <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab("templates")}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Templates
+                </Button>
+                <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab("analytics")}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  View Analytics
+                </Button>
+                {user?.role === "project-executive" && (
+                  <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab("approval")}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Approval Queue
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Recent Reports */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  Recent Reports
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {recentActivity.slice(0, 5).map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="group flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex-shrink-0 mt-0.5">{activity.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{activity.reportName}</p>
+                      <p className="text-xs text-muted-foreground truncate">{activity.projectName}</p>
+                      <p className="text-xs text-muted-foreground">{formatTimeAgo(activity.timestamp)}</p>
+                    </div>
+                  </div>
+                ))}
+                {recentActivity.length === 0 && (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <FileX className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No recent reports</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Report Templates */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  Report Templates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {reportTemplates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="group flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => handleCreateReport(template.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 rounded bg-background/50 border">{template.icon}</div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{template.name}</p>
+                        <p className="text-xs text-muted-foreground">{template.estimatedTime}</p>
                       </div>
                     </div>
-                  ))}
-                  {recentActivity.length === 0 && (
-                    <div className="text-center py-4 text-muted-foreground">
-                      <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No recent activity</p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
 
-        {/* Templates Tab */}
-        {availableTabs.includes("templates") && (
-          <TabsContent value="templates" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Report Templates</CardTitle>
-                <CardContent className="text-muted-foreground">
-                  Choose from standardized report templates optimized for construction project reporting
-                </CardContent>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-                  {reportTemplates.map((template) => (
-                    <Card 
-                      key={template.id} 
-                      className={`cursor-pointer hover:shadow-lg transition-all duration-200 border-2 ${template.color}`}
-                      onClick={() => handleCreateReport(template.id)}
-                    >
-                      <CardHeader className="pb-4">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 rounded-lg bg-background/50 border">
-                            {template.icon}
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">{template.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground">{template.workflow}</p>
-                          </div>
+          {/* Main Content - Report Tabs */}
+          <div className="xl:col-span-9">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <div className="flex items-center gap-1">
+                {availableTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      activeTab === tab
+                        ? "text-primary border-primary bg-primary/5"
+                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                    }`}
+                  >
+                    {tab === "overview" && "Overview"}
+                    {tab === "create" && "Create"}
+                    {tab === "templates" && "Templates"}
+                    {tab === "approval" && "Approval"}
+                    {tab === "my-reports" && "My Reports"}
+                    {tab === "reports" && "Reports"}
+                    {tab === "analytics" && "Analytics"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-6">
+                {/* Stats Cards */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-foreground">{stats.totalReports}</div>
+                      <p className="text-xs text-muted-foreground">+{stats.thisMonth} this month</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                        {stats.pendingApproval}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Avg {stats.avgProcessingTime} days to process</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Approval Rate</CardTitle>
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.approvalRate}%</div>
+                      <Progress value={stats.approvalRate} className="mt-2" />
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Time Saved</CardTitle>
+                      <Timer className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.timeSaved}h</div>
+                      <p className="text-xs text-muted-foreground">Through automation</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* HBI Intelligence Panel */}
+                <Card className="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-950 dark:to-purple-900 border-indigo-200 dark:border-indigo-800">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
+                      <Brain className="h-5 w-5" />
+                      HBI Report Intelligence
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Lightbulb className="h-4 w-4 text-indigo-600" />
+                          <span className="font-medium text-indigo-800 dark:text-indigo-200">Smart Insights</span>
                         </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <p className="text-sm mb-4">{template.description}</p>
-                        <div className="flex justify-between items-center text-xs">
-                          <Badge variant="secondary">{template.sections} sections</Badge>
-                          <span className="flex items-center gap-1">
-                            <Timer className="h-3 w-3" />
-                            {template.estimatedTime}
+                        <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
+                          <li>• {stats.pendingApproval} reports await approval - avg processing time trending down</li>
+                          <li>• Financial reviews show 15% faster completion with new templates</li>
+                          <li>• Owner reports have 95% approval rate when photos are included</li>
+                          <li>• Schedule section accuracy improved 23% with automated data integration</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Target className="h-4 w-4 text-indigo-600" />
+                          <span className="font-medium text-indigo-800 dark:text-indigo-200">Recommendations</span>
+                        </div>
+                        <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
+                          <li>• Schedule monthly progress reports for the 3rd business day</li>
+                          <li>• Include financial forecast memo in all owner reports</li>
+                          <li>• Set up automated reminders 3 days before report due dates</li>
+                          <li>• Consider batch processing for faster approvals</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Charts and Activity */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Report Status Distribution */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <PieChart className="h-5 w-5" />
+                        Report Status Distribution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
+                            <span className="text-sm">Approved</span>
+                          </div>
+                          <span className="text-sm font-medium">{stats.approved}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full"></div>
+                            <span className="text-sm">Pending</span>
+                          </div>
+                          <span className="text-sm font-medium">{stats.pendingApproval}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-rose-500 dark:bg-rose-400 rounded-full"></div>
+                            <span className="text-sm">Rejected</span>
+                          </div>
+                          <span className="text-sm font-medium">{stats.rejected}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-slate-500 dark:bg-slate-400 rounded-full"></div>
+                            <span className="text-sm">Draft</span>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {reports.filter((r) => r.status === "draft").length}
                           </span>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Recent Activity */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Activity className="h-5 w-5" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {recentActivity.slice(0, 6).map((activity) => (
+                          <div key={activity.id} className="flex items-start gap-3">
+                            <div className="flex-shrink-0 mt-0.5">{activity.icon}</div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-foreground">
+                                {activity.type === "created" && `${activity.userName} created "${activity.reportName}"`}
+                                {activity.type === "submitted" &&
+                                  `${activity.userName} submitted "${activity.reportName}"`}
+                                {activity.type === "approved" && `"${activity.reportName}" was approved`}
+                                {activity.type === "rejected" && `"${activity.reportName}" was rejected`}
+                                {activity.type === "distributed" && `"${activity.reportName}" was distributed`}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {activity.projectName} • {formatTimeAgo(activity.timestamp)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        {recentActivity.length === 0 && (
+                          <div className="text-center py-4 text-muted-foreground">
+                            <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">No recent activity</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
+              </TabsContent>
 
-        {/* Other tabs would be implemented similarly */}
-        {availableTabs.includes("my-reports") && (
-          <TabsContent value="my-reports">
-            <ReportHistory 
-              reports={filteredReports}
-              onViewReport={handleViewReport}
-              onEditReport={handleEditReport}
-              userRole={user?.role || "project-manager"}
-            />
-          </TabsContent>
-        )}
+              {/* Templates Tab */}
+              {availableTabs.includes("templates") && (
+                <TabsContent value="templates" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Report Templates</CardTitle>
+                      <CardContent className="text-muted-foreground">
+                        Choose from standardized report templates optimized for construction project reporting
+                      </CardContent>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+                        {reportTemplates.map((template) => (
+                          <Card
+                            key={template.id}
+                            className={`cursor-pointer hover:shadow-lg transition-all duration-200 border-2 ${template.color}`}
+                            onClick={() => handleCreateReport(template.id)}
+                          >
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 rounded-lg bg-background/50 border">{template.icon}</div>
+                                <div>
+                                  <CardTitle className="text-lg">{template.name}</CardTitle>
+                                  <p className="text-sm text-muted-foreground">{template.workflow}</p>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="pt-0">
+                              <p className="text-sm mb-4">{template.description}</p>
+                              <div className="flex justify-between items-center text-xs">
+                                <Badge variant="secondary">{template.sections} sections</Badge>
+                                <span className="flex items-center gap-1">
+                                  <Timer className="h-3 w-3" />
+                                  {template.estimatedTime}
+                                </span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
 
-        {availableTabs.includes("approval") && (
-          <TabsContent value="approval">
-            <ReportApprovalWorkflow 
-              userRole={user?.role || "project-executive"}
-              reports={reports.filter(r => r.status === "submitted")}
-              onReportUpdate={loadReports}
-            />
-          </TabsContent>
-        )}
+              {/* Other tabs */}
+              {availableTabs.includes("my-reports") && (
+                <TabsContent value="my-reports">
+                  <ReportHistory
+                    reports={filteredReports}
+                    onViewReport={handleViewReport}
+                    onEditReport={handleEditReport}
+                    userRole={user?.role || "project-manager"}
+                  />
+                </TabsContent>
+              )}
 
-        {availableTabs.includes("analytics") && (
-          <TabsContent value="analytics">
-            <ReportAnalytics reports={reports} />
-          </TabsContent>
-        )}
-      </Tabs>
+              {availableTabs.includes("approval") && (
+                <TabsContent value="approval">
+                  <ReportApprovalWorkflow
+                    userRole={user?.role || "project-executive"}
+                    reports={reports.filter((r) => r.status === "submitted")}
+                    onReportUpdate={loadReports}
+                  />
+                </TabsContent>
+              )}
 
-      {/* Report Creator Dialog */}
-      <Dialog open={showReportCreator} onOpenChange={setShowReportCreator}>
-                    <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
-          <div className="flex flex-col h-full">
-            <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
-              <DialogTitle>
-                {selectedReport ? `Edit ${selectedReport.name}` : 
-                 selectedTemplate ? `Create ${reportTemplates.find(t => t.id === selectedTemplate)?.name} Report` : 
-                 "Create New Report"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-auto px-6 py-4">
-              <ReportCreator
-                reportId={selectedReport?.id}
-                templateId={selectedTemplate}
-                onSave={() => {
-                  setShowReportCreator(false)
-                  loadReports()
-                }}
-                onCancel={() => setShowReportCreator(false)}
-              />
-            </div>
+              {availableTabs.includes("analytics") && (
+                <TabsContent value="analytics">
+                  <ReportAnalytics reports={reports} />
+                </TabsContent>
+              )}
+            </Tabs>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      {/* Report Viewer Dialog */}
-      <Dialog open={showReportViewer} onOpenChange={setShowReportViewer}>
-                    <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
-          <div className="flex flex-col h-full">
-            <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
-              <DialogTitle>{selectedReport?.name}</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-auto px-6 py-4">
-              <ReportViewer
-                report={selectedReport}
-                onClose={() => setShowReportViewer(false)}
-                userRole={user?.role || "project-manager"}
-              />
+        {/* Report Creator Dialog */}
+        <Dialog open={showReportCreator} onOpenChange={setShowReportCreator}>
+          <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
+            <div className="flex flex-col h-full">
+              <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
+                <DialogTitle>
+                  {selectedReport
+                    ? `Edit ${selectedReport.name}`
+                    : selectedTemplate
+                    ? `Create ${reportTemplates.find((t) => t.id === selectedTemplate)?.name} Report`
+                    : "Create New Report"}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-auto px-6 py-4">
+                <ReportCreator
+                  reportId={selectedReport?.id}
+                  templateId={selectedTemplate}
+                  onSave={() => {
+                    setShowReportCreator(false)
+                    loadReports()
+                  }}
+                  onCancel={() => setShowReportCreator(false)}
+                />
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </StandardPageLayout>
+          </DialogContent>
+        </Dialog>
+
+        {/* Report Viewer Dialog */}
+        <Dialog open={showReportViewer} onOpenChange={setShowReportViewer}>
+          <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
+            <div className="flex flex-col h-full">
+              <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
+                <DialogTitle>{selectedReport?.name}</DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-auto px-6 py-4">
+                <ReportViewer
+                  report={selectedReport}
+                  onClose={() => setShowReportViewer(false)}
+                  userRole={user?.role || "project-manager"}
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </>
   )
 }

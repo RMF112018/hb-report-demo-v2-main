@@ -7,8 +7,9 @@
       "id": "project-overview-1",
       "type": "project-overview",
       "title": "Portfolio Overview",
-      "size": "medium",
+      "size": "optimal",
       "position": { "x": 0, "y": 0 },
+      "span": { "cols": 6, "rows": 6 },
       "visible": true,
       "config": {}
     },
@@ -16,8 +17,9 @@
       "id": "schedule-performance-1",
       "type": "schedule-performance",
       "title": "Schedule Performance",
-      "size": "medium",
-      "position": { "x": 3, "y": 0 },
+      "size": "optimal",
+      "position": { "x": 6, "y": 0 },
+      "span": { "cols": 6, "rows": 4 },
       "visible": true,
       "config": {}
     },
@@ -25,8 +27,9 @@
       "id": "financial-status-1",
       "type": "financial-status",
       "title": "Financial Status",
-      "size": "medium",
-      "position": { "x": 6, "y": 0 },
+      "size": "optimal",
+      "position": { "x": 12, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
       "visible": true,
       "config": {}
     },
@@ -34,8 +37,9 @@
       "id": "general-conditions-1",
       "type": "general-conditions",
       "title": "General Conditions",
-      "size": "medium",
-      "position": { "x": 9, "y": 0 },
+      "size": "optimal",
+      "position": { "x": 16, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
       "visible": true,
       "config": {}
     },
@@ -43,8 +47,9 @@
       "id": "contingency-analysis-1",
       "type": "contingency-analysis",
       "title": "Contingency Analysis",
-      "size": "medium",
-      "position": { "x": 0, "y": 1 },
+      "size": "optimal",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 6, "rows": 6 },
       "visible": true,
       "config": {}
     },
@@ -52,8 +57,9 @@
       "id": "cash-flow-1",
       "type": "cash-flow",
       "title": "Cash Flow Analysis",
-      "size": "medium",
-      "position": { "x": 3, "y": 1 },
+      "size": "optimal",
+      "position": { "x": 6, "y": 4 },
+      "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {}
     },
@@ -61,8 +67,9 @@
       "id": "procurement-1",
       "type": "procurement",
       "title": "Procurement Management",
-      "size": "medium",
-      "position": { "x": 6, "y": 1 },
+      "size": "optimal",
+      "position": { "x": 14, "y": 4 },
+      "span": { "cols": 6, "rows": 6 },
       "visible": true,
       "config": {}
     },
@@ -70,8 +77,9 @@
       "id": "draw-forecast-1",
       "type": "draw-forecast",
       "title": "Draw Forecast",
-      "size": "medium",
-      "position": { "x": 9, "y": 1 },
+      "size": "optimal",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 10, "rows": 6 },
       "visible": true,
       "config": {}
     },
@@ -79,10 +87,11 @@
       "id": "enhanced-hbi-insights-financial",
       "type": "enhanced-hbi-insights",
       "title": "HBI Financial Forecast Insights",
-      "size": "large",
-      "position": { "x": 0, "y": 2 },
+      "size": "optimal",
+      "position": { "x": 10, "y": 10 },
+      "span": { "cols": 10, "rows": 5 },
       "visible": true,
       "config": {}
     }
   ]
-} 
+}

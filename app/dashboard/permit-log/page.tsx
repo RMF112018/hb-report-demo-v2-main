@@ -436,53 +436,77 @@ export default function PermitLogPage() {
       </CardHeader>
       <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-background shadow-sm" data-tour="permit-tabs">
-            <TabsTrigger
-              value="overview"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+          <div className="flex flex-wrap gap-1 p-1 bg-muted rounded-lg mb-6" data-tour="permit-tabs">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "overview"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="permits"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            </button>
+            <button
+              onClick={() => setActiveTab("permits")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "permits"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Permits</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="inspections"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            </button>
+            <button
+              onClick={() => setActiveTab("inspections")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "inspections"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <CheckCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Inspections</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="calendar"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            </button>
+            <button
+              onClick={() => setActiveTab("calendar")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "calendar"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <CalendarDays className="h-4 w-4" />
               <span className="hidden sm:inline">Calendar</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="analytics"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "analytics"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="reports"
-              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            </button>
+            <button
+              onClick={() => setActiveTab("reports")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "reports"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Reports</span>
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="mt-6">
+          <TabsContent value="overview">
             <div className="space-y-6">
               <PermitTable
                 permits={filteredPermits.slice(0, 10)}
@@ -496,7 +520,7 @@ export default function PermitLogPage() {
           </TabsContent>
 
           {/* Permits Tab */}
-          <TabsContent value="permits" className="mt-6">
+          <TabsContent value="permits">
             <div className="mb-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -542,7 +566,7 @@ export default function PermitLogPage() {
           </TabsContent>
 
           {/* Inspections Tab */}
-          <TabsContent value="inspections" className="mt-6">
+          <TabsContent value="inspections">
             <div className="mb-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -579,7 +603,7 @@ export default function PermitLogPage() {
           </TabsContent>
 
           {/* Calendar Tab */}
-          <TabsContent value="calendar" className="mt-6">
+          <TabsContent value="calendar">
             <div className="mb-4">
               <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Permit & Inspection Calendar</h2>
               <p className="text-sm text-muted-foreground mt-1">Visual timeline of permits and inspections</p>
@@ -596,14 +620,14 @@ export default function PermitLogPage() {
           </TabsContent>
 
           {/* Analytics Tab */}
-          <TabsContent value="analytics" className="mt-6">
+          <TabsContent value="analytics">
             <div data-tour="analytics-charts">
               <PermitAnalytics permits={filteredPermits} detailed={true} />
             </div>
           </TabsContent>
 
           {/* Reports Tab */}
-          <TabsContent value="reports" className="mt-6">
+          <TabsContent value="reports">
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-[#003087] dark:text-blue-400">Export Reports</h2>
               <p className="text-sm text-muted-foreground mt-1">Generate comprehensive permit and inspection reports</p>
@@ -646,25 +670,24 @@ export default function PermitLogPage() {
       <div className="space-y-6 p-6">
         {!isFullScreen && (
           <>
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
-                    <Home className="h-3 w-3" />
-                    Dashboard
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Permit Log</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            {/* Sticky Header with Breadcrumbs */}
+            <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-sm border-b pb-4">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                      <Home className="h-3 w-3" />
+                      Dashboard
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Permit Log</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
 
-            {/* Header Section */}
-            <div className="flex flex-col gap-4" data-tour="permit-log-page-header">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mt-4">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Permit Log</h1>
                   <p className="text-muted-foreground mt-1">Track and manage construction permits and inspections</p>
@@ -679,29 +702,165 @@ export default function PermitLogPage() {
                     Export
                   </Button>
                   {hasCreateAccess && (
-                    <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                    <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]" onClick={handleCreatePermit}>
                       <Plus className="h-4 w-4 mr-2" />
                       Create Permit
                     </Button>
                   )}
                 </div>
               </div>
-
-              {/* Statistics Widgets */}
-              <div data-tour="permit-log-quick-stats">
-                <PermitWidgets stats={stats} />
-              </div>
             </div>
 
-            {/* HBI Insights Panel */}
-            <div data-tour="permit-log-hbi-insights">
-              <HbiPermitInsights permits={filteredPermits} stats={stats} />
+            {/* Main Layout with Sidebar */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+              {/* Sidebar */}
+              <div className="xl:col-span-3 space-y-6">
+                {/* Quick Stats */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Stats</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">Total Permits</span>
+                      </div>
+                      <span className="font-semibold">{stats.totalPermits}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Approved</span>
+                      </div>
+                      <span className="font-semibold">{stats.approvedPermits}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm text-muted-foreground">Pending</span>
+                      </div>
+                      <span className="font-semibold">{stats.pendingPermits}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-muted-foreground">Expiring</span>
+                      </div>
+                      <span className="font-semibold">{stats.expiringPermits}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {hasCreateAccess && (
+                      <Button onClick={handleCreatePermit} className="w-full bg-[#FF6B35] hover:bg-[#E55A2B]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Permit
+                      </Button>
+                    )}
+                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading} className="w-full">
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                      Refresh Data
+                    </Button>
+                    {hasExportAccess && (
+                      <Button variant="outline" onClick={() => setShowExportModal(true)} className="w-full">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export Data
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Project Scope */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Project Scope</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">View Type</span>
+                      </div>
+                      <Badge variant="outline">
+                        {user?.role === "project-manager"
+                          ? "single"
+                          : user?.role === "project-executive"
+                          ? "portfolio"
+                          : "enterprise"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Access Level</span>
+                      </div>
+                      <span className="font-semibold">{user?.role || "viewer"}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">{getProjectScopeDescription()}</div>
+                  </CardContent>
+                </Card>
+
+                {/* Inspection Overview */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Inspections</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Passed</span>
+                      </div>
+                      <span className="font-semibold">{stats.passedInspections}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-muted-foreground">Failed</span>
+                      </div>
+                      <span className="font-semibold">{stats.failedInspections}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm text-muted-foreground">Pending</span>
+                      </div>
+                      <span className="font-semibold">{stats.pendingInspections}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm text-muted-foreground">Pass Rate</span>
+                      </div>
+                      <span className="font-semibold">{stats.inspectionPassRate.toFixed(1)}%</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content */}
+              <div className="xl:col-span-9">
+                {/* HBI Insights Panel */}
+                <div className="mb-6" data-tour="permit-log-hbi-insights">
+                  <HbiPermitInsights permits={filteredPermits} stats={stats} />
+                </div>
+
+                {/* Main Content */}
+                <PermitContentCard />
+              </div>
             </div>
           </>
         )}
 
-        {/* Main Content */}
-        <PermitContentCard />
+        {/* Fullscreen Content */}
+        {isFullScreen && <PermitContentCard />}
 
         {/* Create/Edit Permit Modal */}
         <PermitForm

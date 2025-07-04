@@ -376,18 +376,34 @@ export default function ConstraintsLogPage() {
       </CardHeader>
       <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2" data-tour="constraints-log-tabs">
-            <TabsTrigger value="open" className="flex items-center gap-2" data-tour="constraints-tab">
+          <div className="flex space-x-1 p-1 bg-muted rounded-lg mb-6" data-tour="constraints-log-tabs">
+            <button
+              onClick={() => setActiveTab("open")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "open"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-tour="constraints-tab"
+            >
               <Clock className="h-4 w-4" />
               Open Constraints ({stats.open})
-            </TabsTrigger>
-            <TabsTrigger value="closed" className="flex items-center gap-2" data-tour="overview-tab">
+            </button>
+            <button
+              onClick={() => setActiveTab("closed")}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === "closed"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-tour="overview-tab"
+            >
               <CheckCircle className="h-4 w-4" />
               Closed Constraints ({stats.closed})
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
 
-          <TabsContent value="open" className="mt-6">
+          <TabsContent value="open">
             <div data-tour="constraints-table">
               <EnhancedConstraintTable
                 constraints={filteredConstraints}
@@ -404,7 +420,7 @@ export default function ConstraintsLogPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="closed" className="mt-6">
+          <TabsContent value="closed">
             <div data-tour="overview-key-metrics">
               <EnhancedConstraintTable
                 constraints={filteredConstraints}
@@ -431,25 +447,24 @@ export default function ConstraintsLogPage() {
       <div className="space-y-6 p-6">
         {!isFullScreen && (
           <>
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
-                    <Home className="h-3 w-3" />
-                    Dashboard
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Constraints Log</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            {/* Sticky Header with Breadcrumbs */}
+            <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-sm border-b pb-4">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
+                      <Home className="h-3 w-3" />
+                      Dashboard
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Constraints Log</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
 
-            {/* Header Section */}
-            <div className="flex flex-col gap-4" data-tour="constraints-log-page-header">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mt-4">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Constraints Log</h1>
                   <p className="text-muted-foreground mt-1">Track and manage project constraints and resolutions</p>
@@ -483,39 +498,162 @@ export default function ConstraintsLogPage() {
                   </Dialog>
                 </div>
               </div>
-
-              {/* Statistics Widgets */}
-              <div data-tour="constraints-log-quick-stats">
-                <ConstraintWidgets stats={stats} />
-              </div>
             </div>
 
-            {/* HBI Insights Panel */}
-            <div data-tour="overview-hbi-insights">
-              <HbiInsightsPanel constraints={allConstraints} />
-            </div>
+            {/* Main Layout with Sidebar */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+              {/* Sidebar */}
+              <div className="xl:col-span-3 space-y-6">
+                {/* Quick Stats */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Stats</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">Total</span>
+                      </div>
+                      <span className="font-semibold">{stats.total}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm text-muted-foreground">Open</span>
+                      </div>
+                      <span className="font-semibold">{stats.open}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Closed</span>
+                      </div>
+                      <span className="font-semibold">{stats.closed}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-muted-foreground">Overdue</span>
+                      </div>
+                      <span className="font-semibold">{stats.overdue}</span>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Project Constraints Summary - Executive and Project Executive only */}
-            {(user?.role === "executive" || user?.role === "project-executive") && (
-              <div data-tour="project-constraints-summary">
-                <ProjectConstraintsSummary
-                  projects={projects}
-                  selectedProject={filters.project}
-                  onProjectSelect={handleProjectSelect}
-                  onClearFilter={handleClearProjectFilter}
-                />
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full bg-[#FF6B35] hover:bg-[#E55A2B]">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Constraint
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Create New Constraint</DialogTitle>
+                        </DialogHeader>
+                        <ConstraintForm
+                          onSubmit={handleCreateConstraint}
+                          onCancel={() => setIsCreateModalOpen(false)}
+                          categories={categories}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading} className="w-full">
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                      Refresh Data
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsExportModalOpen(true)} className="w-full">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Data
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Project Scope */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Project Scope</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm text-muted-foreground">View Type</span>
+                      </div>
+                      <Badge variant="outline">{projectScope.scope}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-muted-foreground">Projects</span>
+                      </div>
+                      <span className="font-semibold">{projectScope.projectCount}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">{projectScope.description}</div>
+                  </CardContent>
+                </Card>
+
+                {/* Category Breakdown */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Categories</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {Object.entries(stats.byCategory)
+                      .slice(0, 5)
+                      .map(([category, count]) => (
+                        <div key={category} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Filter className="h-4 w-4 text-purple-500" />
+                            <span className="text-sm text-muted-foreground">{category}</span>
+                          </div>
+                          <span className="font-semibold">{count}</span>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
               </div>
-            )}
 
-            {/* Gantt Chart */}
-            <div data-tour="gantt-visualization">
-              <GanttChart constraints={allConstraints} />
+              {/* Main Content */}
+              <div className="xl:col-span-9">
+                {/* HBI Insights Panel */}
+                <div className="mb-6" data-tour="overview-hbi-insights">
+                  <HbiInsightsPanel constraints={allConstraints} />
+                </div>
+
+                {/* Project Constraints Summary - Executive and Project Executive only */}
+                {(user?.role === "executive" || user?.role === "project-executive") && (
+                  <div className="mb-6" data-tour="project-constraints-summary">
+                    <ProjectConstraintsSummary
+                      projects={projects}
+                      selectedProject={filters.project}
+                      onProjectSelect={handleProjectSelect}
+                      onClearFilter={handleClearProjectFilter}
+                    />
+                  </div>
+                )}
+
+                {/* Gantt Chart */}
+                <div className="mb-6" data-tour="gantt-visualization">
+                  <GanttChart constraints={allConstraints} />
+                </div>
+
+                {/* Constraints Table with Tabs */}
+                <ConstraintsTableCard />
+              </div>
             </div>
           </>
         )}
 
-        {/* Constraints Table with Tabs */}
-        <ConstraintsTableCard />
+        {/* Fullscreen Content */}
+        {isFullScreen && <ConstraintsTableCard />}
 
         {/* Edit Modal */}
         {editingConstraint && (

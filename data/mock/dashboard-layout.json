@@ -10,6 +10,7 @@
       "title": "Portfolio Overview",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
+      "span": { "cols": 12, "rows": 4 },
       "visible": true,
       "config": {
         "totalProjects": 24,
