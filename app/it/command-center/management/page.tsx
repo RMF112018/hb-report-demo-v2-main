@@ -56,6 +56,7 @@ import {
 } from "lucide-react"
 import { ITModuleNavigation } from "@/components/layout/ITModuleNavigation"
 import HbIntelManagementCard from "@/components/cards/it/HbIntelManagementCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 /**
  * HB Intel Management Command Center
@@ -76,6 +77,60 @@ export default function HBIntelManagementPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false)
   const [newUserDialogOpen, setNewUserDialogOpen] = useState(false)
+
+  // Management-specific AI insights
+  const managementInsights = [
+    {
+      id: "mgmt-1",
+      type: "performance",
+      severity: "low",
+      title: "System Performance Excellence",
+      text: "99.94% uptime maintained with AI models processing 2,295 requests daily across all projects.",
+      action: "Continue current monitoring practices and optimize resource allocation during peak hours.",
+      confidence: 97,
+      relatedMetrics: ["System Uptime", "AI Performance", "Request Processing"],
+    },
+    {
+      id: "mgmt-2",
+      type: "alert",
+      severity: "medium",
+      title: "User Onboarding Backlog",
+      text: "24 pending user accounts requiring MFA setup and role assignment, delaying project access.",
+      action: "Implement automated onboarding workflow and schedule bulk MFA enrollment session.",
+      confidence: 93,
+      relatedMetrics: ["User Management", "MFA Adoption", "Access Control"],
+    },
+    {
+      id: "mgmt-3",
+      type: "opportunity",
+      severity: "medium",
+      title: "AI Cost Optimization",
+      text: "15% reduction in AI processing costs possible through intelligent job batching and model optimization.",
+      action: "Implement request queuing system and optimize AI model selection algorithms.",
+      confidence: 88,
+      relatedMetrics: ["AI Costs", "Resource Optimization", "Operational Efficiency"],
+    },
+    {
+      id: "mgmt-4",
+      type: "forecast",
+      severity: "low",
+      title: "User Growth Projection",
+      text: "User base growing 12% quarterly, requiring infrastructure scaling within 6 months.",
+      action: "Plan license procurement and infrastructure expansion for projected 300+ users.",
+      confidence: 86,
+      relatedMetrics: ["User Growth", "License Management", "Infrastructure Planning"],
+    },
+    {
+      id: "mgmt-5",
+      type: "risk",
+      severity: "low",
+      title: "Microsoft Graph API Dependency",
+      text: "3 critical integrations rely on single Graph API connection, creating potential single point of failure.",
+      action: "Implement redundant authentication methods and connection pooling strategies.",
+      confidence: 84,
+      relatedMetrics: ["API Reliability", "Integration Health", "System Resilience"],
+    },
+  ]
 
   // Mock data for demonstration
   const systemMetrics = {
@@ -508,6 +563,16 @@ export default function HBIntelManagementPage() {
                     <p className="text-xs text-muted-foreground">by System • 2 hours ago</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* HBI Management Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Management Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={managementInsights} cardId="management-insights" />
               </div>
             </div>
           </div>

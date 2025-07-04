@@ -51,6 +51,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 // Import the Infrastructure Monitor Card
 import InfrastructureMonitorCard from "@/components/cards/it/InfrastructureMonitorCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 /**
  * Infrastructure Monitor Dashboard
@@ -75,6 +76,60 @@ export default function InfrastructureMonitorPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
   const [lastRefresh, setLastRefresh] = useState(new Date())
+
+  // Infrastructure-specific AI insights
+  const infrastructureInsights = [
+    {
+      id: "infra-1",
+      type: "risk",
+      severity: "high",
+      title: "Network Device Failure Risk",
+      text: "Miami Office switch offline for 3+ hours. Secondary device showing degraded performance.",
+      action: "Deploy replacement switch and investigate root cause of primary failure.",
+      confidence: 94,
+      relatedMetrics: ["Device Uptime", "Network Redundancy", "Office Connectivity"],
+    },
+    {
+      id: "infra-2",
+      type: "alert",
+      severity: "medium",
+      title: "Latency Threshold Exceeded",
+      text: "Jacksonville office experiencing 45ms average latency, exceeding acceptable thresholds.",
+      action: "Investigate ISP connection and consider bandwidth upgrade.",
+      confidence: 87,
+      relatedMetrics: ["Network Latency", "ISP Performance", "User Experience"],
+    },
+    {
+      id: "infra-3",
+      type: "forecast",
+      severity: "medium",
+      title: "Capacity Planning Alert",
+      text: "Server CPU utilization trending upward. Capacity constraints predicted within 8 weeks.",
+      action: "Plan server infrastructure expansion and load balancing optimization.",
+      confidence: 89,
+      relatedMetrics: ["Server Performance", "Resource Utilization", "Growth Planning"],
+    },
+    {
+      id: "infra-4",
+      type: "performance",
+      severity: "low",
+      title: "Uptime Achievement",
+      text: "99.94% average uptime maintained across all infrastructure, exceeding SLA targets.",
+      action: "Continue current monitoring practices and document successful procedures.",
+      confidence: 98,
+      relatedMetrics: ["System Uptime", "SLA Compliance", "Reliability"],
+    },
+    {
+      id: "infra-5",
+      type: "opportunity",
+      severity: "low",
+      title: "Network Optimization Potential",
+      text: "SNMP analysis identifies 15% bandwidth efficiency gains through QoS optimization.",
+      action: "Implement traffic shaping policies and optimize critical application prioritization.",
+      confidence: 82,
+      relatedMetrics: ["Bandwidth Utilization", "QoS", "Network Efficiency"],
+    },
+  ]
 
   // Mock data for infrastructure monitoring
   const infraMetrics = {
@@ -628,6 +683,16 @@ export default function InfrastructureMonitorPage() {
                     <p className="text-xs text-muted-foreground">Info • 2 hours ago</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* HBI Infrastructure Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Infrastructure Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={infrastructureInsights} cardId="infrastructure-insights" />
               </div>
             </div>
           </div>

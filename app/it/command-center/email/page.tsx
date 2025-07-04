@@ -45,6 +45,7 @@ import {
 // Mock data and components
 import commandCenterMock from "@/data/mock/it/commandCenterMock.json"
 import EmailSecurityHealthCard from "@/components/cards/it/EmailSecurityHealthCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 /**
  * Email Security Health Page
@@ -62,6 +63,60 @@ export default function EmailSecurityPage() {
   const [selectedDomain, setSelectedDomain] = useState<string>("all")
   const [selectedThreatType, setSelectedThreatType] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("overview")
+
+  // Email-specific AI insights
+  const emailInsights = [
+    {
+      id: "email-1",
+      type: "performance",
+      severity: "low",
+      title: "Email Security Excellence",
+      text: "Advanced threat protection blocked 2,847 malicious emails this month, maintaining 99.8% security rate.",
+      action: "Continue current email security policies and document successful threat prevention practices.",
+      confidence: 97,
+      relatedMetrics: ["Threat Prevention", "Email Security", "Protection Rate"],
+    },
+    {
+      id: "email-2",
+      type: "alert",
+      severity: "medium",
+      title: "SPF Record Optimization Needed",
+      text: "3 vendor domains showing SPF authentication failures, potentially impacting legitimate email delivery.",
+      action: "Review and update SPF records for vendor domains to ensure proper email authentication.",
+      confidence: 92,
+      relatedMetrics: ["SPF Authentication", "Email Delivery", "Domain Security"],
+    },
+    {
+      id: "email-3",
+      type: "risk",
+      severity: "high",
+      title: "Phishing Campaign Detected",
+      text: "Coordinated phishing attempts targeting construction industry detected, 15% increase this week.",
+      action: "Implement additional user awareness training and enhanced email filtering rules.",
+      confidence: 94,
+      relatedMetrics: ["Phishing Detection", "Industry Threats", "User Security"],
+    },
+    {
+      id: "email-4",
+      type: "opportunity",
+      severity: "medium",
+      title: "DMARC Policy Enhancement",
+      text: "Upgrading DMARC policy to 'reject' could improve domain security by 23% based on current metrics.",
+      action: "Gradually implement DMARC reject policy after thorough testing and vendor coordination.",
+      confidence: 88,
+      relatedMetrics: ["DMARC Policy", "Domain Protection", "Authentication"],
+    },
+    {
+      id: "email-5",
+      type: "forecast",
+      severity: "medium",
+      title: "Email Volume Growth Trend",
+      text: "Email traffic increasing 18% quarterly, requiring infrastructure capacity planning.",
+      action: "Monitor email server performance and plan infrastructure scaling for Q2 growth.",
+      confidence: 86,
+      relatedMetrics: ["Email Volume", "Infrastructure Planning", "Performance"],
+    },
+  ]
 
   // Restrict access to admin users only
   if (!user || user.role !== "admin") {
@@ -444,6 +499,16 @@ export default function EmailSecurityPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* HBI Email Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Email Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={emailInsights} cardId="email-insights" />
               </div>
             </div>
           </div>

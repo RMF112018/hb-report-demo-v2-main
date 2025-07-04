@@ -49,6 +49,7 @@ import {
 // Mock data
 import commandCenterMock from "@/data/mock/it/commandCenterMock.json"
 import SiemLogOverviewCard from "@/components/cards/it/SiemLogOverviewCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 /**
  * SIEM & Event Monitor Page
@@ -66,6 +67,60 @@ export default function SIEMEventMonitorPage() {
   const [selectedSource, setSelectedSource] = useState<string>("all")
   const [selectedSeverity, setSelectedSeverity] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("overview")
+
+  // SIEM-specific AI insights
+  const siemInsights = [
+    {
+      id: "siem-1",
+      type: "alert",
+      severity: "high",
+      title: "Coordinated Attack Pattern Detected",
+      text: "Security event volume increased 340% in last 4 hours, indicating potential coordinated attack.",
+      action: "Activate incident response team and initiate comprehensive threat hunting procedures.",
+      confidence: 94,
+      relatedMetrics: ["Event Volume", "Threat Correlation", "Attack Patterns"],
+    },
+    {
+      id: "siem-2",
+      type: "risk",
+      severity: "high",
+      title: "Anomalous User Behavior",
+      text: "3 user accounts showing unusual access patterns and privilege escalation attempts.",
+      action: "Immediately review account activities and implement enhanced monitoring.",
+      confidence: 91,
+      relatedMetrics: ["User Behavior", "Access Patterns", "Privilege Escalation"],
+    },
+    {
+      id: "siem-3",
+      type: "performance",
+      severity: "low",
+      title: "Threat Detection Efficiency",
+      text: "SIEM correlations blocked 847 potential threats this week, maintaining 98.7% detection rate.",
+      action: "Continue current detection rules and optimize correlation algorithms.",
+      confidence: 96,
+      relatedMetrics: ["Detection Rate", "Threat Blocking", "Security Posture"],
+    },
+    {
+      id: "siem-4",
+      type: "forecast",
+      severity: "medium",
+      title: "Log Storage Capacity Planning",
+      text: "Security log growth trending 25% monthly, requiring storage expansion planning.",
+      action: "Implement log archiving strategy and plan storage infrastructure expansion.",
+      confidence: 88,
+      relatedMetrics: ["Log Volume", "Storage Capacity", "Data Retention"],
+    },
+    {
+      id: "siem-5",
+      type: "opportunity",
+      severity: "medium",
+      title: "Correlation Rule Optimization",
+      text: "AI analysis suggests 18% improvement in threat detection through rule optimization.",
+      action: "Review and optimize SIEM correlation rules based on recent attack patterns.",
+      confidence: 85,
+      relatedMetrics: ["Rule Optimization", "Detection Accuracy", "False Positives"],
+    },
+  ]
 
   // Restrict access to admin users only
   if (!user || user.role !== "admin") {
@@ -413,6 +468,16 @@ export default function SIEMEventMonitorPage() {
                     </div>
                   )
                 })}
+              </div>
+            </div>
+
+            {/* HBI SIEM Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI SIEM Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={siemInsights} cardId="siem-insights" />
               </div>
             </div>
           </div>

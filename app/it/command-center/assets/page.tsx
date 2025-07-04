@@ -50,12 +50,77 @@ import {
 
 import commandCenterMock from "@/data/mock/it/commandCenterMock.json"
 import AssetTrackerCard from "@/components/cards/it/AssetTrackerCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 export default function AssetTrackerPage() {
   const { user } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedLocation, setSelectedLocation] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("overview")
+
+  // Assets-specific AI insights
+  const assetInsights = [
+    {
+      id: "asset-1",
+      type: "alert",
+      severity: "high",
+      title: "License Expiration Warning",
+      text: "12 critical software licenses expire within 30 days, risking compliance violations.",
+      action: "Initiate renewal process for expiring licenses and update license management workflow.",
+      confidence: 96,
+      relatedMetrics: ["License Compliance", "Software Assets", "Renewal Management"],
+    },
+    {
+      id: "asset-2",
+      type: "opportunity",
+      severity: "medium",
+      title: "License Optimization Opportunity",
+      text: "AI analysis identifies $127K annual savings through software license rightsizing.",
+      action: "Review underutilized licenses and negotiate enterprise volume discounts.",
+      confidence: 89,
+      relatedMetrics: ["Cost Optimization", "License Utilization", "Procurement"],
+    },
+    {
+      id: "asset-3",
+      type: "risk",
+      severity: "medium",
+      title: "Hardware Refresh Planning",
+      text: "23 devices approaching end-of-warranty within 6 months, requiring replacement planning.",
+      action: "Develop hardware refresh budget and procurement timeline for aging assets.",
+      confidence: 91,
+      relatedMetrics: ["Hardware Lifecycle", "Warranty Management", "Asset Planning"],
+    },
+    {
+      id: "asset-4",
+      type: "performance",
+      severity: "low",
+      title: "Asset Tracking Accuracy",
+      text: "96.7% asset tracking accuracy maintained across all categories and locations.",
+      action: "Continue current asset management practices and implement RFID tracking pilot.",
+      confidence: 94,
+      relatedMetrics: ["Asset Accuracy", "Inventory Management", "Tracking Systems"],
+    },
+    {
+      id: "asset-5",
+      type: "forecast",
+      severity: "medium",
+      title: "Mobile Device Growth Trend",
+      text: "Mobile device requests increasing 15% quarterly, requiring procurement planning.",
+      action: "Adjust mobile device procurement strategy and negotiate bulk purchase agreements.",
+      confidence: 86,
+      relatedMetrics: ["Mobile Assets", "Growth Planning", "Procurement Strategy"],
+    },
+    {
+      id: "asset-6",
+      type: "opportunity",
+      severity: "low",
+      title: "Asset Utilization Enhancement",
+      text: "Shared equipment utilization could increase 22% through improved scheduling system.",
+      action: "Implement asset reservation system and optimize shared resource allocation.",
+      confidence: 83,
+      relatedMetrics: ["Asset Utilization", "Resource Optimization", "Scheduling"],
+    },
+  ]
 
   if (!user || user.role !== "admin") {
     return (
@@ -474,6 +539,16 @@ export default function AssetTrackerPage() {
                     <span className="font-medium">${vendor.cost.toLocaleString()}/mo</span>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* HBI Assets Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Assets Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={assetInsights} cardId="assets-insights" />
               </div>
             </div>
           </div>

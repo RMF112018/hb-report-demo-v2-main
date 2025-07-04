@@ -46,6 +46,7 @@ import {
 } from "lucide-react"
 import { ITModuleNavigation } from "@/components/layout/ITModuleNavigation"
 import EndpointHealthCard from "@/components/cards/it/EndpointHealthCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 /**
  * Endpoint Management Dashboard
@@ -70,6 +71,60 @@ export default function EndpointManagementPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedFilter, setSelectedFilter] = useState("all")
   const [lastRefresh, setLastRefresh] = useState(new Date())
+
+  // Endpoints-specific AI insights
+  const endpointsInsights = [
+    {
+      id: "endpoint-1",
+      type: "risk",
+      severity: "high",
+      title: "Critical Patch Vulnerabilities",
+      text: "15 endpoints remain unpatched with critical security vulnerabilities, exposing network risks.",
+      action: "Initiate emergency patching protocol and implement endpoint isolation procedures.",
+      confidence: 96,
+      relatedMetrics: ["Patch Compliance", "Security Vulnerabilities", "Network Security"],
+    },
+    {
+      id: "endpoint-2",
+      type: "alert",
+      severity: "medium",
+      title: "Compliance Drift Detected",
+      text: "13 devices fallen out of compliance, violating organizational security policies.",
+      action: "Review non-compliant devices and implement automated compliance enforcement.",
+      confidence: 92,
+      relatedMetrics: ["Device Compliance", "Policy Enforcement", "Security Posture"],
+    },
+    {
+      id: "endpoint-3",
+      type: "performance",
+      severity: "low",
+      title: "Endpoint Management Efficiency",
+      text: "91.2% of endpoints maintained in compliant state, exceeding industry standards.",
+      action: "Continue current endpoint management practices and document successful procedures.",
+      confidence: 94,
+      relatedMetrics: ["Compliance Rate", "Management Efficiency", "Security Standards"],
+    },
+    {
+      id: "endpoint-4",
+      type: "forecast",
+      severity: "medium",
+      title: "Device Lifecycle Planning",
+      text: "28 devices approaching end-of-life within 6 months, requiring replacement planning.",
+      action: "Develop device refresh strategy and coordinate procurement for aging endpoints.",
+      confidence: 89,
+      relatedMetrics: ["Device Lifecycle", "Replacement Planning", "Hardware Management"],
+    },
+    {
+      id: "endpoint-5",
+      type: "opportunity",
+      severity: "low",
+      title: "Automation Enhancement",
+      text: "Automated patch deployment could increase efficiency by 23% based on current patterns.",
+      action: "Implement automated patch management and optimize deployment schedules.",
+      confidence: 87,
+      relatedMetrics: ["Automation", "Patch Management", "Operational Efficiency"],
+    },
+  ]
 
   // Mock data for endpoint management
   const endpointMetrics = {
@@ -222,7 +277,7 @@ export default function EndpointManagementPage() {
   const filteredDevices = useMemo(() => {
     if (selectedFilter === "all") return deviceInventory
 
-    const locationMap = {
+    const locationMap: { [key: string]: string } = {
       hq: "HQ",
       jobsites: "Jobsite",
       remote: "Remote",
@@ -548,6 +603,16 @@ export default function EndpointManagementPage() {
                   <span className="text-muted-foreground">Last Sync</span>
                   <span className="font-medium text-xs">{formatLastSync(endpointMetrics.lastScanTime)}</span>
                 </div>
+              </div>
+            </div>
+
+            {/* HBI Endpoints Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Endpoints Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={endpointsInsights} cardId="endpoints-insights" />
               </div>
             </div>
           </div>
