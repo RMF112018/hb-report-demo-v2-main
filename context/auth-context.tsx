@@ -65,14 +65,14 @@ const demoUsers: DemoUser[] = [
   },
   {
     id: "5",
-    firstName: "Lisa",
-    lastName: "Wilson",
-    email: "lisa.wilson@hedrickbrothers.com",
+    firstName: "Markey",
+    lastName: "Mark",
+    email: "markey.mark@hedrickbrothers.com",
     role: "admin",
     company: "Hedrick Brothers",
     createdAt: new Date().toISOString(),
     isActive: true,
-    avatar: "/avatars/lisa-wilson.png",
+    avatar: "/avatars/markey-mark.png",
     permissions: { preConAccess: true },
   },
 ]

@@ -318,3 +318,26 @@ export function ConsultantDashboardCard({ config, span, isCompact, userRole, car
     </CardShell>
   )
 }
+
+export function HbIntelManagementCard({ config, span, isCompact, userRole, card }: ITCardProps) {
+  return (
+    <CardShell title="HB Intel Management" icon={<Settings className="h-5 w-5" style={{ color: "#FA4616" }} />}>
+      <div className="space-y-4">
+        <div className="text-sm text-muted-foreground">Centralized admin hub for HB Intel application controls</div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Active Users</div>
+            <div className="text-2xl font-bold">267</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">AI Models</div>
+            <div className="text-2xl font-bold">3</div>
+          </div>
+        </div>
+        <Badge variant="outline" className="w-fit">
+          Placeholder Data
+        </Badge>
+      </div>
+    </CardShell>
+  )
+}

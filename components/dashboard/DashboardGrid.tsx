@@ -92,6 +92,7 @@ import {
   BackupRestoreStatusCard,
   AiPipelineStatusCard,
   ConsultantDashboardCard,
+  HbIntelManagementCard,
 } from "@/components/cards/ITPlaceholderCards"
 
 /**
@@ -220,41 +221,89 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
 }
 
 // Define card widths - uses the card's actual size/span properties
-const getCardColSpan = (card: DashboardCard): string => {
+const getCardGridSpan = (card: DashboardCard): string => {
   // First check if the card has a span property
   if (card.span) {
     const cols = card.span.cols
-    // Map cols to responsive grid spans
-    switch (cols) {
-      case 2:
-        return "col-span-1 sm:col-span-1 lg:col-span-1 xl:col-span-1 2xl:col-span-1" // Small
-      case 4:
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2" // Medium
-      case 6:
-        return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3" // Large
-      case 8:
-        return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4" // Wide/XLarge
-      default:
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2" // Default
+    const rows = card.span.rows
+
+    // Map cols to responsive grid spans with proportional scaling
+    // Mobile(2) -> SM(6) -> LG(12) -> XL(16) -> 2XL(20)
+    const mobileSpan = Math.min(2, Math.max(1, Math.round((cols * 2) / 20))) // Scale to 2 columns
+    const smSpan = Math.min(6, Math.max(1, Math.round((cols * 6) / 20))) // Scale to 6 columns
+    const lgSpan = Math.min(12, Math.max(1, Math.round((cols * 12) / 20))) // Scale to 12 columns
+    const xlSpan = Math.min(16, Math.max(1, Math.round((cols * 16) / 20))) // Scale to 16 columns
+    const xl2Span = Math.min(20, Math.max(1, cols)) // Full scale to 20 columns
+
+    // Helper function to get safe Tailwind class for column spans
+    const getColSpanClass = (span: number, prefix: string = "") => {
+      const basePrefix = prefix ? `${prefix}:` : ""
+      // Use predefined classes that are safe in Tailwind
+      if (span >= 20) return `${basePrefix}col-span-full`
+      if (span >= 12) return `${basePrefix}col-span-12`
+      if (span >= 11) return `${basePrefix}col-span-11`
+      if (span >= 10) return `${basePrefix}col-span-10`
+      if (span >= 9) return `${basePrefix}col-span-9`
+      if (span >= 8) return `${basePrefix}col-span-8`
+      if (span >= 7) return `${basePrefix}col-span-7`
+      if (span >= 6) return `${basePrefix}col-span-6`
+      if (span >= 5) return `${basePrefix}col-span-5`
+      if (span >= 4) return `${basePrefix}col-span-4`
+      if (span >= 3) return `${basePrefix}col-span-3`
+      if (span >= 2) return `${basePrefix}col-span-2`
+      return `${basePrefix}col-span-1`
     }
+
+    // Helper function to get safe Tailwind class for row spans
+    const getRowSpanClass = (span: number, prefix: string = "") => {
+      const basePrefix = prefix ? `${prefix}:` : ""
+      if (span >= 12) return `${basePrefix}row-span-12`
+      if (span >= 11) return `${basePrefix}row-span-11`
+      if (span >= 10) return `${basePrefix}row-span-10`
+      if (span >= 9) return `${basePrefix}row-span-9`
+      if (span >= 8) return `${basePrefix}row-span-8`
+      if (span >= 7) return `${basePrefix}row-span-7`
+      if (span >= 6) return `${basePrefix}row-span-6`
+      if (span >= 5) return `${basePrefix}row-span-5`
+      if (span >= 4) return `${basePrefix}row-span-4`
+      if (span >= 3) return `${basePrefix}row-span-3`
+      if (span >= 2) return `${basePrefix}row-span-2`
+      return `${basePrefix}row-span-1`
+    }
+
+    const colSpanClasses = `${getColSpanClass(mobileSpan)} ${getColSpanClass(smSpan, "sm")} ${getColSpanClass(
+      lgSpan,
+      "lg"
+    )} ${getColSpanClass(xlSpan, "xl")} ${getColSpanClass(xl2Span, "2xl")}`
+
+    const rowSpanClasses = `${getRowSpanClass(rows)} ${getRowSpanClass(rows, "sm")} ${getRowSpanClass(
+      rows,
+      "lg"
+    )} ${getRowSpanClass(rows, "xl")} ${getRowSpanClass(rows, "2xl")}`
+
+    return `${colSpanClasses} ${rowSpanClasses}`
   }
 
   // Fallback to size property if no span
   if (card.size) {
     switch (card.size) {
       case "small":
-        return "col-span-1 sm:col-span-1 lg:col-span-1 xl:col-span-1 2xl:col-span-1"
+        return "col-span-1 sm:col-span-1 lg:col-span-1 xl:col-span-1 2xl:col-span-1 row-span-3"
       case "medium":
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"
+        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
       case "large":
-        return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3"
+        return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3 row-span-6"
       case "wide":
       case "extra-large":
-        return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"
+        return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-4"
+      case "extra-wide":
+        return "col-span-2 sm:col-span-6 lg:col-span-8 xl:col-span-10 2xl:col-span-12 row-span-3"
+      case "full-width":
+        return "col-span-2 sm:col-span-6 lg:col-span-12 xl:col-span-16 2xl:col-span-full row-span-6"
       case "tall":
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"
+        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-8"
       default:
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"
+        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
     }
   }
 
@@ -263,17 +312,17 @@ const getCardColSpan = (card: DashboardCard): string => {
     case "enhanced-hbi-insights":
     case "market-intelligence":
     case "bd-opportunities":
-      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"
+      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-6"
     case "portfolio-overview":
     case "financial-review-panel":
     case "schedule-monitor":
     case "critical-dates":
-      return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3"
+      return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3 row-span-4"
     case "staffing-distribution":
     case "pipeline-analytics":
-      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4"
+      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-8"
     default:
-      return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2"
+      return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
   }
 }
 
@@ -358,20 +407,24 @@ export function DashboardGrid({
           className={cn(
             // Enhanced background with subtle pattern
             "relative",
-            // Improved grid structure with consistent row sizing
-            "grid auto-rows-max",
-            // Enhanced responsive breakpoints to support fractional widths
+            // Improved grid structure with consistent row sizing and dense flow
+            "grid grid-rows-[repeat(auto-fit,minmax(80px,1fr))]",
+            // Enhanced responsive breakpoints to support much larger cards
             "grid-cols-2", // Mobile: 2 columns (allows for 1.5x = 3 spans)
-            "sm:grid-cols-4", // Small tablet: 4 columns
-            "lg:grid-cols-6", // Large tablet/small desktop: 6 columns
-            "xl:grid-cols-8", // Desktop: 8 columns
-            "2xl:grid-cols-10", // Large desktop: 10 columns
+            "sm:grid-cols-6", // Small tablet: 6 columns
+            "lg:grid-cols-12", // Large tablet/small desktop: 12 columns
+            "xl:grid-cols-16", // Desktop: 16 columns
+            "2xl:grid-cols-20", // Large desktop: 20 columns
             // Consistent spacing - same horizontal and vertical
             spacingClass
           )}
+          style={{
+            gridAutoFlow: "dense", // This enables automatic gap filling
+            gridAutoRows: "80px", // Consistent row height
+          }}
         >
           {items.map((card) => (
-            <div key={card.id} className={cn("w-full", getCardColSpan(card))}>
+            <div key={card.id} className={cn("w-full", getCardGridSpan(card))}>
               <SortableCard
                 card={card}
                 isEditing={isEditing}
@@ -548,7 +601,17 @@ function SortableCard({
         typeof height === "number" && `h-[${height}px]`,
         height === "auto" && "min-h-[320px]"
       )}
-      onClick={() => onCardFocus?.(card)}
+      onClick={(e) => {
+        // Only trigger focus if not in editing mode and not clicking on interactive elements
+        if (!isEditing && !e.defaultPrevented) {
+          const target = e.target as HTMLElement
+          // Check if clicking on control buttons or input elements
+          if (target.closest("button") || target.closest("input") || target.closest('[role="button"]')) {
+            return
+          }
+          onCardFocus?.(card)
+        }
+      }}
     >
       {/* Use enhanced DashboardCardWrapper */}
       <DashboardCardWrapper
@@ -574,105 +637,183 @@ function SortableCard({
   )
 }
 
+// Helper function to calculate span based on card size
+// Helper function to get optimal size for displaying 100% of card content
+const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
+  const optimalSizes: Record<string, { cols: number; rows: number }> = {
+    // Analytics cards need space for charts, metrics, and drill-down content
+    "enhanced-hbi-insights": { cols: 8, rows: 6 }, // Wide for multiple charts
+    "financial-review-panel": { cols: 8, rows: 3 }, // Wide for side-by-side metrics and charts
+    "pipeline-analytics": { cols: 8, rows: 6 }, // Wide for pipeline stages
+    "market-intelligence": { cols: 6, rows: 8 }, // Tall for detailed insights
+
+    // Portfolio/Project cards need space for metrics + charts + footer
+    "portfolio-overview": { cols: 8, rows: 6 }, // Wide to show all metrics + side-by-side charts
+    "project-overview": { cols: 6, rows: 6 }, // Balanced for project details
+
+    // KPI cards can be more compact but still readable
+    "financial-status": { cols: 4, rows: 4 }, // Standard for key metrics
+    "schedule-performance": { cols: 6, rows: 4 }, // Wide for timeline data
+
+    // Status cards need moderate space for details
+    "quality-control": { cols: 4, rows: 6 }, // Tall for inspection lists
+    safety: { cols: 4, rows: 6 }, // Tall for safety metrics
+
+    // List/table cards benefit from wide layouts
+    "staffing-distribution": { cols: 10, rows: 6 }, // Extra wide for staff tables
+    "change-order-analysis": { cols: 8, rows: 8 }, // Large for detailed analysis
+    "field-reports": { cols: 6, rows: 8 }, // Tall for report lists
+
+    // Detail cards need vertical space
+    closeout: { cols: 6, rows: 8 }, // Tall for closeout checklists
+    startup: { cols: 6, rows: 6 }, // Balanced for startup activities
+    "critical-dates": { cols: 8, rows: 6 }, // Wide for timeline view
+
+    // Chart-heavy cards need generous space
+    "cash-flow": { cols: 8, rows: 6 }, // Wide for cash flow charts
+    "contingency-analysis": { cols: 6, rows: 6 }, // Balanced for analysis
+    "draw-forecast": { cols: 10, rows: 6 }, // Extra wide for forecast timeline
+
+    // Simple metric cards
+    "general-conditions": { cols: 4, rows: 4 }, // Standard for basic metrics
+    procurement: { cols: 6, rows: 6 }, // Balanced for procurement data
+    "bd-opportunities": { cols: 8, rows: 6 }, // Wide for opportunity pipeline
+  }
+
+  return optimalSizes[cardType] || { cols: 6, rows: 6 } // Default to large balanced size
+}
+
+const calculateSpan = (card: DashboardCard): { cols: number; rows: number } => {
+  console.log("🧮 calculateSpan called for card:", card.id, "size:", card.size, "span:", card.span)
+
+  // If the card has a direct span property, use it
+  if (card.span) {
+    console.log("✅ Using existing span:", card.span)
+    return card.span
+  }
+
+  // Convert smart preset sizes to cols/rows
+  switch (card.size) {
+    case "optimal":
+      const optimalSize = getOptimalSize(card.type)
+      console.log("🎯 Optimal size for", card.type, ":", optimalSize)
+      return optimalSize
+    case "compact":
+      console.log("📏 Compact size -> 3x3")
+      return { cols: 3, rows: 3 }
+    case "standard":
+      console.log("📏 Standard size -> 4x4")
+      return { cols: 4, rows: 4 }
+    case "wide":
+      console.log("📏 Wide size -> 8x4")
+      return { cols: 8, rows: 4 }
+    case "tall":
+      console.log("📏 Tall size -> 4x8")
+      return { cols: 4, rows: 8 }
+    case "large":
+      console.log("📏 Large size -> 6x6")
+      return { cols: 6, rows: 6 }
+    default:
+      // Handle custom sizes like "custom-6x4"
+      if (typeof card.size === "string" && card.size.startsWith("custom-")) {
+        const sizeParts = card.size.replace("custom-", "").split("x")
+        console.log("🎯 Custom size detected in calculateSpan:", card.size, "parts:", sizeParts)
+        if (sizeParts.length === 2) {
+          const cols = parseInt(sizeParts[0])
+          const rows = parseInt(sizeParts[1])
+          if (!isNaN(cols) && !isNaN(rows)) {
+            console.log("✅ Custom size parsed in calculateSpan:", { cols, rows })
+            return { cols, rows }
+          }
+        }
+      }
+
+      // Fallback to optimal size instead of standard
+      console.log("⚠️ Using fallback optimal size for", card.type)
+      return getOptimalSize(card.type)
+  }
+}
+
 function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCompact: boolean; userRole?: string }) {
-  const baseSpan = { cols: 8, rows: 6 } // Standard size for simplified grid
+  const span = calculateSpan(card)
 
   switch (card.type) {
     case "portfolio-overview":
-      return <PortfolioOverview config={card.config || {}} span={baseSpan} isCompact={isCompact} />
+      return <PortfolioOverview config={card.config || {}} span={span} isCompact={isCompact} />
     case "enhanced-hbi-insights":
       return <EnhancedHBIInsights config={card.config || {}} cardId={card.id} />
     case "financial-review-panel":
       return card.config?.panelProps ? (
-        <FinancialReviewPanel {...card.config.panelProps} />
+        <FinancialReviewPanel {...card.config.panelProps} card={card} span={span} />
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground p-4">
           <p>Configure Financial Review Panel</p>
         </div>
       )
     case "pipeline-analytics":
-      return <PipelineAnalytics config={card.config || {}} span={baseSpan} isCompact={isCompact} />
+      return <PipelineAnalytics config={card.config || {}} span={span} isCompact={isCompact} />
     case "market-intelligence":
-      return <MarketIntelligence config={card.config || {}} span={baseSpan} isCompact={isCompact} />
+      return <MarketIntelligence config={card.config || {}} span={span} isCompact={isCompact} />
     case "project-overview":
-      return (
-        <ProjectOverviewCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <ProjectOverviewCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "schedule-performance":
       return (
-        <SchedulePerformanceCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+        <SchedulePerformanceCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "financial-status":
-      return (
-        <FinancialStatusCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <FinancialStatusCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "general-conditions":
-      return (
-        <GeneralConditionsCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <GeneralConditionsCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "contingency-analysis":
       return (
-        <ContingencyAnalysisCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+        <ContingencyAnalysisCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "cash-flow":
-      return <CashFlowCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+      return <CashFlowCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "procurement":
-      return <ProcurementCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+      return <ProcurementCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "draw-forecast":
-      return <DrawForecastCard config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+      return <DrawForecastCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "quality-control":
       return (
         <QualityControlCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
       )
     case "safety":
-      return (
-        <SafetyCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <SafetyCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "staffing-distribution":
       return (
-        <StaffingDistributionCard
-          config={card.config || {}}
-          span={baseSpan}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
+        <StaffingDistributionCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "change-order-analysis":
       return (
         <ChangeOrderAnalysisCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
       )
     case "closeout":
       return (
-        <CloseoutCard
-          card={card}
-          config={card.config || {}}
-          span={baseSpan}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
+        <CloseoutCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "startup":
       return (
-        <StartupCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
+        <StartupCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "critical-dates":
       return (
         <CriticalDatesCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -682,35 +823,25 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <FieldReportsCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
       )
     case "rfi":
-      return (
-        <RFICard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <RFICard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "submittal":
       return (
-        <SubmittalCard
-          card={card}
-          config={card.config || {}}
-          span={baseSpan}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
+        <SubmittalCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "health":
-      return (
-        <HealthCard card={card} config={card.config || {}} span={baseSpan} isCompact={isCompact} userRole={userRole} />
-      )
+      return <HealthCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
     case "schedule-monitor":
       return (
         <ScheduleMonitorCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -720,7 +851,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <BDOpportunitiesCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -731,27 +862,21 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <UserAccessSummaryCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
       )
     case "system-logs":
       return (
-        <SystemLogsCard
-          card={card}
-          config={card.config || {}}
-          span={baseSpan}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
+        <SystemLogsCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
       )
     case "infrastructure-monitor":
       return (
         <InfrastructureMonitorCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -761,7 +886,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <EndpointHealthCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -771,7 +896,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <SiemLogOverviewCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -781,7 +906,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <EmailSecurityHealthCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -791,7 +916,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <AssetTrackerCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -801,7 +926,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <ChangeGovernancePanelCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -811,7 +936,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <BackupRestoreStatusCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -821,7 +946,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <AiPipelineStatusCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />
@@ -831,7 +956,17 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
         <ConsultantDashboardCard
           card={card}
           config={card.config || {}}
-          span={baseSpan}
+          span={span}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "hb-intel-management":
+      return (
+        <HbIntelManagementCard
+          card={card}
+          config={card.config || {}}
+          span={span}
           isCompact={isCompact}
           userRole={userRole}
         />

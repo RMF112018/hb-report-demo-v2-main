@@ -28,8 +28,73 @@ import ChangeGovernancePanelCard from "@/components/cards/it/ChangeGovernancePan
 import BackupRestoreStatusCard from "@/components/cards/it/BackupRestoreStatusCard"
 import AiPipelineStatusCard from "@/components/cards/it/AiPipelineStatusCard"
 import ConsultantDashboardCard from "@/components/cards/it/ConsultantDashboardCard"
+import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 export default function ITCommandCenterPage() {
+  // IT Command Center summary AI insights
+  const itSummaryInsights = [
+    {
+      id: "it-summary-1",
+      type: "risk",
+      severity: "high",
+      title: "Critical Infrastructure Vulnerability",
+      text: "15 endpoints remain unpatched with critical security vulnerabilities across multiple systems.",
+      action: "Initiate emergency patching protocol and implement endpoint isolation procedures.",
+      confidence: 96,
+      relatedMetrics: ["Endpoint Health", "Security Posture", "Patch Management"],
+    },
+    {
+      id: "it-summary-2",
+      type: "alert",
+      severity: "high",
+      title: "SIEM Event Spike Detected",
+      text: "Security event volume increased 340% in last 4 hours, indicating potential coordinated attack.",
+      action: "Activate incident response team and initiate comprehensive threat hunting.",
+      confidence: 94,
+      relatedMetrics: ["SIEM Events", "Threat Detection", "Security Operations"],
+    },
+    {
+      id: "it-summary-3",
+      type: "opportunity",
+      severity: "medium",
+      title: "License Optimization Potential",
+      text: "AI analysis identifies $127K annual savings through software license rightsizing and consolidation.",
+      action: "Review underutilized licenses and negotiate enterprise agreements.",
+      confidence: 88,
+      relatedMetrics: ["Asset Management", "Cost Optimization", "License Usage"],
+    },
+    {
+      id: "it-summary-4",
+      type: "performance",
+      severity: "medium",
+      title: "Email Security Enhancement",
+      text: "Advanced threat protection blocked 2,847 malicious emails, preventing potential breaches.",
+      action: "Continue current email security policies and consider user awareness training.",
+      confidence: 92,
+      relatedMetrics: ["Email Security", "Threat Prevention", "User Protection"],
+    },
+    {
+      id: "it-summary-5",
+      type: "forecast",
+      severity: "medium",
+      title: "Infrastructure Capacity Planning",
+      text: "Current growth trends suggest infrastructure capacity constraints within 6 months.",
+      action: "Initiate infrastructure expansion planning and budget allocation process.",
+      confidence: 85,
+      relatedMetrics: ["Infrastructure Health", "Capacity Planning", "Growth Management"],
+    },
+    {
+      id: "it-summary-6",
+      type: "risk",
+      severity: "medium",
+      title: "Backup System Redundancy Gap",
+      text: "3 critical systems lack off-site backup redundancy, violating disaster recovery policies.",
+      action: "Implement cloud backup solutions and update disaster recovery procedures.",
+      confidence: 89,
+      relatedMetrics: ["Backup Coverage", "Disaster Recovery", "Business Continuity"],
+    },
+  ]
+
   const modules = [
     {
       name: "Infrastructure Monitor",
@@ -109,6 +174,16 @@ export default function ITCommandCenterPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="h-[300px]">
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="text-lg font-semibold">HBI IT Summary Insights</h3>
+              </div>
+              <div className="p-0 h-[250px]">
+                <EnhancedHBIInsights config={itSummaryInsights} cardId="it-summary-insights" />
+              </div>
+            </div>
+          </div>
           <div className="h-[300px]">
             <UserAccessSummaryCard />
           </div>

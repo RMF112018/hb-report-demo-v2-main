@@ -10,6 +10,7 @@ import { DashboardProvider, useDashboardContext } from "@/context/dashboard-cont
 import type { DashboardCard, DashboardLayout } from "@/types/dashboard"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
   Breadcrumb,
@@ -30,6 +31,24 @@ import {
   RefreshCw,
   EllipsisVertical,
   ChevronRight,
+  Building2,
+  FileText,
+  BarChart3,
+  Calendar,
+  Users,
+  TrendingUp,
+  Calculator,
+  Wrench,
+  ArrowRight,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  FolderOpen,
+  Target,
+  DollarSign,
+  Activity,
+  MapPin,
+  Briefcase,
 } from "lucide-react"
 import { AppHeader } from "@/components/layout/app-header"
 
@@ -38,13 +57,13 @@ import projectsData from "@/data/mock/projects.json"
 import cashFlowData from "@/data/mock/financial/cash-flow.json"
 
 /**
- * Modern Dashboard Page
- * --------------------
- * Full-width dashboard implementation with popover dashboard selector
+ * Modern Dashboard Page with Sidebar Layout
+ * -----------------------------------------
+ * Sidebar + main content layout implementation
  * Features:
- * - Full window width utilization
- * - Popover menu for dashboard selection
- * - Controls moved to second row
+ * - Left sidebar with quick actions and recently accessed projects
+ * - Right side with existing dashboard cards
+ * - Responsive design (sidebar hidden on mobile)
  * - Dynamic card sizing based on content
  */
 
@@ -58,8 +77,22 @@ function DashboardContent({ user }: { user: any }) {
   const [dashboardViewSubmenuOpen, setDashboardViewSubmenuOpen] = useState(false)
   const [comingSoonPopoverOpen, setComingSoonPopoverOpen] = useState(false)
   const ellipsisButtonRef = useRef<HTMLButtonElement>(null)
+  const router = useRouter()
 
   const currentDashboard = dashboards.find((d) => d.id === currentDashboardId)
+
+  // Get recently accessed projects (last 5 active projects)
+  const recentProjects = projectsData.filter((project) => project.active).slice(0, 5)
+
+  // Get dashboard overview stats
+  const dashboardStats = {
+    totalProjects: projectsData.filter((p) => p.active).length,
+    activeProjects: projectsData.filter(
+      (p) => p.active && ["In Progress", "Active"].includes(p.project_stage_name || "")
+    ).length,
+    completedThisYear: projectsData.filter((p) => p.project_stage_name === "Completed").length,
+    totalValue: projectsData.filter((p) => p.active).reduce((sum, p) => sum + (p.contract_value || 0), 0),
+  }
 
   // Auto-start dashboard tour for new visitors
   useEffect(() => {
@@ -144,17 +177,40 @@ function DashboardContent({ user }: { user: any }) {
   const handleCardSizeChange = (cardId: string, size: string) => {
     if (!currentDashboard) return
 
-    // Define size mappings to span dimensions
-    const sizeToSpan = {
-      small: { cols: 2, rows: 2 },
-      medium: { cols: 4, rows: 4 },
-      large: { cols: 6, rows: 6 },
+    // Define smart preset size mappings
+    const smartPresetSizes: Record<string, { cols: number; rows: number }> = {
+      compact: { cols: 3, rows: 3 },
+      standard: { cols: 4, rows: 4 },
       wide: { cols: 8, rows: 4 },
       tall: { cols: 4, rows: 8 },
-      "extra-large": { cols: 8, rows: 8 },
+      large: { cols: 6, rows: 6 },
     }
 
-    const newSpan = sizeToSpan[size as keyof typeof sizeToSpan] || { cols: 4, rows: 4 }
+    let newSpan: { cols: number; rows: number }
+
+    // Handle custom sizes (format: "custom-4x6")
+    if (size.startsWith("custom-")) {
+      const dimensions = size.replace("custom-", "").split("x")
+      console.log("🎯 Custom size detected:", size, "dimensions:", dimensions)
+      if (dimensions.length === 2) {
+        const cols = parseInt(dimensions[0])
+        const rows = parseInt(dimensions[1])
+        if (!isNaN(cols) && !isNaN(rows)) {
+          newSpan = { cols, rows }
+          console.log("✅ Custom size parsed successfully:", newSpan)
+        } else {
+          newSpan = { cols: 4, rows: 4 } // fallback
+          console.log("❌ Custom size parsing failed - using fallback")
+        }
+      } else {
+        newSpan = { cols: 4, rows: 4 } // fallback
+        console.log("❌ Custom size format invalid - using fallback")
+      }
+    } else {
+      // Handle preset sizes
+      newSpan = smartPresetSizes[size] || { cols: 4, rows: 4 }
+      console.log("📋 Preset size selected:", size, "->", newSpan)
+    }
 
     const updatedCards = currentDashboard.cards.map((card) =>
       card.id === cardId
@@ -171,7 +227,11 @@ function DashboardContent({ user }: { user: any }) {
       cards: updatedCards,
     })
 
-    console.log(`Card ${cardId} resized to ${size}:`, newSpan)
+    console.log(`🔄 Card ${cardId} resized to ${size}:`, newSpan)
+    console.log(
+      "🎯 Updated card object:",
+      updatedCards.find((c) => c.id === cardId)
+    )
   }
 
   const handleCardAdd = () => {
@@ -180,7 +240,7 @@ function DashboardContent({ user }: { user: any }) {
       id: `card-${Date.now()}`,
       type: "placeholder",
       title: "New Card",
-      size: "medium",
+      size: "standard",
       position: { x: 0, y: 0 },
       span: { cols: 4, rows: 4 },
       visible: true,
@@ -209,24 +269,66 @@ function DashboardContent({ user }: { user: any }) {
   }
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen()
-      setIsFullscreen(true)
-    } else {
-      document.exitFullscreen()
-      setIsFullscreen(false)
+    setIsFullscreen(!isFullscreen)
+  }
+
+  // ESC key handler for fullscreen mode
+  React.useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false)
+      }
+    }
+
+    document.addEventListener("keydown", handleEscKey)
+    return () => document.removeEventListener("keydown", handleEscKey)
+  }, [isFullscreen])
+
+  // Format currency helper
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`
+    }
+    return `$${value.toLocaleString()}`
+  }
+
+  // Get stage badge variant
+  const getStageVariant = (stage: string | undefined) => {
+    switch (stage) {
+      case "Pre-Construction":
+        return "secondary"
+      case "Bidding":
+        return "default"
+      case "BIM Coordination":
+        return "outline"
+      case "In Progress":
+        return "default"
+      case "Active":
+        return "default"
+      default:
+        return "secondary"
     }
   }
 
-  // Listen for fullscreen changes
-  React.useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
+  // Get stage icon
+  const getStageIcon = (stage: string | undefined) => {
+    switch (stage) {
+      case "Pre-Construction":
+        return <Clock className="h-3 w-3" />
+      case "Bidding":
+        return <TrendingUp className="h-3 w-3" />
+      case "BIM Coordination":
+        return <CheckCircle className="h-3 w-3" />
+      case "In Progress":
+        return <Activity className="h-3 w-3" />
+      case "Active":
+        return <Activity className="h-3 w-3" />
+      default:
+        return <AlertTriangle className="h-3 w-3" />
     }
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange)
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
-  }, [])
+  }
 
   // Inject data into specific card types
   if (currentDashboard) {
@@ -328,7 +430,7 @@ function DashboardContent({ user }: { user: any }) {
           <div className="flex flex-col gap-4 pt-3" data-tour="dashboard-page-header">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+                <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
                 <p className="text-muted-foreground mt-1">
                   {currentDashboard?.description || "Real-time insights and project management overview"}
                 </p>
@@ -568,23 +670,229 @@ function DashboardContent({ user }: { user: any }) {
           </div>
         </div>
 
-        {/* Dashboard Content */}
-        {currentDashboard && (
-          <div data-tour="dashboard-content">
-            <DashboardLayoutComponent
-              cards={currentDashboard.cards}
-              onLayoutChange={handleLayoutChange}
-              onCardRemove={handleCardRemove}
-              onCardConfigure={handleCardConfigure}
-              onCardSizeChange={handleCardSizeChange}
-              onCardAdd={handleCardAdd}
-              onSave={handleSave}
-              onReset={handleReset}
-              isEditing={isEditing}
-              onToggleEdit={() => setIsEditing(!isEditing)}
-              layoutDensity={layoutDensity}
-              userRole={user.role}
-            />
+        {/* Main Content with Sidebar Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          {/* Sidebar - Hidden on mobile, shown on xl+ */}
+          <div
+            className={`hidden xl:block xl:col-span-3 space-y-4 ${isFullscreen ? "opacity-20" : ""}`}
+            data-tour="dashboard-sidebar"
+          >
+            {/* Dashboard Overview */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  Dashboard Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Projects</span>
+                  <span className="font-medium">{dashboardStats.totalProjects}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Active Projects</span>
+                  <span className="font-medium text-green-600">{dashboardStats.activeProjects}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Completed This Year</span>
+                  <span className="font-medium text-blue-600">{dashboardStats.completedThisYear}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Value</span>
+                  <span className="font-medium">{formatCurrency(dashboardStats.totalValue)}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/projects")}>
+                  <Building2 className="h-4 w-4 mr-2" />
+                  View All Projects
+                </Button>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard/reports")}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Generate Report
+                </Button>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard/financial-hub")}
+                >
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Financial Hub
+                </Button>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard/staff-planning")}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Staff Planning
+                </Button>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard/scheduler")}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Project Scheduler
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recently Accessed Projects */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  Recent Projects
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {recentProjects.map((project, index) => (
+                  <div
+                    key={project.project_id || `recent-${index}`}
+                    className="group flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/project/${project.project_id}`)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {project.name || project.display_name || "Untitled Project"}
+                        </p>
+                        <Badge
+                          variant={getStageVariant(project.project_stage_name)}
+                          className="flex items-center gap-1 text-xs"
+                        >
+                          {getStageIcon(project.project_stage_name)}
+                          {project.project_stage_name || "Unknown"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">
+                          {`${project.city || ""} ${project.state_code || ""}`.trim() || "N/A"}
+                        </span>
+                      </div>
+                      {project.contract_value && project.contract_value > 0 && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                          <DollarSign className="h-3 w-3" />
+                          <span>{formatCurrency(project.contract_value)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Performance Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  Performance Metrics
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Schedule Health</span>
+                  <span className="font-medium text-green-600">94%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Budget Health</span>
+                  <span className="font-medium text-green-600">87%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Quality Score</span>
+                  <span className="font-medium text-blue-600">91%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Risk Level</span>
+                  <span className="font-medium text-yellow-600">Low</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content - Dashboard Cards */}
+          <div className={`xl:col-span-9 ${isFullscreen ? "relative" : ""}`} data-tour="dashboard-content">
+            {currentDashboard && (
+              <DashboardLayoutComponent
+                cards={currentDashboard.cards}
+                onLayoutChange={handleLayoutChange}
+                onCardRemove={handleCardRemove}
+                onCardConfigure={handleCardConfigure}
+                onCardSizeChange={handleCardSizeChange}
+                onCardAdd={handleCardAdd}
+                onSave={handleSave}
+                onReset={handleReset}
+                isEditing={isEditing}
+                onToggleEdit={() => setIsEditing(!isEditing)}
+                layoutDensity={layoutDensity}
+                userRole={user.role}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Fullscreen Dashboard Overlay */}
+        {isFullscreen && (
+          <div
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm animate-in fade-in-0 duration-300"
+            style={{ top: "80px" }} // Account for app header height
+          >
+            {/* Fullscreen Header */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/40 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Dashboard - Fullscreen View</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {currentDashboard?.description || "Real-time insights and project management overview"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button variant="outline" size="sm" onClick={toggleFullscreen} className="flex items-center gap-2">
+                    <Minimize2 className="h-4 w-4" />
+                    Exit Fullscreen
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Fullscreen Dashboard Content */}
+            <div className="p-6 overflow-auto" style={{ height: "calc(100vh - 80px - 80px)" }}>
+              {currentDashboard && (
+                <DashboardLayoutComponent
+                  cards={currentDashboard.cards}
+                  onLayoutChange={handleLayoutChange}
+                  onCardRemove={handleCardRemove}
+                  onCardConfigure={handleCardConfigure}
+                  onCardSizeChange={handleCardSizeChange}
+                  onCardAdd={handleCardAdd}
+                  onSave={handleSave}
+                  onReset={handleReset}
+                  isEditing={isEditing}
+                  onToggleEdit={() => setIsEditing(!isEditing)}
+                  layoutDensity={layoutDensity}
+                  userRole={user.role}
+                />
+              )}
+            </div>
           </div>
         )}
       </div>

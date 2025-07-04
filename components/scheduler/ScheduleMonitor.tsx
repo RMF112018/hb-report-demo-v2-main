@@ -1,9 +1,8 @@
-"use client";
+"use client"
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "react"
 import {
   Monitor,
-  Upload,
   Download,
   Calendar,
   Clock,
@@ -11,7 +10,6 @@ import {
   TrendingDown,
   AlertTriangle,
   CheckCircle,
-  FileText,
   RefreshCw,
   Eye,
   Settings,
@@ -19,16 +17,15 @@ import {
   BarChart3,
   Activity,
   Target,
-} from "lucide-react";
+} from "lucide-react"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Progress } from "@/components/ui/progress"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   LineChart,
   Line,
@@ -42,12 +39,11 @@ import {
   ComposedChart,
   Area,
   AreaChart,
-} from "recharts";
-import { useDropzone } from 'react-dropzone';
+} from "recharts"
 
 interface ScheduleMonitorProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
 // Mock milestone comparison data
@@ -59,7 +55,7 @@ const milestoneComparisonData = [
     actual: "2024-02-16",
     variance: 1,
     status: "completed",
-    criticality: "high"
+    criticality: "high",
   },
   {
     milestone: "Structure Complete",
@@ -68,7 +64,7 @@ const milestoneComparisonData = [
     actual: null,
     variance: 3,
     status: "at-risk",
-    criticality: "high"
+    criticality: "high",
   },
   {
     milestone: "MEP Rough Complete",
@@ -77,7 +73,7 @@ const milestoneComparisonData = [
     actual: null,
     variance: 3,
     status: "on-track",
-    criticality: "medium"
+    criticality: "medium",
   },
   {
     milestone: "Substantial Completion",
@@ -86,9 +82,9 @@ const milestoneComparisonData = [
     actual: null,
     variance: 7,
     status: "at-risk",
-    criticality: "high"
+    criticality: "high",
   },
-];
+]
 
 // Mock schedule comparison data
 const scheduleComparisonData = [
@@ -98,7 +94,7 @@ const scheduleComparisonData = [
   { period: "Week 4", current: 85, previous: 87, baseline: 82 },
   { period: "Week 5", current: 90, previous: 85, baseline: 86 },
   { period: "Week 6", current: 87, previous: 88, baseline: 84 },
-];
+]
 
 // Mock float analysis data
 const floatAnalysisData = [
@@ -107,7 +103,7 @@ const floatAnalysisData = [
   { activity: "Steel Erection", totalFloat: 8, freeFloat: 5, status: "safe" },
   { activity: "MEP Layout", totalFloat: 2, freeFloat: 1, status: "near-critical" },
   { activity: "Drywall Install", totalFloat: 12, freeFloat: 8, status: "safe" },
-];
+]
 
 // Mock delay analysis data
 const delayAnalysisData = [
@@ -116,183 +112,87 @@ const delayAnalysisData = [
     impact: 8,
     frequency: 12,
     avgDuration: 2.3,
-    trend: "increasing"
+    trend: "increasing",
   },
   {
     category: "Material Delays",
     impact: 15,
     frequency: 8,
     avgDuration: 4.2,
-    trend: "stable"
+    trend: "stable",
   },
   {
     category: "Labor Shortage",
     impact: 6,
     frequency: 5,
     avgDuration: 3.1,
-    trend: "decreasing"
+    trend: "decreasing",
   },
   {
     category: "Design Changes",
     impact: 12,
     frequency: 7,
     avgDuration: 5.8,
-    trend: "increasing"
+    trend: "increasing",
   },
-];
-
-const acceptedFileTypes = ['.xer', '.mpp', '.xml', '.csv'];
+]
 
 export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonitorProps) {
-  const [selectedComparison, setSelectedComparison] = useState("current-vs-baseline");
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState("2024-06-15 10:30 AM");
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setUploadedFiles(prev => [...prev, ...acceptedFiles]);
-    setIsProcessing(true);
-    
-    // Simulate file processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setLastUpdate(new Date().toLocaleString());
-    }, 3000);
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'application/xml': ['.xml'],
-      'text/csv': ['.csv'],
-      'application/octet-stream': ['.xer', '.mpp'],
-    },
-    multiple: true
-  });
-
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
+  const [selectedComparison, setSelectedComparison] = useState("current-vs-baseline")
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
-      case "on-track": return "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30";
-      case "at-risk": return "text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30";
-      case "critical": return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30";
-      case "near-critical": return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
-      default: return "text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30";
+      case "completed":
+        return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30"
+      case "on-track":
+        return "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30"
+      case "at-risk":
+        return "text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30"
+      case "critical":
+        return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30"
+      case "near-critical":
+        return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30"
+      default:
+        return "text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30"
     }
-  };
+  }
 
   const getFloatStatusColor = (status: string) => {
     switch (status) {
-      case "safe": return "text-green-600 dark:text-green-400";
-      case "near-critical": return "text-yellow-600 dark:text-yellow-400";
-      case "critical": return "text-red-600 dark:text-red-400";
-      default: return "text-gray-600 dark:text-gray-400";
+      case "safe":
+        return "text-green-600 dark:text-green-400"
+      case "near-critical":
+        return "text-yellow-600 dark:text-yellow-400"
+      case "critical":
+        return "text-red-600 dark:text-red-400"
+      default:
+        return "text-gray-600 dark:text-gray-400"
     }
-  };
+  }
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "increasing": return <TrendingUp className="h-4 w-4 text-red-500" />;
-      case "decreasing": return <TrendingDown className="h-4 w-4 text-green-500" />;
-      default: return <Activity className="h-4 w-4 text-blue-500" />;
+      case "increasing":
+        return <TrendingUp className="h-4 w-4 text-red-500" />
+      case "decreasing":
+        return <TrendingDown className="h-4 w-4 text-green-500" />
+      default:
+        return <Activity className="h-4 w-4 text-blue-500" />
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
+    return new Date(dateString).toLocaleDateString()
+  }
 
   const calculateVarianceDays = (baseline: string, current: string) => {
-    const baselineDate = new Date(baseline);
-    const currentDate = new Date(current);
-    return Math.ceil((currentDate.getTime() - baselineDate.getTime()) / (1000 * 3600 * 24));
-  };
+    const baselineDate = new Date(baseline)
+    const currentDate = new Date(current)
+    return Math.ceil((currentDate.getTime() - baselineDate.getTime()) / (1000 * 3600 * 24))
+  }
 
   return (
     <div className="space-y-6">
-      {/* Upload Section */}
-      <Card data-tour="monitor-file-upload">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-blue-600" />
-            Schedule File Upload
-          </CardTitle>
-          <CardDescription>
-            Upload schedule files (.xer, .mpp, .xml, .csv) for comparison and analysis
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                isDragActive 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30' 
-                  : 'border-gray-300 dark:border-gray-700 hover:border-gray-400'
-              }`}
-            >
-              <input {...getInputProps()} />
-              <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-              {isDragActive ? (
-                <p className="text-blue-600">Drop files here...</p>
-              ) : (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 mb-1">
-                    Drag & drop schedule files here, or click to select
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
-                    Supported formats: {acceptedFileTypes.join(', ')}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* File List */}
-            {uploadedFiles.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Uploaded Files:</Label>
-                {uploadedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm">{file.name}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {(file.size / 1024).toFixed(1)} KB
-                      </Badge>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => removeFile(index)}
-                      className="h-6 w-6 p-0"
-                    >
-                      ×
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Processing Status */}
-            {isProcessing && (
-              <div className="flex items-center gap-2 text-blue-600">
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Processing schedule files...</span>
-              </div>
-            )}
-
-            {/* Last Update */}
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Last updated: {lastUpdate}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Comparison Controls */}
       <Card data-tour="monitor-comparison">
         <CardHeader>
@@ -334,32 +234,20 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis dataKey="period" />
               <YAxis tickFormatter={(value) => `${value}%`} />
-              <Tooltip 
+              <Tooltip
                 formatter={(value: number, name: string) => [`${value}%`, name]}
                 labelFormatter={(label) => `Period: ${label}`}
               />
-              <Line 
-                type="monotone" 
-                dataKey="baseline" 
-                stroke="#94a3b8" 
+              <Line
+                type="monotone"
+                dataKey="baseline"
+                stroke="#94a3b8"
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 name="Baseline"
               />
-              <Line 
-                type="monotone" 
-                dataKey="previous" 
-                stroke="#f59e0b" 
-                strokeWidth={2}
-                name="Previous Update"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="current" 
-                stroke="#3b82f6" 
-                strokeWidth={3}
-                name="Current Schedule"
-              />
+              <Line type="monotone" dataKey="previous" stroke="#f59e0b" strokeWidth={2} name="Previous Update" />
+              <Line type="monotone" dataKey="current" stroke="#3b82f6" strokeWidth={3} name="Current Schedule" />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -390,9 +278,7 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
           <Card>
             <CardHeader>
               <CardTitle>Milestone Comparison</CardTitle>
-              <CardDescription>
-                Compare milestone dates across baseline, current schedule, and actuals
-              </CardDescription>
+              <CardDescription>Compare milestone dates across baseline, current schedule, and actuals</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -401,28 +287,41 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${getStatusColor(milestone.status)}`}>
-                          {milestone.status === "completed" ? <CheckCircle className="h-4 w-4" /> :
-                           milestone.status === "at-risk" ? <AlertTriangle className="h-4 w-4" /> :
-                           <Clock className="h-4 w-4" />}
+                          {milestone.status === "completed" ? (
+                            <CheckCircle className="h-4 w-4" />
+                          ) : milestone.status === "at-risk" ? (
+                            <AlertTriangle className="h-4 w-4" />
+                          ) : (
+                            <Clock className="h-4 w-4" />
+                          )}
                         </div>
                         <div>
                           <h4 className="font-medium">{milestone.milestone}</h4>
-                          <Badge variant={milestone.criticality === "high" ? "destructive" : "secondary"} className="text-xs">
+                          <Badge
+                            variant={milestone.criticality === "high" ? "destructive" : "secondary"}
+                            className="text-xs"
+                          >
                             {milestone.criticality} priority
                           </Badge>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className={`text-sm font-medium ${
-                          milestone.variance > 0 ? 'text-red-600' : 
-                          milestone.variance < 0 ? 'text-green-600' : 'text-gray-600'
-                        }`}>
-                          {milestone.variance > 0 ? '+' : ''}{milestone.variance} days
+                        <div
+                          className={`text-sm font-medium ${
+                            milestone.variance > 0
+                              ? "text-red-600"
+                              : milestone.variance < 0
+                              ? "text-green-600"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {milestone.variance > 0 ? "+" : ""}
+                          {milestone.variance} days
                         </div>
                         <div className="text-xs text-muted-foreground">variance</div>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
                         <div className="text-muted-foreground">Baseline</div>
@@ -434,9 +333,7 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
                       </div>
                       <div>
                         <div className="text-muted-foreground">Actual</div>
-                        <div className="font-medium">
-                          {milestone.actual ? formatDate(milestone.actual) : 'Pending'}
-                        </div>
+                        <div className="font-medium">{milestone.actual ? formatDate(milestone.actual) : "Pending"}</div>
                       </div>
                     </div>
                   </div>
@@ -450,24 +347,26 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
           <Card>
             <CardHeader>
               <CardTitle>Float Analysis</CardTitle>
-              <CardDescription>
-                Critical path and float analysis for schedule optimization
-              </CardDescription>
+              <CardDescription>Critical path and float analysis for schedule optimization</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {floatAnalysisData.map((activity, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        activity.status === "critical" ? "bg-red-500" :
-                        activity.status === "near-critical" ? "bg-yellow-500" :
-                        "bg-green-500"
-                      }`} />
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          activity.status === "critical"
+                            ? "bg-red-500"
+                            : activity.status === "near-critical"
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
+                        }`}
+                      />
                       <div>
                         <h4 className="font-medium">{activity.activity}</h4>
                         <p className={`text-sm ${getFloatStatusColor(activity.status)}`}>
-                          {activity.status.replace('-', ' ')}
+                          {activity.status.replace("-", " ")}
                         </p>
                       </div>
                     </div>
@@ -492,9 +391,7 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
           <Card>
             <CardHeader>
               <CardTitle>Delay Analysis</CardTitle>
-              <CardDescription>
-                Analysis of delay patterns and their impact on schedule performance
-              </CardDescription>
+              <CardDescription>Analysis of delay patterns and their impact on schedule performance</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
@@ -543,7 +440,8 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
                   <div>
                     <p className="font-medium text-blue-900 dark:text-blue-100">Performance Improvement</p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Schedule performance has improved 12% over the last reporting period with better resource coordination.
+                      Schedule performance has improved 12% over the last reporting period with better resource
+                      coordination.
                     </p>
                   </div>
                 </div>
@@ -552,7 +450,8 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
                   <div>
                     <p className="font-medium text-orange-900 dark:text-orange-100">Critical Path Extension</p>
                     <p className="text-sm text-orange-700 dark:text-orange-300">
-                      MEP coordination delays have extended the critical path by 8 days, impacting substantial completion.
+                      MEP coordination delays have extended the critical path by 8 days, impacting substantial
+                      completion.
                     </p>
                   </div>
                 </div>
@@ -600,5 +499,5 @@ export default function ScheduleMonitor({ userRole, projectData }: ScheduleMonit
         </TabsContent>
       </Tabs>
     </div>
-  );
-} 
+  )
+}

@@ -59,7 +59,7 @@ const formatNumber = (value?: number) => {
 }
 
 // Custom Pie Chart Component without border/title
-function SimplePieChart({ data }: { data: any[] }) {
+function SimplePieChart({ data, scaleFactor = 1 }: { data: any[]; scaleFactor?: number }) {
   const COLORS = [
     "#3b82f6", // Blue
     "#10b981", // Green
@@ -69,10 +69,14 @@ function SimplePieChart({ data }: { data: any[] }) {
     "#06b6d4", // Cyan
   ]
 
+  // Scale the pie chart radii based on scale factor
+  const innerRadius = Math.max(6, Math.round(15 * scaleFactor))
+  const outerRadius = Math.max(12, Math.round(40 * scaleFactor))
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
-        <Pie data={data} cx="50%" cy="50%" innerRadius={15} outerRadius={40} dataKey="value">
+        <Pie data={data} cx="50%" cy="50%" innerRadius={innerRadius} outerRadius={outerRadius} dataKey="value">
           {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
@@ -84,6 +88,34 @@ function SimplePieChart({ data }: { data: any[] }) {
 
 export default function PortfolioOverview({ card, config, span, isCompact = false }: PortfolioOverviewProps) {
   const [showDrillDown, setShowDrillDown] = useState(false)
+
+  // Calculate card size categories based on span
+  const cardArea = span.cols * span.rows
+  const isVerySmall = cardArea <= 9 // 3x3 or smaller
+  const isSmall = cardArea <= 16 // 4x4 or smaller
+  const isMedium = cardArea <= 24 // 6x4 or smaller
+  const isWide = span.cols >= 8 // Wide cards
+  const isTall = span.rows >= 6 // Tall cards
+  const isLarge = cardArea >= 36 // 6x6 or larger
+
+  // Debug logging to see what's happening
+  console.log("PortfolioOverview DEBUG:", {
+    span,
+    cardArea,
+    sizingResults: {
+      isVerySmall,
+      isSmall,
+      isMedium,
+      isWide,
+      isTall,
+      isLarge,
+    },
+  })
+
+  // Check if this is the optimal size for 100% content
+  if (span.cols === 8 && span.rows === 6) {
+    console.log("🎯 PortfolioOverview is at optimal size (8x6) for 100% content display!")
+  }
 
   // Listen for drill down events from DashboardCardWrapper
   useEffect(() => {
@@ -167,10 +199,6 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
     [activeProjects, completedThisYear]
   )
 
-  // Determine layout based on span
-  const isWide = span.cols >= 8
-  const isTall = span.rows >= 6
-
   // Regional distribution data (Florida regions only)
   const regionalData = [
     { region: "Central FL", projects: 4, value: 89.2 },
@@ -180,156 +208,327 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
     { region: "Space Coast", projects: 1, value: 23.5 },
   ]
 
+  // Dynamic scaling based on card size - SMOOTH PROPORTIONAL SCALING
+  const getSizeClasses = () => {
+    // Calculate scaling factor based on card area (optimal size is 8x6 = 48)
+    const optimalArea = 48
+    const scaleFactor = Math.min(Math.max(cardArea / optimalArea, 0.3), 1.2) // Scale between 30% and 120%
+
+    // Base sizes that will be scaled
+    const baseConfig = {
+      padding: 12, // Base padding in pixels
+      headerPadding: 12,
+      fontSize: 14, // Base font size
+      titleFontSize: 16,
+      metricFontSize: 18,
+      gap: 8,
+      chartHeight: 112, // Base chart height in pixels
+      iconSize: 16, // Base icon size
+    }
+
+    // Scale everything proportionally
+    const scaledConfig = {
+      padding: Math.max(4, Math.round(baseConfig.padding * scaleFactor)),
+      headerPadding: Math.max(4, Math.round(baseConfig.headerPadding * scaleFactor)),
+      fontSize: Math.max(8, Math.round(baseConfig.fontSize * scaleFactor)),
+      titleFontSize: Math.max(10, Math.round(baseConfig.titleFontSize * scaleFactor)),
+      metricFontSize: Math.max(12, Math.round(baseConfig.metricFontSize * scaleFactor)),
+      gap: Math.max(2, Math.round(baseConfig.gap * scaleFactor)),
+      chartHeight: Math.max(32, Math.round(baseConfig.chartHeight * scaleFactor)),
+      iconSize: Math.max(8, Math.round(baseConfig.iconSize * scaleFactor)),
+    }
+
+    // Determine grid layout based on card dimensions
+    const gridCols =
+      span.cols >= 8 ? "grid-cols-4" : span.cols >= 6 ? "grid-cols-2" : span.cols >= 4 ? "grid-cols-2" : "grid-cols-1"
+
+    return {
+      padding: `p-[${scaledConfig.padding}px]`,
+      headerPadding: `p-[${scaledConfig.headerPadding}px]`,
+      text: `text-[${scaledConfig.fontSize}px]`,
+      titleText: `text-[${scaledConfig.titleFontSize}px]`,
+      metricText: `text-[${scaledConfig.metricFontSize}px]`,
+      gap: `gap-[${scaledConfig.gap}px]`,
+      gridCols,
+      chartHeight: `h-[${scaledConfig.chartHeight}px]`,
+      iconSize: `h-[${scaledConfig.iconSize}px] w-[${scaledConfig.iconSize}px]`,
+      showFooter: span.rows >= 4, // Show footer if tall enough
+      showCharts: span.rows >= 3, // Show charts if at least 3 rows
+      showIcons: scaleFactor >= 0.5, // Show icons if scale factor is reasonable
+      maxMetrics: 4, // Always show all metrics, just scaled
+      scaleFactor, // For debugging
+    }
+  }
+
+  const sizeClasses = getSizeClasses()
+
+  // Priority metrics for small cards
+  const allMetrics = [
+    {
+      icon: <Building2 className={`${sizeClasses.iconSize} text-blue-600 dark:text-blue-400`} />,
+      label: isVerySmall ? "Projects" : "Total Projects",
+      value: totalProjects,
+      subtitle: `${activeProjects} active`,
+      color: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      icon: <DollarSign className={`${sizeClasses.iconSize} text-green-600 dark:text-green-400`} />,
+      label: isVerySmall ? "Value" : "Portfolio Value",
+      value: formatCurrency(totalValue),
+      subtitle: "total value",
+      color: "text-green-600 dark:text-green-400",
+    },
+    {
+      icon: <TrendingUp className={`${sizeClasses.iconSize} text-indigo-600 dark:text-indigo-400`} />,
+      label: isVerySmall ? "Cash" : "Net Cash Flow",
+      value: formatCurrency(netCashFlow),
+      subtitle: "this month",
+      color: "text-indigo-600 dark:text-indigo-400",
+    },
+    {
+      icon: <Layers3 className={`${sizeClasses.iconSize} text-purple-600`} />,
+      label: isVerySmall ? "Sq Ft" : "Total Sq Ft",
+      value: formatNumber(totalSqFt),
+      subtitle: "square feet",
+      color: "text-purple-600",
+    },
+  ]
+
+  // Show different number of metrics based on card size
+  const visibleMetrics = allMetrics.slice(0, sizeClasses.maxMetrics)
+
+  console.log("📏 PortfolioOverview scaling:", {
+    cardArea,
+    scaleFactor: sizeClasses.scaleFactor.toFixed(2),
+    span: `${span.cols}x${span.rows}`,
+    isOptimalSize: span.cols === 8 && span.rows === 6,
+  })
+
   return (
     <div className="relative h-full" data-tour="portfolio-overview-card">
       <div className="h-full flex flex-col bg-transparent overflow-hidden">
         {/* Key Metrics Header */}
-        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-1" />
-                <span className="text-xs font-medium text-muted-foreground">Total Projects</span>
+        <div
+          className={`flex-shrink-0 ${sizeClasses.headerPadding} bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700`}
+        >
+          <div className={`${sizeClasses.gridCols} ${sizeClasses.gap} grid`}>
+            {visibleMetrics.map((metric, index) => (
+              <div key={index} className="text-center">
+                <div className="flex items-center justify-center mb-1">
+                  {sizeClasses.showIcons && metric.icon}
+                  <span
+                    className={`${sizeClasses.text} font-medium text-muted-foreground ${
+                      sizeClasses.showIcons ? `ml-[${Math.max(2, Math.round(4 * sizeClasses.scaleFactor))}px]` : ""
+                    }`}
+                  >
+                    {metric.label}
+                  </span>
+                </div>
+                <div className={`${sizeClasses.metricText} font-medium text-foreground`}>{metric.value}</div>
+                {!isVerySmall && <div className={`${sizeClasses.text} text-muted-foreground`}>{metric.subtitle}</div>}
               </div>
-              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
-                {totalProjects}
-              </div>
-              <div className="text-xs text-green-600 dark:text-green-400">{activeProjects} active</div>
-            </div>
-
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400 mr-1" />
-                <span className="text-xs font-medium text-muted-foreground">Portfolio Value</span>
-              </div>
-              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
-                {formatCurrency(totalValue)}
-              </div>
-              <div className="text-xs text-muted-foreground">total value</div>
-            </div>
-
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mr-1" />
-                <span className="text-xs font-medium text-muted-foreground">Net Cash Flow</span>
-              </div>
-              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
-                {formatCurrency(netCashFlow)}
-              </div>
-              <div className="text-xs text-muted-foreground">this month</div>
-            </div>
-
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <Layers3 className="h-4 w-4 text-purple-600 mr-1" />
-                <span className="text-xs font-medium text-muted-foreground">Total Sq Ft</span>
-              </div>
-              <div className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium text-foreground">
-                {formatNumber(totalSqFt)}
-              </div>
-              <div className="text-xs text-muted-foreground">square feet</div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Charts Section */}
-        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-hidden">
-          {isWide ? (
-            // Wide layout: side-by-side charts
-            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-full min-h-48">
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                  <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
-                  Project Growth
-                </h4>
-                <div className="h-32">
-                  <AreaChart data={trendData} color="hsl(var(--chart-2))" compact />
+        {/* Charts Section - Only show if card is large enough */}
+        {sizeClasses.showCharts && (
+          <div className={`flex-1 ${sizeClasses.padding} overflow-hidden`}>
+            {isWide && !isVerySmall && !isSmall ? (
+              // Wide layout: side-by-side charts (only for large cards)
+              <div className={`grid grid-cols-2 ${sizeClasses.gap} h-full`}>
+                <div
+                  className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-[${Math.max(
+                    4,
+                    Math.round(8 * sizeClasses.scaleFactor)
+                  )}px]`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold text-foreground mb-1 flex items-center`}>
+                    <TrendingUp
+                      className={`${sizeClasses.iconSize} mr-[${Math.max(
+                        2,
+                        Math.round(4 * sizeClasses.scaleFactor)
+                      )}px] text-blue-600 dark:text-blue-400`}
+                    />
+                    Growth
+                  </h4>
+                  <div className={sizeClasses.chartHeight}>
+                    <AreaChart data={trendData} color="hsl(var(--chart-2))" compact />
+                  </div>
+                </div>
+
+                <div
+                  className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-[${Math.max(
+                    4,
+                    Math.round(8 * sizeClasses.scaleFactor)
+                  )}px]`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold text-foreground mb-1 flex items-center`}>
+                    <Building2
+                      className={`${sizeClasses.iconSize} mr-[${Math.max(
+                        2,
+                        Math.round(4 * sizeClasses.scaleFactor)
+                      )}px] text-indigo-600 dark:text-indigo-400`}
+                    />
+                    Status
+                  </h4>
+                  <div className={`${sizeClasses.chartHeight} flex items-center`}>
+                    <div
+                      className={`w-[${Math.max(32, Math.round(56 * sizeClasses.scaleFactor))}px] h-[${Math.max(
+                        32,
+                        Math.round(56 * sizeClasses.scaleFactor)
+                      )}px] flex-shrink-0`}
+                    >
+                      <SimplePieChart data={projectStatusData} scaleFactor={sizeClasses.scaleFactor} />
+                    </div>
+                    <div className={`flex-1 ml-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px]`}>
+                      <div className={`grid grid-cols-1 gap-1 ${sizeClasses.text}`}>
+                        {projectStatusData.slice(0, 3).map((item) => (
+                          <div key={item.name} className="flex items-center">
+                            <div
+                              className={`w-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px] h-[${Math.max(
+                                4,
+                                Math.round(8 * sizeClasses.scaleFactor)
+                              )}px] rounded-full mr-[${Math.max(
+                                2,
+                                Math.round(4 * sizeClasses.scaleFactor)
+                              )}px] flex-shrink-0`}
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span
+                              className={`text-muted-foreground truncate text-[${Math.max(
+                                8,
+                                Math.round(10 * sizeClasses.scaleFactor)
+                              )}px]`}
+                            >
+                              {item.name}: {item.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                  <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
-                  Project Status
-                </h4>
-                <div className="h-32 flex items-center">
-                  <div className="w-24 h-24">
-                    <SimplePieChart data={projectStatusData} />
+            ) : (
+              // Stacked layout for non-wide cards
+              <div className={`space-y-1 h-full`}>
+                <div
+                  className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-[${Math.max(
+                    4,
+                    Math.round(8 * sizeClasses.scaleFactor)
+                  )}px]`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold text-foreground mb-1 flex items-center`}>
+                    <TrendingUp
+                      className={`${sizeClasses.iconSize} mr-[${Math.max(
+                        2,
+                        Math.round(4 * sizeClasses.scaleFactor)
+                      )}px] text-blue-600 dark:text-blue-400`}
+                    />
+                    Growth
+                  </h4>
+                  <div className={sizeClasses.chartHeight}>
+                    <AreaChart data={trendData.slice(-4)} color="hsl(var(--chart-2))" compact />
                   </div>
-                  <div className="flex-1 ml-4">
-                    <div className="grid grid-cols-1 gap-2 text-sm">
+                </div>
+
+                {/* Only show second chart if there's enough space */}
+                {(isTall || isLarge) && (
+                  <div
+                    className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-[${Math.max(
+                      4,
+                      Math.round(8 * sizeClasses.scaleFactor)
+                    )}px]`}
+                  >
+                    <h4 className={`${sizeClasses.titleText} font-semibold text-foreground mb-1 flex items-center`}>
+                      <Building2
+                        className={`${sizeClasses.iconSize} mr-[${Math.max(
+                          2,
+                          Math.round(4 * sizeClasses.scaleFactor)
+                        )}px] text-indigo-600 dark:text-indigo-400`}
+                      />
+                      Status
+                    </h4>
+                    <div className={`grid grid-cols-2 gap-1 ${sizeClasses.text}`}>
                       {projectStatusData.map((item) => (
                         <div key={item.name} className="flex items-center">
                           <div
-                            className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+                            className={`w-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px] h-[${Math.max(
+                              4,
+                              Math.round(8 * sizeClasses.scaleFactor)
+                            )}px] rounded-full mr-[${Math.max(
+                              2,
+                              Math.round(4 * sizeClasses.scaleFactor)
+                            )}px] flex-shrink-0`}
                             style={{ backgroundColor: item.color }}
                           />
-                          <span className="text-muted-foreground">
+                          <span
+                            className={`text-muted-foreground truncate text-[${Math.max(
+                              8,
+                              Math.round(10 * sizeClasses.scaleFactor)
+                            )}px]`}
+                          >
                             {item.name}: {item.value}
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            </div>
-          ) : (
-            // Narrow layout: stacked charts
-            <div className="space-y-4">
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                  <TrendingUp className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
-                  Growth Trend
-                </h4>
-                <div className="h-24">
-                  <AreaChart data={trendData.slice(-4)} color="hsl(var(--chart-2))" compact />
-                </div>
-              </div>
+            )}
+          </div>
+        )}
 
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="text-sm font-semibold text-foreground mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                  <Building2 className="h-4 w-4 mr-1 text-indigo-600 dark:text-indigo-400" />
-                  Status Distribution
-                </h4>
-                <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:gap-2 text-sm">
-                  {projectStatusData.map((item) => (
-                    <div key={item.name} className="flex items-center">
-                      <div
-                        className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-muted-foreground">
-                        {item.name}: {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+        {/* Footer - Only show if card is large enough */}
+        {sizeClasses.showFooter && (
+          <div
+            className={`flex-shrink-0 ${sizeClasses.padding} bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700`}
+          >
+            <div className={`grid grid-cols-2 ${sizeClasses.gap} ${sizeClasses.text}`}>
+              <div className="flex items-center">
+                <Calendar
+                  className={`${sizeClasses.iconSize} text-muted-foreground mr-[${Math.max(
+                    2,
+                    Math.round(4 * sizeClasses.scaleFactor)
+                  )}px]`}
+                />
+                <span className="text-muted-foreground">Avg: </span>
+                <span
+                  className={`font-semibold text-foreground ml-[${Math.max(
+                    2,
+                    Math.round(4 * sizeClasses.scaleFactor)
+                  )}px]`}
+                >
+                  {averageDuration}d
+                </span>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer with additional metrics */}
-        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700">
-          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 text-sm">
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
-              <span className="text-muted-foreground">Avg Duration: </span>
-              <span className="font-semibold text-foreground ml-1">{averageDuration} days</span>
-            </div>
-            <div className="flex items-center">
-              <DollarSign className="h-4 w-4 text-muted-foreground mr-2" />
-              <span className="text-muted-foreground">Avg Contract: </span>
-              <span className="font-semibold text-foreground ml-1">{formatCurrency(averageContractValue)}</span>
+              <div className="flex items-center">
+                <DollarSign
+                  className={`${sizeClasses.iconSize} text-muted-foreground mr-[${Math.max(
+                    2,
+                    Math.round(4 * sizeClasses.scaleFactor)
+                  )}px]`}
+                />
+                <span className="text-muted-foreground">Avg: </span>
+                <span
+                  className={`font-semibold text-foreground ml-[${Math.max(
+                    2,
+                    Math.round(4 * sizeClasses.scaleFactor)
+                  )}px]`}
+                >
+                  {formatCurrency(averageContractValue)}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Click-Based Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-3 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
             {/* Close Button */}
             <button
@@ -341,15 +540,13 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">
-              Portfolio Deep Dive
-            </h3>
+            <h3 className="text-lg font-medium mb-2 text-center">Portfolio Deep Dive</h3>
 
-            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+            <div className="grid grid-cols-2 gap-3 h-[calc(100%-60px)]">
               {/* Regional Distribution */}
               <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-3">
+                  <h4 className="font-semibold mb-2 flex items-center">
                     <MapPin className="w-4 h-4 mr-2" />
                     Florida Regional Distribution
                   </h4>
@@ -366,8 +563,8 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-3">
+                  <h4 className="font-semibold mb-2 flex items-center">
                     <Target className="w-4 h-4 mr-2" />
                     Performance Metrics
                   </h4>
@@ -394,8 +591,8 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
               {/* Project Details */}
               <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-3">
+                  <h4 className="font-semibold mb-2 flex items-center">
                     <Award className="w-4 h-4 mr-2" />
                     Largest Projects
                   </h4>
@@ -418,8 +615,8 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-3">
+                  <h4 className="font-semibold mb-2 flex items-center">
                     <Building2 className="w-4 h-4 mr-2" />
                     Portfolio Composition
                   </h4>

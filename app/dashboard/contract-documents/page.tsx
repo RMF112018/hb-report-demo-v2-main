@@ -52,10 +52,13 @@ import {
   XCircle,
   Home,
   RefreshCw,
-  Plus
+  Plus,
 } from "lucide-react"
 import { format } from "date-fns"
-import type { ContractDocument, ContractDocumentsStats } from "@/components/contract-documents/ContractDocumentsExportUtils"
+import type {
+  ContractDocument,
+  ContractDocumentsStats,
+} from "@/components/contract-documents/ContractDocumentsExportUtils"
 
 // Mock data for documents
 const mockDocuments: ContractDocument[] = [
@@ -76,7 +79,7 @@ const mockDocuments: ContractDocument[] = [
     project: {
       id: "proj-001",
       name: "Wilshire Tower Construction",
-      projectNumber: "WT-2024-001"
+      projectNumber: "WT-2024-001",
     },
     keyRisks: [
       {
@@ -84,8 +87,8 @@ const mockDocuments: ContractDocument[] = [
         description: "Complex milestone payment schedule",
         severity: "High",
         recommendation: "Define specific measurable completion criteria",
-        clauseReference: "Section 12.3"
-      }
+        clauseReference: "Section 12.3",
+      },
     ],
     opportunities: [
       {
@@ -93,15 +96,15 @@ const mockDocuments: ContractDocument[] = [
         description: "Substantial bonus for early project completion",
         value: "$125,000",
         probability: "High",
-        clauseReference: "Section 14.2"
-      }
+        clauseReference: "Section 14.2",
+      },
     ],
     complianceChecks: {
       buildingCodes: {
         status: "Compliant",
         lastChecked: "2024-01-15T10:00:00Z",
-        nextReview: "2024-04-15T10:00:00Z"
-      }
+        nextReview: "2024-04-15T10:00:00Z",
+      },
     },
     aiInsights: {
       overallRisk: "Medium",
@@ -110,12 +113,12 @@ const mockDocuments: ContractDocument[] = [
       similarContracts: 3,
       industryBenchmark: {
         riskScore: "15% lower than industry average",
-        complianceScore: "8% higher than industry average"
-      }
-    }
+        complianceScore: "8% higher than industry average",
+      },
+    },
   },
   {
-    id: "doc-002", 
+    id: "doc-002",
     name: "Electrical Subcontract Agreement",
     type: "Subcontract",
     status: "Approved",
@@ -131,7 +134,7 @@ const mockDocuments: ContractDocument[] = [
     project: {
       id: "proj-002",
       name: "Downtown Office Complex",
-      projectNumber: "DOC-2024-005"
+      projectNumber: "DOC-2024-005",
     },
     keyRisks: [
       {
@@ -139,8 +142,8 @@ const mockDocuments: ContractDocument[] = [
         description: "Required performance bond may impact cash flow",
         severity: "Low",
         recommendation: "Verify bond capacity before project start",
-        clauseReference: "Section 6.1"
-      }
+        clauseReference: "Section 6.1",
+      },
     ],
     opportunities: [
       {
@@ -148,15 +151,15 @@ const mockDocuments: ContractDocument[] = [
         description: "Additional discount for material orders over $100K",
         value: "3% discount",
         probability: "High",
-        clauseReference: "Section 4.5"
-      }
+        clauseReference: "Section 4.5",
+      },
     ],
     complianceChecks: {
       buildingCodes: {
         status: "Compliant",
         lastChecked: "2024-01-12T15:00:00Z",
-        nextReview: "2024-04-12T15:00:00Z"
-      }
+        nextReview: "2024-04-12T15:00:00Z",
+      },
     },
     aiInsights: {
       overallRisk: "Low",
@@ -165,9 +168,9 @@ const mockDocuments: ContractDocument[] = [
       similarContracts: 12,
       industryBenchmark: {
         riskScore: "25% lower than industry average",
-        complianceScore: "12% higher than industry average"
-      }
-    }
+        complianceScore: "12% higher than industry average",
+      },
+    },
   },
   {
     id: "doc-003",
@@ -186,7 +189,7 @@ const mockDocuments: ContractDocument[] = [
     project: {
       id: "proj-multiple",
       name: "Multiple Projects",
-      projectNumber: "MULTI-2024"
+      projectNumber: "MULTI-2024",
     },
     keyRisks: [
       {
@@ -194,8 +197,8 @@ const mockDocuments: ContractDocument[] = [
         description: "New building code requirements may require retrofits",
         severity: "High",
         recommendation: "Review all active projects for compliance gaps",
-        clauseReference: "Section 4.2"
-      }
+        clauseReference: "Section 4.2",
+      },
     ],
     opportunities: [
       {
@@ -203,15 +206,15 @@ const mockDocuments: ContractDocument[] = [
         description: "New code provides energy efficiency tax incentives",
         value: "Up to $50,000 per project",
         probability: "Medium",
-        clauseReference: "Appendix C"
-      }
+        clauseReference: "Appendix C",
+      },
     ],
     complianceChecks: {
       environmentalRegs: {
         status: "Requires Review",
         lastChecked: "2024-01-10T10:00:00Z",
-        nextReview: "2024-02-15T10:00:00Z"
-      }
+        nextReview: "2024-02-15T10:00:00Z",
+      },
     },
     aiInsights: {
       overallRisk: "High",
@@ -220,10 +223,10 @@ const mockDocuments: ContractDocument[] = [
       similarContracts: 8,
       industryBenchmark: {
         riskScore: "40% higher than industry average",
-        complianceScore: "2% lower than industry average"
-      }
-    }
-  }
+        complianceScore: "2% lower than industry average",
+      },
+    },
+  },
 ]
 
 const mockAnalytics: ContractDocumentsStats = {
@@ -234,7 +237,7 @@ const mockAnalytics: ContractDocumentsStats = {
   avgReviewTime: 3.2,
   aiInsightsGenerated: 156,
   costSavingsIdentified: 485000,
-  riskItemsResolved: 89
+  riskItemsResolved: 89,
 }
 
 export default function ContractDocumentsPage() {
@@ -255,17 +258,18 @@ export default function ContractDocumentsPage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       setLoading(false)
     }
     loadData()
   }, [])
 
   const filteredDocuments = useMemo(() => {
-    return mockDocuments.filter(doc => {
-      const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           doc.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           doc.project.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return mockDocuments.filter((doc) => {
+      const matchesSearch =
+        doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.project.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === "all" || doc.status === filterStatus
       const matchesType = filterType === "all" || doc.type === filterType
       return matchesSearch && matchesStatus && matchesType
@@ -308,25 +312,25 @@ export default function ContractDocumentsPage() {
   // Get role-specific scope
   const getProjectScope = () => {
     if (!user) return { scope: "all", projectCount: 0, description: "All Projects" }
-    
+
     switch (user.role) {
       case "project-manager":
-        return { 
-          scope: "single", 
-          projectCount: 1, 
-          description: "Single Project View"
+        return {
+          scope: "single",
+          projectCount: 1,
+          description: "Single Project View",
         }
       case "project-executive":
-        return { 
-          scope: "portfolio", 
-          projectCount: 6, 
-          description: "Portfolio View (6 Projects)"
+        return {
+          scope: "portfolio",
+          projectCount: 6,
+          description: "Portfolio View (6 Projects)",
         }
       default:
-        return { 
-          scope: "enterprise", 
-          projectCount: 12, 
-          description: "Enterprise View (All Projects)"
+        return {
+          scope: "enterprise",
+          projectCount: 12,
+          description: "Enterprise View (All Projects)",
         }
     }
   }
@@ -350,10 +354,20 @@ export default function ContractDocumentsPage() {
     try {
       switch (options.format) {
         case "pdf":
-          ContractDocumentsExportUtils.exportToPDF(mockDocuments, mockAnalytics, "Enterprise Portfolio", options.fileName)
+          ContractDocumentsExportUtils.exportToPDF(
+            mockDocuments,
+            mockAnalytics,
+            "Enterprise Portfolio",
+            options.fileName
+          )
           break
         case "excel":
-          ContractDocumentsExportUtils.exportToExcel(mockDocuments, mockAnalytics, "Enterprise Portfolio", options.fileName)
+          ContractDocumentsExportUtils.exportToExcel(
+            mockDocuments,
+            mockAnalytics,
+            "Enterprise Portfolio",
+            options.fileName
+          )
           break
         case "csv":
           ContractDocumentsExportUtils.exportToCSV(mockDocuments, "Enterprise Portfolio", options.fileName)
@@ -414,15 +428,9 @@ export default function ContractDocumentsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Contract Documents</h1>
-              <p className="text-muted-foreground mt-1">Manage and analyze contract documents with AI-powered insights</p>
-              <div className="flex items-center gap-4 mt-2">
-                <Badge variant="outline" className="px-3 py-1">
-                  {projectScope.description}
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  {mockAnalytics.totalDocuments} Total Documents
-                </Badge>
-              </div>
+              <p className="text-muted-foreground mt-1">
+                Manage and analyze contract documents with AI-powered insights
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={handleRefresh} disabled={loading}>
@@ -457,400 +465,393 @@ export default function ContractDocumentsPage() {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
-              <TabsTrigger value="compliance">Compliance</TabsTrigger>
-            </TabsList>
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="documents">Documents</TabsTrigger>
+                <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
+                <TabsTrigger value="compliance">Compliance</TabsTrigger>
+              </TabsList>
 
-            {/* Dashboard Tab */}
-            <TabsContent value="dashboard" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Activity */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Recent Activity
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {mockDocuments.slice(0, 3).map((doc, index) => (
-                        <div key={doc.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium text-sm">{doc.name}</p>
-                              <p className="text-xs text-muted-foreground">{doc.type}</p>
+              {/* Dashboard Tab */}
+              <TabsContent value="dashboard" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Recent Activity */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <Clock className="h-5 w-5" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {mockDocuments.slice(0, 3).map((doc, index) => (
+                          <div key={doc.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="font-medium text-sm">{doc.name}</p>
+                                <p className="text-xs text-muted-foreground">{doc.type}</p>
+                              </div>
                             </div>
-                          </div>
-                          <Badge variant="secondary" className={getStatusColor(doc.status)}>
-                            {doc.status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* AI Insights Summary */}
-                <Card className="border-l-4 border-l-[#FF6B35]">
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <Brain className="h-5 w-5 text-[#FF6B35]" />
-                      HBI AI Insights
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-l-blue-500">
-                        <div className="font-medium text-sm text-blue-800 dark:text-blue-300">
-                          Cost Optimization Opportunity
-                        </div>
-                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          3 contracts show potential for $125K savings through renegotiation
-                        </div>
-                      </div>
-                      <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-l-red-500">
-                        <div className="font-medium text-sm text-red-800 dark:text-red-300">
-                          Risk Alert
-                        </div>
-                        <div className="text-xs text-red-600 dark:text-red-400 mt-1">
-                          New building code changes affect 5 active contracts
-                        </div>
-                      </div>
-                      <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-l-green-500">
-                        <div className="font-medium text-sm text-green-800 dark:text-green-300">
-                          Compliance Achievement
-                        </div>
-                        <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                          All safety documentation is up to date
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Performance Metrics */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-[#003087] dark:text-white">Performance Metrics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-foreground mb-2">
-                        ${(mockAnalytics.costSavingsIdentified / 1000).toFixed(0)}K
-                      </div>
-                      <p className="text-sm text-muted-foreground">Cost Savings Identified</p>
-                      <Progress value={75} className="mt-2" />
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                        {mockAnalytics.aiInsightsGenerated}
-                      </div>
-                      <p className="text-sm text-muted-foreground">AI Insights Generated</p>
-                      <Progress value={85} className="mt-2" />
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                        {mockAnalytics.riskItemsResolved}
-                      </div>
-                      <p className="text-sm text-muted-foreground">Risk Items Resolved</p>
-                      <Progress value={92} className="mt-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Documents Tab */}
-            <TabsContent value="documents" className="space-y-6">
-              {/* Filters */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search documents..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-3 py-2 border rounded-md bg-background"
-                    >
-                      <option value="all">All Status</option>
-                      <option value="Under Review">Under Review</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Action Required">Action Required</option>
-                    </select>
-                    <select
-                      value={filterType}
-                      onChange={(e) => setFilterType(e.target.value)}
-                      className="px-3 py-2 border rounded-md bg-background"
-                    >
-                      <option value="all">All Types</option>
-                      <option value="Prime Contract">Prime Contract</option>
-                      <option value="Subcontract">Subcontract</option>
-                      <option value="Regulatory">Regulatory</option>
-                    </select>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Documents Table */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-[#003087] dark:text-white">Document Library</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Document</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Risk Level</TableHead>
-                        <TableHead>Compliance</TableHead>
-                        <TableHead>Reviewer</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredDocuments.map((doc) => (
-                        <TableRow key={doc.id}>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{doc.name}</p>
-                              <p className="text-xs text-muted-foreground">{doc.project}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{doc.type}</Badge>
-                          </TableCell>
-                          <TableCell>
                             <Badge variant="secondary" className={getStatusColor(doc.status)}>
                               {doc.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <span className={`font-medium ${getRiskColor(doc.riskLevel)}`}>
-                              {doc.riskLevel}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Progress value={doc.complianceScore} className="w-16" />
-                              <span className="text-sm">{doc.complianceScore}%</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{doc.reviewer}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openDocumentModal(doc)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* AI Insights Summary */}
+                  <Card className="border-l-4 border-l-[#FF6B35]">
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-[#FF6B35]" />
+                        HBI AI Insights
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-l-blue-500">
+                          <div className="font-medium text-sm text-blue-800 dark:text-blue-300">
+                            Cost Optimization Opportunity
+                          </div>
+                          <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                            3 contracts show potential for $125K savings through renegotiation
+                          </div>
+                        </div>
+                        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-l-red-500">
+                          <div className="font-medium text-sm text-red-800 dark:text-red-300">Risk Alert</div>
+                          <div className="text-xs text-red-600 dark:text-red-400 mt-1">
+                            New building code changes affect 5 active contracts
+                          </div>
+                        </div>
+                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-l-green-500">
+                          <div className="font-medium text-sm text-green-800 dark:text-green-300">
+                            Compliance Achievement
+                          </div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                            All safety documentation is up to date
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Performance Metrics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-[#003087] dark:text-white">Performance Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-foreground mb-2">
+                          ${(mockAnalytics.costSavingsIdentified / 1000).toFixed(0)}K
+                        </div>
+                        <p className="text-sm text-muted-foreground">Cost Savings Identified</p>
+                        <Progress value={75} className="mt-2" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
+                          {mockAnalytics.aiInsightsGenerated}
+                        </div>
+                        <p className="text-sm text-muted-foreground">AI Insights Generated</p>
+                        <Progress value={85} className="mt-2" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                          {mockAnalytics.riskItemsResolved}
+                        </div>
+                        <p className="text-sm text-muted-foreground">Risk Items Resolved</p>
+                        <Progress value={92} className="mt-2" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Documents Tab */}
+              <TabsContent value="documents" className="space-y-6">
+                {/* Filters */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col lg:flex-row gap-4">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search documents..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="px-3 py-2 border rounded-md bg-background"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Action Required">Action Required</option>
+                      </select>
+                      <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="px-3 py-2 border rounded-md bg-background"
+                      >
+                        <option value="all">All Types</option>
+                        <option value="Prime Contract">Prime Contract</option>
+                        <option value="Subcontract">Subcontract</option>
+                        <option value="Regulatory">Regulatory</option>
+                      </select>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Documents Table */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-[#003087] dark:text-white">Document Library</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Document</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Risk Level</TableHead>
+                          <TableHead>Compliance</TableHead>
+                          <TableHead>Reviewer</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredDocuments.map((doc) => (
+                          <TableRow key={doc.id}>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{doc.name}</p>
+                                <p className="text-xs text-muted-foreground">{doc.project.name}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{doc.type}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className={getStatusColor(doc.status)}>
+                                {doc.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <span className={`font-medium ${getRiskColor(doc.riskLevel)}`}>{doc.riskLevel}</span>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Progress value={doc.complianceScore} className="w-16" />
+                                <span className="text-sm">{doc.complianceScore}%</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{doc.reviewer}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="sm" onClick={() => openDocumentModal(doc)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            {/* AI Analysis Tab */}
-            <TabsContent value="analysis" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-l-4 border-l-[#FF6B35]">
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <Brain className="h-5 w-5 text-[#FF6B35]" />
-                      HBI Analysis Engine
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Zap className="h-5 w-5 text-blue-600" />
-                          <span className="font-medium text-blue-800 dark:text-blue-300">
-                            Real-time Analysis
-                          </span>
+              {/* AI Analysis Tab */}
+              <TabsContent value="analysis" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="border-l-4 border-l-[#FF6B35]">
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-[#FF6B35]" />
+                        HBI Analysis Engine
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Zap className="h-5 w-5 text-blue-600" />
+                            <span className="font-medium text-blue-800 dark:text-blue-300">Real-time Analysis</span>
+                          </div>
+                          <p className="text-sm text-blue-700 dark:text-blue-400">
+                            Our HBI engine continuously monitors document changes and provides instant risk assessments.
+                          </p>
                         </div>
-                        <p className="text-sm text-blue-700 dark:text-blue-400">
-                          Our HBI engine continuously monitors document changes and provides instant risk assessments.
-                        </p>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Risk Detection</span>
+                            <span className="text-sm font-medium">98.5% Accuracy</span>
+                          </div>
+                          <Progress value={98.5} />
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Compliance Checking</span>
+                            <span className="text-sm font-medium">96.2% Accuracy</span>
+                          </div>
+                          <Progress value={96.2} />
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Cost Analysis</span>
+                            <span className="text-sm font-medium">94.8% Accuracy</span>
+                          </div>
+                          <Progress value={94.8} />
+                        </div>
                       </div>
-                      
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white">Analysis Queue</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Risk Detection</span>
-                          <span className="text-sm font-medium">98.5% Accuracy</span>
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#FF6B35]"></div>
+                            <span className="text-sm">Analyzing Building Code Updates</span>
+                          </div>
+                          <Badge variant="secondary">In Progress</Badge>
                         </div>
-                        <Progress value={98.5} />
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Compliance Checking</span>
-                          <span className="text-sm font-medium">96.2% Accuracy</span>
-                        </div>
-                        <Progress value={96.2} />
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Cost Analysis</span>
-                          <span className="text-sm font-medium">94.8% Accuracy</span>
-                        </div>
-                        <Progress value={94.8} />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white">Analysis Queue</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#FF6B35]"></div>
-                          <span className="text-sm">Analyzing Building Code Updates</span>
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">HVAC Subcontract Review</span>
+                          </div>
+                          <Badge variant="outline">Queued</Badge>
                         </div>
-                        <Badge variant="secondary">In Progress</Badge>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">HVAC Subcontract Review</span>
+
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-sm">Prime Contract Analysis</span>
+                          </div>
+                          <Badge
+                            variant="secondary"
+                            className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                          >
+                            Complete
+                          </Badge>
                         </div>
-                        <Badge variant="outline">Queued</Badge>
                       </div>
-                      
-                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Compliance Tab */}
+              <TabsContent value="compliance" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <Shield className="h-5 w-5" />
+                        Regulatory Compliance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Building Codes</span>
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span className="text-sm">Prime Contract Analysis</span>
                         </div>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                          Complete
-                        </Badge>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Safety Standards</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Environmental</span>
+                          <AlertCircle className="h-4 w-4 text-yellow-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Labor Laws</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                    </CardContent>
+                  </Card>
 
-            {/* Compliance Tab */}
-            <TabsContent value="compliance" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      Regulatory Compliance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Building Codes</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <FileCheck className="h-5 w-5" />
+                        Contract Compliance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Payment Terms</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Performance Bonds</span>
+                          <AlertCircle className="h-4 w-4 text-yellow-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Insurance Requirements</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Change Orders</span>
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Safety Standards</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Environmental</span>
-                        <AlertCircle className="h-4 w-4 text-yellow-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Labor Laws</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <FileCheck className="h-5 w-5" />
-                      Contract Compliance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Payment Terms</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                        <BookOpen className="h-5 w-5" />
+                        Documentation Status
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Contract Signing</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Legal Review</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Final Approval</span>
+                          <Clock className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Archive</span>
+                          <Clock className="h-4 w-4 text-blue-500" />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Performance Bonds</span>
-                        <AlertCircle className="h-4 w-4 text-yellow-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Insurance Requirements</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Change Orders</span>
-                        <XCircle className="h-4 w-4 text-red-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                      <BookOpen className="h-5 w-5" />
-                      Documentation Status
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Contract Signing</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Legal Review</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Final Approval</span>
-                        <Clock className="h-4 w-4 text-blue-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Archive</span>
-                        <Clock className="h-4 w-4 text-blue-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
@@ -906,14 +907,14 @@ export default function ContractDocumentsPage() {
       {/* Document Detail Modal */}
       {selectedDocument && (
         <Dialog open={showDocumentModal} onOpenChange={setShowDocumentModal}>
-                      <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-[#003087] dark:text-white flex items-center gap-2">
                 <FileText className="h-5 w-5" />
                 {selectedDocument.name}
               </DialogTitle>
             </DialogHeader>
-            
+
             <div className="space-y-6">
               {/* Document Header */}
               <Card>
@@ -950,9 +951,21 @@ export default function ContractDocumentsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {selectedDocument.keyRisks.map((risk: string, index: number) => (
-                        <div key={index} className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-l-red-500">
-                          <p className="text-sm font-medium text-red-800 dark:text-red-300">{risk}</p>
+                      {selectedDocument.keyRisks.map((risk, index) => (
+                        <div
+                          key={index}
+                          className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-l-red-500"
+                        >
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium text-red-800 dark:text-red-300">{risk.category}</p>
+                            <p className="text-xs text-red-700 dark:text-red-400">{risk.description}</p>
+                            <p className="text-xs text-red-600 dark:text-red-500">
+                              <span className="font-medium">Recommendation:</span> {risk.recommendation}
+                            </p>
+                            <p className="text-xs text-red-600 dark:text-red-500">
+                              <span className="font-medium">Reference:</span> {risk.clauseReference}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -969,9 +982,26 @@ export default function ContractDocumentsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {selectedDocument.opportunities.map((opportunity: string, index: number) => (
-                        <div key={index} className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-l-green-500">
-                          <p className="text-sm font-medium text-green-800 dark:text-green-300">{opportunity}</p>
+                      {selectedDocument.opportunities.map((opportunity, index) => (
+                        <div
+                          key={index}
+                          className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-l-green-500"
+                        >
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                              {opportunity.category}
+                            </p>
+                            <p className="text-xs text-green-700 dark:text-green-400">{opportunity.description}</p>
+                            <p className="text-xs text-green-600 dark:text-green-500">
+                              <span className="font-medium">Value:</span> {opportunity.value}
+                            </p>
+                            <p className="text-xs text-green-600 dark:text-green-500">
+                              <span className="font-medium">Probability:</span> {opportunity.probability}
+                            </p>
+                            <p className="text-xs text-green-600 dark:text-green-500">
+                              <span className="font-medium">Reference:</span> {opportunity.clauseReference}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -998,17 +1028,20 @@ export default function ContractDocumentsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">Analysis Status</p>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      <Badge
+                        variant="secondary"
+                        className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                      >
                         {selectedDocument.aiAnalysisStatus}
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
                     <p className="text-sm text-blue-800 dark:text-blue-300">
-                      <strong>AI Recommendation:</strong> This document shows medium risk due to payment term complexity. 
-                      Consider renegotiating clause 12.3 for clearer milestone definitions. Potential cost savings of $45K identified 
-                      through early completion incentives.
+                      <strong>AI Recommendation:</strong> This document shows medium risk due to payment term
+                      complexity. Consider renegotiating clause 12.3 for clearer milestone definitions. Potential cost
+                      savings of $45K identified through early completion incentives.
                     </p>
                   </div>
                 </CardContent>
@@ -1064,9 +1097,7 @@ export default function ContractDocumentsPage() {
                 <Button variant="outline" onClick={() => setShowUploadModal(false)}>
                   Cancel
                 </Button>
-                <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">
-                  Upload & Analyze
-                </Button>
+                <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">Upload & Analyze</Button>
               </div>
             </div>
           </DialogContent>
@@ -1082,7 +1113,7 @@ export default function ContractDocumentsPage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Export Format</label>
-              <select 
+              <select
                 className="w-full px-3 py-2 border rounded-md bg-background"
                 value={exportFormat}
                 onChange={(e) => setExportFormat(e.target.value as "pdf" | "excel" | "csv")}
@@ -1104,7 +1135,7 @@ export default function ContractDocumentsPage() {
               <Button variant="outline" onClick={() => setIsExportModalOpen(false)}>
                 Cancel
               </Button>
-              <Button 
+              <Button
                 className="bg-[#FF6B35] hover:bg-[#FF5722] text-white"
                 onClick={() => handleExportSubmit({ format: exportFormat, fileName: exportFileName })}
               >
@@ -1117,4 +1148,4 @@ export default function ContractDocumentsPage() {
       </Dialog>
     </>
   )
-} 
+}

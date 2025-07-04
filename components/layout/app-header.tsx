@@ -2,7 +2,19 @@
 
 import { Input } from "@/components/ui/input"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { Search, Moon, Sun, ChevronDown, Building, Wrench, Archive } from "lucide-react"
+import {
+  Search,
+  Moon,
+  Sun,
+  ChevronDown,
+  Building,
+  Wrench,
+  Archive,
+  Menu,
+  MessageCircle,
+  ChevronLeft,
+  X,
+} from "lucide-react"
 import { ProductivityPopover } from "./ProductivityPopover"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -15,7 +27,13 @@ import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 import projectsData from "@/data/mock/projects.json"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { Calendar, Users } from "lucide-react"
 
 /**
@@ -53,8 +71,16 @@ export const AppHeader = () => {
   const [showProjectModal, setShowProjectModal] = useState(false)
   const [projectModalContent, setProjectModalContent] = useState({
     title: "",
-    description: ""
+    description: "",
   })
+
+  // IT Admin menu states
+  const [showITToolsMenu, setShowITToolsMenu] = useState(false)
+  const [showMainMenu, setShowMainMenu] = useState(false)
+
+  // Mobile menu states
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [mobileMenuView, setMobileMenuView] = useState<"main" | "projects" | "tools" | "ittools">("main")
 
   // Initialize department based on current URL
   useEffect(() => {
@@ -92,10 +118,10 @@ export const AppHeader = () => {
     }
 
     // Listen for popstate events (back/forward buttons)
-    window.addEventListener('popstate', handleRouteChange)
-    
+    window.addEventListener("popstate", handleRouteChange)
+
     return () => {
-      window.removeEventListener('popstate', handleRouteChange)
+      window.removeEventListener("popstate", handleRouteChange)
     }
   }, [])
 
@@ -113,52 +139,57 @@ export const AppHeader = () => {
   }, [])
 
   // Real project data from JSON file
-  const projects = useMemo(
-    () => {
-      const allProjects = { 
-        id: "all", 
-        name: "All Projects", 
-        status: "active", 
-        project_stage_name: "All",
-        budget: "$0", 
-        completion: 0 
-      };
-      
-      const realProjects = projectsData.map((project: any) => ({
-        id: project.project_id.toString(),
-        name: project.name,
-        status: project.active ? "active" : "inactive",
-        project_stage_name: project.project_stage_name,
-        budget: `$${(project.contract_value / 1000000).toFixed(1)}M`,
-        completion: Math.round((project.duration > 0 ? 
-          Math.min(100, ((new Date().getTime() - new Date(project.start_date).getTime()) / 
-          (1000 * 60 * 60 * 24)) / project.duration * 100) : 0)),
-        project_number: project.project_number
-      }));
-      
-      return [allProjects, ...realProjects];
-    },
-    [],
-  )
+  const projects = useMemo(() => {
+    const allProjects = {
+      id: "all",
+      name: "All Projects",
+      status: "active",
+      project_stage_name: "All",
+      budget: "$0",
+      completion: 0,
+    }
+
+    const realProjects = projectsData.map((project: any) => ({
+      id: project.project_id.toString(),
+      name: project.name,
+      status: project.active ? "active" : "inactive",
+      project_stage_name: project.project_stage_name,
+      budget: `$${(project.contract_value / 1000000).toFixed(1)}M`,
+      completion: Math.round(
+        project.duration > 0
+          ? Math.min(
+              100,
+              ((new Date().getTime() - new Date(project.start_date).getTime()) /
+                (1000 * 60 * 60 * 24) /
+                project.duration) *
+                100
+            )
+          : 0
+      ),
+      project_number: project.project_number,
+    }))
+
+    return [allProjects, ...realProjects]
+  }, [])
 
   // Filtered project stages based on selected department
   const projectStages = useMemo(() => {
     switch (selectedDepartment) {
       case "operations":
-        return ["Construction", "Closeout", "Warranty"];
+        return ["Construction", "Closeout", "Warranty"]
       case "pre-construction":
-        return ["Bidding", "Pre-Construction"];
+        return ["Bidding", "Pre-Construction"]
       case "archive":
-        return ["Closed"];
+        return ["Closed"]
       default:
-        return ["Construction", "Closeout", "Warranty"];
+        return ["Construction", "Closeout", "Warranty"]
     }
   }, [selectedDepartment])
 
   // Helper function to determine the dashboard path based on user role
   const getDashboardPath = useCallback(() => {
     if (!user) return "/dashboard" // Default or loading state
-    
+
     // All users go to the main dashboard which handles role-specific content
     // The main dashboard page dynamically loads appropriate content based on user role
     switch (user.role) {
@@ -313,7 +344,100 @@ export const AppHeader = () => {
         description: "Access completed project archives and historical data - Coming Soon",
       },
     ],
-    [getDashboardPath], // Add getDashboardPath to dependencies
+    [getDashboardPath] // Add getDashboardPath to dependencies
+  )
+
+  // IT Tools for IT Administrator role
+  const itTools = useMemo(
+    () => [
+      // IT Management modules
+      {
+        name: "IT Command Center",
+        href: "/it-command-center",
+        category: "IT Management",
+        description: "IT system overview and monitoring dashboard",
+        icon: "Shield",
+      },
+      {
+        name: "HB Intel Management",
+        href: "/it/command-center/management",
+        category: "IT Management",
+        description: "Centralized admin hub for application-wide controls",
+        icon: "Users",
+      },
+      {
+        name: "Infrastructure Monitor",
+        href: "/it/command-center/infrastructure",
+        category: "IT Management",
+        description: "Server and network infrastructure monitoring",
+        icon: "Monitor",
+      },
+      {
+        name: "Endpoint Management",
+        href: "/it/command-center/endpoints",
+        category: "IT Management",
+        description: "Device management and patch deployment",
+        icon: "Laptop",
+      },
+      {
+        name: "SIEM & Events",
+        href: "/it/command-center/siem",
+        category: "IT Management",
+        description: "Security event monitoring and analysis",
+        icon: "AlertTriangle",
+      },
+      {
+        name: "Email Security",
+        href: "/it/command-center/email",
+        category: "IT Management",
+        description: "Email security and threat protection",
+        icon: "Mail",
+      },
+      {
+        name: "Asset Tracker",
+        href: "/it/command-center/assets",
+        category: "IT Management",
+        description: "Asset and license lifecycle management",
+        icon: "Package",
+      },
+      {
+        name: "Governance",
+        href: "/it/command-center/governance",
+        category: "IT Management",
+        description: "Change management and compliance tracking",
+        icon: "Settings",
+      },
+      {
+        name: "Backup & DR",
+        href: "/it/command-center/backup",
+        category: "IT Management",
+        description: "Backup and disaster recovery management",
+        icon: "Database",
+      },
+      {
+        name: "AI Pipelines",
+        href: "/it/command-center/ai-pipelines",
+        category: "IT Management",
+        description: "AI and analytics pipeline control",
+        icon: "Brain",
+      },
+      {
+        name: "Consultants",
+        href: "/it/command-center/consultants",
+        category: "IT Management",
+        description: "SOC, server, compliance, and networking vendors",
+        icon: "UserCheck",
+      },
+      // Quick Actions
+      {
+        name: "Coming Soon",
+        href: "#",
+        category: "Quick Actions",
+        description: "Additional quick actions will be available soon",
+        icon: "Clock",
+      },
+    ],
+    []
   )
 
   // Utility functions
@@ -335,7 +459,7 @@ export const AppHeader = () => {
     if (!project.active) {
       return "bg-gray-100 dark:bg-gray-950/30 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800"
     }
-    
+
     // Color based on project stage
     switch (project.project_stage_name) {
       case "Pre-Construction":
@@ -356,33 +480,47 @@ export const AppHeader = () => {
     }
   }, [])
 
-
-
   // Role-based category visibility
   const getVisibleCategories = useCallback(() => {
     const userRole = user?.role?.toLowerCase?.() || user?.role // Ensure case-insensitive comparison
     console.log("Determining visible categories for role:", userRole, "(original:", user?.role, ")")
-    
+
     switch (userRole) {
       case "executive":
       case "project-executive":
       case "admin":
         // All categories visible
-        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
-      
+        return [
+          "Core Tools",
+          "Pre-Construction",
+          "Financial Management",
+          "Field Management",
+          "Compliance",
+          "Warranty",
+          "Historical Projects",
+        ]
+
       case "project-manager":
         // No Pre-Construction or Historical Projects
         return ["Core Tools", "Financial Management", "Field Management", "Compliance", "Warranty"]
-      
+
       case "estimator":
         // Only Pre-Construction and Compliance - let's be extra explicit
         console.log("ESTIMATOR ROLE DETECTED - returning Pre-Construction and Compliance categories")
         return ["Pre-Construction", "Compliance"]
-      
+
       default:
         // Default to all categories for unknown roles
         console.log("Unknown or missing role, defaulting to all categories")
-        return ["Core Tools", "Pre-Construction", "Financial Management", "Field Management", "Compliance", "Warranty", "Historical Projects"]
+        return [
+          "Core Tools",
+          "Pre-Construction",
+          "Financial Management",
+          "Field Management",
+          "Compliance",
+          "Warranty",
+          "Historical Projects",
+        ]
     }
   }, [user])
 
@@ -390,8 +528,15 @@ export const AppHeader = () => {
   const filteredTools = useMemo(() => {
     const userRole = user?.role // Get current user's role
     const visibleCategories = getVisibleCategories()
-    console.log("Filtering tools for department:", selectedDepartment, "user role:", userRole, "visible categories:", visibleCategories)
-    
+    console.log(
+      "Filtering tools for department:",
+      selectedDepartment,
+      "user role:",
+      userRole,
+      "visible categories:",
+      visibleCategories
+    )
+
     const filtered = tools.filter((tool) => {
       // Always show all role-appropriate tools regardless of current page/department
       // Department context is used only for UI presentation, not tool filtering
@@ -401,25 +546,48 @@ export const AppHeader = () => {
       const isRoleVisible = !tool.visibleRoles || (userRole && tool.visibleRoles.includes(userRole))
 
       const shouldInclude = isDepartmentMatch && isRoleVisible
-      
+
       // Enhanced debugging for estimator role
       if (userRole === "estimator") {
-        console.log("Tool:", tool.name, "Category:", tool.category, "Dept:", selectedDepartment, "Visible cats:", visibleCategories, "Dept match:", isDepartmentMatch, "Role visible:", isRoleVisible, "Include:", shouldInclude)
+        console.log(
+          "Tool:",
+          tool.name,
+          "Category:",
+          tool.category,
+          "Dept:",
+          selectedDepartment,
+          "Visible cats:",
+          visibleCategories,
+          "Dept match:",
+          isDepartmentMatch,
+          "Role visible:",
+          isRoleVisible,
+          "Include:",
+          shouldInclude
+        )
       }
 
       return shouldInclude
     })
-    
+
     console.log("Filtered tools count:", filtered.length, "for department:", selectedDepartment, "user role:", userRole)
-    
+
     // Additional debugging for estimator role
     if (userRole === "estimator") {
-      const complianceTools = filtered.filter(t => t.category === "Compliance")
-      const preconTools = filtered.filter(t => t.category === "Pre-Construction")
-      console.log("Estimator - Compliance tools:", complianceTools.length, complianceTools.map(t => t.name))
-      console.log("Estimator - Pre-Construction tools:", preconTools.length, preconTools.map(t => t.name))
+      const complianceTools = filtered.filter((t) => t.category === "Compliance")
+      const preconTools = filtered.filter((t) => t.category === "Pre-Construction")
+      console.log(
+        "Estimator - Compliance tools:",
+        complianceTools.length,
+        complianceTools.map((t) => t.name)
+      )
+      console.log(
+        "Estimator - Pre-Construction tools:",
+        preconTools.length,
+        preconTools.map((t) => t.name)
+      )
     }
-    
+
     return filtered
   }, [selectedDepartment, tools, user, getVisibleCategories]) // Add getVisibleCategories to dependencies
 
@@ -427,7 +595,6 @@ export const AppHeader = () => {
   // ... (getUserInitials, hasPreConAccess, getProjectStatusColor functions defined above)
 
   // Event handlers with debugging
-
 
   const { projectId, projectName, setProjectId, clearProject } = useProjectContext()
 
@@ -443,7 +610,7 @@ export const AppHeader = () => {
       }
 
       // Navigate to Project Control Center for specific projects
-      if (projectId !== "all" && !projectId.startsWith('all-')) {
+      if (projectId !== "all" && !projectId.startsWith("all-")) {
         console.log("Navigating to Project Control Center for project:", projectId)
         router.push(`/project/${projectId}`)
         return
@@ -454,27 +621,33 @@ export const AppHeader = () => {
         if (projectId === "all") {
           return {
             title: "All Projects Selected",
-            description: "In the final production version of this application, selecting this option would display data from all projects across your portfolio. The current demo shows sample data that is not filtered by project selection."
+            description:
+              "In the final production version of this application, selecting this option would display data from all projects across your portfolio. The current demo shows sample data that is not filtered by project selection.",
           }
         }
-        
-        if (projectId.startsWith('all-')) {
-          const stageName = projectId.replace('all-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+
+        if (projectId.startsWith("all-")) {
+          const stageName = projectId
+            .replace("all-", "")
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase())
           return {
             title: `${stageName} Projects Selected`,
-            description: `In the final production version of this application, selecting this option would filter all dashboard data to show only projects in the ${stageName.toLowerCase()} stage. This filter would persist as you navigate to other pages in the application until you change the project selection or log out. The current demo shows sample data that is not filtered by project selection.`
+            description: `In the final production version of this application, selecting this option would filter all dashboard data to show only projects in the ${stageName.toLowerCase()} stage. This filter would persist as you navigate to other pages in the application until you change the project selection or log out. The current demo shows sample data that is not filtered by project selection.`,
           }
         }
-        
+
         const selectedProject = projects.find((p) => p.id === projectId)
         return {
           title: `Project Filter Applied`,
-          description: `In the final production version of this application, selecting "${selectedProject?.name || 'this project'}" would filter all dashboard data to show only information related to this specific project. This filter would persist as you navigate to other pages in the application until you change the project selection or log out. The current demo shows sample data that is not filtered by project selection.`
+          description: `In the final production version of this application, selecting "${
+            selectedProject?.name || "this project"
+          }" would filter all dashboard data to show only information related to this specific project. This filter would persist as you navigate to other pages in the application until you change the project selection or log out. The current demo shows sample data that is not filtered by project selection.`,
         }
       }
 
       const { title, description } = getProjectDisplayInfo()
-      
+
       // Show modal instead of toast
       setProjectModalContent({ title, description })
       setShowProjectModal(true)
@@ -488,7 +661,7 @@ export const AppHeader = () => {
               projectName: projects.find((p) => p.id === projectId)?.name || "All Projects",
               timestamp: new Date().toISOString(),
             },
-          }),
+          })
         )
       }
     },
@@ -508,7 +681,7 @@ export const AppHeader = () => {
         router.push(href)
       }, 100)
     },
-    [router],
+    [router]
   )
 
   const handleLogout = useCallback(() => {
@@ -526,6 +699,10 @@ export const AppHeader = () => {
     setShowProjectMenu(false)
     setShowToolMenu(false)
     setShowUserMenu(false)
+    setShowITToolsMenu(false)
+    setShowMainMenu(false)
+    setShowMobileMenu(false)
+    setMobileMenuView("main")
   }, [])
 
   // Close menus when clicking outside
@@ -557,13 +734,22 @@ export const AppHeader = () => {
       if (showUserMenu && userMenuRef.current && !userMenuRef.current.contains(target)) {
         setShowUserMenu(false)
       }
+
+      // Check if click is outside IT admin menus
+      if (showITToolsMenu && !headerRef.current?.contains(target)) {
+        setShowITToolsMenu(false)
+      }
+
+      if (showMainMenu && !headerRef.current?.contains(target)) {
+        setShowMainMenu(false)
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [showProjectMenu, showToolMenu, showUserMenu])
+  }, [showProjectMenu, showToolMenu, showUserMenu, showITToolsMenu, showMainMenu])
 
   // Restore saved project selection on mount and sync with context
   useEffect(() => {
@@ -596,100 +782,174 @@ export const AppHeader = () => {
         <div className="flex items-center space-x-8">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <img 
-              src="/images/hb_logo_white.png" 
-              alt="HB Logo" 
-              className="h-10 w-auto object-contain"
-            />
+            <img src="/images/hb_logo_white.png" alt="HB Logo" className="h-10 w-auto object-contain" />
             <div className="flex flex-col">
               <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
               <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
             </div>
           </div>
 
-          {/* Navigation Pills */}
-          <nav className="hidden lg:flex items-center space-x-2">
+          {/* Navigation Pills - Role-based */}
+          {user?.role === "admin" ? (
+            // IT Administrator Navigation
+            <nav className="hidden lg:flex items-center space-x-2">
+              {/* Combined Projects/Tools Menu */}
+              <Button
+                variant="ghost"
+                size="default"
+                className={`gap-3 max-w-64 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
+                  showMainMenu ? "bg-white/20 shadow-md" : ""
+                } rounded-lg font-medium`}
+                onClick={() => {
+                  setShowMainMenu(!showMainMenu)
+                  setShowITToolsMenu(false)
+                  setShowUserMenu(false)
+                }}
+                aria-label="Main menu"
+                aria-expanded={showMainMenu}
+              >
+                <Menu className="h-4 w-4" />
+                <span className="truncate">Projects & Tools</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${showMainMenu ? "rotate-180" : ""}`}
+                />
+              </Button>
 
-            {/* Project Picker */}
-            <Button
-              variant="ghost"
-              size="default"
-              className={`gap-3 max-w-64 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
-                showProjectMenu ? "bg-white/20 shadow-md" : ""
-              } ${selectedProject !== "all" ? "bg-white/10" : ""} rounded-lg font-medium`}
-              onClick={() => {
-                setShowProjectMenu(!showProjectMenu)
-                setShowToolMenu(false)
-                setShowUserMenu(false)
-              }}
-              aria-label="Select project"
-              aria-expanded={showProjectMenu}
-              data-tour="projects-menu"
-            >
-              <Building className="h-4 w-4" />
-              <span className="truncate">
-                {(() => {
-                  if (selectedProject.startsWith('all-')) {
-                    const stageName = selectedProject.replace('all-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    return `All ${stageName} Projects`;
-                  }
-                  if (selectedProject === "all") {
-                    return "Projects";
-                  }
-                  // Use project name from context first, fallback to finding in projects array
-                  return projectName || projects.find((p) => p.id === selectedProject)?.name || "Projects";
-                })()}
-              </span>
-              {selectedProject !== "all" && (
-                <Badge variant="secondary" className="ml-1 border-white/30 bg-white/20 text-xs text-white shadow-sm">
-                  {selectedProject.startsWith('all-') ? 'Stage Filter' : 'Project Active'}
-                </Badge>
-              )}
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showProjectMenu ? "rotate-180" : ""}`} />
-            </Button>
+              {/* IT Tools Menu */}
+              <Button
+                variant="ghost"
+                size="default"
+                className={`gap-3 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
+                  showITToolsMenu ? "bg-white/20 shadow-md" : ""
+                } rounded-lg font-medium`}
+                onClick={() => {
+                  setShowITToolsMenu(!showITToolsMenu)
+                  setShowMainMenu(false)
+                  setShowUserMenu(false)
+                }}
+                aria-label="IT Tools menu"
+                aria-expanded={showITToolsMenu}
+              >
+                <Archive className="h-4 w-4" />
+                <span>IT Tools</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${showITToolsMenu ? "rotate-180" : ""}`}
+                />
+              </Button>
+            </nav>
+          ) : (
+            // Regular User Navigation
+            <nav className="hidden lg:flex items-center space-x-2">
+              {/* Project Picker */}
+              <Button
+                variant="ghost"
+                size="default"
+                className={`gap-3 max-w-64 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
+                  showProjectMenu ? "bg-white/20 shadow-md" : ""
+                } ${selectedProject !== "all" ? "bg-white/10" : ""} rounded-lg font-medium`}
+                onClick={() => {
+                  setShowProjectMenu(!showProjectMenu)
+                  setShowToolMenu(false)
+                  setShowUserMenu(false)
+                }}
+                aria-label="Select project"
+                aria-expanded={showProjectMenu}
+                data-tour="projects-menu"
+              >
+                <Building className="h-4 w-4" />
+                <span className="truncate">
+                  {(() => {
+                    if (selectedProject.startsWith("all-")) {
+                      const stageName = selectedProject
+                        .replace("all-", "")
+                        .replace(/-/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())
+                      return `All ${stageName} Projects`
+                    }
+                    if (selectedProject === "all") {
+                      return "Projects"
+                    }
+                    // Use project name from context first, fallback to finding in projects array
+                    return projectName || projects.find((p) => p.id === selectedProject)?.name || "Projects"
+                  })()}
+                </span>
+                {selectedProject !== "all" && (
+                  <Badge variant="secondary" className="ml-1 border-white/30 bg-white/20 text-xs text-white shadow-sm">
+                    {selectedProject.startsWith("all-") ? "Stage Filter" : "Project Active"}
+                  </Badge>
+                )}
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${showProjectMenu ? "rotate-180" : ""}`}
+                />
+              </Button>
 
-            {/* Tool Picker */}
-            <Button
-              variant="ghost"
-              size="default"
-              className={`gap-3 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
-                showToolMenu ? "bg-white/20 shadow-md" : ""
-              } rounded-lg font-medium`}
-              onClick={() => {
-                setShowToolMenu(!showToolMenu)
-                setShowProjectMenu(false)
-                setShowUserMenu(false)
-              }}
-              aria-label="Select tool"
-              aria-expanded={showToolMenu}
-              data-tour="tools-menu"
-            >
-              <Wrench className="h-4 w-4" />
-              <span>Tools</span>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showToolMenu ? "rotate-180" : ""}`} />
-            </Button>
-          </nav>
+              {/* Tool Picker */}
+              <Button
+                variant="ghost"
+                size="default"
+                className={`gap-3 px-5 py-2.5 text-white transition-all duration-200 hover:bg-white/20 hover:shadow-md ${
+                  showToolMenu ? "bg-white/20 shadow-md" : ""
+                } rounded-lg font-medium`}
+                onClick={() => {
+                  setShowToolMenu(!showToolMenu)
+                  setShowProjectMenu(false)
+                  setShowUserMenu(false)
+                }}
+                aria-label="Select tool"
+                aria-expanded={showToolMenu}
+                data-tour="tools-menu"
+              >
+                <Wrench className="h-4 w-4" />
+                <span>Tools</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${showToolMenu ? "rotate-180" : ""}`}
+                />
+              </Button>
+            </nav>
+          )}
+        </div>
 
-          {/* Mobile Menu Button */}
+        {/* Mobile Header (sm and below) */}
+        <div className="flex sm:hidden items-center justify-between w-full">
+          {/* HBI Logo - Left */}
+          <div className="flex items-center">
+            <span className="text-lg font-bold text-white">HBI</span>
+          </div>
+
+          {/* Menu Icon - Center */}
           <Button
             variant="ghost"
             size="default"
-            className="lg:hidden text-white hover:bg-white/20 px-3 py-2 rounded-lg"
-            onClick={() => {
-              // Toggle mobile menu - you can implement this later
-              console.log("Mobile menu clicked")
-            }}
+            className="text-white hover:bg-white/20 px-3 py-2 rounded-lg"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            {showMobileMenu ? (
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </Button>
+
+          {/* User Avatar - Right */}
+          {user && (
+            <Avatar className="h-8 w-8 ring-2 ring-white/20">
+              <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.firstName} />
+              <AvatarFallback className="bg-white text-[#1e3a8a] font-semibold text-sm">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+          )}
         </div>
 
         {/* Right Section - Search, Actions, User Menu */}
         <div className="flex items-center space-x-4">
           {/* Beta Badge */}
-          <Badge variant="secondary" className="hidden text-xs font-medium text-blue-800 dark:text-blue-200 sm:inline-flex bg-blue-100 dark:bg-blue-950/30 px-3 py-1 rounded-full">
+          <Badge
+            variant="secondary"
+            className="hidden text-xs font-medium text-blue-800 dark:text-blue-200 sm:inline-flex bg-blue-100 dark:bg-blue-950/30 px-3 py-1 rounded-full"
+          >
             Beta v2.1
           </Badge>
 
@@ -748,6 +1008,8 @@ export const AppHeader = () => {
                   setShowUserMenu(!showUserMenu)
                   setShowProjectMenu(false)
                   setShowToolMenu(false)
+                  setShowITToolsMenu(false)
+                  setShowMainMenu(false)
                 }}
                 aria-label="User menu"
                 aria-expanded={showUserMenu}
@@ -755,13 +1017,17 @@ export const AppHeader = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8 ring-2 ring-white/20">
                     <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.firstName} />
-                    <AvatarFallback className="bg-white text-[#1e3a8a] font-semibold">{getUserInitials()}</AvatarFallback>
+                    <AvatarFallback className="bg-white text-[#1e3a8a] font-semibold">
+                      {getUserInitials()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="hidden lg:flex flex-col items-start">
                     <span className="text-sm font-medium text-white">{user.firstName}</span>
                     <span className="text-xs text-blue-100 capitalize">{user.role}</span>
                   </div>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`}
+                  />
                 </div>
               </Button>
 
@@ -771,7 +1037,9 @@ export const AppHeader = () => {
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.firstName} />
-                        <AvatarFallback className="bg-blue-600 text-white font-semibold">{getUserInitials()}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-600 text-white font-semibold">
+                          {getUserInitials()}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="text-base font-semibold text-gray-900 dark:text-gray-100">
@@ -791,7 +1059,12 @@ export const AppHeader = () => {
                       className="w-full px-6 py-3 text-left text-sm text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center space-x-3"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
                       </svg>
                       <span>Profile Settings</span>
                     </button>
@@ -803,8 +1076,18 @@ export const AppHeader = () => {
                       className="w-full px-6 py-3 text-left text-sm text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center space-x-3"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                       <span>Account Settings</span>
                     </button>
@@ -817,7 +1100,12 @@ export const AppHeader = () => {
                       className="w-full px-6 py-3 text-left text-sm text-red-600 dark:text-red-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center space-x-3"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
                       </svg>
                       <span>Sign Out</span>
                     </button>
@@ -830,14 +1118,9 @@ export const AppHeader = () => {
       </header>
 
       {/* Menu Overlay */}
-      {(showProjectMenu || showToolMenu) && (
-        <div 
-          className="fixed inset-0 top-20 z-[104] bg-black/20 backdrop-blur-sm"
-          onClick={closeAllMenus}
-        />
+      {(showProjectMenu || showToolMenu || showMainMenu || showITToolsMenu) && (
+        <div className="fixed inset-0 top-20 z-[104] bg-black/20 backdrop-blur-sm" onClick={closeAllMenus} />
       )}
-
-
 
       {/* Project Mega Menu */}
       {showProjectMenu && (
@@ -851,33 +1134,38 @@ export const AppHeader = () => {
                 {selectedDepartment === "archive" ? "Project Archive" : "Select Project by Stage"}
               </h2>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {selectedDepartment === "archive" 
-                  ? "View completed and closed projects" 
+                {selectedDepartment === "archive"
+                  ? "View completed and closed projects"
                   : selectedDepartment === "pre-construction"
-                    ? "Choose from projects in pre-construction phases"
-                    : "Choose from active projects organized by construction phase"
-                }
+                  ? "Choose from projects in pre-construction phases"
+                  : "Choose from active projects organized by construction phase"}
               </p>
             </div>
 
-            <div className={`grid gap-8 ${
-              selectedDepartment === "archive" ? "grid-cols-1 max-w-md" :
-              selectedDepartment === "pre-construction" ? "grid-cols-2 max-w-2xl" :
-              "grid-cols-3"
-            }`}>
+            <div
+              className={`grid gap-8 ${
+                selectedDepartment === "archive"
+                  ? "grid-cols-1 max-w-md"
+                  : selectedDepartment === "pre-construction"
+                  ? "grid-cols-2 max-w-2xl"
+                  : "grid-cols-3"
+              }`}
+            >
               {projectStages.map((stage) => (
                 <div key={stage} className="space-y-4">
                   <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{stage}</h3>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                      {stage}
+                    </h3>
                     <button
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         console.log("All projects button clicked for stage:", stage)
-                        handleProjectChange(`all-${stage.toLowerCase().replace(/\s+/g, '-')}`)
+                        handleProjectChange(`all-${stage.toLowerCase().replace(/\s+/g, "-")}`)
                       }}
                       className={`mt-1 text-xs transition-colors underline-offset-2 hover:underline ${
-                        selectedProject === `all-${stage.toLowerCase().replace(/\s+/g, '-')}`
+                        selectedProject === `all-${stage.toLowerCase().replace(/\s+/g, "-")}`
                           ? "text-blue-800 dark:text-blue-200 font-medium underline"
                           : "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                       }`}
@@ -888,14 +1176,16 @@ export const AppHeader = () => {
                   <div className="space-y-2">
                     {projects
                       .filter((p) => {
-                        if (p.id === "all") return false; // Don't show "All Projects" in stage columns
-                        
+                        if (p.id === "all") return false // Don't show "All Projects" in stage columns
+
                         // Special handling for Pre-Construction stage to include BIM Coordination
                         if (stage === "Pre-Construction") {
-                          return p.project_stage_name === "Pre-Construction" || p.project_stage_name === "BIM Coordination";
+                          return (
+                            p.project_stage_name === "Pre-Construction" || p.project_stage_name === "BIM Coordination"
+                          )
                         }
-                        
-                        return p.project_stage_name === stage;
+
+                        return p.project_stage_name === stage
                       })
                       .map((project) => (
                         <button
@@ -914,12 +1204,11 @@ export const AppHeader = () => {
                         >
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="truncate font-medium text-gray-900 dark:text-gray-100">{project.name}</span>
+                              <span className="truncate font-medium text-gray-900 dark:text-gray-100">
+                                {project.name}
+                              </span>
                               {project.id !== "all" && (
-                                <Badge
-                                  variant="secondary"
-                                  className={`text-xs ${getProjectStatusColor(project)}`}
-                                >
+                                <Badge variant="secondary" className={`text-xs ${getProjectStatusColor(project)}`}>
                                   {project.project_stage_name}
                                 </Badge>
                               )}
@@ -954,22 +1243,33 @@ export const AppHeader = () => {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {selectedDepartment === "pre-construction" ? "Pre-Construction Tools" : 
-                   selectedDepartment === "archive" ? "Archive Tools" : "Construction Tools"}
+                  {selectedDepartment === "pre-construction"
+                    ? "Pre-Construction Tools"
+                    : selectedDepartment === "archive"
+                    ? "Archive Tools"
+                    : "Construction Tools"}
                 </h2>
                 <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                  {selectedDepartment === "pre-construction" ? "Pre-construction pipeline and business development suite" :
-                   selectedDepartment === "archive" ? "Access completed project tools and documentation" :
-                   "Access your project management suite"}
+                  {selectedDepartment === "pre-construction"
+                    ? "Pre-construction pipeline and business development suite"
+                    : selectedDepartment === "archive"
+                    ? "Access completed project tools and documentation"
+                    : "Access your project management suite"}
                 </p>
               </div>
               {selectedDepartment === "pre-construction" && (
-                <Badge variant="secondary" className="text-xs text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-950/30 px-2 py-1">
+                <Badge
+                  variant="secondary"
+                  className="text-xs text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-950/30 px-2 py-1"
+                >
                   Pre-Construction Suite
                 </Badge>
               )}
               {selectedDepartment === "archive" && (
-                <Badge variant="secondary" className="text-xs text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-950/30 px-2 py-1">
+                <Badge
+                  variant="secondary"
+                  className="text-xs text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-950/30 px-2 py-1"
+                >
                   Archive View
                 </Badge>
               )}
@@ -983,48 +1283,52 @@ export const AppHeader = () => {
                   {
                     name: "Core Tools",
                     color: "bg-hb-blue",
-                    tools: filteredTools.filter((tool) => tool.category === "Core Tools")
+                    tools: filteredTools.filter((tool) => tool.category === "Core Tools"),
                   },
                   {
                     name: "Pre-Construction",
                     color: "bg-indigo-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction")
+                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction"),
                   },
                   {
                     name: "Financial Management",
                     color: "bg-green-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Financial Management")
+                    tools: filteredTools.filter((tool) => tool.category === "Financial Management"),
                   },
                   {
                     name: "Field Management",
                     color: "bg-hb-orange",
-                    tools: filteredTools.filter((tool) => tool.category === "Field Management")
+                    tools: filteredTools.filter((tool) => tool.category === "Field Management"),
                   },
                   {
                     name: "Compliance",
                     color: "bg-purple-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Compliance")
+                    tools: filteredTools.filter((tool) => tool.category === "Compliance"),
                   },
                   {
                     name: "Warranty",
                     color: "bg-amber-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Warranty")
+                    tools: filteredTools.filter((tool) => tool.category === "Warranty"),
                   },
                   {
                     name: "Historical Projects",
                     color: "bg-slate-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects")
-                  }
+                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects"),
+                  },
                 ]
-                
-                const filteredCategories = categoryConfig.filter(category => 
-                  visibleCategories.includes(category.name) && category.tools.length > 0
+
+                const filteredCategories = categoryConfig.filter(
+                  (category) => visibleCategories.includes(category.name) && category.tools.length > 0
                 )
 
-                const gridCols = filteredCategories.length <= 2 ? "grid-cols-2" : 
-                                filteredCategories.length <= 3 ? "grid-cols-3" : 
-                                filteredCategories.length <= 4 ? "grid-cols-4" : 
-                                "grid-cols-4"
+                const gridCols =
+                  filteredCategories.length <= 2
+                    ? "grid-cols-2"
+                    : filteredCategories.length <= 3
+                    ? "grid-cols-3"
+                    : filteredCategories.length <= 4
+                    ? "grid-cols-4"
+                    : "grid-cols-4"
 
                 return (
                   <div className={`grid ${gridCols} gap-6`}>
@@ -1074,13 +1378,27 @@ export const AppHeader = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Archive Tools</h3>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                      Archive Tools
+                    </h3>
                   </div>
                   <div className="space-y-1">
                     {[
-                      { name: "Reports", href: "/dashboard/reports", description: "View historical project reports and documentation" },
-                      { name: "Financial Reports", href: "/dashboard/financial-hub", description: "Access closed project financial data" },
-                      { name: "Document Archive", href: "/tools/coming-soon", description: "Browse project documentation library" }
+                      {
+                        name: "Reports",
+                        href: "/dashboard/reports",
+                        description: "View historical project reports and documentation",
+                      },
+                      {
+                        name: "Financial Reports",
+                        href: "/dashboard/financial-hub",
+                        description: "Access closed project financial data",
+                      },
+                      {
+                        name: "Document Archive",
+                        href: "/tools/coming-soon",
+                        description: "Browse project documentation library",
+                      },
                     ].map((tool) => (
                       <button
                         key={tool.href}
@@ -1096,7 +1414,9 @@ export const AppHeader = () => {
                           <div className="font-medium text-gray-900 dark:text-gray-100 text-sm group-hover:text-hb-blue transition-colors">
                             {tool.name}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{tool.description}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {tool.description}
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -1111,58 +1431,68 @@ export const AppHeader = () => {
                   {
                     name: "Core Tools",
                     color: "bg-hb-blue",
-                    tools: filteredTools.filter((tool) => tool.category === "Core Tools")
+                    tools: filteredTools.filter((tool) => tool.category === "Core Tools"),
                   },
                   {
                     name: "Pre-Construction",
                     color: "bg-indigo-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction")
+                    tools: filteredTools.filter((tool) => tool.category === "Pre-Construction"),
                   },
                   {
                     name: "Financial Management",
                     color: "bg-green-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Financial Management")
+                    tools: filteredTools.filter((tool) => tool.category === "Financial Management"),
                   },
                   {
                     name: "Field Management",
                     color: "bg-hb-orange",
-                    tools: filteredTools.filter((tool) => tool.category === "Field Management")
+                    tools: filteredTools.filter((tool) => tool.category === "Field Management"),
                   },
                   {
                     name: "Compliance",
                     color: "bg-purple-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Compliance")
+                    tools: filteredTools.filter((tool) => tool.category === "Compliance"),
                   },
                   {
                     name: "Warranty",
                     color: "bg-amber-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Warranty")
+                    tools: filteredTools.filter((tool) => tool.category === "Warranty"),
                   },
                   {
                     name: "Historical Projects",
                     color: "bg-slate-500",
-                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects")
-                  }
+                    tools: filteredTools.filter((tool) => tool.category === "Historical Projects"),
+                  },
                 ]
-                
+
                 // Debug category filtering for estimator
                 if (user?.role === "estimator") {
-                  console.log("Estimator - All categories before filtering:", categoryConfig.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                  console.log(
+                    "Estimator - All categories before filtering:",
+                    categoryConfig.map((c) => ({ name: c.name, toolCount: c.tools.length }))
+                  )
                   console.log("Estimator - Visible categories:", visibleCategories)
                 }
-                
-                const filteredCategories = categoryConfig.filter(category => 
-                  visibleCategories.includes(category.name) && category.tools.length > 0
+
+                const filteredCategories = categoryConfig.filter(
+                  (category) => visibleCategories.includes(category.name) && category.tools.length > 0
                 )
-                
+
                 if (user?.role === "estimator") {
-                  console.log("Estimator - Final filtered categories:", filteredCategories.map(c => ({ name: c.name, toolCount: c.tools.length })))
+                  console.log(
+                    "Estimator - Final filtered categories:",
+                    filteredCategories.map((c) => ({ name: c.name, toolCount: c.tools.length }))
+                  )
                 }
 
-                const gridCols = filteredCategories.length <= 2 ? "grid-cols-2" : 
-                                filteredCategories.length <= 3 ? "grid-cols-3" : 
-                                filteredCategories.length <= 4 ? "grid-cols-4" : 
-                                "grid-cols-4"
+                const gridCols =
+                  filteredCategories.length <= 2
+                    ? "grid-cols-2"
+                    : filteredCategories.length <= 3
+                    ? "grid-cols-3"
+                    : filteredCategories.length <= 4
+                    ? "grid-cols-4"
+                    : "grid-cols-4"
 
                 return (
                   <div className={`grid ${gridCols} gap-6`}>
@@ -1212,10 +1542,291 @@ export const AppHeader = () => {
         </div>
       )}
 
+      {/* IT Tools Mega Menu */}
+      {showITToolsMenu && (
+        <div className="fixed left-0 right-0 top-20 z-[105] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-xl">
+          <div className="max-w-7xl mx-auto px-8 py-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">IT Tools</h2>
+                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  Access IT management modules and quick actions
+                </p>
+              </div>
+              <Badge
+                variant="secondary"
+                className="text-xs text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-950/30 px-2 py-1"
+              >
+                IT Administrator
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              {/* IT Management */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                    IT Management
+                  </h3>
+                </div>
+                <div className="space-y-1">
+                  {itTools
+                    .filter((tool) => tool.category === "IT Management")
+                    .map((tool) => (
+                      <button
+                        key={tool.name}
+                        onClick={() => {
+                          if (tool.href !== "#") {
+                            router.push(tool.href)
+                            closeAllMenus()
+                          }
+                        }}
+                        className="w-full group flex items-start space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950/50 transition-colors">
+                          <div className="w-4 h-4 bg-blue-500 rounded-sm"></div>
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {tool.name}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {tool.description}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                    Quick Actions
+                  </h3>
+                </div>
+                <div className="space-y-1">
+                  {itTools
+                    .filter((tool) => tool.category === "Quick Actions")
+                    .map((tool) => (
+                      <button
+                        key={tool.name}
+                        onClick={() => {
+                          if (tool.href !== "#") {
+                            router.push(tool.href)
+                            closeAllMenus()
+                          }
+                        }}
+                        className="w-full group flex items-start space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-green-50 dark:bg-green-950/30 flex items-center justify-center group-hover:bg-green-100 dark:group-hover:bg-green-950/50 transition-colors">
+                          <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                            {tool.name}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {tool.description}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Menu for IT Admin (Combined Projects/Tools) */}
+      {showMainMenu && (
+        <div className="fixed left-0 right-0 top-20 z-[105] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-xl">
+          <div className="max-w-7xl mx-auto px-8 py-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Projects & Tools</h2>
+                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  Access project management and construction tools
+                </p>
+              </div>
+              <Badge
+                variant="secondary"
+                className="text-xs text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-950/30 px-2 py-1"
+              >
+                IT Administrator
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              {/* Projects Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                    Projects
+                  </h3>
+                </div>
+                <div className="space-y-1">
+                  {projects.slice(0, 8).map((project) => (
+                    <button
+                      key={project.id}
+                      onClick={() => {
+                        handleProjectChange(project.id)
+                        closeAllMenus()
+                      }}
+                      className={`w-full group flex items-start space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                        selectedProject === project.id ? "bg-blue-50 dark:bg-blue-950/30" : ""
+                      }`}
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950/50 transition-colors">
+                        <Building className="w-4 h-4 text-blue-500" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {project.name}
+                        </div>
+                        {project.id !== "all" && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {project.project_stage_name} • {project.budget}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tools Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                    Construction Tools
+                  </h3>
+                </div>
+
+                {/* Display all tool categories like the standard menu */}
+                <div className="space-y-6">
+                  {(() => {
+                    const visibleCategories = getVisibleCategories()
+
+                    // Apply the same filtering logic as the standard tools menu
+                    const userRole = user?.role
+                    const filteredToolsForCategories = tools.filter((tool: any) => {
+                      // Check department match
+                      const isDepartmentMatch =
+                        selectedDepartment === "operations"
+                          ? !["Pre-Construction", "Historical Projects"].includes(tool.category)
+                          : selectedDepartment === "pre-construction"
+                          ? ["Core Tools", "Pre-Construction"].includes(tool.category)
+                          : selectedDepartment === "archive"
+                          ? ["Historical Projects"].includes(tool.category)
+                          : true
+
+                      // Check role visibility
+                      const isRoleVisible = !tool.visibleRoles || tool.visibleRoles.includes(userRole)
+
+                      return isDepartmentMatch && isRoleVisible
+                    })
+
+                    const categoryConfig = [
+                      {
+                        name: "Core Tools",
+                        color: "bg-blue-500",
+                        tools: filteredToolsForCategories.filter((tool: any) => tool.category === "Core Tools"),
+                      },
+                      {
+                        name: "Pre-Construction",
+                        color: "bg-indigo-500",
+                        tools: filteredToolsForCategories.filter((tool: any) => tool.category === "Pre-Construction"),
+                      },
+                      {
+                        name: "Financial Management",
+                        color: "bg-green-500",
+                        tools: filteredToolsForCategories.filter(
+                          (tool: any) => tool.category === "Financial Management"
+                        ),
+                      },
+                      {
+                        name: "Field Management",
+                        color: "bg-orange-500",
+                        tools: filteredToolsForCategories.filter((tool: any) => tool.category === "Field Management"),
+                      },
+                      {
+                        name: "Compliance",
+                        color: "bg-purple-500",
+                        tools: filteredToolsForCategories.filter((tool: any) => tool.category === "Compliance"),
+                      },
+                      {
+                        name: "Warranty",
+                        color: "bg-amber-500",
+                        tools: filteredToolsForCategories.filter((tool: any) => tool.category === "Warranty"),
+                      },
+                      {
+                        name: "Historical Projects",
+                        color: "bg-slate-500",
+                        tools: filteredToolsForCategories.filter(
+                          (tool: any) => tool.category === "Historical Projects"
+                        ),
+                      },
+                    ]
+
+                    const filteredCategories = categoryConfig.filter(
+                      (category) => visibleCategories.includes(category.name) && category.tools.length > 0
+                    )
+
+                    return filteredCategories.map((category) => (
+                      <div key={category.name} className="space-y-2">
+                        <div className="flex items-center gap-2 pb-1">
+                          <div className={`w-1.5 h-1.5 ${category.color} rounded-full`}></div>
+                          <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                            {category.name}
+                          </h4>
+                        </div>
+                        <div className="space-y-1 pl-3">
+                          {category.tools.map((tool: any) => (
+                            <button
+                              key={tool.name}
+                              onClick={() => {
+                                if (tool.href !== "#") {
+                                  router.push(tool.href)
+                                  closeAllMenus()
+                                }
+                              }}
+                              className="w-full group flex items-start space-x-2 px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="flex-shrink-0 w-6 h-6 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+                                <Wrench className="w-3 h-3 text-gray-500" />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <div className="text-xs font-medium text-gray-900 dark:text-gray-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                                  {tool.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                                  {tool.description}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Search Bar */}
       {showMobileSearch && (
         <>
-          <div 
+          <div
             className="fixed inset-0 top-20 z-[104] bg-black/20 backdrop-blur-sm"
             onClick={() => setShowMobileSearch(false)}
           />
@@ -1239,25 +1850,450 @@ export const AppHeader = () => {
         </>
       )}
 
-      {/* Project Selection Modal */}
-      <Dialog open={showProjectModal} onOpenChange={setShowProjectModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Building className="h-5 w-5 text-blue-600" />
-              {projectModalContent.title}
-            </DialogTitle>
-            <DialogDescription className="text-base leading-relaxed pt-2">
-              {projectModalContent.description}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end pt-4">
-            <Button onClick={() => setShowProjectModal(false)} className="bg-blue-600 hover:bg-blue-700">
-              Got it
-            </Button>
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <>
+          <div
+            className="fixed inset-0 top-20 z-[104] bg-black/50 backdrop-blur-sm sm:hidden"
+            onClick={() => setShowMobileMenu(false)}
+          />
+          <div className="fixed left-0 right-0 top-20 z-[105] bg-white dark:bg-gray-900 sm:hidden animate-in slide-in-from-top-2 duration-300 shadow-lg rounded-b-lg">
+            <div className="flex flex-col max-h-[80vh] overflow-y-auto">
+              {/* Main Menu View */}
+              {mobileMenuView === "main" && (
+                <div className="p-4">
+                  {/* Menu Items */}
+                  <div className="space-y-2">
+                    {/* IT Tools - Only for IT Admin */}
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={() => setMobileMenuView("ittools")}
+                        className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Archive className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          <span className="text-lg font-medium text-gray-900 dark:text-gray-100">IT Tools</span>
+                        </div>
+                        <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Projects */}
+                    <button
+                      onClick={() => setMobileMenuView("projects")}
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Projects</span>
+                      </div>
+                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+
+                    {/* Tools */}
+                    <button
+                      onClick={() => setMobileMenuView("tools")}
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Tools</span>
+                      </div>
+                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 p-4 mt-4">
+                    <div className="flex items-center justify-center space-x-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      >
+                        <MessageCircle className="h-5 w-5" />
+                      </Button>
+                      {mounted && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        >
+                          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* IT Tools View */}
+              {mobileMenuView === "ittools" && (
+                <div className="p-6">
+                  {/* IT Tools View Header */}
+                  <div className="flex items-center space-x-3 mb-6">
+                    <button
+                      onClick={() => setMobileMenuView("main")}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      <svg
+                        className="h-5 w-5 text-gray-500 rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">IT Tools</h2>
+                  </div>
+
+                  {/* IT Tools Categories */}
+                  <div className="space-y-6">
+                    {/* IT Management */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        IT Management
+                      </h3>
+                      <div className="space-y-2">
+                        {itTools
+                          .filter((tool) => tool.category === "IT Management")
+                          .map((tool) => (
+                            <button
+                              key={tool.name}
+                              onClick={() => {
+                                if (tool.href !== "#") {
+                                  router.push(tool.href)
+                                  setShowMobileMenu(false)
+                                }
+                              }}
+                              className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="font-medium text-gray-900 dark:text-gray-100 mb-1">{tool.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{tool.description}</div>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        Quick Actions
+                      </h3>
+                      <div className="space-y-2">
+                        {itTools
+                          .filter((tool) => tool.category === "Quick Actions")
+                          .map((tool) => (
+                            <button
+                              key={tool.name}
+                              onClick={() => {
+                                if (tool.href !== "#") {
+                                  router.push(tool.href)
+                                  setShowMobileMenu(false)
+                                }
+                              }}
+                              className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="font-medium text-gray-900 dark:text-gray-100 mb-1">{tool.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{tool.description}</div>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Projects View */}
+              {mobileMenuView === "projects" && (
+                <div className="p-6">
+                  {/* Projects View Header */}
+                  <div className="flex items-center space-x-3 mb-6">
+                    <button
+                      onClick={() => setMobileMenuView("main")}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      <svg
+                        className="h-5 w-5 text-gray-500 rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
+                  </div>
+
+                  {/* Projects List */}
+                  <div className="space-y-3">
+                    {projects.map((project) => (
+                      <button
+                        key={project.id}
+                        onClick={() => {
+                          handleProjectChange(project.id)
+                          setShowMobileMenu(false)
+                        }}
+                        className={`w-full text-left p-4 rounded-lg border transition-colors ${
+                          selectedProject === project.id
+                            ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30"
+                            : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{project.name}</div>
+                            {project.id !== "all" && (
+                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Project #{(project as any).project_number || project.id}
+                              </div>
+                            )}
+                          </div>
+                          {project.id !== "all" && (
+                            <Badge variant="secondary" className="text-xs ml-2">
+                              {project.project_stage_name}
+                            </Badge>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* IT Tools View */}
+              {mobileMenuView === "ittools" && (
+                <div className="p-4">
+                  {/* IT Tools View Header */}
+                  <div className="flex items-center space-x-3 mb-6">
+                    <button
+                      onClick={() => setMobileMenuView("main")}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      <ChevronLeft className="h-5 w-5 text-gray-500" />
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">IT Tools</h2>
+                  </div>
+
+                  {/* IT Tools Categories */}
+                  <div className="space-y-6">
+                    {/* IT Management */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        IT Management
+                      </h3>
+                      <div className="space-y-2">
+                        {itTools
+                          .filter((tool) => tool.category === "IT Management")
+                          .map((tool, index) => (
+                            <button
+                              key={index}
+                              onClick={() => {
+                                if (tool.href !== "#") {
+                                  router.push(tool.href)
+                                  setShowMobileMenu(false)
+                                  setMobileMenuView("main")
+                                }
+                              }}
+                              className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="font-medium text-gray-900 dark:text-gray-100 mb-1">{tool.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{tool.description}</div>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        Quick Actions
+                      </h3>
+                      <div className="space-y-2">
+                        {itTools
+                          .filter((tool) => tool.category === "Quick Actions")
+                          .map((action, index) => (
+                            <button
+                              key={index}
+                              className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                              disabled={action.name === "Coming Soon"}
+                            >
+                              <div className="font-medium text-gray-400 mb-1">{action.name}</div>
+                              <div className="text-sm text-gray-500">{action.description}</div>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Projects View */}
+              {mobileMenuView === "projects" && (
+                <div className="p-4">
+                  {/* Projects View Header */}
+                  <div className="flex items-center space-x-3 mb-6">
+                    <button
+                      onClick={() => setMobileMenuView("main")}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      <ChevronLeft className="h-5 w-5 text-gray-500" />
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
+                  </div>
+
+                  {/* Projects List */}
+                  <div className="space-y-3">
+                    {projects.map((project) => (
+                      <button
+                        key={project.id}
+                        onClick={() => {
+                          handleProjectChange(project.id)
+                          setShowMobileMenu(false)
+                          setMobileMenuView("main")
+                        }}
+                        className={`w-full text-left p-4 rounded-lg border transition-colors ${
+                          selectedProject === project.id
+                            ? "border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30"
+                            : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{project.name}</div>
+                            {project.id !== "all" && (
+                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Project #{(project as any).project_number || project.id}
+                              </div>
+                            )}
+                          </div>
+                          {project.id !== "all" && (
+                            <Badge variant="secondary" className="text-xs ml-2">
+                              {project.project_stage_name}
+                            </Badge>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tools View */}
+              {mobileMenuView === "tools" && (
+                <div className="p-6">
+                  {/* Tools View Header */}
+                  <div className="flex items-center space-x-3 mb-6">
+                    <button
+                      onClick={() => setMobileMenuView("main")}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      <svg
+                        className="h-5 w-5 text-gray-500 rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Tools</h2>
+                  </div>
+
+                  {/* Tools Categories */}
+                  <div className="space-y-6">
+                    {(() => {
+                      const visibleCategories = getVisibleCategories()
+                      const userRole = user?.role
+                      const filteredToolsForMobile = tools.filter((tool: any) => {
+                        const isDepartmentMatch =
+                          selectedDepartment === "operations"
+                            ? !["Pre-Construction", "Historical Projects"].includes(tool.category)
+                            : selectedDepartment === "pre-construction"
+                            ? ["Core Tools", "Pre-Construction"].includes(tool.category)
+                            : selectedDepartment === "archive"
+                            ? ["Historical Projects"].includes(tool.category)
+                            : true
+
+                        const isRoleVisible = !tool.visibleRoles || tool.visibleRoles.includes(userRole)
+                        return isDepartmentMatch && isRoleVisible
+                      })
+
+                      const categoryConfig = [
+                        {
+                          name: "Core Tools",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Core Tools"),
+                        },
+                        {
+                          name: "Pre-Construction",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Pre-Construction"),
+                        },
+                        {
+                          name: "Financial Management",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Financial Management"),
+                        },
+                        {
+                          name: "Field Management",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Field Management"),
+                        },
+                        {
+                          name: "Compliance",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Compliance"),
+                        },
+                        {
+                          name: "Warranty",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Warranty"),
+                        },
+                        {
+                          name: "Historical Projects",
+                          tools: filteredToolsForMobile.filter((tool: any) => tool.category === "Historical Projects"),
+                        },
+                      ]
+
+                      const filteredCategories = categoryConfig.filter(
+                        (category) => visibleCategories.includes(category.name) && category.tools.length > 0
+                      )
+
+                      return filteredCategories.map((category) => (
+                        <div key={category.name}>
+                          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                            {category.name}
+                          </h3>
+                          <div className="space-y-2">
+                            {category.tools.map((tool: any) => (
+                              <button
+                                key={tool.name}
+                                onClick={() => {
+                                  if (tool.href !== "#") {
+                                    router.push(tool.href)
+                                    setShowMobileMenu(false)
+                                  }
+                                }}
+                                className="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                              >
+                                <div className="font-medium text-gray-900 dark:text-gray-100 mb-1">{tool.name}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{tool.description}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </>
+      )}
     </>
   )
 }

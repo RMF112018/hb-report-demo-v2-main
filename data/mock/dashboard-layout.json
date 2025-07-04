@@ -8,7 +8,7 @@
       "id": "portfolio-overview",
       "type": "portfolio-overview",
       "title": "Portfolio Overview",
-      "size": "large",
+      "size": "optimal",
       "position": { "x": 0, "y": 0 },
       "visible": true,
       "config": {
@@ -22,7 +22,7 @@
         "netCashFlow": 12500000,
         "averageWorkingCapital": 4200000
       }
-    },    
+    },
     {
       "id": "revenue-forecast",
       "type": "revenue-forecast",
