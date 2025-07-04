@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import React, { useState, useEffect } from "react"
+import { Badge } from "@/components/ui/badge"
 import {
   Sparkles,
   TrendingUp,
@@ -13,75 +13,120 @@ import {
   Activity,
   ChevronDown,
   ArrowRight,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface HBIInsight {
-  id: string;
-  type: "forecast" | "risk" | "opportunity" | "performance" | "alert";
-  severity: "low" | "medium" | "high";
-  title: string;
-  text: string;
-  action: string;
-  confidence: number;
-  relatedMetrics: string[];
-  project_id?: string;
+  id: string
+  type: "forecast" | "risk" | "opportunity" | "performance" | "alert"
+  severity: "low" | "medium" | "high"
+  title: string
+  text: string
+  action: string
+  confidence: number
+  relatedMetrics: string[]
+  project_id?: string
 }
 
 interface EnhancedHBIInsightsProps {
-  config: HBIInsight[] | any;
-  cardId?: string;
+  config: HBIInsight[] | any
+  cardId?: string
+  span?: { cols: number; rows: number }
 }
 
-export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps) {
-  const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
-  const [showDrillDown, setShowDrillDown] = useState(false);
+export function EnhancedHBIInsights({ config, cardId, span }: EnhancedHBIInsightsProps) {
+  const [selectedInsight, setSelectedInsight] = useState<string | null>(null)
+  const [showAll, setShowAll] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
+
+  // Calculate responsive sizing based on card dimensions
+  const getResponsiveStyles = () => {
+    const defaultSpan = { cols: 10, rows: 5 } // Default optimal size
+    const actualSpan = span || defaultSpan
+    const cardArea = actualSpan.cols * actualSpan.rows
+    const defaultArea = defaultSpan.cols * defaultSpan.rows // 50
+    const scaleFactor = Math.min(Math.max(cardArea / defaultArea, 0.4), 1.5) // Scale between 40% and 150%
+
+    // Calculate layout properties
+    const isVerySmall = cardArea <= 20 // 4x5 or smaller
+    const isSmall = cardArea <= 30 // 6x5 or smaller
+    const isMedium = cardArea <= 50 // 10x5 (default)
+    const isLarge = cardArea > 50
+    const isWide = actualSpan.cols >= 8
+    const isTall = actualSpan.rows >= 6
+
+    return {
+      scaleFactor,
+      cardArea,
+      isVerySmall,
+      isSmall,
+      isMedium,
+      isLarge,
+      isWide,
+      isTall,
+      // Dynamic sizing
+      headerPadding: Math.max(4, Math.round(8 * scaleFactor)),
+      contentPadding: Math.max(4, Math.round(12 * scaleFactor)),
+      itemSpacing: Math.max(2, Math.round(8 * scaleFactor)),
+      iconSize: Math.max(8, Math.round(12 * scaleFactor)),
+      fontSize: Math.max(10, Math.round(14 * scaleFactor)),
+      titleFontSize: Math.max(12, Math.round(16 * scaleFactor)),
+      badgeFontSize: Math.max(8, Math.round(10 * scaleFactor)),
+      // Layout decisions
+      maxVisibleInsights: isVerySmall ? 2 : isSmall ? 3 : isMedium ? 4 : 6,
+      showConfidenceInHeader: !isVerySmall,
+      showFullStats: !isSmall,
+      useCompactStats: isVerySmall || isSmall,
+      gridCols: isVerySmall ? 2 : 3,
+    }
+  }
+
+  const responsive = getResponsiveStyles()
 
   // Listen for drill down events from DashboardCardWrapper
   useEffect(() => {
     const handleDrillDownEvent = (event: CustomEvent) => {
-      if (event.detail.cardId === cardId || event.detail.cardType === 'enhanced-hbi-insights') {
-        const shouldShow = event.detail.action === 'show'
+      if (event.detail.cardId === cardId || event.detail.cardType === "enhanced-hbi-insights") {
+        const shouldShow = event.detail.action === "show"
         setShowDrillDown(shouldShow)
-        
+
         // Notify wrapper of state change
-        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+        const stateEvent = new CustomEvent("cardDrillDownStateChange", {
           detail: {
             cardId: cardId,
-            cardType: 'enhanced-hbi-insights',
-            isActive: shouldShow
-          }
+            cardType: "enhanced-hbi-insights",
+            isActive: shouldShow,
+          },
         })
         window.dispatchEvent(stateEvent)
       }
-    };
+    }
 
-    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    
+    window.addEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+
     return () => {
-      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    };
-  }, [cardId]);
+      window.removeEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+    }
+  }, [cardId])
 
   // Function to handle closing the drill down overlay
   const handleCloseDrillDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowDrillDown(false)
-    
+
     // Notify wrapper that drill down is closed
-    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+    const stateEvent = new CustomEvent("cardDrillDownStateChange", {
       detail: {
         cardId: cardId,
-        cardType: 'enhanced-hbi-insights',
-        isActive: false
-      }
+        cardType: "enhanced-hbi-insights",
+        isActive: false,
+      },
     })
     window.dispatchEvent(stateEvent)
   }
 
   // Handle both array and object config formats
-  const insights = Array.isArray(config) ? config : [];
+  const insights = Array.isArray(config) ? config : []
 
   // Financial-specific insights if this is a financial review card
   const financialInsights: HBIInsight[] = [
@@ -140,7 +185,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
       relatedMetrics: ["Buyout Savings", "Procurement", "Cost Management"],
       project_id: "global",
     },
-  ];
+  ]
 
   // Mock data for executive dashboard if no insights provided
   const mockInsights: HBIInsight[] = [
@@ -188,134 +233,223 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
       relatedMetrics: ["Cash Flow", "Payment Terms", "Working Capital"],
       project_id: "global",
     },
-  ];
+  ]
 
   // Determine which insights to use based on card context
-  const isFinancialReview = cardId?.includes('financial') || cardId?.includes('fin-');
-  const defaultInsights = isFinancialReview ? financialInsights : mockInsights;
-  const displayInsights = insights.length > 0 ? insights : defaultInsights;
-  const visibleInsights = showAll ? displayInsights : displayInsights.slice(0, 4);
+  const isFinancialReview = cardId?.includes("financial") || cardId?.includes("fin-")
+  const defaultInsights = isFinancialReview ? financialInsights : mockInsights
+  const displayInsights = insights.length > 0 ? insights : defaultInsights
+  const visibleInsights = showAll ? displayInsights : displayInsights.slice(0, responsive.maxVisibleInsights)
   const avgConfidence = Math.round(
-    displayInsights.reduce((sum, insight) => sum + insight.confidence, 0) / displayInsights.length,
-  );
-  const highSeverityCount = displayInsights.filter((insight) => insight.severity === "high").length;
+    displayInsights.reduce((sum, insight) => sum + insight.confidence, 0) / displayInsights.length
+  )
+  const highSeverityCount = displayInsights.filter((insight) => insight.severity === "high").length
 
   const getInsightIcon = (type: string) => {
     switch (type) {
       case "forecast":
-        return <TrendingUp className="h-3 w-3" />;
+        return <TrendingUp className="h-3 w-3" />
       case "risk":
-        return <AlertTriangle className="h-3 w-3" />;
+        return <AlertTriangle className="h-3 w-3" />
       case "opportunity":
-        return <CheckCircle className="h-3 w-3" />;
+        return <CheckCircle className="h-3 w-3" />
       case "performance":
-        return <Target className="h-3 w-3" />;
+        return <Target className="h-3 w-3" />
       default:
-        return <Sparkles className="h-3 w-3" />;
+        return <Sparkles className="h-3 w-3" />
     }
-  };
+  }
 
   const getInsightColor = (severity: string) => {
     switch (severity) {
       case "high":
-        return "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 hover:bg-red-100";
+        return "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 hover:bg-red-100"
       case "medium":
-        return "border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/30 hover:bg-yellow-100";
+        return "border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/30 hover:bg-yellow-100"
       case "low":
-        return "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30 hover:bg-green-100";
+        return "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30 hover:bg-green-100"
       default:
-        return "border-border bg-muted/50";
+        return "border-border bg-muted/50"
     }
-  };
+  }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "high":
-        return "text-red-600 dark:text-red-400 bg-red-100";
+        return "text-red-600 dark:text-red-400 bg-red-100"
       case "medium":
-        return "text-yellow-600 dark:text-yellow-400 bg-yellow-100";
+        return "text-yellow-600 dark:text-yellow-400 bg-yellow-100"
       case "low":
-        return "text-green-600 dark:text-green-400 bg-green-100";
+        return "text-green-600 dark:text-green-400 bg-green-100"
       default:
-        return "text-muted-foreground bg-muted";
+        return "text-muted-foreground bg-muted"
     }
-  };
+  }
 
   return (
-    <div 
-      className="relative h-full"
-      data-tour="hbi-insights"
-    >
+    <div className="relative h-full" data-tour="hbi-insights">
       <div className="h-full flex flex-col bg-transparent overflow-hidden">
         {/* AI Stats Header */}
-        <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
-          <div className="flex items-center gap-2 mb-1 sm:mb-1.5 lg:mb-2">
-            <Badge className="bg-gray-600 text-white border-gray-600 text-xs">
-              <Activity className="h-3 w-3 mr-1" />
+        <div
+          className="flex-shrink-0 border-b border-gray-200 dark:border-gray-600"
+          style={{ padding: `${responsive.headerPadding}px` }}
+        >
+          <div
+            className="flex items-center gap-2"
+            style={{ marginBottom: `${Math.max(4, responsive.headerPadding / 2)}px` }}
+          >
+            <Badge
+              className="bg-gray-600 text-white border-gray-600"
+              style={{ fontSize: `${responsive.badgeFontSize}px` }}
+            >
+              <Activity
+                className="mr-1"
+                style={{
+                  width: `${responsive.iconSize}px`,
+                  height: `${responsive.iconSize}px`,
+                }}
+              />
               AI Powered
             </Badge>
-            <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-              {avgConfidence}% Avg Confidence
-            </div>
-          </div>
-          
-          {/* Compact Stats */}
-          <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
-              <div className="font-bold text-lg text-red-700">{highSeverityCount}</div>
-              <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
-            </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
-              <div className="font-bold text-lg text-green-700">
-                {displayInsights.filter((i) => i.type === "opportunity").length}
+            {responsive.showConfidenceInHeader && (
+              <div
+                className="text-gray-700 dark:text-gray-300 font-medium"
+                style={{ fontSize: `${responsive.fontSize}px` }}
+              >
+                {avgConfidence}% Avg Confidence
               </div>
-              <div className="text-xs text-green-600 dark:text-green-400">Opportunities</div>
-            </div>
-            <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
-              <div className="font-bold text-lg text-blue-700">
-                {displayInsights.filter((i) => i.type === "forecast").length}
-              </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400">Forecasts</div>
-            </div>
+            )}
           </div>
+
+          {/* Responsive Stats Grid */}
+          {responsive.showFullStats ? (
+            <div className={`grid grid-cols-${responsive.gridCols}`} style={{ gap: `${responsive.itemSpacing}px` }}>
+              <div
+                className="text-center bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700"
+                style={{ padding: `${Math.max(4, responsive.contentPadding / 2)}px` }}
+              >
+                <div className="font-bold text-red-700" style={{ fontSize: `${responsive.titleFontSize}px` }}>
+                  {highSeverityCount}
+                </div>
+                <div className="text-red-600 dark:text-red-400" style={{ fontSize: `${responsive.badgeFontSize}px` }}>
+                  Critical
+                </div>
+              </div>
+              <div
+                className="text-center bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700"
+                style={{ padding: `${Math.max(4, responsive.contentPadding / 2)}px` }}
+              >
+                <div className="font-bold text-green-700" style={{ fontSize: `${responsive.titleFontSize}px` }}>
+                  {displayInsights.filter((i) => i.type === "opportunity").length}
+                </div>
+                <div
+                  className="text-green-600 dark:text-green-400"
+                  style={{ fontSize: `${responsive.badgeFontSize}px` }}
+                >
+                  Opportunities
+                </div>
+              </div>
+              <div
+                className="text-center bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700"
+                style={{ padding: `${Math.max(4, responsive.contentPadding / 2)}px` }}
+              >
+                <div className="font-bold text-blue-700" style={{ fontSize: `${responsive.titleFontSize}px` }}>
+                  {displayInsights.filter((i) => i.type === "forecast").length}
+                </div>
+                <div className="text-blue-600 dark:text-blue-400" style={{ fontSize: `${responsive.badgeFontSize}px` }}>
+                  Forecasts
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Compact Stats for Small Cards */
+            <div className="flex justify-center gap-4">
+              <span
+                className="text-red-600 dark:text-red-400 font-medium"
+                style={{ fontSize: `${responsive.fontSize}px` }}
+              >
+                {highSeverityCount} Critical
+              </span>
+              <span
+                className="text-green-600 dark:text-green-400 font-medium"
+                style={{ fontSize: `${responsive.fontSize}px` }}
+              >
+                {displayInsights.filter((i) => i.type === "opportunity").length} Ops
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Insights List */}
-        <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 overflow-y-auto">
-          <div className="space-y-2">
+        <div className="flex-1 overflow-y-auto" style={{ padding: `${responsive.contentPadding}px` }}>
+          <div style={{ gap: `${responsive.itemSpacing}px` }} className="space-y-2">
             {visibleInsights.map((insight) => (
               <div
                 key={insight.id}
                 className={cn(
-                  "p-2 rounded-lg border cursor-pointer transition-all duration-200 shadow-sm",
+                  "rounded-lg border cursor-pointer transition-all duration-200 shadow-sm",
                   getInsightColor(insight.severity),
                   selectedInsight === insight.id && "ring-2 ring-purple-400"
                 )}
+                style={{ padding: `${Math.max(4, responsive.contentPadding / 2)}px` }}
                 onClick={() => setSelectedInsight(selectedInsight === insight.id ? null : insight.id)}
               >
                 <div className="flex items-start gap-2">
                   <div className="flex-shrink-0 mt-0.5">
-                    {getInsightIcon(insight.type)}
+                    {React.cloneElement(getInsightIcon(insight.type), {
+                      style: {
+                        width: `${responsive.iconSize}px`,
+                        height: `${responsive.iconSize}px`,
+                      },
+                    })}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-semibold text-sm text-foreground leading-tight">
-                        {insight.title}
+                      <h4
+                        className="font-semibold text-foreground leading-tight"
+                        style={{ fontSize: `${responsive.fontSize}px` }}
+                      >
+                        {responsive.isVerySmall
+                          ? insight.title.substring(0, 20) + (insight.title.length > 20 ? "..." : "")
+                          : insight.title}
                       </h4>
-                      <Badge className={cn("text-xs px-2 py-0.5", getSeverityColor(insight.severity))}>
+                      <Badge
+                        className={cn("px-2 py-0.5", getSeverityColor(insight.severity))}
+                        style={{ fontSize: `${responsive.badgeFontSize}px` }}
+                      >
                         {insight.confidence}%
                       </Badge>
                     </div>
-                    
-                    <p className="text-sm text-foreground mb-1 leading-snug">
-                      {insight.text}
-                    </p>
 
-                    {selectedInsight === insight.id && (
-                      <div className="mt-2 p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                    {!responsive.useCompactStats && (
+                      <p
+                        className="text-foreground mb-1 leading-snug"
+                        style={{ fontSize: `${Math.max(10, responsive.fontSize - 2)}px` }}
+                      >
+                        {responsive.isSmall
+                          ? insight.text.substring(0, 80) + (insight.text.length > 80 ? "..." : "")
+                          : insight.text}
+                      </p>
+                    )}
+
+                    {selectedInsight === insight.id && !responsive.isVerySmall && (
+                      <div
+                        className="mt-2 rounded-lg border border-gray-300 dark:border-gray-600"
+                        style={{ padding: `${Math.max(4, responsive.contentPadding / 3)}px` }}
+                      >
                         <div className="flex items-start gap-2">
-                          <ArrowRight className="h-3 w-3 mt-0.5 flex-shrink-0" style={{color: '#FA4616'}} />
-                          <p className="text-sm text-foreground font-medium">
+                          <ArrowRight
+                            className="mt-0.5 flex-shrink-0"
+                            style={{
+                              color: "#FA4616",
+                              width: `${responsive.iconSize}px`,
+                              height: `${responsive.iconSize}px`,
+                            }}
+                          />
+                          <p
+                            className="text-foreground font-medium"
+                            style={{ fontSize: `${Math.max(10, responsive.fontSize - 2)}px` }}
+                          >
                             {insight.action}
                           </p>
                         </div>
@@ -329,14 +463,29 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
         </div>
 
         {/* Show More/Less Button */}
-        {displayInsights.length > 4 && (
-          <div className="flex-shrink-0 p-1.5 sm:p-2 lg:p-2.5 border-t border-gray-200 dark:border-gray-600">
+        {displayInsights.length > responsive.maxVisibleInsights && !responsive.isVerySmall && (
+          <div
+            className="flex-shrink-0 border-t border-gray-200 dark:border-gray-600"
+            style={{ padding: `${Math.max(4, responsive.headerPadding / 2)}px` }}
+          >
             <button
               onClick={() => setShowAll(!showAll)}
-              className="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center justify-center gap-2 font-medium py-1"
+              className="w-full text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center justify-center gap-2 font-medium"
+              style={{
+                fontSize: `${responsive.fontSize}px`,
+                padding: `${Math.max(2, responsive.headerPadding / 4)}px`,
+              }}
             >
-              <span>{showAll ? "Show Less" : `+${displayInsights.length - 4} More Insights`}</span>
-              <ChevronDown className={cn("h-4 w-4 transition-transform", showAll && "rotate-180")} />
+              <span>
+                {showAll ? "Show Less" : `+${displayInsights.length - responsive.maxVisibleInsights} More Insights`}
+              </span>
+              <ChevronDown
+                className={cn("transition-transform", showAll && "rotate-180")}
+                style={{
+                  width: `${responsive.iconSize}px`,
+                  height: `${responsive.iconSize}px`,
+                }}
+              />
             </button>
           </div>
         )}
@@ -344,19 +493,48 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
 
       {/* Detailed Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+        <div
+          className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg text-white transition-all duration-300 ease-in-out overflow-y-auto z-50"
+          style={{ padding: `${responsive.contentPadding}px` }}
+        >
           <div className="h-full">
-            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">AI Intelligence Deep Analysis</h3>
-            
-            <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
+            <h3
+              className="font-medium text-center"
+              style={{
+                fontSize: `${Math.max(16, responsive.titleFontSize + 2)}px`,
+                marginBottom: `${responsive.headerPadding}px`,
+              }}
+            >
+              AI Intelligence Deep Analysis
+            </h3>
+
+            <div
+              className={`grid ${responsive.isVerySmall ? "grid-cols-1" : "grid-cols-2"} h-[calc(100%-60px)]`}
+              style={{ gap: `${responsive.itemSpacing}px` }}
+            >
               {/* AI Performance Metrics */}
-              <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                    <Brain className="w-4 h-4 mr-2" />
+              <div style={{ gap: `${responsive.itemSpacing}px` }} className="space-y-4">
+                <div
+                  className="bg-white/10 dark:bg-black/10 rounded-lg"
+                  style={{ padding: `${responsive.contentPadding}px` }}
+                >
+                  <h4
+                    className="font-semibold flex items-center"
+                    style={{
+                      fontSize: `${responsive.titleFontSize}px`,
+                      marginBottom: `${responsive.headerPadding}px`,
+                    }}
+                  >
+                    <Brain
+                      className="mr-2"
+                      style={{
+                        width: `${responsive.iconSize}px`,
+                        height: `${responsive.iconSize}px`,
+                      }}
+                    />
                     AI Performance Analytics
                   </h4>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2" style={{ fontSize: `${responsive.fontSize}px` }}>
                     <div className="flex justify-between">
                       <span>Model Accuracy:</span>
                       <span className="font-medium text-purple-300">{avgConfidence}%</span>
@@ -376,7 +554,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-3 lg:p-4">
                   <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
                     <Zap className="w-4 h-4 mr-2" />
                     Real-Time Insights
@@ -408,7 +586,7 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
 
               {/* Insight Categories Analysis */}
               <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-3 lg:p-4">
                   <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
                     <Target className="w-4 h-4 mr-2" />
                     Insight Categories Breakdown
@@ -418,35 +596,33 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
                       <span>Risk Alerts:</span>
                       <div className="flex items-center space-x-2">
                         <span className="font-medium text-red-400">
-                          {displayInsights.filter(i => i.type === 'risk').length}
+                          {displayInsights.filter((i) => i.type === "risk").length}
                         </span>
-                        <span className="text-xs text-purple-200">
-                          ({highSeverityCount} high)
-                        </span>
+                        <span className="text-xs text-purple-200">({highSeverityCount} high)</span>
                       </div>
                     </div>
                     <div className="flex justify-between">
                       <span>Opportunities:</span>
                       <span className="font-medium text-green-400">
-                        {displayInsights.filter(i => i.type === 'opportunity').length}
+                        {displayInsights.filter((i) => i.type === "opportunity").length}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Forecasts:</span>
                       <span className="font-medium text-blue-400">
-                        {displayInsights.filter(i => i.type === 'forecast').length}
+                        {displayInsights.filter((i) => i.type === "forecast").length}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Performance:</span>
                       <span className="font-medium text-yellow-400">
-                        {displayInsights.filter(i => i.type === 'performance').length}
+                        {displayInsights.filter((i) => i.type === "performance").length}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5">
+                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-3 lg:p-4">
                   <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
                     <Activity className="w-4 h-4 mr-2" />
                     Strategic Recommendations
@@ -456,28 +632,41 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
                       <p className="font-medium mb-1">Priority Actions:</p>
                       <ul className="text-xs space-y-1 list-disc list-inside">
                         <li>Address {highSeverityCount} critical risk alerts immediately</li>
-                        <li>Capitalize on {displayInsights.filter(i => i.type === 'opportunity').length} identified opportunities</li>
+                        <li>
+                          Capitalize on {displayInsights.filter((i) => i.type === "opportunity").length} identified
+                          opportunities
+                        </li>
                         <li>Monitor forecast accuracy for strategic planning</li>
                         <li>Optimize performance based on AI recommendations</li>
                       </ul>
                     </div>
-                    
+
                     <div className="pt-2 border-t border-white/20 dark:border-black/20">
                       <p className="text-xs text-purple-200">
-                        AI confidence level: {avgConfidence}% average. 
-                        System learning from {isFinancialReview ? 'financial' : 'operational'} patterns across all projects.
+                        AI confidence level: {avgConfidence}% average. System learning from{" "}
+                        {isFinancialReview ? "financial" : "operational"} patterns across all projects.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* Close Button */}
-            <div className="absolute bottom-4 right-4">
+            <div
+              className="absolute"
+              style={{
+                bottom: `${responsive.headerPadding}px`,
+                right: `${responsive.headerPadding}px`,
+              }}
+            >
               <button
                 onClick={handleCloseDrillDown}
-                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                style={{
+                  fontSize: `${responsive.fontSize}px`,
+                  padding: `${responsive.headerPadding / 2}px ${responsive.headerPadding}px`,
+                }}
               >
                 Close
               </button>
@@ -486,5 +675,5 @@ export function EnhancedHBIInsights({ config, cardId }: EnhancedHBIInsightsProps
         </div>
       )}
     </div>
-  );
-} 
+  )
+}

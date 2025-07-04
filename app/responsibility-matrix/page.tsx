@@ -5,7 +5,7 @@ import { useAuth } from "@/context/auth-context"
 import { AppHeader } from "@/components/layout/app-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -243,66 +243,6 @@ export default function ResponsibilityMatrixPage() {
     return () => document.removeEventListener("keydown", handleEscape)
   }, [isFullScreen])
 
-  const ResponsibilityMatrixCard = () => (
-    <Card className={isFullScreen ? "fixed inset-0 z-[130] rounded-none" : ""}>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          Responsibility Matrix
-        </CardTitle>
-        <Button variant="outline" size="sm" onClick={toggleFullScreen} className="flex items-center gap-2">
-          {isFullScreen ? (
-            <>
-              <Minimize className="h-4 w-4" />
-              Exit Full Screen
-            </>
-          ) : (
-            <>
-              <Maximize className="h-4 w-4" />
-              Full Screen
-            </>
-          )}
-        </Button>
-      </CardHeader>
-      <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3" data-tour="responsibility-matrix-tabs">
-            <TabsTrigger value="team" className="flex items-center gap-2" data-tour="team-matrix-tab">
-              <Users className="h-4 w-4" />
-              Team Matrix
-            </TabsTrigger>
-            <TabsTrigger value="prime-contract" className="flex items-center gap-2" data-tour="prime-contract-tab">
-              <FileText className="h-4 w-4" />
-              Prime Contract
-            </TabsTrigger>
-            <TabsTrigger value="subcontract" className="flex items-center gap-2" data-tour="subcontract-tab">
-              <Award className="h-4 w-4" />
-              Subcontract
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="team" className="mt-6">
-            <div data-tour="team-responsibility-matrix">
-              <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="prime-contract" className="mt-6">
-            <div data-tour="prime-contract-matrix">
-              <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="subcontract" className="mt-6">
-            <div data-tour="subcontract-matrix">
-              <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  )
-
   return (
     <>
       <AppHeader />
@@ -325,147 +265,330 @@ export default function ResponsibilityMatrixPage() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Header Section */}
-            <div className="flex flex-col gap-4" data-tour="responsibility-matrix-page-header">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold text-foreground">Responsibility Matrix</h1>
-                  <p className="text-muted-foreground mt-1">
-                    Manage task assignments and accountability across project teams
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-                    Refresh
-                  </Button>
-                  <Button variant="outline" onClick={handleExport}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                  <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Task
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Add New Task</DialogTitle>
-                      </DialogHeader>
-                      <div className="p-4">
-                        <p className="text-muted-foreground">Task creation form would go here.</p>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-
-              {/* Statistics Widgets */}
-              <div data-tour="responsibility-matrix-quick-stats">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <Card className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 border-blue-200/60 dark:border-blue-800/60">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                        Total Tasks
-                      </CardTitle>
-                      <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{metrics.totalTasks}</div>
-                      <p className="text-xs text-blue-600 dark:text-blue-400">Across all categories</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-green-50/80 to-emerald-50/80 dark:from-green-950/40 dark:to-emerald-950/40 border-green-200/60 dark:border-green-800/60">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">
-                        Completed
-                      </CardTitle>
-                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-green-900 dark:text-green-100">
-                        {metrics.completedTasks}
-                      </div>
-                      <p className="text-xs text-green-600 dark:text-green-400">
-                        {metrics.completionRate.toFixed(1)}% completion rate
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-950/40 dark:to-amber-950/40 border-orange-200/60 dark:border-orange-800/60">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">
-                        Pending
-                      </CardTitle>
-                      <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                        {metrics.pendingTasks}
-                      </div>
-                      <p className="text-xs text-orange-600 dark:text-orange-400">Awaiting assignment</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-purple-50/80 to-violet-50/80 dark:from-purple-950/40 dark:to-violet-950/40 border-purple-200/60 dark:border-purple-800/60">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                        Avg. Load
-                      </CardTitle>
-                      <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                        {metrics.averageTasksPerRole.toFixed(1)}
-                      </div>
-                      <p className="text-xs text-purple-600 dark:text-purple-400">Tasks per role</p>
-                    </CardContent>
-                  </Card>
+            {/* Header Section - Made Sticky */}
+            <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
+              <div className="flex flex-col gap-4 pt-3" data-tour="responsibility-matrix-page-header">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold text-foreground">Responsibility Matrix</h1>
+                    <p className="text-muted-foreground mt-1">
+                      Manage task assignments and accountability across project teams
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </Button>
+                    <Button variant="outline" onClick={handleExport}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export
+                    </Button>
+                    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Task
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Add New Task</DialogTitle>
+                        </DialogHeader>
+                        <div className="p-4">
+                          <p className="text-muted-foreground">Task creation form would go here.</p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Role Analytics */}
-            <div data-tour="role-analytics">
-              <Card className="bg-gradient-to-br from-gray-50/80 to-slate-50/80 dark:from-gray-950/40 dark:to-slate-950/40">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                    Role Workload Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Main Content with Sidebar Layout */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+              {/* Sidebar - Hidden on mobile, shown on xl+ */}
+              <div className="hidden xl:block xl:col-span-3 space-y-4">
+                {/* Quick Statistics */}
+                <Card data-tour="responsibility-matrix-quick-stats">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      Quick Stats
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total Tasks</span>
+                      <span className="font-medium">{metrics.totalTasks}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Completed</span>
+                      <span className="font-medium text-green-600">{metrics.completedTasks}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Pending</span>
+                      <span className="font-medium text-orange-600">{metrics.pendingTasks}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Completion Rate</span>
+                      <span className="font-medium text-blue-600">{metrics.completionRate.toFixed(1)}%</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button className="w-full justify-start" variant="outline" onClick={() => setActiveTab("team")}>
+                      <Users className="h-4 w-4 mr-2" />
+                      Team Matrix
+                    </Button>
+                    <Button
+                      className="w-full justify-start"
+                      variant="outline"
+                      onClick={() => setActiveTab("prime-contract")}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Prime Contract
+                    </Button>
+                    <Button
+                      className="w-full justify-start"
+                      variant="outline"
+                      onClick={() => setActiveTab("subcontract")}
+                    >
+                      <Award className="h-4 w-4 mr-2" />
+                      Subcontract
+                    </Button>
+                    <Button className="w-full justify-start" variant="outline" onClick={handleExport}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Data
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Role Analytics */}
+                <Card data-tour="role-analytics">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      Role Workload
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
                     {Object.entries(metrics.roleWorkload)
                       .sort(([, a], [, b]) => b - a)
                       .slice(0, 6)
                       .map(([role, count]) => (
-                        <div
-                          key={role}
-                          className="flex items-center justify-between p-3 bg-white/60 dark:bg-black/60 rounded-lg border border-gray-200/60 dark:border-gray-800/60"
-                        >
+                        <div key={role} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
                             <div
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: roleColors[role] || "#6B7280" }}
                             />
-                            <span className="text-sm font-medium">{role}</span>
+                            <span className="text-muted-foreground">{role}</span>
                           </div>
-                          <Badge variant="secondary">{count}</Badge>
+                          <span className="font-medium">{count}</span>
                         </div>
                       ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                {/* Project Scope */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                      Project Scope
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Scope</span>
+                      <span className="font-medium">{projectScope.description}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Projects</span>
+                      <span className="font-medium text-blue-600">{projectScope.projectCount}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg. Load</span>
+                      <span className="font-medium text-purple-600">{metrics.averageTasksPerRole.toFixed(1)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content */}
+              <div className="xl:col-span-9">
+                {/* Responsibility Matrix with Custom Tabs */}
+                <Card className={isFullScreen ? "fixed inset-0 z-[130] rounded-none" : ""}>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      Responsibility Matrix
+                    </CardTitle>
+                    <Button variant="outline" size="sm" onClick={toggleFullScreen} className="flex items-center gap-2">
+                      {isFullScreen ? (
+                        <>
+                          <Minimize className="h-4 w-4" />
+                          Exit Full Screen
+                        </>
+                      ) : (
+                        <>
+                          <Maximize className="h-4 w-4" />
+                          Full Screen
+                        </>
+                      )}
+                    </Button>
+                  </CardHeader>
+                  <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
+                    {/* Custom Tab Navigation */}
+                    <div className="flex items-center gap-1 mb-6" data-tour="responsibility-matrix-tabs">
+                      <button
+                        onClick={() => setActiveTab("team")}
+                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                          activeTab === "team"
+                            ? "text-primary border-primary bg-primary/5"
+                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                        }`}
+                        data-tour="team-matrix-tab"
+                      >
+                        <Users className="h-4 w-4" />
+                        Team Matrix
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("prime-contract")}
+                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                          activeTab === "prime-contract"
+                            ? "text-primary border-primary bg-primary/5"
+                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                        }`}
+                        data-tour="prime-contract-tab"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Prime Contract
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("subcontract")}
+                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                          activeTab === "subcontract"
+                            ? "text-primary border-primary bg-primary/5"
+                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                        }`}
+                        data-tour="subcontract-tab"
+                      >
+                        <Award className="h-4 w-4" />
+                        Subcontract
+                      </button>
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="space-y-6">
+                      {activeTab === "team" && (
+                        <div data-tour="team-responsibility-matrix">
+                          <ResponsibilityMatrixIntegration
+                            userRole={user?.role as any}
+                            className="border-0 shadow-none p-0"
+                          />
+                        </div>
+                      )}
+
+                      {activeTab === "prime-contract" && (
+                        <div data-tour="prime-contract-matrix">
+                          <ResponsibilityMatrixIntegration
+                            userRole={user?.role as any}
+                            className="border-0 shadow-none p-0"
+                          />
+                        </div>
+                      )}
+
+                      {activeTab === "subcontract" && (
+                        <div data-tour="subcontract-matrix">
+                          <ResponsibilityMatrixIntegration
+                            userRole={user?.role as any}
+                            className="border-0 shadow-none p-0"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </>
         )}
 
-        {/* Responsibility Matrix with Tabs */}
-        <ResponsibilityMatrixCard />
+        {/* Fullscreen Mode - Show only the matrix */}
+        {isFullScreen && (
+          <Card className="fixed inset-0 z-[130] rounded-none">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                Responsibility Matrix
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={toggleFullScreen} className="flex items-center gap-2">
+                <Minimize className="h-4 w-4" />
+                Exit Full Screen
+              </Button>
+            </CardHeader>
+            <CardContent className="h-[calc(100vh-80px)] overflow-y-auto">
+              <div className="flex items-center gap-1 mb-6">
+                <button
+                  onClick={() => setActiveTab("team")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                    activeTab === "team"
+                      ? "text-primary border-primary bg-primary/5"
+                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  Team Matrix
+                </button>
+                <button
+                  onClick={() => setActiveTab("prime-contract")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                    activeTab === "prime-contract"
+                      ? "text-primary border-primary bg-primary/5"
+                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  Prime Contract
+                </button>
+                <button
+                  onClick={() => setActiveTab("subcontract")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                    activeTab === "subcontract"
+                      ? "text-primary border-primary bg-primary/5"
+                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <Award className="h-4 w-4" />
+                  Subcontract
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {activeTab === "team" && (
+                  <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
+                )}
+                {activeTab === "prime-contract" && (
+                  <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
+                )}
+                {activeTab === "subcontract" && (
+                  <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </>
   )

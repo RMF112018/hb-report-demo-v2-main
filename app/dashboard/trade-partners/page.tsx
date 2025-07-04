@@ -285,10 +285,13 @@ export default function TradePartnersPage() {
           return 0
       }
 
-      if (typeof aValue === "string") {
+      if (typeof aValue === "string" && typeof bValue === "string") {
         return sortOrder === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
       }
-      return sortOrder === "asc" ? aValue - bValue : bValue - aValue
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortOrder === "asc" ? aValue - bValue : bValue - aValue
+      }
+      return 0
     })
 
     return filtered
@@ -389,7 +392,7 @@ export default function TradePartnersPage() {
         <div className="pt-16">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003087] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading trade partners database...</p>
             </div>
           </div>
@@ -434,7 +437,10 @@ export default function TradePartnersPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button onClick={() => setShowAddPartnerModal(true)} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+              <Button
+                onClick={() => setShowAddPartnerModal(true)}
+                className="bg-hb-orange hover:bg-hb-orange/90 text-white"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Partner
               </Button>
@@ -443,20 +449,20 @@ export default function TradePartnersPage() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="border-l-4 border-l-[#003087]">
+            <Card className="border-l-4 border-l-blue-600 dark:border-l-blue-400">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Partners</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#003087] dark:text-white">{mockTradePartners.length}</div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{mockTradePartners.length}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  <TrendingUp className="h-3 w-3 inline mr-1" />
+                  <TrendingUp className="h-3 w-3 inline mr-1 text-green-600 dark:text-green-400" />
                   +12% this quarter
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-green-500">
+            <Card className="border-l-4 border-l-green-600 dark:border-l-green-400">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Active Partners</CardTitle>
               </CardHeader>
@@ -465,31 +471,31 @@ export default function TradePartnersPage() {
                   {mockTradePartners.filter((p) => p.status === "Active").length}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  <CheckCircle className="h-3 w-3 inline mr-1" />
+                  <CheckCircle className="h-3 w-3 inline mr-1 text-green-600 dark:text-green-400" />
                   Ready for projects
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-[#FF6B35]">
+            <Card className="border-l-4 border-l-orange-600 dark:border-l-orange-400">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Avg Rating</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#FF6B35]">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {(
                     mockTradePartners.reduce((sum, p) => sum + p.performance.overallRating, 0) /
                     mockTradePartners.length
                   ).toFixed(1)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  <Star className="h-3 w-3 inline mr-1" />
+                  <Star className="h-3 w-3 inline mr-1 text-yellow-600 dark:text-yellow-400" />
                   Out of 5.0 stars
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-purple-500">
+            <Card className="border-l-4 border-l-purple-600 dark:border-l-purple-400">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Premier Partners</CardTitle>
               </CardHeader>
@@ -498,7 +504,7 @@ export default function TradePartnersPage() {
                   {mockTradePartners.filter((p) => p.tier === "Premier").length}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  <Award className="h-3 w-3 inline mr-1" />
+                  <Award className="h-3 w-3 inline mr-1 text-purple-600 dark:text-purple-400" />
                   Top performers
                 </p>
               </CardContent>
@@ -666,7 +672,7 @@ export default function TradePartnersPage() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-[#003087] text-white text-xs">
+                                <AvatarFallback className="bg-blue-600 dark:bg-blue-500 text-white text-xs">
                                   {partner.companyName
                                     .split(" ")
                                     .map((n) => n[0])
@@ -751,7 +757,7 @@ export default function TradePartnersPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Performance Distribution</CardTitle>
+                      <CardTitle className="text-foreground">Performance Distribution</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
@@ -778,7 +784,7 @@ export default function TradePartnersPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Tier Distribution</CardTitle>
+                      <CardTitle className="text-foreground">Tier Distribution</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
@@ -806,7 +812,7 @@ export default function TradePartnersPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Performance Report</CardTitle>
+                      <CardTitle className="text-foreground">Performance Report</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4">
@@ -821,7 +827,7 @@ export default function TradePartnersPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Compliance Report</CardTitle>
+                      <CardTitle className="text-foreground">Compliance Report</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4">
@@ -836,7 +842,7 @@ export default function TradePartnersPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Vendor Directory</CardTitle>
+                      <CardTitle className="text-foreground">Vendor Directory</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4">
@@ -860,7 +866,7 @@ export default function TradePartnersPage() {
             <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
               <div style={{ zIndex: 9999 }}>
                 <DialogHeader>
-                  <DialogTitle className="text-[#003087] dark:text-white">
+                  <DialogTitle className="text-foreground">
                     {selectedPartner.companyName} - Performance Scorecard
                   </DialogTitle>
                 </DialogHeader>
@@ -876,7 +882,7 @@ export default function TradePartnersPage() {
             <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto" style={{ zIndex: 9999 }}>
               <div style={{ zIndex: 9999 }}>
                 <DialogHeader>
-                  <DialogTitle className="text-[#003087] dark:text-white">
+                  <DialogTitle className="text-foreground">
                     {selectedPartner.companyName} - Reviews & Ratings
                   </DialogTitle>
                 </DialogHeader>
@@ -891,7 +897,7 @@ export default function TradePartnersPage() {
           <Dialog open={showAddPartnerModal} onOpenChange={setShowAddPartnerModal}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle className="text-[#003087] dark:text-white">Add New Trade Partner</DialogTitle>
+                <DialogTitle className="text-foreground">Add New Trade Partner</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -928,7 +934,7 @@ export default function TradePartnersPage() {
                   <Button variant="outline" onClick={() => setShowAddPartnerModal(false)}>
                     Cancel
                   </Button>
-                  <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">Add Partner</Button>
+                  <Button className="bg-hb-orange hover:bg-hb-orange/90 text-white">Add Partner</Button>
                 </div>
               </div>
             </DialogContent>

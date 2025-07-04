@@ -96,13 +96,15 @@ import {
 } from "@/components/cards/ITPlaceholderCards"
 
 /**
- * DashboardGrid
- * -------------
- * Renders dashboard cards in a modern, responsive grid layout with full editing capabilities.
- * - Responsive width using a container ref.
- * - Increased row height and card padding for a premium feel.
- * - Modern card styles: glassmorphism, soft shadow, prominent header, minHeight.
- * - Full editing features: move, resize, add, remove, configure cards.
+ * Professional Dashboard Grid System
+ *
+ * Features:
+ * - Clean CSS Grid layout with responsive breakpoints
+ * - Professional styling matching application design
+ * - Full drag-and-drop functionality
+ * - Proper card sizing and positioning
+ * - Smooth animations and transitions
+ * - Industry-standard grid behavior
  */
 
 interface DashboardGridProps {
@@ -121,208 +123,80 @@ interface DashboardGridProps {
   userRole?: string
 }
 
-// Define content-aware heights for different card types
-const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto" => {
-  const baseHeight = isCompact ? 300 : 350
+// Responsive grid configuration
+const GRID_CONFIG = {
+  // Column counts for different screen sizes
+  columns: {
+    sm: 2, // Mobile
+    md: 4, // Tablet
+    lg: 12, // Desktop
+    xl: 16, // Large desktop
+    "2xl": 20, // Extra large desktop
+  },
+  // Base row height (in pixels)
+  rowHeight: {
+    compact: 60,
+    normal: 80,
+  },
+  // Grid gaps
+  gap: {
+    compact: 16,
+    normal: 24,
+  },
+}
 
-  // Use card's span rows to determine height if available
-  if (card.span && card.span.rows) {
-    const rows = card.span.rows
-    // Map rows to actual heights (each row is roughly 80px in compact, 100px in normal)
-    const rowHeight = isCompact ? 80 : 100
-    const calculatedHeight = rows * rowHeight
+// Get responsive grid classes
+const getGridClasses = (isCompact: boolean, spacingClass: string) => {
+  const gap = isCompact ? GRID_CONFIG.gap.compact : GRID_CONFIG.gap.normal
 
-    // For tall cards, use auto height to fit content better
-    if (rows >= 8) {
-      return "auto"
-    }
+  return cn(
+    "grid w-full",
+    "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 xl:grid-cols-16 2xl:grid-cols-20",
+    "auto-rows-min",
+    spacingClass || `gap-${gap / 4}`, // Convert px to Tailwind spacing
+    "transition-all duration-300 ease-in-out"
+  )
+}
 
-    return calculatedHeight
-  }
+// Calculate card grid area
+const getCardGridArea = (card: DashboardCard) => {
+  if (!card.span || !card.position) return {}
 
-  // Use card's size to determine height if available
-  if (card.size) {
-    switch (card.size) {
-      case "small":
-        return isCompact ? 200 : 250
-      case "medium":
-        return isCompact ? 300 : 350
-      case "large":
-        return isCompact ? 400 : 460
-      case "wide":
-        return isCompact ? 300 : 350 // Wide cards don't need extra height
-      case "tall":
-        return "auto" // Tall cards should auto-size for content
-      case "extra-large":
-        return "auto" // Extra large cards should auto-size for content
-      default:
-        return baseHeight
-    }
-  }
+  const { cols, rows } = card.span
+  const { x, y } = card.position
 
-  // Fallback to type-based height for existing cards
-  switch (card.type) {
-    case "portfolio-overview":
-      return isCompact ? 420 : 480 // Increased height to show all content
-    case "enhanced-hbi-insights":
-      return "auto" // Auto height to fit content
-    case "financial-review-panel":
-      return isCompact ? 400 : 460 // Increased height for metrics + charts
-    case "pipeline-analytics":
-      return "auto" // Auto height to fit content
-    case "market-intelligence":
-      return "auto" // Auto height to fit content
-    case "project-overview":
-      return "auto" // Auto height to fit all content
-    case "schedule-performance":
-      return "auto" // Auto height to fit all content
-    case "financial-status":
-      return "auto" // Auto height to fit all content
-    case "general-conditions":
-      return "auto" // Auto height to fit all content
-    case "contingency-analysis":
-      return "auto" // Auto height to fit all content
-    case "cash-flow":
-      return "auto" // Auto height to fit all content
-    case "procurement":
-      return "auto" // Auto height to fit all content
-    case "draw-forecast":
-      return "auto" // Auto height to fit all content
-    case "quality-control":
-      return "auto" // Auto height to fit all content
-    case "safety":
-      return "auto" // Auto height to fit all content
-    case "staffing-distribution":
-      return "auto" // Auto height to fit all content
-    case "change-order-analysis":
-      return "auto" // Auto height to fit all content
-    case "closeout":
-      return "auto" // Auto height to fit all content
-    case "startup":
-      return "auto" // Auto height to fit all content
-    case "critical-dates":
-      return "auto" // Auto height to fit all content
-    case "field-reports":
-      return "auto" // Auto height to fit all content
-    case "rfi":
-      return "auto" // Auto height to fit all content
-    case "submittal":
-      return "auto" // Auto height to fit all content
-    case "health":
-      return "auto" // Auto height to fit all content
-    case "schedule-monitor":
-      return "auto" // Auto height to fit all content
-    case "bd-opportunities":
-      return "auto" // Auto height to fit all content
-
-    default:
-      return baseHeight
+  // CSS Grid area: grid-column-start / grid-row-start / grid-column-end / grid-row-end
+  return {
+    gridColumnStart: x + 1,
+    gridColumnEnd: x + cols + 1,
+    gridRowStart: y + 1,
+    gridRowEnd: y + rows + 1,
   }
 }
 
-// Define card widths - uses the card's actual size/span properties
-const getCardGridSpan = (card: DashboardCard): string => {
-  // First check if the card has a span property
-  if (card.span) {
-    const cols = card.span.cols
-    const rows = card.span.rows
-
-    // Map cols to responsive grid spans with proportional scaling
-    // Mobile(2) -> SM(6) -> LG(12) -> XL(16) -> 2XL(20)
-    const mobileSpan = Math.min(2, Math.max(1, Math.round((cols * 2) / 20))) // Scale to 2 columns
-    const smSpan = Math.min(6, Math.max(1, Math.round((cols * 6) / 20))) // Scale to 6 columns
-    const lgSpan = Math.min(12, Math.max(1, Math.round((cols * 12) / 20))) // Scale to 12 columns
-    const xlSpan = Math.min(16, Math.max(1, Math.round((cols * 16) / 20))) // Scale to 16 columns
-    const xl2Span = Math.min(20, Math.max(1, cols)) // Full scale to 20 columns
-
-    // Helper function to get safe Tailwind class for column spans
-    const getColSpanClass = (span: number, prefix: string = "") => {
-      const basePrefix = prefix ? `${prefix}:` : ""
-      // Use predefined classes that are safe in Tailwind
-      if (span >= 20) return `${basePrefix}col-span-full`
-      if (span >= 12) return `${basePrefix}col-span-12`
-      if (span >= 11) return `${basePrefix}col-span-11`
-      if (span >= 10) return `${basePrefix}col-span-10`
-      if (span >= 9) return `${basePrefix}col-span-9`
-      if (span >= 8) return `${basePrefix}col-span-8`
-      if (span >= 7) return `${basePrefix}col-span-7`
-      if (span >= 6) return `${basePrefix}col-span-6`
-      if (span >= 5) return `${basePrefix}col-span-5`
-      if (span >= 4) return `${basePrefix}col-span-4`
-      if (span >= 3) return `${basePrefix}col-span-3`
-      if (span >= 2) return `${basePrefix}col-span-2`
-      return `${basePrefix}col-span-1`
-    }
-
-    // Helper function to get safe Tailwind class for row spans
-    const getRowSpanClass = (span: number, prefix: string = "") => {
-      const basePrefix = prefix ? `${prefix}:` : ""
-      if (span >= 12) return `${basePrefix}row-span-12`
-      if (span >= 11) return `${basePrefix}row-span-11`
-      if (span >= 10) return `${basePrefix}row-span-10`
-      if (span >= 9) return `${basePrefix}row-span-9`
-      if (span >= 8) return `${basePrefix}row-span-8`
-      if (span >= 7) return `${basePrefix}row-span-7`
-      if (span >= 6) return `${basePrefix}row-span-6`
-      if (span >= 5) return `${basePrefix}row-span-5`
-      if (span >= 4) return `${basePrefix}row-span-4`
-      if (span >= 3) return `${basePrefix}row-span-3`
-      if (span >= 2) return `${basePrefix}row-span-2`
-      return `${basePrefix}row-span-1`
-    }
-
-    const colSpanClasses = `${getColSpanClass(mobileSpan)} ${getColSpanClass(smSpan, "sm")} ${getColSpanClass(
-      lgSpan,
-      "lg"
-    )} ${getColSpanClass(xlSpan, "xl")} ${getColSpanClass(xl2Span, "2xl")}`
-
-    const rowSpanClasses = `${getRowSpanClass(rows)} ${getRowSpanClass(rows, "sm")} ${getRowSpanClass(
-      rows,
-      "lg"
-    )} ${getRowSpanClass(rows, "xl")} ${getRowSpanClass(rows, "2xl")}`
-
-    return `${colSpanClasses} ${rowSpanClasses}`
+// Get card height based on content and span
+const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto" => {
+  if (card.span && card.span.rows) {
+    const rowHeight = isCompact ? GRID_CONFIG.rowHeight.compact : GRID_CONFIG.rowHeight.normal
+    return card.span.rows * rowHeight
   }
 
-  // Fallback to size property if no span
-  if (card.size) {
-    switch (card.size) {
-      case "small":
-        return "col-span-1 sm:col-span-1 lg:col-span-1 xl:col-span-1 2xl:col-span-1 row-span-3"
-      case "medium":
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
-      case "large":
-        return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3 row-span-6"
-      case "wide":
-      case "extra-large":
-        return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-4"
-      case "extra-wide":
-        return "col-span-2 sm:col-span-6 lg:col-span-8 xl:col-span-10 2xl:col-span-12 row-span-3"
-      case "full-width":
-        return "col-span-2 sm:col-span-6 lg:col-span-12 xl:col-span-16 2xl:col-span-full row-span-6"
-      case "tall":
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-8"
-      default:
-        return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
-    }
-  }
-
-  // Final fallback to type-based sizing for existing cards without size/span
+  // Content-aware heights for different card types
   switch (card.type) {
-    case "enhanced-hbi-insights":
-    case "market-intelligence":
-    case "bd-opportunities":
-      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-6"
-    case "portfolio-overview":
     case "financial-review-panel":
-    case "schedule-monitor":
-    case "critical-dates":
-      return "col-span-2 sm:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3 row-span-4"
-    case "staffing-distribution":
+      return isCompact ? 400 : 500
+    case "enhanced-hbi-insights":
+      return isCompact ? 350 : 400
+    case "portfolio-overview":
+      return isCompact ? 300 : 350
     case "pipeline-analytics":
-      return "col-span-2 sm:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 row-span-8"
+      return isCompact ? 400 : 450
+    case "market-intelligence":
+      return isCompact ? 450 : 500
+    case "staffing-distribution":
+      return isCompact ? 400 : 450
     default:
-      return "col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-2 2xl:col-span-2 row-span-4"
+      return isCompact ? 300 : 350
   }
 }
 
@@ -339,60 +213,250 @@ export function DashboardGrid({
   userRole,
 }: DashboardGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [items, setItems] = useState(cards)
-  const [focusedCard, setFocusedCard] = useState<DashboardCard | null>(null)
+  const [draggedCard, setDraggedCard] = useState<DashboardCard | null>(null)
 
+  // Configure drag and drop sensors
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
 
-  React.useEffect(() => {
-    setItems(cards)
-  }, [cards])
+  // Calculate grid position from mouse coordinates
+  const getGridPosition = (x: number, y: number, containerRect: DOMRect, isCompact: boolean) => {
+    const gridColumns = 12 // Default grid columns for desktop
+    const gridRows = 50 // Allow for tall layouts
 
-  const handleDragStart = useCallback((event: any) => {
-    setActiveId(event.active.id)
-  }, [])
+    const relativeX = x - containerRect.left
+    const relativeY = y - containerRect.top
 
-  const handleDragEnd = useCallback(
-    (event: any) => {
-      const { active, over } = event
-      setActiveId(null)
+    const cellWidth = containerRect.width / gridColumns
+    const cellHeight = isCompact ? GRID_CONFIG.rowHeight.compact : GRID_CONFIG.rowHeight.normal
 
-      if (active.id !== over?.id) {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
+    const gridX = Math.floor(relativeX / cellWidth)
+    const gridY = Math.floor(relativeY / cellHeight)
 
-        const newItems = arrayMove(items, oldIndex, newIndex)
-        setItems(newItems)
+    return {
+      x: Math.max(0, Math.min(gridX, gridColumns - 1)),
+      y: Math.max(0, Math.min(gridY, gridRows - 1)),
+    }
+  }
 
-        if (onLayoutChange) {
-          const layout = newItems.map((item, index) => ({
-            i: item.id,
-            x: 0,
-            y: index,
-            w: 12,
-            h: 6,
-          }))
-          onLayoutChange(layout)
+  // Initialize missing positions for cards
+  const initializeCardPositions = (cards: DashboardCard[]): DashboardCard[] => {
+    let maxY = 0
+    const occupiedPositions = new Set<string>()
+
+    // First pass: track existing positions
+    cards.forEach((card) => {
+      if (card.position && card.span) {
+        for (let x = card.position.x; x < card.position.x + card.span.cols; x++) {
+          for (let y = card.position.y; y < card.position.y + card.span.rows; y++) {
+            occupiedPositions.add(`${x},${y}`)
+            maxY = Math.max(maxY, y + 1)
+          }
         }
       }
+    })
+
+    // Second pass: assign positions to cards without them
+    return cards.map((card) => {
+      if (card.position) return card
+
+      const span = card.span || getOptimalSize(card.type)
+      let foundPosition = false
+      let newPosition = { x: 0, y: 0 }
+
+      // Try to find an available position
+      for (let y = 0; y <= maxY + 10 && !foundPosition; y++) {
+        for (let x = 0; x <= 12 - span.cols && !foundPosition; x++) {
+          let canPlace = true
+
+          // Check if this position is available
+          for (let dx = 0; dx < span.cols && canPlace; dx++) {
+            for (let dy = 0; dy < span.rows && canPlace; dy++) {
+              if (occupiedPositions.has(`${x + dx},${y + dy}`)) {
+                canPlace = false
+              }
+            }
+          }
+
+          if (canPlace) {
+            newPosition = { x, y }
+            foundPosition = true
+
+            // Mark this position as occupied
+            for (let dx = 0; dx < span.cols; dx++) {
+              for (let dy = 0; dy < span.rows; dy++) {
+                occupiedPositions.add(`${x + dx},${y + dy}`)
+              }
+            }
+          }
+        }
+      }
+
+      if (!foundPosition) {
+        // If no position found, place at the bottom
+        newPosition = { x: 0, y: maxY }
+      }
+
+      return { ...card, position: newPosition, span }
+    })
+  }
+
+  // Check if a position is available (no overlapping cards)
+  const isPositionAvailable = (
+    position: { x: number; y: number },
+    span: { cols: number; rows: number },
+    excludeCardId?: string
+  ) => {
+    const endX = position.x + span.cols
+    const endY = position.y + span.rows
+
+    // Check bounds
+    if (position.x < 0 || position.y < 0 || endX > 12) return false
+
+    return !cards.some((card) => {
+      if (card.id === excludeCardId) return false
+      if (!card.position || !card.span) return false
+
+      const cardEndX = card.position.x + card.span.cols
+      const cardEndY = card.position.y + card.span.rows
+
+      // Check for overlap
+      return !(endX <= card.position.x || position.x >= cardEndX || endY <= card.position.y || position.y >= cardEndY)
+    })
+  }
+
+  // Find the nearest available position
+  const findNearestAvailablePosition = (
+    targetPosition: { x: number; y: number },
+    span: { cols: number; rows: number },
+    excludeCardId?: string
+  ) => {
+    // Try the exact position first
+    if (isPositionAvailable(targetPosition, span, excludeCardId)) {
+      return targetPosition
+    }
+
+    // Search in expanding circles around the target position
+    for (let radius = 1; radius <= 10; radius++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+          if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
+            const testPosition = {
+              x: Math.max(0, Math.min(targetPosition.x + dx, 12 - span.cols)),
+              y: Math.max(0, targetPosition.y + dy),
+            }
+
+            if (isPositionAvailable(testPosition, span, excludeCardId)) {
+              return testPosition
+            }
+          }
+        }
+      }
+    }
+
+    // Fallback to original position if no space found
+    return targetPosition
+  }
+
+  // Initialize cards with positions on first render
+  const initializedCards = useMemo(() => initializeCardPositions(cards), [cards])
+
+  // Handle drag start
+  const handleDragStart = useCallback(
+    (event: any) => {
+      const { active } = event
+      setActiveId(active.id)
+
+      const card = initializedCards.find((c) => c.id === active.id)
+      setDraggedCard(card || null)
     },
-    [items, onLayoutChange]
+    [initializedCards]
   )
 
-  const activeCard = activeId ? items.find((item) => item.id === activeId) : null
+  // Handle drag end with proper grid positioning
+  const handleDragEnd = useCallback(
+    (event: any) => {
+      const { active, delta } = event
 
+      if (!draggedCard || !active) {
+        setActiveId(null)
+        setDraggedCard(null)
+        return
+      }
+
+      try {
+        // Get container bounds for position calculation
+        const gridContainer = document.querySelector("[data-grid-container]") as HTMLElement
+        if (!gridContainer) {
+          console.warn("Grid container not found")
+          setActiveId(null)
+          setDraggedCard(null)
+          return
+        }
+
+        const containerRect = gridContainer.getBoundingClientRect()
+
+        // Calculate new grid position based on drag delta
+        const currentPos = draggedCard.position || { x: 0, y: 0 }
+        const cellWidth = containerRect.width / 12
+        const cellHeight = isCompact ? GRID_CONFIG.rowHeight.compact : GRID_CONFIG.rowHeight.normal
+
+        const newGridPos = {
+          x: Math.round((currentPos.x * cellWidth + delta.x) / cellWidth),
+          y: Math.round((currentPos.y * cellHeight + delta.y) / cellHeight),
+        }
+
+        // Find the nearest available position
+        const cardSpan = draggedCard.span || getOptimalSize(draggedCard.type)
+        const finalPosition = findNearestAvailablePosition(newGridPos, cardSpan, draggedCard.id)
+
+        // Update the card with new position
+        const updatedCards = initializedCards.map((card) => {
+          if (card.id === draggedCard.id) {
+            return {
+              ...card,
+              position: finalPosition,
+            }
+          }
+          return card
+        })
+
+        // Notify parent of layout change
+        onLayoutChange?.(updatedCards)
+      } catch (error) {
+        console.error("Error handling drag end:", error)
+      }
+
+      setActiveId(null)
+      setDraggedCard(null)
+    },
+    [initializedCards, draggedCard, onLayoutChange, isCompact]
+  )
+
+  // Handle card focus for accessibility
   const handleCardFocus = useCallback((card: DashboardCard) => {
-    setFocusedCard(card)
+    // Implementation for card focus (e.g., keyboard navigation)
   }, [])
 
-  const handleCardUnfocus = useCallback(() => {
-    setFocusedCard(null)
-  }, [])
+  // Get sorted cards by position for consistent rendering
+  const sortedCards = useMemo(() => {
+    return [...initializedCards].sort((a, b) => {
+      const aPos = a.position || { x: 0, y: 0 }
+      const bPos = b.position || { x: 0, y: 0 }
+      if (aPos.y !== bPos.y) {
+        return aPos.y - bPos.y
+      }
+      return aPos.x - bPos.x
+    })
+  }, [initializedCards])
 
   return (
     <DndContext
@@ -401,31 +465,20 @@ export function DashboardGrid({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={items.map((item) => item.id)} strategy={rectSortingStrategy}>
-        {/* Enhanced Responsive Grid Layout with consistent spacing */}
-        <div
-          className={cn(
-            // Enhanced background with subtle pattern
-            "relative",
-            // Improved grid structure with consistent row sizing and dense flow
-            "grid grid-rows-[repeat(auto-fit,minmax(80px,1fr))]",
-            // Enhanced responsive breakpoints to support much larger cards
-            "grid-cols-2", // Mobile: 2 columns (allows for 1.5x = 3 spans)
-            "sm:grid-cols-6", // Small tablet: 6 columns
-            "lg:grid-cols-12", // Large tablet/small desktop: 12 columns
-            "xl:grid-cols-16", // Desktop: 16 columns
-            "2xl:grid-cols-20", // Large desktop: 20 columns
-            // Consistent spacing - same horizontal and vertical
-            spacingClass
-          )}
-          style={{
-            gridAutoFlow: "dense", // This enables automatic gap filling
-            gridAutoRows: "80px", // Consistent row height
-          }}
-        >
-          {items.map((card) => (
-            <div key={card.id} className={cn("w-full", getCardGridSpan(card))}>
+      <div
+        className={cn(
+          "w-full h-full",
+          "bg-gray-50/50 dark:bg-gray-900/50",
+          "rounded-xl",
+          "p-4 sm:p-6",
+          "transition-colors duration-300"
+        )}
+      >
+        <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
+          <div className={getGridClasses(isCompact, spacingClass)} data-grid-container>
+            {sortedCards.map((card) => (
               <SortableCard
+                key={card.id}
                 card={card}
                 isEditing={isEditing}
                 isCompact={isCompact}
@@ -437,124 +490,32 @@ export function DashboardGrid({
                 height={getCardHeight(card, isCompact)}
                 userRole={userRole}
               />
-            </div>
-          ))}
-        </div>
-      </SortableContext>
+            ))}
+          </div>
+        </SortableContext>
+      </div>
+
+      {/* Drag overlay for smooth dragging experience */}
       <DragOverlay>
-        {activeCard ? (
-          <div className="bg-card/95 backdrop-blur-sm rounded-xl shadow-2xl opacity-90 transform rotate-2 scale-105 border-2 border-primary/20 w-80">
-            <div className="p-4 sm:p-5">
-              <h3 className="font-semibold text-lg text-foreground">{activeCard.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1">Moving card...</p>
-            </div>
+        {activeId && draggedCard ? (
+          <div
+            className={cn(
+              "rounded-xl shadow-2xl",
+              "bg-white dark:bg-gray-800",
+              "border border-gray-200 dark:border-gray-700",
+              "transform rotate-3 scale-105",
+              "transition-transform duration-200"
+            )}
+          >
+            <CardContent card={draggedCard} isCompact={isCompact} userRole={userRole} />
           </div>
         ) : null}
       </DragOverlay>
-
-      {/* Focused Card Modal */}
-      <Dialog open={!!focusedCard} onOpenChange={() => handleCardUnfocus()}>
-        <DialogContent className="max-w-[60vw] max-h-[90vh] w-fit h-fit p-0 overflow-hidden border-2 border-border/50 shadow-2xl backdrop-blur-sm">
-          {focusedCard && (
-            <>
-              <DialogHeader className="px-6 py-4 border-b border-border/50 bg-card/95 backdrop-blur-sm">
-                <DialogTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Enhanced card icons with standardized color */}
-                    {focusedCard.type === "portfolio-overview" && (
-                      <Briefcase className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "enhanced-hbi-insights" && (
-                      <Brain className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "financial-review-panel" && (
-                      <BarChart3 className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "pipeline-analytics" && (
-                      <Target className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "market-intelligence" && (
-                      <TrendingUp className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "project-overview" && (
-                      <Building2 className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "schedule-performance" && (
-                      <Calendar className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "financial-status" && (
-                      <DollarSign className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "general-conditions" && (
-                      <Wrench className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "contingency-analysis" && (
-                      <Shield className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "cash-flow" && <Droplets className="h-5 w-5" style={{ color: "#FA4616" }} />}
-                    {focusedCard.type === "procurement" && <Package className="h-5 w-5" style={{ color: "#FA4616" }} />}
-                    {focusedCard.type === "draw-forecast" && (
-                      <BarChart3 className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "quality-control" && <Eye className="h-5 w-5" style={{ color: "#FA4616" }} />}
-                    {focusedCard.type === "safety" && (
-                      <AlertTriangleIcon className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "staffing-distribution" && (
-                      <Users className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "change-order-analysis" && (
-                      <FileText className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "closeout" && (
-                      <ClipboardCheck className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "startup" && <Play className="h-5 w-5" style={{ color: "#FA4616" }} />}
-                    {focusedCard.type === "critical-dates" && (
-                      <CalendarDays className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "field-reports" && (
-                      <FileText className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "rfi" && <MessageSquare className="h-5 w-5" style={{ color: "#FA4616" }} />}
-                    {focusedCard.type === "submittal" && <FileText className="h-5 w-5" style={{ color: "#FA4616" }} />}
-
-                    {focusedCard.type === "schedule-monitor" && (
-                      <Calendar className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type === "bd-opportunities" && (
-                      <Building2 className="h-5 w-5" style={{ color: "#FA4616" }} />
-                    )}
-                    {focusedCard.type !== "health" && (
-                      <span className="text-lg font-semibold text-foreground">{focusedCard.title}</span>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCardUnfocus}
-                    className="h-8 w-8 p-0 hover:bg-muted/80 dark:hover:bg-muted/60"
-                    title="Close focus view"
-                  >
-                    <Minimize2 className="h-4 w-4" />
-                  </Button>
-                </DialogTitle>
-              </DialogHeader>
-
-              {/* Enhanced modal content with better background */}
-              <div className="p-6 max-h-[80vh] overflow-y-auto bg-background/50 backdrop-blur-sm">
-                <div className="min-w-[600px] min-h-[400px]">
-                  <CardContent card={focusedCard} isCompact={false} userRole={userRole} />
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </DndContext>
   )
 }
 
+// Sortable card component with professional styling
 interface SortableCardProps {
   card: DashboardCard
   isEditing: boolean
@@ -585,400 +546,176 @@ function SortableCard({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    height: typeof height === "number" ? `${height}px` : height,
+    ...getCardGridArea(card),
+    minHeight: typeof height === "number" ? `${height}px` : height,
   }
 
   return (
     <div
       ref={setNodeRef}
       style={style}
+      className={cn(
+        "relative",
+        "transition-all duration-300 ease-in-out",
+        isDragging && "z-50 scale-105 shadow-2xl",
+        !card.visible && "opacity-50"
+      )}
       {...attributes}
       {...(isEditing ? listeners : {})}
-      className={cn(
-        "cursor-grab active:cursor-grabbing",
-        isDragging && "opacity-60 scale-105 shadow-2xl z-50",
-        typeof height === "number" && `h-[${height}px]`,
-        height === "auto" && "min-h-[320px]"
-      )}
-      onClick={(e) => {
-        // Only trigger focus if not in editing mode and not clicking on interactive elements
-        if (!isEditing && !e.defaultPrevented) {
-          const target = e.target as HTMLElement
-          // Check if clicking on control buttons or input elements
-          if (target.closest("button") || target.closest("input") || target.closest('[role="button"]')) {
-            return
-          }
-          onCardFocus?.(card)
-        }
-      }}
     >
-      {/* Use enhanced DashboardCardWrapper */}
       <DashboardCardWrapper
         card={card}
         onRemove={onCardRemove}
         onConfigure={onCardConfigure}
         onSizeChange={onCardSizeChange}
         onDrillDown={onDrillDown}
+        dragHandleClass="cursor-grab active:cursor-grabbing"
         isEditing={isEditing}
         isCompact={isCompact}
-        dragHandleClass="h-full"
       >
-        <div className="h-full">
-          {/* Enhanced card content area - header removed since DashboardCardWrapper handles it */}
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            <div className="p-2 sm:p-3 lg:p-4 h-full">
-              <CardContent card={card} isCompact={isCompact} userRole={userRole} />
-            </div>
-          </div>
-        </div>
+        <CardContent card={card} isCompact={isCompact} userRole={userRole} />
       </DashboardCardWrapper>
     </div>
   )
 }
 
-// Helper function to calculate span based on card size
-// Helper function to get optimal size for displaying 100% of card content
-const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
-  const optimalSizes: Record<string, { cols: number; rows: number }> = {
-    // Analytics cards need space for charts, metrics, and drill-down content
-    "enhanced-hbi-insights": { cols: 8, rows: 6 }, // Wide for multiple charts
-    "financial-review-panel": { cols: 8, rows: 3 }, // Wide for side-by-side metrics and charts
-    "pipeline-analytics": { cols: 8, rows: 6 }, // Wide for pipeline stages
-    "market-intelligence": { cols: 6, rows: 8 }, // Tall for detailed insights
-
-    // Portfolio/Project cards need space for metrics + charts + footer
-    "portfolio-overview": { cols: 8, rows: 6 }, // Wide to show all metrics + side-by-side charts
-    "project-overview": { cols: 6, rows: 6 }, // Balanced for project details
-
-    // KPI cards can be more compact but still readable
-    "financial-status": { cols: 4, rows: 4 }, // Standard for key metrics
-    "schedule-performance": { cols: 6, rows: 4 }, // Wide for timeline data
-
-    // Status cards need moderate space for details
-    "quality-control": { cols: 4, rows: 6 }, // Tall for inspection lists
-    safety: { cols: 4, rows: 6 }, // Tall for safety metrics
-
-    // List/table cards benefit from wide layouts
-    "staffing-distribution": { cols: 10, rows: 6 }, // Extra wide for staff tables
-    "change-order-analysis": { cols: 8, rows: 8 }, // Large for detailed analysis
-    "field-reports": { cols: 6, rows: 8 }, // Tall for report lists
-
-    // Detail cards need vertical space
-    closeout: { cols: 6, rows: 8 }, // Tall for closeout checklists
-    startup: { cols: 6, rows: 6 }, // Balanced for startup activities
-    "critical-dates": { cols: 8, rows: 6 }, // Wide for timeline view
-
-    // Chart-heavy cards need generous space
-    "cash-flow": { cols: 8, rows: 6 }, // Wide for cash flow charts
-    "contingency-analysis": { cols: 6, rows: 6 }, // Balanced for analysis
-    "draw-forecast": { cols: 10, rows: 6 }, // Extra wide for forecast timeline
-
-    // Simple metric cards
-    "general-conditions": { cols: 4, rows: 4 }, // Standard for basic metrics
-    procurement: { cols: 6, rows: 6 }, // Balanced for procurement data
-    "bd-opportunities": { cols: 8, rows: 6 }, // Wide for opportunity pipeline
-  }
-
-  return optimalSizes[cardType] || { cols: 6, rows: 6 } // Default to large balanced size
-}
-
-const calculateSpan = (card: DashboardCard): { cols: number; rows: number } => {
-  console.log("🧮 calculateSpan called for card:", card.id, "size:", card.size, "span:", card.span)
-
-  // If the card has a direct span property, use it
-  if (card.span) {
-    console.log("✅ Using existing span:", card.span)
-    return card.span
-  }
-
-  // Convert smart preset sizes to cols/rows
-  switch (card.size) {
-    case "optimal":
-      const optimalSize = getOptimalSize(card.type)
-      console.log("🎯 Optimal size for", card.type, ":", optimalSize)
-      return optimalSize
-    case "compact":
-      console.log("📏 Compact size -> 3x3")
-      return { cols: 3, rows: 3 }
-    case "standard":
-      console.log("📏 Standard size -> 4x4")
-      return { cols: 4, rows: 4 }
-    case "wide":
-      console.log("📏 Wide size -> 8x4")
-      return { cols: 8, rows: 4 }
-    case "tall":
-      console.log("📏 Tall size -> 4x8")
-      return { cols: 4, rows: 8 }
-    case "large":
-      console.log("📏 Large size -> 6x6")
-      return { cols: 6, rows: 6 }
-    default:
-      // Handle custom sizes like "custom-6x4"
-      if (typeof card.size === "string" && card.size.startsWith("custom-")) {
-        const sizeParts = card.size.replace("custom-", "").split("x")
-        console.log("🎯 Custom size detected in calculateSpan:", card.size, "parts:", sizeParts)
-        if (sizeParts.length === 2) {
-          const cols = parseInt(sizeParts[0])
-          const rows = parseInt(sizeParts[1])
-          if (!isNaN(cols) && !isNaN(rows)) {
-            console.log("✅ Custom size parsed in calculateSpan:", { cols, rows })
-            return { cols, rows }
-          }
-        }
-      }
-
-      // Fallback to optimal size instead of standard
-      console.log("⚠️ Using fallback optimal size for", card.type)
-      return getOptimalSize(card.type)
-  }
-}
-
+// Card content renderer
 function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCompact: boolean; userRole?: string }) {
-  const span = calculateSpan(card)
+  // Calculate span for components that need it
+  const span = card.span || getOptimalSize(card.type)
+
+  const commonProps = {
+    className: "h-full w-full",
+    isCompact,
+    userRole,
+    span,
+    card,
+    ...(card.config || {}),
+  }
+
+  // Default config for portfolio overview
+  const defaultPortfolioConfig = {
+    totalProjects: 20,
+    activeProjects: 17,
+    completedThisYear: 12,
+    averageDuration: 8.5,
+    averageContractValue: 3.2,
+    totalSqFt: 485000,
+    totalValue: 68.5,
+    netCashFlow: 12.3,
+    averageWorkingCapital: 8.7,
+  }
 
   switch (card.type) {
     case "portfolio-overview":
-      return <PortfolioOverview config={card.config || {}} span={span} isCompact={isCompact} />
+      return <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
     case "enhanced-hbi-insights":
-      return <EnhancedHBIInsights config={card.config || {}} cardId={card.id} />
+      return <EnhancedHBIInsights {...commonProps} />
     case "financial-review-panel":
-      return card.config?.panelProps ? (
-        <FinancialReviewPanel {...card.config.panelProps} card={card} span={span} />
-      ) : (
-        <div className="flex items-center justify-center h-full text-muted-foreground p-4">
-          <p>Configure Financial Review Panel</p>
-        </div>
-      )
+      return <FinancialReviewPanel {...commonProps} />
     case "pipeline-analytics":
-      return <PipelineAnalytics config={card.config || {}} span={span} isCompact={isCompact} />
+      return <PipelineAnalytics {...commonProps} />
     case "market-intelligence":
-      return <MarketIntelligence config={card.config || {}} span={span} isCompact={isCompact} />
+      return <MarketIntelligence {...commonProps} />
     case "project-overview":
-      return <ProjectOverviewCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <ProjectOverviewCard {...commonProps} />
     case "schedule-performance":
-      return (
-        <SchedulePerformanceCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <SchedulePerformanceCard {...commonProps} />
     case "financial-status":
-      return <FinancialStatusCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <FinancialStatusCard {...commonProps} />
     case "general-conditions":
-      return <GeneralConditionsCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <GeneralConditionsCard {...commonProps} />
     case "contingency-analysis":
-      return (
-        <ContingencyAnalysisCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <ContingencyAnalysisCard {...commonProps} />
     case "cash-flow":
-      return <CashFlowCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <CashFlowCard {...commonProps} />
     case "procurement":
-      return <ProcurementCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <ProcurementCard {...commonProps} />
     case "draw-forecast":
-      return <DrawForecastCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <DrawForecastCard {...commonProps} />
     case "quality-control":
-      return (
-        <QualityControlCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <QualityControlCard {...commonProps} />
     case "safety":
-      return <SafetyCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <SafetyCard {...commonProps} />
     case "staffing-distribution":
-      return (
-        <StaffingDistributionCard config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <StaffingDistributionCard {...commonProps} />
     case "change-order-analysis":
-      return (
-        <ChangeOrderAnalysisCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <ChangeOrderAnalysisCard {...commonProps} />
     case "closeout":
-      return (
-        <CloseoutCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <CloseoutCard {...commonProps} />
     case "startup":
-      return (
-        <StartupCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <StartupCard {...commonProps} />
     case "critical-dates":
-      return (
-        <CriticalDatesCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <CriticalDatesCard {...commonProps} />
     case "field-reports":
-      return (
-        <FieldReportsCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <FieldReportsCard {...commonProps} />
     case "rfi":
-      return <RFICard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <RFICard {...commonProps} />
     case "submittal":
-      return (
-        <SubmittalCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <SubmittalCard {...commonProps} />
     case "health":
-      return <HealthCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
+      return <HealthCard {...commonProps} />
     case "schedule-monitor":
-      return (
-        <ScheduleMonitorCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <ScheduleMonitorCard {...commonProps} />
     case "bd-opportunities":
-      return (
-        <BDOpportunitiesCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
-    // IT Command Center placeholder cards
+      return <BDOpportunitiesCard {...commonProps} />
+    // IT Command Center cards
     case "user-access-summary":
-      return (
-        <UserAccessSummaryCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <UserAccessSummaryCard {...commonProps} />
     case "system-logs":
-      return (
-        <SystemLogsCard card={card} config={card.config || {}} span={span} isCompact={isCompact} userRole={userRole} />
-      )
+      return <SystemLogsCard {...commonProps} />
     case "infrastructure-monitor":
-      return (
-        <InfrastructureMonitorCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <InfrastructureMonitorCard {...commonProps} />
     case "endpoint-health":
-      return (
-        <EndpointHealthCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <EndpointHealthCard {...commonProps} />
     case "siem-log-overview":
-      return (
-        <SiemLogOverviewCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <SiemLogOverviewCard {...commonProps} />
     case "email-security-health":
-      return (
-        <EmailSecurityHealthCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <EmailSecurityHealthCard {...commonProps} />
     case "asset-tracker":
-      return (
-        <AssetTrackerCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <AssetTrackerCard {...commonProps} />
     case "change-governance-panel":
-      return (
-        <ChangeGovernancePanelCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <ChangeGovernancePanelCard {...commonProps} />
     case "backup-restore-status":
-      return (
-        <BackupRestoreStatusCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <BackupRestoreStatusCard {...commonProps} />
     case "ai-pipeline-status":
-      return (
-        <AiPipelineStatusCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <AiPipelineStatusCard {...commonProps} />
     case "consultant-dashboard":
-      return (
-        <ConsultantDashboardCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <ConsultantDashboardCard {...commonProps} />
     case "hb-intel-management":
-      return (
-        <HbIntelManagementCard
-          card={card}
-          config={card.config || {}}
-          span={span}
-          isCompact={isCompact}
-          userRole={userRole}
-        />
-      )
+      return <HbIntelManagementCard {...commonProps} />
     default:
       return (
-        <div className="flex items-center justify-center h-full text-muted-foreground p-4">
+        <div className="flex items-center justify-center h-full text-gray-500">
           <div className="text-center">
-            <p className="text-sm">Card Type: {card.type}</p>
-            <p className="text-xs mt-1">Configure this card to display content</p>
+            <AlertTriangleIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Unknown card type: {card.type}</p>
           </div>
         </div>
       )
+  }
+}
+
+// Get optimal size for cards
+const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
+  switch (cardType) {
+    case "financial-review-panel":
+      return { cols: 18, rows: 7 }
+    case "enhanced-hbi-insights":
+      return { cols: 10, rows: 5 }
+    case "portfolio-overview":
+      return { cols: 12, rows: 4 }
+    case "pipeline-analytics":
+      return { cols: 8, rows: 6 }
+    case "market-intelligence":
+      return { cols: 6, rows: 6 }
+    case "staffing-distribution":
+      return { cols: 10, rows: 6 }
+    case "quality-control":
+      return { cols: 4, rows: 6 }
+    case "safety":
+      return { cols: 4, rows: 6 }
+    default:
+      return { cols: 6, rows: 4 }
   }
 }

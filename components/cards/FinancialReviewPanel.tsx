@@ -2,518 +2,690 @@
 
 import { useEffect, useState } from "react"
 import { AreaChart } from "@/components/charts/AreaChart"
-import { TrendingUp, DollarSign, CalendarCheck, BarChart3, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
+// LineChart component will be used inline if needed
+import {
+  TrendingUp,
+  DollarSign,
+  CalendarCheck,
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
+  AlertTriangle,
+  Target,
+  TrendingDown,
+  PieChart,
+  Activity,
+  Clock,
+  Shield,
+  Eye,
+} from "lucide-react"
 import { CustomBarChart } from "@/components/charts/BarChart"
 
-// Props: pass in all relevant data already filtered for stage 4 projects and month 2024-12
+// Import mock data
+import projectsData from "@/data/mock/projects.json"
+import budgetData from "@/data/mock/financial/budget.json"
+import cashFlowData from "@/data/mock/financial/cash-flow.json"
+import jchrData from "@/data/mock/financial/jchr.json"
+import arAgingData from "@/data/mock/financial/ar-aging.json"
+
+// Type definitions
+interface BudgetSummary {
+  totalBudget: number
+  totalActual: number
+  totalVariance: number
+  commitments: number
+}
+
+interface CashFlowAnalysis {
+  totalInflows: number
+  totalOutflows: number
+  netCashFlow: number
+  workingCapital: number
+  monthlyTrends: Array<{
+    month: string
+    inflow: number
+    outflow: number
+    net: number
+  }>
+}
+
+interface CashFlowTrendData {
+  name: string
+  inflow: number
+  outflow: number
+  net: number
+}
+
+interface ArAnalysis {
+  totalAR: number
+  current: number
+  days30: number
+  days60: number
+  days60Plus: number
+  retainage: number
+}
+
+interface JobCostAnalysis {
+  totalBudget: number
+  totalActual: number
+  totalVariance: number
+  commitments: number
+  concrete: number
+  electrical: number
+  plumbing: number
+  other: number
+}
+
+interface FinancialData {
+  budgetHealthScore: number
+  forecastAccuracy: number
+  scheduleHealthScore: number
+  cashFlowRatio: number
+  arHealthScore: number
+  totalActiveValue: number
+  budgetSummary: BudgetSummary
+  cashFlowAnalysis: CashFlowAnalysis
+  arAnalysis: ArAnalysis
+  jobCostAnalysis: JobCostAnalysis
+  activeProjects: any[]
+}
+
+interface ChartDataItem {
+  name: string
+  value: number
+}
+
+// Enhanced Props interface
 export function FinancialReviewPanel({
   card,
-  forecastIndex,
-  budgetHealth,
-  cashflowData,
-  scheduleHealth,
-  cashflowChartData,
-  cashflowMetrics,
-  scheduleMetrics,
   span,
 }: {
   card?: { id: string; type: string; title: string }
-  forecastIndex: number
-  budgetHealth: number
-  cashflowData: any
-  scheduleHealth: number
-  cashflowChartData: { name: string; value: number }[]
-  cashflowMetrics: { label: string; value: string | number }[]
-  scheduleMetrics: { label: string; value: string | number }[]
   span: { cols: number; rows: number }
 }) {
   const [showDrillDown, setShowDrillDown] = useState(false)
+  const [activeTab, setActiveTab] = useState<"overview" | "budget" | "cashflow" | "aging">("overview")
 
-  // Calculate card size categories and scaling
+  // Comprehensive financial data processing
+  const processFinancialData = (): FinancialData => {
+    console.log("🏦 Processing comprehensive financial data...")
+
+    // Active projects analysis
+    const activeProjects = projectsData.filter((p) => p.active)
+    const totalActiveValue = activeProjects.reduce((sum, p) => sum + p.total_value, 0)
+
+    // Budget analysis from budget.json
+    const budgetSummary: BudgetSummary = budgetData.reduce(
+      (acc, item) => {
+        acc.totalBudget += item["Revised Budget"]
+        acc.totalActual += item["Job to Date Costs"]
+        acc.totalVariance += item["Projected over Under"]
+        acc.commitments += item["Committed Costs"]
+        return acc
+      },
+      { totalBudget: 0, totalActual: 0, totalVariance: 0, commitments: 0 }
+    )
+
+    // Enhanced Cash flow analysis
+    const cashFlowAnalysis: CashFlowAnalysis = cashFlowData.projects.reduce(
+      (acc, project) => {
+        acc.totalInflows += project.cashFlowData.summary.totalInflows
+        acc.totalOutflows += project.cashFlowData.summary.totalOutflows
+        acc.netCashFlow += project.cashFlowData.summary.netCashFlow
+        acc.workingCapital += project.cashFlowData.summary.workingCapital
+
+        // Monthly trends
+        project.cashFlowData.monthlyData.forEach((month: any) => {
+          acc.monthlyTrends.push({
+            month: month.month,
+            inflow: month.inflows.total,
+            outflow: month.outflows.total,
+            net: month.netCashFlow,
+          })
+        })
+        return acc
+      },
+      {
+        totalInflows: 0,
+        totalOutflows: 0,
+        netCashFlow: 0,
+        workingCapital: 0,
+        monthlyTrends: [] as Array<{
+          month: string
+          inflow: number
+          outflow: number
+          net: number
+        }>,
+      }
+    )
+
+    // AR Aging analysis
+    const arAnalysis: ArAnalysis = arAgingData.reduce(
+      (acc: ArAnalysis, item: any) => {
+        acc.totalAR += item.total_ar
+        acc.current += item.current
+        acc.days30 += item.days_1_30
+        acc.days60 += item.days_31_60
+        acc.days60Plus += item.days_60_plus
+        acc.retainage += item.retainage
+        return acc
+      },
+      { totalAR: 0, current: 0, days30: 0, days60: 0, days60Plus: 0, retainage: 0 }
+    )
+
+    // Job Cost analysis enhanced
+    const jobCostAnalysis: JobCostAnalysis = jchrData.reduce(
+      (acc, project) => {
+        project.jobCostItems.forEach((item: any) => {
+          acc.totalBudget += item.budgetAmount
+          acc.totalActual += item.actualCost
+          acc.totalVariance += item.variance
+          acc.commitments += item.commitments
+
+          // Category analysis
+          if (item.description.includes("CONCRETE")) acc.concrete += item.actualCost
+          else if (item.description.includes("ELECTRICAL")) acc.electrical += item.actualCost
+          else if (item.description.includes("PLUMBING")) acc.plumbing += item.actualCost
+          else acc.other += item.actualCost
+        })
+        return acc
+      },
+      {
+        totalBudget: 0,
+        totalActual: 0,
+        totalVariance: 0,
+        commitments: 0,
+        concrete: 0,
+        electrical: 0,
+        plumbing: 0,
+        other: 0,
+      }
+    )
+
+    // Calculate enhanced metrics
+    const budgetHealthScore: number =
+      budgetSummary.totalBudget > 0
+        ? Math.max(0, Math.min(10, 10 - (Math.abs(budgetSummary.totalVariance) / budgetSummary.totalBudget) * 20))
+        : 8.5
+
+    const forecastAccuracy: number =
+      cashFlowAnalysis.totalInflows > 0
+        ? Math.max(0, Math.min(10, (cashFlowAnalysis.netCashFlow / cashFlowAnalysis.totalInflows) * 20 + 5))
+        : 9.2
+
+    const scheduleHealthScore: number =
+      activeProjects.length > 0
+        ? (activeProjects.reduce((acc, p) => acc + (p.active ? 1 : 0), 0) / activeProjects.length) * 10
+        : 8.8
+
+    const cashFlowRatio: number =
+      cashFlowAnalysis.totalOutflows > 0 ? cashFlowAnalysis.totalInflows / cashFlowAnalysis.totalOutflows : 1.2
+
+    const arHealthScore: number =
+      arAnalysis.totalAR > 0 ? ((arAnalysis.current + arAnalysis.days30) / arAnalysis.totalAR) * 10 : 9.0
+
+    return {
+      budgetHealthScore,
+      forecastAccuracy,
+      scheduleHealthScore,
+      cashFlowRatio,
+      arHealthScore,
+      totalActiveValue,
+      budgetSummary,
+      cashFlowAnalysis,
+      arAnalysis,
+      jobCostAnalysis,
+      activeProjects,
+    }
+  }
+
+  const financialData: FinancialData = processFinancialData()
+
+  // Calculate responsive sizing
   const cardArea = span.cols * span.rows
-  const isVerySmall = cardArea <= 9 // 3x3 or smaller
-  const isSmall = cardArea <= 16 // 4x4 or smaller
-  const isMedium = cardArea <= 24 // 6x4 or smaller
-  const isWide = span.cols >= 8 // Wide cards
-  const isTall = span.rows >= 6 // Tall cards
-  const isLarge = cardArea >= 36 // 6x6 or larger
-
-  // Dynamic scaling based on card size - SMOOTH PROPORTIONAL SCALING
   const getSizeClasses = () => {
-    // Calculate scaling factor based on card area (optimal size is 8x3 = 24)
-    const optimalArea = 24
-    const scaleFactor = Math.min(Math.max(cardArea / optimalArea, 0.3), 1.2) // Scale between 30% and 120%
+    // Optimal area is 18x7 = 126
+    const optimalArea = 126
+    const scaleFactor = Math.min(Math.max(cardArea / optimalArea, 0.4), 1.5)
 
-    // Base sizes that will be scaled
     const baseConfig = {
-      padding: 10, // Base padding in pixels
-      cardPadding: 6, // Base card padding
-      fontSize: 12, // Base font size
-      titleFontSize: 14,
-      metricFontSize: 16,
-      gap: 6,
-      chartHeight: 80, // Base chart height in pixels
-      iconSize: 16, // Base icon size
-      borderRadius: 8, // Base border radius
+      padding: 12,
+      headerPadding: 10,
+      fontSize: 13,
+      titleFontSize: 16,
+      metricFontSize: 18,
+      gap: 8,
+      chartHeight: 140,
+      iconSize: 16,
+      borderRadius: 8,
     }
 
-    // Scale everything proportionally
     const scaledConfig = {
-      padding: Math.max(4, Math.round(baseConfig.padding * scaleFactor)),
-      cardPadding: Math.max(2, Math.round(baseConfig.cardPadding * scaleFactor)),
-      fontSize: Math.max(8, Math.round(baseConfig.fontSize * scaleFactor)),
-      titleFontSize: Math.max(10, Math.round(baseConfig.titleFontSize * scaleFactor)),
-      metricFontSize: Math.max(12, Math.round(baseConfig.metricFontSize * scaleFactor)),
-      gap: Math.max(2, Math.round(baseConfig.gap * scaleFactor)),
-      chartHeight: Math.max(32, Math.round(baseConfig.chartHeight * scaleFactor)),
-      iconSize: Math.max(8, Math.round(baseConfig.iconSize * scaleFactor)),
+      padding: Math.max(6, Math.round(baseConfig.padding * scaleFactor)),
+      headerPadding: Math.max(4, Math.round(baseConfig.headerPadding * scaleFactor)),
+      fontSize: Math.max(10, Math.round(baseConfig.fontSize * scaleFactor)),
+      titleFontSize: Math.max(12, Math.round(baseConfig.titleFontSize * scaleFactor)),
+      metricFontSize: Math.max(14, Math.round(baseConfig.metricFontSize * scaleFactor)),
+      gap: Math.max(4, Math.round(baseConfig.gap * scaleFactor)),
+      chartHeight: Math.max(80, Math.round(baseConfig.chartHeight * scaleFactor)),
+      iconSize: Math.max(12, Math.round(baseConfig.iconSize * scaleFactor)),
       borderRadius: Math.max(4, Math.round(baseConfig.borderRadius * scaleFactor)),
+      scaleFactor,
     }
 
     return {
       padding: `p-[${scaledConfig.padding}px]`,
-      cardPadding: `p-[${scaledConfig.cardPadding}px]`,
+      headerPadding: `p-[${scaledConfig.headerPadding}px]`,
       text: `text-[${scaledConfig.fontSize}px]`,
       titleText: `text-[${scaledConfig.titleFontSize}px]`,
       metricText: `text-[${scaledConfig.metricFontSize}px]`,
       gap: `gap-[${scaledConfig.gap}px]`,
-      chartHeight: `min-h-[${scaledConfig.chartHeight}px]`,
+      chartHeight: scaledConfig.chartHeight,
       iconSize: `h-[${scaledConfig.iconSize}px] w-[${scaledConfig.iconSize}px]`,
       borderRadius: `rounded-[${scaledConfig.borderRadius}px]`,
-      showCharts: span.rows >= 3, // Show charts if at least 3 rows
-      scaleFactor, // For debugging
+      showCharts: span.rows >= 4,
+      showTabs: span.cols >= 12,
+      columns: span.cols >= 16 ? 4 : span.cols >= 12 ? 3 : 2,
+      scaleFactor,
     }
   }
 
   const sizeClasses = getSizeClasses()
 
-  // Debug logging
-  console.log("📏 FinancialReviewPanel scaling:", {
-    cardArea,
-    scaleFactor: sizeClasses.scaleFactor.toFixed(2),
-    span: `${span.cols}x${span.rows}`,
-    isOptimalSize: span.cols === 8 && span.rows === 3,
-  })
-
-  // Listen for drill down events from DashboardCardWrapper
-  useEffect(() => {
-    if (!card) return
-
-    const handleDrillDownEvent = (event: CustomEvent) => {
-      if (event.detail.cardId === card.id || event.detail.cardType === "financial-review") {
-        const shouldShow = event.detail.action === "show"
-        setShowDrillDown(shouldShow)
-
-        // Notify wrapper of state change
-        const stateEvent = new CustomEvent("cardDrillDownStateChange", {
-          detail: {
-            cardId: card.id,
-            cardType: "financial-review",
-            isActive: shouldShow,
-          },
-        })
-        window.dispatchEvent(stateEvent)
-      }
-    }
-
-    window.addEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
-
-    return () => {
-      window.removeEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
-    }
-  }, [card])
-
-  // Function to handle closing the drill down overlay
-  const handleCloseDrillDown = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowDrillDown(false)
-
-    if (!card) return
-
-    // Notify wrapper that drill down is closed
-    const stateEvent = new CustomEvent("cardDrillDownStateChange", {
-      detail: {
-        cardId: card.id,
-        cardType: "financial-review",
-        isActive: false,
-      },
-    })
-    window.dispatchEvent(stateEvent)
+  // Enhanced trend calculations
+  const getTrendIcon = (value: number, threshold: { good: number; poor: number }) => {
+    if (value >= threshold.good) return ArrowUpRight
+    if (value <= threshold.poor) return ArrowDownRight
+    return Minus
   }
 
-  // Determine trends (mock logic)
+  const getTrendColor = (value: number, threshold: { good: number; poor: number }) => {
+    if (value >= threshold.good) return "text-green-600 dark:text-green-400"
+    if (value <= threshold.poor) return "text-red-600 dark:text-red-400"
+    return "text-muted-foreground"
+  }
+
   const trends = {
-    forecast: forecastIndex > 8.5 ? ArrowUpRight : forecastIndex < 7.5 ? ArrowDownRight : Minus,
-    budget: budgetHealth > 8.0 ? ArrowUpRight : budgetHealth < 7.0 ? ArrowDownRight : Minus,
-    schedule: scheduleHealth > 9.0 ? ArrowUpRight : scheduleHealth < 8.0 ? ArrowDownRight : Minus,
+    forecast: getTrendIcon(financialData.forecastAccuracy, { good: 8.5, poor: 7.5 }),
+    budget: getTrendIcon(financialData.budgetHealthScore, { good: 8.0, poor: 7.0 }),
+    schedule: getTrendIcon(financialData.scheduleHealthScore, { good: 9.0, poor: 8.0 }),
+    cashflow: getTrendIcon(financialData.cashFlowRatio, { good: 1.15, poor: 1.05 }),
+    ar: getTrendIcon(financialData.arHealthScore, { good: 8.5, poor: 7.0 }),
   }
 
   const trendColors = {
-    forecast:
-      forecastIndex > 8.5
-        ? "text-green-600 dark:text-green-400"
-        : forecastIndex < 7.5
-        ? "text-red-600 dark:text-red-400"
-        : "text-muted-foreground",
-    budget:
-      budgetHealth > 8.0
-        ? "text-green-600 dark:text-green-400"
-        : budgetHealth < 7.0
-        ? "text-red-600 dark:text-red-400"
-        : "text-muted-foreground",
-    schedule:
-      scheduleHealth > 9.0
-        ? "text-green-600 dark:text-green-400"
-        : scheduleHealth < 8.0
-        ? "text-red-600 dark:text-red-400"
-        : "text-muted-foreground",
+    forecast: getTrendColor(financialData.forecastAccuracy, { good: 8.5, poor: 7.5 }),
+    budget: getTrendColor(financialData.budgetHealthScore, { good: 8.0, poor: 7.0 }),
+    schedule: getTrendColor(financialData.scheduleHealthScore, { good: 9.0, poor: 8.0 }),
+    cashflow: getTrendColor(financialData.cashFlowRatio, { good: 1.15, poor: 1.05 }),
+    ar: getTrendColor(financialData.arHealthScore, { good: 8.5, poor: 7.0 }),
   }
 
-  // Create simplified chart data for schedule
-  const scheduleChartData = [
-    { name: "Jan", value: 85 },
-    { name: "Feb", value: 88 },
-    { name: "Mar", value: 82 },
-    { name: "Apr", value: 89 },
-    { name: "May", value: 91 },
-    { name: "Jun", value: scheduleHealth * 10 },
+  // Enhanced chart data
+  const budgetVarianceData: ChartDataItem[] = [
+    {
+      name: "On Budget",
+      value: Math.max(0, financialData.budgetSummary.totalBudget - Math.abs(financialData.budgetSummary.totalVariance)),
+    },
+    { name: "Over Budget", value: Math.max(0, financialData.budgetSummary.totalVariance) },
   ]
 
-  return (
-    <div className="relative h-full w-full flex flex-col bg-gray-200 dark:bg-gray-800 overflow-hidden">
-      {/* Key Metrics Row */}
-      <div className={sizeClasses.padding}>
-        <div className={`grid grid-cols-4 ${sizeClasses.gap}`}>
-          {/* Forecast Index */}
-          <div
-            className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} text-center`}
-          >
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px] mb-1`}
-            >
-              <TrendingUp className={`${sizeClasses.iconSize} text-blue-600 dark:text-blue-400`} />
-              <span className={`${sizeClasses.text} font-medium text-blue-700 dark:text-blue-300`}>Forecast</span>
-            </div>
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px]`}
-            >
-              <span className={`${sizeClasses.metricText} font-medium text-blue-900 dark:text-blue-100`}>
-                {forecastIndex.toFixed(1)}
-              </span>
-              <trends.forecast
-                className={`h-[${Math.max(8, Math.round(12 * sizeClasses.scaleFactor))}px] w-[${Math.max(
-                  8,
-                  Math.round(12 * sizeClasses.scaleFactor)
-                )}px] ${trendColors.forecast}`}
-              />
-            </div>
-            <span className={`${sizeClasses.text} text-blue-600 dark:text-blue-400`}>Index</span>
-          </div>
+  const cashFlowTrendData: CashFlowTrendData[] = financialData.cashFlowAnalysis.monthlyTrends
+    .slice(-6)
+    .map((month: any) => ({
+      name: month.month.substring(5),
+      inflow: month.inflow / 1000000,
+      outflow: month.outflow / 1000000,
+      net: month.net / 1000000,
+    }))
 
+  const arAgingDataChart: ChartDataItem[] = [
+    { name: "Current", value: financialData.arAnalysis.current },
+    { name: "1-30 Days", value: financialData.arAnalysis.days30 },
+    { name: "31-60 Days", value: financialData.arAnalysis.days60 },
+    { name: "60+ Days", value: financialData.arAnalysis.days60Plus },
+  ]
+
+  const costBreakdownData: ChartDataItem[] = [
+    { name: "Concrete", value: financialData.jobCostAnalysis.concrete / 1000000 },
+    { name: "Electrical", value: financialData.jobCostAnalysis.electrical / 1000000 },
+    { name: "Plumbing", value: financialData.jobCostAnalysis.plumbing / 1000000 },
+    { name: "Other", value: financialData.jobCostAnalysis.other / 1000000 },
+  ]
+
+  // Format currency
+  const formatCurrency = (value: number, short = false) => {
+    if (short) {
+      if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`
+      if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`
+    }
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
+  }
+
+  return (
+    <div className="relative h-full w-full flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* Enhanced Header with Tabs */}
+      {sizeClasses.showTabs && (
+        <div className={`border-b border-gray-200 dark:border-gray-700 ${sizeClasses.headerPadding}`}>
+          <div className="flex space-x-1">
+            {[
+              { key: "overview", label: "Overview", icon: BarChart3 },
+              { key: "budget", label: "Budget", icon: Target },
+              { key: "cashflow", label: "Cash Flow", icon: TrendingUp },
+              { key: "aging", label: "AR Aging", icon: Clock },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`px-3 py-2 ${sizeClasses.text} font-medium rounded-t-lg transition-colors ${
+                  activeTab === tab.key
+                    ? "bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                }`}
+              >
+                <tab.icon className={`${sizeClasses.iconSize} inline mr-2`} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className={`flex-1 ${sizeClasses.padding} overflow-hidden`}>
+        {/* Key Metrics Row */}
+        <div className={`grid grid-cols-${sizeClasses.columns} ${sizeClasses.gap} mb-4`}>
           {/* Budget Health */}
           <div
-            className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} text-center`}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
           >
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px] mb-1`}
-            >
-              <DollarSign className={`${sizeClasses.iconSize} text-green-600 dark:text-green-400`} />
-              <span className={`${sizeClasses.text} font-medium text-green-700 dark:text-green-300`}>Budget</span>
+            <div className={`flex items-center justify-between mb-2`}>
+              <div className="flex items-center">
+                <Target className={`${sizeClasses.iconSize} text-blue-600 dark:text-blue-400 mr-2`} />
+                <span className={`${sizeClasses.text} font-medium text-gray-700 dark:text-gray-300`}>
+                  Budget Health
+                </span>
+              </div>
+              <trends.budget className={`h-4 w-4 ${trendColors.budget}`} />
             </div>
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px]`}
-            >
-              <span className={`${sizeClasses.metricText} font-medium text-green-900 dark:text-green-100`}>
-                {budgetHealth.toFixed(1)}
-              </span>
-              <trends.budget
-                className={`h-[${Math.max(8, Math.round(12 * sizeClasses.scaleFactor))}px] w-[${Math.max(
-                  8,
-                  Math.round(12 * sizeClasses.scaleFactor)
-                )}px] ${trendColors.budget}`}
-              />
+            <div className={`${sizeClasses.metricText} font-bold text-gray-900 dark:text-gray-100`}>
+              {financialData.budgetHealthScore.toFixed(1)}/10
             </div>
-            <span className={`${sizeClasses.text} text-green-600 dark:text-green-400`}>Health</span>
+            <div className={`${sizeClasses.text} text-gray-500 dark:text-gray-400`}>
+              Variance: {formatCurrency(financialData.budgetSummary.totalVariance, true)}
+            </div>
           </div>
 
-          {/* Schedule Health */}
+          {/* Cash Flow Ratio */}
           <div
-            className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} text-center`}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
           >
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px] mb-1`}
-            >
-              <CalendarCheck className={`${sizeClasses.iconSize} text-indigo-600 dark:text-indigo-400`} />
-              <span className={`${sizeClasses.text} font-medium text-indigo-700 dark:text-indigo-300`}>Schedule</span>
+            <div className={`flex items-center justify-between mb-2`}>
+              <div className="flex items-center">
+                <TrendingUp className={`${sizeClasses.iconSize} text-green-600 dark:text-green-400 mr-2`} />
+                <span className={`${sizeClasses.text} font-medium text-gray-700 dark:text-gray-300`}>Cash Flow</span>
+              </div>
+              <trends.cashflow className={`h-4 w-4 ${trendColors.cashflow}`} />
             </div>
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px]`}
-            >
-              <span className={`${sizeClasses.metricText} font-medium text-indigo-900 dark:text-indigo-100`}>
-                {scheduleHealth.toFixed(1)}
-              </span>
-              <trends.schedule
-                className={`h-[${Math.max(8, Math.round(12 * sizeClasses.scaleFactor))}px] w-[${Math.max(
-                  8,
-                  Math.round(12 * sizeClasses.scaleFactor)
-                )}px] ${trendColors.schedule}`}
-              />
+            <div className={`${sizeClasses.metricText} font-bold text-gray-900 dark:text-gray-100`}>
+              {financialData.cashFlowRatio.toFixed(2)}:1
             </div>
-            <span className={`${sizeClasses.text} text-indigo-600 dark:text-indigo-400`}>Score</span>
+            <div className={`${sizeClasses.text} text-gray-500 dark:text-gray-400`}>
+              Net: {formatCurrency(financialData.cashFlowAnalysis.netCashFlow, true)}
+            </div>
           </div>
 
-          {/* Net Cash Flow */}
+          {/* AR Health */}
           <div
-            className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} text-center`}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
           >
-            <div
-              className={`flex items-center justify-center gap-[${Math.max(
-                2,
-                Math.round(4 * sizeClasses.scaleFactor)
-              )}px] mb-1`}
-            >
-              <BarChart3 className={`${sizeClasses.iconSize} text-purple-600`} />
-              <span className={`${sizeClasses.text} font-medium text-purple-700 dark:text-purple-300`}>Cash Flow</span>
+            <div className={`flex items-center justify-between mb-2`}>
+              <div className="flex items-center">
+                <Clock className={`${sizeClasses.iconSize} text-purple-600 dark:text-purple-400 mr-2`} />
+                <span className={`${sizeClasses.text} font-medium text-gray-700 dark:text-gray-300`}>AR Health</span>
+              </div>
+              <trends.ar className={`h-4 w-4 ${trendColors.ar}`} />
             </div>
-            <div className={`${sizeClasses.metricText} font-medium text-purple-900 dark:text-purple-100`}>
-              {cashflowMetrics[0]?.value || "$0"}
+            <div className={`${sizeClasses.metricText} font-bold text-gray-900 dark:text-gray-100`}>
+              {financialData.arHealthScore.toFixed(1)}/10
             </div>
-            <span className={`${sizeClasses.text} text-purple-600`}>Net</span>
+            <div className={`${sizeClasses.text} text-gray-500 dark:text-gray-400`}>
+              Total: {formatCurrency(financialData.arAnalysis.totalAR, true)}
+            </div>
           </div>
+
+          {/* Schedule Performance */}
+          {sizeClasses.columns >= 4 && (
+            <div
+              className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+            >
+              <div className={`flex items-center justify-between mb-2`}>
+                <div className="flex items-center">
+                  <CalendarCheck className={`${sizeClasses.iconSize} text-indigo-600 dark:text-indigo-400 mr-2`} />
+                  <span className={`${sizeClasses.text} font-medium text-gray-700 dark:text-gray-300`}>Schedule</span>
+                </div>
+                <trends.schedule className={`h-4 w-4 ${trendColors.schedule}`} />
+              </div>
+              <div className={`${sizeClasses.metricText} font-bold text-gray-900 dark:text-gray-100`}>
+                {financialData.scheduleHealthScore.toFixed(1)}/10
+              </div>
+              <div className={`${sizeClasses.text} text-gray-500 dark:text-gray-400`}>
+                {financialData.activeProjects.length} Active Projects
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Charts Section */}
-      {sizeClasses.showCharts && (
-        <div
-          className={`flex-1 px-[${Math.max(4, Math.round(10 * sizeClasses.scaleFactor))}px] pb-[${Math.max(
-            8,
-            Math.round(16 * sizeClasses.scaleFactor)
-          )}px] min-h-0`}
-        >
+        {/* Charts Section */}
+        {sizeClasses.showCharts && (
           <div className={`grid grid-cols-2 ${sizeClasses.gap} h-full`}>
-            {/* Cashflow Trend */}
-            <div
-              className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} flex flex-col`}
-            >
-              <div
-                className={`flex items-center gap-[${Math.max(
-                  4,
-                  Math.round(8 * sizeClasses.scaleFactor)
-                )}px] mb-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px]`}
-              >
-                <TrendingUp className={`${sizeClasses.iconSize} text-blue-600 dark:text-blue-400`} />
-                <span className={`font-medium ${sizeClasses.titleText} text-foreground`}>Cash Flow Trend</span>
-              </div>
-              <div className={`flex-1 ${sizeClasses.chartHeight}`}>
-                <AreaChart data={cashflowChartData} color="hsl(var(--chart-2))" compact />
-              </div>
-              <div
-                className={`mt-[${Math.max(
-                  4,
-                  Math.round(8 * sizeClasses.scaleFactor)
-                )}px] flex flex-wrap gap-[${Math.max(2, Math.round(4 * sizeClasses.scaleFactor))}px]`}
-              >
-                {cashflowMetrics.slice(1, 3).map((metric, i) => (
-                  <div
-                    key={i}
-                    className={`px-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px] py-[${Math.max(
-                      2,
-                      Math.round(4 * sizeClasses.scaleFactor)
-                    )}px] bg-blue-100 dark:bg-blue-900/50 ${sizeClasses.borderRadius} ${
-                      sizeClasses.text
-                    } text-blue-800 dark:text-blue-200`}
-                  >
-                    <span className="font-semibold">{metric.value}</span> {metric.label}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Schedule Performance */}
-            <div
-              className={`bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 ${sizeClasses.borderRadius} ${sizeClasses.cardPadding} flex flex-col`}
-            >
-              <div
-                className={`flex items-center gap-[${Math.max(
-                  4,
-                  Math.round(8 * sizeClasses.scaleFactor)
-                )}px] mb-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px]`}
-              >
-                <CalendarCheck className={`${sizeClasses.iconSize} text-indigo-600 dark:text-indigo-400`} />
-                <span className={`font-medium ${sizeClasses.titleText} text-foreground`}>Schedule Performance</span>
-              </div>
-              <div className={`flex-1 ${sizeClasses.chartHeight}`}>
-                <AreaChart data={scheduleChartData} color="hsl(var(--chart-1))" compact />
-              </div>
-              <div
-                className={`mt-[${Math.max(
-                  4,
-                  Math.round(8 * sizeClasses.scaleFactor)
-                )}px] flex flex-wrap gap-[${Math.max(2, Math.round(4 * sizeClasses.scaleFactor))}px]`}
-              >
-                {scheduleMetrics.slice(0, 2).map((metric, i) => (
-                  <div
-                    key={i}
-                    className={`px-[${Math.max(4, Math.round(8 * sizeClasses.scaleFactor))}px] py-[${Math.max(
-                      2,
-                      Math.round(4 * sizeClasses.scaleFactor)
-                    )}px] bg-indigo-100 dark:bg-indigo-900/50 ${sizeClasses.borderRadius} ${
-                      sizeClasses.text
-                    } text-indigo-800 dark:text-indigo-200`}
-                  >
-                    <span className="font-semibold">{metric.value}</span> {metric.label}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Click-Based Drill-Down Overlay */}
-      {showDrillDown && (
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-2.5 lg:p-3 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
-          <div className="h-full">
-            {/* Close Button */}
-            <button
-              onClick={handleCloseDrillDown}
-              className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label="Close drill down"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <h3 className="text-base sm:text-lg lg:text-xl font-medium mb-2 sm:mb-3 lg:mb-4 text-center">
-              Financial Review Deep Dive
-            </h3>
-
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 h-[calc(100%-60px)]">
-              {/* Financial Health */}
-              <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-3">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                    <TrendingUp className="w-4 h-4 mr-2" />
+            {activeTab === "overview" && (
+              <>
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
                     Budget Performance
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Budget Health Score:</span>
-                      <span className="font-medium text-green-400">{budgetHealth.toFixed(1)}/10</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Forecast Accuracy:</span>
-                      <span className="font-medium text-blue-400">{forecastIndex.toFixed(1)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Variance Trend:</span>
-                      <span className="font-medium text-yellow-400">Improving</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Risk Level:</span>
-                      <span className="font-medium text-green-400">Low</span>
-                    </div>
+                  <div style={{ height: sizeClasses.chartHeight }}>
+                    <CustomBarChart
+                      data={budgetVarianceData}
+                      colors={["#10b981", "#ef4444"]}
+                      compact={true}
+                      showGrid={true}
+                      showValues={true}
+                      animated={true}
+                      height={sizeClasses.chartHeight}
+                    />
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-3">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Cash Flow Analysis
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Cash Flow Trend
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Current Flow:</span>
-                      <span className="font-medium text-green-400">{cashflowMetrics[0]?.value || "$0"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Monthly Average:</span>
-                      <span className="font-medium">$2.1M</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Projection Accuracy:</span>
-                      <span className="font-medium text-green-400">94%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Working Capital:</span>
-                      <span className="font-medium text-blue-400">$8.5M</span>
-                    </div>
+                  <div style={{ height: sizeClasses.chartHeight }}>
+                    <AreaChart data={cashFlowTrendData as any} color="hsl(var(--chart-2))" compact />
                   </div>
                 </div>
-              </div>
+              </>
+            )}
 
-              {/* Schedule & Risk */}
-              <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-3">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                    <CalendarCheck className="w-4 h-4 mr-2" />
-                    Schedule Performance
+            {activeTab === "budget" && (
+              <>
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Cost Breakdown
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Schedule Health:</span>
-                      <span className="font-medium text-green-400">{scheduleHealth.toFixed(1)}/10</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>On-Time Rate:</span>
-                      <span className="font-medium text-green-400">87%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Critical Path Risk:</span>
-                      <span className="font-medium text-yellow-400">Medium</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Milestone Adherence:</span>
-                      <span className="font-medium text-green-400">92%</span>
-                    </div>
+                  <div style={{ height: sizeClasses.chartHeight }}>
+                    <CustomBarChart
+                      data={costBreakdownData}
+                      colors={["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]}
+                      compact={true}
+                      showGrid={true}
+                      showValues={true}
+                      animated={true}
+                      height={sizeClasses.chartHeight}
+                    />
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-2 sm:p-2.5 lg:p-3">
-                  <h4 className="font-semibold mb-1 sm:mb-1.5 lg:mb-2 flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Key Insights
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Budget vs Actual
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="border-b border-white/20 dark:border-black/20 pb-2">
-                      <div className="font-medium">Budget variance trending positive</div>
-                      <div className="text-xs text-blue-200">3% improvement over last quarter</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Total Budget:</span>
+                      <span className={`${sizeClasses.text} font-medium`}>
+                        {formatCurrency(financialData.budgetSummary.totalBudget, true)}
+                      </span>
                     </div>
-                    <div className="border-b border-white/20 dark:border-black/20 pb-2">
-                      <div className="font-medium">Schedule optimization opportunities</div>
-                      <div className="text-xs text-blue-200">2 activities can be accelerated</div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Actual Costs:</span>
+                      <span className={`${sizeClasses.text} font-medium`}>
+                        {formatCurrency(financialData.budgetSummary.totalActual, true)}
+                      </span>
                     </div>
-                    <div className="pt-2">
-                      <p className="text-xs text-blue-200">
-                        Overall financial health is strong with room for schedule optimization.
-                      </p>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Variance:</span>
+                      <span
+                        className={`${sizeClasses.text} font-medium ${
+                          financialData.budgetSummary.totalVariance >= 0 ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        {formatCurrency(financialData.budgetSummary.totalVariance, true)}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
+
+            {activeTab === "cashflow" && (
+              <>
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Monthly Cash Flow
+                  </h4>
+                  <div style={{ height: sizeClasses.chartHeight }}>
+                    <AreaChart data={cashFlowTrendData as any} color="hsl(var(--chart-1))" compact />
+                  </div>
+                </div>
+
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Cash Flow Summary
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Total Inflows:</span>
+                      <span className={`${sizeClasses.text} font-medium text-green-600`}>
+                        {formatCurrency(financialData.cashFlowAnalysis.totalInflows, true)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Total Outflows:</span>
+                      <span className={`${sizeClasses.text} font-medium text-red-600`}>
+                        {formatCurrency(financialData.cashFlowAnalysis.totalOutflows, true)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Net Cash Flow:</span>
+                      <span
+                        className={`${sizeClasses.text} font-medium ${
+                          financialData.cashFlowAnalysis.netCashFlow >= 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {formatCurrency(financialData.cashFlowAnalysis.netCashFlow, true)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Working Capital:</span>
+                      <span className={`${sizeClasses.text} font-medium`}>
+                        {formatCurrency(financialData.cashFlowAnalysis.workingCapital, true)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "aging" && (
+              <>
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    AR Aging Distribution
+                  </h4>
+                  <div style={{ height: sizeClasses.chartHeight }}>
+                    <CustomBarChart
+                      data={arAgingDataChart}
+                      colors={["#10b981", "#f59e0b", "#ef4444", "#7c2d12"]}
+                      compact={true}
+                      showGrid={true}
+                      showValues={true}
+                      animated={true}
+                      height={sizeClasses.chartHeight}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${sizeClasses.borderRadius} ${sizeClasses.headerPadding}`}
+                >
+                  <h4 className={`${sizeClasses.titleText} font-semibold mb-3 text-gray-900 dark:text-gray-100`}>
+                    Collection Analysis
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Total AR:</span>
+                      <span className={`${sizeClasses.text} font-medium`}>
+                        {formatCurrency(financialData.arAnalysis.totalAR, true)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Current (0-30):</span>
+                      <span className={`${sizeClasses.text} font-medium text-green-600`}>
+                        {(
+                          ((financialData.arAnalysis.current + financialData.arAnalysis.days30) /
+                            financialData.arAnalysis.totalAR) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Past Due (60+):</span>
+                      <span className={`${sizeClasses.text} font-medium text-red-600`}>
+                        {((financialData.arAnalysis.days60Plus / financialData.arAnalysis.totalAR) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`${sizeClasses.text} text-gray-600 dark:text-gray-400`}>Retainage:</span>
+                      <span className={`${sizeClasses.text} font-medium`}>
+                        {formatCurrency(financialData.arAnalysis.retainage, true)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

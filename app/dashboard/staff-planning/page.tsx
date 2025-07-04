@@ -1,13 +1,13 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { useAuth } from '@/context/auth-context'
-import { useRouter } from 'next/navigation'
-import { AppHeader } from '@/components/layout/app-header'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import React, { useState, useEffect, useMemo } from "react"
+import { useAuth } from "@/context/auth-context"
+import { useRouter } from "next/navigation"
+import { AppHeader } from "@/components/layout/app-header"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,15 +15,15 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import { 
-  Users, 
-  Calendar, 
-  AlertTriangle, 
-  TrendingUp, 
-  Building2, 
-  FileText, 
-  CheckCircle2, 
+} from "@/components/ui/breadcrumb"
+import {
+  Users,
+  Calendar,
+  AlertTriangle,
+  TrendingUp,
+  Building2,
+  FileText,
+  CheckCircle2,
   Clock,
   Home,
   RefreshCw,
@@ -31,19 +31,19 @@ import {
   Plus,
   DollarSign,
   BarChart3,
-  EllipsisVertical
-} from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+  EllipsisVertical,
+} from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 // Import role-specific components
-import { ExecutiveStaffingView } from '@/components/staffing/ExecutiveStaffingView'
-import { ProjectExecutiveStaffingView } from '@/components/staffing/ProjectExecutiveStaffingView'
-import { ProjectManagerStaffingView } from '@/components/staffing/ProjectManagerStaffingView'
+import { ExecutiveStaffingView } from "@/components/staffing/ExecutiveStaffingView"
+import { ProjectExecutiveStaffingView } from "@/components/staffing/ProjectExecutiveStaffingView"
+import { ProjectManagerStaffingView } from "@/components/staffing/ProjectManagerStaffingView"
 
 // Import mock data for statistics
-import staffingData from '@/data/mock/staffing/staffing.json'
-import projectsData from '@/data/mock/projects.json'
-import spcrData from '@/data/mock/staffing/spcr.json'
+import staffingData from "@/data/mock/staffing/staffing.json"
+import projectsData from "@/data/mock/projects.json"
+import spcrData from "@/data/mock/staffing/spcr.json"
 
 export default function StaffPlanningPage() {
   const { user } = useAuth()
@@ -66,29 +66,29 @@ export default function StaffPlanningPage() {
   // Calculate role-specific statistics
   const stats = useMemo(() => {
     const totalStaff = staffingData.length
-    const assignedStaff = staffingData.filter(staff => staff.assignments && staff.assignments.length > 0).length
+    const assignedStaff = staffingData.filter((staff) => staff.assignments && staff.assignments.length > 0).length
     const utilization = totalStaff > 0 ? (assignedStaff / totalStaff) * 100 : 0
-    
+
     const totalLaborCost = staffingData.reduce((sum, staff) => sum + (staff.laborRate || 0), 0)
     const monthlyLaborCost = totalLaborCost * 40 * 4.33 // Weekly to monthly
-    
-    const pendingSpcrs = spcrData.filter(spcr => spcr.status === 'submitted').length
-    const approvedSpcrs = spcrData.filter(spcr => spcr.status === 'approved').length
-    
+
+    const pendingSpcrs = spcrData.filter((spcr) => spcr.status === "submitted").length
+    const approvedSpcrs = spcrData.filter((spcr) => spcr.status === "approved").length
+
     // Role-specific project counts
     let projectCount = 0
     let projectScope = "All Projects"
-    
+
     switch (user.role) {
-      case 'executive':
+      case "executive":
         projectCount = projectsData.length
         projectScope = "Enterprise View"
         break
-      case 'project-executive':
+      case "project-executive":
         projectCount = 6
         projectScope = "Portfolio View"
         break
-      case 'project-manager':
+      case "project-manager":
         projectCount = 1
         projectScope = "Single Project"
         break
@@ -105,44 +105,56 @@ export default function StaffPlanningPage() {
       pendingSpcrs,
       approvedSpcrs,
       projectCount,
-      projectScope
+      projectScope,
     }
   }, [user.role, staffingData, spcrData, projectsData])
 
   const getPageTitle = () => {
     switch (user.role) {
-      case 'executive':
-        return 'Portfolio Staffing Management'
-      case 'project-executive':
-        return 'Portfolio Staffing Dashboard'
-      case 'project-manager':
-        return 'Project Staffing Dashboard'
+      case "executive":
+        return "Portfolio Staffing Management"
+      case "project-executive":
+        return "Portfolio Staffing Dashboard"
+      case "project-manager":
+        return "Project Staffing Dashboard"
       default:
-        return 'Staff Planning'
+        return "Staff Planning"
     }
   }
 
   const getPageDescription = () => {
     switch (user.role) {
-      case 'executive':
-        return 'Comprehensive staffing oversight across all projects and resources with strategic planning capabilities'
-      case 'project-executive':
-        return 'Manage staffing for your portfolio of projects with performance analytics and resource optimization'
-      case 'project-manager':
-        return 'Detailed team management for your assigned project with responsibility tracking and SPCR workflows'
+      case "executive":
+        return "Comprehensive staffing oversight across all projects and resources with strategic planning capabilities"
+      case "project-executive":
+        return "Manage staffing for your portfolio of projects with performance analytics and resource optimization"
+      case "project-manager":
+        return "Detailed team management for your assigned project with responsibility tracking and SPCR workflows"
       default:
-        return 'Staff planning and resource management system'
+        return "Staff planning and resource management system"
     }
   }
 
   const getRoleBadge = () => {
     switch (user.role) {
-      case 'executive':
-        return <Badge variant="default" className="bg-purple-600 hover:bg-purple-700">Executive</Badge>
-      case 'project-executive':
-        return <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">Project Executive</Badge>
-      case 'project-manager':
-        return <Badge variant="default" className="bg-green-600 hover:bg-green-700">Project Manager</Badge>
+      case "executive":
+        return (
+          <Badge variant="default" className="bg-purple-600 hover:bg-purple-700">
+            Executive
+          </Badge>
+        )
+      case "project-executive":
+        return (
+          <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+            Project Executive
+          </Badge>
+        )
+      case "project-manager":
+        return (
+          <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+            Project Manager
+          </Badge>
+        )
       default:
         return <Badge variant="outline">{user.role}</Badge>
     }
@@ -178,81 +190,16 @@ export default function StaffPlanningPage() {
 
   // Handle create staffing plan
   const handleCreateStaffingPlan = () => {
-    router.push('/dashboard/staff-planning/staffing-plan')
+    router.push("/dashboard/staff-planning/staffing-plan")
   }
-
-  // Statistics widgets
-  const StaffingWidgets = () => (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card data-tour="utilization-widget">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium">Staff Utilization</span>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">{stats.utilization.toFixed(1)}%</div>
-            <div className="text-xs text-muted-foreground">
-              {stats.assignedStaff} of {stats.totalStaff} assigned
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card data-tour="labor-cost-widget">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-green-600" />
-            <span className="text-sm font-medium">Monthly Labor Cost</span>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">${(stats.monthlyLaborCost / 1000).toFixed(0)}K</div>
-            <div className="text-xs text-muted-foreground">
-              Including burden & benefits
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card data-tour="project-scope-widget">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Building2 className="h-4 w-4 text-purple-600" />
-            <span className="text-sm font-medium">Project Scope</span>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">{stats.projectCount}</div>
-            <div className="text-xs text-muted-foreground">
-              {stats.projectScope}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card data-tour="spcr-widget">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <FileText className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium">SPCR Status</span>
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">{stats.pendingSpcrs}</div>
-            <div className="text-xs text-muted-foreground">
-              {stats.approvedSpcrs} approved this month
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
 
   const renderRoleSpecificContent = () => {
     switch (user.role) {
-      case 'executive':
+      case "executive":
         return <ExecutiveStaffingView />
-      case 'project-executive':
+      case "project-executive":
         return <ProjectExecutiveStaffingView />
-      case 'project-manager':
+      case "project-manager":
         return <ProjectManagerStaffingView />
       default:
         return (
@@ -262,8 +209,8 @@ export default function StaffPlanningPage() {
                 <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">Limited Access</h3>
                 <p className="text-muted-foreground">
-                  Your current role has limited access to staffing management features. 
-                  Contact your administrator for additional permissions.
+                  Your current role has limited access to staffing management features. Contact your administrator for
+                  additional permissions.
                 </p>
               </div>
             </CardContent>
@@ -301,7 +248,7 @@ export default function StaffPlanningPage() {
                 <p className="text-muted-foreground mt-1">{getPageDescription()}</p>
               </div>
               <div className="flex items-center gap-3" data-tour="action-controls">
-                {(user.role === 'project-manager' || user.role === 'project-executive') && (
+                {(user.role === "project-manager" || user.role === "project-executive") && (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
@@ -329,7 +276,7 @@ export default function StaffPlanningPage() {
                     </PopoverContent>
                   </Popover>
                 )}
-                
+
                 {/* More Actions Menu */}
                 <Popover open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
                   <PopoverTrigger asChild>
@@ -341,8 +288,8 @@ export default function StaffPlanningPage() {
                     <div className="p-1">
                       <button
                         onClick={() => {
-                          handleRefresh();
-                          setMoreMenuOpen(false);
+                          handleRefresh()
+                          setMoreMenuOpen(false)
                         }}
                         className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
                       >
@@ -351,8 +298,8 @@ export default function StaffPlanningPage() {
                       </button>
                       <button
                         onClick={() => {
-                          handleExport();
-                          setMoreMenuOpen(false);
+                          handleExport()
+                          setMoreMenuOpen(false)
                         }}
                         className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
                       >
@@ -364,16 +311,11 @@ export default function StaffPlanningPage() {
                 </Popover>
               </div>
             </div>
-
-            {/* Statistics Widgets */}
-            <StaffingWidgets />
           </div>
         </div>
 
         {/* Main Content */}
-        <div data-tour="role-content">
-          {renderRoleSpecificContent()}
-        </div>
+        <div data-tour="role-content">{renderRoleSpecificContent()}</div>
 
         {/* Help Section */}
         <Card data-tour="help-section">
@@ -418,4 +360,4 @@ export default function StaffPlanningPage() {
       </div>
     </>
   )
-} 
+}

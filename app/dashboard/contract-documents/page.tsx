@@ -394,7 +394,7 @@ export default function ContractDocumentsPage() {
         <div className="pt-16">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003087] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading document compliance platform...</p>
             </div>
           </div>
@@ -441,7 +441,7 @@ export default function ContractDocumentsPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
+              <Button className="bg-hb-orange hover:bg-hb-orange/90 text-white">
                 <Plus className="h-4 w-4 mr-2" />
                 Upload Document
               </Button>
@@ -478,7 +478,7 @@ export default function ContractDocumentsPage() {
                   {/* Recent Activity */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                      <CardTitle className="text-foreground flex items-center gap-2">
                         <Clock className="h-5 w-5" />
                         Recent Activity
                       </CardTitle>
@@ -504,10 +504,10 @@ export default function ContractDocumentsPage() {
                   </Card>
 
                   {/* AI Insights Summary */}
-                  <Card className="border-l-4 border-l-[#FF6B35]">
+                  <Card className="border-l-4 border-l-orange-600 dark:border-l-orange-400">
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                        <Brain className="h-5 w-5 text-[#FF6B35]" />
+                      <CardTitle className="text-foreground flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                         HBI AI Insights
                       </CardTitle>
                     </CardHeader>
@@ -543,7 +543,7 @@ export default function ContractDocumentsPage() {
                 {/* Performance Metrics */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white">Performance Metrics</CardTitle>
+                    <CardTitle className="text-foreground">Performance Metrics</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -615,7 +615,7 @@ export default function ContractDocumentsPage() {
                 {/* Documents Table */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white">Document Library</CardTitle>
+                    <CardTitle className="text-foreground">Document Library</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -678,10 +678,10 @@ export default function ContractDocumentsPage() {
               {/* AI Analysis Tab */}
               <TabsContent value="analysis" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="border-l-4 border-l-[#FF6B35]">
+                  <Card className="border-l-4 border-l-orange-600 dark:border-l-orange-400">
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                        <Brain className="h-5 w-5 text-[#FF6B35]" />
+                      <CardTitle className="text-foreground flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                         HBI Analysis Engine
                       </CardTitle>
                     </CardHeader>
@@ -722,13 +722,13 @@ export default function ContractDocumentsPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white">Analysis Queue</CardTitle>
+                      <CardTitle className="text-foreground">Analysis Queue</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-3">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#FF6B35]"></div>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600 dark:border-orange-400"></div>
                             <span className="text-sm">Analyzing Building Code Updates</span>
                           </div>
                           <Badge variant="secondary">In Progress</Badge>
@@ -765,7 +765,7 @@ export default function ContractDocumentsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                      <CardTitle className="text-foreground flex items-center gap-2">
                         <Shield className="h-5 w-5" />
                         Regulatory Compliance
                       </CardTitle>
@@ -794,7 +794,7 @@ export default function ContractDocumentsPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                      <CardTitle className="text-foreground flex items-center gap-2">
                         <FileCheck className="h-5 w-5" />
                         Contract Compliance
                       </CardTitle>
@@ -823,7 +823,7 @@ export default function ContractDocumentsPage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                      <CardTitle className="text-foreground flex items-center gap-2">
                         <BookOpen className="h-5 w-5" />
                         Documentation Status
                       </CardTitle>
@@ -858,7 +858,7 @@ export default function ContractDocumentsPage() {
         {/* Help Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
               Contract Documents Help
             </CardTitle>
@@ -886,15 +886,15 @@ export default function ContractDocumentsPage() {
                 <h4 className="font-semibold mb-3 text-foreground">AI Analysis</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                     Identify risks and opportunities automatically
                   </li>
                   <li className="flex items-start gap-2">
-                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                     Generate compliance and performance insights
                   </li>
                   <li className="flex items-start gap-2">
-                    <Zap className="h-4 w-4 text-[#FF6B35] mt-0.5 flex-shrink-0" />
+                    <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                     Benchmark against industry standards
                   </li>
                 </ul>
@@ -909,7 +909,7 @@ export default function ContractDocumentsPage() {
         <Dialog open={showDocumentModal} onOpenChange={setShowDocumentModal}>
           <DialogContent className="w-[60vw] max-w-none max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+              <DialogTitle className="text-foreground flex items-center gap-2">
                 <FileText className="h-5 w-5" />
                 {selectedDocument.name}
               </DialogTitle>
@@ -944,7 +944,7 @@ export default function ContractDocumentsPage() {
                 {/* Key Risks */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                    <CardTitle className="text-foreground flex items-center gap-2">
                       <AlertTriangle className="h-5 w-5 text-red-500" />
                       Key Risks
                     </CardTitle>
@@ -975,7 +975,7 @@ export default function ContractDocumentsPage() {
                 {/* Opportunities */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
+                    <CardTitle className="text-foreground flex items-center gap-2">
                       <TrendingUp className="h-5 w-5 text-green-500" />
                       Opportunities
                     </CardTitle>
@@ -1010,10 +1010,10 @@ export default function ContractDocumentsPage() {
               </div>
 
               {/* HBI Analysis */}
-              <Card className="border-l-4 border-l-[#FF6B35]">
+              <Card className="border-l-4 border-l-orange-600 dark:border-l-orange-400">
                 <CardHeader>
-                  <CardTitle className="text-[#003087] dark:text-white flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-[#FF6B35]" />
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                     HBI AI Analysis
                   </CardTitle>
                 </CardHeader>
@@ -1056,7 +1056,7 @@ export default function ContractDocumentsPage() {
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
-                <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">
+                <Button className="bg-hb-orange hover:bg-hb-orange/90 text-white">
                   <FileCheck className="h-4 w-4 mr-2" />
                   Mark Reviewed
                 </Button>
@@ -1071,7 +1071,7 @@ export default function ContractDocumentsPage() {
         <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-[#003087] dark:text-white">Upload Document</DialogTitle>
+              <DialogTitle className="text-foreground">Upload Document</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
@@ -1097,7 +1097,7 @@ export default function ContractDocumentsPage() {
                 <Button variant="outline" onClick={() => setShowUploadModal(false)}>
                   Cancel
                 </Button>
-                <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">Upload & Analyze</Button>
+                <Button className="bg-hb-orange hover:bg-hb-orange/90 text-white">Upload & Analyze</Button>
               </div>
             </div>
           </DialogContent>
@@ -1108,7 +1108,7 @@ export default function ContractDocumentsPage() {
       <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#003087] dark:text-white">Export Contract Documents</DialogTitle>
+            <DialogTitle className="text-foreground">Export Contract Documents</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -1136,7 +1136,7 @@ export default function ContractDocumentsPage() {
                 Cancel
               </Button>
               <Button
-                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white"
+                className="bg-hb-orange hover:bg-hb-orange/90 text-white"
                 onClick={() => handleExportSubmit({ format: exportFormat, fileName: exportFileName })}
               >
                 <Download className="h-4 w-4 mr-2" />
