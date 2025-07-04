@@ -2,7 +2,7 @@ export interface DashboardCard {
   id: string
   type: string
   title: string
-  size?: "small" | "medium" | "large" | "wide" | "tall" | "extra-large"
+  size?: "compact" | "standard" | "wide" | "tall" | "large" | string
   position?: { x: number; y: number }
   span: { cols: number; rows: number }
   visible?: boolean

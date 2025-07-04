@@ -4,10 +4,13 @@ import React, { useEffect, useState, useMemo } from "react"
 import { useAuth } from "@/context/auth-context"
 import { useTour } from "@/context/tour-context"
 import { useRouter } from "next/navigation"
-// Removed dashboard layout imports - using SharePoint-style layout instead
 import { AppHeader } from "@/components/layout/app-header"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,7 +20,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   ArrowLeft,
@@ -34,7 +36,21 @@ import {
   AlertCircle,
   Activity,
   ChevronDown,
+  ChevronRight,
+  CheckCircle,
   Brain,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  RefreshCw,
+  MapPin,
+  Clock,
+  Target,
+  Briefcase,
+  Database,
+  Monitor,
+  Network,
+  Info,
 } from "lucide-react"
 
 // Mock data imports
@@ -51,6 +67,11 @@ import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibra
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
+// Stage-Adaptive Components
+import { StageAdaptiveContent } from "@/components/project-stages/StageAdaptiveContent"
+import { StageProgressIndicator } from "@/components/project-stages/StageProgressIndicator"
+import { getStageConfig, isStageTransitionValid } from "@/types/project-stage-config"
+
 interface ProjectControlCenterPageProps {
   params: {
     projectId: string
@@ -58,27 +79,30 @@ interface ProjectControlCenterPageProps {
 }
 
 /**
- * Project Control Center Page
- * ---------------------------
- * Centralized project-specific workspace for interacting with all data tied to one project.
+ * PHASE 4: Stage-Adaptive Project Control Center
+ * -----------------------------------------------
+ * Enhanced project page with infrastructure module layout structure,
+ * stage-adaptive interface, and production-ready features.
+ *
  * Features:
- * - Project-specific dashboard layout
- * - Filtered mock data by project_id
- * - SharePoint integration for document management
- * - Full light/dark mode support
+ * - Infrastructure module layout pattern
+ * - Stage-adaptive interface based on project lifecycle stage
+ * - User role-based access control and permissions
+ * - Responsive sidebar with project overview and quick actions
+ * - Tabbed main content with stage-specific sections
+ * - Integration with existing SharePoint and HBI systems
+ * - Full light/dark theme compatibility
  */
 export default function ProjectControlCenterPage({ params }: ProjectControlCenterPageProps) {
   const { user } = useAuth()
   const { startTour, isTourAvailable } = useTour()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
-  const [reportSettingsOpen, setReportSettingsOpen] = useState(false)
-  const [hbiInsightsOpen, setHbiInsightsOpen] = useState(true)
-  const [reportSettings, setReportSettings] = useState({
-    "Financial Review": 15,
-    "PX Progress": 25,
-    "Owner Progress": 5,
-  })
+  const [useStageAdaptive, setUseStageAdaptive] = useState(true)
+  const [activeTab, setActiveTab] = useState("overview")
+  const [stageTransitionError, setStageTransitionError] = useState<string | null>(null)
+  const [currentStage, setCurrentStage] = useState<string>("")
+  const [lastRefresh, setLastRefresh] = useState(new Date())
 
   const projectId = parseInt(params.projectId)
 
@@ -87,383 +111,195 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     return projectsData.find((p) => p.project_id === projectId)
   }, [projectId])
 
-  // Filter all data by project_id
-  const projectData = useMemo(() => {
-    if (!project) return null
+  // User role and permissions management
+  const userRole = useMemo(() => {
+    if (!user?.email) return "viewer"
 
-    // Filter cash flow data
-    const cashFlow = cashFlowData.projects.find((p) => p.project_id === projectId)
+    if (user.email.includes("pm@") || user.email.includes("manager@")) return "project_manager"
+    if (user.email.includes("super@") || user.email.includes("field@")) return "superintendent"
+    if (user.email.includes("exec@") || user.email.includes("executive@")) return "executive"
+    if (user.email.includes("estimator@")) return "estimator"
+    if (user.email.includes("admin@")) return "admin"
 
-    // Filter constraints
-    const constraints = constraintsData.find((c) => c.project_id === projectId)?.constraints || []
+    return "team_member"
+  }, [user])
 
-    // Filter field reports (using reports data as substitute)
-    const fieldReports = reportsData?.reports?.filter((r) => r.projectId === projectId.toString()) || []
+  // Stage configuration and access control
+  const stageConfig = useMemo(() => {
+    if (!project?.project_stage_name) return null
+    return getStageConfig(project.project_stage_name)
+  }, [project])
 
-    // Filter procurement data
-    const procurement = procurementData.filter((p) => p.project_id === `proj-${projectId.toString().padStart(3, "0")}`)
+  // Check if user has access to this stage and project
+  const hasStageAccess = useMemo(() => {
+    if (!stageConfig || !userRole) return false
 
-    // Filter permits
-    const permits = permitsData.find((p) => p.project_id === projectId)?.permits || []
+    if (userRole === "admin" || userRole === "executive") return true
 
-    // Filter staffing data
-    const staffing = staffingData.filter((s) => s.project_id === projectId)
-
-    return {
-      project,
-      cashFlow,
-      constraints,
-      fieldReports,
-      procurement,
-      permits,
-      staffing,
-    }
-  }, [project, projectId])
-
-  // Analytics metrics for SharePoint-style cards
-  const analyticsData = useMemo(() => {
-    if (!projectData) return null
-
-    const currentMonth = projectData.cashFlow?.cashFlowData?.monthlyData?.[0]
-    const foldersCount = 18 // Total project folders
-    const totalFiles = 556 // Sum of all files in folders (24+18+0+0+12+31+47+23+15+89+0+8+52+7+34+67+156+3)
-
-    // Process constraints for Open Issues card
-    const allConstraints = projectData.constraints || []
-    const openConstraints = allConstraints.filter((c) => c.completionStatus !== "Closed")
-
-    // Calculate overdue constraints (past due date)
-    const currentDate = new Date()
-    const overdueConstraints = openConstraints.filter((c) => {
-      if (!c.dueDate) return false
-      const dueDate = new Date(c.dueDate)
-      return dueDate < currentDate
-    })
-
-    // Calculate critical constraints (>60 days elapsed or overdue)
-    const criticalConstraints = openConstraints.filter(
-      (c) => c.daysElapsed > 60 || overdueConstraints.some((oc) => oc.id === c.id)
-    )
-
-    const activeConstraints = openConstraints.length
-    const completedReports = projectData.fieldReports?.filter((r) => r.status === "approved").length || 0
-
-    // Calculate project completion percentage
-    const startDate = new Date(projectData.project?.contract_date || "2024-01-15")
-    const endDate = new Date(projectData.project?.scheduled_completion || "2024-12-31")
-    const totalDuration = endDate.getTime() - startDate.getTime()
-    const elapsedDuration = currentDate.getTime() - startDate.getTime()
-    const percentComplete = Math.max(0, Math.min(100, Math.round((elapsedDuration / totalDuration) * 100)))
-
-    // Calculate project health score (based on main dashboard pattern)
-    const scheduleHealth = 87.5 // Mock: based on schedule performance
-    const budgetHealth = 82.1 // Mock: based on budget performance
-    const qualityHealth = 91.2 // Mock: based on quality metrics
-    const safetyHealth = 95.8 // Mock: based on safety record
-    const riskHealth = 76.4 // Mock: based on risk assessment
-
-    const projectHealthScore = Math.round(
-      (scheduleHealth + budgetHealth + qualityHealth + safetyHealth + riskHealth) / 5
-    )
-
-    const getHealthStatus = (score: number) => {
-      if (score >= 90) return "Excellent"
-      if (score >= 80) return "Good"
-      if (score >= 70) return "Fair"
-      return "Poor"
+    const rolePermissions = {
+      "BIM Coordination": ["project_manager", "estimator", "team_member"],
+      Bidding: ["project_manager", "estimator", "executive"],
+      "Pre-Construction": ["project_manager", "estimator", "executive"],
+      Construction: ["project_manager", "superintendent", "team_member", "executive"],
+      Closeout: ["project_manager", "superintendent", "executive"],
+      Warranty: ["project_manager", "executive"],
+      Closed: ["project_manager", "executive", "admin"],
     }
 
-    // Mock Notice of Commencement description
-    const nocDescription = `Construction of luxury residential estate consisting of custom single-family home with associated site improvements including driveway, landscaping, and utility connections. Project includes foundation, framing, mechanical, electrical, and plumbing systems, interior finishes, and exterior architectural features. Located at 123 Ocean Drive, Palm Beach County, Florida. Estimated completion 365 calendar days from commencement.`
+    const allowedRoles = rolePermissions[stageConfig.stageName as keyof typeof rolePermissions] || []
+    return allowedRoles.includes(userRole)
+  }, [stageConfig, userRole])
 
-    // Cash flow metrics
-    const netCashFlow = projectData.cashFlow?.cashFlowData?.summary?.netCashFlow || 0
-    const monthlyNetCashFlow = currentMonth?.netCashFlow || 0
-    const cashFlowTrend = monthlyNetCashFlow >= 0 ? "positive" : "negative"
-
-    // Schedule health metrics (mock data based on project_id patterns)
-    const scheduleHealthData = {
-      2525840: {
-        logicIntegrity: 92,
-        constraintValidity: 87,
-        durationReasonableness: 78,
-        resourceLoading: 85,
-        calendarCompliance: 94,
-        progressIntegrity: 89,
-      },
-      2525841: {
-        logicIntegrity: 88,
-        constraintValidity: 91,
-        durationReasonableness: 82,
-        resourceLoading: 79,
-        calendarCompliance: 96,
-        progressIntegrity: 85,
-      },
-      2525842: {
-        logicIntegrity: 95,
-        constraintValidity: 83,
-        durationReasonableness: 86,
-        resourceLoading: 91,
-        calendarCompliance: 89,
-        progressIntegrity: 92,
-      },
-    }
-
-    const currentProjectScheduleData =
-      scheduleHealthData[projectId as keyof typeof scheduleHealthData] || scheduleHealthData[2525840] // default fallback
-
-    const scheduleHealthScore = Math.round(
-      (currentProjectScheduleData.logicIntegrity +
-        currentProjectScheduleData.constraintValidity +
-        currentProjectScheduleData.durationReasonableness +
-        currentProjectScheduleData.resourceLoading +
-        currentProjectScheduleData.calendarCompliance +
-        currentProjectScheduleData.progressIntegrity) /
-        6
-    )
-
-    const getScheduleHealthStatus = (score: number) => {
-      if (score >= 90) return "Excellent"
-      if (score >= 80) return "Good"
-      if (score >= 70) return "Fair"
-      return "Poor"
-    }
-
-    return {
-      foldersCount,
-      totalFiles,
-      documentsCount: totalFiles,
-      storageUsed: "4.7 GB",
-      recentActivity: 23,
-      budget: projectData.project?.contract_value || 0,
-      budgetUtilized: currentMonth?.cumulativeCashFlow || 0,
-      activeConstraints,
-      completedReports,
-      teamMembers: projectData.staffing?.length || 0,
-      lastActivity: "15 minutes ago",
-      contractValue: projectData.project?.contract_value || 0,
-      startDate: projectData.project?.contract_date || "2024-01-15",
-      percentComplete,
-      nocDescription,
-      projectHealthScore,
-      healthStatus: getHealthStatus(projectHealthScore),
-      // Open Issues metrics
-      openIssues: openConstraints.length,
-      criticalIssues: criticalConstraints.length,
-      overdueIssues: overdueConstraints.length,
-      recentIssues: openConstraints.filter((c) => c.daysElapsed <= 7).length,
-      // Cash flow metrics
-      netCashFlow,
-      monthlyNetCashFlow,
-      cashFlowTrend,
-      // Schedule health metrics
-      scheduleHealthScore,
-      scheduleHealthStatus: getScheduleHealthStatus(scheduleHealthScore),
-      scheduleHealthData: currentProjectScheduleData,
-    }
-  }, [projectData])
-
-  // Project-specific HBI insights using mock data
+  // Project-specific AI insights
   const projectInsights = useMemo(() => {
-    if (!projectData || !analyticsData) return []
+    if (!project || !stageConfig) return []
 
-    const insights = []
-
-    // Cash flow insights
-    if (projectData.cashFlow) {
-      const netCashFlow = analyticsData.netCashFlow
-      if (netCashFlow < 0) {
-        insights.push({
-          id: `cash-flow-${projectId}`,
-          type: "risk",
-          severity: "high",
-          title: "Negative Cash Flow Detected",
-          text: `Project showing ${Math.abs(netCashFlow / 1000).toFixed(
-            0
-          )}K negative cash flow trend requiring immediate attention.`,
-          action: "Accelerate billing milestones and review payment terms with client.",
-          confidence: 94,
-          relatedMetrics: ["Cash Flow", "Billing Schedule", "Project Margins"],
-          project_id: projectId.toString(),
-        })
-      } else if (netCashFlow > 500000) {
-        insights.push({
-          id: `cash-positive-${projectId}`,
-          type: "opportunity",
-          severity: "medium",
-          title: "Strong Cash Flow Performance",
-          text: `Project generating ${(netCashFlow / 1000).toFixed(0)}K positive cash flow above projections.`,
-          action: "Consider accelerating optional scope items while cash position is strong.",
-          confidence: 91,
-          relatedMetrics: ["Cash Flow", "Project Performance", "Scope Management"],
-          project_id: projectId.toString(),
-        })
-      }
-    }
-
-    // Schedule health insights
-    if (analyticsData.scheduleHealthScore < 80) {
-      insights.push({
-        id: `schedule-health-${projectId}`,
-        type: "alert",
-        severity: "high",
-        title: "Schedule Health Below Threshold",
-        text: `Schedule health score of ${analyticsData.scheduleHealthScore}% indicates potential coordination issues.`,
-        action: "Implement weekly coordination meetings and review critical path activities.",
-        confidence: 89,
-        relatedMetrics: ["Schedule Health", "Critical Path", "Resource Coordination"],
-        project_id: projectId.toString(),
-      })
-    }
-
-    // Constraints insights
-    if (analyticsData.criticalIssues > 5) {
-      insights.push({
-        id: `constraints-${projectId}`,
-        type: "risk",
-        severity: "high",
-        title: "Critical Constraints Accumulating",
-        text: `${analyticsData.criticalIssues} critical constraints identified requiring immediate resolution.`,
-        action: "Prioritize constraint resolution and implement daily constraint tracking.",
-        confidence: 96,
-        relatedMetrics: ["Constraints", "Project Risk", "Timeline Impact"],
-        project_id: projectId.toString(),
-      })
-    }
-
-    // Procurement insights
-    if (projectData.procurement && projectData.procurement.length > 0) {
-      const totalProcurementValue = projectData.procurement.reduce((sum, item) => sum + (item.committed_value || 0), 0)
-      const budgetUtilization = (totalProcurementValue / (analyticsData.contractValue || 1)) * 100
-
-      if (budgetUtilization > 85) {
-        insights.push({
-          id: `procurement-${projectId}`,
-          type: "alert",
-          severity: "medium",
-          title: "High Procurement Utilization",
-          text: `${budgetUtilization.toFixed(1)}% of budget committed through procurement contracts.`,
-          action: "Review remaining scope for potential cost optimization opportunities.",
-          confidence: 87,
-          relatedMetrics: ["Procurement", "Budget Utilization", "Cost Control"],
-          project_id: projectId.toString(),
-        })
-      }
-    }
-
-    // Completion forecast
-    if (analyticsData.percentComplete > 0) {
-      const daysElapsed = Math.floor(
-        (new Date().getTime() - new Date(analyticsData.startDate).getTime()) / (1000 * 3600 * 24)
-      )
-      const projectedDuration = (daysElapsed / analyticsData.percentComplete) * 100
-      const scheduledDuration = Math.floor(
-        (new Date(projectData.project?.scheduled_completion || "2024-12-31").getTime() -
-          new Date(analyticsData.startDate).getTime()) /
-          (1000 * 3600 * 24)
-      )
-
-      if (projectedDuration > scheduledDuration * 1.1) {
-        insights.push({
-          id: `completion-forecast-${projectId}`,
-          type: "forecast",
-          severity: "medium",
-          title: "Schedule Extension Likely",
-          text: `AI models predict ${Math.round(
-            projectedDuration - scheduledDuration
-          )} day extension based on current progress.`,
-          action: "Implement resource acceleration plan for critical path activities.",
-          confidence: 83,
-          relatedMetrics: ["Project Duration", "Progress Rate", "Critical Path"],
-          project_id: projectId.toString(),
-        })
-      } else if (projectedDuration < scheduledDuration * 0.95) {
-        insights.push({
-          id: `early-completion-${projectId}`,
-          type: "opportunity",
-          severity: "low",
-          title: "Early Completion Potential",
-          text: `Current progress indicates potential ${Math.round(
-            scheduledDuration - projectedDuration
-          )} day early completion.`,
-          action: "Consider advancing follow-on project activities or expanding scope.",
-          confidence: 78,
-          relatedMetrics: ["Project Duration", "Progress Rate", "Scope Opportunities"],
-          project_id: projectId.toString(),
-        })
-      }
-    }
-
-    // Performance insights
-    if (analyticsData.projectHealthScore >= 85) {
-      insights.push({
-        id: `performance-${projectId}`,
+    const baseInsights = [
+      {
+        id: "proj-1",
         type: "performance",
         severity: "low",
-        title: "Exceptional Project Performance",
-        text: `Project health score of ${analyticsData.projectHealthScore}% exceeds industry benchmarks.`,
-        action: "Document best practices for replication on future projects.",
+        title: "Project Progress On Track",
+        text: `${project.name} is progressing according to schedule in the ${stageConfig.stageName} stage.`,
+        action: "Continue monitoring key milestones and resource allocation.",
         confidence: 92,
-        relatedMetrics: ["Project Health", "Performance Metrics", "Best Practices"],
-        project_id: projectId.toString(),
+        relatedMetrics: ["Schedule Adherence", "Budget Performance", "Resource Utilization"],
+      },
+      {
+        id: "proj-2",
+        type: "alert",
+        severity: "medium",
+        title: "Budget Variance Alert",
+        text: "Current spending rate suggests potential budget overrun by 3-5% if current trends continue.",
+        action: "Review cost controls and consider value engineering opportunities.",
+        confidence: 87,
+        relatedMetrics: ["Cost Performance", "Budget Tracking", "Change Orders"],
+      },
+      {
+        id: "proj-3",
+        type: "opportunity",
+        severity: "low",
+        title: "Stage Transition Opportunity",
+        text: `Project criteria met for potential advancement to next stage. Consider initiating transition process.`,
+        action: "Schedule stage gate review and prepare transition documentation.",
+        confidence: 78,
+        relatedMetrics: ["Stage Readiness", "Deliverable Status", "Quality Metrics"],
+      },
+    ]
+
+    // Add stage-specific insights
+    if (stageConfig.stageName === "Construction") {
+      baseInsights.push({
+        id: "proj-4",
+        type: "risk",
+        severity: "high",
+        title: "Weather Impact Risk",
+        text: "Upcoming weather patterns may impact exterior work scheduled for next 2 weeks.",
+        action: "Adjust schedule to prioritize weather-sensitive activities and prepare contingency plans.",
+        confidence: 85,
+        relatedMetrics: ["Weather Forecast", "Schedule Risk", "Work Sequencing"],
       })
     }
 
-    return insights
-  }, [projectData, analyticsData, projectId])
+    return baseInsights
+  }, [project, stageConfig])
 
+  // Mock project metrics
+  const projectMetrics = useMemo(() => {
+    if (!project) return null
+
+    return {
+      totalBudget: project.contract_value || 0,
+      spentToDate: Math.round((project.contract_value || 0) * 0.65),
+      remainingBudget: Math.round((project.contract_value || 0) * 0.35),
+      scheduleProgress: 72,
+      budgetProgress: 65,
+      activeTeamMembers: 28,
+      completedMilestones: 8,
+      totalMilestones: 12,
+      riskItems: 3,
+      activeRFIs: 7,
+      changeOrders: 2,
+    }
+  }, [project])
+
+  // Mock recent activity
+  const recentActivity = useMemo(
+    () => [
+      {
+        id: "act-1",
+        type: "milestone",
+        title: "Foundation Pour Complete",
+        description: "Milestone achieved ahead of schedule",
+        timestamp: "2024-01-02T10:30:00Z",
+        icon: CheckCircle,
+        color: "green",
+      },
+      {
+        id: "act-2",
+        type: "alert",
+        title: "Material Delivery Delay",
+        description: "Steel delivery postponed by 3 days",
+        timestamp: "2024-01-02T08:15:00Z",
+        icon: AlertCircle,
+        color: "orange",
+      },
+      {
+        id: "act-3",
+        type: "update",
+        title: "Design Review Completed",
+        description: "Electrical plans approved by engineer",
+        timestamp: "2024-01-01T16:45:00Z",
+        icon: FileText,
+        color: "blue",
+      },
+    ],
+    []
+  )
+
+  // Initialize current stage
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    if (project?.project_stage_name) {
+      setCurrentStage(project.project_stage_name)
+    }
+    setIsLoading(false)
+  }, [project])
 
-  // Navigation handler for Open Issues card
-  const handleOpenIssuesClick = () => {
-    router.push(`/dashboard/constraints-log?project_id=${projectId}`)
+  // Handle refresh
+  const handleRefresh = () => {
+    setLastRefresh(new Date())
+    console.log("Refreshing project data...")
   }
 
-  // Utility function to calculate next due date
-  const getNextDueDate = (dayOfMonth: number) => {
-    const today = new Date()
-    const currentDay = today.getDate()
-    const currentMonth = today.getMonth()
-    const currentYear = today.getFullYear()
+  // Toggle between stage-adaptive and traditional view
+  const toggleViewMode = () => {
+    setUseStageAdaptive(!useStageAdaptive)
+  }
 
-    let targetDate = new Date(currentYear, currentMonth, dayOfMonth)
-
-    // If the target day has already passed this month, move to next month
-    if (currentDay > dayOfMonth) {
-      targetDate = new Date(currentYear, currentMonth + 1, dayOfMonth)
+  // Handle stage transitions with validation
+  const handleStageChange = async (newStage: string) => {
+    if (!project || !hasStageAccess) {
+      setStageTransitionError("Insufficient permissions to change project stage")
+      return
     }
 
-    return targetDate
+    const isValid = isStageTransitionValid(currentStage, newStage)
+    if (!isValid) {
+      setStageTransitionError("Invalid stage transition")
+      return
+    }
+
+    try {
+      console.log(`Transitioning project ${projectId} from ${currentStage} to ${newStage}`)
+      setCurrentStage(newStage)
+      setStageTransitionError(null)
+    } catch (error) {
+      setStageTransitionError("Failed to update project stage. Please try again.")
+      console.error("Stage transition error:", error)
+    }
   }
 
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
-  // Mock last submitted dates for demonstration
-  const mockLastSubmitted = {
-    "Financial Review": new Date("2025-06-15"),
-    "PX Progress": new Date("2025-06-20"),
-    "Owner Progress": new Date("2025-06-28"),
-  }
-
-  // Handle report settings change
-  const handleReportSettingChange = (reportType: string, dayOfMonth: string) => {
-    setReportSettings((prev) => ({
-      ...prev,
-      [reportType]: parseInt(dayOfMonth),
-    }))
-  }
-
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -478,19 +314,53 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     )
   }
 
+  // Project not found
   if (!project) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader />
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <Building2 className="h-24 w-24 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Project Not Found</h1>
-            <p className="text-muted-foreground mb-4">The project with ID {projectId} could not be found.</p>
-            <Button onClick={() => router.push("/dashboard")} variant="outline">
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-2">Project Not Found</h1>
+            <p className="text-muted-foreground mb-4">The project with ID {params.projectId} could not be found.</p>
+            <Button onClick={() => router.push("/projects")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              Back to Projects
             </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Access denied
+  if (!hasStageAccess && useStageAdaptive) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Limited Access</AlertTitle>
+            <AlertDescription>
+              Your role ({userRole}) has limited access to the {stageConfig?.stageName} stage. You can view basic
+              project information below or contact your project manager for additional access.
+            </AlertDescription>
+          </Alert>
+
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">{project.name}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Stage</p>
+                <p className="font-medium">{project.project_stage_name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Your Role</p>
+                <p className="font-medium capitalize">{userRole.replace("_", " ")}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -501,7 +371,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* SharePoint-style Header - Sticky, Responsive */}
+      {/* Header Section - Sticky, following infrastructure module pattern */}
       <div className="sticky top-16 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
         <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
           <div className="max-w-[1920px] mx-auto">
@@ -530,152 +400,96 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
                   {project.name}
                 </h1>
-                <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                  {project.project_stage_name}
+                <Badge variant="secondary" className={`text-xs whitespace-nowrap ${stageConfig?.stageColor}`}>
+                  {currentStage}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {projectMetrics?.scheduleProgress}% Complete
                 </Badge>
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Share2 className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Share</span>
+                <Badge variant="outline" className="text-green-600 border-green-200 text-xs">
+                  <Activity className="h-3 w-3 mr-1" />
+                  Active
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  Last: {lastRefresh.toLocaleTimeString()}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleViewMode}
+                  className="text-sm"
+                  title={useStageAdaptive ? "Switch to traditional view" : "Switch to stage-adaptive view"}
+                >
+                  {useStageAdaptive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  <span className="hidden sm:inline ml-1">{useStageAdaptive ? "Traditional" : "Adaptive"}</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Settings className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Settings</span>
+                <Button variant="outline" size="sm" className="text-sm" onClick={handleRefresh}>
+                  <RefreshCw className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Refresh</span>
                 </Button>
               </div>
             </div>
+
+            {/* Stage Transition Error Alert */}
+            {stageTransitionError && (
+              <Alert className="mt-3">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Stage Transition Error</AlertTitle>
+                <AlertDescription>
+                  {stageTransitionError}
+                  <Button variant="ghost" size="sm" onClick={() => setStageTransitionError(null)} className="ml-2">
+                    Dismiss
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
         </div>
       </div>
 
-      {/* SharePoint-style Content Layout - Responsive container */}
+      {/* Main Content Layout - Following infrastructure module pattern */}
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         {/* Mobile Priority Cards - Show at top on small screens */}
         <div className="block xl:hidden mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {/* Project Overview Card - Mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-sm mb-4 text-foreground">Project Overview</h3>
-              <div className="space-y-4">
-                {/* Description */}
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-2">PROJECT DESCRIPTION</p>
-                  <p className="text-xs text-foreground leading-relaxed line-clamp-3">
-                    {analyticsData?.nocDescription}
-                  </p>
-                </div>
-
-                <div className="border-b border-border"></div>
-
-                {/* Key Metrics */}
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Contract Value</span>
-                    <span className="font-medium">${(analyticsData?.contractValue / 1000000).toFixed(1)}M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Start Date</span>
-                    <span className="font-medium">
-                      {new Date(analyticsData?.startDate || "").toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">% Complete</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-muted rounded-full h-2 w-12">
-                        <div
-                          className="bg-primary rounded-full h-2 transition-all duration-300"
-                          style={{ width: `${analyticsData?.percentComplete || 0}%` }}
-                        />
-                      </div>
-                      <span className="font-medium text-xs">{analyticsData?.percentComplete}%</span>
-                    </div>
-                  </div>
-                </div>
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Contract Value</h3>
+              <div className="text-2xl font-bold text-green-600">
+                ${(projectMetrics?.totalBudget || 0).toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <DollarSign className="h-3 w-3 text-green-500" />
+                Total budget
               </div>
             </div>
 
-            {/* Open Issues Analytics - Mobile */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
-              onClick={handleOpenIssuesClick}
-              title="Click to view constraints log"
-            >
-              <h3 className="font-semibold text-sm mb-4 text-foreground">Open Issues</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Open</span>
-                  <span className="font-medium">{analyticsData?.openIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Critical</span>
-                  <span className="font-medium text-red-600">{analyticsData?.criticalIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Overdue</span>
-                  <span className="font-medium text-orange-600">{analyticsData?.overdueIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Recent (7 days)</span>
-                  <span className="font-medium">{analyticsData?.recentIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Status</span>
-                  <span
-                    className={`font-medium text-xs ${
-                      analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0
-                        ? "text-green-600"
-                        : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0
-                      ? "Good"
-                      : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
-                      ? "Critical"
-                      : "Attention Needed"}
-                  </span>
-                </div>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Progress</h3>
+              <div className="text-2xl font-bold">{projectMetrics?.scheduleProgress}%</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Target className="h-3 w-3 text-blue-500" />
+                Schedule complete
               </div>
             </div>
 
-            {/* Project Reporting - Mobile */}
             <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Report Settings">
-                  <Settings className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                </Button>
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Team Size</h3>
+              <div className="text-2xl font-bold">{projectMetrics?.activeTeamMembers}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Users className="h-3 w-3 text-purple-500" />
+                Active members
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2 text-xs font-medium text-muted-foreground border-b pb-2">
-                  <span>Report</span>
-                  <span>Due Date</span>
-                </div>
-
-                {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => {
-                  const nextDueDate = getNextDueDate(dayOfMonth)
-
-                  return (
-                    <div key={reportType} className="grid grid-cols-2 gap-2 text-xs">
-                      <span className="font-medium text-foreground">
-                        {reportType
-                          .replace("Financial Review", "Financial")
-                          .replace("PX Progress", "PX Prog")
-                          .replace("Owner Progress", "Owner")}
-                      </span>
-                      <span className="text-muted-foreground">{formatDate(nextDueDate)}</span>
-                    </div>
-                  )
-                })}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Risk Items</h3>
+              <div className="text-2xl font-bold text-orange-600">{projectMetrics?.riskItems}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <AlertCircle className="h-3 w-3 text-orange-500" />
+                Active risks
               </div>
             </div>
           </div>
@@ -685,171 +499,38 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
           {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
           <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
-            {/* Project Overview Card - Desktop */}
+            {/* Project Overview Cards - Desktop */}
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Project Overview</h3>
-              <div className="space-y-4">
-                {/* Description */}
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-2">PROJECT DESCRIPTION</p>
-                  <p className="text-xs text-foreground leading-relaxed">{analyticsData?.nocDescription}</p>
-                </div>
-
-                <div className="border-b border-border"></div>
-
-                {/* Key Metrics */}
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Contract Value</span>
-                    <span className="font-medium">${(analyticsData?.contractValue / 1000000).toFixed(1)}M</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Start Date</span>
-                    <span className="font-medium">
-                      {new Date(analyticsData?.startDate || "").toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">% Complete</span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-muted rounded-full h-2 w-12">
-                        <div
-                          className="bg-primary rounded-full h-2 transition-all duration-300"
-                          style={{ width: `${analyticsData?.percentComplete || 0}%` }}
-                        />
-                      </div>
-                      <span className="font-medium text-xs">{analyticsData?.percentComplete}%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Open Issues Analytics - Desktop */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
-              onClick={handleOpenIssuesClick}
-              title="Click to view constraints log"
-            >
-              <h3 className="font-semibold text-sm mb-4 text-foreground">Open Issues</h3>
               <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Open</span>
-                  <span className="font-medium">{analyticsData?.openIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Critical</span>
-                  <span className="font-medium text-red-600">{analyticsData?.criticalIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Overdue</span>
-                  <span className="font-medium text-orange-600">{analyticsData?.overdueIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Recent (7 days)</span>
-                  <span className="font-medium">{analyticsData?.recentIssues}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Status</span>
-                  <span
-                    className={`font-medium text-xs ${
-                      analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0
-                        ? "text-green-600"
-                        : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {analyticsData?.criticalIssues === 0 && analyticsData?.overdueIssues === 0
-                      ? "Good"
-                      : analyticsData?.criticalIssues > 5 || analyticsData?.overdueIssues > 3
-                      ? "Critical"
-                      : "Attention Needed"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Project Reporting - Desktop */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-foreground">Project Reporting</h3>
-                <Dialog open={reportSettingsOpen} onOpenChange={setReportSettingsOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="lg"
-                      className="h-12 w-12 p-0 bg-transparent hover:bg-muted/30 relative z-50"
-                      title="Report Settings"
-                    >
-                      <Settings className="h-6 w-6 text-gray-700 dark:text-gray-300" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Project Report Settings</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Project Report</TableHead>
-                            <TableHead>Report Due Day</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => (
-                            <TableRow key={reportType}>
-                              <TableCell className="font-medium">{reportType}</TableCell>
-                              <TableCell>
-                                <Select
-                                  value={dayOfMonth.toString()}
-                                  onValueChange={(value) => handleReportSettingChange(reportType, value)}
-                                >
-                                  <SelectTrigger className="w-20">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                      <SelectItem key={day} value={day.toString()}>
-                                        {day}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div className="space-y-3">
-                <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground border-b pb-2">
-                  <span>Report</span>
-                  <span>Due Date</span>
-                  <span>Last Submitted</span>
+                {/* Project Description - First Item */}
+                <div className="pb-3 border-b border-border">
+                  <p className="text-xs text-muted-foreground mb-2">Description</p>
+                  <p className="text-xs text-foreground leading-relaxed max-h-24 overflow-y-auto">
+                    {project.description || "No description available"}
+                  </p>
                 </div>
 
-                {Object.entries(reportSettings).map(([reportType, dayOfMonth]) => {
-                  const nextDueDate = getNextDueDate(dayOfMonth)
-                  const lastSubmitted = mockLastSubmitted[reportType as keyof typeof mockLastSubmitted]
-
-                  return (
-                    <div key={reportType} className="grid grid-cols-3 gap-2 text-xs">
-                      <span className="font-medium text-foreground">{reportType}</span>
-                      <span className="text-muted-foreground">{formatDate(nextDueDate)}</span>
-                      <span className="text-muted-foreground">{formatDate(lastSubmitted)}</span>
-                    </div>
-                  )
-                })}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Value</span>
+                  <span className="font-medium">${(projectMetrics?.totalBudget || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Spent to Date</span>
+                  <span className="font-medium">${(projectMetrics?.spentToDate || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Schedule Progress</span>
+                  <span className="font-medium text-blue-600">{projectMetrics?.scheduleProgress}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Budget Progress</span>
+                  <span className="font-medium text-green-600">{projectMetrics?.budgetProgress}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Team Members</span>
+                  <span className="font-medium">{projectMetrics?.activeTeamMembers}</span>
+                </div>
               </div>
             </div>
 
@@ -858,290 +539,358 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
-                  <FileText className="h-4 w-4 mr-2" />
-                  New Document
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Review
                 </Button>
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Files
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Budget Analysis
                 </Button>
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
                   <Users className="h-4 w-4 mr-2" />
-                  Share with Team
+                  Team Management
                 </Button>
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage Access
+                  <FileText className="h-4 w-4 mr-2" />
+                  Generate Report
                 </Button>
               </div>
             </div>
 
-            {/* Recent Activity - Moved from main content */}
+            {/* Project Metrics */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Project Metrics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Milestones</span>
+                  <span className="font-medium text-green-600">
+                    {projectMetrics?.completedMilestones}/{projectMetrics?.totalMilestones}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Active RFIs</span>
+                  <span className="font-medium text-blue-600">{projectMetrics?.activeRFIs}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Change Orders</span>
+                  <span className="font-medium text-orange-600">{projectMetrics?.changeOrders}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Risk Items</span>
+                  <span className="font-medium text-red-600">{projectMetrics?.riskItems}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
               <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded">
-                    <Upload className="h-4 w-4 text-green-600" />
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-3">
+                    <div className={`p-1 rounded bg-${activity.color}-100 dark:bg-${activity.color}-900/20`}>
+                      <activity.icon className={`h-4 w-4 text-${activity.color}-600`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground">{activity.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(activity.timestamp).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-medium">Daily report uploaded to 09-DailyReport</p>
-                    <p className="text-xs text-muted-foreground">by Lisa Garcia • 15 minutes ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="bg-orange-100 dark:bg-orange-900/20 p-1 rounded">
-                    <FileText className="h-4 w-4 text-orange-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-medium">Safety inspection report added to 08-Safety</p>
-                    <p className="text-xs text-muted-foreground">by Mark Davis • 1 hour ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded">
-                    <Share2 className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-medium">Submittal package shared in 15-Submittal</p>
-                    <p className="text-xs text-muted-foreground">by Sarah Wilson • 2 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="bg-purple-100 dark:bg-purple-900/20 p-1 rounded">
-                    <AlertCircle className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-medium">RFI response updated in 07-RFI</p>
-                    <p className="text-xs text-muted-foreground">by John Smith • 3 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="bg-indigo-100 dark:bg-indigo-900/20 p-1 rounded">
-                    <Calendar className="h-4 w-4 text-indigo-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-medium">Meeting minutes uploaded to 06-Meeting</p>
-                    <p className="text-xs text-muted-foreground">by Emily Davis • 4 hours ago</p>
-                  </div>
-                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* HBI Project Insights */}
+            <div className="bg-card border border-border rounded-lg">
+              <div className="p-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">HBI Project Insights</h3>
+              </div>
+              <div className="p-0 h-80">
+                <EnhancedHBIInsights config={projectInsights} cardId={`project-insights-${projectId}`} />
               </div>
             </div>
           </div>
 
           {/* Main Content Area */}
           <div className="xl:col-span-9 space-y-4 lg:space-y-6">
-            {/* Activity Summary Cards - Responsive grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
+            {/* Tab Navigation */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="schedule">Schedule</TabsTrigger>
+                  <TabsTrigger value="financial">Financial</TabsTrigger>
+                  <TabsTrigger value="team">Team</TabsTrigger>
+                  <TabsTrigger value="documents">Documents</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-4 mt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Project Summary Card */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Project Summary</CardTitle>
+                        <CardDescription>Key project information and metrics</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Project Type</p>
+                              <p className="font-medium">{project.project_type_name}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Duration</p>
+                              <p className="font-medium">{project.duration} days</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Square Feet</p>
+                              <p className="font-medium">{project.square_feet?.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Location</p>
+                              <p className="font-medium">{project.address || "Not specified"}</p>
+                            </div>
+                          </div>
+
+                          <div className="pt-4 border-t">
+                            <div className="flex justify-between mb-2">
+                              <span className="text-sm text-muted-foreground">Schedule Progress</span>
+                              <span className="text-sm font-medium">{projectMetrics?.scheduleProgress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-blue-600 h-2 rounded-full"
+                                style={{ width: `${projectMetrics?.scheduleProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Stage-Adaptive Content */}
+                    {useStageAdaptive && stageConfig && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">{stageConfig.stageName} Stage Tools</CardTitle>
+                          <CardDescription>Tools and features for current project stage</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="h-64 overflow-y-auto">
+                            <StageAdaptiveContent
+                              project={{
+                                ...project,
+                                project_stage_name: currentStage,
+                              }}
+                              currentStage={currentStage}
+                              userRole={userRole}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Project Status:</strong> This project is currently in the {currentStage} stage with{" "}
+                      {projectMetrics?.scheduleProgress}% completion. {projectMetrics?.riskItems} risk items require
+                      attention.
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
+
+                <TabsContent value="schedule" className="space-y-4 mt-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Project Health</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-2xl font-bold text-foreground">{analyticsData?.projectHealthScore}%</p>
-                      <span
-                        className={`text-sm px-2 py-1 rounded ${
-                          analyticsData?.projectHealthScore >= 90
-                            ? "text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30"
-                            : analyticsData?.projectHealthScore >= 80
-                            ? "text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30"
-                            : analyticsData?.projectHealthScore >= 70
-                            ? "text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30"
-                            : "text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30"
-                        }`}
-                      >
-                        {analyticsData?.healthStatus}
-                      </span>
-                    </div>
+                    <h3 className="text-lg font-semibold">Schedule Management</h3>
+                    <p className="text-sm text-muted-foreground">Project timeline and milestone tracking</p>
                   </div>
-                  <div
-                    className={`p-2 rounded-lg ${
-                      analyticsData?.projectHealthScore >= 90
-                        ? "bg-green-100 dark:bg-green-900/20"
-                        : analyticsData?.projectHealthScore >= 80
-                        ? "bg-blue-100 dark:bg-blue-900/20"
-                        : analyticsData?.projectHealthScore >= 70
-                        ? "bg-yellow-100 dark:bg-yellow-900/20"
-                        : "bg-red-100 dark:bg-red-900/20"
-                    }`}
-                  >
-                    <TrendingUp
-                      className={`h-5 w-5 ${
-                        analyticsData?.projectHealthScore >= 90
-                          ? "text-green-600"
-                          : analyticsData?.projectHealthScore >= 80
-                          ? "text-blue-600"
-                          : analyticsData?.projectHealthScore >= 70
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div
-                className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
-                onClick={() => router.push("/dashboard/financial-hub?tab=cash-flow")}
-                title="Click to view cash flow analysis"
-              >
-                <div className="flex items-center justify-between">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Project Timeline</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">
+                              {projectMetrics?.completedMilestones}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Completed Milestones</div>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">{projectMetrics?.scheduleProgress}%</div>
+                            <div className="text-sm text-muted-foreground">Schedule Progress</div>
+                          </div>
+                          <div className="text-center p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-orange-600">{project.duration}</div>
+                            <div className="text-sm text-muted-foreground">Total Duration (Days)</div>
+                          </div>
+                        </div>
+                        <div className="text-center py-8">
+                          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <p className="text-muted-foreground">
+                            Detailed schedule view integration coming soon. Connect with your project management system.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="financial" className="space-y-4 mt-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Net Cash Flow</p>
-                    <p className="text-2xl font-bold text-foreground">
-                      ${((analyticsData?.netCashFlow || 0) / 1000).toFixed(0)}K
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {analyticsData?.cashFlowTrend === "positive" ? "+" : ""}$
-                      {((analyticsData?.monthlyNetCashFlow || 0) / 1000).toFixed(0)}K this month
-                    </p>
+                    <h3 className="text-lg font-semibold">Financial Management</h3>
+                    <p className="text-sm text-muted-foreground">Budget tracking and cost analysis</p>
                   </div>
-                  <div
-                    className={`p-2 rounded-lg ${
-                      (analyticsData?.netCashFlow || 0) >= 0
-                        ? "bg-green-100 dark:bg-green-900/20"
-                        : "bg-red-100 dark:bg-red-900/20"
-                    }`}
-                  >
-                    <DollarSign
-                      className={`h-5 w-5 ${
-                        (analyticsData?.netCashFlow || 0) >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div
-                className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200"
-                onClick={() => router.push("/dashboard/scheduler?tab=health-analysis")}
-                title="Click to view detailed schedule health analysis"
-              >
-                <div className="flex items-center justify-between">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Budget Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">
+                              ${(projectMetrics?.totalBudget || 0).toLocaleString()}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Total Budget</div>
+                          </div>
+                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">
+                              ${(projectMetrics?.spentToDate || 0).toLocaleString()}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Spent to Date</div>
+                          </div>
+                          <div className="text-center p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-orange-600">
+                              ${(projectMetrics?.remainingBudget || 0).toLocaleString()}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Remaining Budget</div>
+                          </div>
+                        </div>
+                        <div className="pt-4 border-t">
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Budget Progress</span>
+                            <span className="text-sm font-medium">{projectMetrics?.budgetProgress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-green-600 h-2 rounded-full"
+                              style={{ width: `${projectMetrics?.budgetProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="team" className="space-y-4 mt-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Schedule Health</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-2xl font-bold text-foreground">{analyticsData?.scheduleHealthScore}%</p>
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          analyticsData?.scheduleHealthScore >= 90
-                            ? "text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30"
-                            : analyticsData?.scheduleHealthScore >= 80
-                            ? "text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30"
-                            : analyticsData?.scheduleHealthScore >= 70
-                            ? "text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30"
-                            : "text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30"
-                        }`}
-                      >
-                        {analyticsData?.scheduleHealthStatus}
-                      </span>
-                    </div>
+                    <h3 className="text-lg font-semibold">Team Management</h3>
+                    <p className="text-sm text-muted-foreground">Project team and resource allocation</p>
                   </div>
-                  <div
-                    className={`p-2 rounded-lg ${
-                      analyticsData?.scheduleHealthScore >= 90
-                        ? "bg-green-100 dark:bg-green-900/20"
-                        : analyticsData?.scheduleHealthScore >= 80
-                        ? "bg-blue-100 dark:bg-blue-900/20"
-                        : analyticsData?.scheduleHealthScore >= 70
-                        ? "bg-yellow-100 dark:bg-yellow-900/20"
-                        : "bg-red-100 dark:bg-red-900/20"
-                    }`}
-                  >
-                    <Activity
-                      className={`h-5 w-5 ${
-                        analyticsData?.scheduleHealthScore >= 90
-                          ? "text-green-600"
-                          : analyticsData?.scheduleHealthScore >= 80
-                          ? "text-blue-600"
-                          : analyticsData?.scheduleHealthScore >= 70
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* HBI Project Insights */}
-            <Collapsible open={hbiInsightsOpen} onOpenChange={setHbiInsightsOpen}>
-              <div className="bg-card border border-border rounded-lg overflow-hidden">
-                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-purple-100 dark:bg-purple-900/20 p-2 rounded-lg">
-                      <Brain className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-lg text-foreground">HBI {project.name} Insights</h3>
-                      <p className="text-sm text-muted-foreground">
-                        AI-powered project intelligence and recommendations
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-muted-foreground">{projectInsights.length} insights</div>
-                    <ChevronDown
-                      className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
-                        hbiInsightsOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </div>
-                </CollapsibleTrigger>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Team Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-purple-600">
+                              {projectMetrics?.activeTeamMembers}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Active Team Members</div>
+                          </div>
+                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">
+                              {userRole === "admin" || userRole === "project_manager" ? "Full" : "Limited"}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Your Access Level</div>
+                          </div>
+                        </div>
+                        <div className="text-center py-8">
+                          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <p className="text-muted-foreground">
+                            Team management features integration coming soon. Connect with your HR system.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-                <CollapsibleContent>
-                  <div className="border-t border-border">
-                    <div className="h-96">
-                      <EnhancedHBIInsights config={projectInsights} cardId={`project-insights-${projectId}`} />
-                    </div>
+                <TabsContent value="documents" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Document Management</h3>
+                    <p className="text-sm text-muted-foreground">Project documents and file management</p>
                   </div>
-                </CollapsibleContent>
-              </div>
-            </Collapsible>
 
-            {/* Main Document Library - Responsive height */}
-            <SharePointLibraryViewer
-              projectId={projectId.toString()}
-              projectName={project.name}
-              className="min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]"
-            />
-
-            {/* Project Health - Single Card */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h3 className="font-semibold text-lg mb-4 text-foreground">Project Health</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Schedule Performance</span>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-green-500 h-2 w-16 rounded-full"></div>
-                    <span className="text-sm font-medium">On Track</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Budget Performance</span>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-yellow-500 h-2 w-16 rounded-full"></div>
-                    <span className="text-sm font-medium">At Risk</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Quality Score</span>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-green-500 h-2 w-16 rounded-full"></div>
-                    <span className="text-sm font-medium">Excellent</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Team Productivity</span>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-blue-500 h-2 w-16 rounded-full"></div>
-                    <span className="text-sm font-medium">High</span>
-                  </div>
-                </div>
-              </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">SharePoint Document Library</CardTitle>
+                      <CardDescription>Access project documents and files</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-96">
+                        <SharePointLibraryViewer
+                          projectId={projectId.toString()}
+                          projectName={project.name}
+                          className="h-full"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Integration Info */}
+      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Integration Capabilities</CardTitle>
+            <CardDescription>Project management system integrations</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-blue-600" />
+                <span className="text-sm">SharePoint Integration</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Brain className="h-4 w-4 text-purple-600" />
+                <span className="text-sm">HBI AI Insights</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-green-600" />
+                <span className="text-sm">Schedule Management</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-orange-600" />
+                <span className="text-sm">Financial Tracking</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
