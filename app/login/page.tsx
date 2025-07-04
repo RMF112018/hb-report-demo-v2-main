@@ -132,10 +132,10 @@ export default function LoginPage() {
     },
     {
       key: "admin",
-      label: "System Admin",
+      label: "IT Administrator",
       email: "lisa.wilson@hedrickbrothers.com",
       icon: Shield,
-      redirectTo: "/dashboard",
+      redirectTo: "/it-command-center",
     },
   ]
 
@@ -164,27 +164,27 @@ export default function LoginPage() {
 
   // Auto-start tour and welcome message for new visitors
   useEffect(() => {
-    if (typeof window !== 'undefined' && isTourAvailable && isClient) {
+    if (typeof window !== "undefined" && isTourAvailable && isClient) {
       try {
         // Check if user has disabled tours permanently
-        const hasDisabledTours = localStorage.getItem('hb-tour-available') === 'false'
-        
+        const hasDisabledTours = localStorage.getItem("hb-tour-available") === "false"
+
         if (hasDisabledTours) {
-          console.log('Tours disabled by user preference')
+          console.log("Tours disabled by user preference")
           return
         }
 
         // Session-based tracking to ensure one-time display
-        const hasShownWelcome = sessionStorage.getItem('hb-welcome-shown')
-        const hasShownTour = sessionStorage.getItem('hb-tour-shown-login-demo-accounts')
-        
-        console.log('Tour auto-start check:', {
+        const hasShownWelcome = sessionStorage.getItem("hb-welcome-shown")
+        const hasShownTour = sessionStorage.getItem("hb-tour-shown-login-demo-accounts")
+
+        console.log("Tour auto-start check:", {
           isTourAvailable,
           hasShownWelcome,
           hasShownTour,
-          hasDisabledTours
+          hasDisabledTours,
         })
-        
+
         // Show welcome toast once per session
         if (!hasShownWelcome) {
           setTimeout(() => {
@@ -193,19 +193,19 @@ export default function LoginPage() {
               description: "Interactive tours are available to help you explore the platform.",
               duration: 6000,
             })
-            sessionStorage.setItem('hb-welcome-shown', 'true')
+            sessionStorage.setItem("hb-welcome-shown", "true")
           }, 1000)
         }
-        
+
         // Auto-start login tour once per session
         if (!hasShownTour) {
           setTimeout(() => {
-            console.log('Auto-starting login tour...')
-            startTour('login-demo-accounts', true) // true indicates auto-start
+            console.log("Auto-starting login tour...")
+            startTour("login-demo-accounts", true) // true indicates auto-start
           }, 3000)
         }
       } catch (error) {
-        console.error('Error with storage access:', error)
+        console.error("Error with storage access:", error)
       }
     }
   }, [isTourAvailable, startTour, toast, isClient])
@@ -223,7 +223,8 @@ export default function LoginPage() {
       })
       router.push(redirectTo)
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid credentials. Please check your email and password."
+      const errorMessage =
+        error instanceof Error ? error.message : "Invalid credentials. Please check your email and password."
       setLoginError(errorMessage)
       toast({
         title: "Login failed",
@@ -306,31 +307,29 @@ export default function LoginPage() {
         .login-page-container * {
           color-scheme: light;
         }
-        
+
         /* Enhanced visual feedback animations */
         .login-card {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .login-card:hover {
           transform: translateY(-2px);
-          box-shadow: 
-            0 25px 50px -12px rgba(0, 0, 0, 0.25),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
-        
+
         .login-form input:focus {
           transform: scale(1.01);
         }
-        
+
         /* Improved button states */
         .login-form button {
           position: relative;
           overflow: hidden;
         }
-        
+
         .login-form button:before {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: -100%;
@@ -339,11 +338,11 @@ export default function LoginPage() {
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
           transition: left 0.5s;
         }
-        
+
         .login-form button:hover:before {
           left: 100%;
         }
-        
+
         /* Enhanced focus states for accessibility */
         .login-form *:focus-visible {
           outline: 2px solid #003087;
@@ -420,7 +419,10 @@ export default function LoginPage() {
               <div className="relative z-10 flex-shrink-0">
                 <div className="flex items-center mb-6 lg:mb-8">
                   <div className="bg-white p-2 lg:p-3 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-200">
-                    <Building2 className={`text-[#003087] ${isLargeScreen ? "h-8 w-8" : "h-6 w-6"}`} aria-hidden="true" />
+                    <Building2
+                      className={`text-[#003087] ${isLargeScreen ? "h-8 w-8" : "h-6 w-6"}`}
+                      aria-hidden="true"
+                    />
                   </div>
                   <div className="ml-3 lg:ml-4">
                     <h1 className={`font-bold tracking-tight ${isLargeScreen ? "text-2xl" : "text-xl"}`}>
@@ -447,7 +449,9 @@ export default function LoginPage() {
                     Build Smarter with Dynamic Project Solutions
                   </h2>
                   <p
-                    className={`text-blue-100 leading-relaxed ${isLargeScreen ? "text-xl max-w-lg" : "text-base max-w-md"}`}
+                    className={`text-blue-100 leading-relaxed ${
+                      isLargeScreen ? "text-xl max-w-lg" : "text-base max-w-md"
+                    }`}
                   >
                     Streamline operations, boost productivity, and deliver projects on time with our comprehensive
                     analytics platform.
@@ -473,7 +477,9 @@ export default function LoginPage() {
                           {features[currentFeature].title}
                         </h3>
                         <p
-                          className={`text-blue-200 leading-relaxed mb-3 ${isLargeScreen ? "text-lg" : "text-sm lg:text-base"}`}
+                          className={`text-blue-200 leading-relaxed mb-3 ${
+                            isLargeScreen ? "text-lg" : "text-sm lg:text-base"
+                          }`}
                         >
                           {features[currentFeature].description}
                         </p>
@@ -522,7 +528,9 @@ export default function LoginPage() {
                         <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-400" aria-hidden="true" />
                       </div>
                       <span
-                        className={`text-blue-100 group-hover:text-white transition-colors ${isLargeScreen ? "text-sm" : "text-xs"}`}
+                        className={`text-blue-100 group-hover:text-white transition-colors ${
+                          isLargeScreen ? "text-sm" : "text-xs"
+                        }`}
                       >
                         {benefit}
                       </span>
@@ -558,7 +566,9 @@ export default function LoginPage() {
                         Hedrick Brothers Construction
                       </h1>
                       <p className="text-gray-600 font-medium text-sm mb-1">presents HB Report</p>
-                      <p className="text-gray-500 font-normal text-xs">A Construction Analytics and Reporting Program</p>
+                      <p className="text-gray-500 font-normal text-xs">
+                        A Construction Analytics and Reporting Program
+                      </p>
                     </div>
                   )}
 
@@ -579,7 +589,11 @@ export default function LoginPage() {
                     </CardHeader>
 
                     <CardContent className="space-y-4 lg:space-y-6">
-                      <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-5 login-form" aria-label="User Login Form">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="space-y-4 lg:space-y-5 login-form"
+                        aria-label="User Login Form"
+                      >
                         <div className="space-y-2">
                           <Label htmlFor="email" className="text-sm font-semibold text-gray-700 flex items-center">
                             <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -642,7 +656,11 @@ export default function LoginPage() {
                           <div className="p-3 bg-red-50 border border-red-200 rounded-lg animate-in slide-in-from-top-2 duration-200">
                             <p className="text-sm text-red-700 flex items-center">
                               <svg className="h-4 w-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                               {loginError}
                             </p>
@@ -738,13 +756,19 @@ export default function LoginPage() {
                           <Users className="h-4 w-4 mr-2 text-blue-600" aria-hidden="true" />
                           Try Demo Accounts
                           <ChevronDown
-                            className={`h-4 w-4 ml-2 transition-transform duration-200 text-blue-600 ${showDemoAccounts ? "rotate-180" : ""}`}
+                            className={`h-4 w-4 ml-2 transition-transform duration-200 text-blue-600 ${
+                              showDemoAccounts ? "rotate-180" : ""
+                            }`}
                             aria-hidden="true"
                           />
                         </Button>
 
                         {showDemoAccounts && (
-                          <div id="demo-accounts-list" className="space-y-2 animate-in slide-in-from-top-2 duration-200" data-tour="demo-accounts-list">
+                          <div
+                            id="demo-accounts-list"
+                            className="space-y-2 animate-in slide-in-from-top-2 duration-200"
+                            data-tour="demo-accounts-list"
+                          >
                             {demoAccounts.map((account) => {
                               const IconComponent = account.icon
                               return (
@@ -757,7 +781,10 @@ export default function LoginPage() {
                                   className="w-full h-auto p-3 text-left !border !border-blue-100 !text-blue-700 hover:!bg-blue-50 hover:!border-blue-200 transition-all duration-200 flex items-center justify-start !bg-white"
                                   aria-label={`Login as ${account.label} demo account`}
                                 >
-                                  <IconComponent className="h-4 w-4 mr-3 flex-shrink-0 text-blue-600" aria-hidden="true" />
+                                  <IconComponent
+                                    className="h-4 w-4 mr-3 flex-shrink-0 text-blue-600"
+                                    aria-hidden="true"
+                                  />
                                   <div className="flex-1 min-w-0">
                                     <div className="font-semibold text-sm truncate text-blue-700">{account.label}</div>
                                     <div className="text-xs text-blue-600 opacity-75 truncate">{account.email}</div>

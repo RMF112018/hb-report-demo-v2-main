@@ -79,6 +79,21 @@ import { HealthCard } from "@/components/cards/HealthCard"
 import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
 
+// IT Command Center placeholder cards
+import {
+  UserAccessSummaryCard,
+  SystemLogsCard,
+  InfrastructureMonitorCard,
+  EndpointHealthCard,
+  SiemLogOverviewCard,
+  EmailSecurityHealthCard,
+  AssetTrackerCard,
+  ChangeGovernancePanelCard,
+  BackupRestoreStatusCard,
+  AiPipelineStatusCard,
+  ConsultantDashboardCard,
+} from "@/components/cards/ITPlaceholderCards"
+
 /**
  * DashboardGrid
  * -------------
@@ -703,6 +718,117 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
     case "bd-opportunities":
       return (
         <BDOpportunitiesCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    // IT Command Center placeholder cards
+    case "user-access-summary":
+      return (
+        <UserAccessSummaryCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "system-logs":
+      return (
+        <SystemLogsCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "infrastructure-monitor":
+      return (
+        <InfrastructureMonitorCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "endpoint-health":
+      return (
+        <EndpointHealthCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "siem-log-overview":
+      return (
+        <SiemLogOverviewCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "email-security-health":
+      return (
+        <EmailSecurityHealthCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "asset-tracker":
+      return (
+        <AssetTrackerCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "change-governance-panel":
+      return (
+        <ChangeGovernancePanelCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "backup-restore-status":
+      return (
+        <BackupRestoreStatusCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "ai-pipeline-status":
+      return (
+        <AiPipelineStatusCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "consultant-dashboard":
+      return (
+        <ConsultantDashboardCard
           card={card}
           config={card.config || {}}
           span={baseSpan}

@@ -1,0 +1,583 @@
+{
+  "userAccessSummary": {
+    "totalUsers": 267,
+    "activeUsers": 243,
+    "pendingAccess": 8,
+    "lockedAccounts": 3,
+    "passwordResets": 12,
+    "recentActivities": [
+      {
+        "user": "john.smith@hedrickbrothers.com",
+        "action": "Login",
+        "location": "HQ - Dallas",
+        "timestamp": "2024-12-26T14:23:00Z",
+        "device": "Windows Desktop"
+      },
+      {
+        "user": "sarah.johnson@hedrickbrothers.com",
+        "action": "VPN Connect",
+        "location": "Remote - Austin Office",
+        "timestamp": "2024-12-26T13:45:00Z",
+        "device": "MacBook Pro"
+      },
+      {
+        "user": "mike.wilson@hedrickbrothers.com",
+        "action": "Sage 300 Access",
+        "location": "Jobsite - Houston",
+        "timestamp": "2024-12-26T12:15:00Z",
+        "device": "Surface Tablet"
+      }
+    ],
+    "officeBreakdown": {
+      "HQ Dallas": 156,
+      "Austin Office": 42,
+      "San Antonio Office": 38,
+      "Fort Worth Office": 31,
+      "Remote/Jobsite": 0
+    }
+  },
+  "systemLogs": {
+    "totalLogs": 15420,
+    "errorLogs": 23,
+    "warningLogs": 156,
+    "infoLogs": 15241,
+    "recentEntries": [
+      {
+        "timestamp": "2024-12-26T14:45:23Z",
+        "level": "ERROR",
+        "source": "Sage 300 VPN Gateway",
+        "message": "Connection timeout for user: accounting@hedrickbrothers.com",
+        "details": "VPN tunnel dropped during database query"
+      },
+      {
+        "timestamp": "2024-12-26T14:42:11Z",
+        "level": "WARNING",
+        "source": "SharePoint Online",
+        "message": "Storage quota 85% utilized",
+        "details": "Current usage: 8.5TB of 10TB limit"
+      },
+      {
+        "timestamp": "2024-12-26T14:38:45Z",
+        "level": "INFO",
+        "source": "Procore API",
+        "message": "Daily sync completed successfully",
+        "details": "Synchronized 42 active projects, 156 users"
+      },
+      {
+        "timestamp": "2024-12-26T14:35:12Z",
+        "level": "ERROR",
+        "source": "Cisco Umbrella",
+        "message": "Blocked malicious domain access",
+        "details": "User: field.supervisor@hedrickbrothers.com attempted to access suspicious.example.com"
+      }
+    ],
+    "systemHealth": {
+      "cpuUsage": 68,
+      "memoryUsage": 74,
+      "diskUsage": 82,
+      "networkLatency": 45
+    }
+  },
+  "infrastructure": {
+    "servers": {
+      "total": 25,
+      "online": 24,
+      "offline": 1,
+      "maintenance": 0
+    },
+    "uptime": "99.94%",
+    "criticalServices": [
+      {
+        "name": "Sage 300 Database",
+        "status": "Healthy",
+        "uptime": "99.98%",
+        "lastCheck": "2024-12-26T14:45:00Z"
+      },
+      {
+        "name": "SharePoint Sync Service",
+        "status": "Healthy",
+        "uptime": "99.92%",
+        "lastCheck": "2024-12-26T14:44:30Z"
+      },
+      {
+        "name": "VPN Gateway",
+        "status": "Warning",
+        "uptime": "99.85%",
+        "lastCheck": "2024-12-26T14:44:00Z"
+      }
+    ],
+    "networkHealth": {
+      "primaryISP": {
+        "provider": "AT&T Fiber",
+        "status": "Healthy",
+        "bandwidth": "1000/1000 Mbps",
+        "utilization": 34
+      },
+      "secondaryISP": {
+        "provider": "Comcast Business",
+        "status": "Standby",
+        "bandwidth": "500/50 Mbps",
+        "utilization": 0
+      }
+    },
+    "locations": [
+      {
+        "name": "HQ Dallas",
+        "status": "Healthy",
+        "devices": 156,
+        "lastPing": "2024-12-26T14:45:00Z"
+      },
+      {
+        "name": "Austin Office",
+        "status": "Healthy",
+        "devices": 42,
+        "lastPing": "2024-12-26T14:44:45Z"
+      },
+      {
+        "name": "Highway 35 Jobsite",
+        "status": "Warning",
+        "devices": 8,
+        "connection": "Starlink",
+        "lastPing": "2024-12-26T14:42:12Z"
+      }
+    ]
+  },
+  "endpoints": {
+    "totalDevices": 312,
+    "healthyDevices": 289,
+    "atRiskDevices": 18,
+    "criticalDevices": 5,
+    "patchCompliance": 92.3,
+    "osBreakdown": {
+      "Windows 11": 156,
+      "Windows 10": 89,
+      "macOS": 42,
+      "iOS": 67,
+      "Android": 23
+    },
+    "recentPatches": [
+      {
+        "device": "HB-DESKTOP-042",
+        "user": "project.manager@hedrickbrothers.com",
+        "patch": "Windows Security Update KB5033918",
+        "status": "Installed",
+        "timestamp": "2024-12-26T02:15:00Z"
+      },
+      {
+        "device": "HB-LAPTOP-156",
+        "user": "estimator@hedrickbrothers.com",
+        "patch": "Autodesk BIM 360 v2024.1.2",
+        "status": "Pending Restart",
+        "timestamp": "2024-12-26T01:45:00Z"
+      }
+    ],
+    "criticalAlerts": [
+      {
+        "device": "HB-SURFACE-023",
+        "issue": "Outdated Carbon Black Agent",
+        "severity": "High",
+        "lastSeen": "2024-12-24T16:30:00Z"
+      }
+    ]
+  },
+  "siem": {
+    "totalEvents": 45678,
+    "highPriorityEvents": 12,
+    "mediumPriorityEvents": 156,
+    "resolvedEvents": 45510,
+    "activeThreats": 3,
+    "recentEvents": [
+      {
+        "timestamp": "2024-12-26T14:42:33Z",
+        "severity": "High",
+        "type": "Malware Detection",
+        "source": "Carbon Black",
+        "description": "Suspicious executable blocked on HB-LAPTOP-089",
+        "user": "field.supervisor@hedrickbrothers.com",
+        "status": "Contained"
+      },
+      {
+        "timestamp": "2024-12-26T14:38:21Z",
+        "severity": "Medium",
+        "type": "Failed Login Attempts",
+        "source": "Azure AD",
+        "description": "5 failed login attempts for admin@hedrickbrothers.com",
+        "location": "External IP: 185.220.101.32",
+        "status": "Monitoring"
+      },
+      {
+        "timestamp": "2024-12-26T14:15:45Z",
+        "severity": "Low",
+        "type": "DNS Query Block",
+        "source": "Cisco Umbrella",
+        "description": "Blocked access to known malicious domain",
+        "user": "temp.worker@hedrickbrothers.com",
+        "status": "Resolved"
+      }
+    ],
+    "threatSources": {
+      "Email": 8,
+      "Web Browsing": 15,
+      "USB Devices": 2,
+      "Network": 6,
+      "Unknown": 1
+    }
+  },
+  "email": {
+    "totalMessages": 12450,
+    "blockedMessages": 156,
+    "quarantinedMessages": 23,
+    "deliveredMessages": 12271,
+    "spamDetection": 98.7,
+    "phishingBlocked": 45,
+    "malwareBlocked": 8,
+    "securityMetrics": {
+      "perceptionPointScans": 12450,
+      "threatsCaught": 204,
+      "falsePositives": 12,
+      "avgProcessingTime": "0.3s"
+    },
+    "recentThreats": [
+      {
+        "timestamp": "2024-12-26T14:35:22Z",
+        "type": "Phishing",
+        "sender": "noreply@fake-microsoft.com",
+        "recipient": "accounting@hedrickbrothers.com",
+        "subject": "Urgent: Verify your Microsoft 365 account",
+        "action": "Blocked",
+        "confidence": 95
+      },
+      {
+        "timestamp": "2024-12-26T13:42:11Z",
+        "type": "Malware",
+        "sender": "invoice@suspicious-domain.net",
+        "recipient": "ap@hedrickbrothers.com",
+        "subject": "Invoice #2024-1156.exe",
+        "action": "Quarantined",
+        "confidence": 98
+      }
+    ],
+    "topSenders": [
+      {
+        "domain": "procore.com",
+        "messages": 234,
+        "trusted": true
+      },
+      {
+        "domain": "autodesk.com",
+        "messages": 189,
+        "trusted": true
+      },
+      {
+        "domain": "microsoft.com",
+        "messages": 156,
+        "trusted": true
+      }
+    ]
+  },
+  "assets": {
+    "totalAssets": 387,
+    "softwareLicenses": 23,
+    "hardwareAssets": 312,
+    "expiringSoon": 12,
+    "overdueRenewals": 3,
+    "totalLicenseCost": 145600,
+    "licenses": [
+      {
+        "software": "Microsoft 365 Business Premium",
+        "totalLicenses": 307,
+        "usedLicenses": 267,
+        "availableLicenses": 40,
+        "costPerMonth": 22,
+        "renewalDate": "2025-03-15",
+        "status": "Active"
+      },
+      {
+        "software": "Procore Enterprise",
+        "totalLicenses": 150,
+        "usedLicenses": 89,
+        "availableLicenses": 61,
+        "costPerMonth": 375,
+        "renewalDate": "2025-01-30",
+        "status": "Expiring Soon"
+      },
+      {
+        "software": "Autodesk BIM 360",
+        "totalLicenses": 25,
+        "usedLicenses": 23,
+        "availableLicenses": 2,
+        "costPerMonth": 56,
+        "renewalDate": "2024-12-31",
+        "status": "Critical"
+      },
+      {
+        "software": "Adobe Creative Cloud",
+        "totalLicenses": 15,
+        "usedLicenses": 12,
+        "availableLicenses": 3,
+        "costPerMonth": 79.99,
+        "renewalDate": "2025-06-12",
+        "status": "Active"
+      }
+    ],
+    "hardwareCategories": {
+      "Desktops": 156,
+      "Laptops": 89,
+      "Tablets": 34,
+      "Mobile Devices": 67,
+      "Network Equipment": 23,
+      "Servers": 25,
+      "Printers": 18
+    },
+    "assetHealth": {
+      "excellent": 245,
+      "good": 89,
+      "fair": 42,
+      "poor": 11
+    }
+  },
+  "governance": {
+    "pendingChanges": 7,
+    "approvedChanges": 23,
+    "implementedChanges": 156,
+    "rejectedChanges": 4,
+    "emergencyChanges": 2,
+    "recentChanges": [
+      {
+        "id": "CHG-2024-1156",
+        "title": "Upgrade Sage 300 to v2024.2",
+        "requestor": "it.manager@hedrickbrothers.com",
+        "priority": "High",
+        "status": "Approved",
+        "scheduledDate": "2025-01-15T02:00:00Z",
+        "estimatedDowntime": "4 hours",
+        "approver": "cto@hedrickbrothers.com"
+      },
+      {
+        "id": "CHG-2024-1155",
+        "title": "Deploy Carbon Black to remaining endpoints",
+        "requestor": "security.consultant@externalsoc.com",
+        "priority": "Medium",
+        "status": "In Progress",
+        "scheduledDate": "2024-12-28T08:00:00Z",
+        "estimatedDowntime": "Per device: 30 minutes",
+        "approver": "it.manager@hedrickbrothers.com"
+      },
+      {
+        "id": "CHG-2024-1154",
+        "title": "Update Cisco ASA Firewall Rules",
+        "requestor": "network.consultant@externalmsp.com",
+        "priority": "Low",
+        "status": "Implemented",
+        "completedDate": "2024-12-25T20:30:00Z",
+        "actualDowntime": "15 minutes",
+        "approver": "it.manager@hedrickbrothers.com"
+      }
+    ],
+    "complianceMetrics": {
+      "changeSuccessRate": 94.2,
+      "averageApprovalTime": "2.3 days",
+      "emergencyChangeRate": 3.1,
+      "rollbackRate": 5.8
+    },
+    "upcomingMaintenance": [
+      {
+        "title": "Quarterly Security Patching",
+        "scheduledDate": "2025-01-05T02:00:00Z",
+        "duration": "6 hours",
+        "impact": "Sage 300 unavailable"
+      }
+    ]
+  },
+  "backup": {
+    "lastBackupTime": "2024-12-26T02:00:15Z",
+    "successRate": 98.7,
+    "totalDataProtected": "8.5 TB",
+    "retentionCompliance": 99.2,
+    "rpoStatus": "Met",
+    "rtoStatus": "Met",
+    "backupJobs": [
+      {
+        "name": "Sage 300 Database",
+        "status": "Success",
+        "lastRun": "2024-12-26T02:00:15Z",
+        "duration": "45 minutes",
+        "dataSize": "2.3 GB",
+        "tool": "CommVault"
+      },
+      {
+        "name": "SharePoint Archive",
+        "status": "Success",
+        "lastRun": "2024-12-26T01:30:22Z",
+        "duration": "2.5 hours",
+        "dataSize": "1.2 TB",
+        "tool": "Acronis"
+      },
+      {
+        "name": "File Server Backup",
+        "status": "Warning",
+        "lastRun": "2024-12-25T23:45:11Z",
+        "duration": "3.2 hours",
+        "dataSize": "890 GB",
+        "tool": "Acronis",
+        "issue": "Partial backup - 3 files locked"
+      }
+    ],
+    "drMetrics": {
+      "rpoTarget": "4 hours",
+      "rpoActual": "2.5 hours",
+      "rtoTarget": "24 hours",
+      "rtoActual": "8 hours",
+      "lastDrTest": "2024-11-15T09:00:00Z",
+      "drTestResult": "Successful"
+    },
+    "storageUtilization": {
+      "primary": 67,
+      "secondary": 45,
+      "cloud": 78
+    }
+  },
+  "aiPipelines": {
+    "activeJobs": 4,
+    "queuedJobs": 2,
+    "completedToday": 23,
+    "failedJobs": 1,
+    "totalProcessingTime": "12.5 hours",
+    "pipelines": [
+      {
+        "name": "Project Document Analysis",
+        "status": "Running",
+        "tool": "ChatGPT API",
+        "startTime": "2024-12-26T14:15:00Z",
+        "progress": 67,
+        "documentsProcessed": 156,
+        "estimatedCompletion": "2024-12-26T15:30:00Z"
+      },
+      {
+        "name": "Cost Estimation Review",
+        "status": "Queued",
+        "tool": "GPT-4",
+        "priority": "High",
+        "estimatedDuration": "45 minutes",
+        "documentsToProcess": 23
+      },
+      {
+        "name": "Meeting Transcription",
+        "status": "Completed",
+        "tool": "Otter AI",
+        "completedTime": "2024-12-26T13:45:00Z",
+        "duration": "15 minutes",
+        "meetingsProcessed": 8
+      },
+      {
+        "name": "Image Generation",
+        "status": "Failed",
+        "tool": "MidJourney",
+        "failureTime": "2024-12-26T12:30:00Z",
+        "error": "API rate limit exceeded",
+        "retryScheduled": "2024-12-26T15:00:00Z"
+      }
+    ],
+    "usage": {
+      "chatgptQueries": 1456,
+      "midjourneyImages": 89,
+      "copilotSessions": 234,
+      "otterTranscriptions": 67
+    },
+    "costs": {
+      "monthly": 1245.67,
+      "projected": 1389.23,
+      "costPerQuery": 0.85
+    }
+  },
+  "consultants": {
+    "activeContracts": 8,
+    "totalConsultants": 12,
+    "monthlySpend": 45600,
+    "contracts": [
+      {
+        "company": "CyberShield SOC Services",
+        "type": "Security Operations Center",
+        "contactPerson": "David Chen",
+        "email": "d.chen@cybershield.com",
+        "phone": "+1-555-0123",
+        "contractValue": 15000,
+        "startDate": "2024-01-15",
+        "endDate": "2024-12-31",
+        "status": "Active",
+        "renewalStatus": "Under Review",
+        "kpis": {
+          "incidentResponseTime": "< 2 hours",
+          "monthlyReports": "On Time",
+          "threatDetection": "98.5%"
+        }
+      },
+      {
+        "company": "NetSecure Infrastructure",
+        "type": "Network & Server Management",
+        "contactPerson": "Sarah Martinez",
+        "email": "s.martinez@netsecure.com",
+        "phone": "+1-555-0456",
+        "contractValue": 12500,
+        "startDate": "2024-03-01",
+        "endDate": "2025-02-28",
+        "status": "Active",
+        "renewalStatus": "Auto-Renew",
+        "kpis": {
+          "uptime": "99.9%",
+          "responseTime": "< 1 hour",
+          "patchCompliance": "95%"
+        }
+      },
+      {
+        "company": "DataGuard Backup Solutions",
+        "type": "Backup & Disaster Recovery",
+        "contactPerson": "Mike Thompson",
+        "email": "m.thompson@dataguard.com",
+        "phone": "+1-555-0789",
+        "contractValue": 8500,
+        "startDate": "2024-06-01",
+        "endDate": "2025-05-31",
+        "status": "Active",
+        "renewalStatus": "Confirmed",
+        "kpis": {
+          "backupSuccess": "99.7%",
+          "rpo": "< 4 hours",
+          "rto": "< 24 hours"
+        }
+      },
+      {
+        "company": "SecureTraining Corp",
+        "type": "Cybersecurity Training",
+        "contactPerson": "Jennifer Adams",
+        "email": "j.adams@securetraining.com",
+        "phone": "+1-555-0321",
+        "contractValue": 6200,
+        "startDate": "2024-09-01",
+        "endDate": "2025-08-31",
+        "status": "Active",
+        "renewalStatus": "Pending Review",
+        "kpis": {
+          "completionRate": "89%",
+          "phishingAwareness": "+15%",
+          "certifications": "12 obtained"
+        }
+      }
+    ],
+    "performanceMetrics": {
+      "avgResponseTime": "1.8 hours",
+      "contractCompliance": 94.2,
+      "costEfficiency": 87.5,
+      "satisfactionScore": 4.2
+    },
+    "upcomingRenewals": [
+      {
+        "company": "CyberShield SOC Services",
+        "renewalDate": "2024-12-31",
+        "daysUntilRenewal": 5,
+        "estimatedCost": 165000,
+        "recommendation": "Renew with 10% increase"
+      }
+    ]
+  }
+}
