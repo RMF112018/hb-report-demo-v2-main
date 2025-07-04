@@ -71,7 +71,7 @@ export function DashboardLayout({
       <div className="relative z-10">
         {/* KPI Row with enhanced styling */}
         <div data-tour="kpi-widgets" className="mb-6">
-          <div className="px-3 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pt-4 sm:pt-6">
+          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
             <div className="mx-auto max-w-[1920px]">
               <KPIRow userRole={userRole} />
             </div>
@@ -79,7 +79,7 @@ export function DashboardLayout({
         </div>
 
         {/* Dashboard Content with better container */}
-        <div className="px-3 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-8">
+        <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
           <div className="mx-auto max-w-[1920px]">
             <DashboardGrid
               cards={cards}

@@ -133,7 +133,7 @@ export default function LoginPage() {
     {
       key: "admin",
       label: "IT Administrator",
-      email: "lisa.wilson@hedrickbrothers.com",
+      email: "markey.mark@hedrickbrothers.com",
       icon: Shield,
       redirectTo: "/it-command-center",
     },

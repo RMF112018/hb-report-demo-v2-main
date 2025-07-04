@@ -18,10 +18,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { 
-  Package, 
-  Building2, 
-  DollarSign, 
+import {
+  Package,
+  Building2,
+  DollarSign,
   TrendingUp,
   BarChart3,
   PieChart,
@@ -43,7 +43,7 @@ import {
   Edit,
   Search,
   Filter,
-  RotateCcw
+  RotateCcw,
 } from "lucide-react"
 
 // Import procurement log components
@@ -76,7 +76,7 @@ export default function ProcurementLogPage() {
 
   // Role-based access control
   const userRole = user?.role || "project-manager"
-  
+
   // Get role-specific data scope
   const getDataScope = () => {
     switch (userRole) {
@@ -88,7 +88,7 @@ export default function ProcurementLogPage() {
           canCreate: true,
           canApprove: true,
           canEdit: true,
-          canSync: true
+          canSync: true,
         }
       case "project-executive":
         return {
@@ -98,7 +98,7 @@ export default function ProcurementLogPage() {
           canCreate: true,
           canApprove: true,
           canEdit: true,
-          canSync: true
+          canSync: true,
         }
       case "project-manager":
         return {
@@ -108,7 +108,7 @@ export default function ProcurementLogPage() {
           canCreate: true,
           canApprove: false,
           canEdit: true,
-          canSync: false
+          canSync: false,
         }
       default:
         return {
@@ -118,7 +118,7 @@ export default function ProcurementLogPage() {
           canCreate: false,
           canApprove: false,
           canEdit: false,
-          canSync: false
+          canSync: false,
         }
     }
   }
@@ -128,7 +128,7 @@ export default function ProcurementLogPage() {
   // Mock data generation based on Procore integration
   useEffect(() => {
     setIsLoading(true)
-    
+
     // Simulate loading Procore commitments and generating procurement log records
     setTimeout(() => {
       const mockRecords: ProcurementLogRecord[] = generateMockProcurementRecords()
@@ -144,22 +144,23 @@ export default function ProcurementLogPage() {
 
     // Text search
     if (searchTerm) {
-      filtered = filtered.filter(record =>
-        record.commitment_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.csi_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.csi_description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (record) =>
+          record.commitment_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.csi_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.csi_description.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(record => record.status === statusFilter)
+      filtered = filtered.filter((record) => record.status === statusFilter)
     }
 
     // CSI filter
     if (csiFilter !== "all") {
-      filtered = filtered.filter(record => record.csi_code.startsWith(csiFilter))
+      filtered = filtered.filter((record) => record.csi_code.startsWith(csiFilter))
     }
 
     setFilteredRecords(filtered)
@@ -170,12 +171,12 @@ export default function ProcurementLogPage() {
     setIsLoading(true)
     try {
       // Simulate Procore API sync
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
       // Generate new records with updated Procore data
       const updatedRecords = generateMockProcurementRecords()
       setProcurementRecords(updatedRecords)
-      
+
       toast({
         title: "Procore Sync Complete",
         description: "Commitment data has been synchronized from Procore",
@@ -195,7 +196,7 @@ export default function ProcurementLogPage() {
   const handleRecordSubmit = (recordData: Partial<ProcurementLogRecord>) => {
     if (selectedRecord) {
       // Update existing record
-      const updatedRecords = procurementRecords.map(record =>
+      const updatedRecords = procurementRecords.map((record) =>
         record.id === selectedRecord.id ? { ...record, ...recordData } : record
       )
       setProcurementRecords(updatedRecords)
@@ -209,16 +210,16 @@ export default function ProcurementLogPage() {
         id: `proc-${Date.now()}`,
         procore_commitment_id: "",
         project_id: "proj-001",
-        ...recordData
+        ...recordData,
       } as ProcurementLogRecord
-      
+
       setProcurementRecords([...procurementRecords, newRecord])
       toast({
         title: "Record Created",
         description: "New procurement record has been created successfully",
       })
     }
-    
+
     setShowRecordForm(false)
     setSelectedRecord(null)
   }
@@ -260,14 +261,21 @@ export default function ProcurementLogPage() {
   // Calculate statistics for widgets
   const stats = useMemo(() => {
     const totalValue = procurementRecords.reduce((sum, record) => sum + record.contract_amount, 0)
-    const activeBuyouts = procurementRecords.filter(r => ["bidding", "negotiation", "awarded", "active"].includes(r.status)).length
-    const completedBuyouts = procurementRecords.filter(r => r.status === "completed").length
-    const pendingContracts = procurementRecords.filter(r => r.status === "pending_approval").length
-    const vendorCount = new Set(procurementRecords.map(r => r.vendor_name)).size
-    const complianceRate = procurementRecords.filter(r => r.compliance_status === "compliant").length / Math.max(procurementRecords.length, 1) * 100
-    const avgSavings = procurementRecords.reduce((sum, r) => sum + Math.abs(r.variance_percentage), 0) / Math.max(procurementRecords.length, 1)
+    const activeBuyouts = procurementRecords.filter((r) =>
+      ["bidding", "negotiation", "awarded", "active"].includes(r.status)
+    ).length
+    const completedBuyouts = procurementRecords.filter((r) => r.status === "completed").length
+    const pendingContracts = procurementRecords.filter((r) => r.status === "pending_approval").length
+    const vendorCount = new Set(procurementRecords.map((r) => r.vendor_name)).size
+    const complianceRate =
+      (procurementRecords.filter((r) => r.compliance_status === "compliant").length /
+        Math.max(procurementRecords.length, 1)) *
+      100
+    const avgSavings =
+      procurementRecords.reduce((sum, r) => sum + Math.abs(r.variance_percentage), 0) /
+      Math.max(procurementRecords.length, 1)
     const onTimeDelivery = 92.3 // Mock value - would be calculated from milestone data
-    
+
     // Calculate category breakdown
     const byCategory = procurementRecords.reduce((acc, record) => {
       acc[record.contract_type] = (acc[record.contract_type] || 0) + record.contract_amount
@@ -290,16 +298,18 @@ export default function ProcurementLogPage() {
       avgSavings,
       onTimeDelivery,
       byCategory,
-      byStatus
+      byStatus,
     }
   }, [procurementRecords])
 
   // Calculate additional stats for our components
   const procurementStats = useMemo(() => {
-    const activeProcurements = procurementRecords.filter(r => ["bidding", "negotiation", "awarded", "active"].includes(r.status)).length
-    const completedProcurements = procurementRecords.filter(r => r.status === "completed").length
-    const pendingApprovals = procurementRecords.filter(r => r.status === "pending_approval").length
-    const linkedToBidTabs = procurementRecords.filter(r => r.bid_tab_link?.bid_tab_id).length
+    const activeProcurements = procurementRecords.filter((r) =>
+      ["bidding", "negotiation", "awarded", "active"].includes(r.status)
+    ).length
+    const completedProcurements = procurementRecords.filter((r) => r.status === "completed").length
+    const pendingApprovals = procurementRecords.filter((r) => r.status === "pending_approval").length
+    const linkedToBidTabs = procurementRecords.filter((r) => r.bid_tab_link?.bid_tab_id).length
     const avgCycleTime = 28 // Mock value
 
     return {
@@ -310,7 +320,7 @@ export default function ProcurementLogPage() {
       linkedToBidTabs,
       avgCycleTime,
       complianceRate: stats.complianceRate,
-      totalRecords: procurementRecords.length
+      totalRecords: procurementRecords.length,
     }
   }, [procurementRecords, stats])
 
@@ -338,27 +348,15 @@ export default function ProcurementLogPage() {
       <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3" data-tour="procurement-log-tabs">
-            <TabsTrigger 
-              value="log"
-              className="flex items-center gap-2"
-              data-tour="procurement-tab"
-            >
+            <TabsTrigger value="log" className="flex items-center gap-2" data-tour="procurement-tab">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Procurement Log</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="sync"
-              className="flex items-center gap-2"
-              data-tour="sync-tab"
-            >
+            <TabsTrigger value="sync" className="flex items-center gap-2" data-tour="sync-tab">
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">Procore Sync</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="analytics"
-              className="flex items-center gap-2"
-              data-tour="analytics-tab"
-            >
+            <TabsTrigger value="analytics" className="flex items-center gap-2" data-tour="analytics-tab">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
@@ -478,18 +476,9 @@ export default function ProcurementLogPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Procurement Log</h1>
-                  <p className="text-muted-foreground mt-1">Track and manage subcontract procurement linked to Procore commitments and bid tabs</p>
-                  <div className="flex items-center gap-4 mt-2" data-tour="procurement-log-scope-badges">
-                    <Badge variant="outline" className="px-3 py-1">
-                      {dataScope.description}
-                    </Badge>
-                    <Badge variant="secondary" className="px-3 py-1">
-                      {procurementStats.totalRecords} Records
-                    </Badge>
-                    <Badge variant="secondary" className="px-3 py-1">
-                      {procurementStats.linkedToBidTabs} Linked to Bid Tabs
-                    </Badge>
-                  </div>
+                  <p className="text-muted-foreground mt-1">
+                    Track and manage subcontract procurement linked to Procore commitments and bid tabs
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {dataScope.canSync && (
@@ -503,10 +492,7 @@ export default function ProcurementLogPage() {
                     Export
                   </Button>
                   {dataScope.canCreate && (
-                    <Button 
-                      onClick={() => setShowRecordForm(true)}
-                      className="bg-[#FF6B35] hover:bg-[#E55A2B]"
-                    >
+                    <Button onClick={() => setShowRecordForm(true)} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Record
                     </Button>
@@ -523,7 +509,11 @@ export default function ProcurementLogPage() {
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Total Value</p>
                           <p className="text-2xl font-bold">
-                            {stats.totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}
+                            {stats.totalValue.toLocaleString("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                              minimumFractionDigits: 0,
+                            })}
                           </p>
                         </div>
                         <DollarSign className="h-8 w-8 text-[#FF6B35]" />
@@ -581,9 +571,7 @@ export default function ProcurementLogPage() {
         <Dialog open={showRecordForm} onOpenChange={setShowRecordForm}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
-                {selectedRecord ? "Edit Procurement Record" : "Create New Procurement Record"}
-              </DialogTitle>
+              <DialogTitle>{selectedRecord ? "Edit Procurement Record" : "Create New Procurement Record"}</DialogTitle>
             </DialogHeader>
             <ProcurementLogForm
               record={selectedRecord}
@@ -622,20 +610,20 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
       vendor_contact: {
         name: "John Smith",
         email: "john.smith@cityofwestpalmbeach.com",
-        phone: "(561) 822-1400"
+        phone: "(561) 822-1400",
       },
       csi_code: "07 40 00",
       csi_description: "Roofing and Siding Panels",
       status: "planning",
       contract_amount: 1609994.17,
-      budget_amount: 1700000.00,
+      budget_amount: 1700000.0,
       variance: -90005.83,
       variance_percentage: -5.29,
       procurement_method: "competitive-bid",
       bid_tab_link: {
         bid_tab_id: "bid-tab-exterior-001",
         csi_match: true,
-        description_match: 85
+        description_match: 85,
       },
       contract_type: "subcontract",
       start_date: "2025-02-01",
@@ -645,14 +633,14 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
           name: "Bid Opening",
           date: "2025-01-15",
           status: "completed",
-          completed: true
+          completed: true,
         },
         {
           name: "Contract Award",
           date: "2025-01-30",
           status: "pending",
-          completed: false
-        }
+          completed: false,
+        },
       ],
       compliance_status: "compliant",
       bonds_required: true,
@@ -660,7 +648,7 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
       created_at: "2025-01-10T10:00:00Z",
       updated_at: "2025-01-15T14:30:00Z",
       created_by: "System Import",
-      procurement_notes: "Imported from Procore commitment. Linked to exterior wall assemblies bid tab."
+      procurement_notes: "Imported from Procore commitment. Linked to exterior wall assemblies bid tab.",
     },
     {
       id: "proc-002",
@@ -672,20 +660,20 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
       vendor_contact: {
         name: "Sarah Johnson",
         email: "sarah@americanleakdetection.com",
-        phone: "(561) 744-6999"
+        phone: "(561) 744-6999",
       },
       csi_code: "09 50 00",
       csi_description: "Ceilings",
       status: "negotiation",
       contract_amount: 1018842.05,
-      budget_amount: 1000000.00,
+      budget_amount: 1000000.0,
       variance: 18842.05,
       variance_percentage: 1.88,
       procurement_method: "competitive-bid",
       bid_tab_link: {
         bid_tab_id: "bid-tab-acoustical-001",
         csi_match: true,
-        description_match: 92
+        description_match: 92,
       },
       contract_type: "subcontract",
       start_date: "2025-03-01",
@@ -695,14 +683,14 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
           name: "Bid Analysis",
           date: "2025-01-20",
           status: "completed",
-          completed: true
+          completed: true,
         },
         {
           name: "Negotiations",
           date: "2025-02-01",
           status: "in-progress",
-          completed: false
-        }
+          completed: false,
+        },
       ],
       compliance_status: "warning",
       bonds_required: false,
@@ -710,9 +698,9 @@ function generateMockProcurementRecords(): ProcurementLogRecord[] {
       created_at: "2025-01-12T09:15:00Z",
       updated_at: "2025-01-20T16:45:00Z",
       created_by: "System Import",
-      procurement_notes: "Insurance documentation pending. Negotiations ongoing for value engineering opportunities."
-    }
+      procurement_notes: "Insurance documentation pending. Negotiations ongoing for value engineering opportunities.",
+    },
   ]
 
   return records
-} 
+}

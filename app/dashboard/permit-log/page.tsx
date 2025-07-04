@@ -37,7 +37,7 @@ import {
   RefreshCw,
   Home,
   Eye,
-  Edit
+  Edit,
 } from "lucide-react"
 
 // Import Permit Components
@@ -61,8 +61,11 @@ import permitsData from "@/data/mock/logs/permits.json"
 
 export default function PermitLogPage() {
   const { user } = useAuth()
-  const { selectedProject } = useProjectContext()
+  const { projectId, getProjectById } = useProjectContext()
   const { toast } = useToast()
+
+  // Get the current project object
+  const selectedProject = getProjectById(projectId)
 
   // State management
   const [permits, setPermits] = useState<Permit[]>([])
@@ -284,13 +287,16 @@ export default function PermitLogPage() {
     console.log("View permit:", permit)
   }, [])
 
-  const handleExportPermit = useCallback((permit: Permit) => {
-    console.log("Export permit:", permit)
-    toast({
-      title: "Export Started",
-      description: `Exporting permit ${permit.number}`,
-    })
-  }, [toast])
+  const handleExportPermit = useCallback(
+    (permit: Permit) => {
+      console.log("Export permit:", permit)
+      toast({
+        title: "Export Started",
+        description: `Exporting permit ${permit.number}`,
+      })
+    },
+    [toast]
+  )
 
   const handleSavePermit = useCallback(
     (permitData: Partial<Permit>) => {
@@ -298,9 +304,7 @@ export default function PermitLogPage() {
         // Update existing permit
         setPermits((prev) =>
           prev.map((p) =>
-            p.id === selectedPermit.id 
-              ? { ...p, ...permitData, updatedAt: new Date().toISOString() } 
-              : p
+            p.id === selectedPermit.id ? { ...p, ...permitData, updatedAt: new Date().toISOString() } : p
           )
         )
         toast({
@@ -352,7 +356,7 @@ export default function PermitLogPage() {
   const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string; filePath: string }) => {
     try {
       const projectName = selectedProject?.name || "All Projects"
-      
+
       switch (options.format) {
         case "pdf":
           PermitExportUtils.exportToPDF(filteredPermits, stats, projectName, options.fileName)
@@ -398,7 +402,7 @@ export default function PermitLogPage() {
   // Get role-specific project scope description
   const getProjectScopeDescription = () => {
     if (!user) return "All Projects"
-    
+
     switch (user.role) {
       case "project-manager":
         return "Single Project View"
@@ -433,27 +437,45 @@ export default function PermitLogPage() {
       <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-background shadow-sm" data-tour="permit-tabs">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="overview"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="permits" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="permits"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Permits</span>
             </TabsTrigger>
-            <TabsTrigger value="inspections" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="inspections"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <CheckCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Inspections</span>
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="calendar"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <CalendarDays className="h-4 w-4" />
               <span className="hidden sm:inline">Calendar</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="analytics"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white">
+            <TabsTrigger
+              value="reports"
+              className="flex items-center gap-2 data-[state=active]:bg-[#003087] data-[state=active]:text-white"
+            >
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Reports</span>
             </TabsTrigger>
@@ -646,17 +668,6 @@ export default function PermitLogPage() {
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Permit Log</h1>
                   <p className="text-muted-foreground mt-1">Track and manage construction permits and inspections</p>
-                  <div className="flex items-center gap-4 mt-2" data-tour="permit-log-scope-badges">
-                    <Badge variant="outline" className="px-3 py-1">
-                      {getProjectScopeDescription()}
-                    </Badge>
-                    <Badge variant="secondary" className="px-3 py-1">
-                      {stats.totalPermits} Total Permits
-                    </Badge>
-                    <Badge variant="secondary" className="px-3 py-1">
-                      {stats.approvalRate.toFixed(1)}% Approval Rate
-                    </Badge>
-                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
@@ -693,20 +704,13 @@ export default function PermitLogPage() {
         <PermitContentCard />
 
         {/* Create/Edit Permit Modal */}
-        {showPermitForm && (
-          <Dialog open={showPermitForm} onOpenChange={setShowPermitForm}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{selectedPermit ? "Edit Permit" : "Create New Permit"}</DialogTitle>
-              </DialogHeader>
-              <PermitForm
-                permit={selectedPermit}
-                onSubmit={handleSavePermit}
-                onCancel={() => setShowPermitForm(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
+        <PermitForm
+          permit={selectedPermit}
+          open={showPermitForm}
+          onClose={() => setShowPermitForm(false)}
+          onSave={handleSavePermit}
+          userRole={user?.role}
+        />
 
         {/* Export Modal */}
         <div data-tour="permit-export">
@@ -729,22 +733,38 @@ export default function PermitLogPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Permit Management Help</h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                    Access comprehensive tools for managing construction permits, inspections, and compliance with AI-powered insights.
+                    Access comprehensive tools for managing construction permits, inspections, and compliance with
+                    AI-powered insights.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                    <Badge
+                      variant="outline"
+                      className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600"
+                    >
                       Permit Applications
                     </Badge>
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                    <Badge
+                      variant="outline"
+                      className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600"
+                    >
                       Inspection Scheduling
                     </Badge>
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                    <Badge
+                      variant="outline"
+                      className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600"
+                    >
                       Compliance Tracking
                     </Badge>
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                    <Badge
+                      variant="outline"
+                      className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600"
+                    >
                       Authority Relations
                     </Badge>
-                    <Badge variant="outline" className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600">
+                    <Badge
+                      variant="outline"
+                      className="text-blue-600 border-blue-300 dark:text-blue-300 dark:border-blue-600"
+                    >
                       HBI Insights
                     </Badge>
                   </div>
@@ -756,4 +776,4 @@ export default function PermitLogPage() {
       </div>
     </>
   )
-} 
+}

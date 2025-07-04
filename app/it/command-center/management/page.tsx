@@ -299,8 +299,7 @@ export default function HBIntelManagementPage() {
             <Breadcrumb className="mb-3">
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="text-muted-foreground hover:text-foreground text-sm">
-                    <Home className="h-3 w-3 mr-1" />
+                  <BreadcrumbLink href="/dashboard" className="text-muted-foreground hover:text-foreground text-sm">
                     Home
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -321,17 +320,12 @@ export default function HBIntelManagementPage() {
             {/* Site Title and Actions - Responsive */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <div className="p-2 bg-purple-100 dark:bg-purple-950/30 rounded-lg">
-                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
-                    HB Intel Management
-                  </h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-                    Centralized admin hub for application controls and security
-                  </p>
-                </div>
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
+                  HB Intel Management
+                </h1>
+                <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                  Admin Hub
+                </Badge>
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -353,9 +347,175 @@ export default function HBIntelManagementPage() {
             <div className="mt-3 pt-3 border-t border-border/40" data-tour="it-module-navigation">
               <ITModuleNavigation />
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Management Tabs Row - Directly beneath navigation */}
-            <div className="mt-3 pt-3 border-t border-border/40">
+      {/* Main Content Layout - Following project page pattern */}
+      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Mobile Priority Cards - Show at top on small screens */}
+        <div className="block xl:hidden mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Total Users</h3>
+              <div className="text-2xl font-bold">{systemMetrics.totalUsers}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                {systemMetrics.activeUsers} active
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">MFA Coverage</h3>
+              <div className="text-2xl font-bold">
+                {Math.round((systemMetrics.mfaEnabled / systemMetrics.totalUsers) * 100)}%
+              </div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Shield className="h-3 w-3 text-blue-500" />
+                {systemMetrics.mfaEnabled}/{systemMetrics.totalUsers} users
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">System Uptime</h3>
+              <div className="text-2xl font-bold">{systemMetrics.uptime}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Monitor className="h-3 w-3 text-green-500" />
+                Last 30 days
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">AI Models</h3>
+              <div className="text-2xl font-bold">{systemMetrics.aiModelsActive}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Brain className="h-3 w-3 text-purple-500" />
+                Active models
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Responsive Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
+            {/* System Overview Cards - Desktop */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">System Overview</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Users</span>
+                  <span className="font-medium">{systemMetrics.totalUsers}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Active Users</span>
+                  <span className="font-medium text-green-600">{systemMetrics.activeUsers}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">MFA Enabled</span>
+                  <span className="font-medium">{systemMetrics.mfaEnabled}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">System Uptime</span>
+                  <span className="font-medium text-green-600">{systemMetrics.uptime}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">AI Models</span>
+                  <span className="font-medium">{systemMetrics.aiModelsActive}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
+              <div className="space-y-2">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm" onClick={handleNewUser}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add New User
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm" onClick={handleNewProject}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Project
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  System Settings
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+              </div>
+            </div>
+
+            {/* System Health */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">System Health</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">API Status</span>
+                  <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                    {systemMetrics.apiHealth}
+                  </Badge>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Database Health</span>
+                  <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                    {systemMetrics.databaseHealth}
+                  </Badge>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Active AI Jobs</span>
+                  <span className="font-medium">{systemMetrics.aiProcessingJobs}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Monthly AI Cost</span>
+                  <span className="font-medium">${systemMetrics.monthlyAiCost}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded">
+                    <UserPlus className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">New user added to system</p>
+                    <p className="text-xs text-muted-foreground">by Admin • 15 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded">
+                    <Settings className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Security policy updated</p>
+                    <p className="text-xs text-muted-foreground">by System • 1 hour ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-100 dark:bg-purple-900/20 p-1 rounded">
+                    <Brain className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">AI model deployment completed</p>
+                    <p className="text-xs text-muted-foreground">by System • 2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="xl:col-span-9 space-y-4 lg:space-y-6">
+            {/* Tab Navigation */}
+            <div className="bg-card border border-border rounded-lg p-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -365,461 +525,396 @@ export default function HBIntelManagementPage() {
                   <TabsTrigger value="projects">Projects</TabsTrigger>
                   <TabsTrigger value="system">System</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="overview" className="space-y-4 mt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="lg:col-span-2">
+                      <HbIntelManagementCard />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="users" className="space-y-4 mt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold">User Administration</h3>
+                      <p className="text-sm text-muted-foreground">Manage user accounts and role assignments</p>
+                    </div>
+                    <Button onClick={handleNewUser} className="bg-[#FA4616] hover:bg-[#FA4616]/90">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add User
+                    </Button>
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Microsoft Graph Integration:</strong> User data synchronized from{" "}
+                      <code className="px-1 py-0.5 bg-muted rounded text-xs">graph.microsoft.com/v1.0/users</code>
+                    </AlertDescription>
+                  </Alert>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Recent Users</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>MFA</TableHead>
+                            <TableHead>Last Login</TableHead>
+                            <TableHead className="w-[100px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {recentUsers.map((user) => (
+                            <TableRow key={user.id}>
+                              <TableCell className="font-medium">{user.name}</TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>{user.role}</TableCell>
+                              <TableCell>{getStatusBadge(user.status)}</TableCell>
+                              <TableCell>
+                                {user.mfaEnabled ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-red-500" />
+                                )}
+                              </TableCell>
+                              <TableCell>{user.lastLogin ? formatDateTime(user.lastLogin) : "Never"}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-1">
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="security" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Security & Compliance</h3>
+                    <p className="text-sm text-muted-foreground">Manage security policies and compliance settings</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <Shield className="h-4 w-4" />
+                          Microsoft Graph Endpoints
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {microsoftGraphEndpoints.map((endpoint, index) => (
+                            <div key={index} className="border rounded-lg p-3">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <code className="text-xs bg-muted px-2 py-1 rounded">{endpoint.endpoint}</code>
+                                    <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                                      {endpoint.status}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mb-2">{endpoint.description}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Last sync: {formatDateTime(endpoint.lastSync)}
+                                  </p>
+                                </div>
+                                <Button variant="ghost" size="sm">
+                                  <ExternalLink className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <Key className="h-4 w-4" />
+                          Security Settings
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">Single Sign-On (SSO)</p>
+                            <p className="text-xs text-muted-foreground">Enable Azure AD integration</p>
+                          </div>
+                          <Switch checked={systemMetrics.ssoEnabled} />
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">Multi-Factor Authentication</p>
+                            <p className="text-xs text-muted-foreground">Require MFA for all users</p>
+                          </div>
+                          <Switch checked={true} />
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">Session Timeout</p>
+                            <p className="text-xs text-muted-foreground">Auto-logout after inactivity</p>
+                          </div>
+                          <Select defaultValue="8">
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2">2h</SelectItem>
+                              <SelectItem value="4">4h</SelectItem>
+                              <SelectItem value="8">8h</SelectItem>
+                              <SelectItem value="24">24h</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="ai" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">AI/ML System Management</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Monitor and configure AI models and processing pipelines
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <Brain className="h-4 w-4" />
+                          AI Model Status
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {aiModels.map((model, index) => (
+                            <div key={index} className="border rounded-lg p-3">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <p className="text-sm font-medium">{model.name}</p>
+                                    <Badge
+                                      className={
+                                        model.status === "Active"
+                                          ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
+                                          : "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400"
+                                      }
+                                    >
+                                      {model.status}
+                                    </Badge>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                                    <div>Uptime: {model.uptime}</div>
+                                    <div>Cost: ${model.cost}</div>
+                                    <div>Requests: {model.requestsToday}</div>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm">
+                                  <Settings className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <DollarSign className="h-4 w-4" />
+                          Cost & Usage Analytics
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold">${systemMetrics.monthlyAiCost}</div>
+                          <div className="text-xs text-muted-foreground">Monthly AI costs</div>
+                        </div>
+                        <Separator />
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Processing Jobs</span>
+                            <span className="font-medium">{systemMetrics.aiProcessingJobs}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>Active Models</span>
+                            <span className="font-medium">{systemMetrics.aiModelsActive}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>Total Requests Today</span>
+                            <span className="font-medium">
+                              {aiModels.reduce((sum, model) => sum + model.requestsToday, 0)}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="projects" className="space-y-4 mt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold">Project Management</h3>
+                      <p className="text-sm text-muted-foreground">Create and manage construction projects</p>
+                    </div>
+                    <Button onClick={handleNewProject} className="bg-[#FA4616] hover:bg-[#FA4616]/90">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Project
+                    </Button>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Recent Projects</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Project ID</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Owner</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Budget</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Created</TableHead>
+                            <TableHead className="w-[100px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {recentProjects.map((project) => (
+                            <TableRow key={project.id}>
+                              <TableCell className="font-medium">{project.id}</TableCell>
+                              <TableCell>{project.name}</TableCell>
+                              <TableCell>{project.owner}</TableCell>
+                              <TableCell>{project.type}</TableCell>
+                              <TableCell>${(project.budget / 1000000).toFixed(1)}M</TableCell>
+                              <TableCell>{getStatusBadge(project.status)}</TableCell>
+                              <TableCell>{formatDate(project.created)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-1">
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="system" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">System Information</h3>
+                    <p className="text-sm text-muted-foreground">Application metadata and deployment information</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <FileText className="h-4 w-4" />
+                          Application Metadata
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Build Version</span>
+                          <Badge variant="outline">v{systemMetrics.buildVersion}</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Environment</span>
+                          <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                            {systemMetrics.deploymentEnv}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Last Deployment</span>
+                          <span className="text-sm">{formatDateTime(systemMetrics.lastDeployment)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Database Health</span>
+                          <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                            {systemMetrics.databaseHealth}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                          <Activity className="h-4 w-4" />
+                          System Health
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">API Status</span>
+                          <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                            {systemMetrics.apiHealth}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Uptime</span>
+                          <span className="text-sm font-medium">{systemMetrics.uptime}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Active AI Jobs</span>
+                          <span className="text-sm font-medium">{systemMetrics.aiProcessingJobs}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Active Users</span>
+                          <span className="text-sm font-medium">{systemMetrics.activeUsers}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Device Management:</strong> Integration with{" "}
+                      <code className="px-1 py-0.5 bg-muted rounded text-xs">
+                        graph.microsoft.com/v1.0/deviceManagement
+                      </code>{" "}
+                      for compliance monitoring and device policies.
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
               </Tabs>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout - Following project page pattern */}
-      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="space-y-6">
-          {/* System Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{systemMetrics.totalUsers}</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <CheckCircle className="h-3 w-3 text-green-500" />
-                  {systemMetrics.activeUsers} active
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">MFA Coverage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {Math.round((systemMetrics.mfaEnabled / systemMetrics.totalUsers) * 100)}%
-                </div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Shield className="h-3 w-3 text-blue-500" />
-                  {systemMetrics.mfaEnabled}/{systemMetrics.totalUsers} users
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">System Uptime</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{systemMetrics.uptime}</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Monitor className="h-3 w-3 text-green-500" />
-                  Last 30 days
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">AI Models</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{systemMetrics.aiModelsActive}</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Brain className="h-3 w-3 text-purple-500" />
-                  Active models
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Tab Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsContent value="overview" className="space-y-4 mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="lg:col-span-2">
-                  <HbIntelManagementCard />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="users" className="space-y-4 mt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">User Administration</h3>
-                  <p className="text-sm text-muted-foreground">Manage user accounts and role assignments</p>
-                </div>
-                <Button onClick={handleNewUser} className="bg-[#FA4616] hover:bg-[#FA4616]/90">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add User
-                </Button>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Microsoft Graph Integration:</strong> User data synchronized from{" "}
-                  <code className="px-1 py-0.5 bg-muted rounded text-xs">graph.microsoft.com/v1.0/users</code>
-                </AlertDescription>
-              </Alert>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Recent Users</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>MFA</TableHead>
-                        <TableHead>Last Login</TableHead>
-                        <TableHead className="w-[100px]">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentUsers.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.name}</TableCell>
-                          <TableCell>{user.email}</TableCell>
-                          <TableCell>{user.role}</TableCell>
-                          <TableCell>{getStatusBadge(user.status)}</TableCell>
-                          <TableCell>
-                            {user.mfaEnabled ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <XCircle className="h-4 w-4 text-red-500" />
-                            )}
-                          </TableCell>
-                          <TableCell>{user.lastLogin ? formatDateTime(user.lastLogin) : "Never"}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="security" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">Security & Compliance</h3>
-                <p className="text-sm text-muted-foreground">Manage security policies and compliance settings</p>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Shield className="h-4 w-4" />
-                      Microsoft Graph Endpoints
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {microsoftGraphEndpoints.map((endpoint, index) => (
-                        <div key={index} className="border rounded-lg p-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <code className="text-xs bg-muted px-2 py-1 rounded">{endpoint.endpoint}</code>
-                                <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                                  {endpoint.status}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-muted-foreground mb-2">{endpoint.description}</p>
-                              <p className="text-xs text-muted-foreground">
-                                Last sync: {formatDateTime(endpoint.lastSync)}
-                              </p>
-                            </div>
-                            <Button variant="ghost" size="sm">
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Key className="h-4 w-4" />
-                      Security Settings
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium">Single Sign-On (SSO)</p>
-                        <p className="text-xs text-muted-foreground">Enable Azure AD integration</p>
-                      </div>
-                      <Switch checked={systemMetrics.ssoEnabled} />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium">Multi-Factor Authentication</p>
-                        <p className="text-xs text-muted-foreground">Require MFA for all users</p>
-                      </div>
-                      <Switch checked={true} />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium">Session Timeout</p>
-                        <p className="text-xs text-muted-foreground">Auto-logout after inactivity</p>
-                      </div>
-                      <Select defaultValue="8">
-                        <SelectTrigger className="w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="2">2h</SelectItem>
-                          <SelectItem value="4">4h</SelectItem>
-                          <SelectItem value="8">8h</SelectItem>
-                          <SelectItem value="24">24h</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="ai" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">AI/ML System Management</h3>
-                <p className="text-sm text-muted-foreground">
-                  Monitor and configure AI models and processing pipelines
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Brain className="h-4 w-4" />
-                      AI Model Status
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {aiModels.map((model, index) => (
-                        <div key={index} className="border rounded-lg p-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <p className="text-sm font-medium">{model.name}</p>
-                                <Badge
-                                  className={
-                                    model.status === "Active"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
-                                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400"
-                                  }
-                                >
-                                  {model.status}
-                                </Badge>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                                <div>Uptime: {model.uptime}</div>
-                                <div>Cost: ${model.cost}</div>
-                                <div>Requests: {model.requestsToday}</div>
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="sm">
-                              <Settings className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <DollarSign className="h-4 w-4" />
-                      Cost & Usage Analytics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold">${systemMetrics.monthlyAiCost}</div>
-                      <div className="text-xs text-muted-foreground">Monthly AI costs</div>
-                    </div>
-                    <Separator />
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Processing Jobs</span>
-                        <span className="font-medium">{systemMetrics.aiProcessingJobs}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Active Models</span>
-                        <span className="font-medium">{systemMetrics.aiModelsActive}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Total Requests Today</span>
-                        <span className="font-medium">
-                          {aiModels.reduce((sum, model) => sum + model.requestsToday, 0)}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="projects" className="space-y-4 mt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">Project Management</h3>
-                  <p className="text-sm text-muted-foreground">Create and manage construction projects</p>
-                </div>
-                <Button onClick={handleNewProject} className="bg-[#FA4616] hover:bg-[#FA4616]/90">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Project
-                </Button>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Recent Projects</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Project ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Owner</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Budget</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="w-[100px]">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentProjects.map((project) => (
-                        <TableRow key={project.id}>
-                          <TableCell className="font-medium">{project.id}</TableCell>
-                          <TableCell>{project.name}</TableCell>
-                          <TableCell>{project.owner}</TableCell>
-                          <TableCell>{project.type}</TableCell>
-                          <TableCell>${(project.budget / 1000000).toFixed(1)}M</TableCell>
-                          <TableCell>{getStatusBadge(project.status)}</TableCell>
-                          <TableCell>{formatDate(project.created)}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="system" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">System Information</h3>
-                <p className="text-sm text-muted-foreground">Application metadata and deployment information</p>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <FileText className="h-4 w-4" />
-                      Application Metadata
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Build Version</span>
-                      <Badge variant="outline">v{systemMetrics.buildVersion}</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Environment</span>
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                        {systemMetrics.deploymentEnv}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Last Deployment</span>
-                      <span className="text-sm">{formatDateTime(systemMetrics.lastDeployment)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Database Health</span>
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                        {systemMetrics.databaseHealth}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Activity className="h-4 w-4" />
-                      System Health
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">API Status</span>
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                        {systemMetrics.apiHealth}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Uptime</span>
-                      <span className="text-sm font-medium">{systemMetrics.uptime}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Active AI Jobs</span>
-                      <span className="text-sm font-medium">{systemMetrics.aiProcessingJobs}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Active Users</span>
-                      <span className="text-sm font-medium">{systemMetrics.activeUsers}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Device Management:</strong> Integration with{" "}
-                  <code className="px-1 py-0.5 bg-muted rounded text-xs">
-                    graph.microsoft.com/v1.0/deviceManagement
-                  </code>{" "}
-                  for compliance monitoring and device policies.
-                </AlertDescription>
-              </Alert>
-            </TabsContent>
-          </Tabs>
         </div>
       </div>
 

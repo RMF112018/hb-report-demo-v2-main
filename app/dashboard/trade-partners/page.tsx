@@ -38,7 +38,7 @@ import {
   Users,
   Building,
   FileText,
-  Filter
+  Filter,
 } from "lucide-react"
 
 // Import components
@@ -55,20 +55,20 @@ const mockTradePartners = [
       name: "John Martinez",
       title: "Project Manager",
       phone: "(555) 123-4567",
-      email: "j.martinez@apexelectrical.com"
+      email: "j.martinez@apexelectrical.com",
     },
     location: {
       address: "1234 Industrial Blvd",
       city: "Los Angeles",
       state: "CA",
-      zipCode: "90028"
+      zipCode: "90028",
     },
     businessInfo: {
       licenseNumber: "C-10-987654",
       insuranceExpiry: "2024-12-31",
       bondingCapacity: "$2,000,000",
       yearsInBusiness: 15,
-      employeeCount: 45
+      employeeCount: 45,
     },
     performance: {
       overallRating: 4.7,
@@ -79,37 +79,37 @@ const mockTradePartners = [
       budgetAdherence: 96.8,
       qualityScore: 4.8,
       safetyScore: 4.9,
-      lastUpdated: "2024-01-20T10:30:00Z"
+      lastUpdated: "2024-01-20T10:30:00Z",
     },
     certifications: ["OSHA 30", "NECA Member", "IBEW Local 11"],
     specialties: ["High Voltage", "Industrial Controls", "Smart Building Systems"],
     status: "Active",
     tier: "Preferred",
     lastProjectDate: "2024-01-15",
-    nextProjectDate: "2024-02-01"
+    nextProjectDate: "2024-02-01",
   },
   {
-    id: "tp-002", 
+    id: "tp-002",
     companyName: "Precision Plumbing Corp",
     tradeType: "Plumbing",
     primaryContact: {
       name: "Sarah Chen",
       title: "Operations Director",
       phone: "(555) 987-6543",
-      email: "s.chen@precisionplumbing.com"
+      email: "s.chen@precisionplumbing.com",
     },
     location: {
       address: "5678 Commerce Way",
       city: "Irvine",
       state: "CA",
-      zipCode: "92618"
+      zipCode: "92618",
     },
     businessInfo: {
       licenseNumber: "C-36-123456",
       insuranceExpiry: "2024-10-15",
       bondingCapacity: "$1,500,000",
       yearsInBusiness: 12,
-      employeeCount: 28
+      employeeCount: 28,
     },
     performance: {
       overallRating: 4.3,
@@ -120,14 +120,14 @@ const mockTradePartners = [
       budgetAdherence: 92.1,
       qualityScore: 4.5,
       safetyScore: 4.2,
-      lastUpdated: "2024-01-18T14:20:00Z"
+      lastUpdated: "2024-01-18T14:20:00Z",
     },
     certifications: ["OSHA 10", "Green Plumber Certified", "Backflow Prevention"],
     specialties: ["Medical Gas Systems", "Hydronic Heating", "Water Treatment"],
     status: "Active",
     tier: "Standard",
     lastProjectDate: "2024-01-10",
-    nextProjectDate: "2024-01-25"
+    nextProjectDate: "2024-01-25",
   },
   {
     id: "tp-003",
@@ -137,20 +137,20 @@ const mockTradePartners = [
       name: "Michael Rodriguez",
       title: "Senior Estimator",
       phone: "(555) 456-7890",
-      email: "m.rodriguez@elitehvac.com"
+      email: "m.rodriguez@elitehvac.com",
     },
     location: {
       address: "9876 Technology Dr",
       city: "San Diego",
       state: "CA",
-      zipCode: "92127"
+      zipCode: "92127",
     },
     businessInfo: {
       licenseNumber: "C-20-456789",
       insuranceExpiry: "2024-08-30",
       bondingCapacity: "$3,000,000",
       yearsInBusiness: 22,
-      employeeCount: 67
+      employeeCount: 67,
     },
     performance: {
       overallRating: 4.9,
@@ -161,14 +161,14 @@ const mockTradePartners = [
       budgetAdherence: 98.7,
       qualityScore: 4.9,
       safetyScore: 5.0,
-      lastUpdated: "2024-01-19T16:45:00Z"
+      lastUpdated: "2024-01-19T16:45:00Z",
     },
     certifications: ["NATE Certified", "OSHA 30", "EPA 608", "LEED AP"],
     specialties: ["Variable Refrigerant Flow", "Building Automation", "Energy Recovery"],
     status: "Active",
     tier: "Premier",
     lastProjectDate: "2024-01-20",
-    nextProjectDate: "2024-01-28"
+    nextProjectDate: "2024-01-28",
   },
   {
     id: "tp-004",
@@ -178,20 +178,20 @@ const mockTradePartners = [
       name: "David Kim",
       title: "Project Coordinator",
       phone: "(555) 234-5678",
-      email: "d.kim@foundationmasters.com"
+      email: "d.kim@foundationmasters.com",
     },
     location: {
       address: "2468 Industrial Ave",
       city: "Riverside",
       state: "CA",
-      zipCode: "92505"
+      zipCode: "92505",
     },
     businessInfo: {
       licenseNumber: "C-8-789012",
       insuranceExpiry: "2024-11-20",
       bondingCapacity: "$2,500,000",
       yearsInBusiness: 18,
-      employeeCount: 52
+      employeeCount: 52,
     },
     performance: {
       overallRating: 4.1,
@@ -202,15 +202,15 @@ const mockTradePartners = [
       budgetAdherence: 89.6,
       qualityScore: 4.3,
       safetyScore: 4.0,
-      lastUpdated: "2024-01-17T11:15:00Z"
+      lastUpdated: "2024-01-17T11:15:00Z",
     },
     certifications: ["ACI Certified", "OSHA 10", "Concrete Finisher"],
     specialties: ["Post-Tension Slabs", "Structural Concrete", "Decorative Finishes"],
     status: "Under Review",
     tier: "Standard",
     lastProjectDate: "2024-01-05",
-    nextProjectDate: "2024-02-10"
-  }
+    nextProjectDate: "2024-02-10",
+  },
 ]
 
 const tradeTypes = ["All", "Electrical", "Plumbing", "HVAC", "Concrete", "Roofing", "Drywall", "Flooring", "Painting"]
@@ -227,7 +227,7 @@ export default function TradePartnersPage() {
   const [showScorecardModal, setShowScorecardModal] = useState(false)
   const [showReviewsModal, setShowReviewsModal] = useState(false)
   const [showAddPartnerModal, setShowAddPartnerModal] = useState(false)
-  
+
   // Filter and search state
   const [searchTerm, setSearchTerm] = useState("")
   const [filterTrade, setFilterTrade] = useState("All")
@@ -239,7 +239,7 @@ export default function TradePartnersPage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       setLoading(false)
     }
     loadData()
@@ -247,16 +247,17 @@ export default function TradePartnersPage() {
 
   // Filtered and sorted partners
   const filteredPartners = useMemo(() => {
-    let filtered = mockTradePartners.filter(partner => {
-      const matchesSearch = partner.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           partner.tradeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           partner.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           partner.primaryContact.name.toLowerCase().includes(searchTerm.toLowerCase())
-      
+    let filtered = mockTradePartners.filter((partner) => {
+      const matchesSearch =
+        partner.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partner.tradeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partner.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partner.primaryContact.name.toLowerCase().includes(searchTerm.toLowerCase())
+
       const matchesTrade = filterTrade === "All" || partner.tradeType === filterTrade
       const matchesTier = filterTier === "All" || partner.tier === filterTier
       const matchesStatus = filterStatus === "All" || partner.status === filterStatus
-      
+
       return matchesSearch && matchesTrade && matchesTier && matchesStatus
     })
 
@@ -336,25 +337,25 @@ export default function TradePartnersPage() {
   // Get role-specific scope
   const getProjectScope = () => {
     if (!user) return { scope: "all", partnerCount: 0, description: "All Partners" }
-    
+
     switch (user.role) {
       case "project-manager":
-        return { 
-          scope: "single", 
-          partnerCount: 12, 
-          description: "Project Partners"
+        return {
+          scope: "single",
+          partnerCount: 12,
+          description: "Project Partners",
         }
       case "project-executive":
-        return { 
-          scope: "portfolio", 
-          partnerCount: 28, 
-          description: "Portfolio Partners"
+        return {
+          scope: "portfolio",
+          partnerCount: 28,
+          description: "Portfolio Partners",
         }
       default:
-        return { 
-          scope: "enterprise", 
-          partnerCount: mockTradePartners.length, 
-          description: "Enterprise Database"
+        return {
+          scope: "enterprise",
+          partnerCount: mockTradePartners.length,
+          description: "Enterprise Database",
         }
     }
   }
@@ -423,14 +424,6 @@ export default function TradePartnersPage() {
             <div>
               <h1 className="text-3xl font-bold text-foreground">Trade Partners Database</h1>
               <p className="text-muted-foreground mt-1">Comprehensive subcontractor and vendor management system</p>
-              <div className="flex items-center gap-4 mt-2">
-                <Badge variant="outline" className="px-3 py-1">
-                  {projectScope.description}
-                </Badge>
-                <Badge variant="secondary" className="px-3 py-1">
-                  {mockTradePartners.length} Total Partners
-                </Badge>
-              </div>
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
@@ -441,10 +434,7 @@ export default function TradePartnersPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button 
-                onClick={() => setShowAddPartnerModal(true)}
-                className="bg-[#FF6B35] hover:bg-[#E55A2B]"
-              >
+              <Button onClick={() => setShowAddPartnerModal(true)} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Partner
               </Button>
@@ -455,14 +445,10 @@ export default function TradePartnersPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="border-l-4 border-l-[#003087]">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Partners
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Partners</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#003087] dark:text-white">
-                  {mockTradePartners.length}
-                </div>
+                <div className="text-2xl font-bold text-[#003087] dark:text-white">{mockTradePartners.length}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <TrendingUp className="h-3 w-3 inline mr-1" />
                   +12% this quarter
@@ -472,13 +458,11 @@ export default function TradePartnersPage() {
 
             <Card className="border-l-4 border-l-green-500">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Active Partners
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Active Partners</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {mockTradePartners.filter(p => p.status === "Active").length}
+                  {mockTradePartners.filter((p) => p.status === "Active").length}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <CheckCircle className="h-3 w-3 inline mr-1" />
@@ -489,13 +473,14 @@ export default function TradePartnersPage() {
 
             <Card className="border-l-4 border-l-[#FF6B35]">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Avg Rating
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Avg Rating</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-[#FF6B35]">
-                  {(mockTradePartners.reduce((sum, p) => sum + p.performance.overallRating, 0) / mockTradePartners.length).toFixed(1)}
+                  {(
+                    mockTradePartners.reduce((sum, p) => sum + p.performance.overallRating, 0) /
+                    mockTradePartners.length
+                  ).toFixed(1)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <Star className="h-3 w-3 inline mr-1" />
@@ -506,13 +491,11 @@ export default function TradePartnersPage() {
 
             <Card className="border-l-4 border-l-purple-500">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Premier Partners
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Premier Partners</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {mockTradePartners.filter(p => p.tier === "Premier").length}
+                  {mockTradePartners.filter((p) => p.tier === "Premier").length}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   <Award className="h-3 w-3 inline mr-1" />
@@ -614,8 +597,10 @@ export default function TradePartnersPage() {
                         onChange={(e) => setFilterTrade(e.target.value)}
                         className="px-3 py-2 border rounded-md bg-background"
                       >
-                        {tradeTypes.map(trade => (
-                          <option key={trade} value={trade}>{trade} Trade</option>
+                        {tradeTypes.map((trade) => (
+                          <option key={trade} value={trade}>
+                            {trade} Trade
+                          </option>
                         ))}
                       </select>
                       <select
@@ -623,8 +608,10 @@ export default function TradePartnersPage() {
                         onChange={(e) => setFilterTier(e.target.value)}
                         className="px-3 py-2 border rounded-md bg-background"
                       >
-                        {tierTypes.map(tier => (
-                          <option key={tier} value={tier}>{tier} Tier</option>
+                        {tierTypes.map((tier) => (
+                          <option key={tier} value={tier}>
+                            {tier} Tier
+                          </option>
                         ))}
                       </select>
                       <select
@@ -632,14 +619,16 @@ export default function TradePartnersPage() {
                         onChange={(e) => setFilterStatus(e.target.value)}
                         className="px-3 py-2 border rounded-md bg-background"
                       >
-                        {statusTypes.map(status => (
-                          <option key={status} value={status}>{status} Status</option>
+                        {statusTypes.map((status) => (
+                          <option key={status} value={status}>
+                            {status} Status
+                          </option>
                         ))}
                       </select>
                       <select
                         value={`${sortBy}-${sortOrder}`}
                         onChange={(e) => {
-                          const [sort, order] = e.target.value.split('-')
+                          const [sort, order] = e.target.value.split("-")
                           setSortBy(sort)
                           setSortOrder(order)
                         }}
@@ -678,14 +667,16 @@ export default function TradePartnersPage() {
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback className="bg-[#003087] text-white text-xs">
-                                  {partner.companyName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                  {partner.companyName
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .slice(0, 2)}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p className="font-medium">{partner.companyName}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {partner.primaryContact.name}
-                                </p>
+                                <p className="text-xs text-muted-foreground">{partner.primaryContact.name}</p>
                               </div>
                             </div>
                           </TableCell>
@@ -695,7 +686,9 @@ export default function TradePartnersPage() {
                           <TableCell>
                             <div className="flex items-center gap-1">
                               <MapPin className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">{partner.location.city}, {partner.location.state}</span>
+                              <span className="text-sm">
+                                {partner.location.city}, {partner.location.state}
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell>
@@ -712,9 +705,7 @@ export default function TradePartnersPage() {
                                   />
                                 ))}
                               </div>
-                              <span className="text-sm font-medium">
-                                {partner.performance.overallRating}
-                              </span>
+                              <span className="text-sm font-medium">{partner.performance.overallRating}</span>
                             </div>
                           </TableCell>
                           <TableCell>
@@ -737,18 +728,10 @@ export default function TradePartnersPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openScorecard(partner)}
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => openScorecard(partner)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openReviews(partner)}
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => openReviews(partner)}>
                                 <Star className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="sm">
@@ -772,11 +755,13 @@ export default function TradePartnersPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {tradeTypes.slice(1).map(trade => {
-                          const tradePartners = mockTradePartners.filter(p => p.tradeType === trade)
-                          const avgRating = tradePartners.length > 0 
-                            ? tradePartners.reduce((sum, p) => sum + p.performance.overallRating, 0) / tradePartners.length 
-                            : 0
+                        {tradeTypes.slice(1).map((trade) => {
+                          const tradePartners = mockTradePartners.filter((p) => p.tradeType === trade)
+                          const avgRating =
+                            tradePartners.length > 0
+                              ? tradePartners.reduce((sum, p) => sum + p.performance.overallRating, 0) /
+                                tradePartners.length
+                              : 0
                           return (
                             <div key={trade} className="flex items-center justify-between">
                               <span className="text-sm font-medium">{trade}</span>
@@ -797,8 +782,8 @@ export default function TradePartnersPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {tierTypes.slice(1).map(tier => {
-                          const count = mockTradePartners.filter(p => p.tier === tier).length
+                        {tierTypes.slice(1).map((tier) => {
+                          const count = mockTradePartners.filter((p) => p.tier === tier).length
                           const percentage = (count / mockTradePartners.length) * 100
                           return (
                             <div key={tier} className="flex items-center justify-between">
@@ -917,8 +902,10 @@ export default function TradePartnersPage() {
                   <div>
                     <label className="text-sm font-medium">Trade Type</label>
                     <select className="w-full px-3 py-2 border rounded-md bg-background">
-                      {tradeTypes.slice(1).map(trade => (
-                        <option key={trade} value={trade}>{trade}</option>
+                      {tradeTypes.slice(1).map((trade) => (
+                        <option key={trade} value={trade}>
+                          {trade}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -941,9 +928,7 @@ export default function TradePartnersPage() {
                   <Button variant="outline" onClick={() => setShowAddPartnerModal(false)}>
                     Cancel
                   </Button>
-                  <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">
-                    Add Partner
-                  </Button>
+                  <Button className="bg-[#FF6B35] hover:bg-[#FF5722] text-white">Add Partner</Button>
                 </div>
               </div>
             </DialogContent>
@@ -952,4 +937,4 @@ export default function TradePartnersPage() {
       </div>
     </>
   )
-} 
+}

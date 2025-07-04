@@ -35,20 +35,20 @@ import { ConstraintForm } from "@/components/constraints/ConstraintForm"
 import { ConstraintExportUtils } from "@/components/constraints/ExportUtils"
 import { ExportModal } from "@/components/constraints/ExportModal"
 import { ProjectConstraintsSummary } from "@/components/constraints/ProjectConstraintsSummary"
-import { 
-  Plus, 
-  RefreshCw, 
-  Download, 
-  Clock, 
-  CheckCircle, 
-  Home, 
-  Maximize, 
+import {
+  Plus,
+  RefreshCw,
+  Download,
+  Clock,
+  CheckCircle,
+  Home,
+  Maximize,
   Minimize,
   AlertTriangle,
   BarChart3,
   TrendingUp,
   FileText,
-  Filter
+  Filter,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import constraintsData from "@/data/mock/logs/constraints.json"
@@ -85,7 +85,7 @@ export default function ConstraintsLogPage() {
   useEffect(() => {
     const projectIdFromUrl = searchParams.get("project_id")
     if (projectIdFromUrl) {
-      setFilters(prev => ({ ...prev, project: projectIdFromUrl }))
+      setFilters((prev) => ({ ...prev, project: projectIdFromUrl }))
     }
   }, [searchParams])
 
@@ -115,7 +115,7 @@ export default function ConstraintsLogPage() {
           c.category.toLowerCase().includes(searchLower) ||
           c.assigned.toLowerCase().includes(searchLower) ||
           c.reference.toLowerCase().includes(searchLower) ||
-          c.no.toLowerCase().includes(searchLower),
+          c.no.toLowerCase().includes(searchLower)
       )
     }
 
@@ -137,9 +137,9 @@ export default function ConstraintsLogPage() {
     // Apply project filter
     if (filters.project !== "all") {
       const projectId = parseInt(filters.project)
-      const selectedProject = projects.find(p => p.project_id === projectId)
+      const selectedProject = projects.find((p) => p.project_id === projectId)
       if (selectedProject) {
-        const selectedProjectConstraintIds = selectedProject.constraints.map(c => c.id)
+        const selectedProjectConstraintIds = selectedProject.constraints.map((c) => c.id)
         filtered = filtered.filter((c) => selectedProjectConstraintIds.includes(c.id))
       }
     }
@@ -171,21 +171,15 @@ export default function ConstraintsLogPage() {
       return new Date(c.dueDate) < new Date()
     }).length
 
-    const byCategory = allConstraints.reduce(
-      (acc, constraint) => {
-        acc[constraint.category] = (acc[constraint.category] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
+    const byCategory = allConstraints.reduce((acc, constraint) => {
+      acc[constraint.category] = (acc[constraint.category] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
-    const byStatus = allConstraints.reduce(
-      (acc, constraint) => {
-        acc[constraint.completionStatus] = (acc[constraint.completionStatus] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
+    const byStatus = allConstraints.reduce((acc, constraint) => {
+      acc[constraint.completionStatus] = (acc[constraint.completionStatus] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
     return { total, open, closed, overdue, byCategory, byStatus }
   }, [allConstraints])
@@ -231,12 +225,12 @@ export default function ConstraintsLogPage() {
               no: editingConstraint.no,
               daysElapsed: constraintData.dateIdentified
                 ? Math.floor(
-                    (new Date().getTime() - new Date(constraintData.dateIdentified).getTime()) / (1000 * 60 * 60 * 24),
+                    (new Date().getTime() - new Date(constraintData.dateIdentified).getTime()) / (1000 * 60 * 60 * 24)
                   )
                 : 0,
             }
-          : c,
-      ),
+          : c
+      )
     )
     setEditingConstraint(null)
     toast({
@@ -267,12 +261,12 @@ export default function ConstraintsLogPage() {
 
   // Handle project selection for filtering
   const handleProjectSelect = (projectId: string) => {
-    setFilters(prev => ({ ...prev, project: projectId }))
+    setFilters((prev) => ({ ...prev, project: projectId }))
   }
 
   // Handle clearing project filter
   const handleClearProjectFilter = () => {
-    setFilters(prev => ({ ...prev, project: "all" }))
+    setFilters((prev) => ({ ...prev, project: "all" }))
   }
 
   const handleExportSubmit = (options: { format: "pdf" | "excel" | "csv"; fileName: string; filePath: string }) => {
@@ -334,25 +328,25 @@ export default function ConstraintsLogPage() {
   // Get role-specific scope
   const getProjectScope = () => {
     if (!user) return { scope: "all", projectCount: 0, description: "All Projects" }
-    
+
     switch (user.role) {
       case "project-manager":
-        return { 
-          scope: "single", 
-          projectCount: 1, 
-          description: "Single Project View"
+        return {
+          scope: "single",
+          projectCount: 1,
+          description: "Single Project View",
         }
       case "project-executive":
-        return { 
-          scope: "portfolio", 
-          projectCount: 6, 
-          description: "Portfolio View (6 Projects)"
+        return {
+          scope: "portfolio",
+          projectCount: 6,
+          description: "Portfolio View (6 Projects)",
         }
       default:
-        return { 
-          scope: "enterprise", 
-          projectCount: 12, 
-          description: "Enterprise View (All Projects)"
+        return {
+          scope: "enterprise",
+          projectCount: 12,
+          description: "Enterprise View (All Projects)",
         }
     }
   }
@@ -459,14 +453,6 @@ export default function ConstraintsLogPage() {
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">Constraints Log</h1>
                   <p className="text-muted-foreground mt-1">Track and manage project constraints and resolutions</p>
-                  <div className="flex items-center gap-4 mt-2" data-tour="constraints-log-scope-badges">
-                    <Badge variant="outline" className="px-3 py-1">
-                      {projectScope.description}
-                    </Badge>
-                    <Badge variant="secondary" className="px-3 py-1">
-                      {stats.total} Total Constraints
-                    </Badge>
-                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
@@ -579,4 +565,4 @@ export default function ConstraintsLogPage() {
       </div>
     </>
   )
-} 
+}

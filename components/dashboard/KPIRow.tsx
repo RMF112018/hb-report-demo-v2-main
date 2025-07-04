@@ -1,7 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import { DollarSign, TrendingUp, Target, Activity, PieChart, BarChart3, Users, Calendar, Heart, Shield, Zap, Coins, ChevronDown, ChevronUp } from "lucide-react"
+import {
+  DollarSign,
+  TrendingUp,
+  Target,
+  Activity,
+  PieChart,
+  BarChart3,
+  Users,
+  Calendar,
+  Heart,
+  Shield,
+  Zap,
+  Coins,
+  ChevronDown,
+  ChevronUp,
+  Monitor,
+  Server,
+  AlertTriangle,
+} from "lucide-react"
 import { KPIWidget } from "@/components/charts/KPIWidget"
 import { Button } from "@/components/ui/button"
 
@@ -10,52 +28,56 @@ interface KPIRowProps {
 }
 
 // Helper function to determine performance level based on value and type
-const getPerformanceLevel = (value: string | number, type: string, trend?: string): 'good' | 'ok' | 'warning' | 'bad' => {
-  const numValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]/g, '')) : value
+const getPerformanceLevel = (
+  value: string | number,
+  type: string,
+  trend?: string
+): "good" | "ok" | "warning" | "bad" => {
+  const numValue = typeof value === "string" ? parseFloat(value.replace(/[^0-9.-]/g, "")) : value
 
   switch (type) {
-    case 'health':
-    case 'performance':
-    case 'satisfaction':
-    case 'quality':
-    case 'completion':
-      if (numValue >= 90) return 'good'
-      if (numValue >= 75) return 'ok'
-      if (numValue >= 60) return 'warning'
-      return 'bad'
-    
-    case 'budget':
-      if (numValue <= 95) return 'good'  // Under budget is good
-      if (numValue <= 100) return 'ok'
-      if (numValue <= 105) return 'warning'
-      return 'bad'
-    
-    case 'margin':
-      if (numValue >= 18) return 'good'
-      if (numValue >= 15) return 'ok'
-      if (numValue >= 10) return 'warning'
-      return 'bad'
-    
-    case 'variance':
-      if (numValue <= 3) return 'good'
-      if (numValue <= 5) return 'ok'
-      if (numValue <= 8) return 'warning'
-      return 'bad'
-    
-    case 'safety':
-      if (numValue >= 100) return 'good'  // Days incident-free
-      if (numValue >= 60) return 'ok'
-      if (numValue >= 30) return 'warning'
-      return 'bad'
-    
-    case 'schedule':
-      if (trend === 'up' && numValue >= 85) return 'good'
-      if (numValue >= 75) return 'ok'
-      if (numValue >= 65) return 'warning'
-      return 'bad'
-    
+    case "health":
+    case "performance":
+    case "satisfaction":
+    case "quality":
+    case "completion":
+      if (numValue >= 90) return "good"
+      if (numValue >= 75) return "ok"
+      if (numValue >= 60) return "warning"
+      return "bad"
+
+    case "budget":
+      if (numValue <= 95) return "good" // Under budget is good
+      if (numValue <= 100) return "ok"
+      if (numValue <= 105) return "warning"
+      return "bad"
+
+    case "margin":
+      if (numValue >= 18) return "good"
+      if (numValue >= 15) return "ok"
+      if (numValue >= 10) return "warning"
+      return "bad"
+
+    case "variance":
+      if (numValue <= 3) return "good"
+      if (numValue <= 5) return "ok"
+      if (numValue <= 8) return "warning"
+      return "bad"
+
+    case "safety":
+      if (numValue >= 100) return "good" // Days incident-free
+      if (numValue >= 60) return "ok"
+      if (numValue >= 30) return "warning"
+      return "bad"
+
+    case "schedule":
+      if (trend === "up" && numValue >= 85) return "good"
+      if (numValue >= 75) return "ok"
+      if (numValue >= 65) return "warning"
+      return "bad"
+
     default:
-      return 'ok'
+      return "ok"
   }
 }
 
@@ -65,7 +87,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
   // KPI configurations by role
   function getKPIsForRole() {
     switch (userRole) {
-      case 'executive':
+      case "executive":
         return [
           {
             icon: DollarSign,
@@ -73,7 +95,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$47.8M",
             trend: "up" as const,
             caption: "+8.2% YTD",
-            performance: getPerformanceLevel(47.8, 'revenue', 'up')
+            performance: getPerformanceLevel(47.8, "revenue", "up"),
           },
           {
             icon: Heart,
@@ -82,7 +104,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "stable" as const,
             caption: "±0.2% vs Q3",
-            performance: getPerformanceLevel(77.6, 'health', 'stable')
+            performance: getPerformanceLevel(77.6, "health", "stable"),
           },
           {
             icon: Target,
@@ -90,7 +112,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "12",
             trend: "up" as const,
             caption: "+2 this quarter",
-            performance: getPerformanceLevel(12, 'projects', 'up')
+            performance: getPerformanceLevel(12, "projects", "up"),
           },
           {
             icon: TrendingUp,
@@ -99,7 +121,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "+2.1% vs target",
-            performance: getPerformanceLevel(18.4, 'margin', 'up')
+            performance: getPerformanceLevel(18.4, "margin", "up"),
           },
           {
             icon: PieChart,
@@ -107,7 +129,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$89.2M",
             trend: "up" as const,
             caption: "12.4 months",
-            performance: getPerformanceLevel(89.2, 'backlog', 'up')
+            performance: getPerformanceLevel(89.2, "backlog", "up"),
           },
           {
             icon: Shield,
@@ -116,11 +138,11 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "247 days incident-free",
-            performance: getPerformanceLevel(247, 'safety', 'up')
-          }
+            performance: getPerformanceLevel(247, "safety", "up"),
+          },
         ]
 
-      case 'project-executive':
+      case "project-executive":
         return [
           {
             icon: DollarSign,
@@ -128,7 +150,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$28.4M",
             trend: "up" as const,
             caption: "6 active projects",
-            performance: getPerformanceLevel(28.4, 'revenue', 'up')
+            performance: getPerformanceLevel(28.4, "revenue", "up"),
           },
           {
             icon: Calendar,
@@ -137,7 +159,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "down" as const,
             caption: "-15.7 days avg",
-            performance: getPerformanceLevel(79.8, 'schedule', 'down')
+            performance: getPerformanceLevel(79.8, "schedule", "down"),
           },
           {
             icon: Target,
@@ -146,7 +168,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "+1.8% under budget",
-            performance: getPerformanceLevel(94.2, 'budget', 'up')
+            performance: getPerformanceLevel(94.2, "budget", "up"),
           },
           {
             icon: Users,
@@ -155,7 +177,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "stable" as const,
             caption: "6/6 projects rated",
-            performance: getPerformanceLevel(85.6, 'satisfaction', 'stable')
+            performance: getPerformanceLevel(85.6, "satisfaction", "stable"),
           },
           {
             icon: Activity,
@@ -163,7 +185,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "42",
             trend: "up" as const,
             caption: "$6.8M value",
-            performance: getPerformanceLevel(42, 'change_orders', 'up')
+            performance: getPerformanceLevel(42, "change_orders", "up"),
           },
           {
             icon: Shield,
@@ -171,11 +193,11 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$1.85M",
             trend: "down" as const,
             caption: "74% mitigated",
-            performance: getPerformanceLevel(1.85, 'risk', 'down')
-          }
+            performance: getPerformanceLevel(1.85, "risk", "down"),
+          },
         ]
 
-      case 'project-manager':
+      case "project-manager":
         return [
           {
             icon: DollarSign,
@@ -183,7 +205,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$4.2M",
             trend: "stable" as const,
             caption: "Tropical World",
-            performance: getPerformanceLevel(4.2, 'revenue', 'stable')
+            performance: getPerformanceLevel(4.2, "revenue", "stable"),
           },
           {
             icon: Calendar,
@@ -192,7 +214,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "12.3 days behind",
-            performance: getPerformanceLevel(82.4, 'schedule', 'up')
+            performance: getPerformanceLevel(82.4, "schedule", "up"),
           },
           {
             icon: Target,
@@ -201,7 +223,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "down" as const,
             caption: "1.8% over forecast",
-            performance: getPerformanceLevel(97.2, 'budget', 'down')
+            performance: getPerformanceLevel(97.2, "budget", "down"),
           },
           {
             icon: Zap,
@@ -210,7 +232,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "15 days no rework",
-            performance: getPerformanceLevel(91.2, 'quality', 'up')
+            performance: getPerformanceLevel(91.2, "quality", "up"),
           },
           {
             icon: Shield,
@@ -218,7 +240,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "127",
             trend: "up" as const,
             caption: "incident-free",
-            performance: getPerformanceLevel(127, 'safety', 'up')
+            performance: getPerformanceLevel(127, "safety", "up"),
           },
           {
             icon: BarChart3,
@@ -227,8 +249,63 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "142 days remain",
-            performance: getPerformanceLevel(68.4, 'completion', 'up')
-          }
+            performance: getPerformanceLevel(68.4, "completion", "up"),
+          },
+        ]
+
+      case "admin":
+        return [
+          {
+            icon: Monitor,
+            label: "System Uptime",
+            value: "99.94",
+            unit: "%",
+            trend: "up" as const,
+            caption: "Infrastructure stable",
+            performance: getPerformanceLevel(99.94, "uptime", "up"),
+          },
+          {
+            icon: Server,
+            label: "Active Servers",
+            value: "24/25",
+            trend: "stable" as const,
+            caption: "1 in maintenance",
+            performance: getPerformanceLevel(24, "servers", "stable"),
+          },
+          {
+            icon: Shield,
+            label: "Security Score",
+            value: "98.7",
+            unit: "%",
+            trend: "up" as const,
+            caption: "All systems secure",
+            performance: getPerformanceLevel(98.7, "security", "up"),
+          },
+          {
+            icon: Users,
+            label: "Active Users",
+            value: "243",
+            trend: "up" as const,
+            caption: "267 total users",
+            performance: getPerformanceLevel(243, "users", "up"),
+          },
+          {
+            icon: AlertTriangle,
+            label: "Active Threats",
+            value: "3",
+            trend: "down" as const,
+            caption: "12 resolved today",
+            performance: getPerformanceLevel(3, "threats", "down"),
+          },
+          {
+            icon: Activity,
+            label: "System Load",
+            value: "68.2",
+            unit: "%",
+            trend: "stable" as const,
+            caption: "Normal range",
+            performance: getPerformanceLevel(68.2, "load", "stable"),
+          },
         ]
 
       default: // financial or other roles
@@ -239,7 +316,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$47.8M",
             trend: "up" as const,
             caption: "Active portfolio",
-            performance: getPerformanceLevel(47.8, 'revenue', 'up')
+            performance: getPerformanceLevel(47.8, "revenue", "up"),
           },
           {
             icon: Activity,
@@ -247,7 +324,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$2.8M",
             trend: "up" as const,
             caption: "Monthly avg",
-            performance: getPerformanceLevel(2.8, 'cash_flow', 'up')
+            performance: getPerformanceLevel(2.8, "cash_flow", "up"),
           },
           {
             icon: Coins,
@@ -255,7 +332,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             value: "$3.4M",
             trend: "down" as const,
             caption: "32 days avg",
-            performance: getPerformanceLevel(3.4, 'receivables', 'down')
+            performance: getPerformanceLevel(3.4, "receivables", "down"),
           },
           {
             icon: TrendingUp,
@@ -264,7 +341,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "up" as const,
             caption: "+2.1% vs budget",
-            performance: getPerformanceLevel(18.4, 'margin', 'up')
+            performance: getPerformanceLevel(18.4, "margin", "up"),
           },
           {
             icon: Target,
@@ -273,7 +350,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "down" as const,
             caption: "Under budget",
-            performance: getPerformanceLevel(2.3, 'variance', 'down')
+            performance: getPerformanceLevel(2.3, "variance", "down"),
           },
           {
             icon: Shield,
@@ -282,8 +359,8 @@ export function KPIRow({ userRole }: KPIRowProps) {
             unit: "%",
             trend: "stable" as const,
             caption: "Remaining",
-            performance: getPerformanceLevel(8.7, 'contingency', 'stable')
-          }
+            performance: getPerformanceLevel(8.7, "contingency", "stable"),
+          },
         ]
     }
   }
@@ -292,22 +369,22 @@ export function KPIRow({ userRole }: KPIRowProps) {
   const getResponsiveKPICount = (kpis: any[]) => {
     if (isCollapsed) {
       return {
-        mobile: [],                   // Hide all when collapsed
-        tablet: [],                   // Hide all when collapsed
-        desktop: []                   // Hide all when collapsed
+        mobile: [], // Hide all when collapsed
+        tablet: [], // Hide all when collapsed
+        desktop: [], // Hide all when collapsed
       }
     }
-    
+
     return {
-      mobile: kpis.slice(0, 3),      // Show 3 on mobile (full width)
-      tablet: kpis.slice(0, 4),      // Show 4 on tablet
-      desktop: kpis                  // Show all on desktop
+      mobile: kpis.slice(0, 3), // Show 3 on mobile (full width)
+      tablet: kpis.slice(0, 4), // Show 4 on tablet
+      desktop: kpis, // Show all on desktop
     }
   }
 
   // Get KPIs for the current user role
   const kpis = getKPIsForRole()
-  
+
   // Get responsive KPI distribution
   const responsiveKpis = getResponsiveKPICount(kpis)
 
@@ -315,13 +392,6 @@ export function KPIRow({ userRole }: KPIRowProps) {
     <div className="bg-card border-b border-border">
       {/* Header with collapse toggle - always visible */}
       <div className="flex items-center justify-between px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xs sm:text-sm font-medium text-muted-foreground">Key Metrics</h2>
-          <span className="text-xs text-muted-foreground/60">
-            ({kpis.length} indicators)
-          </span>
-        </div>
-        
         {/* Collapse toggle - visible on tablet and mobile */}
         <Button
           variant="ghost"
@@ -330,19 +400,17 @@ export function KPIRow({ userRole }: KPIRowProps) {
           className="h-6 w-6 p-0 lg:hidden hover:bg-muted/50"
           title={isCollapsed ? "Show metrics" : "Hide metrics"}
         >
-          {isCollapsed ? (
-            <ChevronDown className="h-3 w-3" />
-          ) : (
-            <ChevronUp className="h-3 w-3" />
-          )}
+          {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
         </Button>
       </div>
 
       {/* KPI Content - collapsible on smaller screens */}
-      <div className={`transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'max-h-0 overflow-hidden opacity-0' : 'max-h-[200px] opacity-100'
-      } lg:max-h-none lg:opacity-100`}>
-        <div className="px-2 sm:px-3 lg:px-4 pb-2 sm:pb-3 lg:pb-4">
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isCollapsed ? "max-h-0 overflow-hidden opacity-0" : "max-h-[200px] opacity-100"
+        } lg:max-h-none lg:opacity-100`}
+      >
+        <div className="px-0 sm:px-0 lg:px-0 pb-0 sm:pb-0 lg:pb-0">
           {/* Mobile Layout - 3 KPIs filling full width */}
           {responsiveKpis.mobile.length > 0 && (
             <div className="grid grid-cols-3 gap-1.5 sm:hidden">
@@ -385,9 +453,12 @@ export function KPIRow({ userRole }: KPIRowProps) {
 
           {/* Desktop Layout - All KPIs in responsive grid */}
           {responsiveKpis.desktop.length > 0 && (
-            <div className="hidden lg:grid gap-2 xl:gap-3" style={{
-              gridTemplateColumns: `repeat(${Math.min(responsiveKpis.desktop.length, 6)}, 1fr)`
-            }}>
+            <div
+              className="hidden lg:grid gap-2 xl:gap-3"
+              style={{
+                gridTemplateColumns: `repeat(${Math.min(responsiveKpis.desktop.length, 6)}, 1fr)`,
+              }}
+            >
               {responsiveKpis.desktop.map((kpi, index) => (
                 <div key={index} className="min-w-0">
                   <KPIWidget
@@ -408,4 +479,4 @@ export function KPIRow({ userRole }: KPIRowProps) {
       </div>
     </div>
   )
-} 
+}

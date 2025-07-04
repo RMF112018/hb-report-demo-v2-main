@@ -328,7 +328,7 @@ function DashboardContent({ user }: { user: any }) {
           <div className="flex flex-col gap-4 pt-3" data-tour="dashboard-page-header">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+                <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
                 <p className="text-muted-foreground mt-1">
                   {currentDashboard?.description || "Real-time insights and project management overview"}
                 </p>

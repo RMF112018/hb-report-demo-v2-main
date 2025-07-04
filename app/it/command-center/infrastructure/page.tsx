@@ -427,8 +427,7 @@ export default function InfrastructureMonitorPage() {
             <Breadcrumb className="mb-3">
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="text-muted-foreground hover:text-foreground text-sm">
-                    <Home className="h-3 w-3 mr-1" />
+                  <BreadcrumbLink href="/dashboard" className="text-muted-foreground hover:text-foreground text-sm">
                     Home
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -449,17 +448,12 @@ export default function InfrastructureMonitorPage() {
             {/* Site Title and Actions - Responsive */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
-                  <Monitor className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
-                    Infrastructure Monitor
-                  </h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-                    Real-time monitoring of servers, network, and devices
-                  </p>
-                </div>
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
+                  Infrastructure Monitor
+                </h1>
+                <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                  Real-time
+                </Badge>
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -481,9 +475,167 @@ export default function InfrastructureMonitorPage() {
             <div className="mt-3 pt-3 border-t border-border/40" data-tour="it-module-navigation">
               <ITModuleNavigation />
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Infrastructure Tabs Row - Directly beneath navigation */}
-            <div className="mt-3 pt-3 border-t border-border/40">
+      {/* Main Content Layout - Following project page pattern */}
+      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Mobile Priority Cards - Show at top on small screens */}
+        <div className="block xl:hidden mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">System Uptime</h3>
+              <div className="text-2xl font-bold text-green-600">99.8%</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                Last 30 days
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Servers Online</h3>
+              <div className="text-2xl font-bold">24/25</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Server className="h-3 w-3 text-blue-500" />1 maintenance
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Network Health</h3>
+              <div className="text-2xl font-bold text-green-600">Optimal</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Network className="h-3 w-3 text-green-500" />
+                Avg latency: 15ms
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-2 text-foreground">Active Alerts</h3>
+              <div className="text-2xl font-bold text-orange-600">8</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <AlertTriangle className="h-3 w-3 text-orange-500" />2 critical
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Responsive Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
+            {/* System Overview Cards - Desktop */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">System Overview</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Servers</span>
+                  <span className="font-medium">{infraMetrics.totalServers}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Online Servers</span>
+                  <span className="font-medium text-green-600">{infraMetrics.onlineServers}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Network Devices</span>
+                  <span className="font-medium">{infraMetrics.networkDevices}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Online Devices</span>
+                  <span className="font-medium text-green-600">{infraMetrics.onlineDevices}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Avg Uptime</span>
+                  <span className="font-medium text-green-600">{infraMetrics.avgUptime}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
+              <div className="space-y-2">
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <Monitor className="h-4 w-4 mr-2" />
+                  Server Health
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <Network className="h-4 w-4 mr-2" />
+                  Network Status
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  View Alerts
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh All
+                </Button>
+              </div>
+            </div>
+
+            {/* Alert Summary */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Alert Summary</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Critical</span>
+                  <span className="font-medium text-red-600">{infraMetrics.criticalAlerts}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Warning</span>
+                  <span className="font-medium text-yellow-600">{infraMetrics.warningAlerts}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Information</span>
+                  <span className="font-medium text-blue-600">{infraMetrics.infoAlerts}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Avg Latency</span>
+                  <span className="font-medium">{infraMetrics.avgLatency}ms</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="bg-red-100 dark:bg-red-900/20 p-1 rounded">
+                    <XCircle className="h-4 w-4 text-red-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Server SRV-BACKUP-01 offline</p>
+                    <p className="text-xs text-muted-foreground">Critical • 30 minutes ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-yellow-100 dark:bg-yellow-900/20 p-1 rounded">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">High CPU usage detected</p>
+                    <p className="text-xs text-muted-foreground">Warning • 1 hour ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium">Network health restored</p>
+                    <p className="text-xs text-muted-foreground">Info • 2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="xl:col-span-9 space-y-4 lg:space-y-6">
+            {/* Tab Navigation */}
+            <div className="bg-card border border-border rounded-lg p-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -492,406 +644,349 @@ export default function InfrastructureMonitorPage() {
                   <TabsTrigger value="devices">Devices</TabsTrigger>
                   <TabsTrigger value="alerts">Alerts</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="overview" className="space-y-4 mt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Infrastructure Monitor Card */}
+                    <div className="lg:col-span-2">
+                      <InfrastructureMonitorCard />
+                    </div>
+
+                    {/* Uptime Chart */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">System Uptime Trend</CardTitle>
+                        <CardDescription>24-hour uptime monitoring</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={uptimeData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="time" />
+                              <YAxis domain={[0, 100]} />
+                              <Tooltip />
+                              <Line type="monotone" dataKey="uptime" stroke="#22c55e" strokeWidth={2} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Latency Chart */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Network Latency by Location</CardTitle>
+                        <CardDescription>Average response times in milliseconds</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {latencyData.map((location, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="text-sm font-medium truncate">{location.location}</div>
+                                <div className="text-xs text-muted-foreground">{location.devices} devices</div>
+                              </div>
+                              <div className="text-right">
+                                <div
+                                  className={`text-sm font-medium ${
+                                    location.status === "good"
+                                      ? "text-green-600"
+                                      : location.status === "fair"
+                                      ? "text-yellow-600"
+                                      : "text-red-600"
+                                  }`}
+                                >
+                                  {location.latency}ms
+                                </div>
+                                <div className="text-xs text-muted-foreground">{location.status}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Integration Ready:</strong> This dashboard supports integration with VMware vSphere,
+                      Windows Server Manager, and SNMP monitoring tools.
+                    </AlertDescription>
+                  </Alert>
+                </TabsContent>
+
+                <TabsContent value="servers" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Server Status</h3>
+                    <p className="text-sm text-muted-foreground">Monitor server health and performance metrics</p>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Server Health Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Server</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Uptime</TableHead>
+                            <TableHead>CPU</TableHead>
+                            <TableHead>Memory</TableHead>
+                            <TableHead>Disk</TableHead>
+                            <TableHead>Alerts</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {serverStatus.map((server) => (
+                            <TableRow key={server.id}>
+                              <TableCell>
+                                <div>
+                                  <div className="font-medium">{server.name}</div>
+                                  <div className="text-xs text-muted-foreground">{server.id}</div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-sm">{server.os}</TableCell>
+                              <TableCell>{getStatusBadge(server.status)}</TableCell>
+                              <TableCell className="text-sm">{formatUptime(server.uptime)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-12 h-2 bg-gray-200 rounded-full">
+                                    <div
+                                      className={`h-2 rounded-full ${
+                                        server.cpu > 80
+                                          ? "bg-red-500"
+                                          : server.cpu > 60
+                                          ? "bg-yellow-500"
+                                          : "bg-green-500"
+                                      }`}
+                                      style={{ width: `${server.cpu}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs">{server.cpu}%</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-12 h-2 bg-gray-200 rounded-full">
+                                    <div
+                                      className={`h-2 rounded-full ${
+                                        server.memory > 80
+                                          ? "bg-red-500"
+                                          : server.memory > 60
+                                          ? "bg-yellow-500"
+                                          : "bg-green-500"
+                                      }`}
+                                      style={{ width: `${server.memory}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs">{server.memory}%</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-12 h-2 bg-gray-200 rounded-full">
+                                    <div
+                                      className={`h-2 rounded-full ${
+                                        server.disk > 90
+                                          ? "bg-red-500"
+                                          : server.disk > 80
+                                          ? "bg-yellow-500"
+                                          : "bg-green-500"
+                                      }`}
+                                      style={{ width: `${server.disk}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs">{server.disk}%</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {server.alerts > 0 ? (
+                                  <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
+                                    {server.alerts}
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                                    0
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-3 w-3" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="network" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Network Topology</h3>
+                    <p className="text-sm text-muted-foreground">Monitor network devices and connectivity</p>
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Meraki Integration:</strong> Ready for Cisco Meraki Dashboard API integration for enhanced
+                      network monitoring and management.
+                    </AlertDescription>
+                  </Alert>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Network Performance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={latencyData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="location" angle={-45} textAnchor="end" height={80} />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="latency" fill="#3b82f6" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="devices" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">SNMP Device Monitoring</h3>
+                    <p className="text-sm text-muted-foreground">Network devices discovered via SNMP scanning</p>
+                  </div>
+
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>PRTG Integration:</strong> This dashboard supports PRTG Network Monitor integration for
+                      comprehensive SNMP monitoring and alerting.
+                    </AlertDescription>
+                  </Alert>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Discovered Devices</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Device</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>IP Address</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Uptime</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Ports</TableHead>
+                            <TableHead>Alerts</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {snmpDevices.map((device) => (
+                            <TableRow key={device.id}>
+                              <TableCell>
+                                <div>
+                                  <div className="font-medium">{device.name}</div>
+                                  <div className="text-xs text-muted-foreground">{device.id}</div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-sm">{device.type}</TableCell>
+                              <TableCell className="text-sm font-mono">{device.ip}</TableCell>
+                              <TableCell>{getStatusBadge(device.status)}</TableCell>
+                              <TableCell className="text-sm">{formatUptime(device.uptime)}</TableCell>
+                              <TableCell className="text-sm">{device.location}</TableCell>
+                              <TableCell>
+                                <div className="text-sm">
+                                  <div className="flex items-center gap-1">
+                                    <span>
+                                      {device.ports.used}/{device.ports.total}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">{device.ports.free} available</div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {device.alerts > 0 ? (
+                                  <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
+                                    {device.alerts}
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
+                                    0
+                                  </Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="alerts" className="space-y-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">System Alerts</h3>
+                    <p className="text-sm text-muted-foreground">Monitor and manage infrastructure alerts</p>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Recent Alerts</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Severity</TableHead>
+                            <TableHead>Message</TableHead>
+                            <TableHead>Source</TableHead>
+                            <TableHead>Time</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {recentAlerts.map((alert) => (
+                            <TableRow key={alert.id}>
+                              <TableCell>{getSeverityBadge(alert.severity)}</TableCell>
+                              <TableCell className="font-medium">{alert.message}</TableCell>
+                              <TableCell className="text-sm">{alert.source}</TableCell>
+                              <TableCell className="text-sm">{new Date(alert.timestamp).toLocaleString()}</TableCell>
+                              <TableCell>
+                                {alert.acknowledged ? (
+                                  <Badge variant="outline" className="text-green-600">
+                                    Acknowledged
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-red-600">
+                                    Pending
+                                  </Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
               </Tabs>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout - Following project page pattern */}
-      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="space-y-6">
-          {/* System Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">System Uptime</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">99.8%</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <CheckCircle className="h-3 w-3 text-green-500" />
-                  Last 30 days
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Servers Online</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">24/25</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Server className="h-3 w-3 text-blue-500" />1 maintenance
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Network Health</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">Optimal</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Network className="h-3 w-3 text-green-500" />
-                  Avg latency: 15ms
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Active Alerts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-600">8</div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <AlertTriangle className="h-3 w-3 text-orange-500" />2 critical
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Tab Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsContent value="overview" className="space-y-4 mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Infrastructure Monitor Card */}
-                <div className="lg:col-span-2">
-                  <InfrastructureMonitorCard />
-                </div>
-
-                {/* Uptime Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">System Uptime Trend</CardTitle>
-                    <CardDescription>24-hour uptime monitoring</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={uptimeData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="time" />
-                          <YAxis domain={[0, 100]} />
-                          <Tooltip />
-                          <Line type="monotone" dataKey="uptime" stroke="#22c55e" strokeWidth={2} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Latency Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Network Latency by Location</CardTitle>
-                    <CardDescription>Average response times in milliseconds</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {latencyData.map((location, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-sm font-medium truncate">{location.location}</div>
-                            <div className="text-xs text-muted-foreground">{location.devices} devices</div>
-                          </div>
-                          <div className="text-right">
-                            <div
-                              className={`text-sm font-medium ${
-                                location.status === "good"
-                                  ? "text-green-600"
-                                  : location.status === "fair"
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {location.latency}ms
-                            </div>
-                            <div className="text-xs text-muted-foreground">{location.status}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Integration Ready:</strong> This dashboard supports integration with VMware vSphere, Windows
-                  Server Manager, and SNMP monitoring tools.
-                </AlertDescription>
-              </Alert>
-            </TabsContent>
-
-            <TabsContent value="servers" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">Server Status</h3>
-                <p className="text-sm text-muted-foreground">Monitor server health and performance metrics</p>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Server Health Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Server</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Uptime</TableHead>
-                        <TableHead>CPU</TableHead>
-                        <TableHead>Memory</TableHead>
-                        <TableHead>Disk</TableHead>
-                        <TableHead>Alerts</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {serverStatus.map((server) => (
-                        <TableRow key={server.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{server.name}</div>
-                              <div className="text-xs text-muted-foreground">{server.id}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">{server.os}</TableCell>
-                          <TableCell>{getStatusBadge(server.status)}</TableCell>
-                          <TableCell className="text-sm">{formatUptime(server.uptime)}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-12 h-2 bg-gray-200 rounded-full">
-                                <div
-                                  className={`h-2 rounded-full ${
-                                    server.cpu > 80 ? "bg-red-500" : server.cpu > 60 ? "bg-yellow-500" : "bg-green-500"
-                                  }`}
-                                  style={{ width: `${server.cpu}%` }}
-                                />
-                              </div>
-                              <span className="text-xs">{server.cpu}%</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-12 h-2 bg-gray-200 rounded-full">
-                                <div
-                                  className={`h-2 rounded-full ${
-                                    server.memory > 80
-                                      ? "bg-red-500"
-                                      : server.memory > 60
-                                      ? "bg-yellow-500"
-                                      : "bg-green-500"
-                                  }`}
-                                  style={{ width: `${server.memory}%` }}
-                                />
-                              </div>
-                              <span className="text-xs">{server.memory}%</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-12 h-2 bg-gray-200 rounded-full">
-                                <div
-                                  className={`h-2 rounded-full ${
-                                    server.disk > 90
-                                      ? "bg-red-500"
-                                      : server.disk > 80
-                                      ? "bg-yellow-500"
-                                      : "bg-green-500"
-                                  }`}
-                                  style={{ width: `${server.disk}%` }}
-                                />
-                              </div>
-                              <span className="text-xs">{server.disk}%</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {server.alerts > 0 ? (
-                              <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
-                                {server.alerts}
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                                0
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-3 w-3" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="network" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">Network Topology</h3>
-                <p className="text-sm text-muted-foreground">Monitor network devices and connectivity</p>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Meraki Integration:</strong> Ready for Cisco Meraki Dashboard API integration for enhanced
-                  network monitoring and management.
-                </AlertDescription>
-              </Alert>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Network Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={latencyData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="location" angle={-45} textAnchor="end" height={80} />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="latency" fill="#3b82f6" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="devices" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">SNMP Device Monitoring</h3>
-                <p className="text-sm text-muted-foreground">Network devices discovered via SNMP scanning</p>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>PRTG Integration:</strong> This dashboard supports PRTG Network Monitor integration for
-                  comprehensive SNMP monitoring and alerting.
-                </AlertDescription>
-              </Alert>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Discovered Devices</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Device</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>IP Address</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Uptime</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Ports</TableHead>
-                        <TableHead>Alerts</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {snmpDevices.map((device) => (
-                        <TableRow key={device.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{device.name}</div>
-                              <div className="text-xs text-muted-foreground">{device.id}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">{device.type}</TableCell>
-                          <TableCell className="text-sm font-mono">{device.ip}</TableCell>
-                          <TableCell>{getStatusBadge(device.status)}</TableCell>
-                          <TableCell className="text-sm">{formatUptime(device.uptime)}</TableCell>
-                          <TableCell className="text-sm">{device.location}</TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              <div className="flex items-center gap-1">
-                                <span>
-                                  {device.ports.used}/{device.ports.total}
-                                </span>
-                              </div>
-                              <div className="text-xs text-muted-foreground">{device.ports.free} available</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {device.alerts > 0 ? (
-                              <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
-                                {device.alerts}
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
-                                0
-                              </Badge>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="alerts" className="space-y-4 mt-6">
-              <div>
-                <h3 className="text-lg font-semibold">System Alerts</h3>
-                <p className="text-sm text-muted-foreground">Monitor and manage infrastructure alerts</p>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Recent Alerts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Severity</TableHead>
-                        <TableHead>Message</TableHead>
-                        <TableHead>Source</TableHead>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentAlerts.map((alert) => (
-                        <TableRow key={alert.id}>
-                          <TableCell>{getSeverityBadge(alert.severity)}</TableCell>
-                          <TableCell className="font-medium">{alert.message}</TableCell>
-                          <TableCell className="text-sm">{alert.source}</TableCell>
-                          <TableCell className="text-sm">{new Date(alert.timestamp).toLocaleString()}</TableCell>
-                          <TableCell>
-                            {alert.acknowledged ? (
-                              <Badge variant="outline" className="text-green-600">
-                                Acknowledged
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-red-600">
-                                Pending
-                              </Badge>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
         </div>
       </div>
 

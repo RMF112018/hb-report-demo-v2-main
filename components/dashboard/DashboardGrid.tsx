@@ -92,6 +92,7 @@ import {
   BackupRestoreStatusCard,
   AiPipelineStatusCard,
   ConsultantDashboardCard,
+  HbIntelManagementCard,
 } from "@/components/cards/ITPlaceholderCards"
 
 /**
@@ -829,6 +830,16 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
     case "consultant-dashboard":
       return (
         <ConsultantDashboardCard
+          card={card}
+          config={card.config || {}}
+          span={baseSpan}
+          isCompact={isCompact}
+          userRole={userRole}
+        />
+      )
+    case "hb-intel-management":
+      return (
+        <HbIntelManagementCard
           card={card}
           config={card.config || {}}
           span={baseSpan}
