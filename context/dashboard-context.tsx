@@ -40,10 +40,14 @@ function getDefaultSpan(size?: DashboardCard["size"]): { cols: number; rows: num
 
 // Helper function to ensure cards have span properties
 function normalizeCards(cards: DashboardCard[]): DashboardCard[] {
-  return cards.map((card) => ({
-    ...card,
-    span: card.span || getDefaultSpan(card.size),
-  }))
+  return cards.map((card) => {
+    const normalizedCard = {
+      ...card,
+      span: card.span || getDefaultSpan(card.size),
+    }
+
+    return normalizedCard
+  })
 }
 
 interface DashboardContextType {
@@ -88,7 +92,7 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
           cards: normalizeCards(executiveLayout.cards as DashboardCard[]),
         }
 
-        // Create Executive Overview dashboard
+        // ONLY create Executive Overview and Financial Review dashboards
         userDashboards.push({
           ...template,
           id: `${role}-executive-overview`,
@@ -96,7 +100,6 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
           cards: normalizeCards(template.cards),
         })
 
-        // Create Financial Review dashboard
         userDashboards.push({
           ...financialReviewLayout,
           id: `${role}-financial-review`,
@@ -164,15 +167,30 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
         })
       }
 
-      setDashboards(userDashboards)
+      // Filter to ensure only allowed dashboards for executive role
+      const allowedDashboards =
+        role === "executive"
+          ? userDashboards.filter((d) => d.name === "Executive Overview" || d.name === "Financial Review")
+          : userDashboards
+
+      setDashboards(allowedDashboards)
       setTemplateDashboard(template)
-      setCurrentDashboardId(userDashboards[0]?.id || null)
+      setCurrentDashboardId(allowedDashboards[0]?.id || null)
       setLoading(false)
     }
     fetchDashboards()
   }, [userId, role])
 
   function addDashboard(dashboard: DashboardLayout) {
+    // Prevent adding new dashboards for executive role - only allow Executive Overview and Financial Review
+    if (role === "executive") {
+      const allowedNames = ["Executive Overview", "Financial Review"]
+      if (!allowedNames.includes(dashboard.name)) {
+        console.warn(`Dashboard "${dashboard.name}" not allowed for executive role`)
+        return
+      }
+    }
+
     const normalizedDashboard = {
       ...dashboard,
       cards: normalizeCards(dashboard.cards),

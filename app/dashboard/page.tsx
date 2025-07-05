@@ -51,20 +51,23 @@ import {
   Briefcase,
 } from "lucide-react"
 import { AppHeader } from "@/components/layout/app-header"
+import { DashboardModuleNavigation } from "@/components/layout/DashboardModuleNavigation"
 
 // Mock data imports for cards
 import projectsData from "@/data/mock/projects.json"
 import cashFlowData from "@/data/mock/financial/cash-flow.json"
 
 /**
- * Modern Dashboard Page with Sidebar Layout
- * -----------------------------------------
- * Sidebar + main content layout implementation
+ * Modern Dashboard Page with Module-Based Sidebar Layout
+ * ------------------------------------------------------
+ * Sidebar + main content layout implementation aligned with IT Command Center
  * Features:
- * - Left sidebar with quick actions and recently accessed projects
+ * - Module-based navigation aligned with other system modules
+ * - Left sidebar with key elements: overview, quick actions, recent projects, metrics
  * - Right side with existing dashboard cards
  * - Responsive design (sidebar hidden on mobile)
  * - Dynamic card sizing based on content
+ * - Consistent styling with colored left borders
  */
 
 function DashboardContent({ user }: { user: any }) {
@@ -177,13 +180,44 @@ function DashboardContent({ user }: { user: any }) {
   const handleCardSizeChange = (cardId: string, size: string) => {
     if (!currentDashboard) return
 
-    // Define smart preset size mappings
+    // Define optimized size mappings for dashboard cards
     const smartPresetSizes: Record<string, { cols: number; rows: number }> = {
-      compact: { cols: 3, rows: 3 },
+      compact: { cols: 3, rows: 2 },
+      small: { cols: 3, rows: 3 },
+      medium: { cols: 4, rows: 3 },
       standard: { cols: 4, rows: 4 },
-      wide: { cols: 8, rows: 4 },
-      tall: { cols: 4, rows: 8 },
-      large: { cols: 6, rows: 6 },
+      large: { cols: 6, rows: 4 },
+      wide: { cols: 8, rows: 3 },
+      tall: { cols: 4, rows: 6 },
+      "extra-wide": { cols: 12, rows: 3 },
+      "extra-large": { cols: 6, rows: 6 },
+    }
+
+    // Get card type specific optimal sizing
+    const getOptimalSizeForCardType = (cardType: string) => {
+      switch (cardType) {
+        case "portfolio-overview":
+          return { cols: 12, rows: 4 }
+        case "financial-review-panel":
+          return { cols: 8, rows: 6 }
+        case "market-intelligence":
+        case "revenue-forecast":
+          return { cols: 6, rows: 4 }
+        case "cash-flow":
+        case "budget-health":
+          return { cols: 4, rows: 4 }
+        case "project-health":
+        case "schedule-monitor":
+          return { cols: 4, rows: 3 }
+        case "recent-activities":
+        case "critical-dates":
+          return { cols: 4, rows: 4 }
+        case "staff-planning":
+        case "procurement":
+          return { cols: 6, rows: 3 }
+        default:
+          return { cols: 4, rows: 3 }
+      }
     }
 
     let newSpan: { cols: number; rows: number }
@@ -199,16 +233,25 @@ function DashboardContent({ user }: { user: any }) {
           newSpan = { cols, rows }
           console.log("✅ Custom size parsed successfully:", newSpan)
         } else {
-          newSpan = { cols: 4, rows: 4 } // fallback
+          newSpan = { cols: 4, rows: 3 } // fallback
           console.log("❌ Custom size parsing failed - using fallback")
         }
       } else {
-        newSpan = { cols: 4, rows: 4 } // fallback
+        newSpan = { cols: 4, rows: 3 } // fallback
         console.log("❌ Custom size format invalid - using fallback")
+      }
+    } else if (size === "optimal") {
+      // Use card type specific optimal sizing
+      const card = currentDashboard.cards.find((c) => c.id === cardId)
+      if (card) {
+        newSpan = getOptimalSizeForCardType(card.type)
+        console.log("🎯 Using optimal size for", card.type, ":", newSpan)
+      } else {
+        newSpan = smartPresetSizes.medium
       }
     } else {
       // Handle preset sizes
-      newSpan = smartPresetSizes[size] || { cols: 4, rows: 4 }
+      newSpan = smartPresetSizes[size] || { cols: 4, rows: 3 }
       console.log("📋 Preset size selected:", size, "->", newSpan)
     }
 
@@ -236,13 +279,25 @@ function DashboardContent({ user }: { user: any }) {
 
   const handleCardAdd = () => {
     if (!currentDashboard) return
+
+    // Find the next available position for the new card
+    const findNextPosition = () => {
+      let maxY = 0
+      currentDashboard.cards.forEach((card) => {
+        if (card.position && card.span) {
+          maxY = Math.max(maxY, card.position.y + card.span.rows)
+        }
+      })
+      return { x: 0, y: maxY }
+    }
+
     const newCard: DashboardCard = {
       id: `card-${Date.now()}`,
       type: "placeholder",
       title: "New Card",
-      size: "standard",
-      position: { x: 0, y: 0 },
-      span: { cols: 4, rows: 4 },
+      size: "medium",
+      position: findNextPosition(),
+      span: { cols: 4, rows: 3 }, // Optimized default size
       visible: true,
     }
     updateDashboard({
@@ -386,22 +441,30 @@ function DashboardContent({ user }: { user: any }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboards...</p>
+      <>
+        <AppHeader />
+        <div className="fixed inset-0 top-[80px] flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
+          <div className="flex flex-col items-center justify-center text-center p-8 bg-background/95 rounded-lg shadow-lg border border-border">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-foreground font-medium">Loading dashboards...</p>
+            <p className="text-muted-foreground text-sm mt-1">Please wait while we prepare your dashboard</p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (!dashboards.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">No dashboards found.</p>
+      <>
+        <AppHeader />
+        <div className="fixed inset-0 top-[80px] flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
+          <div className="flex flex-col items-center justify-center text-center p-8 bg-background/95 rounded-lg shadow-lg border border-border">
+            <p className="text-foreground font-medium">No dashboards found.</p>
+            <p className="text-muted-foreground text-sm mt-1">Contact your administrator to set up dashboards</p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -429,11 +492,16 @@ function DashboardContent({ user }: { user: any }) {
         <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
           <div className="flex flex-col gap-4 pt-3" data-tour="dashboard-page-header">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
-                <p className="text-muted-foreground mt-1">
-                  {currentDashboard?.description || "Real-time insights and project management overview"}
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
+                  <LayoutDashboard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+                  <p className="text-muted-foreground mt-1">
+                    {currentDashboard?.description || "Real-time insights and project management overview"}
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="outline" onClick={toggleFullscreen} data-tour="fullscreen-button">
@@ -614,59 +682,46 @@ function DashboardContent({ user }: { user: any }) {
               </div>
             </div>
 
-            {/* Dashboard Controls Row */}
-            <div
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              data-tour="dashboard-controls"
-            >
-              {/* Dashboard Tabs */}
-              <div className="flex items-center gap-1" data-tour="dashboard-tabs">
-                {dashboards.map((dashboard) => (
-                  <button
-                    key={dashboard.id}
-                    onClick={() => handleDashboardSelect(dashboard.id)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                      currentDashboardId === dashboard.id
-                        ? "text-primary border-primary bg-primary/5"
-                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                    }`}
-                  >
-                    {dashboard.name}
-                  </button>
-                ))}
-              </div>
+            {/* Module Navigation Row - Only show for non-executive users */}
+            {user.role !== "executive" && (
+              <div
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                data-tour="dashboard-module-navigation"
+              >
+                <DashboardModuleNavigation />
 
-              {/* Edit Mode Controls */}
-              {isEditing && (
-                <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSave}
-                    className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                  >
-                    Save Changes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleReset}
-                    className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
-                  >
-                    Reset to Default
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCardAdd}
-                    className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Widget
-                  </Button>
-                </div>
-              )}
-            </div>
+                {/* Edit Mode Controls */}
+                {isEditing && (
+                  <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSave}
+                      className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                    >
+                      Save Changes
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleReset}
+                      className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
+                    >
+                      Reset to Default
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCardAdd}
+                      className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Widget
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -678,8 +733,8 @@ function DashboardContent({ user }: { user: any }) {
             data-tour="dashboard-sidebar"
           >
             {/* Dashboard Overview */}
-            <Card>
-              <CardHeader>
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Dashboard Overview
@@ -688,32 +743,32 @@ function DashboardContent({ user }: { user: any }) {
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total Projects</span>
-                  <span className="font-medium">{dashboardStats.totalProjects}</span>
+                  <span className="font-semibold">{dashboardStats.totalProjects}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Active Projects</span>
-                  <span className="font-medium text-green-600">{dashboardStats.activeProjects}</span>
+                  <span className="font-semibold text-green-600">{dashboardStats.activeProjects}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Completed This Year</span>
-                  <span className="font-medium text-blue-600">{dashboardStats.completedThisYear}</span>
+                  <span className="font-semibold text-blue-600">{dashboardStats.completedThisYear}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total Value</span>
-                  <span className="font-medium">{formatCurrency(dashboardStats.totalValue)}</span>
+                  <span className="font-semibold">{formatCurrency(dashboardStats.totalValue)}</span>
                 </div>
               </CardContent>
             </Card>
 
             {/* Quick Actions */}
-            <Card>
-              <CardHeader>
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-green-600 dark:text-green-400" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
                 <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/projects")}>
                   <Building2 className="h-4 w-4 mr-2" />
                   View All Projects
@@ -754,14 +809,14 @@ function DashboardContent({ user }: { user: any }) {
             </Card>
 
             {/* Recently Accessed Projects */}
-            <Card>
-              <CardHeader>
+            <Card className="border-l-4 border-l-orange-500">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <FolderOpen className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                   Recent Projects
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
                 {recentProjects.map((project, index) => (
                   <div
                     key={project.project_id || `recent-${index}`}
@@ -801,8 +856,8 @@ function DashboardContent({ user }: { user: any }) {
             </Card>
 
             {/* Performance Metrics */}
-            <Card>
-              <CardHeader>
+            <Card className="border-l-4 border-l-purple-500">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   Performance Metrics
@@ -811,19 +866,19 @@ function DashboardContent({ user }: { user: any }) {
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Schedule Health</span>
-                  <span className="font-medium text-green-600">94%</span>
+                  <span className="font-semibold text-green-600">94%</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Budget Health</span>
-                  <span className="font-medium text-green-600">87%</span>
+                  <span className="font-semibold text-green-600">87%</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Quality Score</span>
-                  <span className="font-medium text-blue-600">91%</span>
+                  <span className="font-semibold text-blue-600">91%</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Risk Level</span>
-                  <span className="font-medium text-yellow-600">Low</span>
+                  <span className="font-semibold text-yellow-600">Low</span>
                 </div>
               </CardContent>
             </Card>
@@ -845,6 +900,9 @@ function DashboardContent({ user }: { user: any }) {
                 onToggleEdit={() => setIsEditing(!isEditing)}
                 layoutDensity={layoutDensity}
                 userRole={user.role}
+                dashboards={dashboards}
+                currentDashboardId={currentDashboardId || undefined}
+                onDashboardSelect={handleDashboardSelect}
               />
             )}
           </div>
@@ -890,6 +948,9 @@ function DashboardContent({ user }: { user: any }) {
                   onToggleEdit={() => setIsEditing(!isEditing)}
                   layoutDensity={layoutDensity}
                   userRole={user.role}
+                  dashboards={dashboards}
+                  currentDashboardId={currentDashboardId || undefined}
+                  onDashboardSelect={handleDashboardSelect}
                 />
               )}
             </div>

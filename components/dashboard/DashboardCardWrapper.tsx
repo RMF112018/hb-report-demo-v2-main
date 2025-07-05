@@ -194,38 +194,30 @@ const SMART_PRESETS = [
   { value: "full-width", label: "Full Width", description: "Maximum width cards", cols: 20, rows: 6, icon: "🖥️" },
 ]
 
-// Enhanced optimal size calculation
+// Get optimal size for cards (optimized for 16-column executive layout)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
-  const optimalSizes: Record<string, { cols: number; rows: number }> = {
-    "financial-review-panel": { cols: 18, rows: 7 },
-    "enhanced-hbi-insights": { cols: 10, rows: 5 },
-    "portfolio-overview": { cols: 12, rows: 4 },
-    "pipeline-analytics": { cols: 8, rows: 6 },
-    "market-intelligence": { cols: 6, rows: 6 },
-    "staffing-distribution": { cols: 10, rows: 6 },
-    "quality-control": { cols: 4, rows: 6 },
-    safety: { cols: 4, rows: 6 },
-    "project-overview": { cols: 6, rows: 6 },
-    "schedule-performance": { cols: 6, rows: 4 },
-    "financial-status": { cols: 4, rows: 4 },
-    "general-conditions": { cols: 4, rows: 4 },
-    "contingency-analysis": { cols: 6, rows: 6 },
-    "cash-flow": { cols: 8, rows: 6 },
-    procurement: { cols: 6, rows: 6 },
-    "draw-forecast": { cols: 10, rows: 6 },
-    "change-order-analysis": { cols: 8, rows: 8 },
-    closeout: { cols: 6, rows: 8 },
-    startup: { cols: 6, rows: 6 },
-    "critical-dates": { cols: 8, rows: 6 },
-    "field-reports": { cols: 6, rows: 8 },
-    rfi: { cols: 4, rows: 6 },
-    submittal: { cols: 4, rows: 6 },
-    health: { cols: 4, rows: 4 },
-    "schedule-monitor": { cols: 6, rows: 4 },
-    "bd-opportunities": { cols: 8, rows: 6 },
+  switch (cardType) {
+    case "financial-review-panel":
+      return { cols: 16, rows: 6 }
+    case "enhanced-hbi-insights":
+      return { cols: 8, rows: 5 }
+    case "portfolio-overview":
+      return { cols: 8, rows: 5 }
+    case "pipeline-analytics":
+      return { cols: 10, rows: 4 }
+    case "market-intelligence":
+      return { cols: 6, rows: 5 }
+    case "staffing-distribution":
+      return { cols: 8, rows: 5 }
+    case "quality-control":
+      return { cols: 4, rows: 5 }
+    case "safety":
+      return { cols: 4, rows: 5 }
+    case "cash-flow":
+      return { cols: 8, rows: 4 }
+    default:
+      return { cols: 6, rows: 4 }
   }
-
-  return optimalSizes[cardType] || { cols: 6, rows: 4 }
 }
 
 // Professional grid selector component
@@ -348,7 +340,8 @@ export const DashboardCardWrapper = ({
         theme.shadow,
         isCompact && "text-sm",
         !card.visible && "opacity-50",
-        dragHandleClass
+        dragHandleClass,
+        card.type === "pipeline-analytics" && "pipeline-analytics"
       )}
     >
       {/* HB Brand Accent Bar */}
@@ -468,7 +461,7 @@ export const DashboardCardWrapper = ({
       </div>
 
       {/* Card Content */}
-      <div className={cn("dashboard-card-content", "flex-1 overflow-hidden", isCompact ? "p-3" : "p-4")}>
+      <div className={cn("dashboard-card-content", "flex-1 overflow-hidden", isCompact ? "p-1" : "p-2")}>
         {children}
       </div>
 
