@@ -143,30 +143,30 @@ export default function CashFlowCard({ config, span, isCompact, userRole }: Cash
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-2.5 bg-gray-200 dark:bg-gray-600 backdrop-blur-sm border-b border-gray-300 dark:border-gray-500">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 lg:gap-2">
+      <div className="flex-shrink-0 p-4 bg-transparent border-b border-border/20">
+        <div className="grid grid-cols-2 gap-4">
           <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-lg font-medium text-cyan-700">
+            <div className="text-2xl font-bold text-cyan-700 dark:text-cyan-400">
               {formatCurrency(data.netCashFlow)}
             </div>
-            <div className="text-xs text-cyan-600 dark:text-cyan-400">Net Cash Flow</div>
+            <div className="text-sm text-cyan-600 dark:text-cyan-400">Net Cash Flow</div>
           </div>
           <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-lg font-medium text-blue-700">{data.forecastAccuracy}%</div>
-            <div className="text-xs text-blue-600 dark:text-blue-400">Accuracy</div>
+            <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">{data.forecastAccuracy}%</div>
+            <div className="text-sm text-blue-600 dark:text-blue-400">Accuracy</div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-2.5 overflow-y-auto space-y-2">
+      <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {/* Chart */}
-        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-foreground" />
-            <span className="text-sm font-medium text-foreground">Cash Flow Trend</span>
+        <div className="bg-transparent rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <span className="text-sm font-medium text-green-800 dark:text-green-200">Cash Flow Trend</span>
           </div>
-          <div className="h-24 sm:h-32">
+          <div className="h-32">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
@@ -179,21 +179,21 @@ export default function CashFlowCard({ config, span, isCompact, userRole }: Cash
         </div>
 
         {/* Cash Analysis */}
-        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-foreground" />
-            <span className="text-sm font-medium text-foreground">Cash Analysis</span>
+        <div className="bg-transparent rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-3">
+            <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Cash Analysis</span>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Cash In</span>
               <span className="font-medium text-green-600 dark:text-green-400">{formatCurrency(data.cashIn)}</span>
             </div>
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Cash Out</span>
               <span className="font-medium text-red-600 dark:text-red-400">{formatCurrency(data.cashOut)}</span>
             </div>
-            <div className="flex justify-between text-xs pt-1 border-t border-gray-300 dark:border-gray-500">
+            <div className="flex justify-between text-sm pt-2 border-t border-border/20">
               <span className="text-muted-foreground">Net Flow</span>
               <span
                 className={`font-medium ${
@@ -207,18 +207,18 @@ export default function CashFlowCard({ config, span, isCompact, userRole }: Cash
         </div>
 
         {/* Forecast Summary */}
-        <div className="bg-gray-200 dark:bg-gray-600 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-gray-300 dark:border-gray-500">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-foreground" />
-            <span className="text-sm font-medium text-foreground">Forecast</span>
+        <div className="bg-transparent rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <span className="text-sm font-medium text-purple-800 dark:text-purple-200">Forecast</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="text-center p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
-              <div className="text-sm font-bold text-blue-700 dark:text-blue-400">{data.forecastAccuracy}%</div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-transparent rounded border border-border/20">
+              <div className="text-lg font-bold text-blue-700 dark:text-blue-400">{data.forecastAccuracy}%</div>
               <div className="text-xs text-blue-600 dark:text-blue-300">Accuracy</div>
             </div>
-            <div className="text-center p-2 bg-gray-300 dark:bg-gray-500 rounded border border-gray-400 dark:border-gray-400">
-              <div className="text-sm font-bold text-cyan-700 dark:text-cyan-400">
+            <div className="text-center p-3 bg-transparent rounded border border-border/20">
+              <div className="text-lg font-bold text-cyan-700 dark:text-cyan-400">
                 {formatCurrency(data.projectedCashFlow)}
               </div>
               <div className="text-xs text-cyan-600 dark:text-cyan-300">Next Month</div>
@@ -229,25 +229,25 @@ export default function CashFlowCard({ config, span, isCompact, userRole }: Cash
 
       {/* Hover Drill-Down Overlay */}
       {isHovered && (
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-3 flex flex-col justify-center text-white animate-in fade-in duration-200 z-10">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between mb-3">
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-4 flex flex-col justify-center text-white animate-in fade-in duration-200 z-10">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4" style={{ color: "#FA4616" }} />
-                <span className="font-semibold text-sm">Cash Flow Analysis</span>
+                <ChevronRight className="h-5 w-5" style={{ color: "#FA4616" }} />
+                <span className="font-semibold text-lg">Cash Flow Analysis</span>
               </div>
             </div>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between border-b border-gray-700/30 pb-2">
                 <span className="text-gray-200">Operating Cash:</span>
                 <span className="font-medium">{formatCurrency(data.operatingCashFlow)}</span>
               </div>
-              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+              <div className="flex justify-between border-b border-gray-700/30 pb-2">
                 <span className="text-gray-200">Investment Cash:</span>
                 <span className="font-medium">{formatCurrency(data.investmentCashFlow)}</span>
               </div>
-              <div className="flex justify-between border-b border-gray-700/30 pb-1">
+              <div className="flex justify-between border-b border-gray-700/30 pb-2">
                 <span className="text-gray-200">Days Cash on Hand:</span>
                 <span className="font-medium">{data.daysCashOnHand} days</span>
               </div>

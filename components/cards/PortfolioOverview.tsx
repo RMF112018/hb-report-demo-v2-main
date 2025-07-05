@@ -447,10 +447,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
     <div className="relative h-full" data-tour="portfolio-overview-card">
       <div className="h-full flex flex-col bg-transparent overflow-hidden">
         {/* Enhanced Metrics Header */}
-        <div
-          className="flex-shrink-0 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700"
-          style={{ padding: sizeClasses.headerPadding }}
-        >
+        <div className="flex-shrink-0 bg-transparent" style={{ padding: sizeClasses.headerPadding }}>
           <div className={`${sizeClasses.gridCols} grid`} style={{ gap: sizeClasses.gap }}>
             {visibleMetrics.map((metric, index) => (
               <div key={index} className="text-center">
@@ -481,10 +478,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
         {/* Tab Navigation */}
         {sizeClasses.showTabs && (
-          <div
-            className="flex-shrink-0 border-b border-gray-300 dark:border-gray-700"
-            style={{ padding: sizeClasses.headerPadding / 2 }}
-          >
+          <div className="flex-shrink-0 bg-transparent" style={{ padding: sizeClasses.headerPadding / 2 }}>
             <div className="flex space-x-1">
               {tabs.map((tab) => (
                 <button
@@ -493,8 +487,8 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                   className={cn(
                     "flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                     activeTab === tab.id
-                      ? "bg-gray-300 dark:bg-gray-700 text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-700"
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                   style={{ fontSize: sizeClasses.fontSize }}
                 >
@@ -511,7 +505,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
           {activeTab === "overview" && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
               {/* Projects by Stage */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -526,7 +520,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
               </div>
 
               {/* Projects by Type */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -551,7 +545,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
               </div>
 
               {/* Pipeline Distribution */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -580,7 +574,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
           {activeTab === "performance" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
               {/* Budget vs Actual */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -605,7 +599,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
               </div>
 
               {/* Risk Analysis */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -647,7 +641,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
           {activeTab === "regional" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
               {/* Regional Performance */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -672,7 +666,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
               </div>
 
               {/* Regional Breakdown */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -698,7 +692,9 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                         </div>
                         <div className="text-right">
                           <div className="font-semibold text-foreground">{type.value} projects</div>
-                          <div className="text-xs text-gray-300">${(typeData.value / 1000000).toFixed(1)}M total</div>
+                          <div className="text-xs text-muted-foreground">
+                            ${(typeData.value / 1000000).toFixed(1)}M total
+                          </div>
                         </div>
                       </div>
                     )
@@ -711,7 +707,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
           {activeTab === "cashflow" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
               {/* Cash Flow Trends */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -736,7 +732,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
               </div>
 
               {/* Cash Flow Metrics */}
-              <div className="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <div className="bg-transparent rounded-lg p-3">
                 <h4
                   className="font-semibold text-foreground mb-2 flex items-center"
                   style={{ fontSize: sizeClasses.titleFontSize }}
@@ -772,10 +768,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
         {/* Enhanced Footer */}
         {sizeClasses.showFooter && (
-          <div
-            className="flex-shrink-0 bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700"
-            style={{ padding: sizeClasses.padding }}
-          >
+          <div className="flex-shrink-0 bg-transparent" style={{ padding: sizeClasses.padding }}>
             <div className="grid grid-cols-4 gap-4" style={{ fontSize: sizeClasses.fontSize }}>
               <div className="flex items-center">
                 <Calendar
@@ -816,7 +809,7 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
       {/* Enhanced Drill-Down Overlay */}
       {showDrillDown && (
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-4 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
+        <div className="absolute inset-0 bg-gray-900/96 dark:bg-gray-950/96 backdrop-blur-sm rounded-lg p-4 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
             {/* Close Button */}
             <button
@@ -834,51 +827,51 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100%-80px)]">
               {/* Advanced Analytics */}
               <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-4">
+                <div className="bg-white/10 rounded-lg p-4">
                   <h4 className="font-semibold mb-3 flex items-center">
                     <Brain className="w-5 h-5 mr-2" />
                     AI-Powered Insights
                   </h4>
                   <div className="space-y-3 text-sm">
-                    <div className="bg-blue-500/20 rounded-lg p-3">
+                    <div className="bg-white/10 rounded-lg p-3">
                       <div className="font-medium text-blue-300">Portfolio Optimization</div>
-                      <div className="text-blue-200">Resource reallocation could improve efficiency by 12%</div>
+                      <div className="text-gray-300">Resource reallocation could improve efficiency by 12%</div>
                     </div>
-                    <div className="bg-green-500/20 rounded-lg p-3">
+                    <div className="bg-white/10 rounded-lg p-3">
                       <div className="font-medium text-green-300">Cash Flow Forecast</div>
-                      <div className="text-green-200">Positive trend expected for next 6 months</div>
+                      <div className="text-gray-300">Positive trend expected for next 6 months</div>
                     </div>
-                    <div className="bg-orange-500/20 rounded-lg p-3">
+                    <div className="bg-white/10 rounded-lg p-3">
                       <div className="font-medium text-orange-300">Risk Alert</div>
-                      <div className="text-orange-200">2 projects require immediate attention</div>
+                      <div className="text-gray-300">2 projects require immediate attention</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-4">
+                <div className="bg-white/10 rounded-lg p-4">
                   <h4 className="font-semibold mb-3 flex items-center">
                     <Target className="w-5 h-5 mr-2" />
                     Key Performance Indicators
                   </h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Portfolio ROI:</span>
+                    <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                      <span className="text-gray-300">Portfolio ROI:</span>
                       <span className="font-medium text-green-400">18.5%</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>On-Time Delivery:</span>
+                    <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                      <span className="text-gray-300">On-Time Delivery:</span>
                       <span className="font-medium text-green-400">87%</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Budget Adherence:</span>
+                    <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                      <span className="text-gray-300">Budget Adherence:</span>
                       <span className="font-medium text-yellow-400">94%</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Client Satisfaction:</span>
+                    <div className="flex justify-between border-b border-gray-700/30 pb-1">
+                      <span className="text-gray-300">Client Satisfaction:</span>
                       <span className="font-medium text-green-400">4.8/5</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Team Productivity:</span>
+                      <span className="text-gray-300">Team Productivity:</span>
                       <span className="font-medium text-blue-400">112%</span>
                     </div>
                   </div>
@@ -887,52 +880,52 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
 
               {/* Detailed Project Analysis */}
               <div className="space-y-4">
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-4">
+                <div className="bg-white/10 rounded-lg p-4">
                   <h4 className="font-semibold mb-3 flex items-center">
                     <Award className="w-5 h-5 mr-2" />
                     Top Performing Projects
                   </h4>
                   <div className="space-y-3 text-sm">
-                    <div className="border-b border-white/20 pb-2">
+                    <div className="border-b border-gray-700/30 pb-2">
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-medium">Miami Commercial Tower</div>
-                          <div className="text-xs text-blue-200">$250M • Commercial • On Track</div>
+                          <div className="font-medium text-gray-300">Miami Commercial Tower</div>
+                          <div className="text-xs text-gray-400">$250M • Commercial • On Track</div>
                         </div>
                         <div className="text-right">
                           <div className="text-green-400 font-medium">+5.2%</div>
-                          <div className="text-xs">vs budget</div>
+                          <div className="text-xs text-gray-400">vs budget</div>
                         </div>
                       </div>
                     </div>
-                    <div className="border-b border-white/20 pb-2">
+                    <div className="border-b border-gray-700/30 pb-2">
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-medium">Palm Beach Estate</div>
-                          <div className="text-xs text-blue-200">$75M • Residential • 85% Complete</div>
+                          <div className="font-medium text-gray-300">Palm Beach Estate</div>
+                          <div className="text-xs text-gray-400">$75M • Residential • 85% Complete</div>
                         </div>
                         <div className="text-right">
                           <div className="text-green-400 font-medium">+2.8%</div>
-                          <div className="text-xs">vs budget</div>
+                          <div className="text-xs text-gray-400">vs budget</div>
                         </div>
                       </div>
                     </div>
                     <div className="pb-2">
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-medium">Naples Waterfront</div>
-                          <div className="text-xs text-blue-200">$95M • Mixed-Use • Planning</div>
+                          <div className="font-medium text-gray-300">Naples Waterfront</div>
+                          <div className="text-xs text-gray-400">$95M • Mixed-Use • Planning</div>
                         </div>
                         <div className="text-right">
                           <div className="text-yellow-400 font-medium">-1.2%</div>
-                          <div className="text-xs">vs budget</div>
+                          <div className="text-xs text-gray-400">vs budget</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/10 rounded-lg p-4">
+                <div className="bg-white/10 rounded-lg p-4">
                   <h4 className="font-semibold mb-3 flex items-center">
                     <MapPin className="w-5 h-5 mr-2" />
                     Regional Performance
@@ -942,11 +935,11 @@ export default function PortfolioOverview({ card, config, span, isCompact = fals
                       <div key={index} className="flex justify-between items-center">
                         <div className="flex items-center">
                           <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: region.color }} />
-                          <span>{region.name}</span>
+                          <span className="text-gray-300">{region.name}</span>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium">${region.value}M</div>
-                          <div className="text-xs text-gray-300">{region.projects} projects</div>
+                          <div className="font-medium text-gray-300">${region.value}M</div>
+                          <div className="text-xs text-gray-400">{region.projects} projects</div>
                         </div>
                       </div>
                     ))}

@@ -1,24 +1,33 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Calendar, Clock, AlertTriangle, CheckCircle, TrendingDown, ChevronRight, Activity } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { useState } from "react"
+import {
+  Calendar,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  TrendingDown,
+  ChevronRight,
+  Activity,
+  TrendingUp,
+} from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 
 interface SchedulePerformanceCardProps {
-  config?: any;
-  span?: any;
-  isCompact?: boolean;
-  userRole?: string;
+  config?: any
+  span?: any
+  isCompact?: boolean
+  userRole?: string
 }
 
 export default function SchedulePerformanceCard({ config, span, isCompact, userRole }: SchedulePerformanceCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  
+  const [isHovered, setIsHovered] = useState(false)
+
   // Role-based data filtering
   const getDataByRole = () => {
     switch (userRole) {
-      case 'project-manager':
+      case "project-manager":
         // Single project view
         return {
           projectsAhead: 0,
@@ -37,10 +46,10 @@ export default function SchedulePerformanceCard({ config, span, isCompact, userR
             topPerformer: "Tropical World Nursery",
             worstPerformer: "N/A",
             avgRecoveryTime: 5, // days
-            milestoneHits: 92 // percentage
-          }
-        };
-      case 'project-executive':
+            milestoneHits: 92, // percentage
+          },
+        }
+      case "project-executive":
         // Limited to 7 projects
         return {
           projectsAhead: 3,
@@ -59,9 +68,9 @@ export default function SchedulePerformanceCard({ config, span, isCompact, userR
             topPerformer: "Riverside Plaza",
             worstPerformer: "Tech Campus Phase 2",
             avgRecoveryTime: 7, // days
-            milestoneHits: 88 // percentage
-          }
-        };
+            milestoneHits: 88, // percentage
+          },
+        }
       default:
         // Executive - all projects
         return {
@@ -81,177 +90,232 @@ export default function SchedulePerformanceCard({ config, span, isCompact, userR
             topPerformer: "Riverside Plaza",
             worstPerformer: "Tech Campus Phase 2",
             avgRecoveryTime: 8, // days
-            milestoneHits: 85 // percentage
-          }
-        };
+            milestoneHits: 85, // percentage
+          },
+        }
     }
-  };
+  }
 
-  const data = getDataByRole();
+  const data = getDataByRole()
 
   const getVarianceColor = (days: number) => {
-    if (days <= -7) return "text-green-600 dark:text-green-400";
-    if (days <= 7) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
-  };
+    if (days <= -7) return "text-emerald-600 dark:text-emerald-400"
+    if (days <= 7) return "text-amber-600 dark:text-amber-400"
+    return "text-red-600 dark:text-red-400"
+  }
 
   const getVarianceBadge = (days: number) => {
-    if (days <= -7) return "bg-green-100 text-green-700";
-    if (days <= 7) return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
-  };
+    if (days <= -7)
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800"
+    if (days <= 7)
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800"
+    return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800"
+  }
+
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 85) return "bg-emerald-500"
+    if (score >= 70) return "bg-amber-500"
+    return "bg-red-500"
+  }
 
   return (
-    <div 
-      className="h-full flex flex-col bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 overflow-hidden relative transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Header Stats */}
-      <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-orange-200">
-        <div className="grid grid-cols-3 gap-2">
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-green-700">{data.projectsAhead}</div>
-            <div className="text-xs text-green-600 dark:text-green-400">Ahead</div>
+    <div className="h-full overflow-hidden relative group">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-b border-gray-200 dark:border-gray-700">
+        {/* Top Stats Row */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{data.projectsAhead}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">Ahead</div>
           </div>
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-yellow-700">{data.projectsOnTime}</div>
-            <div className="text-xs text-yellow-600 dark:text-yellow-400">On Time</div>
+          <div className="text-center p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{data.projectsOnTime}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">On Time</div>
           </div>
-          <div className="text-center">
-            <div className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-red-700">{data.projectsBehind}</div>
-            <div className="text-xs text-red-600 dark:text-red-400">Behind</div>
+          <div className="text-center p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{data.projectsBehind}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">Behind</div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 space-y-4 overflow-y-auto">
+      <div className="space-y-4 bg-white dark:bg-gray-900">
         {/* Schedule Health Score */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Schedule Health</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-muted-foreground">Overall Score</span>
-              <Badge className={getVarianceBadge(data.avgVarianceDays)}>{data.scheduleHealthScore}%</Badge>
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Schedule Health</span>
             </div>
-            <Progress value={data.scheduleHealthScore} className="h-2" />
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Overall Score</span>
+              <div className="px-2 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded">
+                {data.scheduleHealthScore}%
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <Progress value={data.scheduleHealthScore} className="h-3 bg-gray-200 dark:bg-gray-700" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className={`h-3 rounded-full transition-all duration-500 ${getHealthScoreColor(
+                  data.scheduleHealthScore
+                )}`}
+                style={{ width: `${data.scheduleHealthScore}%` }}
+              />
+            </div>
           </div>
         </div>
 
         {/* Average Variance */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Avg Variance</span>
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Avg Variance</span>
+            </div>
           </div>
           <div className="flex items-center justify-between">
-            <div className={`text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium ${getVarianceColor(data.avgVarianceDays)}`}>
+            <div className={`text-2xl font-bold ${getVarianceColor(data.avgVarianceDays)}`}>
               {Math.abs(data.avgVarianceDays)} Days
             </div>
-            <Badge className={getVarianceBadge(data.avgVarianceDays)}>
-              {data.avgVarianceDays < 0 ? 'Ahead' : data.avgVarianceDays > 0 ? 'Behind' : 'On Time'}
+            <Badge variant="outline" className={getVarianceBadge(data.avgVarianceDays)}>
+              {data.avgVarianceDays < 0 ? (
+                <>
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Ahead
+                </>
+              ) : data.avgVarianceDays > 0 ? (
+                <>
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                  Behind
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  On Time
+                </>
+              )}
             </Badge>
           </div>
         </div>
 
         {/* Damages */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Damages</span>
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-900 dark:text-white">Damages</span>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Realized</span>
-              <span className="font-medium">${data.totalDamagesRealized.toLocaleString()}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Realized</span>
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                ${data.totalDamagesRealized.toLocaleString()}
+              </span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Forecasted</span>
-              <span className="font-medium text-red-600 dark:text-red-400">${data.totalDamagesForecasted.toLocaleString()}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Forecasted</span>
+              <span className="text-lg font-semibold text-red-600 dark:text-red-400">
+                ${data.totalDamagesForecasted.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Critical Projects */}
-        <div className="bg-white/60 dark:bg-black/60 rounded-lg p-1.5 sm:p-2 lg:p-2.5 border border-orange-200">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingDown className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-foreground">Critical Projects</span>
-          </div>
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm sm:text-base lg:text-sm sm:text-base lg:text-lg font-medium text-red-700">{data.criticalProjects}</span>
-            <Badge variant="destructive" className="text-xs">Needs Attention</Badge>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Critical Projects</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-bold text-red-600 dark:text-red-400">{data.criticalProjects}</span>
+              <Badge variant="destructive" className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
+                Needs Attention
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Hover Drill-Down Overlay */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-orange-900/95 backdrop-blur-sm p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 flex flex-col justify-center text-white animate-in fade-in duration-200">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2">
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-semibold text-sm">Schedule Deep Analysis</span>
+      {/* Hover Overlay */}
+      <div
+        className={`absolute inset-0 bg-gray-900/95 backdrop-blur-sm transition-all duration-300 ${
+          isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="h-full flex flex-col justify-center text-white overflow-y-auto">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-3">
+              <ChevronRight className="h-5 w-5 text-orange-400" />
+              <span className="font-semibold text-lg text-orange-400">Schedule Deep Analysis</span>
             </div>
-            
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-orange-200">Best Performer:</span>
-                <span className="font-medium text-green-300">{data.drillDown.topPerformer}</span>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <div className="text-gray-300 mb-1">Best Performer</div>
+                <div className="font-semibold text-emerald-300">{data.drillDown.topPerformer}</div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-orange-200">Needs Attention:</span>
-                <span className="font-medium text-red-300">{data.drillDown.worstPerformer}</span>
+              <div>
+                <div className="text-gray-300 mb-1">Needs Attention</div>
+                <div className="font-semibold text-red-300">{data.drillDown.worstPerformer}</div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-orange-200">Milestone Hit Rate:</span>
-                <span className="font-medium">{data.drillDown.milestoneHits}%</span>
+              <div>
+                <div className="text-gray-300 mb-1">Milestone Hit Rate</div>
+                <div className="font-semibold text-white">{data.drillDown.milestoneHits}%</div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-orange-200">Avg Recovery Time:</span>
-                <span className="font-medium">{data.drillDown.avgRecoveryTime} days</span>
+              <div>
+                <div className="text-gray-300 mb-1">Avg Recovery Time</div>
+                <div className="font-semibold text-white">{data.drillDown.avgRecoveryTime} days</div>
               </div>
             </div>
 
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-orange-700">
-              <div className="flex items-center gap-1 mb-2">
-                <Activity className="h-3 w-3" />
-                <span className="text-xs font-medium text-orange-200">Delay Analysis</span>
+            <div className="border-t border-gray-700 pt-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="h-4 w-4 text-orange-400" />
+                <span className="text-sm font-medium text-orange-400">Delay Analysis</span>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.weatherDelays}</div>
-                  <div className="text-orange-300">Weather</div>
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="text-center p-3 bg-white/10 rounded-lg">
+                  <div className="text-xl font-bold text-white">{data.drillDown.weatherDelays}</div>
+                  <div className="text-gray-300">Weather</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.permitDelays}</div>
-                  <div className="text-orange-300">Permits</div>
+                <div className="text-center p-3 bg-white/10 rounded-lg">
+                  <div className="text-xl font-bold text-white">{data.drillDown.permitDelays}</div>
+                  <div className="text-gray-300">Permits</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold">{data.drillDown.materialDelays}</div>
-                  <div className="text-orange-300">Materials</div>
+                <div className="text-center p-3 bg-white/10 rounded-lg">
+                  <div className="text-xl font-bold text-white">{data.drillDown.materialDelays}</div>
+                  <div className="text-gray-300">Materials</div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-1.5 sm:mt-2 lg:mt-1 sm:mt-1.5 lg:mt-2 pt-3 border-t border-orange-700">
-              <div className="text-xs font-medium text-orange-200 mb-2">Critical Path Activities</div>
-              <div className="space-y-1">
+            <div className="border-t border-gray-700 pt-4">
+              <div className="text-sm font-medium text-orange-400 mb-3">Critical Path Activities</div>
+              <div className="space-y-2">
                 {data.drillDown.criticalPath.map((activity, index) => (
-                  <div key={index} className="text-xs flex items-center gap-2">
-                    <div className="w-1 h-1 bg-orange-300 rounded-full"></div>
-                    <span>{activity}</span>
+                  <div key={index} className="flex items-center gap-3 p-2 bg-white/10 rounded">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0"></div>
+                    <span className="text-sm text-white">{activity}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Hover trigger area */}
+      <div
+        className="absolute inset-0 z-10"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
     </div>
-  );
-} 
+  )
+}

@@ -3,6 +3,12 @@
 import { DashboardCard } from "@/types/dashboard"
 import { DashboardGrid } from "./DashboardGrid"
 import { KPIRow } from "./KPIRow"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+
+import { ActionItemsInbox } from "./ActionItemsInbox"
+import { ActionItemsToDo } from "./ActionItemsToDo"
+import { ProjectActivityFeed } from "../feed/ProjectActivityFeed"
 
 interface DashboardLayoutProps {
   cards: DashboardCard[]
@@ -17,6 +23,10 @@ interface DashboardLayoutProps {
   onToggleEdit?: () => void
   layoutDensity?: "compact" | "normal" | "spacious"
   userRole?: string
+  // Dashboard tabs props
+  dashboards?: Array<{ id: string; name: string }>
+  currentDashboardId?: string
+  onDashboardSelect?: (dashboardId: string) => void
 }
 
 /**
@@ -38,7 +48,42 @@ export function DashboardLayout({
   onToggleEdit,
   layoutDensity = "normal",
   userRole,
+  dashboards = [],
+  currentDashboardId,
+  onDashboardSelect,
 }: DashboardLayoutProps) {
+  const router = useRouter()
+
+  // Check if user role should see Action Items tab
+  const shouldShowActionItemsTab = userRole === "project-executive" || userRole === "project-manager"
+
+  // Check if user role should see Activity Feed tab
+  const shouldShowActivityFeedTab = ["executive", "project-executive", "project-manager", "estimator"].includes(
+    userRole || ""
+  )
+
+  // Set Action Items as default for Project Executive and Project Manager
+  const [showActionItems, setShowActionItems] = useState(shouldShowActionItemsTab)
+  const [showActivityFeed, setShowActivityFeed] = useState(false)
+
+  // Handle Action Items tab click
+  const handleActionItemsClick = () => {
+    setShowActionItems(true)
+    setShowActivityFeed(false)
+  }
+
+  // Handle Activity Feed tab click
+  const handleActivityFeedClick = () => {
+    setShowActivityFeed(true)
+    setShowActionItems(false)
+  }
+
+  // Handle regular dashboard tab click
+  const handleDashboardTabClick = (dashboardId: string) => {
+    setShowActionItems(false)
+    setShowActivityFeed(false)
+    onDashboardSelect?.(dashboardId)
+  }
   // Determine spacing based on layout density - consistent horizontal and vertical
   const getSpacingClass = () => {
     switch (layoutDensity) {
@@ -54,49 +99,132 @@ export function DashboardLayout({
   const isCompact = layoutDensity === "compact"
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden">
-      {/* Enhanced Background with depth and texture */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(var(--chart-1),0.05),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(var(--chart-2),0.05),transparent_50%)]" />
-
-      {/* Subtle grid pattern for texture */}
-      <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-        <div className="h-full w-full bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
-      </div>
-
+    <div className="w-full relative">
       {/* Edit mode overlay */}
       {isEditing && <div className="absolute inset-0 bg-primary/5 backdrop-blur-[0.5px] pointer-events-none" />}
 
       <div className="relative z-10">
-        {/* KPI Row with enhanced styling */}
-        <div data-tour="kpi-widgets" className="mb-6">
-          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
-            <div className="mx-auto max-w-[1920px]">
-              <KPIRow userRole={userRole} />
+        {/* Dashboard Tabs - Show for all users */}
+        {(dashboards.length > 0 || shouldShowActionItemsTab || shouldShowActivityFeedTab) && (
+          <div data-tour="dashboard-tabs" className="mb-6">
+            <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
+              <div className="mx-auto max-w-[1920px]">
+                <div className="flex items-center justify-start gap-1 border-b border-border pb-2">
+                  {/* Action Items Tab - Only for Project Executive and Project Manager */}
+                  {shouldShowActionItemsTab && (
+                    <button
+                      onClick={handleActionItemsClick}
+                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                        showActionItems
+                          ? "text-primary border-primary bg-primary/5"
+                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                      }`}
+                    >
+                      Action Items
+                    </button>
+                  )}
+
+                  {/* Regular Dashboard Tabs */}
+                  {dashboards.map((dashboard) => (
+                    <button
+                      key={dashboard.id}
+                      onClick={() => handleDashboardTabClick(dashboard.id)}
+                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                        currentDashboardId === dashboard.id && !showActionItems && !showActivityFeed
+                          ? "text-primary border-primary bg-primary/5"
+                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                      }`}
+                    >
+                      {dashboard.name}
+                    </button>
+                  ))}
+
+                  {/* Activity Feed Tab - For Executive, Project Executive, Project Manager, and Estimator - Final Tab */}
+                  {shouldShowActivityFeedTab && (
+                    <button
+                      onClick={handleActivityFeedClick}
+                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                        showActivityFeed
+                          ? "text-primary border-primary bg-primary/5"
+                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                      }`}
+                    >
+                      Activity Feed
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Dashboard Content with better container */}
-        <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
-          <div className="mx-auto max-w-[1920px]">
-            <DashboardGrid
-              cards={cards}
-              onLayoutChange={onLayoutChange}
-              onCardRemove={onCardRemove}
-              onCardConfigure={onCardConfigure}
-              onCardSizeChange={onCardSizeChange}
-              onCardAdd={onCardAdd}
-              onSave={onSave}
-              onReset={onReset}
-              isEditing={isEditing}
-              isCompact={isCompact}
-              spacingClass={getSpacingClass()}
-              userRole={userRole}
-            />
+        {/* Action Items Content */}
+        {showActionItems && shouldShowActionItemsTab && (
+          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
+            <div className="mx-auto max-w-[1920px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                {/* Action Items - Full width layout */}
+                <div>
+                  <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
+                </div>
+                <div>
+                  <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Activity Feed Content */}
+        {showActivityFeed && shouldShowActivityFeedTab && (
+          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
+            <div className="mx-auto max-w-[1920px]">
+              <ProjectActivityFeed
+                config={{
+                  userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+                  showFilters: true,
+                  showPagination: true,
+                  itemsPerPage: 20,
+                  allowExport: true,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Regular Dashboard Content */}
+        {!showActionItems && !showActivityFeed && (
+          <>
+            {/* KPI Row with enhanced styling */}
+            <div data-tour="kpi-widgets" className="mb-6">
+              <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
+                <div className="mx-auto max-w-[1920px]">
+                  <KPIRow userRole={userRole} />
+                </div>
+              </div>
+            </div>
+
+            {/* Dashboard Content with better container */}
+            <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
+              <div className="mx-auto max-w-[1920px]">
+                <DashboardGrid
+                  cards={cards}
+                  onLayoutChange={onLayoutChange}
+                  onCardRemove={onCardRemove}
+                  onCardConfigure={onCardConfigure}
+                  onCardSizeChange={onCardSizeChange}
+                  onCardAdd={onCardAdd}
+                  onSave={onSave}
+                  onReset={onReset}
+                  isEditing={isEditing}
+                  isCompact={isCompact}
+                  spacingClass={getSpacingClass()}
+                  userRole={userRole}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Enhanced Edit Mode Indicator */}
@@ -111,10 +239,6 @@ export function DashboardLayout({
           </div>
         </div>
       )}
-
-      {/* Visual enhancement: Floating elements for depth */}
-      <div className="fixed top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl pointer-events-none opacity-60" />
-      <div className="fixed bottom-20 right-10 w-40 h-40 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-3xl pointer-events-none opacity-60" />
     </div>
   )
 }

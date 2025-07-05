@@ -391,7 +391,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
   return (
     <div className="bg-card border-b border-border">
       {/* Header with collapse toggle - always visible */}
-      <div className="flex items-center justify-between px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2">
+      <div className="flex items-center justify-between px-0 sm:px-0 lg:px-0 py-0 sm:py-0">
         {/* Collapse toggle - visible on tablet and mobile */}
         <Button
           variant="ghost"

@@ -1,5 +1,19 @@
 export interface LinkedEntity {
-  type: 'daily-log' | 'forecast' | 'procurement' | 'safety' | 'quality' | 'rfi' | 'change-order' | 'schedule' | 'budget' | 'contract' | 'permit' | 'other'
+  type:
+    | "daily-log"
+    | "forecast"
+    | "procurement"
+    | "safety"
+    | "quality"
+    | "rfi"
+    | "change-order"
+    | "schedule"
+    | "budget"
+    | "contract"
+    | "permit"
+    | "startup-checklist"
+    | "closeout-checklist"
+    | "other"
   id: string
   label: string
   url?: string
@@ -43,8 +57,8 @@ export interface Task {
   id: string
   title: string
   description?: string
-  status: 'todo' | 'in-progress' | 'blocked' | 'completed'
-  priority: 'low' | 'medium' | 'high'
+  status: "todo" | "in-progress" | "blocked" | "completed"
+  priority: "low" | "medium" | "high"
   createdBy: string
   assignedTo: string
   dueDate?: Date
@@ -61,7 +75,7 @@ export interface User {
   email: string
   avatar: string
   role: string
-  status: 'online' | 'away' | 'offline'
+  status: "online" | "away" | "offline"
 }
 
 export interface ProductivityState {
@@ -72,16 +86,16 @@ export interface ProductivityState {
 
 export interface ProductivityActions {
   // Message actions
-  addMessage: (threadId: string, messageData: Omit<Message, 'id' | 'timestamp'>) => void
-  addReaction: (messageId: string, reaction: Omit<Reaction, 'id'>) => void
+  addMessage: (threadId: string, messageData: Omit<Message, "id" | "timestamp">) => void
+  addReaction: (messageId: string, reaction: Omit<Reaction, "id">) => void
   removeReaction: (messageId: string, userId: string, emoji: string) => void
-  
+
   // Task actions
-  addTask: (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void
-  updateTaskStatus: (taskId: string, status: Task['status'], comment?: string) => void
-  addTaskComment: (taskId: string, commentData: Omit<TaskComment, 'id' | 'timestamp'>) => void
-  
+  addTask: (taskData: Omit<Task, "id" | "createdAt" | "updatedAt">) => void
+  updateTaskStatus: (taskId: string, status: Task["status"], comment?: string) => void
+  addTaskComment: (taskId: string, commentData: Omit<TaskComment, "id" | "timestamp">) => void
+
   // Search and filter functions
   searchThreads: (query: string) => MessageThread[]
-  filterTasks: (filters: { assignedTo?: string; status?: Task['status']; linkedType?: string }) => Task[]
-} 
+  filterTasks: (filters: { assignedTo?: string; status?: Task["status"]; linkedType?: string }) => Task[]
+}

@@ -13,7 +13,7 @@ const Card = React.forwardRef<
 
   const variantClasses = {
     default: "shadow-sm hover:shadow-md border-border/50",
-    elevated: "shadow-lg hover:shadow-xl border-border/30 bg-card/95 backdrop-blur-sm",
+    elevated: "shadow-lg hover:shadow-xl border-border/30 bg-card/95",
     outlined: "border-2 border-border shadow-none hover:shadow-sm",
     ghost: "border-transparent shadow-none hover:bg-accent/50",
   }
@@ -42,7 +42,7 @@ const CardHeader = React.forwardRef<
   }
 >(({ className, variant = "default", ...props }, ref) => {
   const variantClasses = {
-    default: "bg-muted/30",
+    default: "",
     gradient: "bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5",
     accent: "bg-accent/20 border-b border-accent/30",
   }

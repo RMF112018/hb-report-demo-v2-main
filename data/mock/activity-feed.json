@@ -1,0 +1,589 @@
+{
+  "executive": [
+    {
+      "id": "act_001",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "submittal",
+      "description": "Submittal 99-999.01 Approved by Architect",
+      "timestamp": "2024-12-27T14:30:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_002",
+      "project_id": 2525841,
+      "project_name": "Miami Commercial Tower",
+      "type": "bid_invitation",
+      "description": "Bid invitation sent to 12 subcontractors for Foundation package",
+      "timestamp": "2024-12-27T13:45:00Z",
+      "source": "building_connected",
+      "user": "Jane Smith"
+    },
+    {
+      "id": "act_003",
+      "project_id": 2525842,
+      "project_name": "Orlando Retail Complex",
+      "type": "change_order",
+      "description": "Change Order #003 - Site Work Modifications approved for $15,000",
+      "timestamp": "2024-12-27T12:15:00Z",
+      "source": "procore",
+      "user": "Robert Johnson"
+    },
+    {
+      "id": "act_004",
+      "project_id": 2525843,
+      "project_name": "Naples Waterfront Condominium",
+      "type": "compliance",
+      "description": "Insurance certificate updated for ABC Electrical Corp",
+      "timestamp": "2024-12-27T11:30:00Z",
+      "source": "compass",
+      "user": "Mary Williams"
+    },
+    {
+      "id": "act_005",
+      "project_id": 2525844,
+      "project_name": "Jacksonville Mixed-Use Development",
+      "type": "pay_app",
+      "description": "Pay Application #5 processed for $125,000",
+      "timestamp": "2024-12-27T10:45:00Z",
+      "source": "sage",
+      "user": "Thomas Brown"
+    },
+    {
+      "id": "act_006",
+      "project_id": 2525845,
+      "project_name": "Fort Lauderdale Hotel Resort",
+      "type": "quality_inspection",
+      "description": "Quality inspection completed for Level 15 concrete pour",
+      "timestamp": "2024-12-27T09:30:00Z",
+      "source": "sitemate",
+      "user": "Karen Thompson"
+    },
+    {
+      "id": "act_007",
+      "project_id": 2525846,
+      "project_name": "Tampa Medical Center",
+      "type": "spcr",
+      "description": "SPCR submitted for additional MEP engineer assignment",
+      "timestamp": "2024-12-27T08:15:00Z",
+      "source": "hb_report",
+      "user": "David Walker"
+    },
+    {
+      "id": "act_008",
+      "project_id": 2525847,
+      "project_name": "Key West Luxury Villas",
+      "type": "rfi",
+      "description": "RFI #045 - Structural detail clarification submitted",
+      "timestamp": "2024-12-26T16:20:00Z",
+      "source": "procore",
+      "user": "Laura Green"
+    },
+    {
+      "id": "act_009",
+      "project_id": 2525848,
+      "project_name": "Pensacola Corporate Campus",
+      "type": "drawing",
+      "description": "Drawing revision A3.1 - Floor plan updates published",
+      "timestamp": "2024-12-26T15:45:00Z",
+      "source": "procore",
+      "user": "James Martinez"
+    },
+    {
+      "id": "act_010",
+      "project_id": 2525849,
+      "project_name": "Sarasota Cultural Center",
+      "type": "proposal",
+      "description": "Proposal received from XYZ Masonry for $85,000",
+      "timestamp": "2024-12-26T14:30:00Z",
+      "source": "building_connected",
+      "user": "Susan Lee"
+    },
+    {
+      "id": "act_011",
+      "project_id": 2525850,
+      "project_name": "Boca Raton Corporate Headquarters",
+      "type": "daily_log",
+      "description": "Daily log entry - 25 workers on site, concrete poured for elevator shaft",
+      "timestamp": "2024-12-26T13:15:00Z",
+      "source": "procore",
+      "user": "Paul Allen"
+    },
+    {
+      "id": "act_012",
+      "project_id": 2525851,
+      "project_name": "Coral Gables Luxury Condominium",
+      "type": "budget",
+      "description": "Budget revision approved - Foundation package increased by $50,000",
+      "timestamp": "2024-12-26T12:00:00Z",
+      "source": "sage",
+      "user": "Rachel King"
+    },
+    {
+      "id": "act_013",
+      "project_id": 2525852,
+      "project_name": "Gainesville University Expansion",
+      "type": "inspection",
+      "description": "Fire marshal inspection passed for Building A",
+      "timestamp": "2024-12-26T11:45:00Z",
+      "source": "procore",
+      "user": "Michael Clark"
+    },
+    {
+      "id": "act_014",
+      "project_id": 2525853,
+      "project_name": "Fort Myers Waterfront Estate",
+      "type": "deficiency",
+      "description": "Deficiency noted - Waterproofing membrane repair required",
+      "timestamp": "2024-12-26T10:30:00Z",
+      "source": "sitemate",
+      "user": "Elizabeth White"
+    },
+    {
+      "id": "act_015",
+      "project_id": 2525854,
+      "project_name": "West Palm Beach Mixed-Use Tower",
+      "type": "forecast",
+      "description": "Labor forecast updated - Additional 10 workers needed next week",
+      "timestamp": "2024-12-26T09:15:00Z",
+      "source": "hb_report",
+      "user": "Brian Taylor"
+    },
+    {
+      "id": "act_016",
+      "project_id": 2525855,
+      "project_name": "Aventura Retail Plaza",
+      "type": "commitment",
+      "description": "Commitment executed with Steel Fabricator Inc for $180,000",
+      "timestamp": "2024-12-25T16:00:00Z",
+      "source": "procore",
+      "user": "Catherine Moore"
+    },
+    {
+      "id": "act_017",
+      "project_id": 2525856,
+      "project_name": "Tallahassee Government Complex",
+      "type": "correspondence",
+      "description": "Email correspondence with architect regarding design modifications",
+      "timestamp": "2024-12-25T15:30:00Z",
+      "source": "building_connected",
+      "user": "Jonathan Hill"
+    },
+    {
+      "id": "act_018",
+      "project_id": 2525857,
+      "project_name": "Miami Beach Luxury Hotel",
+      "type": "change_event",
+      "description": "Change Event #007 - Elevator upgrade initiated",
+      "timestamp": "2024-12-25T14:45:00Z",
+      "source": "procore",
+      "user": "Angela Martin"
+    },
+    {
+      "id": "act_019",
+      "project_id": 2525858,
+      "project_name": "Cape Coral Residential Community",
+      "type": "assignment",
+      "description": "Project Manager assigned to Phase 2 development",
+      "timestamp": "2024-12-25T13:20:00Z",
+      "source": "hb_report",
+      "user": "Richard Lopez"
+    },
+    {
+      "id": "act_020",
+      "project_id": 2525859,
+      "project_name": "Hialeah Industrial Park",
+      "type": "contract",
+      "description": "Final contract executed with HVAC contractor for $65,000",
+      "timestamp": "2024-12-25T12:15:00Z",
+      "source": "sage",
+      "user": "Sarah Young"
+    },
+    {
+      "id": "act_021",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "resolution",
+      "description": "Deficiency resolved - Plumbing fixture alignment corrected",
+      "timestamp": "2024-12-25T11:00:00Z",
+      "source": "sitemate",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_022",
+      "project_id": 2525841,
+      "project_name": "Miami Commercial Tower",
+      "type": "note",
+      "description": "Project note added - Crane delivery delayed by 2 days",
+      "timestamp": "2024-12-25T10:30:00Z",
+      "source": "hb_report",
+      "user": "Jane Smith"
+    },
+    {
+      "id": "act_023",
+      "project_id": 2525842,
+      "project_name": "Orlando Retail Complex",
+      "type": "bid_package",
+      "description": "Bid package created for Roofing Phase 2 - $45,000 budget",
+      "timestamp": "2024-12-24T16:45:00Z",
+      "source": "building_connected",
+      "user": "Robert Johnson"
+    },
+    {
+      "id": "act_024",
+      "project_id": 2525843,
+      "project_name": "Naples Waterfront Condominium",
+      "type": "submittal",
+      "description": "Submittal 15-001.02 - Window specifications resubmitted",
+      "timestamp": "2024-12-24T15:20:00Z",
+      "source": "procore",
+      "user": "Mary Williams"
+    },
+    {
+      "id": "act_025",
+      "project_id": 2525844,
+      "project_name": "Jacksonville Mixed-Use Development",
+      "type": "quality_inspection",
+      "description": "Quality inspection scheduled for structural steel connections",
+      "timestamp": "2024-12-24T14:15:00Z",
+      "source": "sitemate",
+      "user": "Thomas Brown"
+    },
+    {
+      "id": "act_026",
+      "project_id": 2525845,
+      "project_name": "Fort Lauderdale Hotel Resort",
+      "type": "rfi",
+      "description": "RFI #078 - MEP coordination clarification requested",
+      "timestamp": "2024-12-24T13:30:00Z",
+      "source": "procore",
+      "user": "Karen Thompson"
+    },
+    {
+      "id": "act_027",
+      "project_id": 2525846,
+      "project_name": "Tampa Medical Center",
+      "type": "compliance",
+      "description": "Safety certification updated for demolition contractor",
+      "timestamp": "2024-12-24T12:45:00Z",
+      "source": "compass",
+      "user": "David Walker"
+    },
+    {
+      "id": "act_028",
+      "project_id": 2525847,
+      "project_name": "Key West Luxury Villas",
+      "type": "pay_app",
+      "description": "Pay Application #3 submitted for $95,000",
+      "timestamp": "2024-12-24T11:15:00Z",
+      "source": "sage",
+      "user": "Laura Green"
+    },
+    {
+      "id": "act_029",
+      "project_id": 2525848,
+      "project_name": "Pensacola Corporate Campus",
+      "type": "drawing",
+      "description": "As-built drawing updated for underground utilities",
+      "timestamp": "2024-12-24T10:00:00Z",
+      "source": "procore",
+      "user": "James Martinez"
+    },
+    {
+      "id": "act_030",
+      "project_id": 2525849,
+      "project_name": "Sarasota Cultural Center",
+      "type": "daily_log",
+      "description": "Daily log entry - Foundation excavation 75% complete",
+      "timestamp": "2024-12-24T09:30:00Z",
+      "source": "procore",
+      "user": "Susan Lee"
+    },
+    {
+      "id": "act_031",
+      "project_id": 2525850,
+      "project_name": "Boca Raton Corporate Headquarters",
+      "type": "change_order",
+      "description": "Change Order #005 - Parking lot expansion approved for $25,000",
+      "timestamp": "2024-12-23T16:20:00Z",
+      "source": "procore",
+      "user": "Paul Allen"
+    },
+    {
+      "id": "act_032",
+      "project_id": 2525851,
+      "project_name": "Coral Gables Luxury Condominium",
+      "type": "bid_invitation",
+      "description": "Bid invitation sent for Architectural Millwork package",
+      "timestamp": "2024-12-23T15:45:00Z",
+      "source": "building_connected",
+      "user": "Rachel King"
+    },
+    {
+      "id": "act_033",
+      "project_id": 2525852,
+      "project_name": "Gainesville University Expansion",
+      "type": "inspection",
+      "description": "Final electrical inspection passed for Building B",
+      "timestamp": "2024-12-23T14:30:00Z",
+      "source": "procore",
+      "user": "Michael Clark"
+    },
+    {
+      "id": "act_034",
+      "project_id": 2525853,
+      "project_name": "Fort Myers Waterfront Estate",
+      "type": "forecast",
+      "description": "Weather forecast indicates 3-day rain delay for roofing work",
+      "timestamp": "2024-12-23T13:15:00Z",
+      "source": "hb_report",
+      "user": "Elizabeth White"
+    },
+    {
+      "id": "act_035",
+      "project_id": 2525854,
+      "project_name": "West Palm Beach Mixed-Use Tower",
+      "type": "assignment",
+      "description": "Senior Superintendent assigned to oversee final phase",
+      "timestamp": "2024-12-23T12:00:00Z",
+      "source": "hb_report",
+      "user": "Brian Taylor"
+    }
+  ],
+  "project_executive": [
+    {
+      "id": "act_pe_001",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "submittal",
+      "description": "Submittal 99-999.01 Approved by Architect",
+      "timestamp": "2024-12-27T14:30:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pe_002",
+      "project_id": 2525841,
+      "project_name": "Miami Commercial Tower",
+      "type": "bid_invitation",
+      "description": "Bid invitation sent to 12 subcontractors for Foundation package",
+      "timestamp": "2024-12-27T13:45:00Z",
+      "source": "building_connected",
+      "user": "Jane Smith"
+    },
+    {
+      "id": "act_pe_003",
+      "project_id": 2525842,
+      "project_name": "Orlando Retail Complex",
+      "type": "change_order",
+      "description": "Change Order #003 - Site Work Modifications approved for $15,000",
+      "timestamp": "2024-12-27T12:15:00Z",
+      "source": "procore",
+      "user": "Robert Johnson"
+    },
+    {
+      "id": "act_pe_004",
+      "project_id": 2525843,
+      "project_name": "Naples Waterfront Condominium",
+      "type": "compliance",
+      "description": "Insurance certificate updated for ABC Electrical Corp",
+      "timestamp": "2024-12-27T11:30:00Z",
+      "source": "compass",
+      "user": "Mary Williams"
+    },
+    {
+      "id": "act_pe_005",
+      "project_id": 2525844,
+      "project_name": "Jacksonville Mixed-Use Development",
+      "type": "pay_app",
+      "description": "Pay Application #5 processed for $125,000",
+      "timestamp": "2024-12-27T10:45:00Z",
+      "source": "sage",
+      "user": "Thomas Brown"
+    },
+    {
+      "id": "act_pe_006",
+      "project_id": 2525845,
+      "project_name": "Fort Lauderdale Hotel Resort",
+      "type": "quality_inspection",
+      "description": "Quality inspection completed for Level 15 concrete pour",
+      "timestamp": "2024-12-27T09:30:00Z",
+      "source": "sitemate",
+      "user": "Karen Thompson"
+    },
+    {
+      "id": "act_pe_007",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "rfi",
+      "description": "RFI #045 - Structural detail clarification submitted",
+      "timestamp": "2024-12-26T16:20:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pe_008",
+      "project_id": 2525841,
+      "project_name": "Miami Commercial Tower",
+      "type": "drawing",
+      "description": "Drawing revision A3.1 - Floor plan updates published",
+      "timestamp": "2024-12-26T15:45:00Z",
+      "source": "procore",
+      "user": "Jane Smith"
+    },
+    {
+      "id": "act_pe_009",
+      "project_id": 2525842,
+      "project_name": "Orlando Retail Complex",
+      "type": "proposal",
+      "description": "Proposal received from XYZ Masonry for $85,000",
+      "timestamp": "2024-12-26T14:30:00Z",
+      "source": "building_connected",
+      "user": "Robert Johnson"
+    },
+    {
+      "id": "act_pe_010",
+      "project_id": 2525843,
+      "project_name": "Naples Waterfront Condominium",
+      "type": "daily_log",
+      "description": "Daily log entry - 25 workers on site, concrete poured for elevator shaft",
+      "timestamp": "2024-12-26T13:15:00Z",
+      "source": "procore",
+      "user": "Mary Williams"
+    },
+    {
+      "id": "act_pe_011",
+      "project_id": 2525844,
+      "project_name": "Jacksonville Mixed-Use Development",
+      "type": "budget",
+      "description": "Budget revision approved - Foundation package increased by $50,000",
+      "timestamp": "2024-12-26T12:00:00Z",
+      "source": "sage",
+      "user": "Thomas Brown"
+    },
+    {
+      "id": "act_pe_012",
+      "project_id": 2525845,
+      "project_name": "Fort Lauderdale Hotel Resort",
+      "type": "inspection",
+      "description": "Fire marshal inspection passed for Building A",
+      "timestamp": "2024-12-26T11:45:00Z",
+      "source": "procore",
+      "user": "Karen Thompson"
+    },
+    {
+      "id": "act_pe_013",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "deficiency",
+      "description": "Deficiency noted - Waterproofing membrane repair required",
+      "timestamp": "2024-12-26T10:30:00Z",
+      "source": "sitemate",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pe_014",
+      "project_id": 2525841,
+      "project_name": "Miami Commercial Tower",
+      "type": "spcr",
+      "description": "SPCR submitted for additional MEP engineer assignment",
+      "timestamp": "2024-12-26T09:15:00Z",
+      "source": "hb_report",
+      "user": "Jane Smith"
+    },
+    {
+      "id": "act_pe_015",
+      "project_id": 2525842,
+      "project_name": "Orlando Retail Complex",
+      "type": "note",
+      "description": "Project note added - Material delivery scheduled for Monday",
+      "timestamp": "2024-12-25T16:00:00Z",
+      "source": "hb_report",
+      "user": "Robert Johnson"
+    }
+  ],
+  "project_manager": [
+    {
+      "id": "act_pm_001",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "submittal",
+      "description": "Submittal 99-999.01 Approved by Architect",
+      "timestamp": "2024-12-27T14:30:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_002",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "rfi",
+      "description": "RFI #045 - Structural detail clarification submitted",
+      "timestamp": "2024-12-26T16:20:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_003",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "change_order",
+      "description": "Change Order #003 - Site Work Modifications approved for $15,000",
+      "timestamp": "2024-12-26T12:15:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_004",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "quality_inspection",
+      "description": "Quality inspection completed for Level 15 concrete pour",
+      "timestamp": "2024-12-26T09:30:00Z",
+      "source": "sitemate",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_005",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "daily_log",
+      "description": "Daily log entry - 25 workers on site, concrete poured for elevator shaft",
+      "timestamp": "2024-12-25T13:15:00Z",
+      "source": "procore",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_006",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "deficiency",
+      "description": "Deficiency noted - Waterproofing membrane repair required",
+      "timestamp": "2024-12-25T10:30:00Z",
+      "source": "sitemate",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_007",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "spcr",
+      "description": "SPCR submitted for additional MEP engineer assignment",
+      "timestamp": "2024-12-24T15:15:00Z",
+      "source": "hb_report",
+      "user": "John Doe"
+    },
+    {
+      "id": "act_pm_008",
+      "project_id": 2525840,
+      "project_name": "Palm Beach Luxury Estate",
+      "type": "note",
+      "description": "Project note added - Material delivery scheduled for Monday",
+      "timestamp": "2024-12-24T10:00:00Z",
+      "source": "hb_report",
+      "user": "John Doe"
+    }
+  ],
+  "estimator": []
+}
