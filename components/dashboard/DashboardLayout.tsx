@@ -8,6 +8,7 @@ import { useState } from "react"
 import { AccountabilityFeed } from "./AccountabilityFeed"
 import { ActionItemsInbox } from "./ActionItemsInbox"
 import { ActionItemsToDo } from "./ActionItemsToDo"
+import { ProjectActivityFeed } from "../feed/ProjectActivityFeed"
 
 interface DashboardLayoutProps {
   cards: DashboardCard[]
@@ -56,17 +57,31 @@ export function DashboardLayout({
   // Check if user role should see Action Items tab
   const shouldShowActionItemsTab = userRole === "project-executive" || userRole === "project-manager"
 
+  // Check if user role should see Activity Feed tab
+  const shouldShowActivityFeedTab = ["executive", "project-executive", "project-manager", "estimator"].includes(
+    userRole || ""
+  )
+
   // Set Action Items as default for Project Executive and Project Manager
   const [showActionItems, setShowActionItems] = useState(shouldShowActionItemsTab)
+  const [showActivityFeed, setShowActivityFeed] = useState(false)
 
   // Handle Action Items tab click
   const handleActionItemsClick = () => {
     setShowActionItems(true)
+    setShowActivityFeed(false)
+  }
+
+  // Handle Activity Feed tab click
+  const handleActivityFeedClick = () => {
+    setShowActivityFeed(true)
+    setShowActionItems(false)
   }
 
   // Handle regular dashboard tab click
   const handleDashboardTabClick = (dashboardId: string) => {
     setShowActionItems(false)
+    setShowActivityFeed(false)
     onDashboardSelect?.(dashboardId)
   }
   // Determine spacing based on layout density - consistent horizontal and vertical
@@ -90,7 +105,7 @@ export function DashboardLayout({
 
       <div className="relative z-10">
         {/* Dashboard Tabs - Show for all users */}
-        {(dashboards.length > 0 || shouldShowActionItemsTab) && (
+        {(dashboards.length > 0 || shouldShowActionItemsTab || shouldShowActivityFeedTab) && (
           <div data-tour="dashboard-tabs" className="mb-6">
             <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
               <div className="mx-auto max-w-[1920px]">
@@ -115,7 +130,7 @@ export function DashboardLayout({
                       key={dashboard.id}
                       onClick={() => handleDashboardTabClick(dashboard.id)}
                       className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                        currentDashboardId === dashboard.id && !showActionItems
+                        currentDashboardId === dashboard.id && !showActionItems && !showActivityFeed
                           ? "text-primary border-primary bg-primary/5"
                           : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
                       }`}
@@ -123,6 +138,20 @@ export function DashboardLayout({
                       {dashboard.name}
                     </button>
                   ))}
+
+                  {/* Activity Feed Tab - For Executive, Project Executive, Project Manager, and Estimator - Final Tab */}
+                  {shouldShowActivityFeedTab && (
+                    <button
+                      onClick={handleActivityFeedClick}
+                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                        showActivityFeed
+                          ? "text-primary border-primary bg-primary/5"
+                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                      }`}
+                    >
+                      Activity Feed
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -149,8 +178,25 @@ export function DashboardLayout({
           </div>
         )}
 
+        {/* Activity Feed Content */}
+        {showActivityFeed && shouldShowActivityFeedTab && (
+          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
+            <div className="mx-auto max-w-[1920px]">
+              <ProjectActivityFeed
+                config={{
+                  userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+                  showFilters: true,
+                  showPagination: true,
+                  itemsPerPage: 20,
+                  allowExport: true,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Regular Dashboard Content */}
-        {!showActionItems && (
+        {!showActionItems && !showActivityFeed && (
           <>
             {/* KPI Row with enhanced styling */}
             <div data-tour="kpi-widgets" className="mb-6">

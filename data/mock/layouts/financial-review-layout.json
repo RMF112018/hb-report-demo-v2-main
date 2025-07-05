@@ -9,7 +9,7 @@
       "title": "HBI Financial Insights",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
-      "span": { "cols": 8, "rows": 3 },
+      "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {
         "financialMode": true,
@@ -35,8 +35,8 @@
       "type": "schedule-performance",
       "title": "Schedule Performance",
       "size": "optimal",
-      "position": { "x": 0, "y": 3 },
-      "span": { "cols": 8, "rows": 6 },
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 8, "rows": 4 },
       "visible": true,
       "config": {
         "compactMode": true
@@ -47,7 +47,7 @@
       "type": "financial-status",
       "title": "Financial Status",
       "size": "optimal",
-      "position": { "x": 0, "y": 9 },
+      "position": { "x": 0, "y": 10 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
