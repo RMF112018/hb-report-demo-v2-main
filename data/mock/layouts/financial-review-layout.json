@@ -4,11 +4,25 @@
   "description": "Optimized financial analysis dashboard with maximized grid utilization",
   "cards": [
     {
+      "id": "enhanced-hbi-insights-financial",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Financial Insights",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 3 },
+      "visible": true,
+      "config": {
+        "financialMode": true,
+        "focusArea": "financial-forecasting",
+        "executiveMode": true
+      }
+    },
+    {
       "id": "project-overview-1",
       "type": "project-overview",
       "title": "Portfolio Overview",
       "size": "optimal",
-      "position": { "x": 0, "y": 0 },
+      "position": { "x": 8, "y": 0 },
       "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {
@@ -21,7 +35,7 @@
       "type": "schedule-performance",
       "title": "Schedule Performance",
       "size": "optimal",
-      "position": { "x": 8, "y": 0 },
+      "position": { "x": 0, "y": 3 },
       "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {
@@ -33,7 +47,7 @@
       "type": "financial-status",
       "title": "Financial Status",
       "size": "optimal",
-      "position": { "x": 0, "y": 6 },
+      "position": { "x": 0, "y": 9 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -57,7 +71,7 @@
       "type": "contingency-analysis",
       "title": "Contingency Analysis",
       "size": "optimal",
-      "position": { "x": 0, "y": 11 },
+      "position": { "x": 8, "y": 11 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -69,7 +83,7 @@
       "type": "cash-flow",
       "title": "Cash Flow Analysis",
       "size": "optimal",
-      "position": { "x": 8, "y": 11 },
+      "position": { "x": 0, "y": 14 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -82,7 +96,7 @@
       "type": "procurement",
       "title": "Procurement Management",
       "size": "optimal",
-      "position": { "x": 0, "y": 16 },
+      "position": { "x": 8, "y": 16 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -94,25 +108,11 @@
       "type": "draw-forecast",
       "title": "Draw Forecast",
       "size": "optimal",
-      "position": { "x": 8, "y": 16 },
+      "position": { "x": 0, "y": 19 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "forecastPeriod": "quarterly"
-      }
-    },
-    {
-      "id": "enhanced-hbi-insights-financial",
-      "type": "enhanced-hbi-insights",
-      "title": "HBI Financial Insights",
-      "size": "optimal",
-      "position": { "x": 0, "y": 21 },
-      "span": { "cols": 16, "rows": 5 },
-      "visible": true,
-      "config": {
-        "financialMode": true,
-        "focusArea": "financial-forecasting",
-        "executiveMode": true
       }
     }
   ]

@@ -461,9 +461,7 @@ export const DashboardCardWrapper = ({
       </div>
 
       {/* Card Content */}
-      <div className={cn("dashboard-card-content", "flex-1 overflow-hidden", isCompact ? "p-1" : "p-2")}>
-        {children}
-      </div>
+      <div className={cn("dashboard-card-content", "flex-1 overflow-hidden")}>{children}</div>
 
       {/* Grid Selector Overlay */}
       {showGridSelector && (

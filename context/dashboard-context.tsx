@@ -92,11 +92,11 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
           cards: normalizeCards(executiveLayout.cards as DashboardCard[]),
         }
 
-        // ONLY create Executive Overview and Financial Review dashboards
+        // Create Executive Overview and Financial Review dashboards
         userDashboards.push({
           ...template,
           id: `${role}-executive-overview`,
-          name: "Executive Overview",
+          name: "Project Executive Overview",
           cards: normalizeCards(template.cards),
         })
 
@@ -113,14 +113,14 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
           cards: normalizeCards(projectExecutiveLayout.cards as DashboardCard[]),
         }
 
+        // Create Project Executive Overview and Financial Review dashboards
         userDashboards.push({
           ...template,
           id: `${role}-user-dashboard`,
-          name: template?.name || "My Dashboard",
+          name: "Project Executive Overview",
           cards: normalizeCards(template.cards),
         })
 
-        // Add Financial Review dashboard for Project Executive (filtered to 7 projects max)
         userDashboards.push({
           ...financialReviewLayout,
           id: `${role}-financial-review`,
@@ -134,10 +134,11 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
           cards: normalizeCards(projectManagerLayout.cards as DashboardCard[]),
         }
 
+        // Create Project Manager Overview and Financial Review dashboards
         userDashboards.push({
           ...template,
           id: `${role}-user-dashboard`,
-          name: template?.name || "My Dashboard",
+          name: "Project Manager Overview",
           cards: normalizeCards(template.cards),
         })
 
@@ -170,7 +171,7 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
       // Filter to ensure only allowed dashboards for executive role
       const allowedDashboards =
         role === "executive"
-          ? userDashboards.filter((d) => d.name === "Executive Overview" || d.name === "Financial Review")
+          ? userDashboards.filter((d) => d.name === "Project Executive Overview" || d.name === "Financial Review")
           : userDashboards
 
       setDashboards(allowedDashboards)
@@ -182,9 +183,9 @@ export function DashboardProvider({ userId, role, children }: { userId: string; 
   }, [userId, role])
 
   function addDashboard(dashboard: DashboardLayout) {
-    // Prevent adding new dashboards for executive role - only allow Executive Overview and Financial Review
+    // Prevent adding new dashboards for executive role - only allow Project Executive Overview and Financial Review
     if (role === "executive") {
-      const allowedNames = ["Executive Overview", "Financial Review"]
+      const allowedNames = ["Project Executive Overview", "Financial Review"]
       if (!allowedNames.includes(dashboard.name)) {
         console.warn(`Dashboard "${dashboard.name}" not allowed for executive role`)
         return

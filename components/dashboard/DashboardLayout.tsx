@@ -3,6 +3,11 @@
 import { DashboardCard } from "@/types/dashboard"
 import { DashboardGrid } from "./DashboardGrid"
 import { KPIRow } from "./KPIRow"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { AccountabilityFeed } from "./AccountabilityFeed"
+import { ActionItemsInbox } from "./ActionItemsInbox"
+import { ActionItemsToDo } from "./ActionItemsToDo"
 
 interface DashboardLayoutProps {
   cards: DashboardCard[]
@@ -46,6 +51,24 @@ export function DashboardLayout({
   currentDashboardId,
   onDashboardSelect,
 }: DashboardLayoutProps) {
+  const router = useRouter()
+
+  // Check if user role should see Action Items tab
+  const shouldShowActionItemsTab = userRole === "project-executive" || userRole === "project-manager"
+
+  // Set Action Items as default for Project Executive and Project Manager
+  const [showActionItems, setShowActionItems] = useState(shouldShowActionItemsTab)
+
+  // Handle Action Items tab click
+  const handleActionItemsClick = () => {
+    setShowActionItems(true)
+  }
+
+  // Handle regular dashboard tab click
+  const handleDashboardTabClick = (dashboardId: string) => {
+    setShowActionItems(false)
+    onDashboardSelect?.(dashboardId)
+  }
   // Determine spacing based on layout density - consistent horizontal and vertical
   const getSpacingClass = () => {
     switch (layoutDensity) {
@@ -66,18 +89,33 @@ export function DashboardLayout({
       {isEditing && <div className="absolute inset-0 bg-primary/5 backdrop-blur-[0.5px] pointer-events-none" />}
 
       <div className="relative z-10">
-        {/* Dashboard Tabs - Show only for executive users */}
-        {userRole === "executive" && dashboards.length > 0 && (
+        {/* Dashboard Tabs - Show for all users */}
+        {(dashboards.length > 0 || shouldShowActionItemsTab) && (
           <div data-tour="dashboard-tabs" className="mb-6">
             <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
               <div className="mx-auto max-w-[1920px]">
                 <div className="flex items-center justify-start gap-1 border-b border-border pb-2">
+                  {/* Action Items Tab - Only for Project Executive and Project Manager */}
+                  {shouldShowActionItemsTab && (
+                    <button
+                      onClick={handleActionItemsClick}
+                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                        showActionItems
+                          ? "text-primary border-primary bg-primary/5"
+                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                      }`}
+                    >
+                      Action Items
+                    </button>
+                  )}
+
+                  {/* Regular Dashboard Tabs */}
                   {dashboards.map((dashboard) => (
                     <button
                       key={dashboard.id}
-                      onClick={() => onDashboardSelect?.(dashboard.id)}
+                      onClick={() => handleDashboardTabClick(dashboard.id)}
                       className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                        currentDashboardId === dashboard.id
+                        currentDashboardId === dashboard.id && !showActionItems
                           ? "text-primary border-primary bg-primary/5"
                           : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
                       }`}
@@ -91,34 +129,59 @@ export function DashboardLayout({
           </div>
         )}
 
-        {/* KPI Row with enhanced styling */}
-        <div data-tour="kpi-widgets" className="mb-6">
-          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
+        {/* Action Items Content */}
+        {showActionItems && shouldShowActionItemsTab && (
+          <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
             <div className="mx-auto max-w-[1920px]">
-              <KPIRow userRole={userRole} />
+              <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
+                {/* Accountability Feed - Narrower and taller */}
+                <div className="xl:col-span-2">
+                  <AccountabilityFeed userRole={userRole as "project-executive" | "project-manager"} />
+                </div>
+
+                {/* Action Items Sidebar - Wider */}
+                <div className="xl:col-span-3 space-y-6">
+                  <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
+                  <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Dashboard Content with better container */}
-        <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
-          <div className="mx-auto max-w-[1920px]">
-            <DashboardGrid
-              cards={cards}
-              onLayoutChange={onLayoutChange}
-              onCardRemove={onCardRemove}
-              onCardConfigure={onCardConfigure}
-              onCardSizeChange={onCardSizeChange}
-              onCardAdd={onCardAdd}
-              onSave={onSave}
-              onReset={onReset}
-              isEditing={isEditing}
-              isCompact={isCompact}
-              spacingClass={getSpacingClass()}
-              userRole={userRole}
-            />
-          </div>
-        </div>
+        {/* Regular Dashboard Content */}
+        {!showActionItems && (
+          <>
+            {/* KPI Row with enhanced styling */}
+            <div data-tour="kpi-widgets" className="mb-6">
+              <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
+                <div className="mx-auto max-w-[1920px]">
+                  <KPIRow userRole={userRole} />
+                </div>
+              </div>
+            </div>
+
+            {/* Dashboard Content with better container */}
+            <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
+              <div className="mx-auto max-w-[1920px]">
+                <DashboardGrid
+                  cards={cards}
+                  onLayoutChange={onLayoutChange}
+                  onCardRemove={onCardRemove}
+                  onCardConfigure={onCardConfigure}
+                  onCardSizeChange={onCardSizeChange}
+                  onCardAdd={onCardAdd}
+                  onSave={onSave}
+                  onReset={onReset}
+                  isEditing={isEditing}
+                  isCompact={isCompact}
+                  spacingClass={getSpacingClass()}
+                  userRole={userRole}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Enhanced Edit Mode Indicator */}

@@ -52,6 +52,7 @@ import {
 } from "lucide-react"
 import { AppHeader } from "@/components/layout/app-header"
 import { DashboardModuleNavigation } from "@/components/layout/DashboardModuleNavigation"
+import { DueThisWeekPanel } from "@/components/dashboard/DueThisWeekPanel"
 
 // Mock data imports for cards
 import projectsData from "@/data/mock/projects.json"
@@ -497,7 +498,15 @@ function DashboardContent({ user }: { user: any }) {
                   <LayoutDashboard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+                  <h1 className="text-3xl font-bold text-foreground">
+                    {user.role === "executive"
+                      ? "Executive Dashboard"
+                      : user.role === "project-executive"
+                      ? "PX Dashboard"
+                      : user.role === "project-manager"
+                      ? "PM Dashboard"
+                      : "Analytics Dashboard"}
+                  </h1>
                   <p className="text-muted-foreground mt-1">
                     {currentDashboard?.description || "Real-time insights and project management overview"}
                   </p>
@@ -682,44 +691,34 @@ function DashboardContent({ user }: { user: any }) {
               </div>
             </div>
 
-            {/* Module Navigation Row - Only show for non-executive users */}
-            {user.role !== "executive" && (
-              <div
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                data-tour="dashboard-module-navigation"
-              >
-                <DashboardModuleNavigation />
-
-                {/* Edit Mode Controls */}
-                {isEditing && (
-                  <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSave}
-                      className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                    >
-                      Save Changes
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleReset}
-                      className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
-                    >
-                      Reset to Default
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCardAdd}
-                      className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add Widget
-                    </Button>
-                  </div>
-                )}
+            {/* Edit Mode Controls */}
+            {isEditing && (
+              <div className="flex items-center gap-3" data-tour="dashboard-edit-controls">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSave}
+                  className="text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950"
+                >
+                  Reset to Default
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCardAdd}
+                  className="text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Widget
+                </Button>
               </div>
             )}
           </div>
@@ -732,6 +731,11 @@ function DashboardContent({ user }: { user: any }) {
             className={`hidden xl:block xl:col-span-3 space-y-4 ${isFullscreen ? "opacity-20" : ""}`}
             data-tour="dashboard-sidebar"
           >
+            {/* Due This Week Panel - Only for Project Executive and Project Manager */}
+            {(user.role === "project-executive" || user.role === "project-manager") && (
+              <DueThisWeekPanel userRole={user.role} className="mb-4" />
+            )}
+
             {/* Dashboard Overview */}
             <Card className="border-l-4 border-l-blue-500">
               <CardHeader className="pb-3">
