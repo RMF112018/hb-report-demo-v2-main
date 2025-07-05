@@ -33,7 +33,6 @@ import {
 } from "lucide-react"
 
 // Import the new components
-import { AccountabilityFeed } from "@/components/dashboard/AccountabilityFeed"
 import { ActionItemsInbox } from "@/components/dashboard/ActionItemsInbox"
 import { ActionItemsToDo } from "@/components/dashboard/ActionItemsToDo"
 
@@ -142,7 +141,7 @@ export default function ProjectExecutiveActionItemsPage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ */}
           <div className="hidden xl:block xl:col-span-3 space-y-4">
             {/* Executive Overview */}
-            <Card className="border-l-4 border-l-blue-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <LayoutDashboard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -170,7 +169,7 @@ export default function ProjectExecutiveActionItemsPage() {
             </Card>
 
             {/* Performance Metrics */}
-            <Card className="border-l-4 border-l-green-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -198,7 +197,7 @@ export default function ProjectExecutiveActionItemsPage() {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="border-l-4 border-l-purple-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -226,7 +225,7 @@ export default function ProjectExecutiveActionItemsPage() {
             </Card>
 
             {/* Recent Activity */}
-            <Card className="border-l-4 border-l-orange-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -263,11 +262,6 @@ export default function ProjectExecutiveActionItemsPage() {
           <div className="xl:col-span-9 space-y-6">
             {/* Action Items Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Accountability Feed - Takes up more space */}
-              <div className="lg:col-span-2">
-                <AccountabilityFeed userRole="project-executive" />
-              </div>
-
               {/* Inbox Card */}
               <div>
                 <ActionItemsInbox userRole="project-executive" />

@@ -5,7 +5,7 @@ import { DashboardGrid } from "./DashboardGrid"
 import { KPIRow } from "./KPIRow"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { AccountabilityFeed } from "./AccountabilityFeed"
+
 import { ActionItemsInbox } from "./ActionItemsInbox"
 import { ActionItemsToDo } from "./ActionItemsToDo"
 import { ProjectActivityFeed } from "../feed/ProjectActivityFeed"
@@ -162,15 +162,12 @@ export function DashboardLayout({
         {showActionItems && shouldShowActionItemsTab && (
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
             <div className="mx-auto max-w-[1920px]">
-              <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
-                {/* Accountability Feed - Narrower and taller */}
-                <div className="xl:col-span-2">
-                  <AccountabilityFeed userRole={userRole as "project-executive" | "project-manager"} />
-                </div>
-
-                {/* Action Items Sidebar - Wider */}
-                <div className="xl:col-span-3 space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                {/* Action Items - Full width layout */}
+                <div>
                   <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
+                </div>
+                <div>
                   <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
                 </div>
               </div>

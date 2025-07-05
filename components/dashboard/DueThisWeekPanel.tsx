@@ -195,7 +195,7 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
   }
 
   return (
-    <Card className={cn("border-l-4 border-l-orange-500", className)}>
+    <Card className={cn("border-l-4 border-l-[rgb(250,70,22)]", className)}>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">

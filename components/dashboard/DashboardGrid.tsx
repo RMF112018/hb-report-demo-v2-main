@@ -113,7 +113,6 @@ interface DashboardGridProps {
   onCardRemove?: (cardId: string) => void
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void
   onCardSizeChange?: (cardId: string, size: string) => void
-  onDrillDown?: (cardId: string, cardType: string) => void
   onCardAdd?: () => void
   onSave?: () => void
   onReset?: () => void
@@ -208,7 +207,6 @@ export function DashboardGrid({
   onCardRemove,
   onCardConfigure,
   onCardSizeChange,
-  onDrillDown,
   isEditing = false,
   isCompact = false,
   spacingClass = "gap-6",
@@ -487,7 +485,6 @@ export function DashboardGrid({
                 onCardRemove={onCardRemove}
                 onCardConfigure={onCardConfigure}
                 onCardSizeChange={onCardSizeChange}
-                onDrillDown={onDrillDown}
                 onCardFocus={handleCardFocus}
                 height={getCardHeight(card, isCompact)}
                 userRole={userRole}
@@ -525,7 +522,6 @@ interface SortableCardProps {
   onCardRemove?: (cardId: string) => void
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void
   onCardSizeChange?: (cardId: string, size: string) => void
-  onDrillDown?: (cardId: string, cardType: string) => void
   onCardFocus?: (card: DashboardCard) => void
   height: number | "auto"
   userRole?: string
@@ -538,7 +534,6 @@ function SortableCard({
   onCardRemove,
   onCardConfigure,
   onCardSizeChange,
-  onDrillDown,
   onCardFocus,
   height,
   userRole,
@@ -571,7 +566,6 @@ function SortableCard({
         onRemove={onCardRemove}
         onConfigure={onCardConfigure}
         onSizeChange={onCardSizeChange}
-        onDrillDown={onDrillDown}
         dragHandleClass="cursor-grab active:cursor-grabbing"
         isEditing={isEditing}
         isCompact={isCompact}

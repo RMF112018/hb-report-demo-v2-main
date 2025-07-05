@@ -165,12 +165,9 @@
   justify-content: space-between;
   padding: 1.25rem 1.5rem 1rem;
   border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-  background: rgba(248, 250, 252, 0.5);
-  backdrop-filter: blur(4px);
 }
 
 .dark .dashboard-card-header {
-  background: rgba(51, 65, 85, 0.3);
   border-bottom-color: rgba(51, 65, 85, 0.6);
 }
 

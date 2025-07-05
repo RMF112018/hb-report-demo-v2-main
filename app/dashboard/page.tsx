@@ -53,6 +53,7 @@ import {
 import { AppHeader } from "@/components/layout/app-header"
 import { DashboardModuleNavigation } from "@/components/layout/DashboardModuleNavigation"
 import { DueThisWeekPanel } from "@/components/dashboard/DueThisWeekPanel"
+import { ResponsibilityOverview } from "@/components/dashboard/ResponsibilityOverview"
 
 // Mock data imports for cards
 import projectsData from "@/data/mock/projects.json"
@@ -736,8 +737,13 @@ function DashboardContent({ user }: { user: any }) {
               <DueThisWeekPanel userRole={user.role} className="mb-4" />
             )}
 
+            {/* Responsibility Overview - Only for Project Executive and Project Manager */}
+            {(user.role === "project-executive" || user.role === "project-manager") && (
+              <ResponsibilityOverview className="mb-4" />
+            )}
+
             {/* Dashboard Overview */}
-            <Card className="border-l-4 border-l-blue-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -765,7 +771,7 @@ function DashboardContent({ user }: { user: any }) {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="border-l-4 border-l-green-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -813,7 +819,7 @@ function DashboardContent({ user }: { user: any }) {
             </Card>
 
             {/* Recently Accessed Projects */}
-            <Card className="border-l-4 border-l-orange-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <FolderOpen className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -860,7 +866,7 @@ function DashboardContent({ user }: { user: any }) {
             </Card>
 
             {/* Performance Metrics */}
-            <Card className="border-l-4 border-l-purple-500">
+            <Card className="border-l-4 border-l-[rgb(250,70,22)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />

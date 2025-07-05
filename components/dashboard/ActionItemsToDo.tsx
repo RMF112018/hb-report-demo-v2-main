@@ -176,7 +176,7 @@ export function ActionItemsToDo({ userRole, className }: ActionItemsToDoProps) {
   }
 
   return (
-    <Card className={cn("h-full", className)}>
+    <Card className={cn("h-full border-l-4 border-l-[rgb(0,33,165)]", className)}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">

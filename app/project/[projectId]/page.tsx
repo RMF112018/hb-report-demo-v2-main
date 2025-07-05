@@ -66,6 +66,8 @@ import staffingData from "@/data/mock/staffing/staffing.json"
 import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibraryViewer"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
+import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
 
 // Stage-Adaptive Components
 import { StageAdaptiveContent } from "@/components/project-stages/StageAdaptiveContent"
@@ -624,12 +626,23 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
             {/* Tab Navigation */}
             <div className="bg-card border border-border rounded-lg p-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList
+                  className={`grid w-full ${
+                    currentStage === "Construction"
+                      ? "grid-cols-7"
+                      : currentStage === "Closeout"
+                      ? "grid-cols-6"
+                      : "grid-cols-5"
+                  }`}
+                >
                   <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="schedule">Schedule</TabsTrigger>
-                  <TabsTrigger value="financial">Financial</TabsTrigger>
-                  <TabsTrigger value="team">Team</TabsTrigger>
                   <TabsTrigger value="documents">Documents</TabsTrigger>
+                  <TabsTrigger value="financial">Financial</TabsTrigger>
+                  <TabsTrigger value="schedule">Schedule</TabsTrigger>
+                  <TabsTrigger value="team">Team</TabsTrigger>
+                  {currentStage === "Construction" && <TabsTrigger value="startup">Start-Up</TabsTrigger>}
+                  {currentStage === "Construction" && <TabsTrigger value="closeout">Closeout</TabsTrigger>}
+                  {currentStage === "Closeout" && <TabsTrigger value="closeout">Closeout</TabsTrigger>}
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-4 mt-6">
@@ -709,6 +722,85 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                     </AlertDescription>
                   </Alert>
                 </TabsContent>
+
+                {currentStage === "Construction" && (
+                  <TabsContent value="startup" className="space-y-4 mt-6">
+                    <StartUpChecklist
+                      projectId={projectId.toString()}
+                      projectName={project.name}
+                      mode={userRole === "admin" || userRole === "project_manager" ? "editable" : "review"}
+                      onStatusChange={(sectionId, itemId, status) => {
+                        console.log(`Status changed for ${sectionId}-${itemId}: ${status}`)
+                      }}
+                    />
+                  </TabsContent>
+                )}
+
+                {currentStage === "Construction" && (
+                  <TabsContent value="closeout" className="space-y-4 mt-6">
+                    <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
+                          <span className="text-white text-xs font-bold">i</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-blue-900 dark:text-blue-100">
+                            Construction Phase Closeout Preparation
+                          </h4>
+                          <p className="text-sm text-blue-700 dark:text-blue-200 mt-1">
+                            Start preparing for project closeout during construction to ensure a smooth transition. Many
+                            closeout items can be initiated early to avoid delays.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <CloseoutChecklist
+                      projectId={projectId.toString()}
+                      mode={userRole === "admin" || userRole === "project_manager" ? "full" : "compact"}
+                      userRole={userRole === "admin" || userRole === "project_manager" ? "pm" : "viewer"}
+                      onStatusChange={(itemId, status) => {
+                        console.log(`Status changed for ${itemId}: ${status}`)
+                      }}
+                      onCommentAdd={(itemId, comment) => {
+                        console.log(`Comment added for ${itemId}: ${comment}`)
+                      }}
+                      onTaskGenerate={(itemId) => {
+                        console.log(`Task generated for ${itemId}`)
+                      }}
+                      onConstraintCreate={(itemId) => {
+                        console.log(`Constraint created for ${itemId}`)
+                      }}
+                      onNotificationSend={(itemId, type) => {
+                        console.log(`${type} notification sent for ${itemId}`)
+                      }}
+                    />
+                  </TabsContent>
+                )}
+
+                {currentStage === "Closeout" && (
+                  <TabsContent value="closeout" className="space-y-4 mt-6">
+                    <CloseoutChecklist
+                      projectId={projectId.toString()}
+                      mode={userRole === "admin" || userRole === "project_manager" ? "full" : "compact"}
+                      userRole={userRole === "admin" || userRole === "project_manager" ? "pm" : "viewer"}
+                      onStatusChange={(itemId, status) => {
+                        console.log(`Status changed for ${itemId}: ${status}`)
+                      }}
+                      onCommentAdd={(itemId, comment) => {
+                        console.log(`Comment added for ${itemId}: ${comment}`)
+                      }}
+                      onTaskGenerate={(itemId) => {
+                        console.log(`Task generated for ${itemId}`)
+                      }}
+                      onConstraintCreate={(itemId) => {
+                        console.log(`Constraint created for ${itemId}`)
+                      }}
+                      onNotificationSend={(itemId, type) => {
+                        console.log(`${type} notification sent for ${itemId}`)
+                      }}
+                    />
+                  </TabsContent>
+                )}
 
                 <TabsContent value="schedule" className="space-y-4 mt-6">
                   <div>
