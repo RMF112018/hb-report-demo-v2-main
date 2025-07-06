@@ -1,0 +1,160 @@
+{
+  "id": "executive-layout",
+  "name": "Executive Dashboard",
+  "description": "Optimized portfolio health and financial overview with maximized grid utilization",
+  "role": "executive",
+  "cards": [
+    {
+      "id": "financial-review-panel",
+      "type": "financial-review-panel",
+      "title": "Financial Review Panel",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 16, "rows": 5 },
+      "visible": true,
+      "config": {
+        "panelProps": {
+          "executiveMode": true,
+          "scope": "company-wide",
+          "layout": "executive-optimized"
+        }
+      }
+    },
+    {
+      "id": "enhanced-hbi-insights",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Portfolio Insights",
+      "size": "optimal",
+      "position": { "x": 0, "y": 5 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "projectCount": 12,
+        "scope": "company-wide",
+        "maxVisibleInsights": 4,
+        "compactMode": true
+      }
+    },
+    {
+      "id": "portfolio-overview",
+      "type": "portfolio-overview",
+      "title": "Portfolio Overview",
+      "size": "optimal",
+      "position": { "x": 8, "y": 5 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showCharts": true,
+        "compactMetrics": true
+      }
+    },
+    {
+      "id": "pipeline-analytics",
+      "type": "pipeline-analytics",
+      "title": "Pipeline Analytics",
+      "size": "optimal",
+      "position": { "x": 0, "y": 9 },
+      "span": { "cols": 10, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrends": true,
+        "showConversionRate": true,
+        "detailLevel": "executive",
+        "compactMode": true
+      }
+    },
+    {
+      "id": "market-intelligence",
+      "type": "market-intelligence",
+      "title": "Market Intelligence",
+      "size": "optimal",
+      "position": { "x": 10, "y": 9 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrends": true,
+        "showCompetitiveAnalysis": true,
+        "detailLevel": "executive",
+        "compactMode": true
+      }
+    },
+    {
+      "id": "staffing-distribution",
+      "type": "staffing-distribution",
+      "title": "Staffing Distribution",
+      "size": "optimal",
+      "position": { "x": 0, "y": 13 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "compactCharts": true,
+        "focusMetrics": ["utilization", "experience", "spcr"]
+      }
+    },
+    {
+      "id": "company-quality-control",
+      "type": "quality-control",
+      "title": "Quality Control",
+      "size": "optimal",
+      "position": { "x": 8, "y": 13 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectFilter": "all",
+        "projectCount": 12,
+        "scope": "company-wide",
+        "executiveMode": true,
+        "compactMode": true
+      }
+    },
+    {
+      "id": "company-safety-management",
+      "type": "safety",
+      "title": "Safety Management",
+      "size": "optimal",
+      "position": { "x": 12, "y": 13 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectFilter": "all",
+        "projectCount": 12,
+        "scope": "company-wide",
+        "executiveMode": true,
+        "compactMode": true
+      }
+    },
+    {
+      "id": "executive-kpi-summary",
+      "type": "portfolio-overview",
+      "title": "Executive KPI Summary",
+      "size": "optimal",
+      "position": { "x": 0, "y": 17 },
+      "span": { "cols": 8, "rows": 3 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "kpiOnly": true,
+        "showTrends": true,
+        "compactMode": true
+      }
+    },
+    {
+      "id": "cash-flow-summary",
+      "type": "cash-flow",
+      "title": "Cash Flow Summary",
+      "size": "optimal",
+      "position": { "x": 8, "y": 17 },
+      "span": { "cols": 8, "rows": 3 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showTrends": true,
+        "compactMode": true,
+        "timeframe": "quarterly"
+      }
+    }
+  ]
+}

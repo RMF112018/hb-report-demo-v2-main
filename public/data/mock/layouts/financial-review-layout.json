@@ -1,0 +1,119 @@
+{
+  "id": "financial-review",
+  "name": "Financial Review",
+  "description": "Optimized financial analysis dashboard with maximized grid utilization",
+  "cards": [
+    {
+      "id": "enhanced-hbi-insights-financial",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Financial Insights",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "financialMode": true,
+        "focusArea": "financial-forecasting",
+        "executiveMode": true
+      }
+    },
+    {
+      "id": "project-overview-1",
+      "type": "project-overview",
+      "title": "Portfolio Overview",
+      "size": "optimal",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "financialMode": true,
+        "compactView": true
+      }
+    },
+    {
+      "id": "schedule-performance-1",
+      "type": "schedule-performance",
+      "title": "Schedule Performance",
+      "size": "optimal",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "compactMode": true
+      }
+    },
+    {
+      "id": "financial-status-1",
+      "type": "financial-status",
+      "title": "Financial Status",
+      "size": "optimal",
+      "position": { "x": 0, "y": 10 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "detailedView": true
+      }
+    },
+    {
+      "id": "general-conditions-1",
+      "type": "general-conditions",
+      "title": "General Conditions",
+      "size": "optimal",
+      "position": { "x": 8, "y": 6 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "compactMode": true
+      }
+    },
+    {
+      "id": "contingency-analysis-1",
+      "type": "contingency-analysis",
+      "title": "Contingency Analysis",
+      "size": "optimal",
+      "position": { "x": 8, "y": 11 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "detailedAnalysis": true
+      }
+    },
+    {
+      "id": "cash-flow-1",
+      "type": "cash-flow",
+      "title": "Cash Flow Analysis",
+      "size": "optimal",
+      "position": { "x": 0, "y": 14 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "detailedTrends": true,
+        "timeframe": "monthly"
+      }
+    },
+    {
+      "id": "procurement-1",
+      "type": "procurement",
+      "title": "Procurement Management",
+      "size": "optimal",
+      "position": { "x": 8, "y": 16 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "compactMode": true
+      }
+    },
+    {
+      "id": "draw-forecast-1",
+      "type": "draw-forecast",
+      "title": "Draw Forecast",
+      "size": "optimal",
+      "position": { "x": 0, "y": 19 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "forecastPeriod": "quarterly"
+      }
+    }
+  ]
+}

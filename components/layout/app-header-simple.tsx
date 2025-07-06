@@ -311,7 +311,7 @@ export const AppHeaderSimple = () => {
     <>
       <header
         ref={headerRef}
-        className="sticky top-0 z-[100] flex h-20 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-[#1e3a8a] to-[#2a5298] px-8 shadow-lg backdrop-blur-sm"
+        className="sticky top-0 z-[100] flex h-14 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-[#1e3a8a] to-[#2a5298] px-6 shadow-lg backdrop-blur-sm"
         data-tour="app-header"
       >
         {/* Left Section - Logo and Navigation */}
@@ -326,7 +326,7 @@ export const AppHeaderSimple = () => {
                 >
                   <img src="/images/hb_logo_white.png" alt="HB Logo" className="h-10 w-auto object-contain" />
                   <div className="flex flex-col">
-                    <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
+                    <span className="text-lg font-bold text-white leading-tight">HB Intel</span>
                     <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
                   </div>
                 </div>

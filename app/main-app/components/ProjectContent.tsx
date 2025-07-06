@@ -96,7 +96,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({ projectId, proje
         {/* Custom content without duplicating headers/sidebars */}
         <div className="h-full">
           {/* Project Content */}
-          <div className="h-full p-6">
+          <div className="h-full">
             <ProjectPageContent
               projectId={projectId}
               userRole={userRole}

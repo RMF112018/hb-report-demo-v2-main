@@ -134,28 +134,28 @@ export function ActionItemsInbox({ userRole, className }: ActionItemsInboxProps)
       </CardHeader>
       <CardContent className="!p-0">
         {/* Statistics Banner */}
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b">
-          <div className="grid grid-cols-3 gap-4 text-center">
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b">
+          <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+              <div className="text-xl font-semibold text-blue-600">{stats.total}</div>
               <div className="text-xs text-muted-foreground">Total Messages</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-orange-600">{stats.unread}</div>
+              <div className="text-xl font-semibold text-orange-600">{stats.unread}</div>
               <div className="text-xs text-muted-foreground">Unread</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-red-600">{stats.highPriority}</div>
+              <div className="text-xl font-semibold text-red-600">{stats.highPriority}</div>
               <div className="text-xs text-muted-foreground">High Priority</div>
             </div>
           </div>
         </div>
 
         {/* Messages List */}
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-72 overflow-y-auto">
           {mockInboxData.length === 0 ? (
-            <div className="px-6 py-8 text-center text-muted-foreground">
-              <Inbox className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <div className="px-4 py-6 text-center text-muted-foreground">
+              <Inbox className="h-10 w-10 mx-auto mb-3 text-gray-400" />
               <p className="text-sm">No messages in your inbox</p>
               <p className="text-xs mt-1">New messages will appear here</p>
             </div>
@@ -165,7 +165,7 @@ export function ActionItemsInbox({ userRole, className }: ActionItemsInboxProps)
                 <div
                   key={message.id}
                   className={cn(
-                    "px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors cursor-pointer",
+                    "px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors cursor-pointer",
                     message.unread && "bg-blue-50/30 dark:bg-blue-950/10"
                   )}
                 >
@@ -211,11 +211,11 @@ export function ActionItemsInbox({ userRole, className }: ActionItemsInboxProps)
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50 dark:bg-gray-800/30">
+        <div className="px-4 py-3 border-t bg-gray-50 dark:bg-gray-800/30">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">Productivity Tool Integration</div>
-            <Button variant="outline" size="sm">
-              <ExternalLink className="h-4 w-4 mr-2" />
+            <div className="text-xs text-muted-foreground">Productivity Tool Integration</div>
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              <ExternalLink className="h-3 w-3 mr-1.5" />
               View All
             </Button>
           </div>

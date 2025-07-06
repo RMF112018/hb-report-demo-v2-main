@@ -78,6 +78,7 @@ import { SubmittalCard } from "@/components/cards/SubmittalCard"
 import { HealthCard } from "@/components/cards/HealthCard"
 import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
+import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
 
 // IT Command Center placeholder cards
 import {
@@ -174,8 +175,8 @@ const getCardGridArea = (card: DashboardCard) => {
 
 // Get card height based on content and span
 const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto" => {
-  // For pipeline-analytics, use content-driven height
-  if (card.type === "pipeline-analytics") {
+  // For pipeline-analytics and financial-dashboard, use content-driven height
+  if (card.type === "pipeline-analytics" || card.type === "financial-dashboard") {
     return "auto"
   }
 
@@ -681,6 +682,14 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
       return <ConsultantDashboardCard {...commonProps} />
     case "hb-intel-management":
       return <HbIntelManagementCard {...commonProps} />
+    case "financial-dashboard":
+      return (
+        <FinancialDashboard
+          projectId={card.config?.projectId || "2525840"}
+          projectData={card.config?.projectData || {}}
+          userRole={userRole || ""}
+        />
+      )
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -698,6 +707,8 @@ const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
       return { cols: 16, rows: 6 }
+    case "financial-dashboard":
+      return { cols: 16, rows: 20 }
     case "enhanced-hbi-insights":
       return { cols: 8, rows: 5 }
     case "portfolio-overview":

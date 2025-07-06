@@ -1,19 +1,34 @@
 /**
- * @fileoverview Project Sidebar Component
+ * @fileoverview Enhanced Project Sidebar Component
  * @module ProjectSidebar
- * @version 1.0.0
+ * @version 2.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Sidebar navigation with project tree menu organized by stage
+ * Enhanced sidebar navigation integrating header functionality with project tree menu
  */
 
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
 import { Input } from "../../../components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
+import { useAuth } from "../../../context/auth-context"
+import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
+import { useToast } from "../../../components/ui/use-toast"
+import { ProductivityPopover } from "../../../components/layout/ProductivityPopover"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu"
 import {
   Building,
   ChevronDown,
@@ -24,6 +39,12 @@ import {
   FolderOpen,
   PanelLeftClose,
   PanelLeftOpen,
+  Moon,
+  Sun,
+  User,
+  Settings,
+  LogOut,
+  ChevronUp,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
 
@@ -65,8 +86,68 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onToggleCollapsed,
   userRole,
 }) => {
+  const { user, logout } = useAuth()
+  const { theme, setTheme } = useTheme()
+  const router = useRouter()
+  const { toast } = useToast()
+
   const [searchQuery, setSearchQuery] = useState("")
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["Construction", "Pre-Construction"]))
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [notifications] = useState(3)
+
+  // Refs for click outside detection
+  const userMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Helper function to determine the dashboard path based on user role
+  const getDashboardPath = useCallback(() => {
+    // All users go to the main app now
+    return "/main-app"
+  }, [])
+
+  // Utility functions
+  const getUserInitials = useCallback(() => {
+    if (!user) return "U"
+    return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+  }, [user])
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push("/login")
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      })
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast({
+        title: "Error signing out",
+        description: "There was a problem logging out. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (showUserMenu && userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setShowUserMenu(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [showUserMenu])
 
   // Get project status color
   const getProjectStatusColor = (project: ProjectData) => {
@@ -119,37 +200,19 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     return stages
   }, [projects, searchQuery])
 
-  // Role-based stage visibility
-  const getVisibleStages = () => {
-    switch (userRole) {
-      case "estimator":
-        return ["Pre-Construction", "BIM Coordination", "Bidding"]
-      case "executive":
-      case "project-executive":
-      case "admin":
-        return Array.from(projectsByStage.keys())
-      case "project-manager":
-        return ["Construction", "Closeout", "Warranty", "Pre-Construction", "BIM Coordination"]
-      default:
-        return ["Construction", "Closeout", "Warranty"]
-    }
-  }
-
-  const visibleStages = getVisibleStages()
-  const filteredStages = Array.from(projectsByStage.entries())
-    .filter(([stage]) => visibleStages.includes(stage))
-    .sort(([a], [b]) => {
-      const stageOrder = [
-        "Pre-Construction",
-        "BIM Coordination",
-        "Bidding",
-        "Construction",
-        "Closeout",
-        "Warranty",
-        "Closed",
-      ]
-      return stageOrder.indexOf(a) - stageOrder.indexOf(b)
-    })
+  // Sort stages by logical order (projects are already filtered by role at parent level)
+  const sortedStages = Array.from(projectsByStage.entries()).sort(([a], [b]) => {
+    const stageOrder = [
+      "Pre-Construction",
+      "BIM Coordination",
+      "Bidding",
+      "Construction",
+      "Closeout",
+      "Warranty",
+      "Closed",
+    ]
+    return stageOrder.indexOf(a) - stageOrder.indexOf(b)
+  })
 
   const toggleStageExpansion = (stage: string) => {
     const newExpanded = new Set(expandedStages)
@@ -163,74 +226,279 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
   if (collapsed) {
     return (
-      <aside className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-16 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-20 transition-all duration-300 ease-in-out">
-        <div className="p-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleCollapsed}
-            className="w-full h-10 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            title="Expand sidebar"
-          >
-            <PanelLeftOpen className="h-4 w-4" />
-          </Button>
-        </div>
+      <aside className="fixed left-0 top-0 h-screen w-16 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-20 transition-all duration-300 ease-in-out">
+        <div className="flex flex-col h-full">
+          {/* Logo Section - Collapsed */}
+          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push(getDashboardPath())}
+                    className="w-full h-10 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    title="HB Intel Dashboard"
+                  >
+                    <img src="/images/hb_logo.jpg" alt="HB Logo" className="h-6 w-6 object-contain rounded" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>HB Intel Dashboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
 
-        <div className="px-2 space-y-1">
-          <Button
-            variant={selectedProject === null ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onProjectSelect(null)}
-            className="w-full h-10 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            title="Dashboard"
-          >
-            <Home className="h-4 w-4" />
-          </Button>
+          {/* Navigation Controls - Collapsed */}
+          <div className="p-2 space-y-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onToggleCollapsed}
+                    className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    title="Expand sidebar"
+                  >
+                    <PanelLeftOpen className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Expand sidebar</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-          {filteredStages.slice(0, 3).map(([stage, stageProjects]) => (
-            <Button
-              key={stage}
-              variant="ghost"
-              size="sm"
-              className="w-full h-10 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-              title={`${stage} (${stageProjects.length} projects)`}
-              onClick={() => {
-                onToggleCollapsed()
-                toggleStageExpansion(stage)
-              }}
-            >
-              <Folder className="h-4 w-4" />
-            </Button>
-          ))}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={selectedProject === null ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => onProjectSelect(null)}
+                    className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    title="Dashboard"
+                  >
+                    <Home className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Dashboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Theme Toggle - Collapsed */}
+            {mounted && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                      title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                    >
+                      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Toggle theme</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+            {/* Productivity Popover - Collapsed */}
+            <div className="relative">
+              <ProductivityPopover
+                notifications={notifications}
+                className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
+              />
+            </div>
+          </div>
+
+          {/* Project Folders - Collapsed */}
+          <div className="px-2 space-y-1">
+            {sortedStages.slice(0, 3).map(([stage, stageProjects]) => (
+              <TooltipProvider key={stage}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                      title={`${stage} (${stageProjects.length} projects)`}
+                      onClick={() => {
+                        onToggleCollapsed()
+                        toggleStageExpansion(stage)
+                      }}
+                    >
+                      <Folder className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>
+                      {stage} ({stageProjects.length} projects)
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </div>
+
+          {/* User Avatar - Collapsed */}
+          <div className="mt-auto p-2 border-t border-gray-200 dark:border-gray-700">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onToggleCollapsed}
+                    className="w-full h-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    title="Expand for user menu"
+                  >
+                    <Avatar className="h-4 w-4">
+                      <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                      <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>User menu</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
       </aside>
     )
   }
 
   return (
-    <aside className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-20 transition-all duration-300 ease-in-out shadow-lg md:shadow-none">
+    <aside className="fixed left-0 top-0 h-screen w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-20 transition-all duration-300 ease-in-out shadow-lg md:shadow-none">
       <div className="flex flex-col h-full">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleCollapsed}
-            className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            title="Collapse sidebar"
-          >
-            <PanelLeftClose className="h-4 w-4" />
-          </Button>
+        {/* Header with Logo, Title, and Controls */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            {/* Logo and Title */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                    onClick={() => router.push(getDashboardPath())}
+                  >
+                    <img src="/images/hb_logo.jpg" alt="HB Logo" className="h-8 w-8 object-contain rounded" />
+                    <div className="flex flex-col">
+                      <span className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">HB Intel</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        Construction Intelligence
+                      </span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Return to Dashboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Collapse Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapsed}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              title="Collapse sidebar"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Action Icons Row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1">
+              {/* Theme Toggle */}
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                  aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                >
+                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+              )}
+
+              {/* Productivity Popover */}
+              <ProductivityPopover
+                notifications={notifications}
+                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
+              />
+            </div>
+
+            {/* User Menu */}
+            <DropdownMenu open={showUserMenu} onOpenChange={setShowUserMenu}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="h-5 w-5">
+                      <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                      <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className="h-3 w-3" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.firstName} {user?.lastName}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Dashboard Button */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <Button
             variant={selectedProject === null ? "default" : "ghost"}
             size="sm"
             onClick={() => onProjectSelect(null)}
-            className="w-full justify-start"
+            className="w-full justify-start h-8"
           >
             <Home className="h-4 w-4 mr-3" />
             Dashboard
@@ -238,29 +506,34 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-8"
             />
           </div>
         </div>
 
+        {/* Projects Header */}
+        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Projects</h2>
+        </div>
+
         {/* Project Tree */}
         <div className="flex-1 overflow-y-auto p-2">
-          <div className="space-y-1">
-            {filteredStages.map(([stage, stageProjects]) => (
+          <div className="space-y-0.5">
+            {sortedStages.map(([stage, stageProjects]) => (
               <div key={stage}>
                 {/* Stage Header */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => toggleStageExpansion(stage)}
-                  className="w-full justify-start px-2 py-1.5 h-auto font-medium text-gray-700 dark:text-gray-300"
+                  className="w-full justify-start px-2 py-1 h-auto font-medium text-gray-700 dark:text-gray-300"
                 >
                   {expandedStages.has(stage) ? (
                     <ChevronDown className="h-4 w-4 mr-2" />
@@ -280,14 +553,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                 {/* Stage Projects */}
                 {expandedStages.has(stage) && (
-                  <div className="ml-4 space-y-1">
+                  <div className="ml-4 space-y-0.5">
                     {stageProjects.map((project) => (
                       <Button
                         key={project.id}
                         variant={selectedProject === project.id ? "default" : "ghost"}
                         size="sm"
                         onClick={() => onProjectSelect(project.id)}
-                        className="w-full justify-start px-3 py-2 h-auto text-left"
+                        className="w-full justify-start px-3 py-1.5 h-auto text-left"
                       >
                         <Building className="h-4 w-4 mr-3 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -307,9 +580,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         </div>
 
         {/* Footer Info */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-3 border-t border-gray-200 dark:border-gray-700">
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            {filteredStages.reduce((acc, [, projects]) => acc + projects.length, 0)} projects
+            {sortedStages.reduce((acc, [, projects]) => acc + projects.length, 0)} projects
             {searchQuery && " (filtered)"}
           </div>
         </div>

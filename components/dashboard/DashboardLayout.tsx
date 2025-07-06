@@ -88,11 +88,11 @@ export function DashboardLayout({
   const getSpacingClass = () => {
     switch (layoutDensity) {
       case "compact":
-        return "gap-3 sm:gap-3 lg:gap-4"
+        return "gap-2 sm:gap-2 lg:gap-3"
       case "spacious":
-        return "gap-6 sm:gap-6 lg:gap-8"
+        return "gap-4 sm:gap-4 lg:gap-5"
       default:
-        return "gap-4 sm:gap-4 lg:gap-6"
+        return "gap-3 sm:gap-3 lg:gap-4"
     }
   }
 
@@ -106,18 +106,18 @@ export function DashboardLayout({
       <div className="relative z-10">
         {/* Dashboard Tabs - Show for all users */}
         {(dashboards.length > 0 || shouldShowActionItemsTab || shouldShowActivityFeedTab) && (
-          <div data-tour="dashboard-tabs" className="mb-6">
+          <div data-tour="dashboard-tabs" className="mb-4">
             <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
               <div className="mx-auto max-w-[1920px]">
-                <div className="flex items-center justify-start gap-1 border-b border-border pb-2">
+                <div className="flex items-center justify-start gap-0.5 border-b border-gray-200 dark:border-gray-700 pb-1.5">
                   {/* Action Items Tab - Only for Project Executive and Project Manager */}
                   {shouldShowActionItemsTab && (
                     <button
                       onClick={handleActionItemsClick}
-                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
                         showActionItems
-                          ? "text-primary border-primary bg-primary/5"
-                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                          ? "text-primary border-primary bg-primary/10"
+                          : "text-gray-600 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600"
                       }`}
                     >
                       Action Items
@@ -129,10 +129,10 @@ export function DashboardLayout({
                     <button
                       key={dashboard.id}
                       onClick={() => handleDashboardTabClick(dashboard.id)}
-                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
                         currentDashboardId === dashboard.id && !showActionItems && !showActivityFeed
-                          ? "text-primary border-primary bg-primary/5"
-                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                          ? "text-primary border-primary bg-primary/10"
+                          : "text-gray-600 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600"
                       }`}
                     >
                       {dashboard.name}
@@ -143,10 +143,10 @@ export function DashboardLayout({
                   {shouldShowActivityFeedTab && (
                     <button
                       onClick={handleActivityFeedClick}
-                      className={`px-3 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
                         showActivityFeed
-                          ? "text-primary border-primary bg-primary/5"
-                          : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                          ? "text-primary border-primary bg-primary/10"
+                          : "text-gray-600 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600"
                       }`}
                     >
                       Activity Feed
@@ -162,7 +162,7 @@ export function DashboardLayout({
         {showActionItems && shouldShowActionItemsTab && (
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pb-0">
             <div className="mx-auto max-w-[1920px]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 {/* Action Items - Full width layout */}
                 <div>
                   <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
@@ -196,7 +196,7 @@ export function DashboardLayout({
         {!showActionItems && !showActivityFeed && (
           <>
             {/* KPI Row with enhanced styling */}
-            <div data-tour="kpi-widgets" className="mb-6">
+            <div data-tour="kpi-widgets" className="mb-4">
               <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
                 <div className="mx-auto max-w-[1920px]">
                   <KPIRow userRole={userRole} />
@@ -230,11 +230,11 @@ export function DashboardLayout({
       {/* Enhanced Edit Mode Indicator */}
       {isEditing && (
         <div className="fixed bottom-4 right-4 z-50">
-          <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-primary/20 text-sm font-medium">
+          <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-lg border border-primary/20 text-xs font-medium">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-pulse"></div>
-              <span className="hidden sm:inline">Edit Mode Active</span>
-              <span className="sm:hidden">Editing</span>
+              <div className="w-1.5 h-1.5 bg-primary-foreground/80 rounded-full animate-pulse"></div>
+              <span className="hidden sm:inline">Edit Mode</span>
+              <span className="sm:hidden">Edit</span>
             </div>
           </div>
         </div>

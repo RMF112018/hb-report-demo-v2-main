@@ -9,9 +9,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { TourModal } from "@/components/ui/TourModal"
 import { TakeTourButton } from "@/components/TakeTourButton"
-import { AppHeader } from '@/components/layout/app-header'
-import { AppLayoutShell } from '@/components/layout/AppLayoutShell'
-import { ErrorBoundary } from '@/components/ui/error-boundary'
+import { AppLayoutShell } from "@/components/layout/AppLayoutShell"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -56,15 +55,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body className="bg-white dark:bg-gray-950 text-foreground">
         <ErrorBoundary>
           <AuthProvider>
             <TourProvider>
               <ProjectProvider>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                  <AppLayoutShell showHeader={false}>
-                    {children}
-                  </AppLayoutShell>
+                  <AppLayoutShell showHeader={false}>{children}</AppLayoutShell>
                   <TourModal />
                   <TakeTourButton />
                   <Toaster />

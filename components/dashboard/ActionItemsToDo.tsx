@@ -195,32 +195,32 @@ export function ActionItemsToDo({ userRole, className }: ActionItemsToDoProps) {
       </CardHeader>
       <CardContent className="!p-0">
         {/* Statistics Banner */}
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b">
-          <div className="grid grid-cols-4 gap-4 text-center">
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b">
+          <div className="grid grid-cols-4 gap-3 text-center">
             <div>
-              <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+              <div className="text-xl font-semibold text-blue-600">{stats.total}</div>
               <div className="text-xs text-muted-foreground">Total Tasks</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+              <div className="text-xl font-semibold text-orange-600">{stats.pending}</div>
               <div className="text-xs text-muted-foreground">Pending</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+              <div className="text-xl font-semibold text-green-600">{stats.completed}</div>
               <div className="text-xs text-muted-foreground">Completed</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
+              <div className="text-xl font-semibold text-red-600">{stats.overdue}</div>
               <div className="text-xs text-muted-foreground">Overdue</div>
             </div>
           </div>
         </div>
 
         {/* Tasks List */}
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-72 overflow-y-auto">
           {mockToDoData.length === 0 ? (
-            <div className="px-6 py-8 text-center text-muted-foreground">
-              <CheckSquare className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <div className="px-4 py-6 text-center text-muted-foreground">
+              <CheckSquare className="h-10 w-10 mx-auto mb-3 text-gray-400" />
               <p className="text-sm">No tasks assigned</p>
               <p className="text-xs mt-1">New tasks will appear here</p>
             </div>
@@ -230,7 +230,7 @@ export function ActionItemsToDo({ userRole, className }: ActionItemsToDoProps) {
                 <div
                   key={task.id}
                   className={cn(
-                    "px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors cursor-pointer",
+                    "px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors cursor-pointer",
                     task.completed && "opacity-60"
                   )}
                 >
@@ -292,11 +292,11 @@ export function ActionItemsToDo({ userRole, className }: ActionItemsToDoProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50 dark:bg-gray-800/30">
+        <div className="px-4 py-3 border-t bg-gray-50 dark:bg-gray-800/30">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">Productivity Tool Integration</div>
-            <Button variant="outline" size="sm">
-              <ExternalLink className="h-4 w-4 mr-2" />
+            <div className="text-xs text-muted-foreground">Productivity Tool Integration</div>
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              <ExternalLink className="h-3 w-3 mr-1.5" />
               View All
             </Button>
           </div>

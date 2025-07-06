@@ -1,0 +1,116 @@
+{
+  "id": "it-layout",
+  "name": "IT Command Center",
+  "description": "Optimized IT layout for system monitoring and infrastructure management",
+  "role": "admin",
+  "cards": [
+    {
+      "id": "hb-intel-management",
+      "type": "hb-intel-management",
+      "title": "HB Intel Management",
+      "size": "large",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true
+    },
+    {
+      "id": "infrastructure-monitor",
+      "type": "infrastructure-monitor",
+      "title": "Infrastructure Monitor",
+      "size": "large",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true
+    },
+    {
+      "id": "user-access-summary",
+      "type": "user-access-summary",
+      "title": "User Access Summary",
+      "size": "medium",
+      "position": { "x": 0, "y": 4 },
+      "span": { "cols": 5, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "siem-log-overview",
+      "type": "siem-log-overview",
+      "title": "SIEM & Event Monitor",
+      "size": "medium",
+      "position": { "x": 5, "y": 4 },
+      "span": { "cols": 6, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "endpoint-health",
+      "type": "endpoint-health",
+      "title": "Endpoint Health",
+      "size": "medium",
+      "position": { "x": 11, "y": 4 },
+      "span": { "cols": 5, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "system-logs",
+      "type": "system-logs",
+      "title": "System Logs",
+      "size": "medium",
+      "position": { "x": 0, "y": 7 },
+      "span": { "cols": 5, "rows": 4 },
+      "visible": true
+    },
+    {
+      "id": "email-security-health",
+      "type": "email-security-health",
+      "title": "Email Security Health",
+      "size": "medium",
+      "position": { "x": 5, "y": 7 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true
+    },
+    {
+      "id": "backup-restore-status",
+      "type": "backup-restore-status",
+      "title": "Backup & DR Status",
+      "size": "medium",
+      "position": { "x": 11, "y": 7 },
+      "span": { "cols": 5, "rows": 4 },
+      "visible": true
+    },
+    {
+      "id": "asset-tracker",
+      "type": "asset-tracker",
+      "title": "Asset & License Tracker",
+      "size": "wide",
+      "position": { "x": 0, "y": 11 },
+      "span": { "cols": 7, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "ai-pipeline-status",
+      "type": "ai-pipeline-status",
+      "title": "AI Pipeline Status",
+      "size": "medium",
+      "position": { "x": 7, "y": 11 },
+      "span": { "cols": 4, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "consultant-dashboard",
+      "type": "consultant-dashboard",
+      "title": "Consultant Dashboard",
+      "size": "medium",
+      "position": { "x": 11, "y": 11 },
+      "span": { "cols": 5, "rows": 3 },
+      "visible": true
+    },
+    {
+      "id": "change-governance-panel",
+      "type": "change-governance-panel",
+      "title": "Change Management & Governance",
+      "size": "extra-wide",
+      "position": { "x": 0, "y": 14 },
+      "span": { "cols": 16, "rows": 3 },
+      "visible": true
+    }
+  ]
+}

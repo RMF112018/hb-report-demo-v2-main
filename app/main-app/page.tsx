@@ -1,13 +1,13 @@
 /**
  * @fileoverview Main Application Layout Page
  * @module MainApplicationPage
- * @version 1.0.0
+ * @version 2.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
  * Primary application layout supporting all user roles with:
  * - Role-based dashboard content
- * - Project navigation sidebar
+ * - Enhanced project navigation sidebar with integrated header functionality
  * - Dynamic content rendering
  */
 
@@ -15,7 +15,6 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useAuth } from "../../context/auth-context"
-import { AppHeaderSimple } from "../../components/layout/app-header-simple"
 import { ProjectSidebar } from "./components/ProjectSidebar"
 import { RoleDashboard } from "./components/RoleDashboard"
 import { ProjectContent } from "./components/ProjectContent"
@@ -24,6 +23,7 @@ import { PanelLeftOpen } from "lucide-react"
 
 // Mock data imports
 import projectsData from "../../data/mock/projects.json"
+import { filterProjectsByRole, getProjectStats } from "../../lib/project-access-utils"
 import type { UserRole } from "../project/[projectId]/types/project"
 
 /**
@@ -77,20 +77,29 @@ export default function MainApplicationPage() {
 
   // Determine user role
   const userRole = useMemo((): UserRole => {
-    if (!user?.email) return "viewer"
+    if (!user?.role) return "viewer"
 
-    if (user.email.includes("pm@") || user.email.includes("manager@")) return "project-manager"
-    if (user.email.includes("super@") || user.email.includes("field@")) return "superintendent"
-    if (user.email.includes("exec@") || user.email.includes("executive@")) return "executive"
-    if (user.email.includes("estimator@")) return "estimator"
-    if (user.email.includes("admin@")) return "admin"
-
-    return "team-member"
+    // Use the role field directly from the user object
+    switch (user.role) {
+      case "executive":
+        return "executive"
+      case "project-executive":
+        return "project-executive"
+      case "project-manager":
+        return "project-manager"
+      case "estimator":
+        return "estimator"
+      case "admin":
+        return "admin"
+      default:
+        return "team-member"
+    }
   }, [user])
 
-  // Transform project data
+  // Transform and filter project data based on user role
   const projects = useMemo(() => {
-    return projectsData.map((project: any) => ({
+    // First, transform all projects
+    const allProjects = projectsData.map((project: any) => ({
       id: project.project_id.toString(),
       name: project.name,
       description: project.description || "",
@@ -110,7 +119,10 @@ export default function MainApplicationPage() {
         originalData: project,
       },
     }))
-  }, [])
+
+    // Then filter based on user role
+    return filterProjectsByRole(allProjects, userRole)
+  }, [userRole])
 
   // Handle project selection
   const handleProjectSelect = (projectId: string | null) => {
@@ -156,12 +168,9 @@ export default function MainApplicationPage() {
   const selectedProjectData = selectedProject ? projects.find((p) => p.id === selectedProject) : null
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* App Header */}
-      <AppHeaderSimple />
-
-      <div className="flex h-[calc(100vh-5rem)]">
-        {/* Project Sidebar - Fixed positioned */}
+    <div className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="flex h-screen">
+        {/* Enhanced Project Sidebar with integrated header functionality */}
         <ProjectSidebar
           projects={projects}
           selectedProject={selectedProject}
@@ -184,7 +193,7 @@ export default function MainApplicationPage() {
         >
           {/* Mobile sidebar toggle button - visible when collapsed on mobile */}
           {isMobile && sidebarCollapsed && (
-            <div className="fixed top-24 left-4 z-30 md:hidden">
+            <div className="fixed top-4 left-4 z-30 md:hidden">
               <Button
                 variant="outline"
                 size="sm"
@@ -197,8 +206,8 @@ export default function MainApplicationPage() {
             </div>
           )}
 
-          {/* Content Area */}
-          <div className="h-full overflow-y-auto">
+          {/* Content Area with Padding */}
+          <div className="h-full overflow-y-auto p-6">
             {selectedProject && selectedProjectData ? (
               // Project-specific content
               <ProjectContent

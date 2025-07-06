@@ -1,0 +1,138 @@
+{
+  "id": "project-manager-financial-layout",
+  "name": "Financial Review",
+  "description": "Project manager financial control and cost management",
+  "role": "project-manager",
+  "cards": [
+    {
+      "id": "project-overview-pm",
+      "type": "project-overview",
+      "title": "Project Overview",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectManagerMode": true,
+        "activeProjectsFocus": true,
+        "constructionView": true
+      }
+    },
+    {
+      "id": "schedule-performance-pm",
+      "type": "schedule-performance",
+      "title": "Schedule Performance",
+      "size": "optimal",
+      "position": { "x": 6, "y": 0 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectManagerView": true,
+        "activeProjects": true,
+        "criticalPath": true
+      }
+    },
+    {
+      "id": "financial-status-pm",
+      "type": "financial-status",
+      "title": "Financial Status",
+      "size": "optimal",
+      "position": { "x": 12, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectManagerView": true,
+        "budgetControl": true,
+        "costTracking": true,
+        "alerts": true
+      }
+    },
+    {
+      "id": "general-conditions-pm",
+      "type": "general-conditions",
+      "title": "General Conditions",
+      "size": "optimal",
+      "position": { "x": 16, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectLevel": true,
+        "costControl": true,
+        "activeTracking": true
+      }
+    },
+    {
+      "id": "contingency-analysis-pm",
+      "type": "contingency-analysis",
+      "title": "Contingency Analysis",
+      "size": "optimal",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectLevel": true,
+        "riskMitigation": true,
+        "costContingency": true
+      }
+    },
+    {
+      "id": "cash-flow-pm",
+      "type": "cash-flow",
+      "title": "Cash Flow Analysis",
+      "size": "optimal",
+      "position": { "x": 6, "y": 4 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectManagerLevel": true,
+        "activeProjects": true,
+        "weeklyForecasting": true,
+        "forecastHorizon": "3-months"
+      }
+    },
+    {
+      "id": "procurement-pm",
+      "type": "procurement",
+      "title": "Procurement Management",
+      "size": "optimal",
+      "position": { "x": 14, "y": 4 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectLevel": true,
+        "buyoutTracking": true,
+        "costControl": true,
+        "vendorManagement": true
+      }
+    },
+    {
+      "id": "draw-forecast-pm",
+      "type": "draw-forecast",
+      "title": "Draw Forecast",
+      "size": "optimal",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 10, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectManagerLevel": true,
+        "activeProjectForecasting": true,
+        "detailedProjections": true
+      }
+    },
+    {
+      "id": "enhanced-hbi-insights-financial-pm",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Financial Forecast Insights",
+      "size": "optimal",
+      "position": { "x": 10, "y": 10 },
+      "span": { "cols": 10, "rows": 5 },
+      "visible": true,
+      "config": {
+        "focusArea": "financial-forecasting",
+        "projectManagerLevel": true,
+        "activeProjectInsights": true,
+        "costControlFocus": true
+      }
+    }
+  ]
+}
