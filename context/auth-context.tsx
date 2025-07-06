@@ -91,10 +91,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Only access localStorage after client-side hydration
     if (typeof window !== "undefined") {
       try {
-        const stored = localStorage.getItem("hb-demo-user")
-        if (stored) {
-          const parsedUser = JSON.parse(stored)
-          setUser(parsedUser)
+        // Check if we want to disable auto-login (for testing)
+        const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
+
+        if (!disableAutoLogin) {
+          const stored = localStorage.getItem("hb-demo-user")
+          if (stored) {
+            const parsedUser = JSON.parse(stored)
+            setUser(parsedUser)
+          }
         }
       } catch (error) {
         console.error("Error reading from localStorage:", error)
@@ -112,18 +117,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Invalid credentials")
     }
 
-    const redirectTo =
-      match.role === "estimator"
-        ? "/pre-con"
-        : match.role === "project-executive"
-        ? "/dashboard"
-        : match.role === "project-manager"
-        ? "/dashboard"
-        : match.role === "executive"
-        ? "/dashboard"
-        : match.role === "admin"
-        ? "/dashboard"
-        : "/dashboard"
+    // All users now redirect to the main application page
+    // which will show role-appropriate dashboard content
+    const redirectTo = "/main-app"
 
     // Only use localStorage if we're on the client
     if (typeof window !== "undefined") {

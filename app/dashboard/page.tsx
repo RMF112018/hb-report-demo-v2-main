@@ -981,13 +981,18 @@ export default function DashboardPage() {
       router.push("/login")
       return
     }
+
+    // Redirect authenticated users to the new main app
+    router.replace("/main-app")
   }, [user, router])
 
-  if (!user) return null
-
+  // Show loading state during redirect
   return (
-    <DashboardProvider userId={user.id} role={user.role}>
-      <DashboardContent user={user} />
-    </DashboardProvider>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Redirecting to main application...</p>
+      </div>
+    </div>
   )
 }

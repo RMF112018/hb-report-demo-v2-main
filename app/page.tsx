@@ -2,14 +2,24 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/auth-context"
 
 export default function Home() {
   const router = useRouter()
+  const { user, isLoading } = useAuth()
 
   useEffect(() => {
-    // Client-side redirect to avoid SSR issues
-    router.replace("/login")
-  }, [router])
+    if (isLoading) return // Wait for auth to load
+
+    // Client-side redirect based on authentication status
+    if (user) {
+      // User is already authenticated, go to main app
+      router.replace("/main-app")
+    } else {
+      // User is not authenticated, go to login
+      router.replace("/login")
+    }
+  }, [router, user, isLoading])
 
   // Show loading state during redirect
   return (

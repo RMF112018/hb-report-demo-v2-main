@@ -153,8 +153,8 @@ export function ProjectLayout({
         } as React.CSSProperties
       }
     >
-      {/* Header */}
-      <ProjectHeader
+      {/* Header removed - using main app header instead */}
+      {/* <ProjectHeader
         config={config.header}
         navigation={navigation}
         user={
@@ -182,12 +182,12 @@ export function ProjectLayout({
           console.log("Search query:", query)
         }}
         className="z-30"
-      />
+      /> */}
 
       {/* Content area with sidebar */}
       <div className={contentAreaClasses}>
-        {/* Sidebar */}
-        <ProjectSidebar
+        {/* Sidebar removed - using main app sidebar instead */}
+        {/* <ProjectSidebar
           config={config.sidebar}
           navigation={navigation}
           userRole={userRole}
@@ -202,13 +202,13 @@ export function ProjectLayout({
             config.sidebar.state === "overlay" && "fixed",
             config.sidebar.state !== "overlay" && "relative"
           )}
-        />
+        /> */}
 
         {/* Mobile overlay */}
-        <div className={overlayClasses} onClick={handleOverlayClick} aria-hidden="true" />
+        {/* <div className={overlayClasses} onClick={handleOverlayClick} aria-hidden="true" /> */}
 
         {/* Main content */}
-        <div className={mainContentClasses}>
+        <div className="flex-1 flex flex-col">
           <ProjectContent
             config={config.content}
             navigation={navigation}
