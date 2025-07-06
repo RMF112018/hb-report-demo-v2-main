@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   ArrowLeft,
+  ArrowRight,
   Building2,
   Calendar,
   DollarSign,
@@ -73,6 +74,17 @@ import {
   Package,
   Search,
   Scale,
+  Timer,
+  Lightbulb,
+  Send,
+  Edit3,
+  FilePlus,
+  FileX,
+  Wrench,
+  CheckSquare,
+  User,
+  Rocket,
+  Flag,
 } from "lucide-react"
 
 // Mock data imports
@@ -96,6 +108,54 @@ import type {
   DashboardData,
   InsightItem,
 } from "@/types/field-reports"
+
+// Reports interfaces
+interface Report {
+  id: string
+  name: string
+  type: "financial-review" | "monthly-progress" | "monthly-owner"
+  projectId: string
+  projectName: string
+  status: "draft" | "submitted" | "approved" | "rejected" | "published"
+  creatorId: string
+  creatorName: string
+  createdAt: string
+  updatedAt: string
+  dueDate?: string
+  approvedBy?: string
+  approvedAt?: string
+  rejectedBy?: string
+  rejectedAt?: string
+  rejectionReason?: string
+  distributedAt?: string
+  sectionCount: number
+  pageCount: number
+  size: string
+  version: number
+  tags: string[]
+}
+
+interface DashboardStats {
+  totalReports: number
+  pendingApproval: number
+  approved: number
+  rejected: number
+  thisMonth: number
+  approvalRate: number
+  avgProcessingTime: number
+  timeSaved: number
+  overdue: number
+}
+
+interface RecentActivity {
+  id: string
+  type: "created" | "submitted" | "approved" | "rejected" | "distributed"
+  reportName: string
+  projectName: string
+  userName: string
+  timestamp: string
+  icon: React.ReactNode
+}
 
 // Components
 import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibraryViewer"
@@ -140,6 +200,16 @@ import { ProjectFieldReportsSummary } from "@/components/field-reports/ProjectFi
 import { ConstraintWidgets } from "@/components/constraints/ConstraintWidgets"
 import { ConstraintForm } from "@/components/constraints/ConstraintForm"
 import { ProjectConstraintsSummary } from "@/components/constraints/ProjectConstraintsSummary"
+
+// Dashboard Components
+import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
+
+// Reports Components
+import { ReportCreator } from "@/components/reports/ReportCreator"
+import { ReportViewer } from "@/components/reports/ReportViewer"
+import { ReportApprovalWorkflow } from "@/components/reports/ReportApprovalWorkflow"
+import { ReportHistory } from "@/components/reports/ReportHistory"
+import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
 
 // Permit Components
 import { PermitAnalytics } from "@/components/permit-log/PermitAnalytics"
@@ -388,6 +458,8 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
       console.error("Stage transition error:", error)
     }
   }
+
+  // Enhanced navigation handlers - replaced later in the file
 
   // Financial Hub Configuration
   const [activeFinancialTab, setActiveFinancialTab] = useState("overview")
@@ -880,38 +952,20 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
   // Tool categories and tools configuration (from app-header.tsx)
   const tools = useMemo(
     () => [
-      // Checklists
-      {
-        name: "Start-Up Checklist",
-        href: "#startup-checklist",
-        category: "Checklists",
-        description: "Pre-construction and project startup verification checklist",
-        component: "startup-checklist",
-        visibleRoles: ["project-manager", "superintendent", "executive", "admin"],
-        stageRestrictions: ["Construction"],
-      },
-      {
-        name: "Closeout Checklist",
-        href: "#closeout-checklist",
-        category: "Checklists",
-        description: "Project completion and handover verification checklist",
-        component: "closeout-checklist",
-        visibleRoles: ["project-manager", "superintendent", "executive", "admin"],
-        stageRestrictions: ["Construction", "Closeout"],
-      },
-
       // Financial Management
       {
         name: "Financial Hub",
         href: "/dashboard/financial-hub",
         category: "Financial Management",
         description: "Comprehensive financial management and analysis suite",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
       {
         name: "Procurement",
         href: "/dashboard/procurement",
         category: "Financial Management",
         description: "Subcontractor buyout and material procurement management",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
 
       // Field Management
@@ -920,24 +974,28 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         href: "/dashboard/scheduler",
         category: "Field Management",
         description: "AI-powered project schedule generation and optimization",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
       {
         name: "Constraints Log",
         href: "/dashboard/constraints-log",
         category: "Field Management",
         description: "Track and manage project constraints and resolutions",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
       {
         name: "Permit Log",
         href: "/dashboard/permit-log",
         category: "Field Management",
         description: "Permit tracking and compliance",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
       {
         name: "Field Reports",
         href: "/dashboard/field-reports",
         category: "Field Management",
         description: "Daily logs, manpower, safety, and quality reporting",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
 
       // Compliance
@@ -946,12 +1004,14 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         href: "/dashboard/contract-documents",
         category: "Compliance",
         description: "Contract document management and compliance tracking",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
       {
         name: "Trade Partners Database",
         href: "/dashboard/trade-partners",
         category: "Compliance",
         description: "Comprehensive subcontractor and vendor management system",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
 
       // Pre-Construction
@@ -960,24 +1020,28 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         href: "/pre-con",
         category: "Pre-Construction",
         description: "Pre-construction command center and pipeline overview",
+        visibleRoles: ["executive", "project-executive", "estimator", "admin"],
       },
       {
         name: "Business Development",
         href: "/pre-con#business-dev",
         category: "Pre-Construction",
         description: "Lead generation and pursuit management",
+        visibleRoles: ["executive", "project-executive", "estimator", "admin"],
       },
       {
         name: "Estimating",
         href: "/estimating",
         category: "Pre-Construction",
         description: "Cost estimation and analysis tools",
+        visibleRoles: ["executive", "project-executive", "estimator", "admin"],
       },
       {
         name: "Innovation & Digital Services",
         href: "/tools/coming-soon",
         category: "Pre-Construction",
         description: "BIM, VDC, and digital construction technologies",
+        visibleRoles: ["executive", "project-executive", "estimator", "admin"],
       },
 
       // Warranty
@@ -986,6 +1050,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         href: "/tools/coming-soon",
         category: "Warranty",
         description: "Warranty management and tracking tools",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
 
       // Historical Projects
@@ -994,6 +1059,7 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
         href: "/tools/coming-soon",
         category: "Historical Projects",
         description: "Access completed project archives and historical data",
+        visibleRoles: ["executive", "project-executive", "project-manager", "admin"],
       },
     ],
     []
@@ -1008,7 +1074,6 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
       case "project-executive":
       case "admin":
         return [
-          "Checklists",
           "Pre-Construction",
           "Financial Management",
           "Field Management",
@@ -1017,12 +1082,11 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
           "Historical Projects",
         ]
       case "project-manager":
-        return ["Checklists", "Financial Management", "Field Management", "Compliance", "Warranty"]
+        return ["Financial Management", "Field Management", "Compliance", "Warranty"]
       case "estimator":
         return ["Pre-Construction", "Compliance"]
       default:
         return [
-          "Checklists",
           "Pre-Construction",
           "Financial Management",
           "Field Management",
@@ -1050,7 +1114,6 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     const visibleCategories = getVisibleCategories()
     const categoryConfig = [
       { name: "overview", color: "bg-gray-500", icon: "📊", label: "Overview" },
-      { name: "Checklists", color: "bg-blue-500", icon: "✅" },
       { name: "Pre-Construction", color: "bg-indigo-500", icon: "📐" },
       { name: "Financial Management", color: "bg-green-500", icon: "💰" },
       { name: "Field Management", color: "bg-orange-500", icon: "🏗️" },
@@ -1073,16 +1136,52 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     return [...categoriesWithOverview, ...otherCategories]
   }, [getVisibleCategories, filteredTools])
 
-  // Tree navigation state
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null) // Which category is expanded
-  const [selectedTool, setSelectedTool] = useState<string | null>(null) // Which tool is selected
-  const [selectedSubTool, setSelectedSubTool] = useState<string | null>(null) // Which sub-tool is selected
+  // Enhanced dual-state navigation system
+  // Current content state (what's actually displayed)
+  const [committedNavigation, setCommittedNavigation] = useState({
+    category: null as string | null,
+    tool: null as string | null,
+    subTool: null as string | null,
+    coreTab: null as string | null,
+  })
+
+  // Navigation exploration state (what user is browsing)
+  const [explorationNavigation, setExplorationNavigation] = useState({
+    category: null as string | null,
+    tool: null as string | null,
+    subTool: null as string | null,
+    coreTab: null as string | null,
+  })
+
+  // Animation and transition states
+  const [navigationState, setNavigationState] = useState({
+    isNavigating: false,
+    animationPhase: "idle" as "idle" | "exploring" | "committing" | "committed",
+    pendingCommit: null as any,
+  })
+
+  // Legacy state for backward compatibility (will be removed)
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+  const [selectedTool, setSelectedTool] = useState<string | null>(null)
+  const [selectedSubTool, setSelectedSubTool] = useState<string | null>(null)
+  const [selectedCoreTab, setSelectedCoreTab] = useState<string | null>(null)
 
   // Tools for expanded category
   const categoryTools = useMemo(() => {
     if (!expandedCategory) return []
     return filteredTools.filter((tool) => tool.category === expandedCategory)
   }, [filteredTools, expandedCategory])
+
+  // Core tabs configuration (without Staffing)
+  const coreTabsConfig = [
+    { id: "dashboard", label: "Dashboard", description: "Project overview and analytics" },
+    { id: "reports", label: "Reports", description: "Comprehensive reporting dashboard with approval workflows" },
+    { id: "responsibility-matrix", label: "Responsibility Matrix", description: "Role assignments and accountability" },
+    { id: "productivity", label: "Productivity", description: "Threaded messaging and task management" },
+    { id: "checklists", label: "Checklists", description: "Project startup and closeout checklists" },
+  ]
+
+  // Handle core tab click - Final selection commits navigation (defined later in the file)
 
   // Tool sub-tabs configuration
   const getToolSubTabs = useCallback((toolName: string) => {
@@ -1134,6 +1233,11 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
           { id: "calendar", label: "Calendar", icon: "📅" },
           { id: "analytics", label: "Analytics", icon: "📈" },
           { id: "reports", label: "Reports", icon: "📄" },
+        ]
+      case "Checklists":
+        return [
+          { id: "startup", label: "StartUp", icon: "🚀" },
+          { id: "closeout", label: "Closeout", icon: "🏁" },
         ]
       default:
         return []
@@ -3091,40 +3195,913 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     return <div className="space-y-6">{renderContent()}</div>
   }
 
-  // Handle category click
+  // Reports Content Component
+  const ReportsContent = ({
+    selectedSubTool,
+    projectData,
+    userRole,
+  }: {
+    selectedSubTool: string
+    projectData: any
+    userRole: string
+  }) => {
+    // State management for reports functionality
+    const [reports, setReports] = useState<Report[]>([])
+    const [filteredReports, setFilteredReports] = useState<Report[]>([])
+    const [activeReportsTab, setActiveReportsTab] = useState("overview")
+    const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+    const [showReportCreator, setShowReportCreator] = useState(false)
+    const [showReportViewer, setShowReportViewer] = useState(false)
+    const [selectedTemplate, setSelectedTemplate] = useState<string>("")
+    const [isReportsLoading, setIsReportsLoading] = useState(false)
+
+    // Filter state
+    const [searchTerm, setSearchTerm] = useState("")
+    const [statusFilter, setStatusFilter] = useState("all")
+    const [typeFilter, setTypeFilter] = useState("all")
+    const [projectFilter, setProjectFilter] = useState("all")
+    const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({})
+
+    // Report templates
+    const reportTemplates = [
+      {
+        id: "financial-review",
+        name: "Monthly Financial Review",
+        type: "financial-review" as const,
+        description: "Comprehensive financial analysis with forecast memo, budget snapshots, and cost tracking",
+        icon: <DollarSign className="h-6 w-6" />,
+        sections: 4,
+        estimatedTime: "45 min",
+        workflow: "PM → PE → Executive",
+        color: "bg-green-50 border-green-200 text-green-800",
+      },
+      {
+        id: "monthly-progress",
+        name: "Monthly Progress Report",
+        type: "monthly-progress" as const,
+        description: "Complete project status update with schedule, milestones, and performance metrics",
+        icon: <BarChart3 className="h-6 w-6" />,
+        sections: 12,
+        estimatedTime: "60 min",
+        workflow: "PM → PE → Published",
+        color: "bg-blue-50 border-blue-200 text-blue-800",
+      },
+      {
+        id: "monthly-owner",
+        name: "Monthly Owner Report",
+        type: "monthly-owner" as const,
+        description: "Client-focused report with progress photos, schedule updates, and executive summary",
+        icon: <Building2 className="h-6 w-6" />,
+        sections: 6,
+        estimatedTime: "30 min",
+        workflow: "PM → PE → Client Distribution",
+        color: "bg-purple-50 border-purple-200 text-purple-800",
+      },
+    ]
+
+    // Initialize reports data
+    useEffect(() => {
+      loadReports()
+    }, [userRole])
+
+    // Apply filters
+    useEffect(() => {
+      applyFilters()
+    }, [reports, searchTerm, statusFilter, typeFilter, projectFilter, dateRange])
+
+    const loadReports = async () => {
+      try {
+        setIsReportsLoading(true)
+
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
+        // Transform mock data
+        const transformedReports: Report[] = reportsData.reports.map((report) => ({
+          ...report,
+          type: report.type as "financial-review" | "monthly-progress" | "monthly-owner",
+          status: report.status as "draft" | "submitted" | "approved" | "rejected" | "published",
+          projectName: projectData?.name || "Current Project",
+          projectId: projectData?.id?.toString() || projectId.toString(),
+        }))
+
+        // Filter based on user role and current project
+        let userReports = transformedReports.filter((report) => report.projectId === projectId.toString())
+
+        if (userRole === "project-manager") {
+          userReports = userReports.filter((report) => report.creatorId === user?.id)
+        } else if (userRole === "project-executive") {
+          // PEs see all reports from their assigned projects
+          userReports = userReports
+        }
+
+        setReports(userReports)
+      } catch (error) {
+        console.error("Failed to load reports:", error)
+      } finally {
+        setIsReportsLoading(false)
+      }
+    }
+
+    const applyFilters = () => {
+      let filtered = [...reports]
+
+      // Search filter
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase()
+        filtered = filtered.filter(
+          (report) =>
+            report.name.toLowerCase().includes(search) ||
+            report.projectName.toLowerCase().includes(search) ||
+            report.creatorName.toLowerCase().includes(search)
+        )
+      }
+
+      // Status filter
+      if (statusFilter !== "all") {
+        filtered = filtered.filter((report) => report.status === statusFilter)
+      }
+
+      // Type filter
+      if (typeFilter !== "all") {
+        filtered = filtered.filter((report) => report.type === typeFilter)
+      }
+
+      // Project filter
+      if (projectFilter !== "all") {
+        filtered = filtered.filter((report) => report.projectId === projectFilter)
+      }
+
+      // Date range filter
+      if (dateRange.from || dateRange.to) {
+        filtered = filtered.filter((report) => {
+          const reportDate = new Date(report.createdAt)
+          if (dateRange.from && reportDate < dateRange.from) return false
+          if (dateRange.to && reportDate > dateRange.to) return false
+          return true
+        })
+      }
+
+      setFilteredReports(filtered)
+    }
+
+    // Calculate dashboard statistics
+    const stats = useMemo((): DashboardStats => {
+      const total = reports.length
+      const pending = reports.filter((r) => r.status === "submitted").length
+      const approved = reports.filter((r) => r.status === "approved" || r.status === "published").length
+      const rejected = reports.filter((r) => r.status === "rejected").length
+
+      const thisMonth = reports.filter((r) => {
+        const reportDate = new Date(r.createdAt)
+        const now = new Date()
+        return reportDate.getMonth() === now.getMonth() && reportDate.getFullYear() === now.getFullYear()
+      }).length
+
+      const processedReports = approved + rejected
+      const approvalRate = processedReports > 0 ? Math.round((approved / processedReports) * 100) : 0
+
+      const overdue = reports.filter((r) => {
+        if (!r.dueDate || r.status === "approved" || r.status === "published") return false
+        return new Date(r.dueDate) < new Date()
+      }).length
+
+      return {
+        totalReports: total,
+        pendingApproval: pending,
+        approved,
+        rejected,
+        thisMonth,
+        approvalRate,
+        avgProcessingTime: 2.5,
+        timeSaved: total * 4,
+        overdue,
+      }
+    }, [reports])
+
+    // Generate recent activity
+    const recentActivity = useMemo((): RecentActivity[] => {
+      return reports
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        .slice(0, 8)
+        .map((report) => {
+          let type: RecentActivity["type"] = "created"
+          let icon = <FileText className="h-4 w-4 text-blue-500" />
+
+          switch (report.status) {
+            case "submitted":
+              type = "submitted"
+              icon = <Clock className="h-4 w-4 text-yellow-500" />
+              break
+            case "approved":
+            case "published":
+              type = "approved"
+              icon = <CheckCircle className="h-4 w-4 text-green-500" />
+              break
+            case "rejected":
+              type = "rejected"
+              icon = <XCircle className="h-4 w-4 text-red-500" />
+              break
+          }
+
+          return {
+            id: `activity-${report.id}`,
+            type,
+            reportName: report.name,
+            projectName: report.projectName,
+            userName: report.creatorName,
+            timestamp: report.updatedAt,
+            icon,
+          }
+        })
+    }, [reports])
+
+    const formatTimeAgo = (timestamp: string) => {
+      const now = new Date()
+      const time = new Date(timestamp)
+      const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60))
+
+      if (diffInHours < 1) return "Just now"
+      if (diffInHours < 24) return `${diffInHours}h ago`
+      const diffInDays = Math.floor(diffInHours / 24)
+      if (diffInDays < 7) return `${diffInDays}d ago`
+      return time.toLocaleDateString()
+    }
+
+    // Event handlers
+    const handleCreateReport = (templateId?: string) => {
+      setSelectedTemplate(templateId || "")
+      setSelectedReport(null)
+      setShowReportCreator(true)
+    }
+
+    const handleEditReport = (report: Report) => {
+      setSelectedReport(report)
+      setSelectedTemplate("")
+      setShowReportCreator(true)
+    }
+
+    const handleViewReport = (report: Report) => {
+      setSelectedReport(report)
+      setShowReportViewer(true)
+    }
+
+    const getTabsForRole = () => {
+      switch (userRole) {
+        case "project-manager":
+          return ["overview", "create", "templates", "my-reports", "analytics"]
+        case "project-executive":
+          return ["overview", "approval", "reports", "analytics"]
+        case "executive":
+          return ["overview", "reports", "analytics"]
+        default:
+          return ["overview"]
+      }
+    }
+
+    const availableReportsTabs = getTabsForRole()
+
+    const renderContent = () => {
+      return (
+        <div className="space-y-6">
+          {/* Reports Tab Navigation */}
+          <div className="flex items-center gap-1 border-b">
+            {availableReportsTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveReportsTab(tab)}
+                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                  activeReportsTab === tab
+                    ? "text-primary border-primary bg-primary/5"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
+                }`}
+              >
+                {tab === "overview" && "Overview"}
+                {tab === "create" && "Create"}
+                {tab === "templates" && "Templates"}
+                {tab === "approval" && "Approval"}
+                {tab === "my-reports" && "My Reports"}
+                {tab === "reports" && "Reports"}
+                {tab === "analytics" && "Analytics"}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          {activeReportsTab === "overview" && (
+            <div className="space-y-6">
+              {/* Stats Cards */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">{stats.totalReports}</div>
+                    <p className="text-xs text-muted-foreground">+{stats.thisMonth} this month</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                      {stats.pendingApproval}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Avg {stats.avgProcessingTime} days to process</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Approval Rate</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.approvalRate}%</div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Time Saved</CardTitle>
+                    <Timer className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.timeSaved}h</div>
+                    <p className="text-xs text-muted-foreground">Through automation</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* HBI Intelligence Panel */}
+              <Card className="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-indigo-950 dark:to-purple-900 border-indigo-200 dark:border-indigo-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
+                    <Brain className="h-5 w-5" />
+                    HBI Report Intelligence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-indigo-600" />
+                        <span className="font-medium text-indigo-800 dark:text-indigo-200">Smart Insights</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
+                        <li>• {stats.pendingApproval} reports await approval - avg processing time trending down</li>
+                        <li>• Financial reviews show 15% faster completion with new templates</li>
+                        <li>• Owner reports have 95% approval rate when photos are included</li>
+                        <li>• Schedule section accuracy improved 23% with automated data integration</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Target className="h-4 w-4 text-indigo-600" />
+                        <span className="font-medium text-indigo-800 dark:text-indigo-200">Recommendations</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
+                        <li>• Schedule monthly progress reports for the 3rd business day</li>
+                        <li>• Include financial forecast memo in all owner reports</li>
+                        <li>• Set up automated reminders 3 days before report due dates</li>
+                        <li>• Consider batch processing for faster approvals</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {availableReportsTabs.includes("templates") && activeReportsTab === "templates" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Report Templates</CardTitle>
+                <CardDescription>
+                  Choose from standardized report templates optimized for construction project reporting
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+                  {reportTemplates.map((template) => (
+                    <Card
+                      key={template.id}
+                      className={`cursor-pointer hover:shadow-lg transition-all duration-200 border-2 ${template.color}`}
+                      onClick={() => handleCreateReport(template.id)}
+                    >
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="p-2 rounded-lg bg-background/50 border">{template.icon}</div>
+                          <div>
+                            <CardTitle className="text-lg">{template.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{template.workflow}</p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-sm mb-4">{template.description}</p>
+                        <div className="flex justify-between items-center text-xs">
+                          <Badge variant="secondary">{template.sections} sections</Badge>
+                          <span className="flex items-center gap-1">
+                            <Timer className="h-3 w-3" />
+                            {template.estimatedTime}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {availableReportsTabs.includes("my-reports") && activeReportsTab === "my-reports" && (
+            <ReportHistory
+              reports={filteredReports}
+              onViewReport={handleViewReport}
+              onEditReport={handleEditReport}
+              userRole={userRole}
+            />
+          )}
+
+          {availableReportsTabs.includes("approval") && activeReportsTab === "approval" && (
+            <ReportApprovalWorkflow
+              userRole={userRole}
+              reports={reports.filter((r) => r.status === "submitted")}
+              onReportUpdate={loadReports}
+            />
+          )}
+
+          {availableReportsTabs.includes("analytics") && activeReportsTab === "analytics" && (
+            <ReportAnalytics reports={reports} />
+          )}
+
+          {/* Report Creator Dialog */}
+          <Dialog open={showReportCreator} onOpenChange={setShowReportCreator}>
+            <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
+              <div className="flex flex-col h-full">
+                <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
+                  <DialogTitle>
+                    {selectedReport
+                      ? `Edit ${selectedReport.name}`
+                      : selectedTemplate
+                      ? `Create ${reportTemplates.find((t) => t.id === selectedTemplate)?.name} Report`
+                      : "Create New Report"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 overflow-auto px-6 py-4">
+                  <ReportCreator
+                    reportId={selectedReport?.id}
+                    templateId={selectedTemplate}
+                    onSave={() => {
+                      setShowReportCreator(false)
+                      loadReports()
+                    }}
+                    onCancel={() => setShowReportCreator(false)}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Report Viewer Dialog */}
+          <Dialog open={showReportViewer} onOpenChange={setShowReportViewer}>
+            <DialogContent className="!w-[60vw] !max-w-[60vw] !h-[90vh] !max-h-[90vh] p-0 overflow-hidden">
+              <div className="flex flex-col h-full">
+                <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
+                  <DialogTitle>{selectedReport?.name}</DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 overflow-auto px-6 py-4">
+                  <ReportViewer
+                    report={selectedReport}
+                    onClose={() => setShowReportViewer(false)}
+                    userRole={userRole}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )
+    }
+
+    return <div className="space-y-6">{renderContent()}</div>
+  }
+
+  // Enhanced navigation commit handler
+  const handleNavigationCommit = useCallback((navigation: any) => {
+    setNavigationState((prev) => ({
+      ...prev,
+      isNavigating: true,
+      animationPhase: "committing",
+      pendingCommit: navigation,
+    }))
+
+    // Smooth transition delay
+    setTimeout(() => {
+      setCommittedNavigation(navigation)
+      setNavigationState({
+        isNavigating: false,
+        animationPhase: "committed",
+        pendingCommit: null,
+      })
+
+      // Reset to idle after animation
+      setTimeout(() => {
+        setNavigationState((prev) => ({
+          ...prev,
+          animationPhase: "idle",
+        }))
+      }, 300)
+    }, 150)
+  }, [])
+
+  // Handle category click - Enhanced with exploration state and immediate commit for dashboard
   const handleCategoryClick = useCallback(
     (categoryName: string) => {
-      if (expandedCategory === categoryName) {
-        // If clicking the same category that's already expanded
-        if (selectedTool) {
-          // If a tool is selected, deselect it to show the tool menu
-          // But keep the current content visible
-          setSelectedTool(null)
-          setSelectedSubTool(null)
-        } else {
-          // If no tool is selected, collapse the category
-          setExpandedCategory(null)
-        }
+      if (explorationNavigation.category === categoryName) {
+        // If clicking the same category, collapse exploration
+        setExplorationNavigation({
+          category: null,
+          tool: null,
+          subTool: null,
+          coreTab: null,
+        })
       } else {
-        // Switch to new category - this should NOT change content
-        setExpandedCategory(categoryName)
-        // Don't change selectedTool - content should persist across category switches
-        // The content will only change when a new tool is explicitly selected
+        // If clicking a different category, start exploring and commit immediately to show dashboard
+        const newNavigation = {
+          category: categoryName,
+          tool: null,
+          subTool: null,
+          coreTab: null,
+        }
+        setExplorationNavigation(newNavigation)
+        setCommittedNavigation(newNavigation)
+        setNavigationState((prev) => ({
+          ...prev,
+          animationPhase: "exploring",
+        }))
       }
+
+      // Update legacy state for backward compatibility
+      setExpandedCategory(categoryName)
+      setSelectedTool(null)
+      setSelectedSubTool(null)
     },
-    [expandedCategory, selectedTool]
+    [explorationNavigation.category]
   )
 
-  // Handle tool click
-  const handleToolClick = useCallback((toolName: string) => {
-    setSelectedTool(toolName)
-    setSelectedSubTool(null) // Reset sub-tool when tool changes
-  }, [])
+  // Handle tool click - Enhanced with exploration state and auto-commit for tools without sub-tools
+  const handleToolClick = useCallback(
+    (toolName: string) => {
+      // Check if this tool has sub-tools
+      const toolSubTabs = getToolSubTabs(toolName)
 
-  // Handle sub-tool click
-  const handleSubToolClick = useCallback((subToolName: string) => {
-    setSelectedSubTool(subToolName)
-  }, [])
+      if (toolSubTabs.length === 0) {
+        // Tool has no sub-tools, immediately commit the navigation
+        const finalNavigation = {
+          category: explorationNavigation.category,
+          tool: toolName,
+          subTool: null,
+          coreTab: null,
+        }
+        handleNavigationCommit(finalNavigation)
+      } else {
+        // Tool has sub-tools, show exploration state
+        setExplorationNavigation((prev) => ({
+          ...prev,
+          tool: toolName,
+          subTool: null,
+          coreTab: null,
+        }))
+        setNavigationState((prev) => ({
+          ...prev,
+          animationPhase: "exploring",
+        }))
+      }
+
+      // Update legacy state for backward compatibility
+      setSelectedTool(toolName)
+      setSelectedSubTool(null)
+    },
+    [explorationNavigation.category, handleNavigationCommit]
+  )
+
+  // Handle sub-tool click - Final selection commits navigation
+  const handleSubToolClick = useCallback(
+    (subToolName: string) => {
+      // This is the final selection - commit the navigation
+      const finalNavigation = {
+        category: explorationNavigation.category,
+        tool: explorationNavigation.tool,
+        subTool: subToolName,
+        coreTab: null,
+      }
+      handleNavigationCommit(finalNavigation)
+
+      // Update legacy state for backward compatibility
+      setSelectedSubTool(subToolName)
+    },
+    [explorationNavigation.category, explorationNavigation.tool, handleNavigationCommit]
+  )
+
+  // Handle core tab click - Final selection commits navigation
+  const handleCoreTabClick = useCallback(
+    (coreTabName: string) => {
+      // This is the final selection - commit the navigation
+      const finalNavigation = {
+        category: null,
+        tool: null,
+        subTool: null,
+        coreTab: coreTabName,
+      }
+      handleNavigationCommit(finalNavigation)
+
+      // Update legacy state for backward compatibility
+      setSelectedCoreTab(coreTabName)
+    },
+    [handleNavigationCommit]
+  )
+
+  // Checklists Content Component
+  const ChecklistsContent = ({
+    selectedSubTool,
+    projectData,
+    userRole,
+  }: {
+    selectedSubTool: string
+    projectData: any
+    userRole: string
+  }) => {
+    // Get checklist-specific KPIs based on selected sub-tool
+    const getChecklistKPIs = (subTool: string) => {
+      const baseKPIs = [
+        {
+          icon: CheckCircle,
+          value: "2",
+          label: "Checklists Available",
+          color: "blue",
+        },
+        {
+          icon: AlertCircle,
+          value: "85%",
+          label: "Completion Rate",
+          color: "green",
+        },
+        {
+          icon: Clock,
+          value: "3",
+          label: "Days to Complete",
+          color: "amber",
+        },
+      ]
+
+      const subToolKPIs: Record<string, any[]> = {
+        startup: [
+          {
+            icon: Rocket,
+            value: "15",
+            label: "Startup Items",
+            color: "purple",
+          },
+          {
+            icon: CheckCircle,
+            value: "12",
+            label: "Completed",
+            color: "green",
+          },
+          {
+            icon: AlertTriangle,
+            value: "3",
+            label: "Pending",
+            color: "amber",
+          },
+        ],
+        closeout: [
+          {
+            icon: Flag,
+            value: "25",
+            label: "Closeout Items",
+            color: "blue",
+          },
+          {
+            icon: CheckCircle,
+            value: "18",
+            label: "Completed",
+            color: "green",
+          },
+          {
+            icon: AlertTriangle,
+            value: "7",
+            label: "Pending",
+            color: "red",
+          },
+        ],
+        default: [
+          {
+            icon: FileText,
+            value: "40",
+            label: "Total Items",
+            color: "blue",
+          },
+          {
+            icon: TrendingUp,
+            value: "75%",
+            label: "Overall Progress",
+            color: "green",
+          },
+          {
+            icon: Users,
+            value: "5",
+            label: "Assigned To",
+            color: "purple",
+          },
+        ],
+      }
+
+      return [...baseKPIs, ...(subToolKPIs[subTool] || subToolKPIs.default)]
+    }
+
+    const renderContent = () => {
+      switch (selectedSubTool) {
+        case "startup":
+          return (
+            <div className="space-y-6">
+              <StartUpChecklist
+                projectId={projectData?.id || params.projectId}
+                projectName={projectData?.name || "Project"}
+                mode="editable"
+                className="border-0 bg-transparent p-0"
+              />
+            </div>
+          )
+
+        case "closeout":
+          return (
+            <div className="space-y-6">
+              <CloseoutChecklist
+                projectId={projectData?.id || params.projectId}
+                mode="full"
+                userRole={userRole as "pm" | "superintendent" | "admin" | "viewer"}
+              />
+            </div>
+          )
+
+        default:
+          return (
+            <div className="space-y-6">
+              <div className="bg-card border rounded-lg p-6">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold mb-2">Select a Checklist</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Choose a checklist type from the tabs above to get started.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="text-2xl mb-2">🚀</div>
+                      <h4 className="font-medium mb-1">Start-Up Checklist</h4>
+                      <p className="text-sm text-muted-foreground">Essential tasks for project initiation and setup</p>
+                    </div>
+                    <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="text-2xl mb-2">🏁</div>
+                      <h4 className="font-medium mb-1">Closeout Checklist</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Requirements and deliverables for project completion
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+      }
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Checklist KPI Widgets */}
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {getChecklistKPIs(selectedSubTool).map((kpi, index) => {
+            const IconComponent = kpi.icon
+            const colorClasses = {
+              blue: "text-blue-600 dark:text-blue-400",
+              green: "text-green-600 dark:text-green-400",
+              purple: "text-purple-600 dark:text-purple-400",
+              red: "text-red-600 dark:text-red-400",
+              amber: "text-amber-600 dark:text-amber-400",
+              emerald: "text-emerald-600 dark:text-emerald-400",
+              yellow: "text-yellow-600 dark:text-yellow-400",
+            }
+
+            return (
+              <Card key={`${kpi.label}-${index}`} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <IconComponent className={`h-5 w-5 ${colorClasses[kpi.color as keyof typeof colorClasses]} mr-2`} />
+                    <span className={`text-2xl font-bold ${colorClasses[kpi.color as keyof typeof colorClasses]}`}>
+                      {kpi.value}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">{kpi.label}</div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Checklist Content */}
+        <div className="min-h-96">{renderContent()}</div>
+      </div>
+    )
+  }
+
+  // Generate breadcrumb for page title
+  const getPageBreadcrumb = () => {
+    const parts = ["Project Control Center"]
+
+    // Add all navigation steps in order
+    if (committedNavigation.category) {
+      parts.push(committedNavigation.category)
+    }
+
+    if (committedNavigation.tool) {
+      parts.push(committedNavigation.tool)
+    }
+
+    if (committedNavigation.subTool) {
+      parts.push(committedNavigation.subTool)
+    }
+
+    if (committedNavigation.coreTab) {
+      const coreTab = coreTabsConfig.find((tab) => tab.id === committedNavigation.coreTab)
+      if (coreTab) parts.push(coreTab.label)
+    }
+
+    if (parts.length === 1) {
+      return parts[0]
+    }
+
+    // Capitalize each part properly
+    const capitalizedParts = parts.map((part, index) => {
+      if (index === 0) return part // Keep "Project Control Center" as-is
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    })
+
+    // Handle breadcrumb clicks to reveal navigation without changing content
+    const handleBreadcrumbClick = (clickedIndex: number) => {
+      if (clickedIndex === 0) {
+        // Reset to overview exploration
+        setExplorationNavigation({
+          category: null,
+          tool: null,
+          subTool: null,
+          coreTab: null,
+        })
+      } else if (clickedIndex === 1 && committedNavigation.category) {
+        // Show category tools
+        setExplorationNavigation({
+          category: committedNavigation.category,
+          tool: null,
+          subTool: null,
+          coreTab: null,
+        })
+      } else if (clickedIndex === 2 && committedNavigation.tool) {
+        // Show tool sub-tabs
+        setExplorationNavigation({
+          category: committedNavigation.category,
+          tool: committedNavigation.tool,
+          subTool: null,
+          coreTab: null,
+        })
+      }
+    }
+
+    return (
+      <>
+        <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => handleBreadcrumbClick(0)}>
+          {capitalizedParts[0]}
+        </span>
+        <span className="text-sm font-normal text-muted-foreground ml-2">
+          {capitalizedParts.slice(1).map((part, index) => (
+            <span key={index}>
+              {index === 0 ? " > " : " > "}
+              <span
+                className="cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => handleBreadcrumbClick(index + 1)}
+              >
+                {part}
+              </span>
+            </span>
+          ))}
+        </span>
+      </>
+    )
+  }
 
   // Constraints Configuration
   const [activeConstraintsTab, setActiveConstraintsTab] = useState("log")
@@ -3617,6 +4594,66 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                       Full Screen View
                     </Button>
                   </>
+                ) : selectedTool === "Checklists" ? (
+                  // Checklists specific quick actions
+                  <>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Mark Complete
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Checklist
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh Data
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </Button>
+                  </>
+                ) : committedNavigation.coreTab === "reports" ? (
+                  // Reports specific quick actions
+                  <>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Report
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Templates
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      View Analytics
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh Data
+                    </Button>
+                  </>
+                ) : committedNavigation.coreTab === "checklists" ? (
+                  // Checklists specific quick actions
+                  <>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <CheckSquare className="h-4 w-4 mr-2" />
+                      View Startup
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      View Closeout
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Progress
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh Data
+                    </Button>
+                  </>
                 ) : activeTab === "team" ? (
                   // Team-specific quick actions
                   teamQuickActions.map((action, index) => (
@@ -3835,6 +4872,60 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                         timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
                       },
                     ]
+                  : selectedTool === "Checklists"
+                  ? [
+                      {
+                        id: "checklist-1",
+                        title: "StartUp Item Completed",
+                        description: "Bond applications submitted to CFO for approval",
+                        color: "green",
+                        icon: CheckCircle,
+                        timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+                      },
+                      {
+                        id: "checklist-2",
+                        title: "Closeout Task Updated",
+                        description: "Final survey & elevation certificate marked as conforming",
+                        color: "blue",
+                        icon: CheckSquare,
+                        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+                      },
+                      {
+                        id: "checklist-3",
+                        title: "Task Assigned",
+                        description: "O&M manuals delivery assigned to Project Manager",
+                        color: "purple",
+                        icon: User,
+                        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+                      },
+                    ]
+                  : selectedCoreTab === "reports"
+                  ? [
+                      {
+                        id: "reports-1",
+                        title: "Monthly Progress Report Created",
+                        description: "December progress report created and submitted for approval",
+                        color: "green",
+                        icon: FileText,
+                        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                      },
+                      {
+                        id: "reports-2",
+                        title: "Financial Review Approved",
+                        description: "November financial review report approved by executive team",
+                        color: "blue",
+                        icon: CheckCircle,
+                        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+                      },
+                      {
+                        id: "reports-3",
+                        title: "Owner Report Distributed",
+                        description: "Monthly owner report sent to client and stakeholders",
+                        color: "purple",
+                        icon: Send,
+                        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+                      },
+                    ]
                   : activeTab === "team"
                   ? teamRecentActivity
                   : activeTab === "constraints"
@@ -3877,6 +4968,12 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                   ? "Permit Metrics"
                   : selectedTool === "Field Reports"
                   ? "Field Reports Metrics"
+                  : selectedTool === "Checklists"
+                  ? "Checklist Metrics"
+                  : committedNavigation.coreTab === "reports"
+                  ? "Reports Metrics"
+                  : committedNavigation.coreTab === "checklists"
+                  ? "Checklist Metrics"
                   : activeTab === "team"
                   ? "Key Metrics"
                   : activeTab === "constraints"
@@ -4028,6 +5125,50 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                       <span className="font-medium text-emerald-600">88.9%</span>
                     </div>
                   </>
+                ) : selectedTool === "Checklists" ? (
+                  // Checklists specific key metrics
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">StartUp Items</span>
+                      <span className="font-medium text-blue-600">65</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">StartUp Complete</span>
+                      <span className="font-medium text-green-600">78%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Closeout Items</span>
+                      <span className="font-medium text-purple-600">35</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Closeout Complete</span>
+                      <span className="font-medium text-orange-600">12%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Overall Progress</span>
+                      <span className="font-medium text-emerald-600">52%</span>
+                    </div>
+                  </>
+                ) : committedNavigation.coreTab === "reports" ? (
+                  // Reports specific key metrics
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total Reports</span>
+                      <span className="font-medium text-blue-600">0</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Pending Approval</span>
+                      <span className="font-medium text-yellow-600">0</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Approved</span>
+                      <span className="font-medium text-green-600">0</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Approval Rate</span>
+                      <span className="font-medium text-emerald-600">0%</span>
+                    </div>
+                  </>
                 ) : activeTab === "team" ? (
                   // Team-specific key metrics
                   teamKeyMetrics.map((metric, index) => (
@@ -4086,6 +5227,8 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                     ? "HBI Permit Insights"
                     : selectedTool === "Field Reports"
                     ? "HBI Field Reports Insights"
+                    : committedNavigation.coreTab === "reports"
+                    ? "HBI Reports Insights"
                     : activeTab === "team"
                     ? "HBI Team Insights"
                     : activeTab === "constraints"
@@ -4264,6 +5407,72 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                             relatedMetrics: ["Approval Rate", "Process Performance", "Compliance Tracking"],
                           },
                         ]
+                      : selectedTool === "Field Reports"
+                      ? [
+                          {
+                            id: "field-1",
+                            type: "alert",
+                            severity: "medium",
+                            title: "Compliance Monitoring Alert",
+                            text: "Field reports show 7.7% below target compliance rate, requiring immediate attention.",
+                            action: "Review safety protocols and implement additional training for field crews.",
+                            confidence: 92,
+                            relatedMetrics: ["Compliance Rate", "Safety Score", "Training Hours"],
+                          },
+                          {
+                            id: "field-2",
+                            type: "opportunity",
+                            severity: "low",
+                            title: "Efficiency Improvement Opportunity",
+                            text: "Daily log completion times averaging 85% faster than industry benchmark.",
+                            action: "Document best practices for knowledge transfer to other projects.",
+                            confidence: 88,
+                            relatedMetrics: ["Process Efficiency", "Time Management", "Best Practices"],
+                          },
+                          {
+                            id: "field-3",
+                            type: "performance",
+                            severity: "low",
+                            title: "Quality Control Success",
+                            text: "Quality pass rate of 88.9% demonstrates strong field oversight and control processes.",
+                            action: "Maintain current quality control standards while targeting 90%+ pass rate.",
+                            confidence: 94,
+                            relatedMetrics: ["Quality Control", "Pass Rate", "Field Oversight"],
+                          },
+                        ]
+                      : committedNavigation.coreTab === "reports"
+                      ? [
+                          {
+                            id: "reports-1",
+                            type: "opportunity",
+                            severity: "low",
+                            title: "Report Automation Opportunity",
+                            text: "Monthly reporting process can be streamlined through template standardization.",
+                            action: "Implement automated data collection and report generation workflows.",
+                            confidence: 85,
+                            relatedMetrics: ["Process Efficiency", "Template Usage", "Time Savings"],
+                          },
+                          {
+                            id: "reports-2",
+                            type: "performance",
+                            severity: "low",
+                            title: "Documentation Excellence",
+                            text: "Project documentation completeness exceeds industry standards by 23%.",
+                            action: "Continue current documentation practices and consider sharing methodology.",
+                            confidence: 92,
+                            relatedMetrics: ["Documentation Quality", "Completeness Rate", "Industry Benchmark"],
+                          },
+                          {
+                            id: "reports-3",
+                            type: "alert",
+                            severity: "medium",
+                            title: "Baseline Report Development",
+                            text: "Project baseline reporting system ready for implementation and stakeholder review.",
+                            action: "Schedule stakeholder review sessions to establish reporting cadence and content.",
+                            confidence: 88,
+                            relatedMetrics: ["Stakeholder Engagement", "Report Distribution", "Communication"],
+                          },
+                        ]
                       : activeTab === "team"
                       ? teamInsights
                       : activeTab === "constraints"
@@ -4274,6 +5483,59 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                 />
               </div>
             </div>
+
+            {/* Reports Templates Section - Only shown when Reports tab is active */}
+            {committedNavigation.coreTab === "reports" && (
+              <div className="bg-card border border-border rounded-lg p-2">
+                <h3 className="font-semibold text-sm mb-4 text-foreground flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-purple-600" />
+                  Report Templates
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-2 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                      <DollarSign className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Monthly Financial Review</p>
+                      <p className="text-xs text-muted-foreground">45 min</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                      <BarChart3 className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Monthly Progress Report</p>
+                      <p className="text-xs text-muted-foreground">60 min</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-8 h-8 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                      <Calendar className="h-4 w-4 text-orange-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Monthly Owner Report</p>
+                      <p className="text-xs text-muted-foreground">30 min</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Recent Reports Section - Only shown when Reports tab is active */}
+            {committedNavigation.coreTab === "reports" && (
+              <div className="bg-card border border-border rounded-lg p-2">
+                <h3 className="font-semibold text-sm mb-4 text-foreground flex items-center">
+                  <History className="h-4 w-4 mr-2 text-blue-600" />
+                  Recent Reports
+                </h3>
+                <div className="text-center py-8">
+                  <FileX className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No recent reports</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Content Area */}
@@ -4285,12 +5547,21 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                   <h2
                     className="text-lg font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
                     onClick={() => {
+                      const resetNavigation = {
+                        category: null,
+                        tool: null,
+                        subTool: null,
+                        coreTab: null,
+                      }
+                      setCommittedNavigation(resetNavigation)
+                      setExplorationNavigation(resetNavigation)
                       setExpandedCategory(null)
                       setSelectedTool(null)
                       setSelectedSubTool(null)
+                      setSelectedCoreTab(null)
                     }}
                   >
-                    Project Control Center
+                    {getPageBreadcrumb()}
                   </h2>
                   <p className="text-sm text-muted-foreground">Manage project details, documents, and resources</p>
                 </div>
@@ -4307,55 +5578,62 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
               </div>
 
               <div className="w-full">
-                {/* Level 1: Main Category Tabs - Fill space with gaps */}
-                <div className="flex items-center p-1 bg-muted rounded-lg">
-                  {/* Overview Tab */}
-                  <Button
-                    variant={!expandedCategory && !selectedTool ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => {
-                      setExpandedCategory(null)
-                      setSelectedTool(null)
-                      setSelectedSubTool(null)
-                    }}
-                    className="flex-1 flex items-center justify-center mx-1"
-                  >
-                    <span>Core</span>
-                  </Button>
+                {/* Level 1: Main Category Tabs with Enhanced Animation */}
+                <div
+                  className={`transition-all duration-300 ${
+                    navigationState.animationPhase === "exploring" ? "ring-2 ring-blue-500/30" : ""
+                  }`}
+                >
+                  <div className="flex items-center p-1 bg-muted rounded-lg">
+                    {/* Overview Tab */}
+                    <Button
+                      variant={!explorationNavigation.category && !explorationNavigation.tool ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => {
+                        setExplorationNavigation({
+                          category: null,
+                          tool: null,
+                          subTool: null,
+                          coreTab: null,
+                        })
+                        setExpandedCategory(null)
+                        setSelectedTool(null)
+                        setSelectedSubTool(null)
+                        setSelectedCoreTab(null)
+                      }}
+                      className="flex-1 flex items-center justify-center mx-1 transition-all duration-200"
+                    >
+                      <span>Core</span>
+                    </Button>
 
-                  {/* Category Tabs */}
-                  {availableCategories
-                    .filter((cat) => cat.name !== "overview")
-                    .map((category) => (
-                      <Button
-                        key={category.name}
-                        variant={expandedCategory === category.name ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => handleCategoryClick(category.name)}
-                        className="flex-1 flex items-center justify-center mx-1"
-                      >
-                        <span>{category.label || category.name}</span>
-                      </Button>
-                    ))}
+                    {/* Category Tabs */}
+                    {availableCategories
+                      .filter((cat) => cat.name !== "overview")
+                      .map((category) => (
+                        <Button
+                          key={category.name}
+                          variant={explorationNavigation.category === category.name ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => handleCategoryClick(category.name)}
+                          className="flex-1 flex items-center justify-center mx-1 transition-all duration-200 hover:scale-105"
+                        >
+                          <span>{category.label || category.name}</span>
+                        </Button>
+                      ))}
+                  </div>
                 </div>
 
-                {/* Level 2: Tool Tabs (shown when category is expanded AND no tool is selected) - Centered beneath parent */}
-                {expandedCategory && categoryTools.length > 0 && !selectedTool && (
-                  <div className="flex justify-center mt-2">
-                    <div
-                      className="flex flex-wrap items-center justify-center gap-2 p-1 bg-muted/50 rounded-lg"
-                      style={{
-                        maxWidth: `${Math.min(100, categoryTools.length * 140 + 40)}%`,
-                        minWidth: "200px",
-                      }}
-                    >
+                {/* Level 2: Tool Tabs (shown when category is expanded AND no tool is selected) - Professional Design */}
+                {explorationNavigation.category && categoryTools.length > 0 && !explorationNavigation.tool && (
+                  <div className="flex justify-center mt-1">
+                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-muted/30 rounded-lg border border-border/50 transition-all duration-300 animate-in slide-in-from-top-2 w-full">
                       {categoryTools.map((tool) => (
                         <Button
                           key={tool.name}
-                          variant={selectedTool === tool.name ? "default" : "ghost"}
+                          variant={explorationNavigation.tool === tool.name ? "default" : "ghost"}
                           size="sm"
                           onClick={() => handleToolClick(tool.name)}
-                          className="flex items-center text-sm whitespace-nowrap"
+                          className="flex items-center text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] hover:shadow-sm font-medium py-1 h-auto"
                           disabled={tool.href === "#" || tool.href.includes("coming-soon")}
                         >
                           <span>{tool.name}</span>
@@ -4370,36 +5648,197 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                   </div>
                 )}
 
-                {/* Level 3: Sub-tool Tabs (shown when tool is selected and has sub-tabs) - Centered beneath parent */}
-                {selectedTool && getToolSubTabs(selectedTool).length > 0 && (
-                  <div className="flex justify-center mt-2">
-                    <div
-                      className="flex flex-wrap items-center justify-center gap-2 p-1 bg-muted/30 rounded-lg"
-                      style={{
-                        maxWidth: `${Math.min(80, getToolSubTabs(selectedTool).length * 120 + 40)}%`,
-                        minWidth: "180px",
-                      }}
-                    >
-                      {getToolSubTabs(selectedTool).map((subTool) => (
+                {/* Level 2: Core Tabs (shown when Core is selected - no category expanded and no tool selected) - Professional Design */}
+                {!explorationNavigation.category && !explorationNavigation.tool && (
+                  <div className="flex justify-center mt-1">
+                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-muted/30 rounded-lg border border-border/50 transition-all duration-300 animate-in slide-in-from-top-2 w-full">
+                      {coreTabsConfig.map((coreTab) => (
                         <Button
-                          key={subTool.id}
-                          variant={selectedSubTool === subTool.id ? "default" : "ghost"}
+                          key={coreTab.id}
+                          variant={explorationNavigation.coreTab === coreTab.id ? "default" : "ghost"}
                           size="sm"
-                          onClick={() => handleSubToolClick(subTool.id)}
-                          className="flex items-center text-xs whitespace-nowrap"
+                          onClick={() => handleCoreTabClick(coreTab.id)}
+                          className="flex items-center text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] hover:shadow-sm font-medium py-1 h-auto"
                         >
-                          <span>{subTool.label}</span>
+                          <span>{coreTab.label}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Content Area */}
-                <div className="mt-6">
-                  {/* Overview Content */}
-                  {!selectedTool && (
-                    <div className="space-y-4">
+                {/* Level 3: Sub-tool Tabs (shown when tool is selected and has sub-tabs) - Professional Design */}
+                {explorationNavigation.tool && getToolSubTabs(explorationNavigation.tool).length > 0 && (
+                  <div className="mt-1">
+                    <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-lg border border-border/50 transition-all duration-300 animate-in slide-in-from-top-2">
+                      <div className="flex flex-wrap items-center gap-2 flex-1">
+                        {getToolSubTabs(explorationNavigation.tool).map((subTool) => (
+                          <Button
+                            key={subTool.id}
+                            variant={explorationNavigation.subTool === subTool.id ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => handleSubToolClick(subTool.id)}
+                            className="flex items-center text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] hover:shadow-sm font-medium py-1 h-auto"
+                          >
+                            <span>{subTool.label}</span>
+                            <ArrowRight className="h-3 w-3 ml-1 opacity-40" />
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Content Area - Enhanced with Animation & Persistence */}
+                <div
+                  className={`mt-6 transition-all duration-500 ${
+                    navigationState.isNavigating ? "opacity-50 scale-[0.98]" : "opacity-100 scale-100"
+                  }`}
+                >
+                  {/* Core Tab Content - Using committed navigation */}
+                  {!committedNavigation.category && !committedNavigation.tool && committedNavigation.coreTab && (
+                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                      {/* Level 3: Sub-tool Tabs for Core > Checklists */}
+                      {committedNavigation.coreTab === "checklists" && getToolSubTabs("Checklists").length > 0 && (
+                        <div className="flex justify-center">
+                          <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-lg border border-border/50">
+                            {getToolSubTabs("Checklists").map((subTool) => (
+                              <Button
+                                key={subTool.id}
+                                variant={committedNavigation.subTool === subTool.id ? "default" : "ghost"}
+                                size="sm"
+                                onClick={() => {
+                                  const newNavigation = {
+                                    category: null,
+                                    tool: null,
+                                    subTool: subTool.id,
+                                    coreTab: committedNavigation.coreTab,
+                                  }
+                                  setCommittedNavigation(newNavigation)
+                                  setExplorationNavigation(newNavigation)
+                                }}
+                                className="flex items-center text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] hover:shadow-sm font-medium py-1 h-auto"
+                              >
+                                <span>{subTool.label}</span>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {committedNavigation.coreTab === "reports" ? (
+                        <ReportsContent
+                          selectedSubTool=""
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      ) : committedNavigation.coreTab === "checklists" ? (
+                        <ChecklistsContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      ) : (
+                        <div className="min-h-96 border rounded-lg bg-card p-6">
+                          <div className="text-center text-muted-foreground">
+                            <h3 className="text-xl font-semibold mb-2">
+                              {coreTabsConfig.find((tab) => tab.id === committedNavigation.coreTab)?.label}
+                            </h3>
+                            <p className="mb-4">
+                              {coreTabsConfig.find((tab) => tab.id === committedNavigation.coreTab)?.description}
+                            </p>
+                            <p className="text-sm">Content for this tab will be implemented soon.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Category Dashboard - Using committed navigation */}
+                  {committedNavigation.category && !committedNavigation.tool && (
+                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                      {/* Financial Management Category Dashboard */}
+                      {committedNavigation.category === "Financial Management" && (
+                        <FinancialDashboard
+                          projectId={params.projectId}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {/* Add other category dashboards here */}
+                      {committedNavigation.category !== "Financial Management" && (
+                        <div className="min-h-96 border rounded-lg bg-card p-6">
+                          <div className="text-center text-muted-foreground">
+                            <h3 className="text-xl font-semibold mb-2">{committedNavigation.category} Dashboard</h3>
+                            <p className="mb-4">
+                              Category dashboard for {committedNavigation.category} will be implemented soon.
+                            </p>
+                            <p className="text-sm">Select a tool from the navigation to get started.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tool Content - Using committed navigation */}
+                  {committedNavigation.tool && (
+                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                      {/* Render tool content based on committed navigation */}
+                      {committedNavigation.tool === "Financial Hub" && (
+                        <FinancialHubContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Procurement" && (
+                        <ProcurementContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Scheduler" && (
+                        <SchedulerContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Constraints Log" && (
+                        <ConstraintsContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Permit Log" && (
+                        <PermitLogContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Field Reports" && (
+                        <FieldReportsContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                      {committedNavigation.tool === "Checklists" && (
+                        <ChecklistsContent
+                          selectedSubTool={committedNavigation.subTool || ""}
+                          projectData={project}
+                          userRole={user?.role || "project-manager"}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {/* Overview Content - Using committed navigation (when no committed navigation exists) */}
+                  {!committedNavigation.category && !committedNavigation.tool && !committedNavigation.coreTab && (
+                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Project Summary Card */}
                         <Card>
@@ -4419,188 +5858,50 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
                                   <p className="font-medium">{project.duration} days</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-muted-foreground">Square Feet</p>
-                                  <p className="font-medium">{project.square_feet?.toLocaleString()}</p>
+                                  <p className="text-sm text-muted-foreground">Contract Value</p>
+                                  <p className="font-medium">${project.contract_value.toLocaleString()}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-muted-foreground">Location</p>
-                                  <p className="font-medium">{project.address || "Not specified"}</p>
-                                </div>
-                              </div>
-
-                              <div className="pt-4 border-t">
-                                <div className="flex justify-between mb-2">
-                                  <span className="text-sm text-muted-foreground">Schedule Progress</span>
-                                  <span className="text-sm font-medium">{projectMetrics?.scheduleProgress}%</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div
-                                    className="bg-blue-600 h-2 rounded-full"
-                                    style={{ width: `${projectMetrics?.scheduleProgress}%` }}
-                                  />
+                                  <p className="text-sm text-muted-foreground">Stage</p>
+                                  <p className="font-medium">{project.project_stage_name}</p>
                                 </div>
                               </div>
                             </div>
                           </CardContent>
                         </Card>
 
-                        {/* Stage-Adaptive Content */}
-                        {useStageAdaptive && stageConfig && (
-                          <Card>
-                            <CardHeader>
-                              <CardTitle className="text-base">{stageConfig.stageName} Stage Tools</CardTitle>
-                              <CardDescription>Tools and features for current project stage</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="h-64 overflow-y-auto">
-                                <StageAdaptiveContent
-                                  project={{
-                                    ...project,
-                                    project_stage_name: currentStage,
-                                  }}
-                                  currentStage={currentStage}
-                                  userRole={userRole}
-                                />
+                        {/* Project Metrics Card */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-base">Project Metrics</CardTitle>
+                            <CardDescription>Current progress and performance indicators</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-muted-foreground">Schedule Progress</p>
+                                <p className="font-medium">{projectMetrics?.scheduleProgress}%</p>
                               </div>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-
-                      <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertDescription>
-                          <strong>Project Status:</strong> This project is currently in the {currentStage} stage with{" "}
-                          {projectMetrics?.scheduleProgress}% completion. {projectMetrics?.riskItems} risk items require
-                          attention.
-                        </AlertDescription>
-                      </Alert>
-                    </div>
-                  )}
-
-                  {/* Tool Content */}
-                  {selectedTool && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedTool(null)
-                            setSelectedSubTool(null)
-                          }}
-                        >
-                          <ArrowLeft className="h-4 w-4 mr-2" />
-                          Back to Core
-                        </Button>
-                        <h4 className="text-lg font-semibold">{selectedTool}</h4>
-                        {selectedSubTool && (
-                          <>
-                            <span className="text-muted-foreground">/</span>
-                            <span className="text-base font-medium">
-                              {getToolSubTabs(selectedTool).find((st) => st.id === selectedSubTool)?.label}
-                            </span>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="min-h-96 border rounded-lg bg-card">
-                        {selectedTool === "Start-Up Checklist" && (
-                          <StartUpChecklist
-                            projectId={projectId.toString()}
-                            projectName={project?.display_name || project?.name || "Project"}
-                            mode="editable"
-                            onStatusChange={(
-                              sectionId: string,
-                              itemId: string,
-                              status: "Conforming" | "Deficient" | "Neutral" | "N/A"
-                            ) => {
-                              console.log("Start-Up Checklist status change:", sectionId, itemId, status)
-                            }}
-                          />
-                        )}
-                        {selectedTool === "Closeout Checklist" && (
-                          <CloseoutChecklist
-                            projectId={projectId.toString()}
-                            mode="full"
-                            userRole={userRole === "project_manager" ? "pm" : "admin"}
-                            onStatusChange={(
-                              itemId: string,
-                              status: "Conforming" | "Deficient" | "Neutral" | "N/A"
-                            ) => {
-                              console.log("Closeout Checklist status change:", itemId, status)
-                            }}
-                          />
-                        )}
-                        {selectedTool === "Financial Hub" && (
-                          <FinancialHubContent
-                            selectedSubTool={selectedSubTool || "overview"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {selectedTool === "Scheduler" && (
-                          <SchedulerContent
-                            selectedSubTool={selectedSubTool || "overview"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {selectedTool === "Procurement" && (
-                          <ProcurementContent
-                            selectedSubTool={selectedSubTool || "log"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {selectedTool === "Constraints Log" && (
-                          <ConstraintsContent
-                            selectedSubTool={selectedSubTool || "log"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {selectedTool === "Permit Log" && (
-                          <PermitLogContent
-                            selectedSubTool={selectedSubTool || "overview"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {selectedTool === "Field Reports" && (
-                          <FieldReportsContent
-                            selectedSubTool={selectedSubTool || "daily"}
-                            projectData={project}
-                            userRole={userRole}
-                          />
-                        )}
-                        {![
-                          "Start-Up Checklist",
-                          "Closeout Checklist",
-                          "Financial Hub",
-                          "Scheduler",
-                          "Procurement",
-                          "Constraints Log",
-                          "Permit Log",
-                          "Field Reports",
-                        ].includes(selectedTool) && (
-                          <div className="text-center text-muted-foreground p-6">
-                            {selectedTool} content would be rendered here.
-                            <br />
-                            <span className="text-sm">This will display the full tool interface inline.</span>
-                            {selectedSubTool && (
-                              <>
-                                <br />
-                                <span className="text-sm">Selected sub-tab: {selectedSubTool}</span>
-                              </>
-                            )}
-                          </div>
-                        )}
+                              <div>
+                                <p className="text-sm text-muted-foreground">Budget Progress</p>
+                                <p className="font-medium">{projectMetrics?.budgetProgress}%</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Active Team</p>
+                                <p className="font-medium">{projectMetrics?.activeTeamMembers} members</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Milestones</p>
+                                <p className="font-medium">
+                                  {projectMetrics?.completedMilestones}/{projectMetrics?.totalMilestones}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
                       </div>
                     </div>
                   )}
-
-                  {/* Category tool menu removed - tools only accessible via second tab row */}
                 </div>
               </div>
             </div>

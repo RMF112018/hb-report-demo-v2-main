@@ -77,7 +77,7 @@ export interface CloseoutSection {
   title: string
   description?: string
   items: CloseoutItem[]
-  icon: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
 }
 
 interface CloseoutChecklistProps {
@@ -155,7 +155,7 @@ export default function CloseoutChecklist({
         id: "task-closure",
         title: "Task Closure",
         description: "Complete all outstanding project tasks and documentation",
-        icon: <CheckSquare className="h-4 w-4" />,
+        icon: CheckSquare,
         items: [
           {
             id: "tc-1",
@@ -208,7 +208,7 @@ export default function CloseoutChecklist({
         id: "document-tracking",
         title: "Document Tracking",
         description: "Collect and verify all required project documentation",
-        icon: <FileCheck className="h-4 w-4" />,
+        icon: FileCheck,
         items: [
           {
             id: "dt-1",
@@ -330,7 +330,7 @@ export default function CloseoutChecklist({
         id: "inspections",
         title: "Inspections",
         description: "Complete all required inspections and approvals",
-        icon: <ClipboardList className="h-4 w-4" />,
+        icon: ClipboardList,
         items: [
           {
             id: "ins-1",
@@ -436,7 +436,7 @@ export default function CloseoutChecklist({
         id: "turnover",
         title: "Turnover",
         description: "Complete project turnover and final deliverables",
-        icon: <Handshake className="h-4 w-4" />,
+        icon: Handshake,
         items: [
           {
             id: "to-1",
@@ -575,7 +575,7 @@ export default function CloseoutChecklist({
         id: "post-turnover",
         title: "Post-Turnover",
         description: "Follow-up activities after project completion",
-        icon: <Archive className="h-4 w-4" />,
+        icon: Archive,
         items: [
           {
             id: "pt-1",
@@ -624,7 +624,7 @@ export default function CloseoutChecklist({
         id: "px-closeout",
         title: "PX Closeout Docs",
         description: "Complete PX-specific closeout documentation",
-        icon: <Building className="h-4 w-4" />,
+        icon: Building,
         items: [
           {
             id: "px-1",
@@ -1083,7 +1083,7 @@ export default function CloseoutChecklist({
               {sections.map((section) => (
                 <div key={section.id} className="space-y-2">
                   <div className="flex items-center gap-2">
-                    {section.icon}
+                    <section.icon className="h-4 w-4" />
                     <span className="text-sm font-medium">{section.title}</span>
                   </div>
                   <Progress value={getProgressBySection(section)} className="h-1" />
@@ -1186,7 +1186,7 @@ export default function CloseoutChecklist({
                   <CardHeader className="hover:bg-muted/50 cursor-pointer">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        {section.icon}
+                        <section.icon className="h-4 w-4" />
                         <div>
                           <CardTitle className="text-lg">{section.title}</CardTitle>
                           <CardDescription>{section.description}</CardDescription>

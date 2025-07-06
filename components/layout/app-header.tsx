@@ -25,6 +25,7 @@ import { useTheme } from "next-themes"
 import { useProjectContext } from "@/context/project-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import projectsData from "@/data/mock/projects.json"
 import {
@@ -781,13 +782,25 @@ export const AppHeader = () => {
         {/* Left Section - Logo and Navigation */}
         <div className="flex items-center space-x-8">
           {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <img src="/images/hb_logo_white.png" alt="HB Logo" className="h-10 w-auto object-contain" />
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
-              <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
-            </div>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                  onClick={() => router.push(getDashboardPath())}
+                >
+                  <img src="/images/hb_logo_white.png" alt="HB Logo" className="h-10 w-auto object-contain" />
+                  <div className="flex flex-col">
+                    <span className="text-xl font-bold text-white leading-tight">HB Intel</span>
+                    <span className="text-xs text-blue-100 font-medium">Construction Intelligence</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Return to my Dashboard</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* Navigation Pills - Role-based */}
           {user?.role === "admin" ? (
