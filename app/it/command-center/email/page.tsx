@@ -317,7 +317,7 @@ export default function EmailSecurityPage() {
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Messages Overview - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Messages Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -336,7 +336,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Threat Protection - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Threat Protection</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -355,7 +355,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Authentication Status - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Authentication Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -380,7 +380,7 @@ export default function EmailSecurityPage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ */}
           <div className="hidden xl:block xl:col-span-3 space-y-4">
             {/* Email Overview */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Email Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -403,7 +403,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -426,7 +426,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Threat Statistics */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Threat Statistics</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -449,7 +449,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Microsoft Graph API Status */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">API Integration</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -483,7 +483,7 @@ export default function EmailSecurityPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
               <div className="space-y-3">
                 {emailData.recentThreats?.slice(0, 3).map((threat, index) => (
@@ -517,7 +517,7 @@ export default function EmailSecurityPage() {
           <div className="xl:col-span-9 space-y-4 lg:space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Messages</p>
@@ -529,7 +529,7 @@ export default function EmailSecurityPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Spam Detection</p>
@@ -541,7 +541,7 @@ export default function EmailSecurityPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Phishing Blocked</p>
@@ -553,7 +553,7 @@ export default function EmailSecurityPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Threats Caught</p>

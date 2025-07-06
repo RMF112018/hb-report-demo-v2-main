@@ -424,7 +424,7 @@ export default function GovernancePage() {
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Compliance Score - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Compliance Score</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -443,7 +443,7 @@ export default function GovernancePage() {
             </div>
 
             {/* Change Requests - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Change Requests</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -462,7 +462,7 @@ export default function GovernancePage() {
             </div>
 
             {/* Audit Schedule - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Audit Schedule</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -491,7 +491,7 @@ export default function GovernancePage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ */}
           <div className="hidden xl:block xl:col-span-3 space-y-4">
             {/* Governance Overview */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Governance Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -514,7 +514,7 @@ export default function GovernancePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -537,7 +537,7 @@ export default function GovernancePage() {
             </div>
 
             {/* Compliance Frameworks */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Compliance Frameworks</h3>
               <div className="space-y-3">
                 {complianceFrameworks.map((framework) => (
@@ -564,7 +564,7 @@ export default function GovernancePage() {
             </div>
 
             {/* Integration Status */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Integration Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
