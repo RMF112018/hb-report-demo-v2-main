@@ -584,4 +584,32 @@ export interface UseLayoutAnimationReturn {
   isAnimating: (type?: LayoutAnimationType) => boolean
 }
 
+/**
+ * Project Footer component props
+ */
+export interface ProjectFooterProps {
+  config?: {
+    height?: number
+    showStats?: boolean
+    showStatus?: boolean
+    showUserInfo?: boolean
+    fixed?: boolean
+    compact?: boolean
+  }
+  project?: {
+    name: string
+    status: string
+    progress?: number
+  }
+  stats?: {
+    budget?: number | string
+    budgetTrend?: "up" | "down" | "stable"
+    timeline?: string
+    team?: number | string
+  }
+  userRole?: string
+  onAction?: (actionId: string) => void
+  className?: string
+}
+
 export default LayoutConfig

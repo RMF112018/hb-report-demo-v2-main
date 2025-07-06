@@ -23,16 +23,10 @@ import { cn } from "@/lib/utils"
 import { useLayout } from "../../hooks/useLayout"
 import { ProjectLayoutProps } from "../../types/layout"
 import { LAYOUT_CSS_VARIABLES, Z_INDEX_SCALE } from "../../constants/layout"
-// import ProjectHeader from "./ProjectHeader"
-// import ProjectSidebar from "./ProjectSidebar"
-// import ProjectContent from "./ProjectContent"
-// import ProjectFooter from "./ProjectFooter"
-
-// Placeholder components until actual components are created
-const ProjectHeader = (props: any) => <div>Header Placeholder</div>
-const ProjectSidebar = (props: any) => <div>Sidebar Placeholder</div>
-const ProjectContent = (props: any) => <div>Content Placeholder</div>
-const ProjectFooter = (props: any) => <div>Footer Placeholder</div>
+import ProjectHeader from "./ProjectHeader"
+import ProjectSidebar from "./ProjectSidebar"
+import ProjectContent from "./ProjectContent"
+import ProjectFooter from "./ProjectFooter"
 
 /**
  * Main project layout component
@@ -176,7 +170,7 @@ export function ProjectLayout({
           projectData
             ? {
                 name: projectData.name || "Project Name",
-                id: projectData.id || "unknown",
+                id: String(projectData.id || "unknown"),
                 stage: projectData.stage || "in-progress",
               }
             : undefined
@@ -203,10 +197,11 @@ export function ProjectLayout({
           onQuickAction={(actionId) => {
             console.log("Quick action:", actionId)
           }}
-          className={cn("z-20", {
-            fixed: config.sidebar.state === "overlay",
-            relative: config.sidebar.state !== "overlay",
-          })}
+          className={cn(
+            "z-20",
+            config.sidebar.state === "overlay" && "fixed",
+            config.sidebar.state !== "overlay" && "relative"
+          )}
         />
 
         {/* Mobile overlay */}
@@ -249,11 +244,11 @@ export function ProjectLayout({
       {/* Layout debug info (development only) */}
       {process.env.NODE_ENV === "development" && (
         <div className="fixed bottom-4 right-4 z-50 bg-black/80 text-white text-xs p-2 rounded-md font-mono">
-          <div>Breakpoint: {responsive.state.breakpoint}</div>
+          <div>Breakpoint: {state.responsive.breakpoint}</div>
           <div>View Mode: {config.viewMode}</div>
           <div>Sidebar: {config.sidebar.state}</div>
           <div>
-            Screen: {responsive.state.width}x{responsive.state.height}
+            Screen: {state.responsive.width}x{state.responsive.height}
           </div>
           {animation.isAnimating && <div>Animation: {animation.animationType}</div>}
         </div>
