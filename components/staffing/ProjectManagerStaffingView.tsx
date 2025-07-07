@@ -387,49 +387,6 @@ export const ProjectManagerStaffingView = ({ userRole, projectId: propProjectId 
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex items-center gap-1 mb-6">
-              <button
-                onClick={() => setActiveTab("team")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "team"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Team Management
-              </button>
-              <button
-                onClick={() => setActiveTab("timeline")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "timeline"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Timeline View
-              </button>
-              <button
-                onClick={() => setActiveTab("spcr")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "spcr"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                SPCR Creation
-              </button>
-              <button
-                onClick={() => setActiveTab("analytics")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "analytics"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Performance
-              </button>
-            </div>
-
             {/* Team Management Tab */}
             <TabsContent value="team" className="space-y-6">
               <Collapsible open={isTeamExpanded} onOpenChange={setIsTeamExpanded}>

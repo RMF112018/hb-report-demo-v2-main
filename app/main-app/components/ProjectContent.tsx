@@ -1,116 +1,80 @@
 /**
- * @fileoverview Project Content Component
+ * @fileoverview Project Content Component for Main Application
  * @module ProjectContent
- * @version 1.0.0
+ * @version 3.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Project-specific content renderer using the modular project page system
+ * Renders project-specific content using the ProjectControlCenterContent component
+ * - Breadcrumb navigation
+ * - Project title and description
+ * - Integration with existing project control center
+ * - Role-based content filtering
  */
 
 "use client"
 
-import React, { useMemo } from "react"
-import { ProjectPageWrapper } from "../../project/[projectId]/components/ProjectPageWrapper"
-import { ProjectPageContent } from "../../project/[projectId]/components/ProjectPageContent"
-import type { UserRole, ProjectData } from "../../project/[projectId]/types/project"
+import React from "react"
+import ProjectControlCenterContent from "../../project/[projectId]/components/ProjectControlCenterContent"
+import type { UserRole } from "../../project/[projectId]/types/project"
 
 interface User {
-  firstName?: string
-  lastName?: string
-  email?: string
-  role?: string
+  firstName: string
+  lastName: string
+  email: string
+  role: string
+  avatar?: string
+}
+
+interface ProjectData {
+  id: string
+  name: string
+  description: string
+  stage: string
+  project_stage_name: string
+  project_type_name: string
+  contract_value: number
+  duration: number
+  start_date?: string
+  end_date?: string
+  location?: string
+  project_manager?: string
+  client?: string
+  active: boolean
+  project_number: string
+  metadata: {
+    originalData: any
+  }
 }
 
 interface ProjectContentProps {
   projectId: string
-  projectData: {
-    id: string
-    name: string
-    description: string
-    stage: string
-    project_stage_name: string
-    project_type_name: string
-    contract_value: number
-    duration: number
-    start_date?: string
-    end_date?: string
-    location?: string
-    project_manager?: string
-    client?: string
-    active: boolean
-    project_number: string
-    metadata: {
-      originalData: any
-    }
-  }
+  projectData: ProjectData
   userRole: UserRole
   user: User
+  onNavigateBack?: () => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
 }
 
-export const ProjectContent: React.FC<ProjectContentProps> = ({ projectId, projectData, userRole, user }) => {
-  // Transform project data to match the modular system's expectations
-  const transformedProjectData: ProjectData = useMemo(() => {
-    return {
-      id: parseInt(projectData.id),
-      name: projectData.name,
-      description: projectData.description,
-      stage: projectData.stage,
-      project_stage_name: projectData.project_stage_name,
-      project_type_name: projectData.project_type_name,
-      contract_value: projectData.contract_value,
-      duration: projectData.duration,
-      start_date: projectData.start_date,
-      end_date: projectData.end_date,
-      location: projectData.location,
-      project_manager: projectData.project_manager,
-      client: projectData.client,
-      metadata: projectData.metadata,
-    }
-  }, [projectData])
-
-  // Content components mapping (to be implemented)
-  const contentComponents = useMemo(
-    () => ({
-      // FinancialHubContent: FinancialHubContent,
-      // ProcurementContent: ProcurementContent,
-      // SchedulerContent: SchedulerContent,
-      // ConstraintsContent: ConstraintsContent,
-      // PermitLogContent: PermitLogContent,
-      // FieldReportsContent: FieldReportsContent,
-      // ReportsContent: ReportsContent,
-      // ChecklistsContent: ChecklistsContent,
-    }),
-    []
-  )
+export const ProjectContent: React.FC<ProjectContentProps> = ({
+  projectId,
+  projectData,
+  userRole,
+  user,
+  onNavigateBack,
+  activeTab = "dashboard",
+  onTabChange,
+}) => {
+  // Extract the actual numeric project_id from the original data
+  const actualProjectId = projectData.metadata.originalData?.project_id || projectId
 
   return (
-    <div className="h-full w-full">
-      {/* Use ProjectPageWrapper to provide necessary context providers */}
-      <ProjectPageWrapper
-        projectId={projectId}
-        userRole={userRole}
-        projectData={transformedProjectData}
-        className="h-full"
-      >
-        {/* Custom content without duplicating headers/sidebars */}
-        <div className="h-full">
-          {/* Project Content */}
-          <div className="h-full">
-            <ProjectPageContent
-              projectId={projectId}
-              userRole={userRole}
-              projectData={transformedProjectData}
-              contentComponents={contentComponents}
-              legacyProps={{
-                user,
-                project: projectData.metadata.originalData,
-                projectId: parseInt(projectId),
-              }}
-            />
-          </div>
-        </div>
-      </ProjectPageWrapper>
-    </div>
+    <ProjectControlCenterContent
+      projectId={actualProjectId.toString()}
+      projectData={projectData.metadata.originalData}
+      userRole={userRole}
+      user={user}
+    />
   )
 }

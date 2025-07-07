@@ -19,6 +19,10 @@ import { Badge } from "../../../components/ui/badge"
 import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
 import { getProjectStats, getProjectAccessDescription } from "../../../lib/project-access-utils"
 import type { UserRole } from "../../project/[projectId]/types/project"
+import Image from "next/image"
+import { ActionItemsInbox } from "../../../components/dashboard/ActionItemsInbox"
+import { ActionItemsToDo } from "../../../components/dashboard/ActionItemsToDo"
+import { ProjectActivityFeed } from "../../../components/feed/ProjectActivityFeed"
 
 interface ProjectData {
   id: string
@@ -53,12 +57,22 @@ interface RoleDashboardProps {
   user: User
   projects: ProjectData[]
   onProjectSelect: (projectId: string | null) => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
 }
 
-export const RoleDashboard: React.FC<RoleDashboardProps> = ({ userRole, user, projects, onProjectSelect }) => {
+export const RoleDashboard: React.FC<RoleDashboardProps> = ({
+  userRole,
+  user,
+  projects,
+  onProjectSelect,
+  activeTab = "overview",
+  onTabChange,
+}) => {
   // Use the dashboard layout hook
   const {
     layout,
+    layouts,
     cards,
     isLoading,
     error,
@@ -173,7 +187,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({ userRole, user, pr
       case "admin":
         return {
           title: `Welcome back, ${name}`,
-          subtitle: `IT Command Center - ${layout.description}`,
+          subtitle: `IT Administrator Dashboard - ${layout.description}`,
           badge: `System Administrator`,
           accessInfo: accessDescription,
         }
@@ -189,86 +203,132 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({ userRole, user, pr
 
   const welcomeMessage = getRoleWelcomeMessage()
 
+  // Render content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <DashboardLayout
+            cards={cards}
+            onLayoutChange={onLayoutChange}
+            onCardRemove={onCardRemove}
+            onCardConfigure={onCardConfigure}
+            onCardSizeChange={onCardSizeChange}
+            onCardAdd={onCardAdd}
+            onSave={onSave}
+            onReset={onReset}
+            isEditing={isEditing}
+            onToggleEdit={onToggleEdit}
+            layoutDensity={layoutDensity}
+            userRole={userRole}
+            dashboards={dashboards}
+            currentDashboardId={currentDashboardId ?? undefined}
+            onDashboardSelect={onDashboardSelect}
+          />
+        )
+
+      case "financial-review":
+        // Get financial dashboard layout if available, otherwise use current layout
+        const financialLayout = layouts?.find((l) => l.name.toLowerCase().includes("financial")) || layout
+        const financialCards = financialLayout?.cards || cards
+
+        return (
+          <DashboardLayout
+            cards={financialCards}
+            onLayoutChange={onLayoutChange}
+            onCardRemove={onCardRemove}
+            onCardConfigure={onCardConfigure}
+            onCardSizeChange={onCardSizeChange}
+            onCardAdd={onCardAdd}
+            onSave={onSave}
+            onReset={onReset}
+            isEditing={isEditing}
+            onToggleEdit={onToggleEdit}
+            layoutDensity={layoutDensity}
+            userRole={userRole}
+            dashboards={dashboards}
+            currentDashboardId={currentDashboardId ?? undefined}
+            onDashboardSelect={onDashboardSelect}
+          />
+        )
+
+      case "action-items":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
+            <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
+          </div>
+        )
+
+      case "activity-feed":
+        return (
+          <ProjectActivityFeed
+            config={{
+              userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+              showFilters: true,
+              showPagination: true,
+              itemsPerPage: 20,
+              allowExport: true,
+            }}
+          />
+        )
+
+      default:
+        // Default to overview if tab not recognized
+        return (
+          <DashboardLayout
+            cards={cards}
+            onLayoutChange={onLayoutChange}
+            onCardRemove={onCardRemove}
+            onCardConfigure={onCardConfigure}
+            onCardSizeChange={onCardSizeChange}
+            onCardAdd={onCardAdd}
+            onSave={onSave}
+            onReset={onReset}
+            isEditing={isEditing}
+            onToggleEdit={onToggleEdit}
+            layoutDensity={layoutDensity}
+            userRole={userRole}
+            dashboards={dashboards}
+            currentDashboardId={currentDashboardId ?? undefined}
+            onDashboardSelect={onDashboardSelect}
+          />
+        )
+    }
+  }
+
   return (
     <div className="h-full w-full">
-      {/* Dashboard Header */}
-      <div className="mb-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">{welcomeMessage.title}</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{welcomeMessage.subtitle}</p>
-            {welcomeMessage.accessInfo && (
-              <p className="text-xs text-gray-500 dark:text-gray-500 italic">{welcomeMessage.accessInfo}</p>
-            )}
+      {/* Layout Density Controls - Show when editing and on overview tab */}
+      {isEditing && (activeTab === "overview" || activeTab === "financial-review") && (
+        <div className="mb-4 flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+          <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 mr-2">Density:</span>
+          <div className="flex gap-1">
+            {(["compact", "normal", "spacious"] as const).map((density) => (
+              <Button
+                key={density}
+                variant={layoutDensity === density ? "default" : "outline"}
+                size="sm"
+                onClick={() => onDensityChange(density)}
+                className="text-[10px] capitalize h-5 px-1.5"
+              >
+                {density}
+              </Button>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-            >
-              {welcomeMessage.badge}
-            </Badge>
-            {/* Edit Mode Toggle */}
-            <Button
-              variant={isEditing ? "default" : "outline"}
-              size="sm"
-              onClick={onToggleEdit}
-              className="text-xs h-7 px-3"
-            >
-              {isEditing ? "Exit Edit" : "Edit Layout"}
+          <div className="ml-auto flex gap-1">
+            <Button variant="outline" size="sm" onClick={onReset} className="text-[10px] h-5 px-1.5">
+              Reset
+            </Button>
+            <Button variant="default" size="sm" onClick={onSave} className="text-[10px] h-5 px-1.5">
+              Save
             </Button>
           </div>
         </div>
-
-        {/* Layout Density Controls */}
-        {isEditing && (
-          <div className="flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 mr-2">Density:</span>
-            <div className="flex gap-1">
-              {(["compact", "normal", "spacious"] as const).map((density) => (
-                <Button
-                  key={density}
-                  variant={layoutDensity === density ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onDensityChange(density)}
-                  className="text-xs capitalize h-6 px-2"
-                >
-                  {density}
-                </Button>
-              ))}
-            </div>
-            <div className="ml-auto flex gap-1">
-              <Button variant="outline" size="sm" onClick={onReset} className="text-xs h-6 px-2">
-                Reset
-              </Button>
-              <Button variant="default" size="sm" onClick={onSave} className="text-xs h-6 px-2">
-                Save
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Dashboard Content */}
-      <div className="dashboard-content">
-        <DashboardLayout
-          cards={cards}
-          onLayoutChange={onLayoutChange}
-          onCardRemove={onCardRemove}
-          onCardConfigure={onCardConfigure}
-          onCardSizeChange={onCardSizeChange}
-          onCardAdd={onCardAdd}
-          onSave={onSave}
-          onReset={onReset}
-          isEditing={isEditing}
-          onToggleEdit={onToggleEdit}
-          layoutDensity={layoutDensity}
-          userRole={userRole}
-          dashboards={dashboards}
-          currentDashboardId={currentDashboardId ?? undefined}
-          onDashboardSelect={onDashboardSelect}
-        />
-      </div>
+      <div className="dashboard-content">{renderTabContent()}</div>
     </div>
   )
 }
