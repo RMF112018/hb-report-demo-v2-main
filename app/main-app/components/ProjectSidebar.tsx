@@ -237,10 +237,29 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => router.push(getDashboardPath())}
-                    className="w-full h-10 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                    className="w-full h-10 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                     title="HB Intel Dashboard"
                   >
-                    <img src="/images/hb_logo.jpg" alt="HB Logo" className="h-6 w-6 object-contain rounded" />
+                    <div className="flex items-center w-full">
+                      {/* Left: HBI Icon */}
+                      <div className="flex justify-start" style={{ width: "2rem" }}>
+                        <div
+                          className="text-white rounded-md flex items-center justify-center text-xs font-bold"
+                          style={{ width: "2rem", height: "2rem", backgroundColor: "rgba(250, 70, 22, 1)" }}
+                        >
+                          HBI
+                        </div>
+                      </div>
+                      {/* Center: Logo (centered between HBI icon and right edge) */}
+                      <div className="flex-1 flex justify-center">
+                        <img
+                          src="/images/HB_Logo_Large.png"
+                          alt="HB Logo"
+                          className="h-8 object-contain bg-transparent"
+                          style={{ maxWidth: "90%" }}
+                        />
+                      </div>
+                    </div>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -386,21 +405,32 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
       <div className="flex flex-col h-full">
         {/* Header with Logo, Title, and Controls */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            {/* Logo and Title */}
+          <div className="flex items-center justify-center mb-4">
+            {/* Logo and HBI Icon */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                    className="flex items-center w-full cursor-pointer hover:opacity-80 transition-opacity duration-200"
                     onClick={() => router.push(getDashboardPath())}
                   >
-                    <img src="/images/hb_logo.jpg" alt="HB Logo" className="h-8 w-8 object-contain rounded" />
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">HB Intel</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                        Construction Intelligence
-                      </span>
+                    {/* Left: HBI Icon */}
+                    <div className="flex justify-start" style={{ width: "3rem" }}>
+                      <div
+                        className="text-white rounded-lg flex items-center justify-center text-sm font-bold"
+                        style={{ width: "3rem", height: "3rem", backgroundColor: "rgba(250, 70, 22, 1)" }}
+                      >
+                        HBI
+                      </div>
+                    </div>
+                    {/* Center: Logo (centered between HBI icon and right edge) */}
+                    <div className="flex-1 flex justify-center">
+                      <img
+                        src="/images/HB_Logo_Large.png"
+                        alt="HB Logo"
+                        className="object-contain bg-transparent"
+                        style={{ height: "3rem", maxWidth: "90%" }}
+                      />
                     </div>
                   </div>
                 </TooltipTrigger>
@@ -409,17 +439,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-            {/* Collapse Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleCollapsed}
-              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-              title="Collapse sidebar"
-            >
-              <PanelLeftClose className="h-4 w-4" />
-            </Button>
           </div>
 
           {/* Action Icons Row */}
@@ -581,9 +600,21 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
         {/* Footer Info */}
         <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {sortedStages.reduce((acc, [, projects]) => acc + projects.length, 0)} projects
-            {searchQuery && " (filtered)"}
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {sortedStages.reduce((acc, [, projects]) => acc + projects.length, 0)} projects
+              {searchQuery && " (filtered)"}
+            </div>
+            {/* Collapse Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapsed}
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              title="Collapse sidebar"
+            >
+              <PanelLeftClose className="h-8 w-8" />
+            </Button>
           </div>
         </div>
       </div>

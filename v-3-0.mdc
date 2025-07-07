@@ -1,0 +1,668 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# HB Report Demo v3.0 Refactoring Guidelines
+
+## Overview
+This ruleset documents the comprehensive refactoring efforts undertaken for HB Report Demo v3.0, focusing on professional UI styling, integrated sidebar navigation, and enhanced user experience. All changes maintain enterprise-grade standards while improving visual design and functionality.
+
+## Executive Summary of Changes
+This refactoring transformed the HB Report Demo from a bright orange-themed application with separate header/sidebar navigation into a sophisticated professional interface with integrated navigation and modular architecture:
+
+### Primary Transformations
+1. **Visual Identity:** Bright orange theme → Professional blue-gray palette
+2. **Navigation:** Split header/sidebar → Unified sidebar with integrated controls
+3. **Layout:** Fixed header with calculated height → Full-height responsive sidebar
+4. **Architecture:** Monolithic pages → Modular wrapper-content component system
+5. **Styling:** Bold, high-contrast design → Subtle, professional appearance
+
+### Key Metrics
+- **Color Saturation:** Reduced from 60-80% to 20-35% across all charts and components
+- **Component Spacing:** Standardized to `gap-3`/`p-3` maximum for compact layouts
+- **Logo Visibility:** Increased 50% while maintaining proportional balance
+- **Vertical Space:** Gained 3.5rem of usable height through header elimination
+- **Code Modularity:** Implemented dynamic loading for improved performance
+
+## Responsive Design Requirements
+
+### Universal Device Support
+All components, pages, and content elements MUST be fully responsive across the complete spectrum of access methods:
+
+**Minimum Device Range:**
+- **Mobile Minimum:** iPhone SE (375px width, 667px height)
+- **Tablet Range:** iPad (768px width, 1024px height)
+- **Desktop Standard:** 1920px width, 1080px height
+- **Large Display Maximum:** 110" presentation displays (up to 3840px+ width)
+
+### Responsive Design Principles
+
+#### 1. Mobile-First Architecture
+```css
+/* Base styles for mobile (375px+) */
+.component {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Tablet enhancements (768px+) */
+@media (min-width: 768px) {
+  .component {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Desktop enhancements (1024px+) */
+@media (min-width: 1024px) {
+  .component {
+    padding: 1.5rem;
+    font-size: 1.125rem;
+  }
+}
+
+/* Large display optimizations (1920px+) */
+@media (min-width: 1920px) {
+  .component {
+    padding: 2rem;
+    font-size: 1.25rem;
+  }
+}
+```
+
+#### 2. Sidebar Responsive Behavior
+- **Mobile (< 768px):** Overlay sidebar with full-screen backdrop
+- **Tablet (768px-1023px):** Persistent sidebar with content reflow
+- **Desktop (1024px+):** Persistent sidebar with optimized content layout
+- **Large Display (1920px+):** Enhanced spacing and typography scaling
+
+#### 3. Touch Target Requirements
+- **Minimum Touch Area:** 44px × 44px (iOS HIG standard)
+- **Interactive Elements:** All buttons, links, and controls must meet touch standards
+- **Spacing:** Minimum 8px between interactive elements on mobile
+- **Hover States:** Must not interfere with touch interactions
+
+#### 4. Typography Scaling
+```css
+/* Responsive text scaling */
+.text-responsive {
+  font-size: clamp(0.875rem, 2.5vw, 1.25rem);  /* Mobile to desktop */
+  line-height: 1.5;
+}
+
+/* Large display typography */
+@media (min-width: 1920px) {
+  .text-responsive {
+    font-size: clamp(1.125rem, 1.5vw, 2rem);
+  }
+}
+```
+
+#### 5. Content Scaling Guidelines
+- **Images:** Use `object-fit: contain` with responsive sizing
+- **Charts:** Implement responsive chart libraries with viewport scaling
+- **Tables:** Horizontal scroll on mobile, full display on larger screens
+- **Modals:** Full-screen on mobile, centered on larger displays
+
+#### 6. Navigation Adaptations
+```jsx
+// Mobile navigation pattern
+{isMobile ? (
+  <Sheet>
+    <SheetTrigger asChild>
+      <Button className="h-10 w-10" size="sm">
+        <Menu className="h-5 w-5" />
+      </Button>
+    </SheetTrigger>
+    <SheetContent side="left">
+      <ProjectSidebar collapsed={false} />
+    </SheetContent>
+  </Sheet>
+) : (
+  <ProjectSidebar collapsed={sidebarCollapsed} />
+)}
+```
+
+### Device-Specific Optimizations
+
+#### Mobile Devices (375px - 767px)
+- **Sidebar:** Overlay with swipe gestures
+- **Content:** Single-column layout with vertical stacking
+- **Typography:** Larger base font size for readability
+- **Interactive Elements:** Enhanced touch targets (minimum 44px)
+- **Images:** Optimized loading with responsive breakpoints
+
+#### Tablet Devices (768px - 1023px)
+- **Sidebar:** Persistent with content reflow
+- **Content:** Two-column layout where appropriate
+- **Typography:** Balanced scaling between mobile and desktop
+- **Interactive Elements:** Hybrid touch/mouse support
+
+#### Desktop Displays (1024px - 1919px)
+- **Sidebar:** Persistent with hover interactions
+- **Content:** Multi-column layouts with optimal reading width
+- **Typography:** Standard desktop sizing
+- **Interactive Elements:** Optimized for mouse interactions
+
+#### Large Displays (1920px+)
+- **Layout:** Enhanced spacing and component scaling
+- **Typography:** Increased font sizes for viewing distance
+- **Content:** Wider maximum widths with proper content centering
+- **Interface Elements:** Proportionally scaled for visibility
+
+### Testing Requirements
+- **Browser Testing:** Chrome, Safari, Firefox, Edge across all device sizes
+- **Physical Device Testing:** Actual mobile devices and large displays
+- **Viewport Testing:** Browser dev tools with all standard breakpoints
+- **Orientation Testing:** Portrait and landscape on mobile/tablet
+- **Accessibility Testing:** Screen readers and keyboard navigation
+
+### Implementation Standards
+```typescript
+// Responsive hook example
+const useResponsive = () => {
+  const [breakpoint, setBreakpoint] = useState('mobile');
+  
+  useEffect(() => {
+    const updateBreakpoint = () => {
+      const width = window.innerWidth;
+      if (width < 768) setBreakpoint('mobile');
+      else if (width < 1024) setBreakpoint('tablet');
+      else if (width < 1920) setBreakpoint('desktop');
+      else setBreakpoint('large');
+    };
+    
+    updateBreakpoint();
+    window.addEventListener('resize', updateBreakpoint);
+    return () => window.removeEventListener('resize', updateBreakpoint);
+  }, []);
+  
+  return breakpoint;
+};
+```
+
+## Architecture Changes
+
+### 1. Professional Color Scheme Implementation
+**File:** `styles/globals.css`
+**Changes Made:**
+- Transformed primary color from bright orange (`13 96% 53%`) to professional blue-gray (`215 25% 27%`)
+- Reduced chart color saturation from 60-80% to 20-35% for subtle, professional appearance
+- Updated secondary/muted colors to sophisticated gray palette
+- Maintained dark theme consistency with adjusted color mappings
+
+**Editing Guidelines:**
+- Always test color changes in both light and dark themes
+- Maintain accessibility contrast ratios (WCAG 2.1 AA standards)
+- Use CSS custom properties for consistent theming
+- Validate color harmony across all UI components
+
+### 2. Integrated Sidebar Navigation System
+**File:** `app/main-app/components/ProjectSidebar.tsx`
+**Version:** 2.0.0
+**Major Architectural Changes:**
+
+#### Header Elimination & Integration
+- **Complete Header Removal:**
+  - **Removed:** Separate `AppHeaderSimple` component dependency
+  - **Eliminated:** `app-header-simple.tsx` import from layout files
+  - **Result:** No top navigation bar, clean single-sidebar design
+- **Layout Height Transformation:**
+  - **Before:** `h-[calc(100vh-3.5rem)]` accounting for header height
+  - **After:** `h-screen` for full viewport height utilization
+  - **Sidebar:** Now spans entire left edge from `top-0` to bottom
+  - **Content Area:** Gains additional 3.5rem of vertical space
+- **Functionality Migration:**
+  - **Logo & Branding:** Moved from header to sidebar top section
+  - **User Controls:** Theme toggle, notifications, user menu integrated
+  - **Navigation:** All interactions consolidated into single sidebar interface
+
+#### Logo & Branding System
+- **HBI Icon:** Added square icon with rounded corners (2rem collapsed, 3rem expanded)
+- **HBI Icon Color:** Custom orange background `rgba(250, 70, 22, 1)` with white text
+- **Logo Positioning:** Three-column layout for precise centering between HBI icon and sidebar edge
+- **Logo Size Evolution:** 
+  - Initial: Standard size with 60% max-width constraint
+  - Phase 1: Increased height by 50% (h-8 to h-12, then h-12 to h-18)
+  - Phase 2: Increased max-width from 60% to 90% for actual visual enlargement
+  - Final: Matched logo height to HBI icon height (h-8 collapsed, h-12 expanded)
+- **Container Width:** Ensured 100% width of expanded sidebar with `w-full` class
+- **Container Structure:**
+  ```jsx
+  <div className="flex items-center w-full">
+    <div className="flex justify-start" style={{ width: "2rem|3rem" }}>
+      <div 
+        className="text-white rounded-md flex items-center justify-center"
+        style={{ 
+          width: "2rem|3rem", 
+          height: "2rem|3rem", 
+          backgroundColor: "rgba(250, 70, 22, 1)" 
+        }}
+      >
+        HBI
+      </div>
+    </div>
+    <div className="flex-1 flex justify-center">
+      <img style={{ height: "2rem|3rem", maxWidth: "90%" }} />
+    </div>
+  </div>
+  ```
+
+#### Navigation Controls
+- **Collapse Button Migration:**
+  - **Removed from:** Header section alongside logo
+  - **Moved to:** Footer section aligned right with project count
+  - **Size Increase:** Icon doubled from `h-4 w-4` to `h-8 w-8` (100% increase)
+  - **Layout Impact:** Header changed from `justify-between` to `justify-center`
+- **Footer Layout Restructure:**
+  ```jsx
+  // Before: Simple text display
+  <div className="text-xs">9 projects</div>
+  
+  // After: Balanced layout with controls
+  <div className="flex items-center justify-between">
+    <div className="text-xs">9 projects</div>
+    <Button className="h-8 w-8">
+      <PanelLeftClose className="h-8 w-8" />
+    </Button>
+  </div>
+  ```
+- **Theme Toggle:** Integrated into sidebar with persistent access in both states
+- **User Menu:** Complete dropdown with profile, settings, logout options
+- **Productivity Popover:** Message notifications with badge counters
+
+**Editing Guidelines:**
+- Use consistent sizing patterns: collapsed (2rem), expanded (3rem) for major elements
+- Maintain three-column layout for balanced logo centering
+- Preserve tooltip functionality for collapsed state accessibility
+- Follow component composition patterns for maintainability
+
+### 3. Dashboard Professional Styling
+**Files Modified:**
+- `components/dashboard/DashboardLayout.tsx`
+- `components/dashboard/KPIRow.tsx`
+- `components/dashboard/KPIWidget.tsx`
+- `components/dashboard/ActionItemsInbox.tsx`
+- `components/dashboard/ActionItemsToDo.tsx`
+- `app/main-app/components/RoleDashboard.tsx`
+
+**Key Changes:**
+- **Spacing Reduction:** Gap/padding reduced from `gap-6`/`p-6` to `gap-4`/`p-3` for compact layouts
+- **Shadow Minimization:** Changed from `shadow-lg` to `shadow-sm` for subtle depth
+- **Border Refinement:** Reduced border opacity and simplified hover effects
+- **Performance Indicators:** Color opacity reduced from 80% to 30% for professional subtlety
+- **Header Scaling:** Reduced from `text-xl`/`text-2xl` to `text-lg`/`text-xl` sizes
+- **Card Styling:** Tighter padding and reduced visual weight throughout
+
+**Specific Styling Patterns Established:**
+```css
+/* Professional hover states */
+.hover-state {
+  hover:bg-gray-100 dark:hover:bg-gray-800
+}
+
+/* Consistent border patterns */
+.border-pattern {
+  border-gray-200 dark:border-gray-700
+}
+
+/* Compact spacing */
+.spacing-compact {
+  gap-3 p-3     /* Standard card spacing */
+  gap-2 p-2     /* List item spacing */
+  gap-4         /* Component separation (maximum) */
+}
+
+/* Subtle shadows */
+.shadow-subtle {
+  shadow-sm     /* Default for cards */
+  shadow-none   /* For flat designs */
+}
+```
+
+**Editing Guidelines:**
+- Use `gap-4` or smaller for spacing between components
+- Apply `shadow-sm` for subtle depth without overwhelming visuals
+- Keep performance indicators subtle with 30% opacity maximum
+- Maintain consistent padding patterns: `p-3` for cards, `p-2` for lists
+- Use established hover state pattern: `hover:bg-gray-100 dark:hover:bg-gray-800`
+
+### 4. Page Modularization Architecture
+**File:** `app/project/[projectId]/page.tsx`
+**Version:** 3.0.0 (Phase 3 Integration)
+**Architecture Pattern:** Wrapper-Content Component Separation
+
+#### Modular Structure
+The project page follows a sophisticated modularization pattern designed for scalability and maintainability:
+
+```typescript
+// Main Page Structure
+<ProjectPageWrapper>
+  <ProjectPageContent 
+    contentComponents={contentComponentsMapping}
+    legacyProps={backwardCompatibility}
+  />
+</ProjectPageWrapper>
+```
+
+#### Component Separation Strategy
+1. **ProjectPageWrapper**: Layout container and project context provider
+2. **ProjectPageContent**: Dynamic content renderer based on user role and project state
+3. **Content Components**: Modular, lazy-loadable feature modules
+
+#### Content Components Mapping
+```typescript
+const contentComponents = {
+  FinancialHubContent: () => import('./components/content/FinancialHubContent'),
+  ProcurementContent: () => import('./components/content/ProcurementContent'),
+  SchedulerContent: () => import('./components/content/SchedulerContent'),
+  ConstraintsContent: () => import('./components/content/ConstraintsContent'),
+  PermitLogContent: () => import('./components/content/PermitLogContent'),
+  FieldReportsContent: () => import('./components/content/FieldReportsContent'),
+  ReportsContent: () => import('./components/content/ReportsContent'),
+  ChecklistsContent: () => import('./components/content/ChecklistsContent'),
+}
+```
+
+#### Key Features
+- **Lazy Loading**: Content components load only when needed
+- **Role-Based Rendering**: Dynamic content based on user permissions
+- **Type Safety**: Full TypeScript integration with project data types
+- **Legacy Compatibility**: Backward compatibility props for existing components
+- **Error Boundaries**: Proper loading and error state handling
+
+**Implementation Guidelines:**
+- Each content component should be self-contained with its own state management
+- Use the `contentComponents` mapping for dynamic imports and code splitting
+- Maintain the wrapper-content separation for consistent layout behavior
+- Implement proper loading states and error boundaries for each module
+- Follow the established TypeScript interfaces for project data and user roles
+
+## Component-Specific Guidelines
+
+### ProjectSidebar Component (`app/main-app/components/ProjectSidebar.tsx`)
+**Current State:** Fully integrated navigation with header functionality
+
+**Key Features:**
+1. **Responsive Logo System**
+   - Collapsed: `h-8` (32px) logo with 2rem HBI icon
+   - Expanded: `h-12` (48px) logo with 3rem HBI icon
+   - Custom orange HBI background: `rgba(250, 70, 22, 1)`
+
+2. **Footer Navigation**
+   - Project count display on left
+   - Collapse button on right with increased size
+   - Consistent border styling with rest of sidebar
+
+3. **State Management**
+   - Project expansion states
+   - Search functionality
+   - User menu visibility
+   - Theme persistence
+
+**Responsive Design Considerations:**
+- **Mobile Toggle:** Button positioned at `top-4` instead of `top-18` after header removal
+- **Collapsed State:** All functionality accessible via tooltips and larger touch targets
+- **Expanded State:** Full navigation with proper touch spacing on mobile devices
+- **Breakpoint Behavior:** Sidebar overlay on mobile, persistent on desktop
+
+**Modification Patterns:**
+```typescript
+// Adding new sidebar sections
+<div className="p-3 border-b border-gray-200 dark:border-gray-700">
+  {/* New content with consistent padding and borders */}
+</div>
+
+// Color consistency
+className="hover:bg-gray-100 dark:hover:bg-gray-800"
+
+// Icon sizing
+className="h-4 w-4" // Standard icons
+className="h-8 w-8" // Larger interactive elements
+
+// Logo sizing patterns
+// Collapsed state
+style={{ width: "2rem", height: "2rem" }}    // HBI Avatar
+className="h-8"                               // Logo image
+
+// Expanded state  
+style={{ width: "3rem", height: "3rem" }}    // HBI Avatar
+className="h-12"                              // Logo image
+```
+
+**Critical Sizing Relationships:**
+- HBI Avatar height MUST match logo image height in both states
+- Logo container MUST span 100% width with `w-full` class
+- Three-column layout maintains logo centering between HBI icon and sidebar edge
+
+### Theme Integration
+**File:** `components/theme-provider.tsx`
+**Usage:** Integrated into sidebar with persistent access
+
+**Color Variables Modified:**
+```css
+/* Before: Bright orange theme */
+:root {
+  --primary: 13 96% 53%;         /* Bright orange */
+  --chart-1: 12 76% 61%;         /* High saturation */
+  --chart-2: 173 58% 39%;        /* High saturation */
+  --chart-3: 197 37% 24%;        /* High saturation */
+  /* ... other bright colors */
+}
+
+/* After: Professional blue-gray theme */
+:root {
+  --primary: 215 25% 27%;        /* Professional blue-gray */
+  --secondary: 210 40% 96%;      /* Light gray */
+  --muted: 210 40% 94%;         /* Muted backgrounds */
+  --accent: 210 40% 94%;        /* Accent elements */
+  --chart-1: 215 20% 65%;       /* Reduced saturation (20-35%) */
+  --chart-2: 173 25% 55%;       /* Reduced saturation */
+  --chart-3: 197 20% 45%;       /* Reduced saturation */
+  /* Maintained dark theme consistency */
+}
+
+/* Special application colors */
+.hbi-avatar {
+  background-color: rgba(250, 70, 22, 1);  /* HBI brand orange */
+  color: white;
+}
+```
+
+**Color Application Guidelines:**
+- **Primary Use:** Navigation, buttons, active states
+- **Chart Colors:** Maximum 35% saturation for professional appearance
+- **HBI Branding:** Specific orange `rgba(250, 70, 22, 1)` only for HBI avatar
+- **Hover States:** Consistent gray-100/gray-800 pattern
+- **Borders:** Standard gray-200/gray-700 throughout
+
+## Development Workflow
+
+### Adding New Features
+1. **Sidebar Extensions:**
+   - Add to appropriate section (header, body, footer)
+   - Maintain border consistency with `border-gray-200 dark:border-gray-700`
+   - Use established padding patterns
+
+2. **Dashboard Components:**
+   - Follow professional color scheme
+   - Implement compact spacing
+   - Use subtle shadows and borders
+
+3. **Theme Support:**
+   - Always provide dark mode variants
+   - Test color contrast for accessibility
+   - Use CSS custom properties for consistency
+
+4. **Project Page Modules:**
+   - Create new content components in `app/project/[projectId]/components/content/`
+   - Add component to the `contentComponents` mapping for dynamic loading
+   - Implement proper TypeScript interfaces extending base project types
+   - Include loading states and error boundaries
+   - Follow the established props pattern: `{ projectId, userRole, projectData, ...customProps }`
+
+**Example New Module Creation:**
+```typescript
+// 1. Create the component
+// app/project/[projectId]/components/content/NewFeatureContent.tsx
+export default function NewFeatureContent({ projectId, userRole, projectData }) {
+  // Component implementation
+}
+
+// 2. Add to content mapping
+// app/project/[projectId]/page.tsx
+const contentComponents = {
+  // ... existing components
+  NewFeatureContent: () => import('./components/content/NewFeatureContent'),
+}
+
+// 3. Update TypeScript types if needed
+// app/project/[projectId]/types/project.ts
+interface ContentComponents {
+  NewFeatureContent?: React.ComponentType<ContentProps>
+}
+```
+
+### Testing Requirements
+- **Responsive Design:** Test collapsed/expanded sidebar states
+- **Theme Switching:** Verify light/dark mode compatibility
+- **Accessibility:** Ensure keyboard navigation and screen reader support
+- **Performance:** Validate smooth animations and state transitions
+- **Modular Loading:** Test dynamic content component loading and error states
+- **Role-Based Access:** Verify content visibility based on user roles
+- **Content Integration:** Test wrapper-content component communication
+- **Legacy Compatibility:** Ensure existing components work with new architecture
+
+## File Structure Documentation
+
+### Modified Core Files
+1. **`app/main-app/components/ProjectSidebar.tsx`**
+   - Primary navigation component
+   - Integrated header functionality
+   - Complete user interaction system
+
+2. **`styles/globals.css`**
+   - Professional color scheme
+   - Theme variable definitions
+   - Global styling consistency
+
+3. **`app/layout.tsx`**
+   - Removed header component imports
+   - Updated layout structure for full-height sidebar
+
+4. **`app/project/[projectId]/page.tsx`**
+   - Modularized project page architecture
+   - Wrapper-Content component separation
+   - Dynamic content loading system
+   - Role-based access control integration
+
+### Project Page Module Structure
+```
+app/project/[projectId]/
+├── page.tsx                     # Main modular page component
+├── components/
+│   ├── ProjectPageWrapper.tsx   # Layout and context provider
+│   ├── ProjectPageContent.tsx   # Dynamic content renderer
+│   └── content/                 # Modular content components
+│       ├── FinancialHubContent.tsx
+│       ├── ProcurementContent.tsx
+│       ├── SchedulerContent.tsx
+│       ├── ConstraintsContent.tsx
+│       ├── PermitLogContent.tsx
+│       ├── FieldReportsContent.tsx
+│       ├── ReportsContent.tsx
+│       └── ChecklistsContent.tsx
+├── types/
+│   └── project.ts              # TypeScript definitions
+└── utils/                      # Utility functions
+```
+
+### Component Integration Points
+- **Layout Shell:** Full-height sidebar with content area
+- **Theme Provider:** Global theme state management
+- **User Context:** Authentication and user data integration
+- **Project Context:** Project selection and navigation state
+
+## Future Enhancement Guidelines
+
+### Scalability Considerations
+- Maintain component composition patterns
+- Use TypeScript interfaces for type safety
+- Implement proper error boundaries
+- Follow established naming conventions
+
+### Performance Optimization
+- Lazy load non-critical components
+- Implement virtualization for large project lists
+- Optimize image loading and caching
+- Use React.memo for expensive renders
+
+### Accessibility Standards
+- Maintain ARIA labels and roles
+- Ensure keyboard navigation paths
+- Provide screen reader announcements
+- Test with assistive technologies
+
+## Version Control
+- **Current Version:** 3.0.0 (HB Report Demo)
+- **Major Components:**
+  - ProjectSidebar v2.0.0 (Integrated navigation)
+  - Project Page Architecture v3.0.0 (Modular system)
+  - Professional UI Theme v1.0.0 (Color scheme)
+- **Breaking Changes:** 
+  - Header component removal and sidebar integration
+  - Page modularization requiring component restructuring
+  - Professional color scheme affecting all UI components
+- **Migration Path:** 
+  - Update layout imports and remove header dependencies
+  - Migrate project pages to use ProjectPageWrapper/ProjectPageContent pattern
+  - Update color references to new professional palette
+- **Rollback Strategy:** 
+  - Maintain previous header components in archive
+  - Keep original color variables commented in globals.css
+  - Document legacy page structure for reference
+
+## Migration Checklist for New Developers
+1. **Setup:** Review professional color scheme in `styles/globals.css`
+2. **Navigation:** Understand integrated sidebar architecture in `ProjectSidebar.tsx`
+3. **Page Structure:** Study modular pattern in `app/project/[projectId]/page.tsx`
+4. **Content Creation:** Follow wrapper-content separation for new features
+5. **Testing:** Implement comprehensive testing for all interaction states
+6. **Documentation:** Update component documentation with any new features
+
+## Troubleshooting Common Issues
+
+### Logo Sizing Problems
+- **Issue:** Logo appears too small despite height changes
+- **Solution:** Check `maxWidth` constraint - should be 90%, not 60%
+- **Root Cause:** CSS `object-contain` respects both height and width constraints
+
+### Collapse Button Missing
+- **Issue:** Cannot find collapse button in header
+- **Solution:** Check footer section - button moved to bottom-right position
+- **Root Cause:** Architecture change relocated button during header elimination
+
+### Theme Colors Not Applying
+- **Issue:** Components still showing orange theme
+- **Solution:** Clear browser cache and restart dev server for CSS variable changes
+- **Root Cause:** CSS custom property changes require full reload
+
+### Mobile Layout Issues
+- **Issue:** Sidebar not responding properly on mobile
+- **Solution:** Verify mobile toggle button position changed from `top-18` to `top-4`
+- **Root Cause:** Header removal changed positioning calculations
+
+### HBI Avatar Color Issues
+- **Issue:** Avatar showing theme colors instead of orange
+- **Solution:** Ensure using `rgba(250, 70, 22, 1)` not CSS custom properties
+- **Root Cause:** HBI avatar uses specific brand color, not theme variables
+
+## Critical Success Factors
+1. **Always maintain HBI avatar-logo height matching**
+2. **Preserve three-column layout structure for logo centering**
+3. **Test both collapsed and expanded sidebar states**
+4. **Verify professional color scheme consistency**
+5. **Ensure full-height layout (`h-screen`) is maintained**
+
+This ruleset ensures consistent development practices and maintainable code architecture for the HB Report Demo v3.0 professional interface with modular page architecture.
