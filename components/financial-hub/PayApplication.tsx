@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, FileText, Clock, CheckCircle, DollarSign, Building, Users, Calendar, TrendingUp } from "lucide-react"
 import { AiaPayApplicationList } from "./AiaPayApplicationList"
 import { AiaPayApplicationForm } from "./AiaPayApplicationForm"
-import { AiaInsightsPanel } from "./AiaInsightsPanel"
+
 import type { AiaPayApplication, AiaApplicationSummary } from "@/types/aia-pay-application"
 
 interface PayApplicationProps {

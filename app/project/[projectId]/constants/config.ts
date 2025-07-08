@@ -263,6 +263,12 @@ export const CORE_TABS_CONFIG: CoreTabConfig[] = [
     description: "Comprehensive reporting dashboard with approval workflows",
     icon: FileText,
   },
+  {
+    id: "field-management",
+    label: "Field Management",
+    description: "Field operations management and scheduling tools",
+    icon: Building2,
+  },
 ]
 
 /**
@@ -316,6 +322,27 @@ export const SUB_TOOLS_CONFIG: Record<
   Checklists: [
     { id: "startup", label: "Start-Up", icon: "🚀", description: "Project startup checklist" },
     { id: "closeout", label: "Closeout", icon: "🏁", description: "Project closeout checklist" },
+  ],
+  "Field Management": [
+    {
+      id: "scheduler",
+      label: "Scheduler",
+      icon: "📅",
+      description: "AI-powered project schedule generation and optimization",
+    },
+    {
+      id: "constraints-log",
+      label: "Constraints Log",
+      icon: "⚠️",
+      description: "Track and manage project constraints and resolutions",
+    },
+    { id: "permit-log", label: "Permit Log", icon: "🛡️", description: "Permit tracking and compliance" },
+    {
+      id: "field-reports",
+      label: "Field Reports",
+      icon: "📋",
+      description: "Daily logs, manpower, safety, and quality reporting",
+    },
   ],
 }
 

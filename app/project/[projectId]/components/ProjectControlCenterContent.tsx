@@ -87,6 +87,7 @@ import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt
 import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
 import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
 import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
+import FieldManagementContent from "./content/FieldManagementContent"
 
 interface ProjectControlCenterContentProps {
   projectId: string
@@ -1025,6 +1026,19 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
                 />
               </TabsContent>
             </Tabs>
+          </div>
+        )
+
+      case "field-management":
+        return (
+          <div className="w-full max-w-full">
+            <FieldManagementContent
+              selectedSubTool="overview"
+              projectData={projectData}
+              userRole={userRole}
+              projectId={projectId}
+              className="w-full"
+            />
           </div>
         )
 
