@@ -45,6 +45,7 @@ import {
 // Import Financial Hub Components
 import FinancialOverview from "@/components/financial-hub/FinancialOverview"
 import BudgetAnalysis from "@/components/financial-hub/BudgetAnalysis"
+import BudgetAnalysisProjectContent from "./BudgetAnalysisProjectContent"
 import CashFlowAnalysis from "@/components/financial-hub/CashFlowAnalysis"
 import { PayApplication } from "@/components/financial-hub/PayApplication"
 import ARAgingCard from "@/components/financial-hub/ARAgingCard"
@@ -163,9 +164,8 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
       ...prev,
       financialTab: tabId,
     }))
-    if (onTabChange) {
-      onTabChange(tabId)
-    }
+    // Don't bubble up sub-tab changes to the main app - only handle internal navigation
+    // The main app should maintain "financial-management" as the activeTab
   }
 
   // Render content based on selected tab
@@ -189,7 +189,13 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
       case "budget-analysis":
         return (
           <div className="space-y-6 w-full max-w-full">
-            <BudgetAnalysis userRole={userRole} projectData={projectScope} />
+            <BudgetAnalysisProjectContent
+              projectId={projectId}
+              projectData={projectScope}
+              userRole={userRole}
+              user={user}
+              className="w-full"
+            />
           </div>
         )
 

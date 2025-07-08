@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Calculator,
   TrendingUp,
@@ -77,6 +77,9 @@ import budgetData from "@/data/mock/financial/budget.json"
 interface BudgetAnalysisProps {
   userRole: string
   projectData: any
+  initialViewMode?: string
+  hideViewToggle?: boolean
+  className?: string
 }
 
 // Budget item interface
@@ -242,15 +245,25 @@ type ViewMode = "overview" | "categories" | "variance" | "budget"
 type SortField = keyof BudgetItem
 type SortDirection = "asc" | "desc"
 
-export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysisProps) {
+export default function BudgetAnalysis({
+  userRole,
+  projectData,
+  initialViewMode = "overview",
+  hideViewToggle = false,
+  className,
+}: BudgetAnalysisProps) {
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
 
-  const [viewMode, setViewMode] = useState<ViewMode>("overview")
+  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode as ViewMode)
   const [searchTerm, setSearchTerm] = useState("")
+
+  // Update view mode when initialViewMode changes
+  useEffect(() => {
+    setViewMode(initialViewMode as ViewMode)
+  }, [initialViewMode])
   const [sortField, setSortField] = useState<SortField>("Budget Code")
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [isBudgetTableFullscreen, setIsBudgetTableFullscreen] = useState(false)
-  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   // Filter budget data to single project (2525840 - Palm Beach Luxury Estate)
   const filteredBudgetData = useMemo(() => {
@@ -825,11 +838,12 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
                 {/* Budget Data Table */}
                 <div className="rounded-md border">
                   <div
-                    className={`overflow-auto ${
+                    className={`overflow-auto w-full ${
                       isBudgetTableFullscreen ? "max-h-[calc(100vh-200px)]" : "max-h-[calc(100vh-300px)]"
                     }`}
+                    style={{ maxWidth: "100%" }}
                   >
-                    <Table>
+                    <Table className="min-w-[1800px]">
                       <TableHeader className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b-2 border-border/50 shadow-lg">
                         <TableRow className="bg-background/95 backdrop-blur-md">
                           <TableHead className="min-w-[200px]">
@@ -1227,125 +1241,16 @@ export default function BudgetAnalysis({ userRole, projectData }: BudgetAnalysis
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 w-full max-w-full overflow-hidden ${className || ""}`}>
       {/* Controls Bar */}
-      <div className="flex items-center justify-between">
-        <ViewToggle />
-      </div>
-
-      {/* HBI Budget Insights - General Analysis */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
-                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              HBI Budget Insights
-              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                AI-Powered
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
-              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            </Button>
-          </CardTitle>
-          {!isInsightsCollapsed && (
-            <CardDescription className="text-gray-600 dark:text-gray-400">
-              Global AI analysis and strategic recommendations for budget management
-            </CardDescription>
-          )}
-        </CardHeader>
-        {!isInsightsCollapsed && (
-          <CardContent className="space-y-4">
-            {/* Key AI Insights */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-                <AlertTriangle className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  <strong>Cost Variance Alert:</strong> Budget tracking shows {budgetUtilization.toFixed(1)}%
-                  utilization. HBI recommends reviewing high-variance cost codes to optimize spend.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                <performanceStatus.icon className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200">
-                  <strong>Performance Status:</strong> Project is currently tracking {performanceStatus.status} budget
-                  with CPI of {summaryData.costPerformanceIndex.toFixed(2)}.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800 dark:text-green-200">
-                  <strong>Change Order Impact:</strong> CO impact at {changeOrderImpact.toFixed(1)}% of original budget.
-                  Within acceptable range for project complexity.
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            {/* Budget Intelligence Summary */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                <Activity className="h-4 w-4" />
-                Portfolio-Wide Budget Intelligence
-              </h4>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-sm">Cost Performance</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    HBI identified ${(Math.abs(projectedVariance) / 1000000).toFixed(1)}M in projected variance across
-                    budget categories with {(summaryData.completionPercentage * 100).toFixed(1)}% completion.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-sm">Risk Mitigation</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Risk assessment shows {riskLevel} risk profile with $
-                    {(summaryData.contingencyAvailable / 1000000).toFixed(1)}M contingency available for unforeseen
-                    costs.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">
-                        Interactive Budget Analysis Available
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Use the view toggles above to explore detailed budget breakdowns, variance analysis, and
-                      category-level performance metrics.
-                    </p>
-                  </div>
-                  <div className="text-2xl">📊</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        )}
-      </Card>
+      {!hideViewToggle && (
+        <div className="flex items-center justify-between">
+          <ViewToggle />
+        </div>
+      )}
 
       {/* Main Content Area */}
-      {renderContent()}
+      <div className="w-full max-w-full overflow-hidden">{renderContent()}</div>
     </div>
   )
 }

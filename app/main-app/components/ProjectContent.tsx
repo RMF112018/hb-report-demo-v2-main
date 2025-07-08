@@ -84,6 +84,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
         tool: null,
         subTool: null,
         coreTab: "dashboard", // Default to dashboard within core
+        staffingSubTab: null,
       }
     }
 
@@ -100,6 +101,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
       tool: null,
       subTool: null,
       coreTab: null,
+      staffingSubTab: null,
     }
   }, [activeTab])
 
@@ -151,7 +153,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
 
   // Render main content (rightContent mode)
   return (
-    <div className="flex-1 min-w-0 w-full max-w-full overflow-hidden">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden flex flex-col">
       <ProjectPageWrapper projectId={actualProjectId} projectData={projectData} userRole={userRole}>
         <ProjectPageContent
           projectId={actualProjectId}

@@ -44,8 +44,19 @@ interface ProjectControlCenterPageProps {
  */
 export default function ProjectControlCenterPage({ params }: ProjectControlCenterPageProps) {
   const { user } = useAuth()
+  const [activeTab, setActiveTab] = React.useState<string | undefined>()
 
   const projectId = parseInt(params.projectId)
+
+  // Read URL parameters for tab selection
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const tabParam = urlParams.get("tab") || urlParams.get("activeTab")
+    if (tabParam) {
+      setActiveTab(tabParam)
+      console.log("URL tab parameter:", tabParam)
+    }
+  }, [])
 
   // Find the specific project
   const project = useMemo(() => {
@@ -144,6 +155,8 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
           user,
           project,
           projectId,
+          activeTab,
+          onTabChange: setActiveTab,
         }}
       />
     </ProjectPageWrapper>

@@ -561,46 +561,44 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
         <SummaryCards metrics={metrics} />
 
         {/* Filters and Controls */}
-        <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center gap-1">
-            <Filter className="h-3 w-3 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">Filters:</span>
+        <div className="flex items-center justify-between w-full flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
-            <SelectTrigger className="w-24 h-8">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-28 h-8">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center gap-1 ml-auto">
-            <Button variant="outline" size="sm" onClick={handleResetToDefault} className="h-8 px-2 text-xs">
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Reset
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleResetToDefault}>
+              <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
-              <Download className="h-3 w-3 mr-1" />
-              Export
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4" />
             </Button>
           </div>
         </div>

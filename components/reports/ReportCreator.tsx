@@ -23,6 +23,8 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import {
   GripVertical,
@@ -47,9 +49,15 @@ import {
   Table,
   Type,
   Calendar,
-  DollarSign
+  DollarSign,
+  TrendingUp,
+  ChevronDown,
+  Monitor,
+  X,
 } from "lucide-react"
 import type { Report, ReportSection } from "@/types/report-types"
+import { FinancialForecastMemo } from "./demo/FinancialForecastMemo"
+import { DrawForecast } from "./demo/DrawForecast"
 
 interface SortableSectionProps {
   section: ReportSection
@@ -71,6 +79,8 @@ function SortableSection({ section, onUpdate, onRemove, isRequired }: SortableSe
       case "financial-forecast-memo":
       case "financial-summary":
         return <DollarSign className="h-4 w-4" />
+      case "draw-forecast":
+        return <TrendingUp className="h-4 w-4" />
       case "schedule-performance":
       case "schedule-monitor":
         return <Calendar className="h-4 w-4" />
@@ -88,9 +98,9 @@ function SortableSection({ section, onUpdate, onRemove, isRequired }: SortableSe
   }
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
+    <div
+      ref={setNodeRef}
+      style={style}
       className={`bg-white dark:bg-gray-800 border rounded-lg p-4 transition-all ${
         isDragging ? "opacity-50 shadow-lg" : "hover:shadow-md"
       }`}
@@ -116,10 +126,7 @@ function SortableSection({ section, onUpdate, onRemove, isRequired }: SortableSe
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Switch 
-            checked={section.enabled} 
-            onCheckedChange={(enabled) => onUpdate({ ...section, enabled })} 
-          />
+          <Switch checked={section.enabled} onCheckedChange={(enabled) => onUpdate({ ...section, enabled })} />
           {!isRequired && (
             <Button
               variant="ghost"
@@ -185,19 +192,21 @@ interface ReportCreatorProps {
 
 export function ReportCreator({ reportId, templateId, onSave, onCancel }: ReportCreatorProps) {
   const { toast } = useToast()
-  
+
   // State management
   const [currentReport, setCurrentReport] = useState<Partial<Report> | null>(null)
   const [availableSections, setAvailableSections] = useState<any[]>([])
   const [isDirty, setIsDirty] = useState(false)
   const [lastSaved, setLastSaved] = useState<string>()
   const [loading, setLoading] = useState(true)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [previewType, setPreviewType] = useState<"digital" | "pdf">("pdf")
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   )
 
   // Available section templates
@@ -212,7 +221,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "portrait" as const,
       dataSource: "Procore",
       estimatedPages: 3,
-      requiredFor: ["financial-review", "monthly-progress"]
+      requiredFor: ["financial-review", "monthly-progress"],
     },
     {
       id: "procore-budget-snapshot",
@@ -224,7 +233,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "Procore API",
       estimatedPages: 4,
-      requiredFor: ["financial-review", "monthly-progress"]
+      requiredFor: ["financial-review", "monthly-progress"],
     },
     {
       id: "sage-job-cost-history",
@@ -236,7 +245,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "Sage Integration",
       estimatedPages: 3,
-      requiredFor: ["financial-review"]
+      requiredFor: ["financial-review"],
     },
     {
       id: "gc-gr-forecast",
@@ -248,7 +257,19 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "Financial Hub",
       estimatedPages: 2,
-      requiredFor: ["financial-review", "monthly-progress"]
+      requiredFor: ["financial-review", "monthly-progress"],
+    },
+    {
+      id: "draw-forecast",
+      title: "Draw Forecast",
+      contentType: "draw-forecast",
+      description: "Project draw schedule and cash flow forecast",
+      category: "Financial",
+      defaultPaperSize: "letter" as const,
+      defaultOrientation: "portrait" as const,
+      dataSource: "Financial Hub",
+      estimatedPages: 2,
+      requiredFor: ["financial-review", "monthly-progress"],
     },
     {
       id: "cover-page",
@@ -260,7 +281,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "portrait" as const,
       dataSource: "Manual",
       estimatedPages: 1,
-      requiredFor: ["monthly-progress", "monthly-owner"]
+      requiredFor: ["monthly-progress", "monthly-owner"],
     },
     {
       id: "executive-summary",
@@ -272,7 +293,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "portrait" as const,
       dataSource: "AI Generated",
       estimatedPages: 2,
-      requiredFor: ["monthly-progress"]
+      requiredFor: ["monthly-progress"],
     },
     {
       id: "schedule-performance",
@@ -284,7 +305,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "P6 Integration",
       estimatedPages: 4,
-      requiredFor: ["monthly-progress"]
+      requiredFor: ["monthly-progress"],
     },
     {
       id: "progress-photos",
@@ -296,7 +317,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "Photo Management",
       estimatedPages: 6,
-      requiredFor: ["monthly-owner"]
+      requiredFor: ["monthly-owner"],
     },
     {
       id: "schedule-monitor",
@@ -308,7 +329,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "P6 Integration",
       estimatedPages: 3,
-      requiredFor: ["monthly-owner"]
+      requiredFor: ["monthly-owner"],
     },
     {
       id: "safety-summary",
@@ -320,7 +341,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "portrait" as const,
       dataSource: "Safety Database",
       estimatedPages: 2,
-      requiredFor: []
+      requiredFor: [],
     },
     {
       id: "quality-control",
@@ -332,7 +353,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "portrait" as const,
       dataSource: "QC System",
       estimatedPages: 3,
-      requiredFor: []
+      requiredFor: [],
     },
     {
       id: "procurement-status",
@@ -344,8 +365,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       defaultOrientation: "landscape" as const,
       dataSource: "Procurement System",
       estimatedPages: 5,
-      requiredFor: []
-    }
+      requiredFor: [],
+    },
   ]
 
   // Load initial data
@@ -374,8 +395,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
               sectionCount: 0,
               pageCount: 0,
               size: "0 MB",
-              automationLevel: 0
-            }
+              automationLevel: 0,
+            },
           })
         } else if (templateId) {
           // Create from template
@@ -395,8 +416,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
               sectionCount: templateSections.length,
               pageCount: templateSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
               size: "0 MB",
-              automationLevel: 0
-            }
+              automationLevel: 0,
+            },
           })
         } else {
           // Create blank report
@@ -415,8 +436,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
               sectionCount: 0,
               pageCount: 0,
               size: "0 MB",
-              automationLevel: 0
-            }
+              automationLevel: 0,
+            },
           })
         }
       } catch (error) {
@@ -424,7 +445,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         toast({
           title: "Error",
           description: "Failed to load report data",
-          variant: "destructive"
+          variant: "destructive",
         })
       } finally {
         setLoading(false)
@@ -448,9 +469,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
   }
 
   const getTemplateSections = (templateId: string): ReportSection[] => {
-    const requiredSections = sectionTemplates.filter(template => 
-      template.requiredFor.includes(templateId)
-    )
+    const requiredSections = sectionTemplates.filter((template) => template.requiredFor.includes(templateId))
 
     return requiredSections.map((template, index) => ({
       id: `sec-${Date.now()}-${index}`,
@@ -464,7 +483,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       lastUpdated: new Date().toISOString(),
       dataSource: template.dataSource,
       pageCount: template.estimatedPages,
-      reviewed: false
+      reviewed: false,
     }))
   }
 
@@ -488,7 +507,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
 
       toast({
         title: "Auto-saved",
-        description: "Report configuration saved automatically"
+        description: "Report configuration saved automatically",
       })
     }
   }, [currentReport, toast])
@@ -497,9 +516,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
     (updatedSection: ReportSection) => {
       if (!currentReport) return
 
-      const updatedSections = currentReport.sections?.map((section) =>
-        section.id === updatedSection.id ? updatedSection : section
-      ) || []
+      const updatedSections =
+        currentReport.sections?.map((section) => (section.id === updatedSection.id ? updatedSection : section)) || []
 
       setCurrentReport({
         ...currentReport,
@@ -508,8 +526,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         metadata: {
           ...currentReport.metadata!,
           sectionCount: updatedSections.length,
-          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0)
-        }
+          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
+        },
       })
       setIsDirty(true)
     },
@@ -529,8 +547,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         metadata: {
           ...currentReport.metadata!,
           sectionCount: updatedSections.length,
-          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0)
-        }
+          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
+        },
       })
       setIsDirty(true)
     },
@@ -553,7 +571,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         lastUpdated: new Date().toISOString(),
         dataSource: template.dataSource,
         pageCount: template.estimatedPages,
-        reviewed: false
+        reviewed: false,
       }
 
       const updatedSections = [...(currentReport.sections || []), newSection]
@@ -565,8 +583,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         metadata: {
           ...currentReport.metadata!,
           sectionCount: updatedSections.length,
-          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0)
-        }
+          pageCount: updatedSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
+        },
       })
       setIsDirty(true)
     },
@@ -583,13 +601,13 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
 
         const reorderedSections = arrayMove(currentReport.sections, oldIndex, newIndex).map((section, index) => ({
           ...section,
-          order: index + 1
+          order: index + 1,
         }))
 
         setCurrentReport({
           ...currentReport,
           sections: reorderedSections,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         })
         setIsDirty(true)
       }
@@ -604,7 +622,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
 
       toast({
         title: "Report Saved",
-        description: "Your report configuration has been saved successfully"
+        description: "Your report configuration has been saved successfully",
       })
     }
   }, [currentReport, onSave, saveToLocalStorage, toast])
@@ -613,6 +631,35 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
     if (!currentReport?.sections?.length) return 0
     const reviewedCount = currentReport.sections.filter((section) => section.reviewed).length
     return Math.round((reviewedCount / currentReport.sections.length) * 100)
+  }, [currentReport])
+
+  const handlePreview = useCallback((type: "digital" | "pdf") => {
+    setPreviewType(type)
+    setPreviewModalOpen(true)
+  }, [])
+
+  const getPreviewContent = useCallback(() => {
+    if (!currentReport?.sections?.length) {
+      return <div className="text-center py-16 text-muted-foreground">No sections to preview</div>
+    }
+
+    // Find the first available demo section to show
+    const financialForecastSection = currentReport.sections.find((s) => s.contentType === "financial-forecast-memo")
+    const drawForecastSection = currentReport.sections.find((s) => s.contentType === "draw-forecast")
+
+    if (financialForecastSection) {
+      return <FinancialForecastMemo />
+    } else if (drawForecastSection) {
+      return <DrawForecast />
+    } else {
+      return (
+        <div className="text-center py-16 text-muted-foreground">
+          <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+          <p>Preview not available for selected sections</p>
+          <p className="text-xs mt-2">Add Financial Forecast Memo or Draw Forecast to see preview</p>
+        </div>
+      )
+    }
   }, [currentReport])
 
   if (loading) {
@@ -659,7 +706,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
                   setCurrentReport({
                     ...currentReport,
                     name: e.target.value,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                   })
                   setIsDirty(true)
                 }}
@@ -667,13 +714,13 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
             </div>
             <div>
               <Label htmlFor="report-type">Report Type</Label>
-              <Select 
-                value={currentReport.type} 
+              <Select
+                value={currentReport.type}
                 onValueChange={(type: any) => {
                   setCurrentReport({
                     ...currentReport,
                     type,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                   })
                   setIsDirty(true)
                 }}
@@ -689,7 +736,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
               </Select>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">
@@ -726,8 +773,8 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
             </CardHeader>
             <CardContent>
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext 
-                  items={currentReport.sections?.map((s) => s.id) || []} 
+                <SortableContext
+                  items={currentReport.sections?.map((s) => s.id) || []}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-4">
@@ -820,7 +867,7 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
                   Apply Suggestion
                 </Button>
               </div>
-              
+
               <div className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="h-4 w-4 text-indigo-600" />
@@ -847,16 +894,61 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
           </Button>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
-            <Eye className="h-4 w-4 mr-2" />
-            Preview
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handlePreview("digital")}>
+                <Monitor className="h-4 w-4 mr-2" />
+                Digital
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePreview("pdf")}>
+                <FileText className="h-4 w-4 mr-2" />
+                PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={handleSave} className="bg-[#FF6B35] hover:bg-[#E55A2B]">
             <Save className="h-4 w-4 mr-2" />
             Save Report
           </Button>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      <Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                {previewType === "pdf" ? <FileText className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
+                {previewType === "pdf" ? "PDF Preview" : "Digital Preview"}
+              </DialogTitle>
+              <Button variant="ghost" size="sm" onClick={() => setPreviewModalOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="mt-4">
+            {previewType === "pdf" ? (
+              <div className="bg-gray-100 p-4 rounded-lg">
+                <div className="bg-white shadow-lg rounded-lg overflow-hidden">{getPreviewContent()}</div>
+              </div>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p>Digital preview coming soon</p>
+                <p className="text-xs mt-2">This will show an interactive version of the report</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
-} 
+}

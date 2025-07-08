@@ -67,6 +67,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 // Import content components from legacy page
@@ -75,11 +76,17 @@ import { ReportViewer } from "@/components/reports/ReportViewer"
 import { ReportApprovalWorkflow } from "@/components/reports/ReportApprovalWorkflow"
 import { ReportHistory } from "@/components/reports/ReportHistory"
 import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
+import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
+import { ProjectReports } from "@/components/reports/ProjectReports"
 import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
 import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
 import ResponsibilityMatrixCore from "./ResponsibilityMatrixCore"
 import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
 import { ProjectManagerStaffingView } from "@/components/staffing/ProjectManagerStaffingView"
+import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
+import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
+import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
+import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
 
 interface ProjectControlCenterContentProps {
   projectId: string
@@ -96,6 +103,7 @@ interface NavigationState {
   subTool: string | null
   coreTab: string | null
   staffingSubTab: string | null
+  reportsSubTab: string | null
 }
 
 // Expandable Description Component
@@ -536,6 +544,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     subTool: null,
     coreTab: "dashboard", // Default to dashboard tab
     staffingSubTab: "dashboard", // Default to dashboard sub-tab
+    reportsSubTab: "dashboard", // Default to dashboard sub-tab
   })
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
@@ -567,6 +576,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       ...prev,
       coreTab: tabId,
       staffingSubTab: "dashboard", // Reset staffing sub-tab when changing core tab
+      reportsSubTab: "dashboard", // Reset reports sub-tab when changing core tab
     }))
     if (onTabChange) {
       onTabChange(tabId)
@@ -574,6 +584,20 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   // Handle staffing sub-tab changes
+  const handleStaffingSubTabChange = (tabId: string) => {
+    setNavigation((prev) => ({
+      ...prev,
+      staffingSubTab: tabId,
+    }))
+  }
+
+  // Handle reports sub-tab changes
+  const handleReportsSubTabChange = (tabId: string) => {
+    setNavigation((prev) => ({
+      ...prev,
+      reportsSubTab: tabId,
+    }))
+  }
 
   // Get HBI Insights title based on active tab
   const getHBIInsightsTitle = () => {
@@ -699,10 +723,10 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       ]
     } else if (navigation.coreTab === "staffing") {
       return [
-        { label: "Create Staffing Plan", icon: Plus, onClick: () => {} },
-        { label: "View Resource Calendar", icon: Calendar, onClick: () => {} },
+        { label: "View Timeline", icon: Calendar, onClick: () => {} },
+        { label: "Create SPCR", icon: FileText, onClick: () => {} },
         { label: "Assign Staff", icon: Users, onClick: () => {} },
-        { label: "Update Assignments", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Schedule", icon: Download, onClick: () => {} },
       ]
     } else if (navigation.coreTab === "responsibility-matrix") {
       return [
@@ -747,10 +771,10 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       ]
     } else if (navigation.coreTab === "staffing") {
       return [
-        { label: "Total Resources", value: "24", color: "blue" },
-        { label: "Assigned", value: "18", color: "green" },
-        { label: "Unassigned", value: "6", color: "orange" },
-        { label: "Utilization", value: "75%", color: "purple" },
+        { label: "Active Staff", value: "12", color: "blue" },
+        { label: "Assignments", value: "18", color: "green" },
+        { label: "Positions", value: "8", color: "purple" },
+        { label: "Avg Duration", value: "45d", color: "orange" },
       ]
     } else if (navigation.coreTab === "responsibility-matrix") {
       return [
@@ -892,24 +916,29 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       case "reports":
         return (
           <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="create">Create</TabsTrigger>
-                <TabsTrigger value="workflow">Workflow</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <Tabs defaultValue="dashboard" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="project-reports">Project Reports</TabsTrigger>
               </TabsList>
-              <TabsContent value="overview" className="w-full max-w-full overflow-hidden">
-                <ReportViewer report={null} onClose={() => {}} userRole={userRole} />
+              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
+                <ReportsDashboard
+                  projectId={projectId}
+                  projectData={projectData}
+                  userRole={userRole}
+                  user={user}
+                  onTabChange={handleReportsSubTabChange}
+                />
               </TabsContent>
-              <TabsContent value="create" className="w-full max-w-full overflow-hidden">
-                <ReportCreator />
-              </TabsContent>
-              <TabsContent value="workflow" className="w-full max-w-full overflow-hidden">
-                <ReportApprovalWorkflow userRole={userRole} reports={[]} onReportUpdate={() => {}} />
-              </TabsContent>
-              <TabsContent value="analytics" className="w-full max-w-full overflow-hidden">
-                <ReportAnalytics reports={[]} />
+              <TabsContent value="project-reports" className="w-full max-w-full overflow-hidden">
+                <ProjectReports
+                  projectId={projectId}
+                  projectData={projectData}
+                  userRole={userRole}
+                  user={user}
+                  activeTab={navigation.reportsSubTab || "overview"}
+                  onTabChange={handleReportsSubTabChange}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -948,17 +977,13 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       case "productivity":
         return (
           <div className="w-full max-w-full">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Productivity Tools</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="text-center py-6">
-                  <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground text-sm">Productivity tools content will be displayed here.</p>
-                </div>
-              </CardContent>
-            </Card>
+            <ProjectProductivityContent
+              projectId={projectId}
+              projectData={projectData}
+              userRole={userRole}
+              user={user}
+              className="w-full"
+            />
           </div>
         )
 
@@ -971,46 +996,33 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 <TabsTrigger value="spcr">SPCR</TabsTrigger>
               </TabsList>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Staffing Dashboard</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="text-center py-6">
-                      <BarChart3 className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                      <p className="text-muted-foreground text-sm">
-                        Staffing dashboard content will be displayed here.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
               <TabsContent value="timeline" className="w-full max-w-full overflow-hidden">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">Staffing Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="text-center py-6">
-                      <Calendar className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                      <p className="text-muted-foreground text-sm">Staffing timeline content will be displayed here.</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProjectStaffingGantt
+                  projectId={projectId}
+                  projectData={projectData}
+                  userRole={userRole}
+                  isReadOnly={userRole === "viewer"}
+                  className="w-full"
+                  height="600px"
+                />
+              </TabsContent>
+              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
+                <StaffingDashboard
+                  projectId={projectId}
+                  projectData={projectData}
+                  userRole={userRole}
+                  className="w-full"
+                  isCompact={false}
+                  isFullScreen={isFocusMode}
+                />
               </TabsContent>
               <TabsContent value="spcr" className="w-full max-w-full overflow-hidden">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">SPCR Management</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="text-center py-6">
-                      <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                      <p className="text-muted-foreground text-sm">SPCR management content will be displayed here.</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProjectSPCRManager
+                  projectId={parseInt(projectId)}
+                  projectData={projectData}
+                  userRole={userRole}
+                  className="h-full"
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -1036,101 +1048,116 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
   // Render content based on activeTab prop (controlled by page header)
   const renderContent = () => {
-    // Check if we should show Financial Hub content
-    if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      return (
-        <FinancialHubProjectContent
-          projectId={projectId}
-          projectData={projectData}
-          userRole={userRole}
-          user={user}
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-        />
-      )
-    }
+    // Handle different module tabs from main app navigation
+    switch (activeTab) {
+      case "financial-management":
+      case "financial-hub":
+        return (
+          <FinancialHubProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+          />
+        )
 
-    // Default to Core Project Tools content
-    return (
-      <div className="space-y-6 w-full max-w-full overflow-hidden">
-        {/* Module Title with Focus Button */}
-        <div className="pb-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
-              <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
-              {isFocusMode ? (
-                <>
-                  <Minimize2 className="h-3 w-3 mr-1" />
-                  Exit Focus
-                </>
-              ) : (
-                <>
-                  <Maximize2 className="h-3 w-3 mr-1" />
-                  Focus
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+      case "pre-construction":
+        return (
+          <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+        )
 
-        {/* Responsive Core Tab Navigation */}
-        <div className="border-b border-border">
-          {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-          <div className="hidden sm:block">
-            <div className="flex space-x-6 overflow-x-auto">
-              {coreTabsConfig.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleCoreTabChange(tab.id)}
-                  className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    navigation.coreTab === tab.id
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile Dropdown Navigation - Only visible on mobile */}
-          <div className="sm:hidden py-3">
-            <Select value={navigation.coreTab || "dashboard"} onValueChange={(value) => handleCoreTabChange(value)}>
-              <SelectTrigger className="w-full">
-                <div className="flex items-center space-x-2">
-                  <Settings className="h-4 w-4" />
-                  <span>Core Tools</span>
-                  <Badge variant="secondary" className="ml-auto">
-                    {coreTabsConfig.find((tab) => tab.id === navigation.coreTab)?.label || "Dashboard"}
-                  </Badge>
+      case "core":
+      case undefined:
+      case null:
+      default:
+        // Render Core Project Tools content with internal navigation
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title with Focus Button */}
+            <div className="pb-2 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
+                  <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
                 </div>
-              </SelectTrigger>
-              <SelectContent>
-                {coreTabsConfig.map((tab) => (
-                  <SelectItem key={tab.id} value={tab.id}>
-                    <div className="flex items-center space-x-2">
-                      <tab.icon className="h-4 w-4" />
-                      <div>
-                        <div className="font-medium">{tab.label}</div>
-                        <div className="text-xs text-muted-foreground">{tab.description}</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+                <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+                  {isFocusMode ? (
+                    <>
+                      <Minimize2 className="h-3 w-3 mr-1" />
+                      Exit Focus
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-3 w-3 mr-1" />
+                      Focus
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
 
-        {/* Content Area */}
-        <div className="min-h-96 w-full max-w-full overflow-hidden">{renderCoreTabContent()}</div>
-      </div>
-    )
+            {/* Responsive Core Tab Navigation */}
+            <div className="border-b border-border flex-shrink-0">
+              {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
+              <div className="hidden sm:block">
+                <div className="flex space-x-6 overflow-x-auto">
+                  {coreTabsConfig.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleCoreTabChange(tab.id)}
+                      className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                        navigation.coreTab === tab.id
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+                      }`}
+                    >
+                      <tab.icon className="h-4 w-4" />
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Dropdown Navigation - Only visible on mobile */}
+              <div className="sm:hidden py-3">
+                <Select value={navigation.coreTab || "dashboard"} onValueChange={(value) => handleCoreTabChange(value)}>
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center space-x-2">
+                      <Settings className="h-4 w-4" />
+                      <span>Core Tools</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {coreTabsConfig.find((tab) => tab.id === navigation.coreTab)?.label || "Dashboard"}
+                      </Badge>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {coreTabsConfig.map((tab) => (
+                      <SelectItem key={tab.id} value={tab.id}>
+                        <div className="flex items-center space-x-2">
+                          <tab.icon className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">{tab.label}</div>
+                            <div className="text-xs text-muted-foreground">{tab.description}</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+              <div className={cn("w-full min-w-0 max-w-full", isFocusMode ? "min-h-full" : "h-full overflow-hidden")}>
+                {renderCoreTabContent()}
+              </div>
+            </div>
+          </div>
+        )
+    }
   }
 
   // Main content without module tab selector (controlled by page header)
@@ -1140,8 +1167,8 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   if (isFocusMode) {
     return (
       <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="p-6 h-full w-full max-w-full">{mainContent}</div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
         </div>
       </div>
     )
@@ -1180,6 +1207,20 @@ export const getProjectSidebarContent = (
         { label: "Export Checklist", icon: Download, onClick: () => {} },
         { label: "Update Progress", icon: RefreshCw, onClick: () => {} },
       ]
+    } else if (navigation.coreTab === "staffing") {
+      return [
+        { label: "View Timeline", icon: Calendar, onClick: () => {} },
+        { label: "Create SPCR", icon: FileText, onClick: () => {} },
+        { label: "Assign Staff", icon: Users, onClick: () => {} },
+        { label: "Export Schedule", icon: Download, onClick: () => {} },
+      ]
+    } else if (navigation.coreTab === "productivity") {
+      return [
+        { label: "New Message", icon: MessageSquare, onClick: () => {} },
+        { label: "Create Task", icon: CheckSquare, onClick: () => {} },
+        { label: "Team Updates", icon: Users, onClick: () => {} },
+        { label: "Export Activity", icon: Download, onClick: () => {} },
+      ]
     }
 
     // Default actions
@@ -1213,6 +1254,20 @@ export const getProjectSidebarContent = (
         { label: "Closeout Items", value: "35", color: "purple" },
         { label: "Closeout Complete", value: "12%", color: "orange" },
       ]
+    } else if (navigation.coreTab === "staffing") {
+      return [
+        { label: "Active Staff", value: "12", color: "blue" },
+        { label: "Assignments", value: "18", color: "green" },
+        { label: "Positions", value: "8", color: "purple" },
+        { label: "Avg Duration", value: "45d", color: "orange" },
+      ]
+    } else if (navigation.coreTab === "productivity") {
+      return [
+        { label: "Active Threads", value: "5", color: "blue" },
+        { label: "Tasks in Progress", value: "8", color: "orange" },
+        { label: "Completed Tasks", value: "12", color: "green" },
+        { label: "Team Messages", value: "24", color: "purple" },
+      ]
     }
 
     // Add null safety for projectMetrics
@@ -1238,6 +1293,66 @@ export const getProjectSidebarContent = (
   }
 
   const getHBIInsights = () => {
+    if (activeTab === "financial-management" || activeTab === "financial-hub") {
+      // Budget-specific insights for Financial Management
+      return [
+        {
+          id: "budget-1",
+          type: "warning",
+          severity: "medium",
+          title: "Budget Variance Alert",
+          text: "Material costs are tracking 3.2% above budget. Steel and concrete prices have increased significantly.",
+          action: "Review variance",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "budget-2",
+          type: "success",
+          severity: "low",
+          title: "Labor Cost Efficiency",
+          text: "Labor costs are running 5% under budget due to improved productivity and scheduling optimization.",
+          action: "View details",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "budget-3",
+          type: "alert",
+          severity: "high",
+          title: "Change Order Impact",
+          text: "Pending change orders totaling $245K may impact current budget projections by Q3.",
+          action: "Review COs",
+          timestamp: "6 hours ago",
+        },
+        {
+          id: "budget-4",
+          type: "info",
+          severity: "low",
+          title: "Budget Milestone Achieved",
+          text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
+          action: "View milestone",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "budget-5",
+          type: "warning",
+          severity: "medium",
+          title: "Contingency Usage",
+          text: "Contingency fund is at 45% utilization. Consider reviewing remaining scope for potential risks.",
+          action: "Analyze contingency",
+          timestamp: "2 days ago",
+        },
+        {
+          id: "budget-6",
+          type: "info",
+          severity: "low",
+          title: "Cost Forecast Update",
+          text: "Updated cost forecasting models show project completion within 2% of original budget.",
+          action: "View forecast",
+          timestamp: "3 days ago",
+        },
+      ]
+    }
+
     if (activeTab === "pre-construction") {
       return [
         {
@@ -1284,6 +1399,47 @@ export const getProjectSidebarContent = (
           text: "Site team members identified and ready for project mobilization.",
           action: "View team",
           timestamp: "5 days ago",
+        },
+      ]
+    }
+
+    if (navigation.coreTab === "productivity") {
+      return [
+        {
+          id: "prod-1",
+          type: "success",
+          severity: "low",
+          title: "Team Collaboration Active",
+          text: "Team communication frequency has increased 25% this week, indicating good engagement.",
+          action: "View activity",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "prod-2",
+          type: "warning",
+          severity: "medium",
+          title: "Task Completion Trend",
+          text: "Task completion rate has dropped 15% from last week. Consider workload redistribution.",
+          action: "Review tasks",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "prod-3",
+          type: "info",
+          severity: "low",
+          title: "Communication Efficiency",
+          text: "Average response time to messages has improved to 2.3 hours.",
+          action: "View metrics",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "prod-4",
+          type: "alert",
+          severity: "high",
+          title: "Overdue Tasks Alert",
+          text: "3 tasks are approaching their due dates. Immediate attention required.",
+          action: "Review overdue",
+          timestamp: "2 days ago",
         },
       ]
     }
@@ -1343,6 +1499,8 @@ export const getProjectSidebarContent = (
       return "HBI Financial Hub Insights"
     } else if (activeTab === "pre-construction") {
       return "HBI Pre-Construction Insights"
+    } else if (navigation.coreTab === "productivity") {
+      return "HBI Productivity Insights"
     }
     return "HBI Core Tools Insights"
   }

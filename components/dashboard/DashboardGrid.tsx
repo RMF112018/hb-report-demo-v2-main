@@ -96,6 +96,16 @@ import {
   HbIntelManagementCard,
 } from "@/components/cards/ITPlaceholderCards"
 
+// Staffing analytics cards
+import {
+  TeamUtilizationCard,
+  LaborCostAnalysisCard,
+  SPCRActivityCard,
+  TeamExperienceCard,
+  ProjectStaffingOverviewCard,
+  StaffingAlertsCard,
+} from "@/components/cards/staffing/StaffingAnalyticsCards"
+
 /**
  * Professional Dashboard Grid System
  *
@@ -690,6 +700,19 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
           userRole={userRole || ""}
         />
       )
+    // Staffing analytics cards
+    case "team-utilization":
+      return <TeamUtilizationCard {...commonProps} projectId={card.config?.projectId} />
+    case "labor-cost-analysis":
+      return <LaborCostAnalysisCard {...commonProps} projectId={card.config?.projectId} />
+    case "spcr-activity":
+      return <SPCRActivityCard {...commonProps} projectId={card.config?.projectId} />
+    case "team-experience":
+      return <TeamExperienceCard {...commonProps} projectId={card.config?.projectId} />
+    case "project-staffing-overview":
+      return <ProjectStaffingOverviewCard {...commonProps} projectId={card.config?.projectId} />
+    case "staffing-alerts":
+      return <StaffingAlertsCard {...commonProps} projectId={card.config?.projectId} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">

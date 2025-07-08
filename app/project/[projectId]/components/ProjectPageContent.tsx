@@ -83,7 +83,17 @@ export function ProjectPageContent({
 
   // Extract the actual numeric project_id from the original data
   const actualProjectId = useMemo(() => {
-    return projectData?.metadata?.originalData?.project_id || projectId
+    // Get the numeric project ID from metadata or parse the string projectId
+    const numericId = projectData?.metadata?.originalData?.project_id || parseInt(projectId, 10)
+
+    // Validate that we have a valid numeric ID
+    if (isNaN(numericId) || numericId <= 0) {
+      console.error(`Invalid project ID: ${projectId}`)
+      return projectId // Fallback to original string
+    }
+
+    // Always return as string for consistent handling
+    return numericId.toString()
   }, [projectData, projectId])
 
   // Get the original project data for legacy compatibility
@@ -92,7 +102,7 @@ export function ProjectPageContent({
   }, [projectData])
 
   return (
-    <div className="flex-1 w-full h-full max-w-full overflow-hidden">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden flex flex-col">
       <ProjectControlCenterContent
         projectId={actualProjectId.toString()}
         projectData={originalProjectData}

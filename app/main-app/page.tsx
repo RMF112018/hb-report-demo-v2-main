@@ -666,9 +666,11 @@ export default function MainApplicationPage() {
             <div
               className={`${
                 contentConfig.hasLeftContent ? "w-4/5" : "w-full"
-              } overflow-y-auto overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950`}
+              } overflow-y-auto overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col`}
             >
-              <div className="p-4 min-w-0 w-full max-w-full overflow-hidden">{contentConfig.rightContent}</div>
+              <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-hidden flex flex-col">
+                <div className="flex-1 min-w-0 w-full max-w-full overflow-hidden">{contentConfig.rightContent}</div>
+              </div>
             </div>
           </div>
         </main>
