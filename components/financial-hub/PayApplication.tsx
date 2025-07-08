@@ -180,13 +180,6 @@ export function PayApplication({ userRole, projectData }: PayApplicationProps) {
 
   return (
     <div className="space-y-6">
-      {/* HBI AI Insights */}
-      {activeView === "list" && (
-        <div data-tour="pay-app-hbi-insights">
-          <AiaInsightsPanel applications={applications} projectId={projectId} />
-        </div>
-      )}
-
       {/* Main Content */}
       {activeView === "list" ? (
         <div data-tour="pay-app-applications-list">

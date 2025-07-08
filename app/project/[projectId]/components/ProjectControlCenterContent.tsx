@@ -1294,61 +1294,442 @@ export const getProjectSidebarContent = (
 
   const getHBIInsights = () => {
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      // Budget-specific insights for Financial Management
+      // Get current financial sub-tab from navigation
+      const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
+
+      // Budget Analysis insights
+      if (currentFinancialTab === "budget-analysis") {
+        return [
+          {
+            id: "budget-1",
+            type: "warning",
+            severity: "medium",
+            title: "Budget Variance Alert",
+            text: "Material costs are tracking 3.2% above budget. Steel and concrete prices have increased significantly.",
+            action: "Review variance",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "budget-2",
+            type: "success",
+            severity: "low",
+            title: "Labor Cost Efficiency",
+            text: "Labor costs are running 5% under budget due to improved productivity and scheduling optimization.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "budget-3",
+            type: "alert",
+            severity: "high",
+            title: "Change Order Impact",
+            text: "Pending change orders totaling $245K may impact current budget projections by Q3.",
+            action: "Review COs",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "budget-4",
+            type: "info",
+            severity: "low",
+            title: "Budget Milestone Achieved",
+            text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
+            action: "View milestone",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "budget-5",
+            type: "warning",
+            severity: "medium",
+            title: "Contingency Usage",
+            text: "Contingency fund is at 45% utilization. Consider reviewing remaining scope for potential risks.",
+            action: "Analyze contingency",
+            timestamp: "2 days ago",
+          },
+          {
+            id: "budget-6",
+            type: "info",
+            severity: "low",
+            title: "Cost Forecast Update",
+            text: "Updated cost forecasting models show project completion within 2% of original budget.",
+            action: "View forecast",
+            timestamp: "3 days ago",
+          },
+        ]
+      }
+
+      // JCHR insights
+      if (currentFinancialTab === "jchr") {
+        return [
+          {
+            id: "jchr-1",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Variance Alert",
+            text: "Division 03 showing highest variance. HBI recommends immediate cost review and mitigation planning.",
+            action: "Review division",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "jchr-2",
+            type: "info",
+            severity: "low",
+            title: "Spend Velocity",
+            text: "Current burn rate at 78.1% of budget. Projected completion tracking on schedule.",
+            action: "View metrics",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "jchr-3",
+            type: "success",
+            severity: "low",
+            title: "Cost Performance Tracking",
+            text: "HBI identified minor cost variance across divisions with 78.1% budget utilization.",
+            action: "View performance",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "jchr-4",
+            type: "info",
+            severity: "low",
+            title: "Profitability Analysis",
+            text: "Current profit margin at 6.8% with financial health score of 88%. Strong profitability outlook.",
+            action: "View analysis",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // AR Aging insights
+      if (currentFinancialTab === "ar-aging") {
+        return [
+          {
+            id: "ar-1",
+            type: "warning",
+            severity: "medium",
+            title: "Collection Priority Alert",
+            text: "$850K in 60+ day aging. HBI recommends immediate collection action and client communication strategy.",
+            action: "Review collections",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "ar-2",
+            type: "info",
+            severity: "low",
+            title: "Cash Flow Impact",
+            text: "Total AR at $8.5M with 75.3% current. Healthy aging profile maintained.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "ar-3",
+            type: "success",
+            severity: "low",
+            title: "Retainage Analysis",
+            text: "$2.1M in retainage held. Retainage levels within normal range for improved cash flow.",
+            action: "View retainage",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "ar-4",
+            type: "info",
+            severity: "medium",
+            title: "Collection Efficiency",
+            text: "Average collection period of 42 days shows strong receivables management performance.",
+            action: "View efficiency",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Cash Flow insights
+      if (currentFinancialTab === "cash-flow") {
+        return [
+          {
+            id: "cash-1",
+            type: "warning",
+            severity: "medium",
+            title: "Liquidity Alert",
+            text: "Current burn rate of $1.2M/month with 65 days cash on hand. Monitor closely for working capital optimization.",
+            action: "Review liquidity",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "cash-2",
+            type: "info",
+            severity: "low",
+            title: "Forecast Performance",
+            text: "94.1% accuracy with improving trend. Excellent predictive reliability maintained.",
+            action: "View forecast",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "cash-3",
+            type: "success",
+            severity: "low",
+            title: "Liquidity Position",
+            text: "Strong liquidity ratio of 3.2 indicates healthy cash position. Excellent financial stability.",
+            action: "View position",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "cash-4",
+            type: "info",
+            severity: "medium",
+            title: "Risk Assessment",
+            text: "2 high-impact risks identified. Payment delays showing 15% probability impact.",
+            action: "View risks",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Forecasting insights
+      if (currentFinancialTab === "forecasting") {
+        return [
+          {
+            id: "forecast-1",
+            type: "info",
+            severity: "low",
+            title: "Forecast Accuracy",
+            text: "HBI forecasting model achieving 94.2% accuracy with strong predictive confidence intervals.",
+            action: "View accuracy",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "forecast-2",
+            type: "success",
+            severity: "low",
+            title: "Revenue Projection",
+            text: "Project revenue forecast tracking within 2% of original projections with positive momentum.",
+            action: "View projections",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "forecast-3",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Trend Analysis",
+            text: "Material cost escalation trends suggest 3-5% increase in Q3. Consider procurement acceleration.",
+            action: "Review trends",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "forecast-4",
+            type: "info",
+            severity: "medium",
+            title: "Schedule Impact",
+            text: "Weather delays may impact Q2 forecasts by 8-12 days. Mitigation strategies available.",
+            action: "View mitigation",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Change Management insights
+      if (currentFinancialTab === "change-management") {
+        return [
+          {
+            id: "change-1",
+            type: "warning",
+            severity: "medium",
+            title: "Change Order Volume",
+            text: "Current change order rate at 8.5% of contract value. Monitor scope creep trends carefully.",
+            action: "Review volume",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "change-2",
+            type: "alert",
+            severity: "high",
+            title: "Approval Bottleneck",
+            text: "3 change orders pending approval for 10+ days. Risk of schedule impact if not resolved.",
+            action: "Expedite approvals",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "change-3",
+            type: "info",
+            severity: "low",
+            title: "Cost Impact Analysis",
+            text: "Average change order processing time reduced to 5.2 days through workflow optimization.",
+            action: "View optimization",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "change-4",
+            type: "success",
+            severity: "low",
+            title: "Profit Margin Protection",
+            text: "98% of change orders maintained target profit margins through effective pricing strategies.",
+            action: "View margins",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Pay Authorization insights
+      if (currentFinancialTab === "pay-authorization") {
+        return [
+          {
+            id: "pay-auth-1",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Workflow Alert",
+            text: "3 payment authorizations pending with potential 2.5-day processing delay if not addressed.",
+            action: "Review workflow",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "pay-auth-2",
+            type: "info",
+            severity: "low",
+            title: "Processing Efficiency",
+            text: "HBI identified 35% faster approval cycles through automated validation workflows.",
+            action: "View efficiency",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "pay-auth-3",
+            type: "success",
+            severity: "low",
+            title: "Compliance Monitoring",
+            text: "97% accuracy in detecting billing discrepancies and ensuring standard compliance.",
+            action: "View compliance",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "pay-auth-4",
+            type: "info",
+            severity: "medium",
+            title: "Cash Flow Optimization",
+            text: "Streamlined authorization process improving cash flow velocity by 18%.",
+            action: "View optimization",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Pay Applications insights
+      if (currentFinancialTab === "pay-application") {
+        return [
+          {
+            id: "pay-app-1",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Workflow Alert",
+            text: "3 applications pending approval with potential 2.5-day processing delay if not addressed.",
+            action: "Review applications",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "pay-app-2",
+            type: "info",
+            severity: "low",
+            title: "Cash Flow Impact",
+            text: "$2.28M in total applications can accelerate project cash flow by 18% if processed efficiently.",
+            action: "View impact",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "pay-app-3",
+            type: "success",
+            severity: "low",
+            title: "Retention Optimization",
+            text: "$285K in retention showing 92% compliance rate with potential early release opportunities.",
+            action: "View retention",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "pay-app-4",
+            type: "info",
+            severity: "medium",
+            title: "Processing Efficiency",
+            text: "HBI identified 35% faster approval cycles through automated G702/G703 validation.",
+            action: "View efficiency",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Retention insights
+      if (currentFinancialTab === "retention") {
+        return [
+          {
+            id: "retention-1",
+            type: "warning",
+            severity: "medium",
+            title: "Release Timing Alert",
+            text: "$44.5K in retention pending release within 90 days. HBI recommends proactive documentation review.",
+            action: "Review timing",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "retention-2",
+            type: "info",
+            severity: "low",
+            title: "Cash Flow Optimization",
+            text: "Current retention balance represents 15.2% of total retention. Optimal release timing could improve cash flow by 12%.",
+            action: "View optimization",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "retention-3",
+            type: "success",
+            severity: "low",
+            title: "Risk Assessment",
+            text: "Low retention risk across all active contracts. Average contractor performance rating of 94.2%.",
+            action: "View assessment",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "retention-4",
+            type: "info",
+            severity: "medium",
+            title: "Release Optimization",
+            text: "Predictive analysis indicates optimal release timing could accelerate cash flow by $86K over next quarter.",
+            action: "View analysis",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Default Financial Overview insights
       return [
         {
-          id: "budget-1",
-          type: "warning",
-          severity: "medium",
-          title: "Budget Variance Alert",
-          text: "Material costs are tracking 3.2% above budget. Steel and concrete prices have increased significantly.",
-          action: "Review variance",
-          timestamp: "2 hours ago",
-        },
-        {
-          id: "budget-2",
-          type: "success",
-          severity: "low",
-          title: "Labor Cost Efficiency",
-          text: "Labor costs are running 5% under budget due to improved productivity and scheduling optimization.",
-          action: "View details",
-          timestamp: "4 hours ago",
-        },
-        {
-          id: "budget-3",
-          type: "alert",
-          severity: "high",
-          title: "Change Order Impact",
-          text: "Pending change orders totaling $245K may impact current budget projections by Q3.",
-          action: "Review COs",
-          timestamp: "6 hours ago",
-        },
-        {
-          id: "budget-4",
+          id: "financial-1",
           type: "info",
           severity: "low",
-          title: "Budget Milestone Achieved",
-          text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
-          action: "View milestone",
+          title: "Financial Health Score",
+          text: "Project financial health score of 88% indicates strong performance across all metrics.",
+          action: "View details",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "financial-2",
+          type: "success",
+          severity: "low",
+          title: "Budget Performance",
+          text: "Project tracking within 2% of original budget with healthy profit margins maintained.",
+          action: "View budget",
+          timestamp: "3 hours ago",
+        },
+        {
+          id: "financial-3",
+          type: "warning",
+          severity: "medium",
+          title: "Cash Flow Monitoring",
+          text: "Net cash flow at $8.2M with 65 days cash on hand. Monitor for working capital optimization.",
+          action: "Review cash flow",
           timestamp: "1 day ago",
         },
         {
-          id: "budget-5",
-          type: "warning",
-          severity: "medium",
-          title: "Contingency Usage",
-          text: "Contingency fund is at 45% utilization. Consider reviewing remaining scope for potential risks.",
-          action: "Analyze contingency",
-          timestamp: "2 days ago",
-        },
-        {
-          id: "budget-6",
+          id: "financial-4",
           type: "info",
           severity: "low",
-          title: "Cost Forecast Update",
-          text: "Updated cost forecasting models show project completion within 2% of original budget.",
-          action: "View forecast",
-          timestamp: "3 days ago",
+          title: "Cost Control Insights",
+          text: "Material costs 8.3% over budget. Consider renegotiating supplier contracts or sourcing alternatives.",
+          action: "Review costs",
+          timestamp: "2 days ago",
         },
       ]
     }

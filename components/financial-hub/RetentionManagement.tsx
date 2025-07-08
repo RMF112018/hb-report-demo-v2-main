@@ -114,7 +114,6 @@ export default function RetentionManagement({ userRole, projectData }: Retention
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>("overview")
-  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   const getRetentionSummary = () => {
     switch (userRole) {
@@ -505,120 +504,6 @@ export default function RetentionManagement({ userRole, projectData }: Retention
         <ViewToggle />
         <FullscreenToggle isFullscreen={isFullscreen.retention} onToggle={() => toggleFullscreen("retention")} />
       </div>
-
-      {/* HBI Retention Intelligence */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
-                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              HBI Retention Intelligence
-              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                AI-Powered
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
-              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            </Button>
-          </CardTitle>
-          {!isInsightsCollapsed && (
-            <CardDescription className="text-gray-600 dark:text-gray-400">
-              AI-powered retention analysis and strategic recommendations for contractor management
-            </CardDescription>
-          )}
-        </CardHeader>
-        {!isInsightsCollapsed && (
-          <CardContent className="space-y-4">
-            {/* Key AI Insights */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-                <AlertTriangle className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  <strong>Release Timing Alert:</strong> {formatCurrency(44500)} in retention pending release within 90
-                  days. HBI recommends proactive documentation review and contractor performance verification.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200">
-                  <strong>Cash Flow Optimization:</strong> Current retention balance of{" "}
-                  {formatCurrency(summary.totalBalance)}
-                  represents{" "}
-                  {((summary.totalBalance / (summary.totalBalance + summary.totalReleased)) * 100).toFixed(1)}% of total
-                  retention. Optimal release timing could improve cash flow by 12%.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800 dark:text-green-200">
-                  <strong>Compliance Excellence:</strong> 100% compliance with {(summary.averageRate * 100).toFixed(1)}%
-                  retention rate across {summary.contractorCount} contractors. Strong performance records indicate low
-                  risk for retention releases.
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            {/* Retention Intelligence Summary */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                Retention Management Intelligence
-              </h4>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-sm">Risk Assessment</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    HBI analysis shows low retention risk across all active contracts. Average contractor performance
-                    rating of 94.2% with zero warranty claims in past 12 months.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-sm">Release Optimization</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Predictive analysis indicates optimal release timing for {summary.contractorCount} contractors could
-                    accelerate cash flow by {formatCurrency(summary.totalBalance * 0.12)} over next quarter.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">
-                        Strategic Retention Management
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      AI monitoring contractor performance, warranty periods, and release schedules to optimize
-                      retention management and minimize risk exposure.
-                    </p>
-                  </div>
-                  <div className="text-2xl">🏗️</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        )}
-      </Card>
 
       {/* Main Content Area */}
       {renderContent()}
