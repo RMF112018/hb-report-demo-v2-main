@@ -256,7 +256,7 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
   }
 
   const generateComplianceItems = (payAppId: string): ComplianceItem[] => {
-    const baseItems = [
+    const baseItems: Pick<ComplianceItem, "id" | "payAppId" | "type" | "label" | "required" | "description">[] = [
       {
         id: `comp-${payAppId}-coi`,
         payAppId,
