@@ -1172,13 +1172,14 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     return filteredTools.filter((tool) => tool.category === expandedCategory)
   }, [filteredTools, expandedCategory])
 
-  // Core tabs configuration (without Staffing)
+  // Core tabs configuration
   const coreTabsConfig = [
     { id: "dashboard", label: "Dashboard", description: "Project overview and analytics" },
-    { id: "reports", label: "Reports", description: "Comprehensive reporting dashboard with approval workflows" },
-    { id: "responsibility-matrix", label: "Responsibility Matrix", description: "Role assignments and accountability" },
-    { id: "productivity", label: "Productivity", description: "Threaded messaging and task management" },
     { id: "checklists", label: "Checklists", description: "Project startup and closeout checklists" },
+    { id: "productivity", label: "Productivity", description: "Threaded messaging and task management" },
+    { id: "staffing", label: "Staffing", description: "Resource planning and scheduling" },
+    { id: "responsibility-matrix", label: "Responsibility Matrix", description: "Role assignments and accountability" },
+    { id: "reports", label: "Reports", description: "Comprehensive reporting dashboard with approval workflows" },
   ]
 
   // Handle core tab click - Final selection commits navigation (defined later in the file)

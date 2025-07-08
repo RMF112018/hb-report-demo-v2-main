@@ -154,10 +154,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           localStorage.removeItem(key)
         })
 
-        // Clear all tour-related data and report configuration data
+        // Clear all tour-related data, report configuration data, and responsibility matrix data
         const allKeys = Object.keys(localStorage)
         allKeys.forEach((key) => {
-          if (key.startsWith("report-config-") || key.startsWith("hb-tour-shown-") || key.startsWith("hb-welcome-")) {
+          if (
+            key.startsWith("report-config-") ||
+            key.startsWith("hb-tour-shown-") ||
+            key.startsWith("hb-welcome-") ||
+            key.startsWith("responsibility-matrix-")
+          ) {
             localStorage.removeItem(key)
           }
         })

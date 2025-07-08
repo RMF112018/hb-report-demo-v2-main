@@ -25,7 +25,7 @@ import { ProjectSidebar } from "./components/ProjectSidebar"
 import { RoleDashboard } from "./components/RoleDashboard"
 import ITCommandCenterContent from "./components/ITCommandCenterContent"
 import { ToolContent } from "./components/ToolContent"
-import { ProjectContent } from "./components/ProjectContent"
+import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
 import type { PageHeaderTab, PageHeaderButton, PageHeaderBadge } from "./components/PageHeader"
 import { useRouter } from "next/navigation"
@@ -61,6 +61,7 @@ export default function MainApplicationPage() {
   const [isMobile, setIsMobile] = useState(false)
   const [activeTab, setActiveTab] = useState<string>("overview")
   const [initialTabSet, setInitialTabSet] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
 
   useEffect(() => {
     setMounted(true)
@@ -94,9 +95,9 @@ export default function MainApplicationPage() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
 
-  // Handle sidebar panel state changes - kept for compatibility
+  // Handle sidebar panel state changes - updates layout to account for sidebar width
   const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
-    // No longer needed as layout uses normal document flow
+    setSidebarWidth(totalWidth)
   }
 
   // Determine user role
@@ -311,12 +312,12 @@ export default function MainApplicationPage() {
 
     if (selectedProject && selectedProjectData) {
       return [
-        { id: "dashboard", label: "Dashboard" },
-        { id: "financial", label: "Financial" },
-        { id: "schedule", label: "Schedule" },
-        { id: "procurement", label: "Procurement" },
-        { id: "field", label: "Field" },
-        { id: "reports", label: "Reports" },
+        { id: "core", label: "Core" },
+        { id: "pre-construction", label: "Pre-Construction" },
+        { id: "financial-management", label: "Financial Management" },
+        { id: "field-management", label: "Field Management" },
+        { id: "compliance", label: "Compliance" },
+        { id: "warranty", label: "Warranty" },
       ]
     }
 
@@ -390,6 +391,7 @@ export default function MainApplicationPage() {
         // Add new widget or item
         console.log("Add widget clicked")
         break
+
       default:
         console.log(`Button clicked: ${buttonId}`)
     }
@@ -398,15 +400,24 @@ export default function MainApplicationPage() {
   // Set initial tab based on user role
   useEffect(() => {
     if (mounted && !initialTabSet && userRole) {
-      // Set default tab based on user role
-      if (userRole === "project-executive" || userRole === "project-manager") {
+      // Set default tab based on user role and current selection
+      if (selectedProject) {
+        setActiveTab("core")
+      } else if (userRole === "project-executive" || userRole === "project-manager") {
         setActiveTab("action-items")
       } else {
         setActiveTab("overview")
       }
       setInitialTabSet(true)
     }
-  }, [mounted, userRole, initialTabSet])
+  }, [mounted, userRole, initialTabSet, selectedProject])
+
+  // Handle project selection changes
+  useEffect(() => {
+    if (selectedProject) {
+      setActiveTab("core")
+    }
+  }, [selectedProject])
 
   // Restore saved selections on mount
   useEffect(() => {
@@ -532,8 +543,20 @@ export default function MainApplicationPage() {
     }
 
     if (selectedProject && selectedProjectData) {
-      // Projects can provide left sidebar content
+      // Projects provide left sidebar content
       return {
+        leftContent: (
+          <ProjectContent
+            projectId={selectedProject}
+            projectData={selectedProjectData}
+            userRole={userRole}
+            user={user!}
+            onNavigateBack={() => handleProjectSelect(null)}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            renderMode="leftContent"
+          />
+        ),
         rightContent: (
           <ProjectContent
             projectId={selectedProject}
@@ -543,9 +566,10 @@ export default function MainApplicationPage() {
             onNavigateBack={() => handleProjectSelect(null)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
+            renderMode="rightContent"
           />
         ),
-        hasLeftContent: false, // Projects don't provide left content by default
+        hasLeftContent: true,
       }
     }
 
@@ -612,8 +636,11 @@ export default function MainApplicationPage() {
           onToolSelect={handleToolSelect}
         />
 
-        {/* Main Content Area - Automatically positioned after sidebar */}
-        <main className="flex-1 overflow-hidden flex flex-col">
+        {/* Main Content Area - Positioned to account for sidebar width */}
+        <main
+          className="flex-1 overflow-hidden flex flex-col transition-all duration-300 ease-in-out"
+          style={{ marginLeft: isMobile ? "0px" : `${sidebarWidth}px` }}
+        >
           {/* Consistent Page Header */}
           <PageHeader
             userName={headerConfig.userName}
@@ -628,16 +655,20 @@ export default function MainApplicationPage() {
 
           {/* Main Content Container - 2 Column Layout */}
           <div className="flex-1 flex overflow-hidden">
-            {/* Left Column - 25% width (hidden if no content) */}
+            {/* Left Column - 20% width (hidden if no content) */}
             {contentConfig.hasLeftContent && (
-              <div className="w-1/4 border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
-                <div className="p-4">{contentConfig.leftContent}</div>
+              <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-gray-50/20 dark:bg-gray-900/20">
+                <div className="p-4 space-y-1">{contentConfig.leftContent}</div>
               </div>
             )}
 
-            {/* Right Column - 75% width (100% if no left content) */}
-            <div className={`${contentConfig.hasLeftContent ? "w-3/4" : "w-full"} overflow-y-auto`}>
-              <div className="p-6">{contentConfig.rightContent}</div>
+            {/* Right Column - 80% width (100% if no left content) */}
+            <div
+              className={`${
+                contentConfig.hasLeftContent ? "w-4/5" : "w-full"
+              } overflow-y-auto overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950`}
+            >
+              <div className="p-4 min-w-0 w-full max-w-full overflow-hidden">{contentConfig.rightContent}</div>
             </div>
           </div>
         </main>

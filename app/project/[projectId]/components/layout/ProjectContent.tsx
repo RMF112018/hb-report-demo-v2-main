@@ -84,6 +84,8 @@ export function ProjectContent({
   const innerContentClasses = cn(
     "w-full",
     "h-full",
+    "max-w-full",
+    "overflow-hidden",
     "transition-all",
     "duration-300",
     "ease-in-out",
@@ -163,11 +165,11 @@ export function ProjectContent({
 
   // Content container style
   const contentStyle = {
-    padding: responsivePadding,
-    maxWidth: maxWidth || "none",
+    padding: 0,
+    maxWidth: "100%",
     backgroundColor: backgroundColor || "transparent",
     minHeight: dimensions.height,
-    width: dimensions.width,
+    width: "100%",
   }
 
   // Handle scroll events for scroll-to-top button
@@ -202,17 +204,6 @@ export function ProjectContent({
               <LoadingSkeleton />
             ) : (
               <>
-                {/* Development info */}
-                {process.env.NODE_ENV === "development" && (
-                  <Alert className="mb-6">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                      Content Area - User: {userRole || "guest"} | Dimensions: {dimensions.width}x{dimensions.height}px
-                      | Padding: {responsivePadding}px | Breakpoint: {layoutState.responsive.breakpoint || "unknown"}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
                 {/* Main content */}
                 <div className="relative">{children}</div>
               </>
@@ -228,17 +219,6 @@ export function ProjectContent({
             <LoadingDisplay />
           ) : (
             <>
-              {/* Development info */}
-              {process.env.NODE_ENV === "development" && (
-                <Alert className="mb-6">
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    Content Area (Non-scrollable) - User: {userRole || "guest"} | Dimensions: {dimensions.width}x
-                    {dimensions.height}px | Padding: {responsivePadding}px
-                  </AlertDescription>
-                </Alert>
-              )}
-
               {/* Main content */}
               <div className="relative h-full">{children}</div>
             </>

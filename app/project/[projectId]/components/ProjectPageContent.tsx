@@ -1,17 +1,17 @@
 /**
  * @fileoverview Project Page Content component
  * @module ProjectPageContent
- * @version 1.0.0
+ * @version 3.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Main content component that integrates existing page functionality
- * with the new layout and navigation systems.
+ * Main content component that integrates existing project control center functionality
+ * with the new v3.0 modular architecture and page header system.
  */
 
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import ProjectControlCenterContent from "./ProjectControlCenterContent"
 import type { ProjectData, UserRole } from "../types/project"
 
@@ -41,11 +41,23 @@ export interface ProjectPageContentProps {
   }
 
   /** Additional props for legacy content */
-  legacyProps?: Record<string, any>
+  legacyProps?: {
+    user?: any
+    project?: any
+    projectId?: any
+    activeTab?: string
+    onTabChange?: (tabId: string) => void
+    onNavigateBack?: () => void
+  }
 }
 
 /**
- * ProjectPageContent component - Main content integration
+ * ProjectPageContent component - Main content integration for v3.0 architecture
+ *
+ * This component serves as the bridge between the new modular architecture
+ * and the existing project control center content. It ensures that all
+ * project-specific content, tabs, buttons, and badges are properly
+ * integrated with the main application's PageHeader system.
  */
 export function ProjectPageContent({
   projectId,
@@ -54,13 +66,43 @@ export function ProjectPageContent({
   contentComponents,
   legacyProps,
 }: ProjectPageContentProps) {
-  // Mock user object - in real app this would come from auth context
-  const user = {
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@hbbuilding.com",
-    role: userRole,
-  }
+  // Create proper user object for legacy compatibility
+  const user = useMemo(() => {
+    if (legacyProps?.user) {
+      return legacyProps.user
+    }
 
-  return <ProjectControlCenterContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+    // Fallback user object
+    return {
+      firstName: "John",
+      lastName: "Smith",
+      email: "john.smith@hbbuilding.com",
+      role: userRole,
+    }
+  }, [legacyProps?.user, userRole])
+
+  // Extract the actual numeric project_id from the original data
+  const actualProjectId = useMemo(() => {
+    return projectData?.metadata?.originalData?.project_id || projectId
+  }, [projectData, projectId])
+
+  // Get the original project data for legacy compatibility
+  const originalProjectData = useMemo(() => {
+    return projectData?.metadata?.originalData || null
+  }, [projectData])
+
+  return (
+    <div className="flex-1 w-full h-full max-w-full overflow-hidden">
+      <ProjectControlCenterContent
+        projectId={actualProjectId.toString()}
+        projectData={originalProjectData}
+        userRole={userRole}
+        user={user}
+        activeTab={legacyProps?.activeTab}
+        onTabChange={legacyProps?.onTabChange}
+      />
+    </div>
+  )
 }
+
+export default ProjectPageContent

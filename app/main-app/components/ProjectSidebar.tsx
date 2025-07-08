@@ -619,7 +619,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Notify parent when panel state changes
   useEffect(() => {
     if (onPanelStateChange && !isMobile) {
-      // On desktop/tablet, notify parent of panel state
+      // On desktop/tablet, sidebar is now fixed and doesn't affect document flow
+      // Still notify parent for any layout adjustments they might need
       const isExpanded = activeCategory !== null
       const totalWidth = isExpanded ? 384 : 64 // collapsed sidebar or total width when expanded
       onPanelStateChange(isExpanded, totalWidth)
@@ -1059,7 +1060,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Desktop/Tablet Layout
   if (!isMobile) {
     return (
-      <div className="flex h-screen">
+      <div className="fixed top-0 left-0 z-40 h-screen">
         {/* Sidebar Container - Dynamic width based on expanded state */}
         <div
           className={`
@@ -1072,6 +1073,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
             duration-300 
             ease-in-out
             flex
+            h-full
+            shadow-lg
             ${activeCategory ? "w-[384px]" : "w-16"}
           `}
         >
@@ -1161,11 +1164,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
             </div>
           </aside>
 
-          {/* Expandable Content Panel - Part of normal flow */}
+          {/* Expandable Content Panel - Fixed positioned overlay */}
           {activeCategory && (
             <aside
               ref={expandedContentRef}
-              className="w-80 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-lg"
+              className="w-80 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-xl"
             >
               <div className="flex flex-col h-full">
                 {/* Content Header */}

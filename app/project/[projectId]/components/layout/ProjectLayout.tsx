@@ -94,6 +94,9 @@ export function ProjectLayout({
     "flex-1",
     "flex",
     "flex-col",
+    "w-full",
+    "max-w-full",
+    "overflow-hidden",
     "transition-all",
     "duration-300",
     "ease-in-out",
@@ -208,7 +211,7 @@ export function ProjectLayout({
         {/* <div className={overlayClasses} onClick={handleOverlayClick} aria-hidden="true" /> */}
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
           <ProjectContent
             config={config.content}
             navigation={navigation}
@@ -240,19 +243,6 @@ export function ProjectLayout({
           Skip to navigation
         </a>
       </div>
-
-      {/* Layout debug info (development only) */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed bottom-4 right-4 z-50 bg-black/80 text-white text-xs p-2 rounded-md font-mono">
-          <div>Breakpoint: {state.responsive.breakpoint}</div>
-          <div>View Mode: {config.viewMode}</div>
-          <div>Sidebar: {config.sidebar.state}</div>
-          <div>
-            Screen: {state.responsive.width}x{state.responsive.height}
-          </div>
-          {animation.isAnimating && <div>Animation: {animation.animationType}</div>}
-        </div>
-      )}
     </div>
   )
 }

@@ -234,16 +234,10 @@ export const CORE_TABS_CONFIG: CoreTabConfig[] = [
     icon: BarChart3,
   },
   {
-    id: "reports",
-    label: "Reports",
-    description: "Comprehensive reporting dashboard with approval workflows",
-    icon: FileText,
-  },
-  {
-    id: "responsibility-matrix",
-    label: "Responsibility Matrix",
-    description: "Role assignments and accountability",
-    icon: Users,
+    id: "checklists",
+    label: "Checklists",
+    description: "Project startup and closeout checklists",
+    icon: CheckSquare,
   },
   {
     id: "productivity",
@@ -252,10 +246,22 @@ export const CORE_TABS_CONFIG: CoreTabConfig[] = [
     icon: Activity,
   },
   {
-    id: "checklists",
-    label: "Checklists",
-    description: "Project startup and closeout checklists",
-    icon: CheckSquare,
+    id: "staffing",
+    label: "Staffing",
+    description: "Resource planning and scheduling",
+    icon: Calendar,
+  },
+  {
+    id: "responsibility-matrix",
+    label: "Responsibility Matrix",
+    description: "Role assignments and accountability",
+    icon: Users,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    description: "Comprehensive reporting dashboard with approval workflows",
+    icon: FileText,
   },
 ]
 
