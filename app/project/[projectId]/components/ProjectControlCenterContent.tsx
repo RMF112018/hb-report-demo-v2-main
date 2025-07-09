@@ -96,6 +96,7 @@ interface ProjectControlCenterContentProps {
   user: any
   activeTab?: string
   onTabChange?: (tabId: string) => void
+  onSidebarContentChange?: (content: React.ReactNode) => void
 }
 
 interface NavigationState {
@@ -538,6 +539,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   user,
   activeTab = "core",
   onTabChange,
+  onSidebarContentChange,
 }) => {
   const [navigation, setNavigation] = useState<NavigationState>({
     category: null,
@@ -1035,7 +1037,13 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         )
 
       case "field-management":
-        return getFieldManagementRightPanelContent(projectData, userRole, projectId, navigation.subTool || "scheduler")
+        return getFieldManagementRightPanelContent(
+          projectData,
+          userRole,
+          projectId,
+          navigation.subTool || "scheduler",
+          onSidebarContentChange
+        )
 
       default:
         return null
@@ -1078,7 +1086,13 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         )
 
       case "field-management":
-        return getFieldManagementRightPanelContent(projectData, userRole, projectId, navigation.subTool || "scheduler")
+        return getFieldManagementRightPanelContent(
+          projectData,
+          userRole,
+          projectId,
+          navigation.subTool || "scheduler",
+          onSidebarContentChange
+        )
 
       case "core":
       case undefined:
@@ -1991,7 +2005,8 @@ export const getFieldManagementRightPanelContent = (
   projectData: any,
   userRole: string,
   projectId: string,
-  selectedSubTool: string = "overview"
+  selectedSubTool: string = "overview",
+  onSidebarContentChange?: (content: React.ReactNode) => void
 ) => {
   return (
     <div className="h-full w-full overflow-hidden">
@@ -2000,6 +2015,7 @@ export const getFieldManagementRightPanelContent = (
         projectData={projectData}
         userRole={userRole}
         projectId={projectId}
+        onSidebarContentChange={onSidebarContentChange}
         className="w-full h-full"
       />
     </div>

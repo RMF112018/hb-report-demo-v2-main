@@ -49,6 +49,9 @@ export interface ProjectPageContentProps {
     onTabChange?: (tabId: string) => void
     onNavigateBack?: () => void
   }
+
+  /** Callback for sidebar content changes */
+  onSidebarContentChange?: (content: React.ReactNode) => void
 }
 
 /**
@@ -65,6 +68,7 @@ export function ProjectPageContent({
   projectData,
   contentComponents,
   legacyProps,
+  onSidebarContentChange,
 }: ProjectPageContentProps) {
   // Create proper user object for legacy compatibility
   const user = useMemo(() => {
@@ -110,6 +114,7 @@ export function ProjectPageContent({
         user={user}
         activeTab={legacyProps?.activeTab}
         onTabChange={legacyProps?.onTabChange}
+        onSidebarContentChange={onSidebarContentChange}
       />
     </div>
   )
@@ -120,7 +125,8 @@ export const getProjectFieldManagementRightPanelContent = (
   projectId: string,
   userRole: UserRole,
   projectData?: ProjectData,
-  selectedSubTool?: string
+  selectedSubTool?: string,
+  onSidebarContentChange?: (content: React.ReactNode) => void
 ) => {
   // Extract the actual numeric project ID from the original data
   const numericId = projectData?.metadata?.originalData?.project_id || parseInt(projectId, 10)
@@ -129,7 +135,13 @@ export const getProjectFieldManagementRightPanelContent = (
   // Get the original project data for legacy compatibility
   const originalProjectData = projectData?.metadata?.originalData || null
 
-  return getFieldManagementRightPanelContent(originalProjectData, userRole, actualProjectId, selectedSubTool)
+  return getFieldManagementRightPanelContent(
+    originalProjectData,
+    userRole,
+    actualProjectId,
+    selectedSubTool,
+    onSidebarContentChange
+  )
 }
 
 export default ProjectPageContent

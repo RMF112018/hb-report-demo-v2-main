@@ -11,7 +11,7 @@
 
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +30,8 @@ import {
   Monitor,
   GitBranch,
   RefreshCw,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react"
 
 // Scheduler Components
@@ -39,12 +41,47 @@ import LookAhead from "@/components/scheduler/LookAhead"
 import ScheduleGenerator from "@/components/scheduler/ScheduleGenerator"
 import ProjectSchedule from "@/components/scheduler/ProjectSchedule"
 
+// AIAssistantCoach for left sidebar integration
+import { AIAssistantCoach } from "@/components/scheduler/update-components/AIAssistantCoach"
+
+// Expandable Description Component (same as in ProjectControlCenterContent)
+const ExpandableDescription: React.FC<{ description: string }> = ({ description }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded)
+  }
+
+  return (
+    <div>
+      <div
+        className={`text-xs text-foreground leading-relaxed ${isExpanded ? "overflow-visible" : "overflow-hidden"}`}
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: isExpanded ? "none" : 3,
+          WebkitBoxOrient: "vertical",
+          ...(isExpanded ? {} : { maxHeight: "none" }),
+        }}
+      >
+        {description}
+      </div>
+      <button
+        onClick={toggleExpanded}
+        className="flex items-center justify-center w-full mt-2 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      </button>
+    </div>
+  )
+}
+
 interface SchedulerContentProps {
   selectedSubTool: string
   projectData: any
   userRole: string
   projectId?: string
   onSubToolChange?: (subTool: string) => void
+  onSidebarContentChange?: (content: React.ReactNode) => void
   [key: string]: any
 }
 
@@ -54,8 +91,13 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
   userRole,
   projectId,
   onSubToolChange,
+  onSidebarContentChange,
   ...props
 }) => {
+  const [updatePackage, setUpdatePackage] = useState<any>(null)
+  const [aiInsights, setAiInsights] = useState<any[]>([])
+  const [filteredActivities, setFilteredActivities] = useState<any[]>([])
+
   const getProjectScope = () => {
     const scheduleHealth = 87
     const criticalPathDays = 312 // 10m 12d
@@ -203,6 +245,79 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
     return [...baseKPIs, ...(subToolKPIs[subTool] || [])]
   }
 
+  // Generate sidebar content based on selected sub-tool
+  React.useEffect(() => {
+    if (onSidebarContentChange) {
+      if (selectedSubTool === "update") {
+        // When Update tab is selected, create custom sidebar content with AIAssistantCoach
+        const customSidebarContent = (
+          <div className="space-y-4">
+            {/* Project Overview Panel - Always visible */}
+            <Card className="border-border">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Project Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0">
+                {/* Project Description with collapsible logic */}
+                <div className="pb-3 border-b border-border">
+                  <p className="text-xs text-muted-foreground mb-2">Description</p>
+                  <ExpandableDescription description={projectData?.description || "No description available"} />
+                </div>
+
+                {/* Project Metrics */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Contract Value</span>
+                    <span className="font-medium">${(projectData?.contract_value || 75000000).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Spent to Date</span>
+                    <span className="font-medium">
+                      ${((projectData?.contract_value || 75000000) * 0.68).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Schedule Progress</span>
+                    <span className="font-medium text-blue-600">72%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Budget Progress</span>
+                    <span className="font-medium text-green-600">68%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Team Members</span>
+                    <span className="font-medium">24</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* HBI Scheduler Panel - AIAssistantCoach integration */}
+            <AIAssistantCoach
+              insights={aiInsights}
+              activities={filteredActivities}
+              onInsightAction={(insightId, action) => {
+                console.log("AI insight action:", insightId, action)
+              }}
+              updatePackage={updatePackage}
+              onExport={(format) => {
+                console.log("Export format:", format)
+              }}
+              onDistribute={(recipients) => {
+                console.log("Distribute to:", recipients)
+              }}
+            />
+          </div>
+        )
+
+        onSidebarContentChange(customSidebarContent)
+      } else {
+        // For other tabs, show default sidebar content (null means use default)
+        onSidebarContentChange(null)
+      }
+    }
+  }, [selectedSubTool, updatePackage, aiInsights, filteredActivities, onSidebarContentChange, projectData])
+
   const renderContent = () => {
     if (!selectedSubTool || selectedSubTool === "overview") {
       return <SchedulerOverview userRole={userRole} projectData={projectData} />
@@ -212,7 +327,17 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
       case "project-schedule":
         return <ProjectSchedule userRole={userRole} projectData={projectData} projectId={projectId} />
       case "update":
-        return <ScheduleUpdate userRole={userRole} projectData={projectData} projectId={projectId} />
+        return (
+          <ScheduleUpdate
+            userRole={userRole}
+            projectData={projectData}
+            projectId={projectId}
+            hideAISidebar={true}
+            onUpdatePackageChange={setUpdatePackage}
+            onAIInsightsChange={setAiInsights}
+            onActivitiesChange={setFilteredActivities}
+          />
+        )
       case "look-ahead":
         return <LookAhead userRole={userRole} projectData={projectData} />
       case "generator":

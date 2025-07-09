@@ -12,11 +12,12 @@
  * - Provides role-based content filtering
  * - Implements responsive design and performance optimization
  * - Supports dynamic content loading and error boundaries
+ * - Supports dynamic sidebar content updates from scheduler
  */
 
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useMemo, useState, useCallback } from "react"
 import { ProjectPageWrapper } from "@/app/project/[projectId]/components/ProjectPageWrapper"
 import { ProjectPageContent } from "@/app/project/[projectId]/components/ProjectPageContent"
 import { getProjectSidebarContent } from "@/app/project/[projectId]/components/ProjectControlCenterContent"
@@ -31,7 +32,12 @@ interface ProjectContentProps {
   activeTab?: string
   onTabChange?: (tabId: string) => void
   renderMode?: "leftContent" | "rightContent"
+  onSidebarContentChange?: (content: React.ReactNode) => void
+  sidebarContent?: React.ReactNode
 }
+
+// Create a shared state for sidebar content updates
+let sidebarContentUpdateCallback: ((content: React.ReactNode) => void) | null = null
 
 const ProjectContent: React.FC<ProjectContentProps> = ({
   projectId,
@@ -42,7 +48,12 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
   activeTab,
   onTabChange,
   renderMode = "rightContent",
+  onSidebarContentChange,
+  sidebarContent,
 }) => {
+  // State for dynamic sidebar content
+  const [dynamicSidebarContent, setDynamicSidebarContent] = useState<React.ReactNode>(null)
+
   // Transform data to match expected format using useMemo for performance
   const projectData = useMemo(() => {
     if (!originalProjectData) return null
@@ -85,6 +96,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
         subTool: null,
         coreTab: "dashboard", // Default to dashboard within core
         staffingSubTab: null,
+        reportsSubTab: null,
       }
     }
 
@@ -98,10 +110,11 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
 
     return {
       category: tabToCategoryMap[activeTab as keyof typeof tabToCategoryMap] || null,
-      tool: null,
+      tool: activeTab === "field-management" ? "Field Management" : null,
       subTool: null,
       coreTab: null,
       staffingSubTab: null,
+      reportsSubTab: null,
     }
   }, [activeTab])
 
@@ -125,8 +138,38 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
   // Generate left sidebar content
   const leftSidebarContent = useMemo(() => {
     if (!projectData || !projectMetrics) return null
+
+    // If we have dynamic sidebar content, use it; otherwise use default
+    if (dynamicSidebarContent) {
+      return dynamicSidebarContent
+    }
+
     return getProjectSidebarContent(projectData, navigationState, projectMetrics, activeTab)
-  }, [projectData, navigationState, projectMetrics, activeTab])
+  }, [projectData, navigationState, projectMetrics, activeTab, dynamicSidebarContent])
+
+  // Handle sidebar content updates from scheduler
+  const handleSidebarContentChange = useCallback(
+    (content: React.ReactNode) => {
+      setDynamicSidebarContent(content)
+      if (onSidebarContentChange) {
+        onSidebarContentChange(content)
+      }
+    },
+    [onSidebarContentChange]
+  )
+
+  // Set up the global callback for sidebar updates
+  React.useEffect(() => {
+    if (renderMode === "leftContent") {
+      sidebarContentUpdateCallback = handleSidebarContentChange
+    }
+
+    return () => {
+      if (renderMode === "leftContent") {
+        sidebarContentUpdateCallback = null
+      }
+    }
+  }, [renderMode, handleSidebarContentChange])
 
   if (!projectData || !enhancedUser) {
     return (
@@ -146,6 +189,14 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
     onNavigateBack,
   }
 
+  // Create sidebar content change handler for right content
+  const rightContentSidebarHandler = useCallback((content: React.ReactNode) => {
+    // If we have a callback to update the left sidebar, use it
+    if (sidebarContentUpdateCallback) {
+      sidebarContentUpdateCallback(content)
+    }
+  }, [])
+
   // Render based on mode
   if (renderMode === "leftContent") {
     return leftSidebarContent
@@ -160,6 +211,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
           projectData={projectData}
           userRole={userRole}
           legacyProps={legacyProps}
+          onSidebarContentChange={rightContentSidebarHandler}
         />
       </ProjectPageWrapper>
     </div>
