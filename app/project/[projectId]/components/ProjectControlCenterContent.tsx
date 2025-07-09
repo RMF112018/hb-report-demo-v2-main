@@ -1029,18 +1029,13 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           </div>
         )
 
-      case "field-management":
+      case "pre-construction":
         return (
-          <div className="w-full max-w-full">
-            <FieldManagementContent
-              selectedSubTool="overview"
-              projectData={projectData}
-              userRole={userRole}
-              projectId={projectId}
-              className="w-full"
-            />
-          </div>
+          <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
+
+      case "field-management":
+        return getFieldManagementRightPanelContent(projectData, userRole, projectId, "overview")
 
       default:
         return null
@@ -1081,6 +1076,9 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         return (
           <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
+
+      case "field-management":
+        return getFieldManagementRightPanelContent(projectData, userRole, projectId, "overview")
 
       case "core":
       case undefined:
@@ -1987,3 +1985,23 @@ export const getProjectSidebarContent = (
 }
 
 export default ProjectControlCenterContent
+
+// Export the Field Management content for right panel injection
+export const getFieldManagementRightPanelContent = (
+  projectData: any,
+  userRole: string,
+  projectId: string,
+  selectedSubTool: string = "overview"
+) => {
+  return (
+    <div className="h-full w-full overflow-hidden">
+      <FieldManagementContent
+        selectedSubTool={selectedSubTool}
+        projectData={projectData}
+        userRole={userRole}
+        projectId={projectId}
+        className="w-full h-full"
+      />
+    </div>
+  )
+}

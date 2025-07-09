@@ -14,7 +14,7 @@
 import React, { useMemo } from "react"
 import { useAuth } from "../../../context/auth-context"
 import { ProjectPageWrapper } from "./components/ProjectPageWrapper"
-import { ProjectPageContent } from "./components/ProjectPageContent"
+import { ProjectPageContent, getProjectFieldManagementRightPanelContent } from "./components/ProjectPageContent"
 
 // Content components will be imported here when available
 // import FinancialHubContent from "./components/content/FinancialHubContent"
@@ -162,3 +162,6 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     </ProjectPageWrapper>
   )
 }
+
+// Export the Field Management right panel content function for main app integration
+export { getProjectFieldManagementRightPanelContent }

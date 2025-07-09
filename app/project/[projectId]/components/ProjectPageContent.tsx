@@ -12,7 +12,7 @@
 "use client"
 
 import React, { useMemo } from "react"
-import ProjectControlCenterContent from "./ProjectControlCenterContent"
+import ProjectControlCenterContent, { getFieldManagementRightPanelContent } from "./ProjectControlCenterContent"
 import type { ProjectData, UserRole } from "../types/project"
 
 /**
@@ -113,6 +113,23 @@ export function ProjectPageContent({
       />
     </div>
   )
+}
+
+// Export function to get right panel content for Field Management
+export const getProjectFieldManagementRightPanelContent = (
+  projectId: string,
+  userRole: UserRole,
+  projectData?: ProjectData,
+  selectedSubTool?: string
+) => {
+  // Extract the actual numeric project ID from the original data
+  const numericId = projectData?.metadata?.originalData?.project_id || parseInt(projectId, 10)
+  const actualProjectId = isNaN(numericId) || numericId <= 0 ? projectId : numericId.toString()
+
+  // Get the original project data for legacy compatibility
+  const originalProjectData = projectData?.metadata?.originalData || null
+
+  return getFieldManagementRightPanelContent(originalProjectData, userRole, actualProjectId, selectedSubTool)
 }
 
 export default ProjectPageContent

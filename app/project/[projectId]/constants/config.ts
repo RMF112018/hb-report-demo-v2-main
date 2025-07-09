@@ -263,12 +263,6 @@ export const CORE_TABS_CONFIG: CoreTabConfig[] = [
     description: "Comprehensive reporting dashboard with approval workflows",
     icon: FileText,
   },
-  {
-    id: "field-management",
-    label: "Field Management",
-    description: "Field operations management and scheduling tools",
-    icon: Building2,
-  },
 ]
 
 /**

@@ -23,6 +23,9 @@ import { FieldReportsWidgets, type FieldReportsStats } from "@/components/field-
 import { FieldReportsExportUtils } from "@/components/field-reports/FieldReportsExportUtils"
 import { HbiFieldReportsInsights } from "@/components/field-reports/HbiFieldReportsInsights"
 import { ProjectFieldReportsSummary } from "@/components/field-reports/ProjectFieldReportsSummary"
+import { DailyLogSubTab } from "@/components/field-reports/DailyLogSubTab"
+import { SafetyAuditsSubTab } from "@/components/field-reports/SafetyAuditsSubTab"
+import { QualityControlSubTab } from "@/components/field-reports/QualityControlSubTab"
 import { useToast } from "@/hooks/use-toast"
 import {
   Download,
@@ -594,10 +597,6 @@ export default function FieldReportsPage() {
                     <Download className="h-4 w-4 mr-2" />
                     Export
                   </Button>
-                  <Button className="bg-hb-orange hover:bg-hb-orange/90 text-white">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Log
-                  </Button>
                   <Button variant="outline" onClick={() => setIsFullscreen(!isFullscreen)}>
                     <Maximize className="h-4 w-4 mr-2" />
                     {isFullscreen ? "Exit" : "Fullscreen"}
@@ -889,34 +888,37 @@ export default function FieldReportsPage() {
                       </TabsContent>
 
                       <TabsContent value="daily-logs" className="mt-0">
-                        <div className="space-y-6">
-                          {/* Filter and search controls would go here */}
-                          <div className="bg-card p-4 rounded-lg border">
-                            <p className="text-muted-foreground">
-                              Daily logs table and detailed view would be implemented here.
-                            </p>
-                          </div>
-                        </div>
+                        <DailyLogSubTab
+                          data={{
+                            dailyLogs: filteredFieldData.dailyLogs,
+                            manpower: filteredFieldData.manpower,
+                          }}
+                          stats={fieldMetrics}
+                          userRole={user?.role}
+                          onRefresh={handleRefresh}
+                        />
                       </TabsContent>
 
                       <TabsContent value="safety" className="mt-0">
-                        <div className="space-y-6">
-                          <div className="bg-card p-4 rounded-lg border">
-                            <p className="text-muted-foreground">
-                              Safety audits table and detailed view would be implemented here.
-                            </p>
-                          </div>
-                        </div>
+                        <SafetyAuditsSubTab
+                          data={{
+                            safetyAudits: filteredFieldData.safety,
+                          }}
+                          stats={fieldMetrics}
+                          userRole={user?.role}
+                          onRefresh={handleRefresh}
+                        />
                       </TabsContent>
 
                       <TabsContent value="quality" className="mt-0">
-                        <div className="space-y-6">
-                          <div className="bg-card p-4 rounded-lg border">
-                            <p className="text-muted-foreground">
-                              Quality control inspections table and detailed view would be implemented here.
-                            </p>
-                          </div>
-                        </div>
+                        <QualityControlSubTab
+                          data={{
+                            qualityInspections: filteredFieldData.qualityControl,
+                          }}
+                          stats={fieldMetrics}
+                          userRole={user?.role}
+                          onRefresh={handleRefresh}
+                        />
                       </TabsContent>
                     </Tabs>
                   </CardContent>
