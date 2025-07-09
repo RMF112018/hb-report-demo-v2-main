@@ -78,9 +78,7 @@ export function StandardPageLayout({
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-              {description && (
-                <p className="text-muted-foreground mt-1">{description}</p>
-              )}
+              {description && <p className="text-muted-foreground mt-1">{description}</p>}
               {badges.length > 0 && (
                 <div className="flex items-center gap-4 mt-2">
                   {badges.map((badge, index) => (
@@ -95,11 +93,7 @@ export function StandardPageLayout({
                 </div>
               )}
             </div>
-            {actions && (
-              <div className="flex items-center gap-3">
-                {actions}
-              </div>
-            )}
+            {actions && <div className="flex items-center gap-3">{actions}</div>}
           </div>
           {headerContent}
         </div>
@@ -116,7 +110,7 @@ export function createDashboardBreadcrumbs(currentPage: string, parentPath?: str
   const breadcrumbs: BreadcrumbItem[] = [
     {
       label: "Dashboard",
-      href: "/dashboard",
+      href: "/main-app",
       icon: <Home className="h-3 w-3" />,
     },
   ]
@@ -147,4 +141,4 @@ export function createPreconBreadcrumbs(currentPage: string): BreadcrumbItem[] {
       label: currentPage,
     },
   ]
-} 
+}

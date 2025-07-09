@@ -44,6 +44,9 @@ import ProjectSchedule from "@/components/scheduler/ProjectSchedule"
 // AIAssistantCoach for left sidebar integration
 import { AIAssistantCoach } from "@/components/scheduler/update-components/AIAssistantCoach"
 
+// Look Ahead History Manager for left sidebar integration
+import LookAheadHistoryManager from "@/components/scheduler/LookAheadHistoryManager"
+
 // Expandable Description Component (same as in ProjectControlCenterContent)
 const ExpandableDescription: React.FC<{ description: string }> = ({ description }) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -311,12 +314,74 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
         )
 
         onSidebarContentChange(customSidebarContent)
+      } else if (selectedSubTool === "look-ahead") {
+        // When Look Ahead tab is selected, create custom sidebar content with Look Ahead History
+        const customSidebarContent = (
+          <div className="space-y-4">
+            {/* Project Overview Panel - Always visible */}
+            <Card className="border-border">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Project Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0">
+                {/* Project Description with collapsible logic */}
+                <div className="pb-3 border-b border-border">
+                  <p className="text-xs text-muted-foreground mb-2">Description</p>
+                  <ExpandableDescription description={projectData?.description || "No description available"} />
+                </div>
+
+                {/* Project Metrics */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Contract Value</span>
+                    <span className="font-medium">${(projectData?.contract_value || 75000000).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Spent to Date</span>
+                    <span className="font-medium">
+                      ${((projectData?.contract_value || 75000000) * 0.68).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Schedule Progress</span>
+                    <span className="font-medium text-blue-600">72%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Budget Progress</span>
+                    <span className="font-medium text-green-600">68%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Team Members</span>
+                    <span className="font-medium">24</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Look Ahead History Panel */}
+            <LookAheadHistoryManager
+              projectId={projectId || "default"}
+              onCopyEntry={(entry) => {
+                console.log("Copy entry:", entry)
+              }}
+              onViewEntry={(entry) => {
+                console.log("View entry:", entry)
+              }}
+              onDeleteEntry={(entryId) => {
+                console.log("Delete entry:", entryId)
+              }}
+              currentWeek={new Date()}
+            />
+          </div>
+        )
+
+        onSidebarContentChange(customSidebarContent)
       } else {
         // For other tabs, show default sidebar content (null means use default)
         onSidebarContentChange(null)
       }
     }
-  }, [selectedSubTool, updatePackage, aiInsights, filteredActivities, onSidebarContentChange, projectData])
+  }, [selectedSubTool, updatePackage, aiInsights, filteredActivities, onSidebarContentChange, projectData, projectId])
 
   const renderContent = () => {
     if (!selectedSubTool || selectedSubTool === "overview") {
@@ -347,7 +412,7 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
     }
   }
 
-  // Define available tabs based on user role
+  // Define available tabs - all tabs shown to all roles for consistent experience
   const getTabsForRole = () => {
     const allTabs = [
       { id: "overview", label: "Overview", icon: BarChart3 },
@@ -357,13 +422,7 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
       { id: "generator", label: "Generator", icon: Brain },
     ]
 
-    // Filter tabs based on user role
-    if (userRole === "executive") {
-      return allTabs.filter((tab) => ["overview", "project-schedule", "look-ahead"].includes(tab.id))
-    } else if (userRole === "project-executive") {
-      return allTabs.filter((tab) => !["generator"].includes(tab.id))
-    }
-
+    // All roles now see all tabs (matching project-manager access)
     return allTabs
   }
 

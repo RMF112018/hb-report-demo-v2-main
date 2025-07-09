@@ -66,6 +66,9 @@ import {
   Minimize2,
   ChevronDown,
   ChevronUp,
+  AlertCircle,
+  Bell,
+  Phone,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
@@ -531,6 +534,2420 @@ const staffingSubTabsConfig = [
   { id: "timeline", label: "Timeline", description: "Staffing timeline and scheduling", icon: Calendar },
   { id: "spcr", label: "SPCR", description: "Staffing plan change requests", icon: FileText },
 ]
+
+// Warranty tabs configuration
+const warrantyTabsConfig = [
+  { id: "dashboard", label: "Dashboard", description: "Warranty overview and metrics", icon: BarChart3 },
+  { id: "claim-center", label: "Claim Center", description: "Process and track warranty claims", icon: AlertTriangle },
+  { id: "documents", label: "Documents", description: "Warranty documentation and certificates", icon: FileText },
+  { id: "product-assistant", label: "Product Assistant", description: "AI-powered product information", icon: Brain },
+  {
+    id: "labor-warranty",
+    label: "Labor Warranty Tracking",
+    description: "Track labor warranties and service",
+    icon: Users,
+  },
+]
+
+// Warranty Management Content Component
+const WarrantyManagementContent: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+  user: any
+}> = ({ projectId, projectData, userRole, user }) => {
+  const [activeTab, setActiveTab] = useState("dashboard")
+  const [isFocusMode, setIsFocusMode] = useState(false)
+
+  const handleFocusToggle = () => {
+    setIsFocusMode(!isFocusMode)
+  }
+
+  const renderWarrantyTabContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <div className="space-y-6 p-6 w-full max-w-full">
+            {/* WarrantyDashboard - Quick View Widgets */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Open Claims</p>
+                      <p className="text-2xl font-bold text-orange-600">8</p>
+                    </div>
+                    <AlertTriangle className="h-8 w-8 text-orange-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">2 urgent, 3 high priority</p>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Overdue Items</p>
+                      <p className="text-2xl font-bold text-red-600">3</p>
+                    </div>
+                    <Clock className="h-8 w-8 text-red-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Past resolution deadline</p>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Warranties</p>
+                      <p className="text-2xl font-bold text-blue-600">24</p>
+                    </div>
+                    <Shield className="h-8 w-8 text-blue-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">12 labor, 12 manufacturer</p>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Avg Resolution</p>
+                      <p className="text-2xl font-bold text-green-600">4.2d</p>
+                    </div>
+                    <Target className="h-8 w-8 text-green-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Within SLA target</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Tabbed Content Area */}
+            <Tabs defaultValue="claims" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="claims">Claims</TabsTrigger>
+                <TabsTrigger value="documents">Documents</TabsTrigger>
+                <TabsTrigger value="warranty-types">Types</TabsTrigger>
+                <TabsTrigger value="vendors">Vendors</TabsTrigger>
+                <TabsTrigger value="reports">Reports</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="claims" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Recent Warranty Claims</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[
+                        {
+                          id: "WC-001",
+                          issue: "HVAC System Malfunction",
+                          location: "Unit 4B",
+                          status: "In Progress",
+                          priority: "High",
+                          assignee: "HVAC Subcontractor",
+                          days: 5,
+                        },
+                        {
+                          id: "WC-002",
+                          issue: "Kitchen Faucet Leak",
+                          location: "Unit 2A",
+                          status: "Assigned",
+                          priority: "Medium",
+                          assignee: "Plumbing Team",
+                          days: 2,
+                        },
+                        {
+                          id: "WC-003",
+                          issue: "Window Seal Failure",
+                          location: "Unit 1C",
+                          status: "Under Review",
+                          priority: "Low",
+                          assignee: "Quality Control",
+                          days: 1,
+                        },
+                        {
+                          id: "WC-004",
+                          issue: "Electrical Outlet Issue",
+                          location: "Unit 3B",
+                          status: "Completed",
+                          priority: "Medium",
+                          assignee: "Electrical Sub",
+                          days: 3,
+                        },
+                      ].map((claim) => (
+                        <div
+                          key={claim.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium text-sm">{claim.id}</span>
+                              <Badge
+                                variant={
+                                  claim.priority === "High"
+                                    ? "destructive"
+                                    : claim.priority === "Medium"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                                className="text-xs"
+                              >
+                                {claim.priority}
+                              </Badge>
+                              <Badge variant={claim.status === "Completed" ? "default" : "outline"} className="text-xs">
+                                {claim.status}
+                              </Badge>
+                            </div>
+                            <p className="text-sm font-medium mt-1">{claim.issue}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {claim.location} • Assigned to {claim.assignee}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground">{claim.days} days ago</p>
+                            <Button size="sm" variant="outline" className="mt-1">
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="warranty-types" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Labor Warranties</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">HVAC Installation</span>
+                          <Badge variant="default">1 Year</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Electrical Work</span>
+                          <Badge variant="default">2 Years</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Plumbing Systems</span>
+                          <Badge variant="default">1 Year</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Manufacturer Warranties</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Appliances</span>
+                          <Badge variant="secondary">3-5 Years</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Windows</span>
+                          <Badge variant="secondary">10 Years</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Roofing Materials</span>
+                          <Badge variant="secondary">15 Years</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="reports" className="space-y-4">
+                {/* WarrantyReportingSuite */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Claims by Category</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">HVAC</span>
+                          <span className="text-sm font-medium">35%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Plumbing</span>
+                          <span className="text-sm font-medium">25%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Electrical</span>
+                          <span className="text-sm font-medium">20%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Other</span>
+                          <span className="text-sm font-medium">20%</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Resolution Metrics</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">Avg Resolution Time</span>
+                          <span className="text-sm font-medium">4.2 days</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Within Coverage</span>
+                          <span className="text-sm font-medium">92%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Claims Rejected</span>
+                          <span className="text-sm font-medium">8%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Repeat Claims</span>
+                          <span className="text-sm font-medium">12%</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Export Reports</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <Button size="sm" variant="outline" className="w-full">
+                          <Download className="h-4 w-4 mr-2" />
+                          Claims Summary (PDF)
+                        </Button>
+                        <Button size="sm" variant="outline" className="w-full">
+                          <Download className="h-4 w-4 mr-2" />
+                          Performance Report (Excel)
+                        </Button>
+                        <Button size="sm" variant="outline" className="w-full">
+                          <Download className="h-4 w-4 mr-2" />
+                          Subcontractor Analysis
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )
+
+      case "claim-center":
+        return (
+          <div className="space-y-6 p-6 w-full max-w-full">
+            {/* WarrantyClaimCenter Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold">Warranty Claims Center</h3>
+                <p className="text-sm text-muted-foreground">
+                  Comprehensive claim intake, assignment, and resolution management
+                </p>
+              </div>
+              <Button className="h-8 px-3 text-xs">
+                <Plus className="h-3 w-3 mr-1" />
+                New Claim
+              </Button>
+            </div>
+
+            <Tabs defaultValue="intake" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="intake">Claim Intake</TabsTrigger>
+                <TabsTrigger value="assignment">Assignment</TabsTrigger>
+                <TabsTrigger value="resolution">Resolution Board</TabsTrigger>
+                <TabsTrigger value="closure">Closure & Approval</TabsTrigger>
+              </TabsList>
+
+              {/* WarrantyClaimCenter - Claim Intake Form */}
+              <TabsContent value="intake" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">New Warranty Claim</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Complete all required fields to submit a warranty claim
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Project/Unit *</label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select project location" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="unit-4b">Unit 4B - Riverside Plaza</SelectItem>
+                            <SelectItem value="unit-2a">Unit 2A - Riverside Plaza</SelectItem>
+                            <SelectItem value="unit-1c">Unit 1C - Riverside Plaza</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Priority *</label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select priority level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="urgent">Urgent (Safety/Security)</SelectItem>
+                            <SelectItem value="high">High (Major System)</SelectItem>
+                            <SelectItem value="medium">Medium (Standard)</SelectItem>
+                            <SelectItem value="low">Low (Cosmetic)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Issue Category *</label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hvac">HVAC Systems</SelectItem>
+                            <SelectItem value="plumbing">Plumbing</SelectItem>
+                            <SelectItem value="electrical">Electrical</SelectItem>
+                            <SelectItem value="appliances">Appliances</SelectItem>
+                            <SelectItem value="windows">Windows & Doors</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Date of Discovery *</label>
+                        <input type="date" className="w-full px-3 py-2 border border-input rounded-md text-sm" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Issue Description *</label>
+                      <textarea
+                        className="w-full px-3 py-2 border border-input rounded-md text-sm min-h-[100px]"
+                        placeholder="Provide detailed description of the issue, including symptoms and impact"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Supporting Files</label>
+                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                        <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          Drag & drop photos or documents, or click to browse
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">GPS location will be auto-tagged to photos</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline">Save Draft</Button>
+                      <Button>Submit Claim</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* ClaimAssignmentPanel */}
+              <TabsContent value="assignment" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Claim Assignment Dashboard</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Assign claims to internal leads and external resolution teams
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          id: "WC-001",
+                          issue: "HVAC System Malfunction",
+                          location: "Unit 4B",
+                          status: "New",
+                          priority: "High",
+                          submittedBy: "Property Manager",
+                        },
+                        {
+                          id: "WC-005",
+                          issue: "Garbage Disposal Issue",
+                          location: "Unit 3A",
+                          status: "Under Review",
+                          priority: "Medium",
+                          submittedBy: "Resident",
+                        },
+                        {
+                          id: "WC-006",
+                          issue: "Bathroom Fan Noise",
+                          location: "Unit 1D",
+                          status: "New",
+                          priority: "Low",
+                          submittedBy: "Warranty Manager",
+                        },
+                      ].map((claim) => (
+                        <div key={claim.id} className="border rounded-lg p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium">{claim.id}</span>
+                              <Badge
+                                variant={
+                                  claim.priority === "High"
+                                    ? "destructive"
+                                    : claim.priority === "Medium"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                              >
+                                {claim.priority}
+                              </Badge>
+                              <Badge variant="outline">{claim.status}</Badge>
+                            </div>
+                            <span className="text-xs text-muted-foreground">Submitted by {claim.submittedBy}</span>
+                          </div>
+
+                          <div>
+                            <p className="font-medium text-sm">{claim.issue}</p>
+                            <p className="text-xs text-muted-foreground">{claim.location}</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-xs font-medium">Internal Lead</label>
+                              <Select>
+                                <SelectTrigger className="h-8">
+                                  <SelectValue placeholder="Assign lead" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="warranty-manager">Warranty Manager</SelectItem>
+                                  <SelectItem value="trade-lead">Trade Lead</SelectItem>
+                                  <SelectItem value="project-manager">Project Manager</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-xs font-medium">External Assignee</label>
+                              <Select>
+                                <SelectTrigger className="h-8">
+                                  <SelectValue placeholder="Assign contractor" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="hvac-sub">HVAC Subcontractor</SelectItem>
+                                  <SelectItem value="plumbing-sub">Plumbing Team</SelectItem>
+                                  <SelectItem value="electrical-sub">Electrical Sub</SelectItem>
+                                  <SelectItem value="general-sub">General Contractor</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-xs font-medium">Due Date</label>
+                              <input type="date" className="w-full px-2 py-1 border border-input rounded text-xs h-8" />
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end space-x-2">
+                            <Button size="sm" variant="outline">
+                              Send Notification
+                            </Button>
+                            <Button size="sm">Assign Claim</Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* IssueResolutionBoard - Kanban Style */}
+              <TabsContent value="resolution" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Resolution Workflow Board</CardTitle>
+                    <p className="text-sm text-muted-foreground">Kanban-style tracking of warranty claim lifecycle</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                      {/* New Column */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">New</h4>
+                          <Badge variant="secondary">2</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="bg-card border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-007</span>
+                              <Badge variant="destructive" className="text-xs">
+                                High
+                              </Badge>
+                            </div>
+                            <p className="text-xs">Cabinet Door Alignment</p>
+                            <p className="text-xs text-muted-foreground">Unit 2C</p>
+                          </div>
+                          <div className="bg-card border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-008</span>
+                              <Badge variant="secondary" className="text-xs">
+                                Low
+                              </Badge>
+                            </div>
+                            <p className="text-xs">Paint Touch-up Needed</p>
+                            <p className="text-xs text-muted-foreground">Unit 1A</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* In Progress Column */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">In Progress</h4>
+                          <Badge variant="secondary">3</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="bg-card border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-001</span>
+                              <Badge variant="destructive" className="text-xs">
+                                High
+                              </Badge>
+                            </div>
+                            <p className="text-xs">HVAC System Malfunction</p>
+                            <p className="text-xs text-muted-foreground">Unit 4B • HVAC Sub</p>
+                            <div className="text-xs text-muted-foreground">Due: Tomorrow</div>
+                          </div>
+                          <div className="bg-card border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-002</span>
+                              <Badge variant="default" className="text-xs">
+                                Medium
+                              </Badge>
+                            </div>
+                            <p className="text-xs">Kitchen Faucet Leak</p>
+                            <p className="text-xs text-muted-foreground">Unit 2A • Plumbing</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Review Column */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">Under Review</h4>
+                          <Badge variant="secondary">1</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="bg-card border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-004</span>
+                              <Badge variant="default" className="text-xs">
+                                Medium
+                              </Badge>
+                            </div>
+                            <p className="text-xs">Electrical Outlet Issue</p>
+                            <p className="text-xs text-muted-foreground">Unit 3B • Completed</p>
+                            <Button size="sm" variant="outline" className="w-full mt-2 text-xs">
+                              Review Work
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Closed Column */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">Closed</h4>
+                          <Badge variant="secondary">12</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="bg-card border rounded-lg p-3 space-y-2 opacity-75">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">WC-003</span>
+                              <CheckCircle className="h-3 w-3 text-green-500" />
+                            </div>
+                            <p className="text-xs">Window Seal Repair</p>
+                            <p className="text-xs text-muted-foreground">Unit 1C • Approved</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* ClosureApprovalFlow */}
+              <TabsContent value="closure" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Closure & Approval Workflow</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Review completed work and manage client approval process
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {[
+                        {
+                          id: "WC-004",
+                          issue: "Electrical Outlet Issue",
+                          location: "Unit 3B",
+                          contractor: "Electrical Sub",
+                          completedDate: "2024-01-15",
+                          workSummary: "Replaced faulty GFCI outlet and tested all circuits in unit",
+                          photos: 3,
+                          clientApproval: "pending",
+                        },
+                        {
+                          id: "WC-009",
+                          issue: "Dishwasher Installation",
+                          location: "Unit 5A",
+                          contractor: "Appliance Team",
+                          completedDate: "2024-01-14",
+                          workSummary: "Installed replacement dishwasher and verified all connections",
+                          photos: 5,
+                          clientApproval: "approved",
+                        },
+                      ].map((item) => (
+                        <div key={item.id} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium">{item.id}</span>
+                              <Badge variant={item.clientApproval === "approved" ? "default" : "outline"}>
+                                {item.clientApproval === "approved" ? "Client Approved" : "Pending Approval"}
+                              </Badge>
+                            </div>
+                            <span className="text-xs text-muted-foreground">Completed: {item.completedDate}</span>
+                          </div>
+
+                          <div>
+                            <p className="font-medium text-sm">{item.issue}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {item.location} • {item.contractor}
+                            </p>
+                          </div>
+
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <h5 className="text-xs font-medium mb-1">Work Summary:</h5>
+                            <p className="text-xs">{item.workSummary}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{item.photos} photos attached</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-3 w-3 mr-1" />
+                              View Photos
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <MessageSquare className="h-3 w-3 mr-1" />
+                              Contact Client
+                            </Button>
+                            <Button size="sm" variant={item.clientApproval === "approved" ? "default" : "outline"}>
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              {item.clientApproval === "approved" ? "Approved" : "Approve & Close"}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )
+
+      case "documents":
+        return (
+          <div className="space-y-6 p-6 w-full max-w-full">
+            {/* WarrantyDocumentsRepository Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold">Warranty Documents Repository</h3>
+                <p className="text-sm text-muted-foreground">
+                  Centralized management of all warranty documentation and certificates
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline" className="h-8 px-3 text-xs">
+                  <Download className="h-3 w-3 mr-1" />
+                  Batch Export
+                </Button>
+                <Button className="h-8 px-3 text-xs">
+                  <Upload className="h-3 w-3 mr-1" />
+                  Upload Document
+                </Button>
+              </div>
+            </div>
+
+            <Tabs defaultValue="labor" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="labor">Labor Warranties</TabsTrigger>
+                <TabsTrigger value="manufacturer">Manufacturer</TabsTrigger>
+                <TabsTrigger value="completion">Completion Docs</TabsTrigger>
+                <TabsTrigger value="monitoring">Expiration Monitor</TabsTrigger>
+              </TabsList>
+
+              {/* Labor Warranty Documents */}
+              <TabsContent value="labor" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Labor Warranty Certificates</CardTitle>
+                    <p className="text-sm text-muted-foreground">Organized by subcontractor and trade package</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          contractor: "ABC HVAC Systems",
+                          trade: "HVAC",
+                          csiCode: "23 00 00",
+                          documents: 3,
+                          expiration: "2025-06-15",
+                          status: "Active",
+                        },
+                        {
+                          contractor: "Pro Plumbing Co.",
+                          trade: "Plumbing",
+                          csiCode: "22 00 00",
+                          documents: 2,
+                          expiration: "2025-03-20",
+                          status: "Active",
+                        },
+                        {
+                          contractor: "Elite Electrical",
+                          trade: "Electrical",
+                          csiCode: "26 00 00",
+                          documents: 4,
+                          expiration: "2025-08-10",
+                          status: "Active",
+                        },
+                        {
+                          contractor: "Master Flooring",
+                          trade: "Flooring",
+                          csiCode: "09 60 00",
+                          documents: 1,
+                          expiration: "2025-01-30",
+                          status: "Expiring Soon",
+                        },
+                      ].map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium">{item.contractor}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.trade}
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  CSI {item.csiCode}
+                                </Badge>
+                                <Badge
+                                  variant={item.status === "Active" ? "default" : "destructive"}
+                                  className="text-xs"
+                                >
+                                  {item.status}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.documents} warranty documents • Expires: {item.expiration}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline">
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                <Download className="h-3 w-3 mr-1" />
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Manufacturer Warranty Documents */}
+              <TabsContent value="manufacturer" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Manufacturer Warranties</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Product warranties organized by vendor and equipment type
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          vendor: "Carrier Corporation",
+                          product: "HVAC Equipment",
+                          model: "Model 42ABC",
+                          serial: "SN123456789",
+                          warranty: "5 Years",
+                          expiration: "2029-04-15",
+                          status: "Active",
+                        },
+                        {
+                          vendor: "GE Appliances",
+                          product: "Kitchen Appliances",
+                          model: "Various Models",
+                          serial: "Multiple",
+                          warranty: "2 Years",
+                          expiration: "2026-12-01",
+                          status: "Active",
+                        },
+                        {
+                          vendor: "Kohler Company",
+                          product: "Plumbing Fixtures",
+                          model: "K-Series",
+                          serial: "Multiple",
+                          warranty: "Limited Lifetime",
+                          expiration: "Lifetime",
+                          status: "Active",
+                        },
+                        {
+                          vendor: "Pella Windows",
+                          product: "Windows & Doors",
+                          model: "Impervia Series",
+                          serial: "Multiple",
+                          warranty: "10 Years",
+                          expiration: "2034-02-20",
+                          status: "Active",
+                        },
+                      ].map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium">{item.vendor}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.product}
+                                </Badge>
+                                <Badge variant="default" className="text-xs">
+                                  {item.warranty}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.model} • Serial: {item.serial} • Expires: {item.expiration}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline">
+                                <FileText className="h-3 w-3 mr-1" />
+                                Certificate
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                <Phone className="h-3 w-3 mr-1" />
+                                Contact
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Completion Documents */}
+              <TabsContent value="completion" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Completion & Acceptance Forms</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Project completion documentation and closeout packages
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          type: "Certificate of Occupancy",
+                          date: "2024-01-15",
+                          status: "Approved",
+                          fileType: "PDF",
+                          size: "2.4 MB",
+                        },
+                        {
+                          type: "Final Inspection Report",
+                          date: "2024-01-12",
+                          status: "Approved",
+                          fileType: "PDF",
+                          size: "1.8 MB",
+                        },
+                        {
+                          type: "Punch List - Final",
+                          date: "2024-01-10",
+                          status: "Completed",
+                          fileType: "PDF",
+                          size: "945 KB",
+                        },
+                        {
+                          type: "Closeout Package",
+                          date: "2024-01-08",
+                          status: "Submitted",
+                          fileType: "ZIP",
+                          size: "15.2 MB",
+                        },
+                        {
+                          type: "As-Built Drawings",
+                          date: "2024-01-05",
+                          status: "Approved",
+                          fileType: "DWG",
+                          size: "8.7 MB",
+                        },
+                      ].map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="h-4 w-4 text-blue-500" />
+                                <span className="font-medium">{item.type}</span>
+                                <Badge
+                                  variant={item.status === "Approved" ? "default" : "secondary"}
+                                  className="text-xs"
+                                >
+                                  {item.status}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.date} • {item.fileType} • {item.size}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline">
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                <Download className="h-3 w-3 mr-1" />
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Expiration Monitoring */}
+              <TabsContent value="monitoring" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Expiring Soon</p>
+                          <p className="text-2xl font-bold text-orange-600">3</p>
+                        </div>
+                        <AlertTriangle className="h-8 w-8 text-orange-500" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Within 30 days</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Expired</p>
+                          <p className="text-2xl font-bold text-red-600">1</p>
+                        </div>
+                        <AlertCircle className="h-8 w-8 text-red-500" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Requires attention</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Renewal Alerts</p>
+                          <p className="text-2xl font-bold text-blue-600">2</p>
+                        </div>
+                        <Bell className="h-8 w-8 text-blue-500" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Sent this month</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Warranty Expiration Timeline</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Monitor warranty expiration dates and renewal requirements
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          item: "Master Flooring - Labor Warranty",
+                          type: "Labor",
+                          expiration: "2025-01-30",
+                          daysUntil: 15,
+                          status: "Expiring Soon",
+                          action: "Contact contractor",
+                        },
+                        {
+                          item: "Kitchen Appliances - GE Warranty",
+                          type: "Manufacturer",
+                          expiration: "2025-02-15",
+                          daysUntil: 31,
+                          status: "Expiring Soon",
+                          action: "Review coverage",
+                        },
+                        {
+                          item: "HVAC System - Carrier Warranty",
+                          type: "Manufacturer",
+                          expiration: "2025-06-15",
+                          daysUntil: 152,
+                          status: "Active",
+                          action: "Monitor",
+                        },
+                        {
+                          item: "Windows - Pella Warranty",
+                          type: "Manufacturer",
+                          expiration: "2034-02-20",
+                          daysUntil: 3320,
+                          status: "Active",
+                          action: "Monitor",
+                        },
+                      ].map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium">{item.item}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.type}
+                                </Badge>
+                                <Badge
+                                  variant={item.status === "Active" ? "default" : "destructive"}
+                                  className="text-xs"
+                                >
+                                  {item.status}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Expires: {item.expiration} • {item.daysUntil} days remaining
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline">
+                                <Bell className="h-3 w-3 mr-1" />
+                                Set Alert
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                {item.action}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )
+
+      case "product-assistant":
+        return (
+          <div className="space-y-6 p-6 w-full max-w-full">
+            {/* ManufacturerWarrantyAssistant Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold">Manufacturer Warranty Assistant</h3>
+                <p className="text-sm text-muted-foreground">
+                  Connect clients with manufacturers and manage warranty handoffs
+                </p>
+              </div>
+              <Button className="h-8 px-3 text-xs">
+                <Plus className="h-3 w-3 mr-1" />
+                New Connection
+              </Button>
+            </div>
+
+            <Tabs defaultValue="connections" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="connections">Client Connections</TabsTrigger>
+                <TabsTrigger value="coverage">Coverage Details</TabsTrigger>
+                <TabsTrigger value="handoff">Handoff Management</TabsTrigger>
+              </TabsList>
+
+              {/* Client Connections */}
+              <TabsContent value="connections" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Manufacturer Contact Directory</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Registered manufacturers and vendors with contact information
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          company: "Carrier Corporation",
+                          category: "HVAC Equipment",
+                          contact: "warranty@carrier.com",
+                          phone: "1-800-CARRIER",
+                          website: "www.carrier.com/warranty",
+                          products: 5,
+                          activeWarranties: 3,
+                          status: "Active",
+                        },
+                        {
+                          company: "GE Appliances",
+                          category: "Kitchen Appliances",
+                          contact: "support@geappliances.com",
+                          phone: "1-800-GE-CARES",
+                          website: "www.geappliances.com/support",
+                          products: 12,
+                          activeWarranties: 8,
+                          status: "Active",
+                        },
+                        {
+                          company: "Kohler Company",
+                          category: "Plumbing Fixtures",
+                          contact: "warranty@kohler.com",
+                          phone: "1-800-KOHLER-1",
+                          website: "www.kohler.com/warranty",
+                          products: 7,
+                          activeWarranties: 6,
+                          status: "Active",
+                        },
+                        {
+                          company: "Pella Windows",
+                          category: "Windows & Doors",
+                          contact: "warranty@pella.com",
+                          phone: "1-877-473-5527",
+                          website: "www.pella.com/warranty",
+                          products: 3,
+                          activeWarranties: 3,
+                          status: "Active",
+                        },
+                      ].map((manufacturer, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium">{manufacturer.company}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {manufacturer.category}
+                                </Badge>
+                                <Badge variant="default" className="text-xs">
+                                  {manufacturer.status}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4 mt-2">
+                                <div className="space-y-1">
+                                  <p className="text-xs text-muted-foreground">Contact Information</p>
+                                  <p className="text-xs">{manufacturer.contact}</p>
+                                  <p className="text-xs">{manufacturer.phone}</p>
+                                  <p className="text-xs text-blue-600 hover:underline cursor-pointer">
+                                    {manufacturer.website}
+                                  </p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-xs text-muted-foreground">Coverage Statistics</p>
+                                  <p className="text-xs">{manufacturer.products} products registered</p>
+                                  <p className="text-xs">{manufacturer.activeWarranties} active warranties</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline">
+                                <Phone className="h-3 w-3 mr-1" />
+                                Call
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                <MessageSquare className="h-3 w-3 mr-1" />
+                                Connect Client
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Coverage Details */}
+              <TabsContent value="coverage" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Product Coverage Database</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Detailed warranty coverage, serial numbers, and terms
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          product: "Carrier HVAC Unit",
+                          model: "Model 42ABC-123",
+                          serial: "SN123456789",
+                          warranty: "5 Year Parts & Labor",
+                          expiration: "2029-04-15",
+                          coverage:
+                            "Full system coverage including compressor, heat exchanger, and electrical components",
+                          exclusions: "Filters, user maintenance items",
+                          location: "Unit 4B - Main System",
+                        },
+                        {
+                          product: "GE Dishwasher",
+                          model: "GDF570SSJSS",
+                          serial: "SN987654321",
+                          warranty: "2 Year Limited",
+                          expiration: "2026-12-01",
+                          coverage: "Parts and labor for manufacturing defects",
+                          exclusions: "Normal wear, user damage",
+                          location: "Unit 2A - Kitchen",
+                        },
+                        {
+                          product: "Kohler Kitchen Faucet",
+                          model: "K-596-VS",
+                          serial: "Multiple Units",
+                          warranty: "Limited Lifetime",
+                          expiration: "Lifetime",
+                          coverage: "Finish and function under normal use",
+                          exclusions: "Commercial use, abuse",
+                          location: "Various Units",
+                        },
+                      ].map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium">{item.product}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {item.warranty}
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs">
+                                Expires: {item.expiration}
+                              </Badge>
+                            </div>
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-3 w-3 mr-1" />
+                              View Certificate
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div className="space-y-2">
+                              <div>
+                                <span className="font-medium">Model:</span> {item.model}
+                              </div>
+                              <div>
+                                <span className="font-medium">Serial:</span> {item.serial}
+                              </div>
+                              <div>
+                                <span className="font-medium">Location:</span> {item.location}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <span className="font-medium">Coverage:</span> {item.coverage}
+                              </div>
+                              <div>
+                                <span className="font-medium">Exclusions:</span> {item.exclusions}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Handoff Management */}
+              <TabsContent value="handoff" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Client-Manufacturer Handoff Management</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Manage warranty claim handoffs and communication tracking
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          claimId: "WH-001",
+                          client: "Riverside Plaza - Unit 4B",
+                          manufacturer: "Carrier Corporation",
+                          product: "HVAC Unit Model 42ABC",
+                          issue: "Cooling system not maintaining temperature",
+                          status: "Handoff Complete",
+                          handoffDate: "2024-01-10",
+                          followUpDate: "2024-01-17",
+                          correspondence: 3,
+                        },
+                        {
+                          claimId: "WH-002",
+                          client: "Riverside Plaza - Unit 2A",
+                          manufacturer: "GE Appliances",
+                          product: "Kitchen Dishwasher",
+                          issue: "Not draining properly after wash cycles",
+                          status: "Pending Handoff",
+                          handoffDate: "Scheduled for 2024-01-20",
+                          followUpDate: "Pending",
+                          correspondence: 1,
+                        },
+                        {
+                          claimId: "WH-003",
+                          client: "Riverside Plaza - Unit 1C",
+                          manufacturer: "Pella Windows",
+                          product: "Sliding Patio Door",
+                          issue: "Seal failure causing air leakage",
+                          status: "In Progress",
+                          handoffDate: "2024-01-05",
+                          followUpDate: "2024-01-12",
+                          correspondence: 5,
+                        },
+                      ].map((handoff, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium">{handoff.claimId}</span>
+                              <Badge
+                                variant={
+                                  handoff.status === "Handoff Complete"
+                                    ? "default"
+                                    : handoff.status === "In Progress"
+                                    ? "secondary"
+                                    : "outline"
+                                }
+                                className="text-xs"
+                              >
+                                {handoff.status}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {handoff.correspondence} messages
+                              </Badge>
+                            </div>
+                            <Button size="sm" variant="outline">
+                              <MessageSquare className="h-3 w-3 mr-1" />
+                              View Messages
+                            </Button>
+                          </div>
+
+                          <div className="space-y-2 text-xs">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <p>
+                                  <span className="font-medium">Client:</span> {handoff.client}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Product:</span> {handoff.product}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Issue:</span> {handoff.issue}
+                                </p>
+                              </div>
+                              <div>
+                                <p>
+                                  <span className="font-medium">Manufacturer:</span> {handoff.manufacturer}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Handoff Date:</span> {handoff.handoffDate}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Follow-up:</span> {handoff.followUpDate}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex space-x-2 mt-3">
+                            <Button size="sm" variant="outline">
+                              <FileText className="h-3 w-3 mr-1" />
+                              Generate Cover Letter
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <Download className="h-3 w-3 mr-1" />
+                              Export Package
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <Phone className="h-3 w-3 mr-1" />
+                              Contact Manufacturer
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )
+
+      case "labor-warranty":
+        return (
+          <div className="space-y-6 p-6 w-full max-w-full">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold">Labor Warranty Tracking</h3>
+                <p className="text-sm text-muted-foreground">Track labor warranties and service commitments</p>
+              </div>
+              <Button className="h-8 px-3 text-xs">
+                <Plus className="h-3 w-3 mr-1" />
+                Add Labor Warranty
+              </Button>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Labor Warranty Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Active Labor Warranties</span>
+                      <span className="text-sm font-medium">8</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Upcoming Expirations</span>
+                      <span className="text-sm font-medium">2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Service Calls</span>
+                      <span className="text-sm font-medium">12</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Coverage Value</span>
+                      <span className="text-sm font-medium">$450K</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Avg Response Time</span>
+                      <span className="text-sm font-medium">2.5 days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Satisfaction Rate</span>
+                      <span className="text-sm font-medium">95%</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  const mainContent = (
+    <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+      {/* Module Title with Focus Button */}
+      <div className="pb-2 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Warranty Management Tools</h2>
+            <p className="text-sm text-muted-foreground">Comprehensive warranty management and claim processing</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+            {isFocusMode ? (
+              <>
+                <Minimize2 className="h-3 w-3 mr-1" />
+                Exit Focus
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3 w-3 mr-1" />
+                Focus
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-border">
+        <nav className="-mb-px flex space-x-8">
+          {warrantyTabsConfig.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === tab.id
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+        <div className="w-full min-w-0 max-w-full h-full overflow-hidden">{renderWarrantyTabContent()}</div>
+      </div>
+    </div>
+  )
+
+  // Return focus mode if active
+  if (isFocusMode) {
+    return (
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+        </div>
+      </div>
+    )
+  }
+
+  return mainContent
+}
+
+// Enhanced Trade Partners Panel with Compass Integration
+const TradePartnersPanel: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+}> = ({ projectId, projectData, userRole }) => {
+  const [activeView, setActiveView] = useState<"directory" | "project" | "scorecard">("directory")
+  const [selectedSubcontractor, setSelectedSubcontractor] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [tradeFilter, setTradeFilter] = useState<string>("all")
+  const [compassScoreRange, setCompassScoreRange] = useState([0, 100])
+  const [internalScoreRange, setInternalScoreRange] = useState([0, 100])
+  const [showScorecardModal, setShowScorecardModal] = useState(false)
+
+  // Mock Compass API Data
+  const mockCompassData = [
+    {
+      id: "comp-001",
+      companyName: "Climate Control Systems",
+      trade: "HVAC",
+      region: "Southeast",
+      unionStatus: "Non-Union",
+      licenses: ["EPA 608", "NATE Certified"],
+      compassQScore: 87,
+      complianceStatus: "Compliant",
+      dbeMbeWbe: ["MBE"],
+      contactInfo: {
+        primary: "John Smith",
+        email: "john@climatecontrol.com",
+        phone: "(555) 123-4567",
+      },
+      projectHistory: [
+        { project: "Downtown Plaza", year: "2023", value: "$2.1M", performance: "Excellent" },
+        { project: "Metro Office", year: "2022", value: "$1.8M", performance: "Good" },
+      ],
+      documentStatus: {
+        insurance: "Current",
+        bond: "Current",
+        license: "Current",
+        safety: "Current",
+      },
+    },
+    {
+      id: "comp-002",
+      companyName: "PowerTech Solutions",
+      trade: "Electrical",
+      region: "Southeast",
+      unionStatus: "Union",
+      licenses: ["Master Electrician", "OSHA 30"],
+      compassQScore: 92,
+      complianceStatus: "Compliant",
+      dbeMbeWbe: [],
+      contactInfo: {
+        primary: "Sarah Johnson",
+        email: "sarah@powertech.com",
+        phone: "(555) 234-5678",
+      },
+      projectHistory: [
+        { project: "Tech Campus", year: "2023", value: "$3.2M", performance: "Excellent" },
+        { project: "Retail Center", year: "2022", value: "$2.4M", performance: "Good" },
+      ],
+      documentStatus: {
+        insurance: "Current",
+        bond: "Current",
+        license: "Current",
+        safety: "Expires Soon",
+      },
+    },
+    {
+      id: "comp-003",
+      companyName: "AquaFlow Plumbing",
+      trade: "Plumbing",
+      region: "Southeast",
+      unionStatus: "Non-Union",
+      licenses: ["Master Plumber", "Green Plumber"],
+      compassQScore: 78,
+      complianceStatus: "Minor Issues",
+      dbeMbeWbe: ["WBE"],
+      contactInfo: {
+        primary: "Mike Wilson",
+        email: "mike@aquaflow.com",
+        phone: "(555) 345-6789",
+      },
+      projectHistory: [
+        { project: "Hospital Wing", year: "2023", value: "$1.5M", performance: "Fair" },
+        { project: "School Renovation", year: "2022", value: "$890K", performance: "Good" },
+      ],
+      documentStatus: {
+        insurance: "Current",
+        bond: "Current",
+        license: "Current",
+        safety: "Current",
+      },
+    },
+  ]
+
+  // Mock Internal HB Intel Scores
+  const mockInternalScores = [
+    {
+      subcontractorId: "comp-001",
+      hbIntelScore: 89,
+      projectScores: {
+        communication: 9,
+        coordination: 8,
+        quality: 9,
+        responsiveness: 9,
+      },
+      tags: ["would-hire-again", "reliable"],
+      comments: "Excellent communication and quality work. Always meets deadlines.",
+      wouldHireAgain: true,
+      needsSupervision: false,
+      avoidCriticalPath: false,
+      reviewedBy: "Alex Singh",
+      reviewDate: "2024-01-15",
+      attachments: ["safety_report.pdf", "quality_photos.jpg"],
+    },
+    {
+      subcontractorId: "comp-002",
+      hbIntelScore: 94,
+      projectScores: {
+        communication: 10,
+        coordination: 9,
+        quality: 9,
+        responsiveness: 9,
+      },
+      tags: ["would-hire-again", "preferred-vendor"],
+      comments: "Outstanding performance across all metrics. Highly recommended.",
+      wouldHireAgain: true,
+      needsSupervision: false,
+      avoidCriticalPath: false,
+      reviewedBy: "Dana Nguyen",
+      reviewDate: "2024-02-20",
+      attachments: ["project_completion_report.pdf"],
+    },
+    {
+      subcontractorId: "comp-003",
+      hbIntelScore: 72,
+      projectScores: {
+        communication: 7,
+        coordination: 6,
+        quality: 8,
+        responsiveness: 7,
+      },
+      tags: ["needs-supervision"],
+      comments: "Good quality work but requires close coordination on scheduling.",
+      wouldHireAgain: true,
+      needsSupervision: true,
+      avoidCriticalPath: false,
+      reviewedBy: "Michael Lee",
+      reviewDate: "2024-03-10",
+      attachments: [],
+    },
+  ]
+
+  // Mock Project-Specific Data
+  const mockProjectSubcontractors = [
+    {
+      ...mockCompassData[0],
+      projectStatus: "Under Consideration",
+      estimatingPhase: "Buyout",
+      lastContact: "2024-01-20",
+      bidStatus: "Pending",
+      notes: "Competitive pricing, good reputation",
+    },
+    {
+      ...mockCompassData[1],
+      projectStatus: "Contracted",
+      estimatingPhase: "Awarded",
+      lastContact: "2024-02-01",
+      bidStatus: "Awarded",
+      notes: "Best value, excellent references",
+    },
+    {
+      ...mockCompassData[2],
+      projectStatus: "Qualified",
+      estimatingPhase: "Prequalification",
+      lastContact: "2024-01-15",
+      bidStatus: "Invited",
+      notes: "Local contractor, needs supervision",
+    },
+  ]
+
+  const getInternalScore = (subcontractorId: string) => {
+    return mockInternalScores.find((score) => score.subcontractorId === subcontractorId)
+  }
+
+  const getCompassStatusColor = (status: string) => {
+    switch (status) {
+      case "Compliant":
+        return "text-green-600 dark:text-green-500"
+      case "Minor Issues":
+        return "text-yellow-600 dark:text-yellow-500"
+      case "Non-Compliant":
+        return "text-red-600 dark:text-red-500"
+      default:
+        return "text-muted-foreground"
+    }
+  }
+
+  const getProjectStatusColor = (status: string) => {
+    switch (status) {
+      case "Contracted":
+        return "text-green-600 dark:text-green-500"
+      case "Qualified":
+        return "text-blue-600 dark:text-blue-500"
+      case "Under Consideration":
+        return "text-yellow-600 dark:text-yellow-500"
+      case "Rejected":
+        return "text-red-600 dark:text-red-500"
+      default:
+        return "text-muted-foreground"
+    }
+  }
+
+  const filteredData = mockCompassData.filter((sub) => {
+    const matchesSearch =
+      sub.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sub.trade.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesTrade = !tradeFilter || tradeFilter === "all" || sub.trade === tradeFilter
+    const matchesCompassScore = sub.compassQScore >= compassScoreRange[0] && sub.compassQScore <= compassScoreRange[1]
+    const internalScore = getInternalScore(sub.id)
+    const matchesInternalScore =
+      !internalScore ||
+      (internalScore.hbIntelScore >= internalScoreRange[0] && internalScore.hbIntelScore <= internalScoreRange[1])
+
+    return matchesSearch && matchesTrade && matchesCompassScore && matchesInternalScore
+  })
+
+  const renderRegionalDirectoryView = () => (
+    <div className="space-y-6">
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Trade Partner Directory</CardTitle>
+          <p className="text-sm text-muted-foreground">Complete regional directory powered by Compass API</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium">Search</label>
+              <input
+                type="text"
+                placeholder="Company name or trade..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border border-input rounded-md text-sm bg-background"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Trade</label>
+              <Select value={tradeFilter} onValueChange={setTradeFilter}>
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="All trades" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Trades</SelectItem>
+                  <SelectItem value="HVAC">HVAC</SelectItem>
+                  <SelectItem value="Electrical">Electrical</SelectItem>
+                  <SelectItem value="Plumbing">Plumbing</SelectItem>
+                  <SelectItem value="Concrete">Concrete</SelectItem>
+                  <SelectItem value="Steel">Steel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Compass Score Range</label>
+              <div className="flex items-center space-x-2 mt-1">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={compassScoreRange[0]}
+                  onChange={(e) => setCompassScoreRange([parseInt(e.target.value), compassScoreRange[1]])}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-16">
+                  {compassScoreRange[0]}-{compassScoreRange[1]}
+                </span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Actions</label>
+              <div className="flex space-x-2 mt-1">
+                <Button size="sm" variant="outline">
+                  <Download className="h-4 w-4 mr-1" />
+                  Export
+                </Button>
+                <Button size="sm" variant="outline">
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Sync
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Directory Table */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-muted">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Company
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Trade
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Compass Score
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    HB Intel Score
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Certifications
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-background divide-y divide-border">
+                {filteredData.map((sub) => {
+                  const internalScore = getInternalScore(sub.id)
+                  return (
+                    <tr key={sub.id} className="hover:bg-muted/50">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-foreground">{sub.companyName}</div>
+                          <div className="text-sm text-muted-foreground">{sub.contactInfo.primary}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <Badge variant="secondary" className="text-xs">
+                          {sub.trade}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="text-sm font-medium">{sub.compassQScore}</div>
+                          <div className="ml-2 text-xs text-muted-foreground">Compass</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {internalScore ? (
+                          <div className="flex items-center">
+                            <div className="text-sm font-medium">{internalScore.hbIntelScore}</div>
+                            <div className="ml-2 text-xs text-muted-foreground">Internal</div>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/70">Not Rated</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className={`text-sm ${getCompassStatusColor(sub.complianceStatus)}`}>
+                          {sub.complianceStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex flex-wrap gap-1">
+                          {sub.dbeMbeWbe.map((cert, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {cert}
+                            </Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline" onClick={() => setSelectedSubcontractor(sub)}>
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedSubcontractor(sub)
+                              setShowScorecardModal(true)
+                            }}
+                          >
+                            Score
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderProjectView = () => (
+    <div className="space-y-6">
+      {/* Project Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Project Trade Partners</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Subcontractors under consideration or contracted for this project
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-500">8</div>
+              <div className="text-sm text-muted-foreground">Under Consideration</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-500">3</div>
+              <div className="text-sm text-muted-foreground">Contracted</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-500">5</div>
+              <div className="text-sm text-muted-foreground">Qualified</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-500">2</div>
+              <div className="text-sm text-muted-foreground">Rejected</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Project Trade Partners Table */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Company
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Trade
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Compass Score
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    HB Intel Score
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phase
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {mockProjectSubcontractors.map((sub) => {
+                  const internalScore = getInternalScore(sub.id)
+                  return (
+                    <tr key={sub.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{sub.companyName}</div>
+                          <div className="text-sm text-gray-500">{sub.notes}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <Badge variant="secondary" className="text-xs">
+                          {sub.trade}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium">{sub.compassQScore}</div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {internalScore ? (
+                          <div className="text-sm font-medium">{internalScore.hbIntelScore}</div>
+                        ) : (
+                          <span className="text-xs text-gray-400">Not Rated</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className={`text-sm ${getProjectStatusColor(sub.projectStatus)}`}>
+                          {sub.projectStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <Badge variant="outline" className="text-xs">
+                          {sub.estimatingPhase}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline" onClick={() => setSelectedSubcontractor(sub)}>
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedSubcontractor(sub)
+                              setShowScorecardModal(true)
+                            }}
+                          >
+                            Score
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderScorecardView = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Internal Subcontractor Scorecards</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Internal performance reviews and ratings (not synced with Compass)
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {mockInternalScores.map((score) => {
+              const sub = mockCompassData.find((s) => s.id === score.subcontractorId)
+              if (!sub) return null
+
+              return (
+                <div key={score.subcontractorId} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="font-medium">{sub.companyName}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {sub.trade} • Reviewed by {score.reviewedBy}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-green-600 dark:text-green-500">{score.hbIntelScore}</div>
+                      <div className="text-sm text-muted-foreground">HB Intel Score</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground">Communication</div>
+                      <div className="text-lg font-medium">{score.projectScores.communication}/10</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Coordination</div>
+                      <div className="text-lg font-medium">{score.projectScores.coordination}/10</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Quality</div>
+                      <div className="text-lg font-medium">{score.projectScores.quality}/10</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Responsiveness</div>
+                      <div className="text-lg font-medium">{score.projectScores.responsiveness}/10</div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-medium mb-2">Tags</div>
+                    <div className="flex flex-wrap gap-2">
+                      {score.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {tag.replace("-", " ")}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-medium mb-2">Comments</div>
+                    <p className="text-sm text-muted-foreground">{score.comments}</p>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-muted-foreground">Last updated: {score.reviewDate}</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedSubcontractor(sub)
+                        setShowScorecardModal(true)
+                      }}
+                    >
+                      Update Score
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6 w-full max-w-full">
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveView("directory")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeView === "directory"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+            }`}
+          >
+            Directory
+          </button>
+          <button
+            onClick={() => setActiveView("project")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeView === "project"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+            }`}
+          >
+            Project View
+          </button>
+          <button
+            onClick={() => setActiveView("scorecard")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeView === "scorecard"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+            }`}
+          >
+            Scorecards
+          </button>
+        </nav>
+      </div>
+
+      {/* View Content */}
+      {activeView === "directory" && renderRegionalDirectoryView()}
+      {activeView === "project" && renderProjectView()}
+      {activeView === "scorecard" && renderScorecardView()}
+    </div>
+  )
+}
+
+// Enhanced Contract Document Review Panel
+const ContractDocumentReviewPanel: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+}> = ({ projectId, projectData, userRole }) => {
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<"dashboard" | "review">("dashboard")
+  const [selectedClause, setSelectedClause] = useState<string | null>(null)
+  const [flaggedClauses, setFlaggedClauses] = useState<any[]>([])
+  const [aiInsights, setAiInsights] = useState<any[]>([])
+
+  const handleDocumentSelect = (documentId: string) => {
+    setSelectedDocument(documentId)
+    setViewMode("review")
+  }
+
+  const handleClauseSelect = (clauseId: string) => {
+    setSelectedClause(clauseId)
+  }
+
+  const handleFlagClause = (clauseId: string, category: string, comment: string) => {
+    // Implementation for flagging clauses
+  }
+
+  return (
+    <div className="space-y-6 w-full max-w-full">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Contract Document Review</CardTitle>
+          <p className="text-sm text-muted-foreground">AI-powered contract analysis and review</p>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <p className="text-sm text-muted-foreground">Contract document review interface</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// Compliance Management Content Component
+const ComplianceContent: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+  user: any
+}> = ({ projectId, projectData, userRole, user }) => {
+  const [activeTab, setActiveTab] = useState("contract-documents")
+  const [isFocusMode, setIsFocusMode] = useState(false)
+
+  const handleFocusToggle = () => {
+    setIsFocusMode(!isFocusMode)
+  }
+
+  // Tab configuration
+  const complianceTabsConfig = [
+    {
+      id: "contract-documents",
+      label: "Contract Documents",
+      icon: FileText,
+      description: "Contract management and documentation",
+    },
+    {
+      id: "trade-partners",
+      label: "Trade Partners",
+      icon: Users,
+      description: "Trade partner compliance and certifications",
+    },
+  ]
+
+  const renderComplianceTabContent = () => {
+    switch (activeTab) {
+      case "contract-documents":
+        return <ContractDocumentReviewPanel projectId={projectId} projectData={projectData} userRole={userRole} />
+
+      case "trade-partners":
+        return <TradePartnersPanel projectId={projectId} projectData={projectData} userRole={userRole} />
+
+      default:
+        return null
+    }
+  }
+
+  // Main content
+  const mainContent = (
+    <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+      {/* Module Title with Focus Button */}
+      <div className="pb-2 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Compliance Tools</h2>
+            <p className="text-sm text-muted-foreground">Contract management and trade partner compliance</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+            {isFocusMode ? (
+              <>
+                <Minimize2 className="h-3 w-3 mr-1" />
+                Exit Focus
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3 w-3 mr-1" />
+                Focus
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Responsive Tab Navigation */}
+      <div className="border-b border-border flex-shrink-0">
+        <div className="flex space-x-6 overflow-x-auto">
+          {complianceTabsConfig.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+        <div className="w-full min-w-0 max-w-full h-full overflow-hidden">{renderComplianceTabContent()}</div>
+      </div>
+    </div>
+  )
+
+  // Return focus mode if active
+  if (isFocusMode) {
+    return (
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+        </div>
+      </div>
+    )
+  }
+
+  return mainContent
+}
 
 const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = ({
   projectId,
@@ -1085,6 +3502,14 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
 
+      case "warranty":
+        return (
+          <WarrantyManagementContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+        )
+
+      case "compliance":
+        return <ComplianceContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+
       case "field-management":
         return getFieldManagementRightPanelContent(
           projectData,
@@ -1219,6 +3644,20 @@ export const getProjectSidebarContent = (
         { label: "Schedule Planning", icon: Calendar, onClick: () => {} },
         { label: "Team Setup", icon: Users, onClick: () => {} },
       ]
+    } else if (activeTab === "warranty") {
+      return [
+        { label: "New Warranty Claim", icon: Plus, onClick: () => {} },
+        { label: "Upload Documents", icon: Upload, onClick: () => {} },
+        { label: "AI Product Assistant", icon: Brain, onClick: () => {} },
+        { label: "Labor Warranty", icon: Users, onClick: () => {} },
+      ]
+    } else if (activeTab === "compliance") {
+      return [
+        { label: "New Contract", icon: Plus, onClick: () => {} },
+        { label: "Upload Documents", icon: Upload, onClick: () => {} },
+        { label: "Trade Partner Review", icon: Users, onClick: () => {} },
+        { label: "Compliance Report", icon: FileText, onClick: () => {} },
+      ]
     } else if (navigation.coreTab === "reports") {
       return [
         { label: "Create Report", icon: Plus, onClick: () => {} },
@@ -1265,6 +3704,20 @@ export const getProjectSidebarContent = (
         { label: "BIM Progress", value: "75%", color: "blue" },
         { label: "Permits Submitted", value: "8/12", color: "orange" },
         { label: "Team Readiness", value: "85%", color: "purple" },
+      ]
+    } else if (activeTab === "warranty") {
+      return [
+        { label: "Active Warranties", value: "12", color: "blue" },
+        { label: "Open Claims", value: "3", color: "orange" },
+        { label: "Resolved Claims", value: "45", color: "green" },
+        { label: "Coverage Value", value: "$1.2M", color: "purple" },
+      ]
+    } else if (activeTab === "compliance") {
+      return [
+        { label: "Active Contracts", value: "12", color: "blue" },
+        { label: "Trade Partners", value: "18", color: "green" },
+        { label: "Compliance Rate", value: "94%", color: "green" },
+        { label: "Expiring Soon", value: "3", color: "orange" },
       ]
     } else if (navigation.coreTab === "reports") {
       return [
@@ -1810,6 +4263,47 @@ export const getProjectSidebarContent = (
       ]
     }
 
+    if (activeTab === "warranty") {
+      return [
+        {
+          id: "warranty-1",
+          type: "warning",
+          severity: "medium",
+          title: "HVAC Warranty Claim",
+          text: "Air conditioning unit not maintaining temperature. Technician scheduled for tomorrow.",
+          action: "View claim",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "warranty-2",
+          type: "success",
+          severity: "low",
+          title: "Roofing Warranty Complete",
+          text: "Roofing warranty claim #245 has been resolved. Replacement materials installed.",
+          action: "View details",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "warranty-3",
+          type: "info",
+          severity: "low",
+          title: "Labor Warranty Coverage",
+          text: "8 active labor warranties providing $450K coverage. Next expiration in 3 months.",
+          action: "Review coverage",
+          timestamp: "3 days ago",
+        },
+        {
+          id: "warranty-4",
+          type: "alert",
+          severity: "high",
+          title: "Warranty Document Upload",
+          text: "Missing warranty documentation for electrical work. Upload required for compliance.",
+          action: "Upload docs",
+          timestamp: "5 hours ago",
+        },
+      ]
+    }
+
     if (navigation.coreTab === "productivity") {
       return [
         {
@@ -1906,6 +4400,8 @@ export const getProjectSidebarContent = (
       return "HBI Financial Hub Insights"
     } else if (activeTab === "pre-construction") {
       return "HBI Pre-Construction Insights"
+    } else if (activeTab === "warranty") {
+      return "HBI Warranty Insights"
     } else if (navigation.coreTab === "productivity") {
       return "HBI Productivity Insights"
     }

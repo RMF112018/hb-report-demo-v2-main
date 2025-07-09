@@ -298,7 +298,7 @@ export const tourDOMUtils = {
               tourLogger.debug("Element found with staffing helper:", tourValue)
               return staffingElement
             }
-          } else if (currentPath.includes("/dashboard")) {
+          } else if (currentPath.includes("/main-app")) {
             const dashboardElement = await tourDOMUtils.findDashboardElement(tourValue)
             if (dashboardElement) {
               tourLogger.debug("Element found with dashboard helper:", tourValue)

@@ -3448,16 +3448,8 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
     }
 
     const getTabsForRole = () => {
-      switch (userRole) {
-        case "project-manager":
-          return ["overview", "create", "templates", "my-reports", "analytics"]
-        case "project-executive":
-          return ["overview", "approval", "reports", "analytics"]
-        case "executive":
-          return ["overview", "reports", "analytics"]
-        default:
-          return ["overview"]
-      }
+      // All roles now see the same tabs as project-manager for consistent experience
+      return ["overview", "create", "templates", "my-reports", "analytics"]
     }
 
     const availableReportsTabs = getTabsForRole()

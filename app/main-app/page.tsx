@@ -78,6 +78,26 @@ export default function MainApplicationPage() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
+  // Handle URL navigation - Clear selections when directly navigating to /main-app
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const currentPath = window.location.pathname
+
+      // If user navigates directly to /main-app (no query params or sub-paths)
+      if (currentPath === "/main-app") {
+        // Clear all selections to ensure user returns to their role-based dashboard main view
+        setSelectedProject(null)
+        setSelectedModule(null)
+        setSelectedTool(null)
+
+        // Clear localStorage selections
+        localStorage.removeItem("selectedProject")
+        localStorage.removeItem("selectedModule")
+        localStorage.removeItem("selectedTool")
+      }
+    }
+  }, [mounted])
+
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -88,12 +108,14 @@ export default function MainApplicationPage() {
         setSelectedTool(null)
         setSelectedModule(null)
         setSelectedProject(null)
+        // Navigate to main-app to ensure clean URL
+        router.push("/main-app")
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, [router])
 
   // Handle sidebar panel state changes - updates layout to account for sidebar width
   const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
@@ -238,8 +260,9 @@ export default function MainApplicationPage() {
       switch (selectedTool) {
         case "staffing":
           return [
-            { id: "overview", label: "Overview" },
-            { id: "assignments", label: "Assignments" },
+            { id: "portfolio", label: "Portfolio Overview" },
+            { id: "management", label: "Resource Management" },
+            { id: "analytics", label: "Analytics & Insights" },
           ]
         case "financial-hub":
           const allFinancialTabs = [
@@ -403,6 +426,8 @@ export default function MainApplicationPage() {
       // Set default tab based on user role and current selection
       if (selectedProject) {
         setActiveTab("core")
+      } else if (selectedTool === "staffing") {
+        setActiveTab("portfolio")
       } else if (userRole === "project-executive" || userRole === "project-manager") {
         setActiveTab("action-items")
       } else {
@@ -410,7 +435,7 @@ export default function MainApplicationPage() {
       }
       setInitialTabSet(true)
     }
-  }, [mounted, userRole, initialTabSet, selectedProject])
+  }, [mounted, userRole, initialTabSet, selectedProject, selectedTool])
 
   // Handle project selection changes
   useEffect(() => {
@@ -418,6 +443,17 @@ export default function MainApplicationPage() {
       setActiveTab("core")
     }
   }, [selectedProject])
+
+  // Handle tool selection changes
+  useEffect(() => {
+    if (selectedTool) {
+      if (selectedTool === "staffing") {
+        setActiveTab("portfolio")
+      } else {
+        setActiveTab("overview")
+      }
+    }
+  }, [selectedTool])
 
   // Restore saved selections on mount
   useEffect(() => {
@@ -634,6 +670,8 @@ export default function MainApplicationPage() {
           onPanelStateChange={handleSidebarPanelStateChange}
           onModuleSelect={handleModuleSelect}
           onToolSelect={handleToolSelect}
+          selectedModule={selectedModule}
+          selectedTool={selectedTool}
         />
 
         {/* Main Content Area - Positioned to account for sidebar width */}

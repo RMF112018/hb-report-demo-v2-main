@@ -43,7 +43,7 @@ export function DashboardModuleNavigation() {
       name: "Dashboard",
       fullName: "Analytics Dashboard",
       icon: LayoutDashboard,
-      path: "/dashboard",
+      path: "/main-app",
       description: "Main dashboard with project overview and key metrics",
     },
     {

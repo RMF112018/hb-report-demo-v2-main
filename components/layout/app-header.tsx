@@ -189,19 +189,19 @@ export const AppHeader = () => {
 
   // Helper function to determine the dashboard path based on user role
   const getDashboardPath = useCallback(() => {
-    if (!user) return "/dashboard" // Default or loading state
+    if (!user) return "/main-app" // Default or loading state
 
-    // All users go to the main dashboard which handles role-specific content
-    // The main dashboard page dynamically loads appropriate content based on user role
+    // All users go to the main application which handles role-specific content
+    // The main application page dynamically loads appropriate content based on user role
     switch (user.role) {
       case "executive":
       case "project-executive":
       case "project-manager":
       case "estimator":
       case "admin":
-        return "/dashboard"
+        return "/main-app"
       default:
-        return "/dashboard" // Fallback for any other roles
+        return "/main-app" // Fallback for any other roles
     }
   }, [user])
 

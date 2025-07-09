@@ -245,7 +245,7 @@ export default function LoginPage() {
 
     setTimeout(() => {
       setIsLoading(false)
-      router.push("/dashboard") // Mock redirect
+      router.push("/main-app") // Updated redirect
     }, 2000)
   }
 

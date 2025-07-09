@@ -142,17 +142,11 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
   const financialData = getFinancialData()
 
-  // Filter tabs based on user role
+  // All roles now see all tabs for consistent experience
   const getTabsForRole = () => {
     const allTabs = [...financialTabsConfig]
 
-    // Filter tabs based on user role
-    if (userRole === "executive") {
-      return allTabs.filter((tab) => ["overview", "budget-analysis", "cash-flow", "forecasting"].includes(tab.id))
-    } else if (userRole === "project-executive") {
-      return allTabs.filter((tab) => !["pay-authorization", "retention"].includes(tab.id))
-    }
-
+    // All roles now see all tabs (matching project-manager access)
     return allTabs
   }
 

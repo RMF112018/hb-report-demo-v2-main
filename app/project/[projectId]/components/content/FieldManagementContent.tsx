@@ -42,6 +42,8 @@ import {
   RefreshCw,
   Eye,
   Settings,
+  Focus,
+  Package,
 } from "lucide-react"
 
 // Import the modular constraints components
@@ -67,6 +69,12 @@ import type { DailyLog, ManpowerRecord, SafetyAudit, QualityInspection } from "@
 // Import scheduler components
 import SchedulerContent from "./SchedulerContent"
 
+// Import procurement components
+import { ProcurementCommitmentsTable } from "@/components/procurement/ProcurementCommitmentsTable"
+import { ProcurementOverviewWidget } from "@/components/procurement/ProcurementOverviewWidget"
+import { ProcoreIntegrationPanel } from "@/components/procurement/ProcoreIntegrationPanel"
+import { HbiProcurementInsights } from "@/components/procurement/HbiProcurementInsights"
+
 interface FieldManagementContentProps {
   selectedSubTool: string
   projectData: any
@@ -87,11 +95,31 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
   ...props
 }) => {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState(selectedSubTool || "overview")
+  const [activeTab, setActiveTab] = useState(selectedSubTool || "procurement")
   const [constraintsSubTab, setConstraintsSubTab] = useState("overview")
   const [permitSubTab, setPermitSubTab] = useState("overview")
   const [fieldReportsSubTab, setFieldReportsSubTab] = useState("overview")
   const [schedulerSubTab, setSchedulerSubTab] = useState("overview")
+  const [procurementSubTab, setProcurementSubTab] = useState("overview")
+  const [isFocusMode, setIsFocusMode] = useState(false)
+
+  // Focus mode toggle handler
+  const handleFocusToggle = () => {
+    setIsFocusMode(!isFocusMode)
+    // Apply focus mode styles to prevent body scroll when in focus mode
+    if (!isFocusMode) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+  }
+
+  // Cleanup effect to restore body scroll when component unmounts
+  React.useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [])
 
   // Permit state management
   const [permits, setPermits] = useState<Permit[]>([])
@@ -1005,6 +1033,67 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
   const fieldReportsStats = getFieldReportsStats()
 
   const renderContent = () => {
+    // Handle procurement sub-tab
+    if (activeTab === "procurement") {
+      return (
+        <div className="space-y-6">
+          {/* Procurement Sub-tabs */}
+          <div className="space-y-4 w-full max-w-full overflow-hidden">
+            <Tabs value={procurementSubTab} onValueChange={setProcurementSubTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="commitments">Commitments</TabsTrigger>
+                <TabsTrigger value="integration">Procore Sync</TabsTrigger>
+                <TabsTrigger value="insights">AI Insights</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="w-full max-w-full overflow-hidden">
+                <ProcurementOverviewWidget
+                  projectId={projectId}
+                  onViewAll={() => setProcurementSubTab("commitments")}
+                  onSyncProcore={() => setProcurementSubTab("integration")}
+                  onNewRecord={() => console.log("New procurement record")}
+                />
+              </TabsContent>
+
+              <TabsContent value="commitments" className="w-full max-w-full overflow-hidden">
+                <ProcurementCommitmentsTable
+                  projectId={projectId}
+                  userRole={userRole}
+                  onCommitmentSelect={(commitment) => console.log("Selected commitment:", commitment)}
+                  onCommitmentEdit={(commitment) => console.log("Edit commitment:", commitment)}
+                  onSyncProcore={() => setProcurementSubTab("integration")}
+                />
+              </TabsContent>
+
+              <TabsContent value="integration" className="w-full max-w-full overflow-hidden">
+                <ProcoreIntegrationPanel
+                  projectId={projectId}
+                  onSyncTriggered={() => console.log("Sync triggered")}
+                  onViewInProcore={() => window.open("https://app.procore.com/commitments", "_blank")}
+                />
+              </TabsContent>
+
+              <TabsContent value="insights" className="w-full max-w-full overflow-hidden">
+                <HbiProcurementInsights
+                  procurementStats={{
+                    totalValue: 12450000,
+                    activeProcurements: 24,
+                    completedProcurements: 18,
+                    pendingApprovals: 8,
+                    linkedToBidTabs: 22,
+                    avgCycleTime: 14,
+                    complianceRate: 95,
+                    totalRecords: 24,
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      )
+    }
+
     if (!activeTab || activeTab === "overview") {
       return (
         <div className="space-y-6">
@@ -1516,27 +1605,28 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
     )
   }
 
-  // Define available tabs based on user role
+  // Define available tabs - all tabs shown to all roles for consistent experience
   const getTabsForRole = () => {
     const allTabs = [
+      { id: "procurement", label: "Procurement", icon: Package },
       { id: "scheduler", label: "Scheduler", icon: Calendar },
       { id: "constraints-log", label: "Constraints Log", icon: AlertTriangle },
       { id: "permit-log", label: "Permit Log", icon: Shield },
       { id: "field-reports", label: "Field Reports", icon: ClipboardList },
     ]
 
-    // Filter tabs based on user role
-    return allTabs.filter((tab) => {
-      if (userRole === "viewer") return ["scheduler", "field-reports"].includes(tab.id)
-      if (userRole === "team-member") return ["scheduler", "constraints-log", "field-reports"].includes(tab.id)
-      return true // All other roles can see all tabs
-    })
+    // All roles now see all tabs (matching project-manager access)
+    return allTabs
   }
 
   const availableTabs = getTabsForRole()
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div
+      className={`space-y-6 w-full max-w-full overflow-hidden ${
+        isFocusMode ? "fixed inset-0 z-50 bg-background pt-16 p-6 overflow-y-auto" : ""
+      }`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -1546,13 +1636,14 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Analytics
-          </Button>
-          <Button variant="outline" size="sm">
-            <FileText className="h-4 w-4 mr-2" />
-            Export
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleFocusToggle}
+            className={isFocusMode ? "bg-primary text-primary-foreground" : ""}
+          >
+            <Focus className="h-4 w-4 mr-2" />
+            {isFocusMode ? "Exit Focus" : "Focus"}
           </Button>
         </div>
       </div>

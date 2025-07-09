@@ -338,7 +338,7 @@ export const ProcurementContent: React.FC<ProcurementContentProps> = ({ selected
     }
   }
 
-  // Define available tabs based on user role
+  // Define available tabs - all tabs shown to all roles for consistent experience
   const getTabsForRole = () => {
     const allTabs = [
       { id: "overview", label: "Overview", icon: BarChart3 },
@@ -348,13 +348,7 @@ export const ProcurementContent: React.FC<ProcurementContentProps> = ({ selected
       { id: "insights", label: "Insights", icon: TrendingUp },
     ]
 
-    // Filter tabs based on user role
-    if (userRole === "executive") {
-      return allTabs.filter((tab) => ["overview", "cost-analysis", "insights"].includes(tab.id))
-    } else if (userRole === "project-executive") {
-      return allTabs.filter((tab) => !["sync-panel"].includes(tab.id))
-    }
-
+    // All roles now see all tabs (matching project-manager access)
     return allTabs
   }
 

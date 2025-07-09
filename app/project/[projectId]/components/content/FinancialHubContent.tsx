@@ -294,7 +294,7 @@ export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({ select
     }
   }
 
-  // Define available tabs based on user role
+  // Define available tabs - all tabs shown to all roles for consistent experience
   const getTabsForRole = () => {
     const allTabs = [
       { id: "overview", label: "Overview", icon: BarChart3 },
@@ -310,13 +310,7 @@ export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({ select
       { id: "retention-management", label: "Retention Management", icon: Percent },
     ]
 
-    // Filter tabs based on user role
-    if (userRole === "executive") {
-      return allTabs.filter((tab) => ["overview", "budget-analysis", "cash-flow", "forecasting"].includes(tab.id))
-    } else if (userRole === "project-executive") {
-      return allTabs.filter((tab) => !["pay-authorization", "retention-management"].includes(tab.id))
-    }
-
+    // All roles now see all tabs (matching project-manager access)
     return allTabs
   }
 

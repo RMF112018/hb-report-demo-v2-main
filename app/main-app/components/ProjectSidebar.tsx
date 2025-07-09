@@ -51,7 +51,6 @@ import {
   X,
   ArrowLeft,
   Bell,
-  Zap,
   Microchip,
   Shield,
   Brain,
@@ -97,6 +96,8 @@ interface ProjectSidebarProps {
   onPanelStateChange?: (isExpanded: boolean, width: number) => void
   onModuleSelect?: (moduleId: string | null) => void
   onToolSelect?: (toolName: string | null) => void
+  selectedModule?: string | null
+  selectedTool?: string | null
 }
 
 // Define sidebar categories
@@ -115,7 +116,7 @@ const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
   { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Main Dashboard" },
   { id: "projects", label: "Projects", icon: Building, tooltip: "Project Navigation" },
   { id: "it-modules", label: "IT Modules", icon: Microchip, tooltip: "IT Command Center Modules", adminOnly: true },
-  { id: "tools", label: "Tools", icon: Zap, tooltip: "Productivity Tools" },
+  { id: "tools", label: "Tools", icon: Folder, tooltip: "Application Tools" },
   { id: "tools-menu", label: "Tools Menu", icon: Drill, tooltip: "Advanced Tools Menu", executiveOnly: true },
   { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Notifications & Updates" },
   { id: "settings", label: "Settings", icon: Settings, tooltip: "User Settings" },
@@ -250,12 +251,6 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     category: "Core Tools",
     description: "Role assignments and accountability",
   },
-  {
-    name: "Productivity",
-    href: "/tools/productivity",
-    category: "Core Tools",
-    description: "Threaded messaging and task management",
-  },
 
   // Financial Management
   {
@@ -364,6 +359,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onPanelStateChange,
   onModuleSelect,
   onToolSelect,
+  selectedModule,
+  selectedTool,
 }) => {
   const { user, logout } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -630,7 +627,21 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Handle category selection
   const handleCategorySelect = (category: SidebarCategory) => {
     if (category === "dashboard") {
+      // Clear all selections to return to role-based dashboard main view
       onProjectSelect(null)
+      onModuleSelect?.(null)
+      onToolSelect?.(null)
+
+      // Navigate to main-app to ensure correct URL
+      router.push("/main-app")
+
+      // Show confirmation toast
+      toast({
+        title: "Returned to Dashboard",
+        description: "Showing your role-based dashboard main view",
+        duration: 2000,
+      })
+
       if (isMobile) {
         setMobileMenuOpen(false)
       } else {
@@ -703,7 +714,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     return (
                       <Button
                         key={category.id}
-                        variant={selectedProject === null && category.id === "dashboard" ? "default" : "ghost"}
+                        variant={
+                          category.id === "dashboard" &&
+                          selectedProject === null &&
+                          selectedModule === null &&
+                          selectedTool === null
+                            ? "default"
+                            : "ghost"
+                        }
                         onClick={() => handleCategorySelect(category.id)}
                         className="w-full justify-start h-12"
                       >
@@ -888,15 +906,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                 {activeSubCategory === "tools" && (
                   <div className="space-y-2">
                     <Button variant="ghost" className="w-full justify-start h-12">
-                      <Zap className="h-5 w-5 mr-3" />
-                      Productivity Tools
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start h-12">
-                      <Zap className="h-5 w-5 mr-3" />
+                      <Eye className="h-5 w-5 mr-3" />
                       Construction Analytics
                     </Button>
                     <Button variant="ghost" className="w-full justify-start h-12">
-                      <Zap className="h-5 w-5 mr-3" />
+                      <Monitor className="h-5 w-5 mr-3" />
                       Report Generator
                     </Button>
                   </div>
@@ -1004,7 +1018,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                   <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
                                     {tool.name}
                                   </div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
                                     {tool.description}
                                   </div>
                                 </div>
@@ -1107,7 +1121,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                           className={`
                             w-full h-10 p-0 rounded-lg relative
                             ${
-                              activeCategory === category.id
+                              activeCategory === category.id ||
+                              (category.id === "dashboard" &&
+                                selectedProject === null &&
+                                selectedModule === null &&
+                                selectedTool === null)
                                 ? "bg-primary text-primary-foreground"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-800"
                             }
@@ -1302,15 +1320,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                   {activeCategory === "tools" && (
                     <div className="p-4 space-y-2">
                       <Button variant="ghost" className="w-full justify-start">
-                        <Zap className="h-4 w-4 mr-3" />
-                        Productivity Tools
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start">
-                        <Zap className="h-4 w-4 mr-3" />
+                        <Eye className="h-4 w-4 mr-3" />
                         Construction Analytics
                       </Button>
                       <Button variant="ghost" className="w-full justify-start">
-                        <Zap className="h-4 w-4 mr-3" />
+                        <Monitor className="h-4 w-4 mr-3" />
                         Report Generator
                       </Button>
                     </div>
@@ -1434,7 +1448,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                       <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
                                         {tool.name}
                                       </div>
-                                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                                         {tool.description}
                                       </div>
                                     </div>
