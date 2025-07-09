@@ -286,8 +286,13 @@ export const SUB_TOOLS_CONFIG: Record<
   ],
   Scheduler: [
     { id: "overview", label: "Overview", icon: "📅", description: "Schedule overview" },
-    { id: "schedule-monitor", label: "Schedule Monitor", icon: "🖥️", description: "Schedule monitoring" },
-    { id: "health-analysis", label: "Health Analysis", icon: "🏥", description: "Schedule health analysis" },
+    {
+      id: "project-schedule",
+      label: "Project Schedule",
+      icon: "📊",
+      description: "Gantt chart with updates and critical path",
+    },
+    { id: "update", label: "Update", icon: "🔄", description: "Schedule updates and synchronization" },
     { id: "look-ahead", label: "Look Ahead", icon: "👁️", description: "Forward looking schedule" },
     { id: "generator", label: "Generator", icon: "⚡", description: "Schedule generation" },
   ],

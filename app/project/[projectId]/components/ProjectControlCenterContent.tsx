@@ -1035,7 +1035,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         )
 
       case "field-management":
-        return getFieldManagementRightPanelContent(projectData, userRole, projectId, "overview")
+        return getFieldManagementRightPanelContent(projectData, userRole, projectId, navigation.subTool || "scheduler")
 
       default:
         return null
@@ -1078,7 +1078,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         )
 
       case "field-management":
-        return getFieldManagementRightPanelContent(projectData, userRole, projectId, "overview")
+        return getFieldManagementRightPanelContent(projectData, userRole, projectId, navigation.subTool || "scheduler")
 
       case "core":
       case undefined:

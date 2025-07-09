@@ -29,22 +29,33 @@ import {
   Brain,
   Monitor,
   GitBranch,
+  RefreshCw,
 } from "lucide-react"
 
 // Scheduler Components
 import SchedulerOverview from "@/components/scheduler/SchedulerOverview"
-import ScheduleMonitor from "@/components/scheduler/ScheduleMonitor"
-import HealthAnalysis from "@/components/scheduler/HealthAnalysis"
+import ScheduleUpdate from "@/components/scheduler/ScheduleUpdate"
 import LookAhead from "@/components/scheduler/LookAhead"
 import ScheduleGenerator from "@/components/scheduler/ScheduleGenerator"
+import ProjectSchedule from "@/components/scheduler/ProjectSchedule"
 
 interface SchedulerContentProps {
   selectedSubTool: string
   projectData: any
   userRole: string
+  projectId?: string
+  onSubToolChange?: (subTool: string) => void
+  [key: string]: any
 }
 
-export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubTool, projectData, userRole }) => {
+export const SchedulerContent: React.FC<SchedulerContentProps> = ({
+  selectedSubTool,
+  projectData,
+  userRole,
+  projectId,
+  onSubToolChange,
+  ...props
+}) => {
   const getProjectScope = () => {
     const scheduleHealth = 87
     const criticalPathDays = 312 // 10m 12d
@@ -107,24 +118,44 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
           color: "emerald",
         },
       ],
-      "health-analysis": [
+      "project-schedule": [
         {
-          icon: Target,
-          value: "92%",
-          label: "Progress Accuracy",
-          color: "green",
+          icon: Calendar,
+          value: "20",
+          label: "Total Activities",
+          color: "blue",
         },
         {
-          icon: Zap,
-          value: "3",
-          label: "Critical Issues",
+          icon: GitBranch,
+          value: "10",
+          label: "Critical Activities",
           color: "red",
         },
         {
-          icon: Monitor,
-          value: "15",
-          label: "Monitored Tasks",
+          icon: TrendingUp,
+          value: "+2d",
+          label: "Schedule Variance",
+          color: "orange",
+        },
+      ],
+      update: [
+        {
+          icon: RefreshCw,
+          value: "Latest",
+          label: "Update Status",
           color: "blue",
+        },
+        {
+          icon: Clock,
+          value: "2h ago",
+          label: "Last Update",
+          color: "gray",
+        },
+        {
+          icon: CheckCircle,
+          value: "Synced",
+          label: "Data Status",
+          color: "green",
         },
       ],
       "look-ahead": [
@@ -147,7 +178,7 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
           color: "green",
         },
       ],
-      "schedule-generator": [
+      generator: [
         {
           icon: Brain,
           value: "AI",
@@ -178,13 +209,13 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
     }
 
     switch (selectedSubTool) {
-      case "schedule-monitor":
-        return <ScheduleMonitor userRole={userRole} projectData={projectData} />
-      case "health-analysis":
-        return <HealthAnalysis userRole={userRole} projectData={projectData} />
+      case "project-schedule":
+        return <ProjectSchedule userRole={userRole} projectData={projectData} projectId={projectId} />
+      case "update":
+        return <ScheduleUpdate userRole={userRole} projectData={projectData} projectId={projectId} />
       case "look-ahead":
         return <LookAhead userRole={userRole} projectData={projectData} />
-      case "schedule-generator":
+      case "generator":
         return <ScheduleGenerator userRole={userRole} projectData={projectData} />
       default:
         return <SchedulerOverview userRole={userRole} projectData={projectData} />
@@ -195,17 +226,17 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
   const getTabsForRole = () => {
     const allTabs = [
       { id: "overview", label: "Overview", icon: BarChart3 },
-      { id: "schedule-monitor", label: "Monitor", icon: Monitor },
-      { id: "health-analysis", label: "Health Analysis", icon: Activity },
+      { id: "project-schedule", label: "Project Schedule", icon: Calendar },
+      { id: "update", label: "Update", icon: RefreshCw },
       { id: "look-ahead", label: "Look Ahead", icon: Calendar },
-      { id: "schedule-generator", label: "Generator", icon: Brain },
+      { id: "generator", label: "Generator", icon: Brain },
     ]
 
     // Filter tabs based on user role
     if (userRole === "executive") {
-      return allTabs.filter((tab) => ["overview", "health-analysis", "look-ahead"].includes(tab.id))
+      return allTabs.filter((tab) => ["overview", "project-schedule", "look-ahead"].includes(tab.id))
     } else if (userRole === "project-executive") {
-      return allTabs.filter((tab) => !["schedule-generator"].includes(tab.id))
+      return allTabs.filter((tab) => !["generator"].includes(tab.id))
     }
 
     return allTabs
@@ -216,7 +247,7 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={onSubToolChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
           {availableTabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm">
@@ -227,25 +258,8 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({ selectedSubT
         </TabsList>
 
         {availableTabs.map((tab) => (
-          <TabsContent key={tab.id} value={tab.id} className="mt-6">
-            <div className="space-y-4">
-              {/* Tab-specific KPIs */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {getSchedulerKPIs(tab.id).map((kpi, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-2">
-                        <kpi.icon className={`h-5 w-5 text-${kpi.color}-600`} />
-                        <div>
-                          <p className="text-sm font-medium">{kpi.value}</p>
-                          <p className="text-xs text-muted-foreground">{kpi.label}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
+          <TabsContent key={tab.id} value={tab.id} className="mt-6 w-full max-w-full overflow-hidden">
+            <div className="space-y-4 w-full max-w-full overflow-hidden">
               {/* Tab Content */}
               {renderContent()}
             </div>

@@ -64,6 +64,9 @@ import { SafetyAuditsSubTab } from "@/components/field-reports/SafetyAuditsSubTa
 import { QualityControlSubTab } from "@/components/field-reports/QualityControlSubTab"
 import type { DailyLog, ManpowerRecord, SafetyAudit, QualityInspection } from "@/types/field-reports"
 
+// Import scheduler components
+import SchedulerContent from "./SchedulerContent"
+
 interface FieldManagementContentProps {
   selectedSubTool: string
   projectData: any
@@ -1168,6 +1171,21 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
               </TabsContent>
             </Tabs>
           </div>
+        </div>
+      )
+    }
+
+    // Handle scheduler sub-tab
+    if (activeTab === "scheduler") {
+      return (
+        <div className="space-y-6">
+          <SchedulerContent
+            selectedSubTool={schedulerSubTab}
+            projectData={projectData}
+            userRole={userRole}
+            projectId={projectId}
+            onSubToolChange={setSchedulerSubTab}
+          />
         </div>
       )
     }
