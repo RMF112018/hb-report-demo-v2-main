@@ -27,9 +27,9 @@ import ITCommandCenterContent from "./components/ITCommandCenterContent"
 import { ToolContent } from "./components/ToolContent"
 import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
-import type { PageHeaderTab, PageHeaderButton, PageHeaderBadge } from "./components/PageHeader"
+import type { PageHeaderTab } from "./components/PageHeader"
 import { useRouter } from "next/navigation"
-import { Edit, Settings, RefreshCw, Download, Plus, Calendar, Users, Activity } from "lucide-react"
+import { Calendar, Users, Activity } from "lucide-react"
 
 // Mock data imports
 import projectsData from "../../data/mock/projects.json"
@@ -391,35 +391,6 @@ export default function MainApplicationPage() {
     }
   }
 
-  // Handle header button clicks
-  const handleHeaderButtonClick = (buttonId: string) => {
-    switch (buttonId) {
-      case "edit":
-        // Toggle edit mode for dashboard
-        // This would need to be passed down to the RoleDashboard component
-        break
-      case "refresh":
-        // Refresh the current content
-        window.location.reload()
-        break
-      case "settings":
-        // Open settings modal or navigate to settings
-        console.log("Settings clicked")
-        break
-      case "export":
-        // Export current content
-        console.log("Export clicked")
-        break
-      case "add":
-        // Add new widget or item
-        console.log("Add widget clicked")
-        break
-
-      default:
-        console.log(`Button clicked: ${buttonId}`)
-    }
-  }
-
   // Set initial tab based on user role
   useEffect(() => {
     if (mounted && !initialTabSet && userRole) {
@@ -477,17 +448,126 @@ export default function MainApplicationPage() {
   const getHeaderConfig = () => {
     const userName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email || "User"
 
+    // Build navigation state for enhanced breadcrumbs
+    const navigationState = {
+      selectedProject,
+      selectedProjectName: selectedProjectData?.name,
+      selectedModule,
+      selectedTool,
+      activeTab,
+      activeTabLabel: getTabsForContent().find((tab) => tab.id === activeTab)?.label,
+      projectStage: selectedProjectData?.project_stage_name,
+      fieldManagementTool: getFieldManagementTool(),
+      currentViewType: getCurrentViewType(),
+      isProjectView: !!selectedProject,
+      isToolView: !!selectedTool,
+      isModuleView: !!selectedModule,
+      isDashboardView: !selectedProject && !selectedTool && !selectedModule,
+    }
+
+    // Helper function to determine field management tool based on current state
+    function getFieldManagementTool() {
+      if (!selectedProject) return undefined
+
+      // Check if we're in a field management context
+      if (activeTab === "field-management") {
+        // Check module title for specific tools
+        if (selectedTool === "scheduler") return "scheduler"
+        if (selectedTool === "constraints") return "constraints"
+        if (selectedTool === "permit-log") return "permit-log"
+        if (selectedTool === "field-reports") return "field-reports"
+
+        // Default to scheduler if in field management tab
+        return "scheduler"
+      }
+
+      return undefined
+    }
+
+    // Helper function to determine current view type
+    function getCurrentViewType() {
+      if (selectedProject && selectedProjectData) {
+        switch (activeTab) {
+          case "core":
+            return "project-overview"
+          case "field-management":
+            return "field-management"
+          case "financial-management":
+            return "financial-management"
+          case "pre-construction":
+            return "pre-construction"
+          case "compliance":
+            return "compliance"
+          case "warranty":
+            return "warranty"
+          default:
+            return "project-view"
+        }
+      }
+
+      if (selectedTool) {
+        return `tool-${selectedTool}`
+      }
+
+      if (selectedModule) {
+        return `module-${selectedModule}`
+      }
+
+      return "dashboard"
+    }
+
+    // Navigation callbacks
+    const navigationCallbacks = {
+      onNavigateToHome: () => {
+        setSelectedProject(null)
+        setSelectedModule(null)
+        setSelectedTool(null)
+        setActiveTab("overview")
+        localStorage.removeItem("selectedProject")
+        localStorage.removeItem("selectedModule")
+        localStorage.removeItem("selectedTool")
+        router.push("/main-app")
+      },
+      onNavigateToProject: (projectId: string) => {
+        setSelectedProject(projectId)
+        setSelectedModule(null)
+        setSelectedTool(null)
+        setActiveTab("core")
+        localStorage.setItem("selectedProject", projectId)
+        localStorage.removeItem("selectedModule")
+        localStorage.removeItem("selectedTool")
+      },
+      onNavigateToModule: (moduleId: string) => {
+        setSelectedProject(null)
+        setSelectedModule(moduleId)
+        setSelectedTool(null)
+        setActiveTab("overview")
+        localStorage.removeItem("selectedProject")
+        localStorage.setItem("selectedModule", moduleId)
+        localStorage.removeItem("selectedTool")
+      },
+      onNavigateToTool: (toolName: string) => {
+        setSelectedProject(null)
+        setSelectedModule(null)
+        setSelectedTool(toolName)
+        setActiveTab(toolName === "staffing" ? "portfolio" : "overview")
+        localStorage.removeItem("selectedProject")
+        localStorage.removeItem("selectedModule")
+        localStorage.setItem("selectedTool", toolName)
+      },
+      onNavigateToTab: (tabId: string) => {
+        setActiveTab(tabId)
+      },
+    }
+
     if (selectedTool) {
       return {
         userName,
         moduleTitle: selectedTool.replace(/([A-Z])/g, " $1").trim(),
         subHead: `${selectedTool.charAt(0).toUpperCase() + selectedTool.slice(1)} management and analysis tools`,
         tabs: getTabsForContent(),
-        badges: [{ id: "role", label: `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} Access` }],
-        buttons: [
-          { id: "edit", label: "Edit Layout", icon: Edit, onClick: () => handleHeaderButtonClick("edit") },
-          { id: "refresh", label: "Refresh", icon: RefreshCw, onClick: () => handleHeaderButtonClick("refresh") },
-        ],
+        navigationState,
+        ...navigationCallbacks,
       }
     }
 
@@ -495,16 +575,12 @@ export default function MainApplicationPage() {
       return {
         userName,
         moduleTitle: selectedProjectData.name,
-        subHead: `${selectedProjectData.project_stage_name} • ${selectedProjectData.project_type_name}`,
+        subHead: `${selectedProjectData.project_stage_name} • ${selectedProjectData.project_type_name} • $${(
+          selectedProjectData.contract_value / 1000000
+        ).toFixed(1)}M`,
         tabs: getTabsForContent(),
-        badges: [
-          { id: "stage", label: selectedProjectData.project_stage_name },
-          { id: "value", label: `$${(selectedProjectData.contract_value / 1000000).toFixed(1)}M` },
-        ],
-        buttons: [
-          { id: "settings", label: "Settings", icon: Settings, onClick: () => handleHeaderButtonClick("settings") },
-          { id: "export", label: "Export", icon: Download, onClick: () => handleHeaderButtonClick("export") },
-        ],
+        navigationState,
+        ...navigationCallbacks,
       }
     }
 
@@ -515,14 +591,8 @@ export default function MainApplicationPage() {
         moduleTitle,
         subHead: `${moduleTitle.charAt(0).toUpperCase() + moduleTitle.slice(1)} operations and monitoring`,
         tabs: getTabsForContent(),
-        badges: [
-          { id: "role", label: "System Administrator" },
-          { id: "status", label: "All Systems Operational" },
-        ],
-        buttons: [
-          { id: "refresh", label: "Refresh", icon: RefreshCw, onClick: () => handleHeaderButtonClick("refresh") },
-          { id: "settings", label: "Settings", icon: Settings, onClick: () => handleHeaderButtonClick("settings") },
-        ],
+        navigationState,
+        ...navigationCallbacks,
       }
     }
 
@@ -535,27 +605,13 @@ export default function MainApplicationPage() {
         ? "IT administration dashboard with system overview and module access"
         : `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} dashboard with personalized insights`
 
-    const dashboardBadges =
-      userRole === "admin"
-        ? [
-            { id: "role", label: "System Administrator" },
-            { id: "status", label: "All Systems Operational" },
-          ]
-        : [
-            { id: "role", label: roleLabel },
-            { id: "projects", label: `${projects.length} Projects` },
-          ]
-
     return {
       userName,
       moduleTitle: dashboardTitle,
       subHead: dashboardSubHead,
       tabs: getTabsForContent(),
-      badges: dashboardBadges,
-      buttons: [
-        { id: "edit", label: "Edit Layout", icon: Edit, onClick: () => handleHeaderButtonClick("edit") },
-        { id: "add", label: "Add Widget", icon: Plus, onClick: () => handleHeaderButtonClick("add") },
-      ],
+      navigationState,
+      ...navigationCallbacks,
     }
   }
 
@@ -687,8 +743,12 @@ export default function MainApplicationPage() {
             tabs={headerConfig.tabs}
             activeTab={activeTab}
             onTabChange={handleTabChange}
-            badges={headerConfig.badges}
-            buttons={headerConfig.buttons}
+            navigationState={headerConfig.navigationState}
+            onNavigateToHome={headerConfig.onNavigateToHome}
+            onNavigateToProject={headerConfig.onNavigateToProject}
+            onNavigateToModule={headerConfig.onNavigateToModule}
+            onNavigateToTool={headerConfig.onNavigateToTool}
+            onNavigateToTab={headerConfig.onNavigateToTab}
           />
 
           {/* Main Content Container - 2 Column Layout */}

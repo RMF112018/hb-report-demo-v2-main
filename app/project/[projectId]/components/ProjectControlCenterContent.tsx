@@ -19,7 +19,7 @@
 import React, { useState, useEffect } from "react"
 import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -91,6 +91,7 @@ import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
 import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
 import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
 import FieldManagementContent from "./content/FieldManagementContent"
+import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
 
 interface ProjectControlCenterContentProps {
   projectId: string
@@ -183,242 +184,480 @@ const PreConstructionContent: React.FC<{
   userRole: string
   user: any
 }> = ({ projectId, projectData, userRole, user }) => {
-  const [rightPanelTab, setRightPanelTab] = useState("estimating")
+  const [activePreconTab, setActivePreconTab] = useState("estimating")
+  const [activeEstimatingSubTab, setActiveEstimatingSubTab] = useState("overview")
 
-  // Render right panel content
-  const renderRightPanelContent = () => {
-    switch (rightPanelTab) {
+  // Render content based on active tab
+  const renderPreconTabContent = () => {
+    switch (activePreconTab) {
       case "estimating":
         return (
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calculator className="h-5 w-5" />
-                  Estimating Tools
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3">
-                    <Button variant="outline" className="justify-start">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Cost Analysis
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <BarChart3 className="h-4 w-4 mr-2" />
-                      Bid Leveling
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <Calculator className="h-4 w-4 mr-2" />
-                      Estimate Builder
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <Target className="h-4 w-4 mr-2" />
-                      Accuracy Tracking
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Estimating Sub-Tab Navigation */}
+            <Tabs value={activeEstimatingSubTab} onValueChange={setActiveEstimatingSubTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 xl:grid-cols-13 gap-1 h-auto p-1">
+                <TabsTrigger value="overview" className="text-xs px-2 py-1">
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="takeoff" className="text-xs px-2 py-1">
+                  Takeoff
+                </TabsTrigger>
+                <TabsTrigger value="bidding" className="text-xs px-2 py-1">
+                  Bidding
+                </TabsTrigger>
+                <TabsTrigger value="area-calculation" className="text-xs px-2 py-1">
+                  Area Calc
+                </TabsTrigger>
+                <TabsTrigger value="allowances" className="text-xs px-2 py-1">
+                  Allowances
+                </TabsTrigger>
+                <TabsTrigger value="clarifications" className="text-xs px-2 py-1">
+                  Clarifications
+                </TabsTrigger>
+                <TabsTrigger value="value-analysis" className="text-xs px-2 py-1">
+                  Value Analysis
+                </TabsTrigger>
+                <TabsTrigger value="documents" className="text-xs px-2 py-1">
+                  Documents
+                </TabsTrigger>
+                <TabsTrigger value="trade-partners" className="text-xs px-2 py-1">
+                  Trade Partners
+                </TabsTrigger>
+                <TabsTrigger value="bid-leveling" className="text-xs px-2 py-1">
+                  Bid Leveling
+                </TabsTrigger>
+                <TabsTrigger value="cost-summary" className="text-xs px-2 py-1">
+                  Cost Summary
+                </TabsTrigger>
+                <TabsTrigger value="gc-gr" className="text-xs px-2 py-1">
+                  GC GR
+                </TabsTrigger>
+                <TabsTrigger value="bid-tabs" className="text-xs px-2 py-1">
+                  Bid Tabs
+                </TabsTrigger>
+              </TabsList>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button size="sm" className="w-full justify-start">
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Estimate
-                  </Button>
-                  <Button size="sm" variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Templates
-                  </Button>
+              <TabsContent value="overview" className="mt-6">
+                <div className="space-y-6">
+                  {/* Estimating Dashboard */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Calculator className="h-5 w-5" />
+                          Cost Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                              ${projectData?.contract_value ? (projectData.contract_value / 1000000).toFixed(1) : "0"}M
+                            </div>
+                            <p className="text-sm text-muted-foreground">Estimated Value</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Button size="sm" className="w-full justify-start">
+                              <FileText className="h-4 w-4 mr-2" />
+                              View Cost Breakdown
+                            </Button>
+                            <Button size="sm" variant="outline" className="w-full justify-start">
+                              <BarChart3 className="h-4 w-4 mr-2" />
+                              Bid Leveling
+                            </Button>
+                            <Button size="sm" variant="outline" className="w-full justify-start">
+                              <Target className="h-4 w-4 mr-2" />
+                              Accuracy Tracking
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Building2 className="h-5 w-5" />
+                          Project Scope
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                              {projectData?.project_type_name || "Commercial"}
+                            </div>
+                            <p className="text-sm text-muted-foreground">Project Type</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Button size="sm" className="w-full justify-start">
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Scope Details
+                            </Button>
+                            <Button size="sm" variant="outline" className="w-full justify-start">
+                              <Calculator className="h-4 w-4 mr-2" />
+                              Estimate Builder
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5" />
+                          Estimating Progress
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">85%</div>
+                            <p className="text-sm text-muted-foreground">Complete</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Button size="sm" className="w-full justify-start">
+                              <Plus className="h-4 w-4 mr-2" />
+                              New Estimate
+                            </Button>
+                            <Button size="sm" variant="outline" className="w-full justify-start">
+                              <Download className="h-4 w-4 mr-2" />
+                              Export Templates
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Estimating Activities */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <ClipboardList className="h-5 w-5" />
+                        Estimating Activities
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[
+                          { task: "Quantity Takeoff", status: "completed", progress: 100 },
+                          { task: "Material Pricing", status: "in-progress", progress: 75 },
+                          { task: "Labor Calculations", status: "in-progress", progress: 60 },
+                          { task: "Equipment Costs", status: "pending", progress: 30 },
+                          { task: "Final Review", status: "pending", progress: 0 },
+                        ].map((item, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-3 h-3 rounded-full ${
+                                  item.status === "completed"
+                                    ? "bg-green-500"
+                                    : item.status === "in-progress"
+                                    ? "bg-yellow-500"
+                                    : "bg-gray-300"
+                                }`}
+                              />
+                              <span className="font-medium">{item.task}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-20 bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full ${
+                                    item.status === "completed"
+                                      ? "bg-green-500"
+                                      : item.status === "in-progress"
+                                      ? "bg-yellow-500"
+                                      : "bg-gray-300"
+                                  }`}
+                                  style={{ width: `${item.progress}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-muted-foreground w-12">{item.progress}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+              </TabsContent>
+
+              {/* All other estimating sub-tabs */}
+              <TabsContent value="takeoff" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quantity Takeoff</CardTitle>
+                    <CardDescription>Detailed quantity takeoff and measurements</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Takeoff tools and quantity management interface will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="bidding" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Bidding</CardTitle>
+                    <CardDescription>Bid management and submission tracking</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Bidding interface and submission tracking will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="area-calculation" className="mt-6">
+                <AreaCalculationsModule
+                  projectId={projectId}
+                  projectName={projectData?.name || `Project ${projectId}`}
+                  onSave={(data) => {
+                    console.log("Area calculations saved:", data)
+                    // Handle save logic here
+                  }}
+                  onExport={(format) => {
+                    console.log("Exporting area calculations as:", format)
+                    // Handle export logic here
+                  }}
+                />
+              </TabsContent>
+
+              <TabsContent value="allowances" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Allowances</CardTitle>
+                    <CardDescription>Project allowances and contingency management</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Allowances management and contingency tracking will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="clarifications" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Clarifications</CardTitle>
+                    <CardDescription>Bid clarifications and RFI management</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Clarifications and RFI management interface will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="value-analysis" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Value Analysis</CardTitle>
+                    <CardDescription>Value engineering and cost optimization</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Value analysis and cost optimization tools will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="documents" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Documents</CardTitle>
+                    <CardDescription>Estimating documents and specifications</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Document management and specification viewer will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="trade-partners" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Trade Partners</CardTitle>
+                    <CardDescription>Subcontractor and vendor management</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Trade partner management and vendor database will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="bid-leveling" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Bid Leveling</CardTitle>
+                    <CardDescription>Bid comparison and leveling analysis</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Bid leveling and comparison tools will be displayed here.</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="cost-summary" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Cost Summary</CardTitle>
+                    <CardDescription>Comprehensive cost summary and breakdown</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Cost summary and detailed breakdown will be displayed here.</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="gc-gr" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>GC GR</CardTitle>
+                    <CardDescription>General contractor and general requirements</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      General contractor and general requirements management will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="bid-tabs" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Bid Tabs</CardTitle>
+                    <CardDescription>Organized bid tabulation and comparison</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Bid tabulation and comparison interface will be displayed here.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         )
 
       case "pre-construction":
         return (
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Pre-Construction Tools
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3">
-                    <Button variant="outline" className="justify-start">
-                      <Users className="h-4 w-4 mr-2" />
-                      Team Planning
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Schedule Development
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Document Management
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Risk Assessment
-                    </Button>
+            {/* Pre-Construction Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Team Planning
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">12</div>
+                      <p className="text-sm text-muted-foreground">Team Members</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <Users className="h-4 w-4 mr-2" />
+                        View Team Structure
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Team Member
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Project Setup</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button size="sm" className="w-full justify-start">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Project
-                  </Button>
-                  <Button size="sm" variant="outline" className="w-full justify-start">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Sync Updates
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
-
-      case "bim-coordination":
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5" />
-                  BIM Coordination Tools
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3">
-                    <Button variant="outline" className="justify-start">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Model Viewer
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Clash Detection
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Model Reports
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Model Updates
-                    </Button>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Schedule Development
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {projectData?.duration || "TBD"}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Days Duration</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        View Schedule
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Milestone
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Coordination</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button size="sm" className="w-full justify-start">
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Coordination
-                  </Button>
-                  <Button size="sm" variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Model
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
-
-  return (
-    <div className="flex-1 flex overflow-hidden min-h-[600px]">
-      {/* Left Column - Main Content (80% width) */}
-      <div className="w-4/5 overflow-y-auto overflow-x-hidden min-w-0 max-w-full flex-shrink">
-        <div className="space-y-6 p-6">
-          <div className="pb-2">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold text-foreground">Pre-Construction Management</h2>
-              <p className="text-sm text-muted-foreground">
-                Manage estimating, planning, and BIM coordination for {projectData?.name || "this project"}
-              </p>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Risk Assessment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">3</div>
+                      <p className="text-sm text-muted-foreground">Identified Risks</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Risk Register
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Risk Item
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </div>
 
-          {/* Main Pre-Construction Content */}
-          <div className="grid gap-6">
-            {/* Project Overview Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Project Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      ${projectData?.contract_value ? (projectData.contract_value / 1000000).toFixed(1) : "0"}M
-                    </div>
-                    <p className="text-sm text-muted-foreground">Contract Value</p>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {projectData?.project_stage_name || "Planning"}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Current Stage</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                      {projectData?.duration || "TBD"} Days
-                    </div>
-                    <p className="text-sm text-muted-foreground">Duration</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Key Activities Card */}
+            {/* Pre-Construction Activities */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ClipboardList className="h-5 w-5" />
-                  Key Pre-Construction Activities
+                  Pre-Construction Activities
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { task: "Estimate Review & Validation", status: "completed", progress: 100 },
-                    { task: "BIM Model Coordination", status: "in-progress", progress: 75 },
-                    { task: "Subcontractor Selection", status: "in-progress", progress: 60 },
-                    { task: "Permit Applications", status: "pending", progress: 30 },
-                    { task: "Project Schedule Development", status: "pending", progress: 15 },
+                    { task: "Contract Review", status: "completed", progress: 100 },
+                    { task: "Site Survey", status: "in-progress", progress: 80 },
+                    { task: "Permit Applications", status: "in-progress", progress: 45 },
+                    { task: "Subcontractor Selection", status: "pending", progress: 25 },
+                    { task: "Material Procurement", status: "pending", progress: 0 },
                   ].map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
@@ -427,21 +666,21 @@ const PreConstructionContent: React.FC<{
                             item.status === "completed"
                               ? "bg-green-500"
                               : item.status === "in-progress"
-                              ? "bg-blue-500"
+                              ? "bg-yellow-500"
                               : "bg-gray-300"
                           }`}
                         />
                         <span className="font-medium">{item.task}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${
                               item.status === "completed"
                                 ? "bg-green-500"
                                 : item.status === "in-progress"
-                                ? "bg-blue-500"
-                                : "bg-gray-400"
+                                ? "bg-yellow-500"
+                                : "bg-gray-300"
                             }`}
                             style={{ width: `${item.progress}%` }}
                           />
@@ -454,46 +693,206 @@ const PreConstructionContent: React.FC<{
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
+        )
 
-      {/* Right Panel - Pre-Construction Tools (20% width) */}
-      <div className="w-1/5 border-l border-gray-200 dark:border-gray-800 overflow-y-auto bg-gray-50/20 dark:bg-gray-900/20">
-        <div className="p-4 space-y-4">
-          {/* Right Panel Header */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">Pre-Construction Tools</h3>
-            <p className="text-sm text-muted-foreground">Access specialized tools and resources</p>
+      case "ids-bim-coordination":
+        return (
+          <div className="space-y-6">
+            {/* IDS & BIM Coordination Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5" />
+                    BIM Models
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">7</div>
+                      <p className="text-sm text-muted-foreground">Active Models</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Model Viewer
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Model
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Clash Detection
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-red-50 dark:bg-red-950 rounded-lg">
+                      <div className="text-2xl font-bold text-red-600 dark:text-red-400">15</div>
+                      <p className="text-sm text-muted-foreground">Open Clashes</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        View Clashes
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Run Detection
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Digital Services
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">95%</div>
+                      <p className="text-sm text-muted-foreground">Coordination</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Button size="sm" className="w-full justify-start">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Model Reports
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full justify-start">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export Model
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* BIM Coordination Activities */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  BIM Coordination Activities
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { task: "Model Federation", status: "completed", progress: 100 },
+                    { task: "Clash Detection Run", status: "in-progress", progress: 85 },
+                    { task: "Trade Coordination", status: "in-progress", progress: 70 },
+                    { task: "Model Updates", status: "pending", progress: 40 },
+                    { task: "Final Coordination", status: "pending", progress: 0 },
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            item.status === "completed"
+                              ? "bg-green-500"
+                              : item.status === "in-progress"
+                              ? "bg-yellow-500"
+                              : "bg-gray-300"
+                          }`}
+                        />
+                        <span className="font-medium">{item.task}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              item.status === "completed"
+                                ? "bg-green-500"
+                                : item.status === "in-progress"
+                                ? "bg-yellow-500"
+                                : "bg-gray-300"
+                            }`}
+                            style={{ width: `${item.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-muted-foreground w-12">{item.progress}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
+        )
 
-          {/* Right Panel Tabs */}
-          <Tabs value={rightPanelTab} onValueChange={setRightPanelTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-9 text-xs">
-              <TabsTrigger value="estimating" className="text-xs">
-                Estimating
-              </TabsTrigger>
-              <TabsTrigger value="pre-construction" className="text-xs">
-                Pre-Construction
-              </TabsTrigger>
-              <TabsTrigger value="bim-coordination" className="text-xs">
-                BIM Coordination
-              </TabsTrigger>
-            </TabsList>
+      default:
+        return null
+    }
+  }
 
-            <TabsContent value="estimating" className="mt-4">
-              {renderRightPanelContent()}
-            </TabsContent>
+  return (
+    <div className="space-y-6">
+      {/* Module Title and Sub-head */}
+      <div className="pb-4">
+        <h2 className="text-2xl font-semibold text-foreground">Pre-Construction Suite</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Comprehensive pre-construction management for {projectData?.name || "this project"} •{" "}
+          {projectData?.project_stage_name || "Pre-Construction"} • $
+          {projectData?.contract_value ? (projectData.contract_value / 1000000).toFixed(1) : "0"}M
+        </p>
+      </div>
 
-            <TabsContent value="pre-construction" className="mt-4">
-              {renderRightPanelContent()}
-            </TabsContent>
-
-            <TabsContent value="bim-coordination" className="mt-4">
-              {renderRightPanelContent()}
-            </TabsContent>
-          </Tabs>
+      {/* Tab Navigation - Styled like Financial Hub */}
+      <div className="border-b border-border">
+        <div className="flex space-x-6 overflow-x-auto">
+          <button
+            onClick={() => setActivePreconTab("estimating")}
+            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+              activePreconTab === "estimating"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+            }`}
+          >
+            <Calculator className="h-4 w-4" />
+            <span>Estimating</span>
+          </button>
+          <button
+            onClick={() => setActivePreconTab("pre-construction")}
+            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+              activePreconTab === "pre-construction"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+            }`}
+          >
+            <Building2 className="h-4 w-4" />
+            <span>Pre-Construction</span>
+          </button>
+          <button
+            onClick={() => setActivePreconTab("ids-bim-coordination")}
+            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+              activePreconTab === "ids-bim-coordination"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+            }`}
+          >
+            <Brain className="h-4 w-4" />
+            <span>IDS & BIM Coordination</span>
+          </button>
         </div>
       </div>
+
+      {/* Tab Content */}
+      <div className="mt-6">{renderPreconTabContent()}</div>
     </div>
   )
 }
