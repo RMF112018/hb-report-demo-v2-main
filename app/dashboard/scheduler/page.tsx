@@ -524,25 +524,6 @@ export default function SchedulerPage() {
           <div className="xl:col-span-9">
             {/* Scheduler Modules */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              {/* Tab Navigation */}
-              <div className="flex space-x-1 p-1 bg-muted rounded-lg" data-tour="scheduler-tabs">
-                {availableModules.map((module) => (
-                  <button
-                    key={module.id}
-                    onClick={() => setActiveTab(module.id)}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === module.id
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    data-tour={`${module.id}-tab`}
-                  >
-                    <module.icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{module.label}</span>
-                  </button>
-                ))}
-              </div>
-
               {/* Tab Content */}
               {availableModules.map((module) => {
                 const ModuleComponent = module.component

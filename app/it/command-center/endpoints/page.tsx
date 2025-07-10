@@ -458,7 +458,7 @@ export default function EndpointManagementPage() {
         {/* Mobile Priority Cards - Show at top on small screens */}
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">Total Devices</h3>
               <div className="text-2xl font-bold">{endpointMetrics.totalDevices}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -467,7 +467,7 @@ export default function EndpointManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">Compliance Rate</h3>
               <div className="text-2xl font-bold text-green-600">
                 {Math.round((endpointMetrics.compliantDevices / endpointMetrics.totalDevices) * 100)}%
@@ -478,7 +478,7 @@ export default function EndpointManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">Patch Level</h3>
               <div className="text-2xl font-bold text-blue-600">{endpointMetrics.avgPatchLevel}%</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -487,7 +487,7 @@ export default function EndpointManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">Pending Updates</h3>
               <div className="text-2xl font-bold text-orange-600">{endpointMetrics.pendingUpdates}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -503,7 +503,7 @@ export default function EndpointManagementPage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
           <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
             {/* Device Overview - Desktop */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Device Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -530,7 +530,7 @@ export default function EndpointManagementPage() {
             </div>
 
             {/* Location Filter */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Filter by Location</h3>
               <div className="space-y-2">
                 <Select value={selectedFilter} onValueChange={setSelectedFilter}>
@@ -565,7 +565,7 @@ export default function EndpointManagementPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -588,7 +588,7 @@ export default function EndpointManagementPage() {
             </div>
 
             {/* Microsoft Graph Status */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Integration Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -620,7 +620,7 @@ export default function EndpointManagementPage() {
           {/* Main Content Area */}
           <div className="xl:col-span-9 space-y-4 lg:space-y-6">
             {/* Tab Navigation */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>

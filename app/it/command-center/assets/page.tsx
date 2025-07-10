@@ -405,7 +405,7 @@ export default function AssetTrackerPage() {
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Asset Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -423,7 +423,7 @@ export default function AssetTrackerPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">License Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -441,7 +441,7 @@ export default function AssetTrackerPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Asset Health</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -465,7 +465,7 @@ export default function AssetTrackerPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
           <div className="hidden xl:block xl:col-span-3 space-y-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Asset Summary</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -487,7 +487,7 @@ export default function AssetTrackerPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -509,7 +509,7 @@ export default function AssetTrackerPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Hardware Categories</h3>
               <div className="space-y-3">
                 {Object.entries(assetData.hardwareCategories).map(([category, count]) => {
@@ -527,7 +527,7 @@ export default function AssetTrackerPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Top Vendors</h3>
               <div className="space-y-3">
                 {vendorSummary.slice(0, 5).map((vendor) => (

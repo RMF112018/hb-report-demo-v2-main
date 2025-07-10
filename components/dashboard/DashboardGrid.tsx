@@ -78,6 +78,7 @@ import { SubmittalCard } from "@/components/cards/SubmittalCard"
 import { HealthCard } from "@/components/cards/HealthCard"
 import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
+import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
 
 // IT Command Center placeholder cards
 import {
@@ -94,6 +95,16 @@ import {
   ConsultantDashboardCard,
   HbIntelManagementCard,
 } from "@/components/cards/ITPlaceholderCards"
+
+// Staffing analytics cards
+import {
+  TeamUtilizationCard,
+  LaborCostAnalysisCard,
+  SPCRActivityCard,
+  TeamExperienceCard,
+  ProjectStaffingOverviewCard,
+  StaffingAlertsCard,
+} from "@/components/cards/staffing/StaffingAnalyticsCards"
 
 /**
  * Professional Dashboard Grid System
@@ -113,7 +124,6 @@ interface DashboardGridProps {
   onCardRemove?: (cardId: string) => void
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void
   onCardSizeChange?: (cardId: string, size: string) => void
-  onDrillDown?: (cardId: string, cardType: string) => void
   onCardAdd?: () => void
   onSave?: () => void
   onReset?: () => void
@@ -129,9 +139,9 @@ const GRID_CONFIG = {
   columns: {
     sm: 2, // Mobile
     md: 4, // Tablet
-    lg: 12, // Desktop
-    xl: 16, // Large desktop
-    "2xl": 20, // Extra large desktop
+    lg: 16, // Desktop - optimized for executive dashboard
+    xl: 16, // Large desktop - optimized for executive dashboard
+    "2xl": 16, // Extra large desktop - consistent 16 columns
   },
   // Base row height (in pixels)
   rowHeight: {
@@ -151,8 +161,7 @@ const getGridClasses = (isCompact: boolean, spacingClass: string) => {
 
   return cn(
     "grid w-full",
-    "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 xl:grid-cols-16 2xl:grid-cols-20",
-    "auto-rows-min",
+    "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-16 xl:grid-cols-16 2xl:grid-cols-16",
     spacingClass || `gap-${gap / 4}`, // Convert px to Tailwind spacing
     "transition-all duration-300 ease-in-out"
   )
@@ -176,6 +185,11 @@ const getCardGridArea = (card: DashboardCard) => {
 
 // Get card height based on content and span
 const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto" => {
+  // For pipeline-analytics and financial-dashboard, use content-driven height
+  if (card.type === "pipeline-analytics" || card.type === "financial-dashboard") {
+    return "auto"
+  }
+
   if (card.span && card.span.rows) {
     const rowHeight = isCompact ? GRID_CONFIG.rowHeight.compact : GRID_CONFIG.rowHeight.normal
     return card.span.rows * rowHeight
@@ -189,8 +203,6 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
       return isCompact ? 350 : 400
     case "portfolio-overview":
       return isCompact ? 300 : 350
-    case "pipeline-analytics":
-      return isCompact ? 400 : 450
     case "market-intelligence":
       return isCompact ? 450 : 500
     case "staffing-distribution":
@@ -206,7 +218,6 @@ export function DashboardGrid({
   onCardRemove,
   onCardConfigure,
   onCardSizeChange,
-  onDrillDown,
   isEditing = false,
   isCompact = false,
   spacingClass = "gap-6",
@@ -229,7 +240,7 @@ export function DashboardGrid({
 
   // Calculate grid position from mouse coordinates
   const getGridPosition = (x: number, y: number, containerRect: DOMRect, isCompact: boolean) => {
-    const gridColumns = 12 // Default grid columns for desktop
+    const gridColumns = 16 // Optimized grid columns for executive dashboard
     const gridRows = 50 // Allow for tall layouts
 
     const relativeX = x - containerRect.left
@@ -274,7 +285,7 @@ export function DashboardGrid({
 
       // Try to find an available position
       for (let y = 0; y <= maxY + 10 && !foundPosition; y++) {
-        for (let x = 0; x <= 12 - span.cols && !foundPosition; x++) {
+        for (let x = 0; x <= 16 - span.cols && !foundPosition; x++) {
           let canPlace = true
 
           // Check if this position is available
@@ -319,7 +330,7 @@ export function DashboardGrid({
     const endY = position.y + span.rows
 
     // Check bounds
-    if (position.x < 0 || position.y < 0 || endX > 12) return false
+    if (position.x < 0 || position.y < 0 || endX > 16) return false
 
     return !cards.some((card) => {
       if (card.id === excludeCardId) return false
@@ -350,7 +361,7 @@ export function DashboardGrid({
         for (let dy = -radius; dy <= radius; dy++) {
           if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
             const testPosition = {
-              x: Math.max(0, Math.min(targetPosition.x + dx, 12 - span.cols)),
+              x: Math.max(0, Math.min(targetPosition.x + dx, 16 - span.cols)),
               y: Math.max(0, targetPosition.y + dy),
             }
 
@@ -406,7 +417,7 @@ export function DashboardGrid({
 
         // Calculate new grid position based on drag delta
         const currentPos = draggedCard.position || { x: 0, y: 0 }
-        const cellWidth = containerRect.width / 12
+        const cellWidth = containerRect.width / 16
         const cellHeight = isCompact ? GRID_CONFIG.rowHeight.compact : GRID_CONFIG.rowHeight.normal
 
         const newGridPos = {
@@ -465,17 +476,17 @@ export function DashboardGrid({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div
-        className={cn(
-          "w-full h-full",
-          "bg-gray-50/50 dark:bg-gray-900/50",
-          "rounded-xl",
-          "p-4 sm:p-6",
-          "transition-colors duration-300"
-        )}
-      >
+      <div className={cn("w-full", "rounded-xl", "p-0 sm:p-0", "transition-colors duration-300")}>
         <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
-          <div className={getGridClasses(isCompact, spacingClass)} data-grid-container>
+          <div
+            className={getGridClasses(isCompact, spacingClass)}
+            data-grid-container
+            style={{
+              // Ensure grid is displayed properly
+              display: "grid",
+              width: "100%",
+            }}
+          >
             {sortedCards.map((card) => (
               <SortableCard
                 key={card.id}
@@ -485,7 +496,6 @@ export function DashboardGrid({
                 onCardRemove={onCardRemove}
                 onCardConfigure={onCardConfigure}
                 onCardSizeChange={onCardSizeChange}
-                onDrillDown={onDrillDown}
                 onCardFocus={handleCardFocus}
                 height={getCardHeight(card, isCompact)}
                 userRole={userRole}
@@ -523,7 +533,6 @@ interface SortableCardProps {
   onCardRemove?: (cardId: string) => void
   onCardConfigure?: (cardId: string, configUpdate?: Partial<DashboardCard>) => void
   onCardSizeChange?: (cardId: string, size: string) => void
-  onDrillDown?: (cardId: string, cardType: string) => void
   onCardFocus?: (card: DashboardCard) => void
   height: number | "auto"
   userRole?: string
@@ -536,18 +545,18 @@ function SortableCard({
   onCardRemove,
   onCardConfigure,
   onCardSizeChange,
-  onDrillDown,
   onCardFocus,
   height,
   userRole,
 }: SortableCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
 
+  const gridArea = getCardGridArea(card)
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    ...getCardGridArea(card),
-    minHeight: typeof height === "number" ? `${height}px` : height,
+    ...gridArea,
+    ...(typeof height === "number" && card.type !== "pipeline-analytics" ? { minHeight: `${height}px` } : {}),
   }
 
   return (
@@ -568,7 +577,6 @@ function SortableCard({
         onRemove={onCardRemove}
         onConfigure={onCardConfigure}
         onSizeChange={onCardSizeChange}
-        onDrillDown={onDrillDown}
         dragHandleClass="cursor-grab active:cursor-grabbing"
         isEditing={isEditing}
         isCompact={isCompact}
@@ -585,7 +593,7 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
   const span = card.span || getOptimalSize(card.type)
 
   const commonProps = {
-    className: "h-full w-full",
+    className: card.type === "pipeline-analytics" ? "w-full" : "h-full w-full",
     isCompact,
     userRole,
     span,
@@ -684,6 +692,27 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
       return <ConsultantDashboardCard {...commonProps} />
     case "hb-intel-management":
       return <HbIntelManagementCard {...commonProps} />
+    case "financial-dashboard":
+      return (
+        <FinancialDashboard
+          projectId={card.config?.projectId || "2525840"}
+          projectData={card.config?.projectData || {}}
+          userRole={userRole || ""}
+        />
+      )
+    // Staffing analytics cards
+    case "team-utilization":
+      return <TeamUtilizationCard {...commonProps} projectId={card.config?.projectId} />
+    case "labor-cost-analysis":
+      return <LaborCostAnalysisCard {...commonProps} projectId={card.config?.projectId} />
+    case "spcr-activity":
+      return <SPCRActivityCard {...commonProps} projectId={card.config?.projectId} />
+    case "team-experience":
+      return <TeamExperienceCard {...commonProps} projectId={card.config?.projectId} />
+    case "project-staffing-overview":
+      return <ProjectStaffingOverviewCard {...commonProps} projectId={card.config?.projectId} />
+    case "staffing-alerts":
+      return <StaffingAlertsCard {...commonProps} projectId={card.config?.projectId} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -696,25 +725,29 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
   }
 }
 
-// Get optimal size for cards
+// Get optimal size for cards (optimized for 16-column executive layout)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 18, rows: 7 }
+      return { cols: 16, rows: 6 }
+    case "financial-dashboard":
+      return { cols: 16, rows: 20 }
     case "enhanced-hbi-insights":
-      return { cols: 10, rows: 5 }
+      return { cols: 8, rows: 5 }
     case "portfolio-overview":
-      return { cols: 12, rows: 4 }
+      return { cols: 8, rows: 5 }
     case "pipeline-analytics":
-      return { cols: 8, rows: 6 }
+      return { cols: 10, rows: 4 }
     case "market-intelligence":
-      return { cols: 6, rows: 6 }
+      return { cols: 6, rows: 5 }
     case "staffing-distribution":
-      return { cols: 10, rows: 6 }
+      return { cols: 8, rows: 5 }
     case "quality-control":
-      return { cols: 4, rows: 6 }
+      return { cols: 4, rows: 5 }
     case "safety":
-      return { cols: 4, rows: 6 }
+      return { cols: 4, rows: 5 }
+    case "cash-flow":
+      return { cols: 8, rows: 4 }
     default:
       return { cols: 6, rows: 4 }
   }

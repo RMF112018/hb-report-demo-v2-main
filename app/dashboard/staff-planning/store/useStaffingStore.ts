@@ -144,6 +144,9 @@ export interface StaffingActions {
   getSPCRsByProject: (projectId: number) => SPCR[]
   getSPCRsByRole: (userRole: "executive" | "project-executive" | "project-manager") => SPCR[]
   calculateLaborCost: (staffIds: string[], weeklyHours?: number) => number
+
+  // Data management
+  reinitializeData: () => void
 }
 
 // Helper function to generate workflow stage
@@ -169,6 +172,17 @@ const initializeData = () => {
     workflowStage: getWorkflowStage(spcr.status),
     comments: [],
   })) as SPCR[]
+
+  console.log(
+    `useStaffingStore: Initialized with ${staff.length} staff members, ${projects.length} projects, ${spcrs.length} SPCRs`
+  )
+
+  // Debug: Check for project 2525840 assignments
+  const project2525840Assignments = staff.filter((s) => s.assignments.some((a) => a.project_id === 2525840))
+  console.log(`useStaffingStore: Found ${project2525840Assignments.length} staff members assigned to project 2525840:`)
+  project2525840Assignments.slice(0, 5).forEach((staff) => {
+    console.log(`  - ${staff.name} (${staff.position})`)
+  })
 
   return { staff, projects, spcrs }
 }
@@ -359,11 +373,22 @@ export const useStaffingStore = create<StaffingState & StaffingActions>()(
             .filter((staff) => staffIds.includes(staff.id))
             .reduce((total, staff) => total + staff.laborRate * weeklyHours, 0)
         },
+
+        reinitializeData: () => {
+          const { staff, projects, spcrs } = initializeData()
+          set({
+            staffMembers: staff,
+            projects: projects,
+            spcrs: spcrs,
+          })
+        },
       }
     },
     {
-      name: "staffing-storage",
+      name: "staffing-storage-v2", // Changed name to force fresh initialization
       partialize: (state) => ({
+        staffMembers: state.staffMembers, // Include staffMembers in persistence
+        projects: state.projects, // Include projects in persistence
         spcrs: state.spcrs,
         ganttFilters: state.ganttFilters,
         spcrDraft: state.spcrDraft,

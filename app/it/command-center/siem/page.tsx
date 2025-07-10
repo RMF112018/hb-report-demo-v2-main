@@ -276,7 +276,7 @@ export default function SIEMEventMonitorPage() {
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Total Events Card - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Total Events</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -299,7 +299,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Active Threats Card - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Active Threats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -322,7 +322,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Threat Sources Card - Mobile */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Threat Sources</h3>
               <div className="space-y-3">
                 {threatSourcesData.slice(0, 3).map(({ source, count, icon: Icon }) => (
@@ -344,7 +344,7 @@ export default function SIEMEventMonitorPage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ */}
           <div className="hidden xl:block xl:col-span-3 space-y-4">
             {/* Security Overview */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Security Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -367,7 +367,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -390,7 +390,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Threat Sources */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Threat Sources</h3>
               <div className="space-y-3">
                 {threatSourcesData.map(({ source, count, icon: Icon }) => (
@@ -406,7 +406,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Integration Status */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Integration Status</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -449,7 +449,7 @@ export default function SIEMEventMonitorPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
               <div className="space-y-3">
                 {siemData.recentEvents?.slice(0, 4).map((event, index) => {
@@ -486,7 +486,7 @@ export default function SIEMEventMonitorPage() {
           <div className="xl:col-span-9 space-y-4 lg:space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Events</p>
@@ -498,7 +498,7 @@ export default function SIEMEventMonitorPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">High Priority</p>
@@ -510,7 +510,7 @@ export default function SIEMEventMonitorPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Active Threats</p>
@@ -522,7 +522,7 @@ export default function SIEMEventMonitorPage() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4">
+              <div className="bg-card border border-border rounded-lg p-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Resolved</p>

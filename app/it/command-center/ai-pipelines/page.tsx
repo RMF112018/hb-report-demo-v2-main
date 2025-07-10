@@ -480,7 +480,7 @@ export default function AiPipelinesPage() {
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Pipeline Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -498,7 +498,7 @@ export default function AiPipelinesPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Model Performance</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -516,7 +516,7 @@ export default function AiPipelinesPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">System Metrics</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -538,7 +538,7 @@ export default function AiPipelinesPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
           <div className="hidden xl:block xl:col-span-3 space-y-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Pipeline Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -560,7 +560,7 @@ export default function AiPipelinesPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
@@ -582,7 +582,7 @@ export default function AiPipelinesPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Model Status</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -604,7 +604,7 @@ export default function AiPipelinesPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">System Health</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">

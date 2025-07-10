@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { User } from "@/types"
 
-export type DemoRole = "executive" | "project-executive" | "project-manager" | "estimator" | "admin"
+export type DemoRole = "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "presentation"
 export type DemoUser = User
 
 interface AuthContextType {
@@ -12,6 +12,11 @@ interface AuthContextType {
   logout: () => void
   isLoading: boolean
   isClient: boolean
+  // New role switching functionality
+  viewingAs: DemoRole | null
+  switchRole: (role: DemoRole) => void
+  returnToPresentation: () => void
+  isPresentationMode: boolean
 }
 
 const demoUsers: DemoUser[] = [
@@ -75,6 +80,18 @@ const demoUsers: DemoUser[] = [
     avatar: "/avatars/markey-mark.png",
     permissions: { preConAccess: true },
   },
+  {
+    id: "6",
+    firstName: "Demo",
+    lastName: "Presenter",
+    email: "demo.presenter@hedrickbrothers.com",
+    role: "presentation",
+    company: "Hedrick Brothers",
+    createdAt: new Date().toISOString(),
+    isActive: true,
+    avatar: "/avatars/demo-presenter.png",
+    permissions: { preConAccess: true },
+  },
 ]
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -83,6 +100,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DemoUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+  const [viewingAs, setViewingAs] = useState<DemoRole | null>(null)
+
+  // Helper to get the effective user role for display and permissions
+  const getEffectiveRole = (): DemoRole => {
+    if (user?.role === "presentation" && viewingAs) {
+      return viewingAs
+    }
+    return (user?.role as DemoRole) || "executive"
+  }
+
+  // Helper to get the effective user data for display
+  const getEffectiveUser = (): DemoUser | null => {
+    if (!user) return null
+
+    if (user.role === "presentation" && viewingAs) {
+      // Find the demo user data for the role being viewed
+      const viewingUser = demoUsers.find((u) => u.role === viewingAs)
+      if (viewingUser) {
+        return {
+          ...viewingUser,
+          // Keep the presentation user's ID but use the viewed role's data
+          id: user.id,
+        }
+      }
+    }
+
+    return user
+  }
 
   // Handle client-side hydration
   useEffect(() => {
@@ -91,15 +136,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Only access localStorage after client-side hydration
     if (typeof window !== "undefined") {
       try {
-        const stored = localStorage.getItem("hb-demo-user")
-        if (stored) {
-          const parsedUser = JSON.parse(stored)
-          setUser(parsedUser)
+        // Check if we want to disable auto-login (for testing)
+        const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
+
+        if (!disableAutoLogin) {
+          const stored = localStorage.getItem("hb-demo-user")
+          const storedViewingAs = localStorage.getItem("hb-viewing-as")
+
+          if (stored) {
+            const parsedUser = JSON.parse(stored)
+            setUser(parsedUser)
+
+            // Restore viewing role for presentation users
+            if (parsedUser.role === "presentation" && storedViewingAs) {
+              setViewingAs(storedViewingAs as DemoRole)
+            }
+          }
         }
       } catch (error) {
         console.error("Error reading from localStorage:", error)
         // Clear potentially corrupted data
         localStorage.removeItem("hb-demo-user")
+        localStorage.removeItem("hb-viewing-as")
       }
     }
 
@@ -112,23 +170,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Invalid credentials")
     }
 
-    const redirectTo =
-      match.role === "estimator"
-        ? "/pre-con"
-        : match.role === "project-executive"
-        ? "/dashboard"
-        : match.role === "project-manager"
-        ? "/dashboard"
-        : match.role === "executive"
-        ? "/dashboard"
-        : match.role === "admin"
-        ? "/dashboard"
-        : "/dashboard"
+    // All users now redirect to the main application page
+    // which will show role-appropriate dashboard content
+    const redirectTo = "/main-app"
 
     // Only use localStorage if we're on the client
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("hb-demo-user", JSON.stringify(match))
+
+        // For presentation users, default to viewing as executive
+        if (match.role === "presentation") {
+          setViewingAs("executive")
+          localStorage.setItem("hb-viewing-as", "executive")
+        } else {
+          // Clear any existing viewing role for non-presentation users
+          setViewingAs(null)
+          localStorage.removeItem("hb-viewing-as")
+        }
       } catch (error) {
         console.error("Error saving to localStorage:", error)
       }
@@ -138,12 +197,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { redirectTo }
   }
 
+  const switchRole = (role: DemoRole) => {
+    if (user?.role !== "presentation") {
+      console.warn("Role switching is only available for presentation users")
+      return
+    }
+
+    setViewingAs(role)
+
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("hb-viewing-as", role)
+      } catch (error) {
+        console.error("Error saving viewing role to localStorage:", error)
+      }
+    }
+  }
+
+  const returnToPresentation = () => {
+    if (user?.role !== "presentation") {
+      console.warn("Return to presentation is only available for presentation users")
+      return
+    }
+
+    setViewingAs(null)
+
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("hb-viewing-as")
+      } catch (error) {
+        console.error("Error removing viewing role from localStorage:", error)
+      }
+    }
+  }
+
   const logout = () => {
     if (typeof window !== "undefined") {
       try {
         // Clear all user-specific localStorage data
         const keysToRemove = [
           "hb-demo-user", // User authentication data
+          "hb-viewing-as", // Presentation viewing role
           "selectedProject", // Selected project
           "hb-forecast-data", // Financial forecast data
           "hb-forecast-acknowledgments", // Forecast acknowledgments
@@ -158,10 +252,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           localStorage.removeItem(key)
         })
 
-        // Clear all tour-related data and report configuration data
+        // Clear all tour-related data, report configuration data, and responsibility matrix data
         const allKeys = Object.keys(localStorage)
         allKeys.forEach((key) => {
-          if (key.startsWith("report-config-") || key.startsWith("hb-tour-shown-") || key.startsWith("hb-welcome-")) {
+          if (
+            key.startsWith("report-config-") ||
+            key.startsWith("hb-tour-shown-") ||
+            key.startsWith("hb-welcome-") ||
+            key.startsWith("responsibility-matrix-")
+          ) {
             localStorage.removeItem(key)
           }
         })
@@ -172,9 +271,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
     setUser(null)
+    setViewingAs(null)
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, isLoading, isClient }}>{children}</AuthContext.Provider>
+  // Get the current effective user data (either the actual user or the viewed role user)
+  const effectiveUser = getEffectiveUser()
+  const isPresentationMode = user?.role === "presentation"
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user: effectiveUser,
+        login,
+        logout,
+        isLoading,
+        isClient,
+        viewingAs,
+        switchRole,
+        returnToPresentation,
+        isPresentationMode,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = (): AuthContextType => {

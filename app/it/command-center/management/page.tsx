@@ -411,7 +411,7 @@ export default function HBIntelManagementPage() {
         {/* Mobile Priority Cards - Show at top on small screens */}
         <div className="block xl:hidden mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">Total Users</h3>
               <div className="text-2xl font-bold">{systemMetrics.totalUsers}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -420,7 +420,7 @@ export default function HBIntelManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">MFA Coverage</h3>
               <div className="text-2xl font-bold">
                 {Math.round((systemMetrics.mfaEnabled / systemMetrics.totalUsers) * 100)}%
@@ -431,7 +431,7 @@ export default function HBIntelManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">System Uptime</h3>
               <div className="text-2xl font-bold">{systemMetrics.uptime}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -440,7 +440,7 @@ export default function HBIntelManagementPage() {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-2 text-foreground">AI Models</h3>
               <div className="text-2xl font-bold">{systemMetrics.aiModelsActive}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -456,7 +456,7 @@ export default function HBIntelManagementPage() {
           {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
           <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
             {/* System Overview Cards - Desktop */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">System Overview</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -483,7 +483,7 @@ export default function HBIntelManagementPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Quick Actions</h3>
               <div className="space-y-2">
                 <Button variant="ghost" size="sm" className="w-full justify-start text-sm" onClick={handleNewUser}>
@@ -506,7 +506,7 @@ export default function HBIntelManagementPage() {
             </div>
 
             {/* System Health */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">System Health</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -533,7 +533,7 @@ export default function HBIntelManagementPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Recent Activity</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -580,7 +580,7 @@ export default function HBIntelManagementPage() {
           {/* Main Content Area */}
           <div className="xl:col-span-9 space-y-4 lg:space-y-6">
             {/* Tab Navigation */}
-            <div className="bg-card border border-border rounded-lg p-4">
+            <div className="bg-card border border-border rounded-lg p-2">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="overview">Overview</TabsTrigger>

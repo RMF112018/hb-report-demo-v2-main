@@ -3,86 +3,371 @@ description:
 globs: 
 alwaysApply: false
 ---
+# HB Report Demo v3.0 - Project Page Development Ruleset
 
-# 🧭 Ruleset: Project Control Center
+## Overview
 
-**File**: `.cursor/rules/project-control-center.mdc`
+This ruleset defines the architecture, patterns, and guidelines for developing the project page (`/project/[projectId]`) in HB Report Demo v3.0. The project page serves as the central hub for project management tools and follows enterprise-grade standards.
 
----
+## Architecture Overview
 
-## I. 🧱 Architecture & Purpose
+### Core File Structure
 
-### 1. Page Definition
-- Route: `app/project/[project_id]/page.tsx`
-- Purpose: A centralized project-specific workspace for interacting with all data tied to one project.
+```
+app/project/[projectId]/
+├── page.tsx                           # Main project page entry point
+├── components/
+│   ├── ProjectControlCenterContent.tsx # Main content component
+│   ├── ProjectPageContent.tsx          # Page content wrapper
+│   ├── layout/
+│   │   ├── ProjectLayout.tsx          # Layout wrapper
+│   │   └── ProjectContent.tsx         # Content container
+│   └── ResponsibilityMatrixCore.tsx   # Matrix component
+├── constants/
+│   └── config.ts                      # Tab configurations
+└── types/
+    └── project.ts                     # Type definitions
+```
 
-### 2. Data Context
-- Driven by `project_id` passed via route params.
-- Loads project-specific data from @projects.json and related mock data files (e.g. forecasts, costs, reports).
-- Supports dark and light themes consistently with the dashboard layout.
+### Key Dependencies
 
----
+- **Main App Integration**: `app/main-app/page.tsx` - Primary navigation hub
+- **Layout Components**: `components/layout/` - Shared layout components
+- **UI Components**: `components/ui/` - Shadcn/UI component library
+- **Context**: `context/auth-context.tsx` - Authentication and user state
+- **Hooks**: `hooks/` - Custom React hooks for state management
 
-## II. 🧭 Navigation
+## Page Layout Architecture
 
-### 1. App Header Integration
-- Clicking a project under the "Projects" dropdown in the header routes to `/project/[project_id]`.
-- The page serves as a landing point for deep-diving into:
-  - Financials
-  - Field Reports
-  - Procurement
-  - Forecasts
-  - Documentation (via SharePoint)
+### 1. Three-Panel Layout Structure
 
----
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Page Header                              │
+├─────────────────────────────────────────────────────────────┤
+│ Left │                                                      │
+│ Side │           Main Content Area                          │
+│ bar  │                                                      │
+│ (20% │           (80% width)                                │
+│ width│                                                      │
+│      │                                                      │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## III. 🎨 Layout & Styling
+### 2. Component Hierarchy
 
-### 1. Consistency with Dashboard
-- Uses the same layout components as the dashboard: `DashboardLayout`, `DashboardGrid`.
-- Cards support:
-  - Drag-resize
-  - Add/remove
-  - Grouping
+- **ProjectLayout**: Root layout wrapper
+- **ProjectContent**: Main content container
+- **ProjectControlCenterContent**: Core content logic
+- **ProjectPageContent**: Content wrapper with header integration
 
-### 2. Theming
-- Fully supports Tailwind dark/light themes.
-- Use `bg-background`, `text-foreground`, and token-based colors.
+## Core Tab System
 
----
+### 1. Main Tab Configuration
 
-## IV. 🔗 Microsoft Graph API Integration
+Located in: `app/project/[projectId]/constants/config.ts`
 
-### 1. Purpose
-- Demonstrate real-world integration with SharePoint using Microsoft Graph API.
-- Let users view and interact with document libraries related to the selected project.
+```typescript
+export const CORE_TABS_CONFIG = [
+  { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "checklists", label: "Checklists", icon: CheckSquare },
+  { id: "productivity", label: "Productivity", icon: MessageSquare },
+  { id: "staffing", label: "Staffing", icon: Calendar },
+  { id: "responsibility-matrix", label: "Responsibility Matrix", icon: Users },
+  { id: "reports", label: "Reports", icon: FileText },
+]
+```
 
-### 2. Integration Guidelines
-- **Do NOT implement auth here** – the app will handle SSO authentication globally.
-- Use existing Graph session context for all Graph API requests.
+### 2. Sub-Tab Implementation Pattern
 
-### 3. Document Library Viewer
-- Create `<SharePointLibraryViewer />` card.
-- Supports:
-  - Browsing project folder
-  - Viewing files
-  - Preview or download support
+**For tabs requiring sub-navigation, use the Tabs component pattern:**
 
-### 4. Extendibility
-- **Note**: Encourage future use of Microsoft Graph connectors and endpoints including:
-  - Teams (project collaboration)
-  - Outlook/Calendar (meeting & milestone sync)
-  - OneDrive (per-user file view)
-  - Planner/Tasks (task-level drilldown)
-  - Lists (punchlist, procurement trackers)
-  - Excel (financials import/export)
+```typescript
+// Example: Staffing sub-tabs
+case "staffing":
+  return (
+    <div className="space-y-4 w-full max-w-full">
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="spcr">SPCR</TabsTrigger>
+        </TabsList>
+        <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
+          {/* Content */}
+        </TabsContent>
+        {/* Additional TabsContent blocks */}
+      </Tabs>
+    </div>
+  )
+```
 
----
+## Navigation State Management
 
-## V. ⚙️ Cursor Instructions
+### 1. NavigationState Interface
 
-- You may propose the complete page layout and implementation approach.
-- Use shadcn/ui + Tailwind CSS.
-- Use `lib/msgraph.ts` and `hooks/useSharePointDocs.ts` for clean separation of concerns.
-- Fallback to mock JSON response if MS Graph connection is not available during development.
-- Ensure compatibility with HB Report architecture, layout strategy, and code conventions.
+```typescript
+interface NavigationState {
+  category: string | null
+  tool: string | null
+  subTool: string | null
+  coreTab: string | null
+  staffingSubTab: string | null // Example sub-tab state
+}
+```
+
+### 2. State Management Pattern
+
+- Use `useState` for local navigation state
+- Implement tab change handlers: `handleCoreTabChange(tabId: string)`
+- Reset sub-tab states when switching main tabs
+- Maintain consistent state across component re-renders
+
+## Content Injection Process
+
+### 1. Component-Based Injection
+
+All content should be injected through dedicated components:
+
+```typescript
+// Main content rendering
+const renderCoreTabContent = () => {
+  switch (navigation.coreTab) {
+    case "dashboard":
+      return <DashboardContent />
+    case "checklists":
+      return <ChecklistsContent />
+    // ... other cases
+  }
+}
+```
+
+### 2. Sidebar Content Injection
+
+```typescript
+// Sidebar content function
+export const getProjectSidebarContent = (
+  projectData: any,
+  navigation: NavigationState,
+  projectMetrics: any,
+  activeTab?: string
+) => {
+  // Return sidebar JSX based on current state
+}
+```
+
+## Styling Guidelines
+
+### 1. Responsive Design Patterns
+
+```typescript
+// Desktop/Tablet Navigation
+<div className="hidden sm:block">
+  <div className="flex space-x-6 overflow-x-auto">
+    {/* Desktop tabs */}
+  </div>
+</div>
+
+// Mobile Dropdown
+<div className="sm:hidden py-3">
+  <Select value={currentTab} onValueChange={handleTabChange}>
+    {/* Mobile dropdown */}
+  </Select>
+</div>
+```
+
+### 2. Consistent Spacing and Layout
+
+- **Main containers**: `space-y-6 w-full max-w-full overflow-hidden`
+- **Card components**: `shadow-sm hover:shadow-md transition-shadow duration-200`
+- **Tab navigation**: `py-3 px-1 border-b-2 font-medium text-sm`
+- **Content areas**: `min-h-96 w-full max-w-full overflow-hidden`
+
+### 3. Color and Theme Consistency
+
+- **Active states**: `border-primary text-primary`
+- **Inactive states**: `border-transparent text-muted-foreground`
+- **Hover states**: `hover:text-foreground hover:border-gray-300`
+- **Focus modes**: Implemented with overlay pattern
+
+## Component Development Standards
+
+### 1. Component Structure Template
+
+```typescript
+interface ComponentProps {
+  projectId: string
+  projectData: any
+  userRole: string
+  user: any
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}
+
+const Component: React.FC<ComponentProps> = ({ projectId, projectData, userRole, user, activeTab, onTabChange }) => {
+  // Component logic
+  return <div className="space-y-4 w-full max-w-full">{/* Component content */}</div>
+}
+```
+
+### 2. Error Handling and Loading States
+
+```typescript
+if (!mounted) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  )
+}
+```
+
+### 3. Focus Mode Implementation
+
+```typescript
+// Focus mode toggle
+const handleFocusToggle = () => {
+  setIsFocusMode(!isFocusMode)
+}
+
+// Focus mode rendering
+if (isFocusMode) {
+  return (
+    <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="p-6 h-full w-full max-w-full">{mainContent}</div>
+      </div>
+    </div>
+  )
+}
+```
+
+## Integration Points
+
+### 1. Main App Integration
+
+- **Entry point**: `app/main-app/page.tsx`
+- **Content injection**: Through `ProjectContent` component
+- **Navigation sync**: Via `activeTab` and `onTabChange` props
+
+### 2. Financial Hub Integration
+
+```typescript
+// Conditional content rendering
+if (activeTab === "financial-management" || activeTab === "financial-hub") {
+  return <FinancialHubProjectContent {...props} />
+}
+```
+
+### 3. Authentication Integration
+
+```typescript
+// Auth context usage
+const { user, userRole } = useAuth()
+```
+
+## Data Flow Patterns
+
+### 1. Props Flow
+
+```
+MainApp → ProjectContent → ProjectControlCenterContent → TabContent
+```
+
+### 2. State Management
+
+- **Local state**: Navigation, UI states, form data
+- **Context state**: User authentication, global preferences
+- **Prop drilling**: Project data, user role, handlers
+
+### 3. Event Handling
+
+```typescript
+// Consistent event handler patterns
+const handleTabChange = (tabId: string) => {
+  setNavigation((prev) => ({ ...prev, coreTab: tabId }))
+  // Additional logic
+}
+```
+
+## Development Best Practices
+
+### 1. TypeScript Standards
+
+- Always define proper interfaces for component props
+- Use union types for tab IDs and navigation states
+- Implement proper null checking and optional chaining
+
+### 2. Performance Optimization
+
+- Implement lazy loading for heavy components
+- Use React.memo for expensive renders
+- Optimize re-renders with useCallback and useMemo
+
+### 3. Testing Considerations
+
+- Test files should mirror component structure
+- Mock all external dependencies
+- Test responsive behavior and state changes
+
+### 4. Accessibility Standards
+
+- Implement proper ARIA labels for navigation
+- Ensure keyboard navigation works correctly
+- Maintain focus management in dynamic content
+
+## File Modification Guidelines
+
+### 1. Adding New Tabs
+
+1. Update `CORE_TABS_CONFIG` in `constants/config.ts`
+2. Add case in `renderCoreTabContent()` function
+3. Update sidebar content functions
+4. Add corresponding metric and action definitions
+
+### 2. Modifying Existing Components
+
+1. Maintain existing prop interfaces
+2. Preserve responsive design patterns
+3. Update related sidebar content
+4. Test integration with main app
+
+### 3. Adding Sub-Tab Systems
+
+1. Follow the established Tabs component pattern
+2. Use consistent styling with `TabsList` and `TabsTrigger`
+3. Implement proper content organization
+4. Maintain mobile responsiveness
+
+## Integration with v3.0 Architecture
+
+### 1. Main App Layout Integration
+
+- Project page integrates with main app through controlled props
+- Sidebar content is injected through dedicated functions
+- Navigation state is maintained separately from main app
+
+### 2. Shared Component Usage
+
+- Use components from `components/ui/` for consistency
+- Leverage shared layout components
+- Maintain styling consistency with v3.0 design system
+
+### 3. Future Extensibility
+
+- Component architecture supports easy addition of new tabs
+- Sidebar content system allows for dynamic content based on context
+- Responsive design patterns ensure mobile compatibility
+
+## Critical Implementation Notes
+
+1. **Always use `w-full max-w-full overflow-hidden`** for content containers
+2. **Maintain three-panel layout proportions**: 20% - 60% - 20%
+3. **Implement proper loading states** for all async operations
+4. **Use consistent tab navigation patterns** across all implementations
+5. **Preserve focus mode functionality** in all content components
+6. **Maintain sidebar content injection** through dedicated functions
+7. **Follow responsive design patterns** for mobile compatibility
+8. **Use TypeScript interfaces** for all component props and state
+
+This ruleset should be consulted for all project page development to ensure consistency with the v3.0 architecture and design standards.

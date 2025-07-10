@@ -1,0 +1,239 @@
+[
+  {
+    "id": "2525841",
+    "name": "Regional Medical Center Expansion",
+    "display_name": "Regional Medical Center Expansion",
+    "project_number": "2525841",
+    "location": "Charlotte, NC",
+    "estimated_value": 28500000,
+    "projected_finish_date": "2026-08-15T00:00:00Z",
+    "project_stage_name": "Bidding",
+    "status": "active",
+    "client": "Regional Healthcare System",
+    "delivery_method": "Design-Build",
+    "team_lead": "Sarah Chen",
+    "key_dates": {
+      "bid_due": "2025-03-15T17:00:00Z",
+      "project_start": "2025-05-01T00:00:00Z",
+      "project_end": "2026-08-15T00:00:00Z"
+    },
+    "packages": [],
+    "team": [
+      {
+        "id": "team-001",
+        "name": "Sarah Chen",
+        "email": "s.chen@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 234-5678",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-002",
+        "name": "Michael Rodriguez",
+        "email": "m.rodriguez@hedrickbrothers.com",
+        "role": "Coordinator",
+        "phone": "(555) 345-6789",
+        "department": "Project Management",
+        "isActive": true
+      },
+      {
+        "id": "team-003",
+        "name": "Jennifer Park",
+        "email": "j.park@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 456-7890",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-005",
+        "name": "Robert Johnson",
+        "email": "r.johnson@hedrickbrothers.com",
+        "role": "Executive Oversight",
+        "phone": "(555) 123-4567",
+        "department": "Executive",
+        "isActive": true
+      }
+    ],
+    "created_date": "2025-01-15T09:00:00Z",
+    "last_modified": "2025-01-30T17:00:00Z"
+  },
+  {
+    "id": "2525842",
+    "name": "Downtown Office Tower",
+    "display_name": "Downtown Office Tower",
+    "project_number": "2525842",
+    "location": "Raleigh, NC",
+    "estimated_value": 45200000,
+    "projected_finish_date": "2026-12-01T00:00:00Z",
+    "project_stage_name": "Bidding",
+    "status": "active",
+    "client": "Metro Development Group",
+    "delivery_method": "Design-Bid-Build",
+    "team_lead": "Jennifer Park",
+    "key_dates": {
+      "bid_due": "2025-04-01T17:00:00Z",
+      "project_start": "2025-06-15T00:00:00Z",
+      "project_end": "2026-12-01T00:00:00Z"
+    },
+    "packages": [],
+    "team": [
+      {
+        "id": "team-003",
+        "name": "Jennifer Park",
+        "email": "j.park@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 456-7890",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-006",
+        "name": "Lisa Wong",
+        "email": "l.wong@hedrickbrothers.com",
+        "role": "Coordinator",
+        "phone": "(555) 678-9012",
+        "department": "Project Management",
+        "isActive": true
+      },
+      {
+        "id": "team-007",
+        "name": "Mark Thompson",
+        "email": "m.thompson@hedrickbrothers.com",
+        "role": "Support",
+        "phone": "(555) 789-0123",
+        "department": "Field Operations",
+        "isActive": true
+      }
+    ],
+    "created_date": "2025-01-20T10:30:00Z",
+    "last_modified": "2025-01-28T14:45:00Z"
+  },
+  {
+    "id": "2525843",
+    "name": "University Research Facility",
+    "display_name": "University Research Facility",
+    "project_number": "2525843",
+    "location": "Durham, NC",
+    "estimated_value": 18750000,
+    "projected_finish_date": "2026-05-30T00:00:00Z",
+    "project_stage_name": "Bidding",
+    "status": "awarded",
+    "client": "Duke University",
+    "delivery_method": "CM at Risk",
+    "team_lead": "David Kim",
+    "key_dates": {
+      "bid_due": "2025-02-28T17:00:00Z",
+      "project_start": "2025-04-15T00:00:00Z",
+      "project_end": "2026-05-30T00:00:00Z"
+    },
+    "packages": [],
+    "team": [
+      {
+        "id": "team-004",
+        "name": "David Kim",
+        "email": "d.kim@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 567-8901",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-008",
+        "name": "Amanda Foster",
+        "email": "a.foster@hedrickbrothers.com",
+        "role": "Coordinator",
+        "phone": "(555) 890-1234",
+        "department": "Project Management",
+        "isActive": true
+      }
+    ],
+    "created_date": "2025-01-10T08:15:00Z",
+    "last_modified": "2025-01-25T16:20:00Z"
+  },
+  {
+    "id": "2525844",
+    "name": "Manufacturing Plant Expansion",
+    "display_name": "Manufacturing Plant Expansion",
+    "project_number": "2525844",
+    "location": "Greensboro, NC",
+    "estimated_value": 32400000,
+    "projected_finish_date": "2026-10-15T00:00:00Z",
+    "project_stage_name": "Bidding",
+    "status": "lost",
+    "client": "Advanced Manufacturing Inc.",
+    "delivery_method": "Design-Build",
+    "team_lead": "Michael Rodriguez",
+    "key_dates": {
+      "bid_due": "2025-01-31T17:00:00Z",
+      "project_start": "2025-04-01T00:00:00Z",
+      "project_end": "2026-10-15T00:00:00Z"
+    },
+    "packages": [],
+    "team": [
+      {
+        "id": "team-002",
+        "name": "Michael Rodriguez",
+        "email": "m.rodriguez@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 345-6789",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-009",
+        "name": "James Miller",
+        "email": "j.miller@hedrickbrothers.com",
+        "role": "Support",
+        "phone": "(555) 012-3456",
+        "department": "Field Operations",
+        "isActive": true
+      }
+    ],
+    "created_date": "2024-12-15T09:45:00Z",
+    "last_modified": "2025-01-31T18:00:00Z"
+  },
+  {
+    "id": "2525845",
+    "name": "Residential Complex Phase 2",
+    "display_name": "Residential Complex Phase 2",
+    "project_number": "2525845",
+    "location": "Asheville, NC",
+    "estimated_value": 22100000,
+    "projected_finish_date": "2026-09-30T00:00:00Z",
+    "project_stage_name": "Bidding",
+    "status": "withdrawn",
+    "client": "Mountain View Developments",
+    "delivery_method": "Design-Bid-Build",
+    "team_lead": "Lisa Wong",
+    "key_dates": {
+      "bid_due": "2025-03-01T17:00:00Z",
+      "project_start": "2025-05-15T00:00:00Z",
+      "project_end": "2026-09-30T00:00:00Z"
+    },
+    "packages": [],
+    "team": [
+      {
+        "id": "team-006",
+        "name": "Lisa Wong",
+        "email": "l.wong@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 678-9012",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-010",
+        "name": "Kevin Davis",
+        "email": "k.davis@hedrickbrothers.com",
+        "role": "Coordinator",
+        "phone": "(555) 234-5678",
+        "department": "Project Management",
+        "isActive": true
+      }
+    ],
+    "created_date": "2025-01-05T11:20:00Z",
+    "last_modified": "2025-01-29T12:30:00Z"
+  }
+]

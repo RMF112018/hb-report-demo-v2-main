@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, FileText, Clock, CheckCircle, DollarSign, Building, Users, Calendar, TrendingUp } from "lucide-react"
 import { AiaPayApplicationList } from "./AiaPayApplicationList"
 import { AiaPayApplicationForm } from "./AiaPayApplicationForm"
-import { AiaInsightsPanel } from "./AiaInsightsPanel"
+
 import type { AiaPayApplication, AiaApplicationSummary } from "@/types/aia-pay-application"
 
 interface PayApplicationProps {
@@ -180,13 +180,6 @@ export function PayApplication({ userRole, projectData }: PayApplicationProps) {
 
   return (
     <div className="space-y-6">
-      {/* HBI AI Insights */}
-      {activeView === "list" && (
-        <div data-tour="pay-app-hbi-insights">
-          <AiaInsightsPanel applications={applications} projectId={projectId} />
-        </div>
-      )}
-
       {/* Main Content */}
       {activeView === "list" ? (
         <div data-tour="pay-app-applications-list">

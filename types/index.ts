@@ -35,4 +35,7 @@ export interface ProjectData {
 }
 
 // Export productivity types
-export * from './productivity'
+export * from "./productivity"
+
+// Export activity feed types
+export * from "./activity-feed"

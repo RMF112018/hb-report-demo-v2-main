@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# bid-management-refactor.mdc
+
+## Overview
+Refactor the `BidManagement.tsx` file to match and surpass the Autodesk BuildingConnected "Projects" page functionality and interface. This refactor focuses on enabling interaction with bid packages, bid tabs, project files, messages, team members, bid forms, and reports through BuildingConnected's API and links to SharePoint folders via Microsoft Graph API.
+
+---
+
+## Tasks
+
+### 1. Refactor Entry Component: BidManagement.tsx
+- Break `BidManagement.tsx` into discrete sections:
+  - `BidPackageList.tsx`
+  - `BidMessagePanel.tsx`
+  - `BidFileManager.tsx`
+  - `BidFormPanel.tsx`
+  - `BidTeamManager.tsx`
+  - `BidReportsPanel.tsx`
+  - `BidProjectDetails.tsx`
+  - `BidTabPanel.tsx`
+- Implement tabbed layout or sidebar navigation for section toggling.
+
+### 2. Display Active Bidding Projects
+- Use project data from `data/mock/projects.json` where `project_stage_name === "Bidding"`.
+- Display `display_name`, `project_number`, `location`, `estimated_value`, and `projected_finish_date`.
+- Each project item should be clickable to enter a detailed project bid dashboard view.
+
+### 3. Bid Package Management
+- In `BidPackageList.tsx`, display bid packages (mock until API available).
+- Fields: package name, scope, due date, invited subs, assigned team, status.
+- Allow create/edit/delete of packages.
+- Match layout seen in BuildingConnected screenshots.
+
+### 4. Bid Tab Management
+- Reuse and enhance logic from `components/estimating/BidTabManagement.tsx`.
+- Enable creation of a bid tab per bid package.
+- Allow linking bidders and inputs to evaluation categories.
+- Support importing data, comparing bids, and exporting final tab.
+- Component name: `BidTabPanel.tsx`.
+- Maintain compatibility with package selection state from `BidPackageList.tsx`.
+
+### 5. Bid Messages Panel
+- Build `BidMessagePanel.tsx` to show message threads.
+- Mock inbox with correspondence by sub, thread view, subject, time.
+- Add composer to reply, mention, or tag bidders/team.
+- Link messages with bid packages.
+
+### 6. Bid File Manager
+- In `BidFileManager.tsx`, display folder and file tree.
+- Show uploaded documents with timestamp, uploader, access control.
+- Support uploading/downloading files via:
+  - BuildingConnected API (future phase)
+  - SharePoint integration (Microsoft Graph mock or live token)
+
+### 7. Bid Project Details Panel
+- `BidProjectDetails.tsx` shows editable form with fields:
+  - Project description, delivery method, location, team lead, key dates
+  - Option to sync changes back to central `projects.json`
+- Allow update and auto-fill from selected project.
+
+### 8. Bid Form Panel
+- `BidFormPanel.tsx` to view and edit assigned bid forms.
+- Link forms to bid packages.
+- Support importing existing bid form templates from `bidFormTemplates.json`
+- Add line-item preview and form builder toggle.
+
+### 9. Team Assignment View
+- `BidTeamManager.tsx`: allow role-based team assignment per project
+- Roles: Lead Estimator, Coordinator, Executive Oversight
+- Allow selection from demo user directory (mocked)
+- UI should allow removal or reassignment of team members
+
+### 10. Bid Reports
+- `BidReportsPanel.tsx`: allow users to generate or download reports:
+  - Invited vs. responded
+  - Bid tab comparisons
+  - Team assignment logs
+- Pull template types from BuildingConnected API
+
+### 11. Theme Compliance
+- Ensure dark/light mode support across all new components.
+- Use Tailwind `dark:` utilities and consistent spacing/layout.
+
+### 12. Role Visibility
+- Show full bid management module only for users with `Estimator`, `Admin`, or `Presentation` roles.
+- Display top-right badge reflecting active demo view (e.g., `Viewing Estimator Demo`).
+
+### 13. Routing
+- Route this view from within `/estimating/bid-center/[project_id]`
+- Nested routing allows scoped URL for each project bid view
+
+### 14. API Integration Phase (Future)
+- Replace mock components with live Autodesk BuildingConnected API endpoints:
+  - Projects
+  - Bid Packages
+  - Forms
+  - Bid Tabs
+  - Messages
+  - Reports
+- Authenticate via APS token and validate API limits and pagination.
+
+---
+
+## Notes
+- Follow the UI/UX logic displayed in the BuildingConnected screenshots.
+- Ensure full layout responsiveness and interaction polish.
+- Prioritize user onboarding via consistency with existing layout conventions in HB Intel.

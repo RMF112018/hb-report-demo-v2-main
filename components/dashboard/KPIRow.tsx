@@ -389,15 +389,15 @@ export function KPIRow({ userRole }: KPIRowProps) {
   const responsiveKpis = getResponsiveKPICount(kpis)
 
   return (
-    <div className="bg-card border-b border-border">
+    <div className="bg-card border-b border-gray-200 dark:border-gray-700">
       {/* Header with collapse toggle - always visible */}
-      <div className="flex items-center justify-between px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2">
+      <div className="flex items-center justify-between px-0 sm:px-0 lg:px-0 py-0 sm:py-0">
         {/* Collapse toggle - visible on tablet and mobile */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-6 w-6 p-0 lg:hidden hover:bg-muted/50"
+          className="h-5 w-5 p-0 lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800"
           title={isCollapsed ? "Show metrics" : "Hide metrics"}
         >
           {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
@@ -413,7 +413,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
         <div className="px-0 sm:px-0 lg:px-0 pb-0 sm:pb-0 lg:pb-0">
           {/* Mobile Layout - 3 KPIs filling full width */}
           {responsiveKpis.mobile.length > 0 && (
-            <div className="grid grid-cols-3 gap-1.5 sm:hidden">
+            <div className="grid grid-cols-3 gap-1 sm:hidden">
               {responsiveKpis.mobile.map((kpi, index) => (
                 <div key={index} className="min-w-0">
                   <KPIWidget
@@ -433,7 +433,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
 
           {/* Tablet Layout - 4 KPIs filling full width */}
           {responsiveKpis.tablet.length > 0 && (
-            <div className="hidden sm:grid lg:hidden grid-cols-4 gap-2">
+            <div className="hidden sm:grid lg:hidden grid-cols-4 gap-1.5">
               {responsiveKpis.tablet.map((kpi, index) => (
                 <div key={index} className="min-w-0">
                   <KPIWidget
@@ -454,7 +454,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
           {/* Desktop Layout - All KPIs in responsive grid */}
           {responsiveKpis.desktop.length > 0 && (
             <div
-              className="hidden lg:grid gap-2 xl:gap-3"
+              className="hidden lg:grid gap-1.5 xl:gap-2"
               style={{
                 gridTemplateColumns: `repeat(${Math.min(responsiveKpis.desktop.length, 6)}, 1fr)`,
               }}

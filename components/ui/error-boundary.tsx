@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import React from 'react'
+import React from "react"
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -23,7 +23,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo)
+    console.error("Error caught by ErrorBoundary:", error, errorInfo)
   }
 
   resetError = () => {
@@ -42,9 +42,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           <div className="text-center p-8 max-w-md">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h2>
-            <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please try refreshing the page.
-            </p>
+            <p className="text-gray-600 mb-6">We encountered an unexpected error. Please try refreshing the page.</p>
             <div className="space-y-3">
               <button
                 onClick={this.resetError}
@@ -53,7 +51,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 Try Again
               </button>
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  // In error boundaries, full page reload is acceptable as a last resort
+                  // since the React component tree has crashed and needs to be reset
+                  if (typeof window !== "undefined") {
+                    window.location.reload()
+                  }
+                }}
                 className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Refresh Page
@@ -61,9 +65,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             </div>
             {this.state.error && (
               <details className="mt-6 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                  Error Details
-                </summary>
+                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">Error Details</summary>
                 <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded border overflow-auto">
                   {this.state.error.toString()}
                 </pre>
@@ -78,4 +80,4 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-export { ErrorBoundary } 
+export { ErrorBoundary }

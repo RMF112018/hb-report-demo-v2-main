@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 import {
   DollarSign,
   TrendingUp,
@@ -15,11 +15,11 @@ import {
   Clock,
   Calendar,
   CheckCircle2,
-} from "lucide-react";
+} from "lucide-react"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import {
   AreaChart,
   Area,
@@ -33,11 +33,11 @@ import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
-} from "recharts";
+} from "recharts"
 
 interface FinancialOverviewProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
 // Mock data for financial overview
@@ -48,21 +48,21 @@ const cashFlowData = [
   { month: "Apr", inflow: 600000, outflow: 480000, net: 120000 },
   { month: "May", inflow: 580000, outflow: 520000, net: 60000 },
   { month: "Jun", inflow: 650000, outflow: 580000, net: 70000 },
-];
+]
 
 const budgetData = [
   { category: "Labor", budgeted: 2500000, actual: 2350000, variance: -150000 },
   { category: "Materials", budgeted: 1800000, actual: 1950000, variance: 150000 },
   { category: "Equipment", budgeted: 800000, actual: 750000, variance: -50000 },
   { category: "Subcontractors", budgeted: 1200000, actual: 1180000, variance: -20000 },
-];
+]
 
 const expenseBreakdown = [
   { name: "Labor", value: 2350000, color: "#3b82f6" },
   { name: "Materials", value: 1950000, color: "#10b981" },
   { name: "Equipment", value: 750000, color: "#f59e0b" },
   { name: "Subcontractors", value: 1180000, color: "#ef4444" },
-];
+]
 
 // Cost Control Data
 const costControlCategories = [
@@ -70,7 +70,7 @@ const costControlCategories = [
   { id: 2, name: "Materials", budgeted: 1800000, actual: 1950000, progress: 108 },
   { id: 3, name: "Equipment", budgeted: 800000, actual: 750000, progress: 94 },
   { id: 4, name: "Subcontractors", budgeted: 1200000, actual: 1180000, progress: 98 },
-];
+]
 
 // Payment Performance Analytics Data
 const paymentPerformanceData = {
@@ -107,7 +107,7 @@ const paymentPerformanceData = {
     { month: "May", onTimeApps: 89, avgApproval: 3.2, avgPayment: 12.1, compliance: 87 },
     { month: "Jun", onTimeApps: 94, avgApproval: 2.8, avgPayment: 11.9, compliance: 91 },
   ],
-};
+}
 
 const recentPaymentActivity = [
   {
@@ -142,7 +142,7 @@ const recentPaymentActivity = [
     status: "late",
     daysFromDue: 5,
   },
-];
+]
 
 /**
  * Financial Hub Overview Component
@@ -159,59 +159,25 @@ const recentPaymentActivity = [
  * @param projectData - Current project scope data
  */
 export default function FinancialOverview({ userRole, projectData }: FinancialOverviewProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState("6months");
+  const [selectedPeriod, setSelectedPeriod] = useState("6months")
 
   // Calculate key metrics
-  const totalBudget = budgetData.reduce((sum, item) => sum + item.budgeted, 0);
-  const totalActual = budgetData.reduce((sum, item) => sum + item.actual, 0);
-  const totalVariance = totalBudget - totalActual;
-  const variancePercentage = ((totalVariance / totalBudget) * 100).toFixed(1);
+  const totalBudget = budgetData.reduce((sum, item) => sum + item.budgeted, 0)
+  const totalActual = budgetData.reduce((sum, item) => sum + item.actual, 0)
+  const totalVariance = totalBudget - totalActual
+  const variancePercentage = ((totalVariance / totalBudget) * 100).toFixed(1)
 
-  const currentCashFlow = cashFlowData[cashFlowData.length - 1]?.net || 0;
-  const avgCashFlow = cashFlowData.reduce((sum, item) => sum + item.net, 0) / cashFlowData.length;
+  const currentCashFlow = cashFlowData[cashFlowData.length - 1]?.net || 0
+  const avgCashFlow = cashFlowData.reduce((sum, item) => sum + item.net, 0) / cashFlowData.length
 
   // Cost Control Metrics
-  const totalCostControlBudget = costControlCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
-  const totalCostControlActual = costControlCategories.reduce((sum, cat) => sum + cat.actual, 0);
-  const costControlVariance = totalCostControlBudget - totalCostControlActual;
-  const avgProgress = costControlCategories.reduce((sum, cat) => sum + cat.progress, 0) / costControlCategories.length;
+  const totalCostControlBudget = costControlCategories.reduce((sum, cat) => sum + cat.budgeted, 0)
+  const totalCostControlActual = costControlCategories.reduce((sum, cat) => sum + cat.actual, 0)
+  const costControlVariance = totalCostControlBudget - totalCostControlActual
+  const avgProgress = costControlCategories.reduce((sum, cat) => sum + cat.progress, 0) / costControlCategories.length
 
   return (
     <div className="space-y-6">
-
-      {/* Cost Control AI Insights */}
-      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800" data-tour="overview-hbi-insights">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-            <Activity className="h-5 w-5" />
-            HBI Cost Control Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Materials Over Budget</p>
-                <p className="text-xs text-amber-700 dark:text-amber-300">
-                  Materials category is 8.3% over budget. Consider renegotiating supplier contracts or sourcing
-                  alternatives.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Labor Efficiency</p>
-                <p className="text-xs text-amber-700 dark:text-amber-300">
-                  Labor costs are 6% under budget with strong productivity metrics. Current trajectory is optimal.
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2" data-tour="overview-charts">
         {/* Cash Flow Chart */}
@@ -286,8 +252,8 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
-                </Card>
+        </Card>
       </div>
     </div>
-  );
-} 
+  )
+}

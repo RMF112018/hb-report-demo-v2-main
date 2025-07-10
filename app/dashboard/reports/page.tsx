@@ -609,28 +609,6 @@ export default function ReportsPage() {
           {/* Main Content - Report Tabs */}
           <div className="xl:col-span-9">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <div className="flex items-center gap-1">
-                {availableTabs.map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                      activeTab === tab
-                        ? "text-primary border-primary bg-primary/5"
-                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                    }`}
-                  >
-                    {tab === "overview" && "Overview"}
-                    {tab === "create" && "Create"}
-                    {tab === "templates" && "Templates"}
-                    {tab === "approval" && "Approval"}
-                    {tab === "my-reports" && "My Reports"}
-                    {tab === "reports" && "Reports"}
-                    {tab === "analytics" && "Analytics"}
-                  </button>
-                ))}
-              </div>
-
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
                 {/* Stats Cards */}

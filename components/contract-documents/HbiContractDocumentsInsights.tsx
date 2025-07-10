@@ -18,7 +18,7 @@ import {
   BarChart3,
   RefreshCw,
   Scale,
-  Target
+  Target,
 } from "lucide-react"
 import type { ContractDocument, ContractDocumentsStats } from "./ContractDocumentsExportUtils"
 
@@ -61,12 +61,12 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
           "Schedule immediate legal review for all high-risk documents",
           "Prioritize renegotiation of problematic contract terms",
           "Implement additional approval processes for high-risk contracts",
-          "Develop risk mitigation strategies for each identified risk"
+          "Develop risk mitigation strategies for each identified risk",
         ],
         affectedDocuments: documents
-          .filter(doc => doc.riskLevel === "High")
-          .map(doc => doc.id)
-          .slice(0, 10)
+          .filter((doc) => doc.riskLevel === "High")
+          .map((doc) => doc.id)
+          .slice(0, 10),
       })
     }
 
@@ -77,27 +77,38 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case "critical": return "bg-red-100 text-red-800 border-red-200"
-      case "high": return "bg-orange-100 text-orange-800 border-orange-200"
-      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "low": return "bg-blue-100 text-blue-800 border-blue-200"
-      default: return "bg-gray-100 text-gray-800 border-gray-200"
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-200 dark:border-red-800"
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-800"
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-800"
+      case "low":
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-800"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
     }
   }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "opportunity": return <TrendingUp className="h-4 w-4" />
-      case "alert": return <AlertTriangle className="h-4 w-4" />
-      default: return <Brain className="h-4 w-4" />
+      case "opportunity":
+        return <TrendingUp className="h-4 w-4" />
+      case "alert":
+        return <AlertTriangle className="h-4 w-4" />
+      default:
+        return <Brain className="h-4 w-4" />
     }
   }
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "cost-savings": return <DollarSign className="h-4 w-4" />
-      case "risk-mitigation": return <Shield className="h-4 w-4" />
-      default: return <Brain className="h-4 w-4" />
+      case "cost-savings":
+        return <DollarSign className="h-4 w-4" />
+      case "risk-mitigation":
+        return <Shield className="h-4 w-4" />
+      default:
+        return <Brain className="h-4 w-4" />
     }
   }
 
@@ -117,7 +128,10 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               HBI Contract Documents Insights
             </span>
-            <Badge variant="outline" className="ml-2 border-blue-300 text-blue-700">
+            <Badge
+              variant="outline"
+              className="ml-2 border-blue-300 text-blue-700 dark:border-blue-600 dark:text-blue-400"
+            >
               <Sparkles className="h-3 w-3 mr-1" />
               AI-Powered
             </Badge>
@@ -127,7 +141,7 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="border-blue-200 hover:bg-blue-50"
+            className="border-blue-200 hover:bg-blue-50 dark:border-blue-600 dark:hover:bg-blue-900"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
@@ -161,7 +175,10 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
           <TabsContent value="insights" className="mt-4">
             <div className="space-y-4">
               {insights.map((insight) => (
-                <Card key={insight.id} className="border border-blue-200 bg-white/70 dark:bg-gray-800/70 hover:shadow-md transition-shadow">
+                <Card
+                  key={insight.id}
+                  className="border border-blue-200 bg-white/70 dark:bg-gray-800/70 dark:border-blue-700 hover:shadow-md transition-shadow"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -171,14 +188,15 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
                           <Badge variant="outline" className={getImpactColor(insight.impact)}>
                             {insight.impact}
                           </Badge>
-                          <Badge variant="outline" className="text-blue-600 border-blue-300">
+                          <Badge
+                            variant="outline"
+                            className="text-blue-600 border-blue-300 dark:text-blue-400 dark:border-blue-600"
+                          >
                             {insight.confidence}% confidence
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          {insight.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{insight.description}</p>
+                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-1">
                             {getCategoryIcon(insight.category)}
                             <span className="capitalize">{insight.category.replace("-", " ")}</span>
@@ -201,20 +219,25 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
                         variant="ghost"
                         size="sm"
                         onClick={() => setActiveInsight(activeInsight === insight.id ? null : insight.id)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900"
                       >
-                        <ChevronRight className={`h-4 w-4 transition-transform ${activeInsight === insight.id ? "rotate-90" : ""}`} />
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${activeInsight === insight.id ? "rotate-90" : ""}`}
+                        />
                       </Button>
                     </div>
-                    
+
                     {activeInsight === insight.id && (
-                      <div className="mt-4 pt-4 border-t border-blue-200">
+                      <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
                         <div className="space-y-3">
                           <div>
                             <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Action Items:</h4>
                             <ul className="space-y-1">
                               {insight.actionItems.map((item, index) => (
-                                <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <li
+                                  key={index}
+                                  className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
+                                >
                                   <CheckCircle className="h-3 w-3 text-blue-500 mt-0.5 flex-shrink-0" />
                                   {item}
                                 </li>
@@ -232,22 +255,22 @@ export function HbiContractDocumentsInsights({ documents, stats }: HbiContractDo
 
           <TabsContent value="alerts" className="mt-4">
             <div className="space-y-4">
-              {insights.filter(insight => insight.type === "alert").map((insight) => (
-                <Card key={insight.id} className="border border-red-200 bg-red-50/50 dark:bg-red-950/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <h3 className="font-semibold text-red-900 dark:text-red-100">{insight.title}</h3>
-                      <Badge variant="outline" className={getImpactColor(insight.impact)}>
-                        {insight.impact} priority
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-red-700 dark:text-red-300">
-                      {insight.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+              {insights
+                .filter((insight) => insight.type === "alert")
+                .map((insight) => (
+                  <Card key={insight.id} className="border border-red-200 bg-red-50/50 dark:bg-red-950/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-red-600" />
+                        <h3 className="font-semibold text-red-900 dark:text-red-100">{insight.title}</h3>
+                        <Badge variant="outline" className={getImpactColor(insight.impact)}>
+                          {insight.impact} priority
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-red-700 dark:text-red-300">{insight.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </TabsContent>
         </Tabs>

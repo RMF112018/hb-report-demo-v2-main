@@ -1,0 +1,255 @@
+[
+  {
+    "id": "pkg-001",
+    "projectId": "2525841",
+    "name": "Structural Steel Package",
+    "scope": "Structural Steel Fabrication and Erection",
+    "description": "Complete structural steel framework including beams, columns, and connections for the main building structure.",
+    "dueDate": "2025-02-15T17:00:00Z",
+    "invitedSubs": [
+      "American Steel Fabricators",
+      "Metro Steel Solutions",
+      "Precision Steel Works",
+      "Industrial Steel Corp",
+      "Summit Steel Contractors"
+    ],
+    "assignedTeam": [
+      {
+        "id": "team-001",
+        "name": "Sarah Chen",
+        "email": "s.chen@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 234-5678",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-002",
+        "name": "Michael Rodriguez",
+        "email": "m.rodriguez@hedrickbrothers.com",
+        "role": "Coordinator",
+        "phone": "(555) 345-6789",
+        "department": "Project Management",
+        "isActive": true
+      }
+    ],
+    "status": "responses-due",
+    "estimatedValue": 2450000,
+    "responses": [
+      {
+        "id": "resp-001",
+        "packageId": "pkg-001",
+        "vendorId": "vendor-001",
+        "vendorName": "American Steel Fabricators",
+        "bidAmount": 2380000,
+        "status": "submitted",
+        "submissionDate": "2025-01-28T14:30:00Z",
+        "validUntil": "2025-03-15T17:00:00Z",
+        "lineItems": [
+          {
+            "id": "line-001",
+            "description": "Structural Steel Beams",
+            "quantity": 125,
+            "unit": "TON",
+            "unitPrice": 4200,
+            "totalPrice": 525000
+          },
+          {
+            "id": "line-002",
+            "description": "Steel Columns",
+            "quantity": 85,
+            "unit": "TON",
+            "unitPrice": 4500,
+            "totalPrice": 382500
+          }
+        ],
+        "attachments": [],
+        "notes": "Includes shop drawings and PE stamp. 16-week delivery schedule.",
+        "evaluationScore": 88,
+        "riskLevel": "low"
+      }
+    ],
+    "requirements": [
+      "AISC Certified Fabricator",
+      "Minimum 10 years commercial experience",
+      "Bonded and insured ($5M minimum)",
+      "Shop drawings included",
+      "PE stamp required"
+    ],
+    "attachments": [
+      {
+        "id": "att-001",
+        "name": "structural-drawings.pdf",
+        "type": "application/pdf",
+        "size": 25600000,
+        "url": "/files/structural-drawings.pdf",
+        "uploadedBy": "Sarah Chen",
+        "uploadedDate": "2025-01-20T10:00:00Z"
+      }
+    ],
+    "created_date": "2025-01-20T10:00:00Z",
+    "last_modified": "2025-01-28T15:00:00Z"
+  },
+  {
+    "id": "pkg-002",
+    "projectId": "2525841",
+    "name": "MEP Package",
+    "scope": "Mechanical, Electrical, and Plumbing Systems",
+    "description": "Complete MEP installation including HVAC, electrical distribution, lighting, plumbing, and fire protection systems.",
+    "dueDate": "2025-02-20T17:00:00Z",
+    "invitedSubs": [
+      "Elite Mechanical Systems",
+      "Advanced Electrical Solutions",
+      "Premier MEP Contractors",
+      "Integrated Building Systems"
+    ],
+    "assignedTeam": [
+      {
+        "id": "team-003",
+        "name": "Jennifer Park",
+        "email": "j.park@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 456-7890",
+        "department": "Estimating",
+        "isActive": true
+      }
+    ],
+    "status": "sent",
+    "estimatedValue": 4200000,
+    "responses": [],
+    "requirements": [
+      "Licensed electrical and plumbing contractors",
+      "NECA and PHCC membership preferred",
+      "Minimum 5 years healthcare experience",
+      "BIM coordination capabilities",
+      "10-year warranty on equipment"
+    ],
+    "attachments": [
+      {
+        "id": "att-002",
+        "name": "mep-specifications.pdf",
+        "type": "application/pdf",
+        "size": 18400000,
+        "url": "/files/mep-specifications.pdf",
+        "uploadedBy": "Jennifer Park",
+        "uploadedDate": "2025-01-22T09:30:00Z"
+      }
+    ],
+    "created_date": "2025-01-22T09:30:00Z",
+    "last_modified": "2025-01-25T11:15:00Z"
+  },
+  {
+    "id": "pkg-003",
+    "projectId": "2525841",
+    "name": "Concrete Package",
+    "scope": "Cast-in-Place Concrete and Foundation Work",
+    "description": "Complete concrete work including foundations, slabs, walls, and architectural concrete elements.",
+    "dueDate": "2025-02-10T17:00:00Z",
+    "invitedSubs": [
+      "Superior Concrete Solutions",
+      "Metro Concrete Corp",
+      "Precision Concrete Works",
+      "Atlantic Concrete Contractors"
+    ],
+    "assignedTeam": [
+      {
+        "id": "team-001",
+        "name": "Sarah Chen",
+        "email": "s.chen@hedrickbrothers.com",
+        "role": "Lead Estimator",
+        "phone": "(555) 234-5678",
+        "department": "Estimating",
+        "isActive": true
+      },
+      {
+        "id": "team-004",
+        "name": "David Kim",
+        "email": "d.kim@hedrickbrothers.com",
+        "role": "Support",
+        "phone": "(555) 567-8901",
+        "department": "Field Operations",
+        "isActive": true
+      }
+    ],
+    "status": "under-review",
+    "estimatedValue": 1850000,
+    "responses": [
+      {
+        "id": "resp-002",
+        "packageId": "pkg-003",
+        "vendorId": "vendor-002",
+        "vendorName": "Superior Concrete Solutions",
+        "bidAmount": 1795000,
+        "status": "under-review",
+        "submissionDate": "2025-01-30T16:45:00Z",
+        "validUntil": "2025-03-10T17:00:00Z",
+        "lineItems": [
+          {
+            "id": "line-003",
+            "description": "Foundation Concrete",
+            "quantity": 450,
+            "unit": "CY",
+            "unitPrice": 185,
+            "totalPrice": 83250
+          },
+          {
+            "id": "line-004",
+            "description": "Slab on Grade",
+            "quantity": 12500,
+            "unit": "SF",
+            "unitPrice": 8.75,
+            "totalPrice": 109375
+          }
+        ],
+        "attachments": [],
+        "notes": "Includes pump truck and finishing. Ready mix from certified supplier.",
+        "evaluationScore": 92,
+        "riskLevel": "low"
+      },
+      {
+        "id": "resp-003",
+        "packageId": "pkg-003",
+        "vendorId": "vendor-003",
+        "vendorName": "Metro Concrete Corp",
+        "bidAmount": 1820000,
+        "status": "submitted",
+        "submissionDate": "2025-01-29T11:20:00Z",
+        "validUntil": "2025-03-08T17:00:00Z",
+        "lineItems": [
+          {
+            "id": "line-005",
+            "description": "Foundation Concrete",
+            "quantity": 450,
+            "unit": "CY",
+            "unitPrice": 190,
+            "totalPrice": 85500
+          }
+        ],
+        "attachments": [],
+        "notes": "Alternative pumping method proposed for efficiency.",
+        "evaluationScore": 86,
+        "riskLevel": "medium"
+      }
+    ],
+    "requirements": [
+      "ACI certified finishers",
+      "Minimum 8 years commercial experience",
+      "Insurance minimum $3M",
+      "References from similar projects",
+      "Quality control testing plan"
+    ],
+    "attachments": [
+      {
+        "id": "att-003",
+        "name": "concrete-specifications.pdf",
+        "type": "application/pdf",
+        "size": 15200000,
+        "url": "/files/concrete-specifications.pdf",
+        "uploadedBy": "Sarah Chen",
+        "uploadedDate": "2025-01-18T14:20:00Z"
+      }
+    ],
+    "created_date": "2025-01-18T14:20:00Z",
+    "last_modified": "2025-01-30T17:00:00Z"
+  }
+]

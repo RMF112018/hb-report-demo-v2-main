@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import React, { useState, useMemo } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible"
 import {
   AlertTriangle,
   Clock,
@@ -31,86 +31,94 @@ import {
   User,
   Pause,
   Ban,
-} from "lucide-react";
+} from "lucide-react"
 
 // Local type definitions
 interface PaymentComment {
-  id: string;
-  payAppId: string;
-  userId: string;
-  userName: string;
-  comment: string;
-  timestamp: string;
-  type: "general" | "approval" | "verification" | "compliance";
+  id: string
+  payAppId: string
+  userId: string
+  userName: string
+  comment: string
+  timestamp: string
+  type: "general" | "approval" | "verification" | "compliance"
 }
 
 interface PaymentApproval {
-  id: string;
-  payAppId: string;
-  reviewerId: string;
-  reviewerName: string;
-  status: "approved" | "pending" | "hold" | "rejected";
-  verifiedAmount: number;
-  originalAmount: number;
-  comments: string;
-  timestamp: string;
-  reason?: string;
+  id: string
+  payAppId: string
+  reviewerId: string
+  reviewerName: string
+  status: "approved" | "pending" | "hold" | "rejected"
+  verifiedAmount: number
+  originalAmount: number
+  comments: string
+  timestamp: string
+  reason?: string
 }
 
 interface ComplianceItem {
-  id: string;
-  payAppId: string;
-  type: "coi" | "lien_waiver" | "partial_lien_release" | "progress_photos" | "change_orders" | "safety_compliance" | "prevailing_wage" | "certified_payroll";
-  label: string;
-  required: boolean;
-  status: "pending" | "submitted" | "approved" | "rejected" | "expired";
-  description: string;
-  dueDate?: string;
-  submittedDate?: string;
-  approvedDate?: string;
-  externalSystemId?: string;
-  documentUrl?: string;
-  notes?: string;
+  id: string
+  payAppId: string
+  type:
+    | "coi"
+    | "lien_waiver"
+    | "partial_lien_release"
+    | "progress_photos"
+    | "change_orders"
+    | "safety_compliance"
+    | "prevailing_wage"
+    | "certified_payroll"
+  label: string
+  required: boolean
+  status: "pending" | "submitted" | "approved" | "rejected" | "expired"
+  description: string
+  dueDate?: string
+  submittedDate?: string
+  approvedDate?: string
+  externalSystemId?: string
+  documentUrl?: string
+  notes?: string
 }
 
 interface PayApplication {
-  id: string;
-  period: string;
-  amount: number;
-  status: "draft" | "submitted" | "approved" | "paid";
-  date: string;
-  retentionAmount: number;
-  netAmount: number;
-  percentComplete: number;
-  contractor: string;
-  complianceItems: ComplianceItem[];
-  comments: PaymentComment[];
-  approvals: PaymentApproval[];
-  currentApprovalStatus?: "approved" | "pending" | "hold" | "rejected";
-  verifiedAmount?: number;
+  id: string
+  period: string
+  amount: number
+  status: "draft" | "submitted" | "approved" | "paid"
+  date: string
+  retentionAmount: number
+  netAmount: number
+  percentComplete: number
+  contractor: string
+  complianceItems: ComplianceItem[]
+  comments: PaymentComment[]
+  approvals: PaymentApproval[]
+  currentApprovalStatus?: "approved" | "pending" | "hold" | "rejected"
+  verifiedAmount?: number
 }
 
 interface InvoicingProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
 export default function Invoicing({ userRole, projectData }: InvoicingProps) {
-  const [selectedPayApp, setSelectedPayApp] = useState<PayApplication | null>(null);
-  const [expandedPayApps, setExpandedPayApps] = useState<Set<string>>(new Set());
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [editingAmounts, setEditingAmounts] = useState<Set<string>>(new Set());
-  const [tempAmounts, setTempAmounts] = useState<Record<string, number>>({});
-  const [newComment, setNewComment] = useState("");
-  const [approvalStatuses, setApprovalStatuses] = useState<Record<string, string>>({});
-  const [approvalComments, setApprovalComments] = useState<Record<string, string>>({});
+  const [selectedPayApp, setSelectedPayApp] = useState<PayApplication | null>(null)
+  const [expandedPayApps, setExpandedPayApps] = useState<Set<string>>(new Set())
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [editingAmounts, setEditingAmounts] = useState<Set<string>>(new Set())
+  const [tempAmounts, setTempAmounts] = useState<Record<string, number>>({})
+  const [newComment, setNewComment] = useState("")
+  const [approvalStatuses, setApprovalStatuses] = useState<Record<string, string>>({})
+  const [approvalComments, setApprovalComments] = useState<Record<string, string>>({})
 
   // Mock current user (would come from auth context)
   const currentUser = {
     id: "user-001",
     name: "John Smith",
     role: "Project Manager",
-  };
+  }
 
   // Role-based data generation
   const getPayApplicationData = (): PayApplication[] => {
@@ -142,26 +150,26 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         contractor: "DEF Contractors",
         currentApprovalStatus: "hold",
       },
-    ];
+    ]
 
     // Role-based scaling
     const getScaledAmount = (baseAmount: number) => {
       switch (userRole) {
-        case 'project-manager':
-          return baseAmount * 0.5; // Single project scale
-        case 'project-executive':
-          return baseAmount * 2.5; // Portfolio scale
+        case "project-manager":
+          return baseAmount * 0.5 // Single project scale
+        case "project-executive":
+          return baseAmount * 2.5 // Portfolio scale
         default:
-          return baseAmount * 4.2; // Enterprise scale
+          return baseAmount * 4.2 // Enterprise scale
       }
-    };
+    }
 
     return baseApplications.map((app, index) => {
-      const baseAmount = [125000, 150000, 175000][index];
-      const amount = getScaledAmount(baseAmount);
-      const retentionAmount = amount * 0.05;
-      const netAmount = amount - retentionAmount;
-      const verifiedAmount = index === 1 ? amount * 0.987 : amount; // Second one has adjustment
+      const baseAmount = [125000, 150000, 175000][index]
+      const amount = getScaledAmount(baseAmount)
+      const retentionAmount = amount * 0.05
+      const netAmount = amount - retentionAmount
+      const verifiedAmount = index === 1 ? amount * 0.987 : amount // Second one has adjustment
 
       return {
         ...app,
@@ -172,9 +180,9 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         comments: generateComments(app.id!),
         approvals: generateApprovals(app.id!, amount, verifiedAmount),
         complianceItems: generateComplianceItems(app.id!),
-      } as PayApplication;
-    });
-  };
+      } as PayApplication
+    })
+  }
 
   const generateComments = (payAppId: string): PaymentComment[] => {
     const commentSets = {
@@ -220,10 +228,10 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
           type: "approval" as const,
         },
       ],
-    };
+    }
 
-    return commentSets[payAppId as keyof typeof commentSets] || [];
-  };
+    return commentSets[payAppId as keyof typeof commentSets] || []
+  }
 
   const generateApprovals = (payAppId: string, originalAmount: number, verifiedAmount: number): PaymentApproval[] => {
     return [
@@ -235,16 +243,20 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         status: payAppId === "PA-2024-002" ? "approved" : payAppId === "PA-2024-003" ? "hold" : "pending",
         verifiedAmount,
         originalAmount,
-        comments: payAppId === "PA-2024-002" ? "Approved with adjustment for incomplete electrical work" : 
-                 payAppId === "PA-2024-003" ? "Hold pending compliance resolution" : "",
+        comments:
+          payAppId === "PA-2024-002"
+            ? "Approved with adjustment for incomplete electrical work"
+            : payAppId === "PA-2024-003"
+            ? "Hold pending compliance resolution"
+            : "",
         timestamp: "2024-02-01T09:00:00Z",
         reason: payAppId === "PA-2024-003" ? "Compliance issues must be resolved" : undefined,
       },
-    ];
-  };
+    ]
+  }
 
   const generateComplianceItems = (payAppId: string): ComplianceItem[] => {
-    const baseItems = [
+    const baseItems: Pick<ComplianceItem, "id" | "payAppId" | "type" | "label" | "required" | "description">[] = [
       {
         id: `comp-${payAppId}-coi`,
         payAppId,
@@ -261,7 +273,7 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         required: true,
         description: "Conditional lien waiver for current period",
       },
-    ];
+    ]
 
     // Add conditional items based on pay app
     if (payAppId === "PA-2024-003") {
@@ -272,56 +284,63 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         label: "Partial Lien Release",
         required: true,
         description: "Partial lien release for previous period work",
-      });
+      })
     }
 
-    return baseItems.map(item => ({
+    return baseItems.map((item) => ({
       ...item,
-      status: payAppId === "PA-2024-003" && item.type === "partial_lien_release" ? "rejected" : 
-              payAppId === "PA-2024-002" ? "approved" : 
-              item.type === "coi" ? "approved" : "submitted",
+      status:
+        payAppId === "PA-2024-003" && item.type === "partial_lien_release"
+          ? "rejected"
+          : payAppId === "PA-2024-002"
+          ? "approved"
+          : item.type === "coi"
+          ? "approved"
+          : "submitted",
       submittedDate: "2024-01-25",
       approvedDate: payAppId === "PA-2024-002" || item.type === "coi" ? "2024-01-26" : undefined,
       dueDate: item.type === "lien_waiver" ? "2024-02-05" : undefined,
       externalSystemId: `${item.type.toUpperCase()}-2024-001`,
-      notes: payAppId === "PA-2024-003" && item.type === "partial_lien_release" ? 
-             "Incorrect notarization, resubmission required" : undefined,
-    }));
-  };
+      notes:
+        payAppId === "PA-2024-003" && item.type === "partial_lien_release"
+          ? "Incorrect notarization, resubmission required"
+          : undefined,
+    }))
+  }
 
-  const enhancedPayApplications = useMemo(() => getPayApplicationData(), [userRole]);
+  const enhancedPayApplications = useMemo(() => getPayApplicationData(), [userRole])
 
   // Initialize approval statuses
   React.useEffect(() => {
-    const initialStatuses: Record<string, string> = {};
+    const initialStatuses: Record<string, string> = {}
     enhancedPayApplications.forEach((payApp) => {
-      initialStatuses[payApp.id] = payApp.currentApprovalStatus || "pending";
-    });
-    setApprovalStatuses(initialStatuses);
-  }, [enhancedPayApplications]);
+      initialStatuses[payApp.id] = payApp.currentApprovalStatus || "pending"
+    })
+    setApprovalStatuses(initialStatuses)
+  }, [enhancedPayApplications])
 
   const handleAmountEdit = (payAppId: string) => {
-    const payApp = enhancedPayApplications.find((pa) => pa.id === payAppId);
+    const payApp = enhancedPayApplications.find((pa) => pa.id === payAppId)
     if (payApp) {
-      setTempAmounts({ ...tempAmounts, [payAppId]: payApp.verifiedAmount || payApp.amount });
-      setEditingAmounts(new Set([...editingAmounts, payAppId]));
+      setTempAmounts({ ...tempAmounts, [payAppId]: payApp.verifiedAmount || payApp.amount })
+      setEditingAmounts(new Set([...editingAmounts, payAppId]))
     }
-  };
+  }
 
   const handleAmountSave = (payAppId: string) => {
-    console.log(`Saving verified amount for ${payAppId}: ${tempAmounts[payAppId]}`);
-    setEditingAmounts(new Set([...editingAmounts].filter((id) => id !== payAppId)));
-  };
+    console.log(`Saving verified amount for ${payAppId}: ${tempAmounts[payAppId]}`)
+    setEditingAmounts(new Set([...editingAmounts].filter((id) => id !== payAppId)))
+  }
 
   const handleAmountCancel = (payAppId: string) => {
-    const newTempAmounts = { ...tempAmounts };
-    delete newTempAmounts[payAppId];
-    setTempAmounts(newTempAmounts);
-    setEditingAmounts(new Set([...editingAmounts].filter((id) => id !== payAppId)));
-  };
+    const newTempAmounts = { ...tempAmounts }
+    delete newTempAmounts[payAppId]
+    setTempAmounts(newTempAmounts)
+    setEditingAmounts(new Set([...editingAmounts].filter((id) => id !== payAppId)))
+  }
 
   const handleAddComment = (payAppId: string) => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) return
 
     const comment: PaymentComment = {
       id: `comment-${Date.now()}`,
@@ -331,19 +350,19 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
       comment: newComment,
       timestamp: new Date().toISOString(),
       type: "general",
-    };
+    }
 
-    console.log("Adding comment:", comment);
-    setNewComment("");
-  };
+    console.log("Adding comment:", comment)
+    setNewComment("")
+  }
 
   const handleApprovalStatusChange = (payAppId: string, status: string) => {
-    setApprovalStatuses({ ...approvalStatuses, [payAppId]: status });
-  };
+    setApprovalStatuses({ ...approvalStatuses, [payAppId]: status })
+  }
 
   const handleSubmitApproval = (payAppId: string) => {
-    const payApp = enhancedPayApplications.find((pa) => pa.id === payAppId);
-    if (!payApp) return;
+    const payApp = enhancedPayApplications.find((pa) => pa.id === payAppId)
+    if (!payApp) return
 
     const approval: PaymentApproval = {
       id: `approval-${Date.now()}`,
@@ -355,159 +374,128 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
       originalAmount: payApp.amount,
       comments: approvalComments[payAppId] || "",
       timestamp: new Date().toISOString(),
-    };
+    }
 
-    console.log("Submitting approval:", approval);
-    setApprovalComments({ ...approvalComments, [payAppId]: "" });
-  };
+    console.log("Submitting approval:", approval)
+    setApprovalComments({ ...approvalComments, [payAppId]: "" })
+  }
 
   const getApprovalStatusColor = (status: string) => {
     switch (status) {
       case "approved":
-        return "text-green-600 bg-green-50 border-green-200";
+        return "text-green-600 bg-green-50 border-green-200"
       case "pending":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+        return "text-yellow-600 bg-yellow-50 border-yellow-200"
       case "hold":
-        return "text-orange-600 bg-orange-50 border-orange-200";
+        return "text-orange-600 bg-orange-50 border-orange-200"
       case "rejected":
-        return "text-red-600 bg-red-50 border-red-200";
+        return "text-red-600 bg-red-50 border-red-200"
       default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
+        return "text-gray-600 bg-gray-50 border-gray-200"
     }
-  };
+  }
 
   const getApprovalIcon = (status: string) => {
     switch (status) {
       case "approved":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-green-600" />
       case "pending":
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+        return <Clock className="h-4 w-4 text-yellow-600" />
       case "hold":
-        return <Pause className="h-4 w-4 text-orange-600" />;
+        return <Pause className="h-4 w-4 text-orange-600" />
       case "rejected":
-        return <Ban className="h-4 w-4 text-red-600" />;
+        return <Ban className="h-4 w-4 text-red-600" />
       default:
-        return <Clock className="h-4 w-4 text-gray-600" />;
+        return <Clock className="h-4 w-4 text-gray-600" />
     }
-  };
+  }
 
   const togglePayAppExpansion = (payAppId: string) => {
-    const newExpanded = new Set(expandedPayApps);
+    const newExpanded = new Set(expandedPayApps)
     if (newExpanded.has(payAppId)) {
-      newExpanded.delete(payAppId);
+      newExpanded.delete(payAppId)
     } else {
-      newExpanded.add(payAppId);
+      newExpanded.add(payAppId)
     }
-    setExpandedPayApps(newExpanded);
-  };
+    setExpandedPayApps(newExpanded)
+  }
 
   const getComplianceStatusColor = (status: string) => {
     switch (status) {
       case "approved":
-        return "text-green-600 bg-green-50 border-green-200";
+        return "text-green-600 bg-green-50 border-green-200"
       case "submitted":
-        return "text-blue-600 bg-blue-50 border-blue-200";
+        return "text-blue-600 bg-blue-50 border-blue-200"
       case "pending":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+        return "text-yellow-600 bg-yellow-50 border-yellow-200"
       case "rejected":
-        return "text-red-600 bg-red-50 border-red-200";
+        return "text-red-600 bg-red-50 border-red-200"
       case "expired":
-        return "text-red-600 bg-red-100 border-red-300";
+        return "text-red-600 bg-red-100 border-red-300"
       default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
+        return "text-gray-600 bg-gray-50 border-gray-200"
     }
-  };
+  }
 
   const getComplianceIcon = (status: string) => {
     switch (status) {
       case "approved":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-green-600" />
       case "submitted":
-        return <Clock className="h-4 w-4 text-blue-600" />;
+        return <Clock className="h-4 w-4 text-blue-600" />
       case "pending":
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+        return <Clock className="h-4 w-4 text-yellow-600" />
       case "rejected":
-        return <XCircle className="h-4 w-4 text-red-600" />;
+        return <XCircle className="h-4 w-4 text-red-600" />
       case "expired":
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
       default:
-        return <FileText className="h-4 w-4 text-gray-600" />;
+        return <FileText className="h-4 w-4 text-gray-600" />
     }
-  };
+  }
 
   const handleRefreshCompliance = async () => {
-    setIsRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsRefreshing(false);
-  };
+    setIsRefreshing(true)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    setIsRefreshing(false)
+  }
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
 
   // Calculate summary statistics
   const summaryStats = useMemo(() => {
-    const total = enhancedPayApplications.length;
-    const draft = enhancedPayApplications.filter((pa) => pa.status === "draft").length;
-    const submitted = enhancedPayApplications.filter((pa) => pa.status === "submitted").length;
-    const approved = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "approved").length;
-    const pending = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "pending").length;
-    const hold = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "hold").length;
-    const rejected = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "rejected").length;
-    const totalAmount = enhancedPayApplications.reduce((sum, pa) => sum + pa.amount, 0);
-    const totalVerified = enhancedPayApplications.reduce((sum, pa) => sum + (pa.verifiedAmount || pa.amount), 0);
+    const total = enhancedPayApplications.length
+    const draft = enhancedPayApplications.filter((pa) => pa.status === "draft").length
+    const submitted = enhancedPayApplications.filter((pa) => pa.status === "submitted").length
+    const approved = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "approved").length
+    const pending = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "pending").length
+    const hold = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "hold").length
+    const rejected = enhancedPayApplications.filter((pa) => pa.currentApprovalStatus === "rejected").length
+    const totalAmount = enhancedPayApplications.reduce((sum, pa) => sum + pa.amount, 0)
+    const totalVerified = enhancedPayApplications.reduce((sum, pa) => sum + (pa.verifiedAmount || pa.amount), 0)
 
-    return { total, draft, submitted, approved, pending, hold, rejected, totalAmount, totalVerified };
-  }, [enhancedPayApplications]);
+    return { total, draft, submitted, approved, pending, hold, rejected, totalAmount, totalVerified }
+  }, [enhancedPayApplications])
 
   return (
     <div className="space-y-6">
-      {/* HBI AI Insights */}
-      <Card className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950 border-blue-200 dark:border-blue-800">
-        <CardHeader className="pb-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-1.5 bg-white/20 rounded-lg">
-              <Brain className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              HBI Payment Approval Analysis
-              <p className="text-xs font-normal text-blue-100 mt-0.5">AI-Powered Approval Workflow & Risk Assessment</p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 p-4">
-          <Alert className="border-yellow-200 dark:border-yellow-800">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              <div className="space-y-1">
-                <p className="font-medium">HBI Approval Workflow Insights</p>
-                <p className="text-sm text-muted-foreground">
-                  {summaryStats.hold} payment{summaryStats.hold !== 1 ? 's' : ''} on hold due to compliance issues. Average approval time: 2.3 days.
-                </p>
-                <p className="text-sm font-medium">
-                  Recommendation: {summaryStats.hold > 0 ? 'Expedite compliance resolution to maintain payment schedule.' : 'All payments are progressing normally.'}
-                </p>
-              </div>
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
@@ -676,7 +664,9 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
                           )}
                         </div>
                         <div
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border ${getApprovalStatusColor(payApp.currentApprovalStatus || "pending")}`}
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border ${getApprovalStatusColor(
+                            payApp.currentApprovalStatus || "pending"
+                          )}`}
                         >
                           {getApprovalIcon(payApp.currentApprovalStatus || "pending")}
                           {payApp.currentApprovalStatus || "pending"}
@@ -753,7 +743,7 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
                                   placeholder="Add a comment..."
                                   onKeyPress={(e) => {
                                     if (e.key === "Enter") {
-                                      handleAddComment(payApp.id);
+                                      handleAddComment(payApp.id)
                                     }
                                   }}
                                 />
@@ -812,7 +802,9 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
                                       </div>
                                       <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
                                       {item.notes && (
-                                        <p className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">Note: {item.notes}</p>
+                                        <p className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">
+                                          Note: {item.notes}
+                                        </p>
                                       )}
                                     </div>
                                   </div>
@@ -837,5 +829,5 @@ export default function Invoicing({ userRole, projectData }: InvoicingProps) {
         </CardContent>
       </Card>
     </div>
-  );
-} 
+  )
+}

@@ -96,7 +96,6 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
   const [selectedAuthorization, setSelectedAuthorization] = useState<PaymentAuthorization | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [showMessageThread, setShowMessageThread] = useState(false)
-  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   // Mock data - in real app this would come from API
   const [paymentAuthorizations, setPaymentAuthorizations] = useState<PaymentAuthorization[]>([
@@ -779,114 +778,6 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
   return (
     <div className="space-y-6">
-      {/* HBI Accounts Payable Insights */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
-                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              HBI Accounts Payable Insights
-              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                AI-Powered
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
-              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            </Button>
-          </CardTitle>
-          {!isInsightsCollapsed && (
-            <CardDescription className="text-gray-600 dark:text-gray-400">
-              AI-powered analysis and strategic recommendations for payment authorization workflow
-            </CardDescription>
-          )}
-        </CardHeader>
-        {!isInsightsCollapsed && (
-          <CardContent className="space-y-4">
-            {/* Key AI Insights */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-                <AlertTriangle className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  <strong>Compliance Risk Alert:</strong> {data.pendingApprovals} payment authorizations require
-                  immediate attention to avoid payment delays.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200">
-                  <strong>Cash Flow Optimization:</strong> {formatCurrency(data.pendingAmount)} in pending
-                  authorizations can improve cash flow by 12% if processed this week.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800 dark:text-green-200">
-                  <strong>Process Efficiency:</strong> TIMBERSCAN integration showing 89% compliance rate with automated
-                  verification reducing processing time by 40%.
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            {/* Payment Intelligence Summary */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                Payment Authorization Intelligence
-              </h4>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-sm">Workflow Optimization</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    HBI identified potential 2.3-day reduction in payment processing time through automated compliance
-                    verification and parallel approval workflows.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-sm">Risk Mitigation</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Predictive analysis shows 94% reduction in payment delays through proactive compliance monitoring
-                    and early stakeholder notification.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">Smart Payment Prioritization</span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      AI-powered ranking system prioritizes payment authorizations based on cash flow impact, vendor
-                      relationships, and project criticality.
-                    </p>
-                  </div>
-                  <div className="text-2xl">💰</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        )}
-      </Card>
-
       {/* Dashboard Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>

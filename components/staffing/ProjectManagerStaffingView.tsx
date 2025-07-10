@@ -47,6 +47,7 @@ import spcrData from "@/data/mock/staffing/spcr.json"
 
 interface ProjectManagerStaffingViewProps {
   userRole?: string
+  projectId?: number
 }
 
 interface StaffMember {
@@ -66,7 +67,7 @@ interface StaffMember {
   }>
 }
 
-export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingViewProps) => {
+export const ProjectManagerStaffingView = ({ userRole, projectId: propProjectId }: ProjectManagerStaffingViewProps) => {
   const { toast } = useToast()
 
   // State management
@@ -78,8 +79,8 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Project Manager oversees Palm Beach Luxury Estate (project_id: 2525840)
-  const projectId = 2525840
+  // Use the prop projectId, or fall back to Palm Beach Luxury Estate (project_id: 2525840)
+  const projectId = propProjectId || 2525840
   const project = projectsData.find((p) => p.project_id === projectId)
 
   useEffect(() => {
@@ -199,8 +200,8 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
     <div className={cn("space-y-6", isFullScreen && "fixed inset-0 z-[9999] bg-background p-6 overflow-auto")}>
       {/* Main Content with Sidebar Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
-        {/* Sidebar - Hidden on mobile, shown on xl+ */}
-        <div className="hidden xl:block xl:col-span-3 space-y-4">
+        {/* Sidebar - Hidden for project page integration */}
+        <div className="hidden space-y-4">
           {/* Team Overview */}
           <Card>
             <CardHeader>
@@ -308,75 +309,13 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
           </Card>
         </div>
 
-        {/* Main Content - Team Management Tabs */}
-        <div className="xl:col-span-9">
-          {/* Statistics Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium">Team Size</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-2xl font-bold">{teamAnalytics.totalMembers}</div>
-                  <div className="text-xs text-muted-foreground">{teamAnalytics.seniorMembers} senior members</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium">Weekly Labor Cost</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-2xl font-bold">${(teamAnalytics.weeklyLaborCost / 1000).toFixed(0)}K</div>
-                  <div className="text-xs text-muted-foreground">Base rate only</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium">Avg Experience</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-2xl font-bold">{teamAnalytics.avgExperience.toFixed(1)}</div>
-                  <div className="text-xs text-muted-foreground">Years in industry</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium">SPCR Drafts</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-2xl font-bold">{pendingSpcrs}</div>
-                  <div className="text-xs text-muted-foreground">Ready to submit</div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Main Content - Team Management Tabs - Full Width */}
+        <div className="col-span-full">
+          {/* Team Management Header */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold">Team Management</h3>
+            <p className="text-sm text-muted-foreground">Project team and resource allocation</p>
           </div>
-
-          {/* HBI Insights Panel */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-blue-600" />
-                Team Management Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EnhancedHBIInsights config={pmInsights} cardId="pm-staffing" />
-            </CardContent>
-          </Card>
 
           {/* Statistics Widgets */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -433,8 +372,8 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
             </Card>
           </div>
 
-          {/* HBI Insights Panel */}
-          <Card>
+          {/* HBI Insights Panel - Hidden for project page integration */}
+          <Card className="hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-blue-600" />
@@ -448,49 +387,6 @@ export const ProjectManagerStaffingView = ({ userRole }: ProjectManagerStaffingV
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex items-center gap-1 mb-6">
-              <button
-                onClick={() => setActiveTab("team")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "team"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Team Management
-              </button>
-              <button
-                onClick={() => setActiveTab("timeline")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "timeline"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Timeline View
-              </button>
-              <button
-                onClick={() => setActiveTab("spcr")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "spcr"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                SPCR Creation
-              </button>
-              <button
-                onClick={() => setActiveTab("analytics")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "analytics"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Performance
-              </button>
-            </div>
-
             {/* Team Management Tab */}
             <TabsContent value="team" className="space-y-6">
               <Collapsible open={isTeamExpanded} onOpenChange={setIsTeamExpanded}>

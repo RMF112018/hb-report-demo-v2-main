@@ -1,441 +1,659 @@
-"use client";
+/**
+ * @fileoverview HB Intel Scheduler Overview Dashboard
+ * @module SchedulerOverview
+ * @version 3.0.0
+ * @author HB Development Team
+ * @since 2024-01-15
+ *
+ * Comprehensive analytical dashboard and monitoring center for project schedule
+ * with advanced analytics, AI insights, and SmartPM/nPlan-inspired features
+ */
 
-import { useState } from "react";
+"use client"
+
+import React, { useState, useMemo, useCallback } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 import {
-  Calendar,
-  Clock,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
-  CheckCircle,
   Target,
-  Activity,
   BarChart3,
-  PieChart,
+  GitBranch,
   Zap,
-  Users,
-  DollarSign,
+  Brain,
   Eye,
-} from "lucide-react";
+  Download,
+  Settings,
+  RefreshCw,
+  CheckCircle,
+  Diamond,
+  ArrowUpDown,
+  Share2,
+  ChevronUp,
+  ChevronDown,
+  MoreVertical,
+} from "lucide-react"
+import { format } from "date-fns"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  ComposedChart,
-} from "recharts";
-import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights";
-
+// Types
 interface SchedulerOverviewProps {
-  userRole: string;
-  projectData: any;
+  userRole: string
+  projectData: any
 }
 
-// Mock schedule performance data
-const schedulePerformanceData = [
-  { month: "Jan 2024", planned: 85, actual: 82, variance: -3, activities: 156 },
-  { month: "Feb 2024", planned: 78, actual: 81, variance: 3, activities: 143 },
-  { month: "Mar 2024", planned: 92, actual: 89, variance: -3, activities: 167 },
-  { month: "Apr 2024", planned: 88, actual: 91, variance: 3, activities: 158 },
-  { month: "May 2024", planned: 95, actual: 92, variance: -3, activities: 174 },
-  { month: "Jun 2024", planned: 90, actual: 94, variance: 4, activities: 162 },
-];
+interface ScheduleMetric {
+  label: string
+  value: string | number
+  trend: "up" | "down" | "stable"
+  delta: string
+  status: "good" | "warning" | "critical"
+  description: string
+}
 
-const milestoneProgressData = [
-  { name: "Foundation", progress: 100, status: "completed", daysVariance: 2 },
-  { name: "Structure", progress: 85, status: "active", daysVariance: -3 },
-  { name: "MEP Rough-in", progress: 60, status: "active", daysVariance: 0 },
-  { name: "Interior Finishes", progress: 25, status: "upcoming", daysVariance: 0 },
-  { name: "Final Inspections", progress: 0, status: "upcoming", daysVariance: 0 },
-];
+interface AIInsight {
+  id: string
+  type: "risk" | "optimization" | "quality" | "performance"
+  priority: "high" | "medium" | "low"
+  title: string
+  description: string
+  impact: string
+  recommendation: string
+  confidence: number
+  timestamp: Date
+  linkedActivities: string[]
+}
 
-const criticalPathMetrics = [
-  { metric: "Total Duration", value: "312 days", change: "+8 days", trend: "up" },
-  { metric: "Critical Activities", value: "47", change: "-2", trend: "down" },
-  { metric: "Total Float", value: "14 days", change: "-3 days", trend: "down" },
-  { metric: "Near Critical", value: "23", change: "+5", trend: "up" },
-];
-
-const resourceUtilizationData = [
-  { resource: "Project Manager", utilization: 95, availability: 100, efficiency: 88 },
-  { resource: "Superintendent", utilization: 88, availability: 100, efficiency: 92 },
-  { resource: "Foremen", utilization: 92, availability: 85, efficiency: 85 },
-  { resource: "Skilled Labor", utilization: 78, availability: 90, efficiency: 82 },
-  { resource: "Equipment", utilization: 85, availability: 95, efficiency: 90 },
-];
-
-const activityStatusData = [
-  { name: "Completed", value: 425, color: "#10b981" },
-  { name: "In Progress", value: 156, color: "#3b82f6" },
-  { name: "Not Started", value: 666, color: "#f59e0b" },
-  { name: "On Hold", value: 23, color: "#ef4444" },
-];
-
-// HBI Schedule Insights
-const scheduleInsights = [
+// Mock AI Insights
+const mockAIInsights: AIInsight[] = [
   {
-    id: "sched-1",
+    id: "insight-001",
     type: "risk",
-    severity: "high",
-    title: "Critical Path Delay Risk",
-    text: "Weather-dependent activities show 78% probability of 5-day delay in Q2.",
-    action: "Implement weather contingency plan and reschedule non-critical activities.",
-    confidence: 92,
-    relatedMetrics: ["Critical Path", "Weather Risk", "Float Management"],
-  },
-  {
-    id: "sched-2",
-    type: "opportunity",
-    severity: "medium",
-    title: "Resource Optimization Potential",
-    text: "AI identifies opportunity to reduce project duration by 12 days through resource reallocation.",
-    action: "Implement recommended resource shifts during weeks 15-18.",
-    confidence: 87,
-    relatedMetrics: ["Resource Allocation", "Critical Path", "Cost Efficiency"],
-  },
-  {
-    id: "sched-3",
-    type: "alert",
-    severity: "high",
-    title: "MEP Coordination Bottleneck",
-    text: "Complex MEP coordination in Level 3 showing potential 8-day impact to milestone.",
-    action: "Expedite BIM coordination sessions and increase engineering support.",
-    confidence: 94,
-    relatedMetrics: ["MEP Progress", "BIM Coordination", "Milestone Risk"],
-  },
-  {
-    id: "sched-4",
-    type: "forecast",
-    severity: "medium",
-    title: "Substantial Completion Forecast",
-    text: "Predictive models indicate 89% probability of on-time substantial completion.",
-    action: "Monitor critical activities and maintain current resource allocation.",
+    priority: "high",
+    title: "Critical Path Shift Detected",
+    description:
+      "Foundation work (A007) is trending 5 days behind, potentially shifting critical path to structural steel sequence.",
+    impact: "May delay project completion by 3-5 days",
+    recommendation: "Consider accelerating foundation pour or parallel sequencing with steel delivery",
     confidence: 89,
-    relatedMetrics: ["Completion Date", "Resource Planning", "Risk Mitigation"],
+    timestamp: new Date("2025-12-30"),
+    linkedActivities: ["A007", "A008"],
   },
-];
+  {
+    id: "insight-002",
+    type: "optimization",
+    priority: "medium",
+    title: "Float Optimization Opportunity",
+    description:
+      "Site preparation activities have 8 days of free float that could be leveraged for weather contingency.",
+    impact: "Improved schedule resilience without cost impact",
+    recommendation: "Redistribute float to weather-dependent activities in Q1",
+    confidence: 76,
+    timestamp: new Date("2025-12-29"),
+    linkedActivities: ["A004", "A005"],
+  },
+]
 
-export default function SchedulerOverview({ userRole, projectData }: SchedulerOverviewProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState("6months");
+// KPI Calculation Functions
+const calculateKPIs = (category: string): ScheduleMetric[] => {
+  switch (category) {
+    case "overview":
+      return [
+        {
+          label: "Schedule Performance Index",
+          value: "96.0%",
+          trend: "up",
+          delta: "+2.0%",
+          status: "good",
+          description: "Ratio of earned value to planned value",
+        },
+        {
+          label: "Activities Completed",
+          value: "8/20",
+          trend: "up",
+          delta: "+2",
+          status: "good",
+          description: "Progress against total activity count",
+        },
+        {
+          label: "Critical Path Length",
+          value: "6",
+          trend: "down",
+          delta: "-1",
+          status: "good",
+          description: "Number of activities on critical path",
+        },
+        {
+          label: "Schedule Grade",
+          value: "B+",
+          trend: "stable",
+          delta: "0",
+          status: "good",
+          description: "Overall schedule quality assessment",
+        },
+      ]
+    case "performance":
+      return [
+        {
+          label: "Schedule Performance Index",
+          value: "96.0%",
+          trend: "up",
+          delta: "+2.0%",
+          status: "good",
+          description: "Ratio of earned value to planned value",
+        },
+        {
+          label: "Cost Performance Index",
+          value: "95.0%",
+          trend: "up",
+          delta: "+2.0%",
+          status: "good",
+          description: "Cost efficiency indicator",
+        },
+        {
+          label: "Compression Index",
+          value: "1.12",
+          trend: "up",
+          delta: "+0.05",
+          status: "warning",
+          description: "Schedule compression measurement",
+        },
+        {
+          label: "Forecast Accuracy",
+          value: "85%",
+          trend: "up",
+          delta: "+3%",
+          status: "good",
+          description: "Prediction accuracy over time",
+        },
+      ]
+    default:
+      return []
+  }
+}
 
-  // Calculate key metrics
-  const totalActivities = activityStatusData.reduce((sum, item) => sum + item.value, 0);
-  const completedActivities = activityStatusData.find(item => item.name === "Completed")?.value || 0;
-  const progressPercentage = Math.round((completedActivities / totalActivities) * 100);
-  const avgUtilization = Math.round(
-    resourceUtilizationData.reduce((sum, item) => sum + item.utilization, 0) / resourceUtilizationData.length
-  );
+// Components
+const KPICard: React.FC<{ metric: ScheduleMetric; isPinned?: boolean; onPin?: () => void }> = ({
+  metric,
+  isPinned = false,
+  onPin,
+}) => {
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case "up":
+        return <TrendingUp className="h-4 w-4 text-green-600" />
+      case "down":
+        return <TrendingDown className="h-4 w-4 text-red-600" />
+      default:
+        return <ArrowUpDown className="h-4 w-4 text-gray-600" />
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "text-green-600 dark:text-green-400";
-      case "active": return "text-blue-600 dark:text-blue-400";
-      case "upcoming": return "text-gray-600 dark:text-gray-400";
-      default: return "text-gray-600 dark:text-gray-400";
+      case "good":
+        return "text-green-600 bg-green-50 border-green-200"
+      case "warning":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200"
+      case "critical":
+        return "text-red-600 bg-red-50 border-red-200"
+      default:
+        return "text-gray-600 bg-gray-50 border-gray-200"
     }
-  };
+  }
 
-  const getTrendIcon = (trend: string) => {
-    return trend === "up" ? 
-      <TrendingUp className="h-3 w-3 text-red-500" /> : 
-      <TrendingDown className="h-3 w-3 text-green-500" />;
-  };
+  return (
+    <Card className={cn("relative", isPinned && "ring-2 ring-primary")}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium text-muted-foreground">{metric.label}</CardTitle>
+          {onPin && (
+            <Button variant="ghost" size="sm" onClick={onPin} className="h-6 w-6 p-0">
+              <Target className={cn("h-3 w-3", isPinned ? "text-primary" : "text-muted-foreground")} />
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-bold">{metric.value}</span>
+            <div className="flex items-center gap-1">
+              {getTrendIcon(metric.trend)}
+              <span className="text-sm text-muted-foreground">{metric.delta}</span>
+            </div>
+          </div>
+          <Badge variant="outline" className={cn("text-xs", getStatusColor(metric.status))}>
+            {metric.status.toUpperCase()}
+          </Badge>
+          <p className="text-xs text-muted-foreground">{metric.description}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+const AIInsightCard: React.FC<{ insight: AIInsight }> = ({ insight }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "risk":
+        return <AlertTriangle className="h-4 w-4 text-red-500" />
+      case "optimization":
+        return <Zap className="h-4 w-4 text-blue-500" />
+      case "quality":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "performance":
+        return <TrendingUp className="h-4 w-4 text-purple-500" />
+      default:
+        return <Brain className="h-4 w-4 text-gray-500" />
+    }
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200"
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  return (
+    <Card className="relative">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            {getTypeIcon(insight.type)}
+            <div>
+              <CardTitle className="text-sm font-medium">{insight.title}</CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className={cn("text-xs", getPriorityColor(insight.priority))}>
+                  {insight.priority.toUpperCase()}
+                </Badge>
+                <span className="text-xs text-muted-foreground">{insight.confidence}% confidence</span>
+              </div>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="h-6 w-6 p-0">
+            {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <p className="text-sm">{insight.description}</p>
+
+          {isExpanded && (
+            <div className="space-y-3 pt-3 border-t">
+              <div>
+                <h4 className="text-xs font-medium text-muted-foreground mb-1">IMPACT</h4>
+                <p className="text-sm">{insight.impact}</p>
+              </div>
+              <div>
+                <h4 className="text-xs font-medium text-muted-foreground mb-1">RECOMMENDATION</h4>
+                <p className="text-sm">{insight.recommendation}</p>
+              </div>
+              <div>
+                <h4 className="text-xs font-medium text-muted-foreground mb-1">LINKED ACTIVITIES</h4>
+                <div className="flex flex-wrap gap-1">
+                  {insight.linkedActivities.map((activity) => (
+                    <Badge key={activity} variant="secondary" className="text-xs">
+                      {activity}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+const ScheduleMonitor: React.FC = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Eye className="h-5 w-5" />
+            Schedule Monitor
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Timeline Overview */}
+          <div className="relative h-32 bg-muted rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Project Timeline</span>
+              <span className="text-sm text-muted-foreground">Sep 2025 - Mar 2026</span>
+            </div>
+
+            {/* Baseline vs Current */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="text-xs">Baseline</span>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                  <div className="h-full w-full bg-gray-400 rounded-full"></div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-xs">Current</span>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                  <div className="h-full w-4/5 bg-blue-500 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Milestone Status */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Diamond className="h-4 w-4 text-green-500" />
+                <span className="text-sm font-medium">On Track</span>
+              </div>
+              <div className="text-2xl font-bold text-green-600">5</div>
+              <p className="text-xs text-muted-foreground">Milestones</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Diamond className="h-4 w-4 text-yellow-500" />
+                <span className="text-sm font-medium">At Risk</span>
+              </div>
+              <div className="text-2xl font-bold text-yellow-600">2</div>
+              <p className="text-xs text-muted-foreground">Milestones</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Diamond className="h-4 w-4 text-red-500" />
+                <span className="text-sm font-medium">Delayed</span>
+              </div>
+              <div className="text-2xl font-bold text-red-600">1</div>
+              <p className="text-xs text-muted-foreground">Milestones</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <GitBranch className="h-4 w-4 text-purple-500" />
+                <span className="text-sm font-medium">Critical Path</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">6</div>
+              <p className="text-xs text-muted-foreground">Activities</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// Main Component
+const SchedulerOverview: React.FC<SchedulerOverviewProps> = ({ userRole, projectData }) => {
+  const [activeCategory, setActiveCategory] = useState("overview")
+  const [pinnedKPIs, setPinnedKPIs] = useState<string[]>([])
+  const [showAIInsights, setShowAIInsights] = useState(true)
+  const [dateRange, setDateRange] = useState("all")
+  const [activityFilter, setActivityFilter] = useState("all")
+
+  const currentKPIs = useMemo(() => calculateKPIs(activeCategory), [activeCategory])
+  const filteredInsights = useMemo(() => {
+    if (activeCategory === "overview") return mockAIInsights
+    return mockAIInsights.filter((insight) => insight.type === activeCategory)
+  }, [activeCategory])
+
+  const handlePinKPI = useCallback((kpiLabel: string) => {
+    setPinnedKPIs((prev) =>
+      prev.includes(kpiLabel) ? prev.filter((label) => label !== kpiLabel) : [...prev, kpiLabel]
+    )
+  }, [])
+
+  const categories = [
+    { id: "overview", label: "Overview", icon: BarChart3 },
+    { id: "performance", label: "Performance", icon: TrendingUp },
+    { id: "quality", label: "Schedule Quality", icon: CheckCircle },
+    { id: "risk", label: "Risk & Forecast", icon: AlertTriangle },
+    { id: "optimization", label: "Optimization", icon: Zap },
+  ]
+
+  const renderSelectedCategory = () => {
+    const activeCategory_data = categories.find((cat) => cat.id === activeCategory)
+    if (!activeCategory_data) return null
+    const IconComponent = activeCategory_data.icon
+    return (
+      <div className="flex items-center gap-2">
+        <IconComponent className="h-4 w-4" />
+        {activeCategory_data.label}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-tour="overview-key-metrics">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Schedule Progress</CardTitle>
-            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {progressPercentage}%
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              {completedActivities.toLocaleString()} of {totalActivities.toLocaleString()} activities
-            </p>
-            <Progress value={progressPercentage} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Critical Path</CardTitle>
-            <Target className="h-4 w-4 text-green-600 dark:text-green-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
-              312 days
-            </div>
-            <p className="text-xs text-green-600 dark:text-green-400">+8 days from baseline</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Resource Utilization</CardTitle>
-            <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-              {avgUtilization}%
-            </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">Average across all resources</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Schedule Health</CardTitle>
-            <Activity className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-              87%
-            </div>
-            <p className="text-xs text-orange-600 dark:text-orange-400">Overall schedule health score</p>
-          </CardContent>
-        </Card>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">HB Intel Scheduler</h2>
+          <p className="text-sm text-muted-foreground">Analytical dashboard and monitoring center</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="quarter">This Quarter</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={activityFilter} onValueChange={setActivityFilter}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Activities</SelectItem>
+              <SelectItem value="milestones">Milestones</SelectItem>
+              <SelectItem value="critical">Critical Path</SelectItem>
+              <SelectItem value="delayed">Delayed</SelectItem>
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="h-4 w-4 mr-2" />
+                Configure
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh Data
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share View
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* HBI Schedule Insights */}
-        <Card className="lg:col-span-1" data-tour="overview-hbi-insights">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-purple-600" />
-              HBI Schedule Insights
-            </CardTitle>
-            <CardDescription>AI-powered schedule analysis and recommendations</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <EnhancedHBIInsights config={scheduleInsights} cardId="scheduler-insights" />
-          </CardContent>
-        </Card>
-
-        {/* Schedule Performance Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              Schedule Performance Trend
-            </CardTitle>
-            <CardDescription>Planned vs actual progress with variance analysis</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={schedulePerformanceData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="month" />
-                <YAxis yAxisId="left" tickFormatter={(value) => `${value}%`} />
-                <YAxis yAxisId="right" orientation="right" tickFormatter={(value) => `${value}`} />
-                <Tooltip
-                  formatter={(value: number, name: string) => {
-                    if (name === "activities") return [`${value}`, "Activities"];
-                    return [`${value}%`, name];
-                  }}
-                  labelFormatter={(label) => `Period: ${label}`}
-                />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="planned"
-                  stackId="1"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.2}
-                  name="Planned"
-                />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="actual"
-                  stackId="2"
-                  stroke="#10b981"
-                  fill="#10b981"
-                  fillOpacity={0.4}
-                  name="Actual"
-                />
-                <Bar
-                  yAxisId="right"
-                  dataKey="activities"
-                  fill="#f59e0b"
-                  fillOpacity={0.6}
-                  name="Activities"
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Additional Analytics */}
-      <Tabs defaultValue="milestones" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="milestones" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Milestones
-          </TabsTrigger>
-          <TabsTrigger value="critical-path" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Critical Path
-          </TabsTrigger>
-          <TabsTrigger value="resources" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Resources
-          </TabsTrigger>
-          <TabsTrigger value="activities" className="flex items-center gap-2">
-            <PieChart className="h-4 w-4" />
-            Activities
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="milestones" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Milestone Progress</CardTitle>
-              <CardDescription>Key project milestones and their current status</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {milestoneProgressData.map((milestone, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        milestone.status === "completed" ? "bg-green-100 text-green-600" :
-                        milestone.status === "active" ? "bg-blue-100 text-blue-600" :
-                        "bg-gray-100 text-gray-600"
-                      }`}>
-                        {milestone.status === "completed" ? <CheckCircle className="h-4 w-4" /> :
-                         milestone.status === "active" ? <Clock className="h-4 w-4" /> :
-                         <Calendar className="h-4 w-4" />}
-                      </div>
-                      <div>
-                        <h4 className="font-medium">{milestone.name}</h4>
-                        <p className={`text-sm ${getStatusColor(milestone.status)}`}>
-                          {milestone.daysVariance !== 0 && 
-                            `${milestone.daysVariance > 0 ? '+' : ''}${milestone.daysVariance} days variance`}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right min-w-[100px]">
-                        <div className="text-sm font-medium">{milestone.progress}%</div>
-                        <Progress value={milestone.progress} className="w-20" />
-                      </div>
-                    </div>
+      {/* Category Navigation */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Analytics Category:</span>
+          <Select value={activeCategory} onValueChange={setActiveCategory}>
+            <SelectTrigger className="w-48">
+              <SelectValue>{renderSelectedCategory()}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  <div className="flex items-center gap-2">
+                    <category.icon className="h-4 w-4" />
+                    {category.label}
                   </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Pinned KPIs Banner */}
+      {pinnedKPIs.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Pinned KPIs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {currentKPIs
+                .filter((kpi) => pinnedKPIs.includes(kpi.label))
+                .map((kpi) => (
+                  <KPICard key={kpi.label} metric={kpi} isPinned={true} onPin={() => handlePinKPI(kpi.label)} />
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dynamic Content Based on Selected Category */}
+      <div className="space-y-6">
+        {activeCategory === "overview" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <ScheduleMonitor />
+
+              {/* KPI Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {currentKPIs.map((kpi) => (
+                  <KPICard
+                    key={kpi.label}
+                    metric={kpi}
+                    isPinned={pinnedKPIs.includes(kpi.label)}
+                    onPin={() => handlePinKPI(kpi.label)}
+                  />
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
 
-        <TabsContent value="critical-path" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {criticalPathMetrics.map((metric, index) => (
-              <Card key={index}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{metric.metric}</CardTitle>
+            {/* AI Insights Sidebar */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">HBI Insights</h3>
+                <div className="flex items-center gap-2">
+                  <Switch checked={showAIInsights} onCheckedChange={setShowAIInsights} />
+                  <Brain className="h-4 w-4" />
+                </div>
+              </div>
+
+              {showAIInsights && (
+                <div className="space-y-4">
+                  {filteredInsights.map((insight) => (
+                    <AIInsightCard key={insight.id} insight={insight} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "performance" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {currentKPIs.map((kpi) => (
+                <KPICard
+                  key={kpi.label}
+                  metric={kpi}
+                  isPinned={pinnedKPIs.includes(kpi.label)}
+                  onPin={() => handlePinKPI(kpi.label)}
+                />
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>SPI/CPI Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{metric.value}</div>
-                  <div className="flex items-center gap-1 text-xs">
-                    {getTrendIcon(metric.trend)}
-                    <span className={metric.trend === "up" ? "text-red-600" : "text-green-600"}>
-                      {metric.change}
-                    </span>
+                  <div className="h-64 flex items-center justify-center">
+                    <p className="text-muted-foreground">SPI/CPI Chart Visualization</p>
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </TabsContent>
 
-        <TabsContent value="resources" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resource Utilization Analysis</CardTitle>
-              <CardDescription>Current resource allocation and efficiency metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {resourceUtilizationData.map((resource, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{resource.resource}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {resource.utilization}% utilized
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="space-y-1">
-                        <div className="text-xs text-muted-foreground">Utilization</div>
-                        <Progress value={resource.utilization} className="h-2" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="text-xs text-muted-foreground">Availability</div>
-                        <Progress value={resource.availability} className="h-2" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="text-xs text-muted-foreground">Efficiency</div>
-                        <Progress value={resource.efficiency} className="h-2" />
-                      </div>
-                    </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Progress Velocity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center">
+                    <p className="text-muted-foreground">Velocity Chart Visualization</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
-        <TabsContent value="activities" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Status Distribution</CardTitle>
-              <CardDescription>Current status breakdown of all project activities</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart>
-                  <Pie
-                    data={activityStatusData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    dataKey="value"
-                    label={(entry) => `${entry.name}: ${entry.value}`}
-                  >
-                    {activityStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        {/* Other categories would render similar content structures */}
+        {activeCategory !== "overview" && activeCategory !== "performance" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {currentKPIs.map((kpi) => (
+                <KPICard
+                  key={kpi.label}
+                  metric={kpi}
+                  isPinned={pinnedKPIs.includes(kpi.label)}
+                  onPin={() => handlePinKPI(kpi.label)}
+                />
+              ))}
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{categories.find((c) => c.id === activeCategory)?.label} Dashboard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-center justify-center">
+                  <p className="text-muted-foreground">
+                    {categories.find((c) => c.id === activeCategory)?.label} content coming soon
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
-  );
-} 
+  )
+}
+
+export default SchedulerOverview

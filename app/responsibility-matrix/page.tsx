@@ -449,46 +449,6 @@ export default function ResponsibilityMatrixPage() {
                     </Button>
                   </CardHeader>
                   <CardContent className={isFullScreen ? "h-[calc(100vh-80px)] overflow-y-auto" : ""}>
-                    {/* Custom Tab Navigation */}
-                    <div className="flex items-center gap-1 mb-6" data-tour="responsibility-matrix-tabs">
-                      <button
-                        onClick={() => setActiveTab("team")}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                          activeTab === "team"
-                            ? "text-primary border-primary bg-primary/5"
-                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                        }`}
-                        data-tour="team-matrix-tab"
-                      >
-                        <Users className="h-4 w-4" />
-                        Team Matrix
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("prime-contract")}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                          activeTab === "prime-contract"
-                            ? "text-primary border-primary bg-primary/5"
-                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                        }`}
-                        data-tour="prime-contract-tab"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Prime Contract
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("subcontract")}
-                        className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                          activeTab === "subcontract"
-                            ? "text-primary border-primary bg-primary/5"
-                            : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                        }`}
-                        data-tour="subcontract-tab"
-                      >
-                        <Award className="h-4 w-4" />
-                        Subcontract
-                      </button>
-                    </div>
-
                     {/* Tab Content */}
                     <div className="space-y-6">
                       {activeTab === "team" && (
@@ -539,42 +499,6 @@ export default function ResponsibilityMatrixPage() {
               </Button>
             </CardHeader>
             <CardContent className="h-[calc(100vh-80px)] overflow-y-auto">
-              <div className="flex items-center gap-1 mb-6">
-                <button
-                  onClick={() => setActiveTab("team")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                    activeTab === "team"
-                      ? "text-primary border-primary bg-primary/5"
-                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                  }`}
-                >
-                  <Users className="h-4 w-4" />
-                  Team Matrix
-                </button>
-                <button
-                  onClick={() => setActiveTab("prime-contract")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                    activeTab === "prime-contract"
-                      ? "text-primary border-primary bg-primary/5"
-                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                  }`}
-                >
-                  <FileText className="h-4 w-4" />
-                  Prime Contract
-                </button>
-                <button
-                  onClick={() => setActiveTab("subcontract")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                    activeTab === "subcontract"
-                      ? "text-primary border-primary bg-primary/5"
-                      : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                  }`}
-                >
-                  <Award className="h-4 w-4" />
-                  Subcontract
-                </button>
-              </div>
-
               <div className="space-y-6">
                 {activeTab === "team" && (
                   <ResponsibilityMatrixIntegration userRole={user?.role as any} className="border-0 shadow-none p-0" />

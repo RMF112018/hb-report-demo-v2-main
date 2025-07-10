@@ -386,29 +386,6 @@ export const ExecutiveStaffingView = () => {
         <div className="xl:col-span-9">
           {/* Segmented Control */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex items-center gap-1 mb-6">
-              <button
-                onClick={() => setActiveTab("overview")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "overview"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveTab("assignments")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === "assignments"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                Assignments & SPCR Management
-              </button>
-            </div>
-
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               {/* Overview Collapsible Section */}

@@ -1,0 +1,134 @@
+{
+  "id": "project-executive-financial-layout",
+  "name": "Financial Review",
+  "description": "Project executive portfolio financial management and client reporting",
+  "role": "project-executive",
+  "cards": [
+    {
+      "id": "project-overview-pe",
+      "type": "project-overview",
+      "title": "Portfolio Overview",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectExecutiveMode": true,
+        "portfolioFocus": true,
+        "clientView": true
+      }
+    },
+    {
+      "id": "schedule-performance-pe",
+      "type": "schedule-performance",
+      "title": "Schedule Performance",
+      "size": "optimal",
+      "position": { "x": 6, "y": 0 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "portfolioView": true,
+        "clientReporting": true,
+        "multiProject": true
+      }
+    },
+    {
+      "id": "financial-status-pe",
+      "type": "financial-status",
+      "title": "Financial Status",
+      "size": "optimal",
+      "position": { "x": 12, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "projectExecutiveView": true,
+        "profitabilityFocus": true,
+        "portfolioMetrics": true
+      }
+    },
+    {
+      "id": "general-conditions-pe",
+      "type": "general-conditions",
+      "title": "General Conditions",
+      "size": "optimal",
+      "position": { "x": 16, "y": 0 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "portfolioLevel": true,
+        "clientImpact": true
+      }
+    },
+    {
+      "id": "contingency-analysis-pe",
+      "type": "contingency-analysis",
+      "title": "Contingency Analysis",
+      "size": "optimal",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "portfolioRisk": true,
+        "clientReporting": true,
+        "profitProtection": true
+      }
+    },
+    {
+      "id": "cash-flow-pe",
+      "type": "cash-flow",
+      "title": "Cash Flow Analysis",
+      "size": "optimal",
+      "position": { "x": 6, "y": 4 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectExecutiveLevel": true,
+        "portfolioView": true,
+        "clientCashFlow": true,
+        "forecastHorizon": "6-months"
+      }
+    },
+    {
+      "id": "procurement-pe",
+      "type": "procurement",
+      "title": "Procurement Management",
+      "size": "optimal",
+      "position": { "x": 14, "y": 4 },
+      "span": { "cols": 6, "rows": 6 },
+      "visible": true,
+      "config": {
+        "portfolioView": true,
+        "clientValue": true,
+        "strategicProcurement": true
+      }
+    },
+    {
+      "id": "draw-forecast-pe",
+      "type": "draw-forecast",
+      "title": "Draw Forecast",
+      "size": "optimal",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 10, "rows": 6 },
+      "visible": true,
+      "config": {
+        "projectExecutiveLevel": true,
+        "portfolioForecasting": true,
+        "clientPlanning": true
+      }
+    },
+    {
+      "id": "enhanced-hbi-insights-financial-pe",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Financial Forecast Insights",
+      "size": "optimal",
+      "position": { "x": 10, "y": 10 },
+      "span": { "cols": 10, "rows": 5 },
+      "visible": true,
+      "config": {
+        "focusArea": "financial-forecasting",
+        "projectExecutiveLevel": true,
+        "portfolioInsights": true
+      }
+    }
+  ]
+}

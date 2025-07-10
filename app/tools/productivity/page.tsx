@@ -288,38 +288,6 @@ export default function ProductivityPage() {
 
           {/* Main Content */}
           <div className="xl:col-span-9">
-            {/* Custom Tab Navigation */}
-            <div className="flex items-center gap-1 mb-6">
-              <button
-                onClick={() => setActiveTab("messages")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === "messages"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                <MessageSquare className="h-4 w-4" />
-                Messages
-                <Badge variant="secondary" className="ml-2">
-                  {stats.totalThreads}
-                </Badge>
-              </button>
-              <button
-                onClick={() => setActiveTab("tasks")}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === "tasks"
-                    ? "text-primary border-primary bg-primary/5"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                }`}
-              >
-                <CheckSquare className="h-4 w-4" />
-                Tasks
-                <Badge variant="secondary" className="ml-2">
-                  {stats.totalTasks}
-                </Badge>
-              </button>
-            </div>
-
             {/* Tab Content */}
             <div className="space-y-6">
               {activeTab === "messages" && (

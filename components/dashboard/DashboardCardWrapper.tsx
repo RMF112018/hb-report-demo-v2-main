@@ -6,9 +6,7 @@ import {
   Move,
   Settings2,
   MoreVertical,
-  Maximize2,
-  Minimize2,
-  ChevronRight,
+  Eye,
   TrendingUp,
   Briefcase,
   Brain,
@@ -21,7 +19,6 @@ import {
   Shield,
   Droplets,
   Package,
-  Eye,
   AlertTriangle as AlertTriangleIcon,
   Users,
   FileText,
@@ -30,7 +27,6 @@ import {
   CalendarDays,
   MessageSquare,
   Heart,
-  Expand,
   LayoutGrid,
 } from "lucide-react"
 import { DashboardCard } from "@/types/dashboard"
@@ -44,13 +40,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
+import { ProjectDetailsOverlay } from "./ProjectDetailsOverlay"
 
 interface DashboardCardWrapperProps {
   card: DashboardCard
   children: ReactNode
   onRemove?: (id: string) => void
   onConfigure?: (id: string) => void
-  onDrillDown?: (id: string, cardType: string) => void
   onSizeChange?: (id: string, size: string) => void
   dragHandleClass?: string
   isEditing?: boolean
@@ -194,38 +190,30 @@ const SMART_PRESETS = [
   { value: "full-width", label: "Full Width", description: "Maximum width cards", cols: 20, rows: 6, icon: "🖥️" },
 ]
 
-// Enhanced optimal size calculation
+// Get optimal size for cards (optimized for 16-column executive layout)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
-  const optimalSizes: Record<string, { cols: number; rows: number }> = {
-    "financial-review-panel": { cols: 18, rows: 7 },
-    "enhanced-hbi-insights": { cols: 10, rows: 5 },
-    "portfolio-overview": { cols: 12, rows: 4 },
-    "pipeline-analytics": { cols: 8, rows: 6 },
-    "market-intelligence": { cols: 6, rows: 6 },
-    "staffing-distribution": { cols: 10, rows: 6 },
-    "quality-control": { cols: 4, rows: 6 },
-    safety: { cols: 4, rows: 6 },
-    "project-overview": { cols: 6, rows: 6 },
-    "schedule-performance": { cols: 6, rows: 4 },
-    "financial-status": { cols: 4, rows: 4 },
-    "general-conditions": { cols: 4, rows: 4 },
-    "contingency-analysis": { cols: 6, rows: 6 },
-    "cash-flow": { cols: 8, rows: 6 },
-    procurement: { cols: 6, rows: 6 },
-    "draw-forecast": { cols: 10, rows: 6 },
-    "change-order-analysis": { cols: 8, rows: 8 },
-    closeout: { cols: 6, rows: 8 },
-    startup: { cols: 6, rows: 6 },
-    "critical-dates": { cols: 8, rows: 6 },
-    "field-reports": { cols: 6, rows: 8 },
-    rfi: { cols: 4, rows: 6 },
-    submittal: { cols: 4, rows: 6 },
-    health: { cols: 4, rows: 4 },
-    "schedule-monitor": { cols: 6, rows: 4 },
-    "bd-opportunities": { cols: 8, rows: 6 },
+  switch (cardType) {
+    case "financial-review-panel":
+      return { cols: 16, rows: 6 }
+    case "enhanced-hbi-insights":
+      return { cols: 8, rows: 5 }
+    case "portfolio-overview":
+      return { cols: 8, rows: 5 }
+    case "pipeline-analytics":
+      return { cols: 10, rows: 4 }
+    case "market-intelligence":
+      return { cols: 6, rows: 5 }
+    case "staffing-distribution":
+      return { cols: 8, rows: 5 }
+    case "quality-control":
+      return { cols: 4, rows: 5 }
+    case "safety":
+      return { cols: 4, rows: 5 }
+    case "cash-flow":
+      return { cols: 8, rows: 4 }
+    default:
+      return { cols: 6, rows: 4 }
   }
-
-  return optimalSizes[cardType] || { cols: 6, rows: 4 }
 }
 
 // Professional grid selector component
@@ -302,7 +290,6 @@ export const DashboardCardWrapper = ({
   children,
   onRemove,
   onConfigure,
-  onDrillDown,
   onSizeChange,
   dragHandleClass,
   isEditing = false,
@@ -310,6 +297,7 @@ export const DashboardCardWrapper = ({
 }: DashboardCardWrapperProps) => {
   const [showActions, setShowActions] = useState(false)
   const [showGridSelector, setShowGridSelector] = useState(false)
+  const [showDetailsOverlay, setShowDetailsOverlay] = useState(false)
   const category = getCardCategory(card.type)
   const theme = getCategoryTheme(category)
 
@@ -324,9 +312,9 @@ export const DashboardCardWrapper = ({
     setShowActions(!showActions)
   }
 
-  const handleDrillDown = (e: React.MouseEvent) => {
+  const handleViewDetails = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onDrillDown?.(card.id, card.type)
+    setShowDetailsOverlay(true)
   }
 
   const handleSizeChange = (cols: number, rows: number) => {
@@ -334,155 +322,171 @@ export const DashboardCardWrapper = ({
   }
 
   return (
-    <div
-      className={cn(
-        "dashboard-card dashboard-card-wrapper",
-        "relative group",
-        "bg-white dark:bg-gray-800",
-        "border border-gray-200 dark:border-gray-700",
-        "rounded-xl shadow-sm",
-        "transition-all duration-300 ease-in-out",
-        "hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-gray-900/50",
-        "hover:-translate-y-1",
-        theme.border,
-        theme.shadow,
-        isCompact && "text-sm",
-        !card.visible && "opacity-50",
-        dragHandleClass
-      )}
-    >
-      {/* HB Brand Accent Bar */}
+    <>
       <div
         className={cn(
-          "absolute top-0 left-0 right-0 h-1 rounded-t-xl",
-          "bg-gradient-to-r from-[#FA4616] to-[#ff8a5b]",
-          "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          "dashboard-card dashboard-card-wrapper",
+          "relative group",
+          "bg-white dark:bg-gray-800",
+          "border border-gray-200 dark:border-gray-700",
+          "rounded-xl shadow-sm",
+          "transition-all duration-300 ease-in-out",
+          "hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-gray-900/50",
+          "hover:-translate-y-1",
+          theme.border,
+          isCompact && "text-sm",
+          !card.visible && "opacity-50",
+          dragHandleClass,
+          card.type === "pipeline-analytics" && "pipeline-analytics"
         )}
-      />
-
-      {/* Professional Header */}
-      <div
-        className={cn(
-          "dashboard-card-header",
-          "flex items-center justify-between",
-          "px-4 py-3 border-b border-gray-100 dark:border-gray-700",
-          "bg-gray-50/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-t-xl",
-          isCompact && "px-3 py-2"
-        )}
+        style={{
+          boxShadow: `
+            inset 4px 0 0 rgb(0, 33, 165),
+            0 1px 3px rgba(0, 0, 0, 0.1)
+          `,
+        }}
       >
-        <div className="flex items-center gap-3">
-          {/* Card Icon */}
-          <div className="flex-shrink-0">{getCardIcon(card.type)}</div>
+        {/* HB Brand Accent Bar */}
+        <div
+          className={cn(
+            "absolute top-0 left-0 right-0 h-1 rounded-t-xl",
+            "bg-gradient-to-r from-[#FA4616] to-[#ff8a5b]",
+            "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          )}
+        />
 
-          {/* Card Title */}
-          <h3
-            className={cn(
-              "dashboard-card-title",
-              "font-semibold text-gray-900 dark:text-gray-100",
-              "truncate",
-              isCompact ? "text-sm" : "text-base"
-            )}
-          >
-            {card.title}
-          </h3>
-        </div>
+        {/* Professional Header */}
+        <div
+          className={cn(
+            "dashboard-card-header",
+            "flex items-center justify-between",
+            "px-4 py-3 border-b border-gray-100 dark:border-gray-700",
+            "rounded-t-xl",
+            isCompact && "px-3 py-2"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            {/* Card Icon */}
+            <div className="flex-shrink-0">{getCardIcon(card.type)}</div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1">
-          {/* Drill Down Button */}
-          {onDrillDown && (
+            {/* Card Title */}
+            <h3
+              className={cn(
+                "dashboard-card-title",
+                "font-semibold text-gray-900 dark:text-gray-100",
+                "truncate",
+                isCompact ? "text-sm" : "text-base"
+              )}
+            >
+              {card.title}
+            </h3>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1">
+            {/* View Details Button */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleDrillDown}
+              onClick={handleViewDetails}
               className={cn(
-                "h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                "h-7 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
                 "hover:bg-gray-100 dark:hover:bg-gray-700",
-                "text-gray-500 dark:text-gray-400"
+                "text-gray-500 dark:text-gray-400",
+                "text-xs font-medium"
               )}
-              title="Drill down"
+              title="View project details"
             >
-              <Expand className="h-3 w-3" />
+              <Eye className="h-3 w-3 mr-1" />
+              View Details
             </Button>
-          )}
 
-          {/* Edit Mode Actions */}
-          {isEditing && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
-                    "hover:bg-gray-100 dark:hover:bg-gray-700",
-                    "text-gray-500 dark:text-gray-400"
+            {/* Edit Mode Actions */}
+            {isEditing && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                      "hover:bg-gray-100 dark:hover:bg-gray-700",
+                      "text-gray-500 dark:text-gray-400"
+                    )}
+                    title="Card options"
+                  >
+                    <MoreVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Card Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+
+                  {onConfigure && (
+                    <DropdownMenuItem onClick={() => onConfigure(card.id)}>
+                      <Settings2 className="h-4 w-4 mr-2" />
+                      Configure
+                    </DropdownMenuItem>
                   )}
-                  title="Card options"
-                >
-                  <MoreVertical className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Card Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
 
-                {onConfigure && (
-                  <DropdownMenuItem onClick={() => onConfigure(card.id)}>
-                    <Settings2 className="h-4 w-4 mr-2" />
-                    Configure
+                  <DropdownMenuItem onClick={() => setShowGridSelector(true)}>
+                    <LayoutGrid className="h-4 w-4 mr-2" />
+                    Resize
                   </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  {onRemove && (
+                    <DropdownMenuItem onClick={() => onRemove(card.id)} className="text-red-600 dark:text-red-400">
+                      <X className="h-4 w-4 mr-2" />
+                      Remove
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Drag Handle */}
+            {isEditing && (
+              <div
+                className={cn(
+                  "cursor-grab active:cursor-grabbing",
+                  "opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                  "p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700",
+                  "text-gray-400 dark:text-gray-500"
                 )}
-
-                <DropdownMenuItem onClick={() => setShowGridSelector(true)}>
-                  <LayoutGrid className="h-4 w-4 mr-2" />
-                  Resize
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                {onRemove && (
-                  <DropdownMenuItem onClick={() => onRemove(card.id)} className="text-red-600 dark:text-red-400">
-                    <X className="h-4 w-4 mr-2" />
-                    Remove
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Drag Handle */}
-          {isEditing && (
-            <div
-              className={cn(
-                "cursor-grab active:cursor-grabbing",
-                "opacity-0 group-hover:opacity-100 transition-opacity duration-200",
-                "p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700",
-                "text-gray-400 dark:text-gray-500"
-              )}
-            >
-              <Move className="h-3 w-3" />
-            </div>
-          )}
+              >
+                <Move className="h-3 w-3" />
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Card Content */}
+        <div className={cn("dashboard-card-content", "flex-1 overflow-hidden")}>{children}</div>
+
+        {/* Grid Selector Overlay */}
+        {showGridSelector && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-50">
+            <GridSelector
+              currentCols={getCurrentDimensions().cols}
+              currentRows={getCurrentDimensions().rows}
+              onSizeChange={handleSizeChange}
+              onClose={() => setShowGridSelector(false)}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Card Content */}
-      <div className={cn("dashboard-card-content", "flex-1 overflow-hidden", isCompact ? "p-3" : "p-4")}>
-        {children}
-      </div>
-
-      {/* Grid Selector Overlay */}
-      {showGridSelector && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-50">
-          <GridSelector
-            currentCols={getCurrentDimensions().cols}
-            currentRows={getCurrentDimensions().rows}
-            onSizeChange={handleSizeChange}
-            onClose={() => setShowGridSelector(false)}
-          />
-        </div>
+      {/* Project Details Overlay */}
+      {showDetailsOverlay && (
+        <ProjectDetailsOverlay
+          cardId={card.id}
+          cardType={card.type}
+          cardTitle={card.title}
+          onClose={() => setShowDetailsOverlay(false)}
+        />
       )}
-    </div>
+    </>
   )
 }

@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   ChevronDown,
   ChevronRight,
@@ -21,13 +20,6 @@ import {
   Percent,
   Building2,
   Activity,
-  ChevronUp,
-  Zap,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Bot,
-  Target,
 } from "lucide-react"
 
 // Import mock data
@@ -73,7 +65,6 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
   const [filterVendor, setFilterVendor] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(new Set())
-  const [isInsightsCollapsed, setIsInsightsCollapsed] = useState(false)
 
   // Get project data - using project_id 2525804 as specified in requirements
   const currentProject = useMemo(() => {
@@ -215,131 +206,6 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
 
   return (
     <div className="space-y-6">
-      {/* HBI Job Cost Insights - General Analysis */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-gray-800 dark:text-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
-                <Zap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              HBI Job Cost Insights
-              <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                AI-Powered
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsInsightsCollapsed(!isInsightsCollapsed)}
-              className="text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              {isInsightsCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            </Button>
-          </CardTitle>
-          {!isInsightsCollapsed && (
-            <CardDescription className="text-gray-600 dark:text-gray-400">
-              AI analysis and strategic recommendations for job cost performance
-            </CardDescription>
-          )}
-        </CardHeader>
-        {!isInsightsCollapsed && (
-          <CardContent className="space-y-4">
-            {/* Key AI Insights */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-                <AlertTriangle className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  <strong>Cost Variance Alert:</strong> Division{" "}
-                  {groupedData.find(
-                    (g) =>
-                      Math.abs(g.totals.variance) === Math.max(...groupedData.map((d) => Math.abs(d.totals.variance)))
-                  )?.division || "01"}{" "}
-                  showing highest variance. HBI recommends immediate cost review and mitigation planning.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200">
-                  <strong>Spend Velocity:</strong> Current burn rate at {summaryMetrics.percentSpent.toFixed(1)}% of
-                  budget. Projected completion tracking {summaryMetrics.percentSpent > 85 ? "ahead" : "on"} schedule.
-                </AlertDescription>
-              </Alert>
-
-              <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800 dark:text-green-200">
-                  <strong>Commitment Analysis:</strong> Total commitments at{" "}
-                  {formatCurrency(summaryMetrics.totalCommitments)}.
-                  {summaryMetrics.totalCommitments / summaryMetrics.totalBudget > 0.8
-                    ? "High commitment ratio requires monitoring"
-                    : "Commitment levels within normal range"}
-                  .
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            {/* Job Cost Intelligence Summary */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                Job Cost Performance Intelligence
-              </h4>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-sm">Cost Performance Tracking</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    HBI identified {Math.abs(summaryMetrics.totalVariance) > 100000 ? "significant" : "minor"} cost
-                    variance of {formatCurrency(Math.abs(summaryMetrics.totalVariance))} across
-                    {groupedData.length} divisions with {summaryMetrics.percentSpent.toFixed(1)}% budget utilization.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-sm">Profitability Analysis</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Current profit margin at {summaryMetrics.profitMargin.toFixed(1)}% with financial health score of{" "}
-                    {summaryMetrics.financialHealth.toFixed(0)}%.
-                    {summaryMetrics.profitMargin > 10
-                      ? "Strong"
-                      : summaryMetrics.profitMargin > 5
-                      ? "Moderate"
-                      : "Low"}{" "}
-                    profitability outlook.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">
-                        Interactive Cost Analysis Available
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Drill down into divisional cost breakdowns, analyze category performance, and track variance
-                      trends using the expandable job cost table below.
-                    </p>
-                  </div>
-                  <div className="text-2xl">💰</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        )}
-      </Card>
-
       {/* Filters and Controls */}
       <Card>
         <CardHeader>

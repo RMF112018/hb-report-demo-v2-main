@@ -3,6 +3,7 @@
 import { DashboardCard } from "@/types/dashboard"
 import { DashboardGrid } from "./DashboardGrid"
 import { KPIRow } from "./KPIRow"
+import { useRouter } from "next/navigation"
 
 interface DashboardLayoutProps {
   cards: DashboardCard[]
@@ -17,6 +18,10 @@ interface DashboardLayoutProps {
   onToggleEdit?: () => void
   layoutDensity?: "compact" | "normal" | "spacious"
   userRole?: string
+  // Dashboard tabs props
+  dashboards?: Array<{ id: string; name: string }>
+  currentDashboardId?: string
+  onDashboardSelect?: (dashboardId: string) => void
 }
 
 /**
@@ -38,39 +43,38 @@ export function DashboardLayout({
   onToggleEdit,
   layoutDensity = "normal",
   userRole,
+  dashboards = [],
+  currentDashboardId,
+  onDashboardSelect,
 }: DashboardLayoutProps) {
+  const router = useRouter()
+
+  // Handle dashboard tab click
+  const handleDashboardTabClick = (dashboardId: string) => {
+    onDashboardSelect?.(dashboardId)
+  }
   // Determine spacing based on layout density - consistent horizontal and vertical
   const getSpacingClass = () => {
     switch (layoutDensity) {
       case "compact":
-        return "gap-3 sm:gap-3 lg:gap-4"
+        return "gap-2 sm:gap-2 lg:gap-3"
       case "spacious":
-        return "gap-6 sm:gap-6 lg:gap-8"
+        return "gap-4 sm:gap-4 lg:gap-5"
       default:
-        return "gap-4 sm:gap-4 lg:gap-6"
+        return "gap-3 sm:gap-3 lg:gap-4"
     }
   }
 
   const isCompact = layoutDensity === "compact"
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden">
-      {/* Enhanced Background with depth and texture */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(var(--chart-1),0.05),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(var(--chart-2),0.05),transparent_50%)]" />
-
-      {/* Subtle grid pattern for texture */}
-      <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-        <div className="h-full w-full bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
-      </div>
-
+    <div className="w-full relative">
       {/* Edit mode overlay */}
       {isEditing && <div className="absolute inset-0 bg-primary/5 backdrop-blur-[0.5px] pointer-events-none" />}
 
       <div className="relative z-10">
         {/* KPI Row with enhanced styling */}
-        <div data-tour="kpi-widgets" className="mb-6">
+        <div data-tour="kpi-widgets" className="mb-4">
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
             <div className="mx-auto max-w-[1920px]">
               <KPIRow userRole={userRole} />
@@ -102,19 +106,15 @@ export function DashboardLayout({
       {/* Enhanced Edit Mode Indicator */}
       {isEditing && (
         <div className="fixed bottom-4 right-4 z-50">
-          <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-primary/20 text-sm font-medium">
+          <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-lg border border-primary/20 text-xs font-medium">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-foreground/80 rounded-full animate-pulse"></div>
-              <span className="hidden sm:inline">Edit Mode Active</span>
-              <span className="sm:hidden">Editing</span>
+              <div className="w-1.5 h-1.5 bg-primary-foreground/80 rounded-full animate-pulse"></div>
+              <span className="hidden sm:inline">Edit Mode</span>
+              <span className="sm:hidden">Edit</span>
             </div>
           </div>
         </div>
       )}
-
-      {/* Visual enhancement: Floating elements for depth */}
-      <div className="fixed top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl pointer-events-none opacity-60" />
-      <div className="fixed bottom-20 right-10 w-40 h-40 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-3xl pointer-events-none opacity-60" />
     </div>
   )
 }

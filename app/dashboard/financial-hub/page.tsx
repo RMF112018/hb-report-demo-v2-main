@@ -718,31 +718,6 @@ export default function FinancialHubPage() {
                 </Button>
               </div>
             </div>
-
-            {/* Financial Hub Controls Row */}
-            <div
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              data-tour="financial-hub-controls"
-            >
-              {/* Financial Hub Tabs */}
-              <div className="flex items-center gap-1" data-tour="financial-hub-navigation">
-                {availableModules.map((module) => (
-                  <button
-                    key={module.id}
-                    onClick={() => setActiveTab(module.id)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-                      activeTab === module.id
-                        ? "text-primary border-primary bg-primary/5"
-                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-muted-foreground/50"
-                    }`}
-                    data-tour={`financial-hub-tab-${module.id}`}
-                  >
-                    <module.icon className="h-3 w-3 flex-shrink-0" />
-                    <span className="hidden sm:inline">{module.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
