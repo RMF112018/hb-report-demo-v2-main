@@ -136,6 +136,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Only access localStorage after client-side hydration
     if (typeof window !== "undefined") {
       try {
+        // AUTO-CLEAR LOCALSTORAGE ON NEW DEV SESSIONS
+        if (process.env.NODE_ENV === "development") {
+          // Check if auto-clear is disabled (for persistent development testing)
+          const autoCleanDisabled = localStorage.getItem("hb-disable-auto-clean") === "true"
+
+          // Check if this is a fresh browser session (no sessionStorage marker)
+          const hasActiveSession = sessionStorage.getItem("hb-dev-session-active")
+
+          if (!hasActiveSession && !autoCleanDisabled) {
+            console.log("🔄 Fresh development session detected - clearing localStorage")
+
+            // Clear all HB Report related localStorage data
+            const keysToRemove = [
+              "hb-demo-user", // User authentication data
+              "hb-viewing-as", // Presentation viewing role
+              "selectedProject", // Selected project
+              "hb-forecast-data", // Financial forecast data
+              "hb-forecast-acknowledgments", // Forecast acknowledgments
+              "hb-forecast-previous-methods", // Previous forecast methods
+              "hb-tours-completed", // Completed tours
+              "hb-tour-available", // Tour availability setting
+              "staffing-needing-filter", // Staffing filter preference
+              "hb-disable-auto-login", // Auto-login disable flag
+              // Note: hb-disable-auto-clean is preserved to maintain developer preferences
+            ]
+
+            // Remove predefined keys
+            keysToRemove.forEach((key) => {
+              localStorage.removeItem(key)
+            })
+
+            // Clear all tour-related data, report configuration data, and responsibility matrix data
+            const allKeys = Object.keys(localStorage)
+            allKeys.forEach((key) => {
+              if (
+                key.startsWith("report-config-") ||
+                key.startsWith("hb-tour-shown-") ||
+                key.startsWith("hb-welcome-") ||
+                key.startsWith("responsibility-matrix-")
+              ) {
+                localStorage.removeItem(key)
+              }
+            })
+
+            // Mark this session as active to prevent clearing on subsequent page loads
+            sessionStorage.setItem("hb-dev-session-active", "true")
+            console.log("✅ localStorage cleared - starting fresh development session")
+            console.log(
+              "💡 To disable auto-clear in development: localStorage.setItem('hb-disable-auto-clean', 'true')"
+            )
+          } else if (autoCleanDisabled) {
+            console.log("🔒 Auto-clean disabled - preserving localStorage across dev sessions")
+            // Still mark session as active
+            sessionStorage.setItem("hb-dev-session-active", "true")
+          }
+        }
+
         // Check if we want to disable auto-login (for testing)
         const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
 

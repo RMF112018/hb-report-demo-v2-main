@@ -336,6 +336,19 @@ export default function MainApplicationPage() {
     }
 
     if (selectedProject && selectedProjectData) {
+      // Check if project is in bidding stage
+      const isBiddingStage = selectedProjectData.project_stage_name === "Bidding"
+
+      if (isBiddingStage) {
+        // Only show Core, Pre-Construction, and Field Management tabs for bidding projects
+        return [
+          { id: "core", label: "Core" },
+          { id: "pre-construction", label: "Pre-Construction" },
+          { id: "field-management", label: "Field Management" },
+        ]
+      }
+
+      // Default full tab set for non-bidding projects
       return [
         { id: "core", label: "Core" },
         { id: "pre-construction", label: "Pre-Construction" },
@@ -402,7 +415,9 @@ export default function MainApplicationPage() {
     if (mounted && !initialTabSet && userRole) {
       // Set default tab based on user role and current selection
       if (selectedProject) {
-        setActiveTab("core")
+        // Check if project is in bidding stage
+        const isBiddingStage = selectedProjectData?.project_stage_name === "Bidding"
+        setActiveTab(isBiddingStage ? "pre-construction" : "core")
       } else if (selectedTool === "staffing") {
         setActiveTab("portfolio")
       } else if (userRole === "project-executive" || userRole === "project-manager") {
@@ -414,14 +429,16 @@ export default function MainApplicationPage() {
       }
       setInitialTabSet(true)
     }
-  }, [mounted, userRole, initialTabSet, selectedProject, selectedTool])
+  }, [mounted, userRole, initialTabSet, selectedProject, selectedTool, selectedProjectData])
 
   // Handle project selection changes
   useEffect(() => {
     if (selectedProject) {
-      setActiveTab("core")
+      // Check if project is in bidding stage
+      const isBiddingStage = selectedProjectData?.project_stage_name === "Bidding"
+      setActiveTab(isBiddingStage ? "pre-construction" : "core")
     }
-  }, [selectedProject])
+  }, [selectedProject, selectedProjectData])
 
   // Handle tool selection changes
   useEffect(() => {
@@ -580,12 +597,31 @@ export default function MainApplicationPage() {
     }
 
     if (selectedProject && selectedProjectData) {
+      // Check if project is in bidding stage
+      const isBiddingStage = selectedProjectData.project_stage_name === "Bidding"
+
+      // Generate subHead based on project stage
+      let subHead: string
+      if (isBiddingStage) {
+        // Calculate client bid due date (14 days from current date)
+        const clientBidDueDate = new Date()
+        clientBidDueDate.setDate(clientBidDueDate.getDate() + 14)
+        const formattedDate = clientBidDueDate.toLocaleDateString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "numeric",
+        })
+        subHead = `${selectedProjectData.project_stage_name} • ${selectedProjectData.project_type_name} • Bid Due Date: ${formattedDate}`
+      } else {
+        subHead = `${selectedProjectData.project_stage_name} • ${selectedProjectData.project_type_name} • $${(
+          selectedProjectData.contract_value / 1000000
+        ).toFixed(1)}M`
+      }
+
       return {
         userName,
         moduleTitle: selectedProjectData.name,
-        subHead: `${selectedProjectData.project_stage_name} • ${selectedProjectData.project_type_name} • $${(
-          selectedProjectData.contract_value / 1000000
-        ).toFixed(1)}M`,
+        subHead,
         tabs: getTabsForContent(),
         navigationState,
         ...navigationCallbacks,

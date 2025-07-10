@@ -48,16 +48,6 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
 
   const projectId = parseInt(params.projectId)
 
-  // Read URL parameters for tab selection
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const tabParam = urlParams.get("tab") || urlParams.get("activeTab")
-    if (tabParam) {
-      setActiveTab(tabParam)
-      console.log("URL tab parameter:", tabParam)
-    }
-  }, [])
-
   // Find the specific project
   const project = useMemo(() => {
     return projectsData.find((p) => p.project_id === projectId)
@@ -86,6 +76,20 @@ export default function ProjectControlCenterPage({ params }: ProjectControlCente
       },
     }
   }, [project])
+
+  // Read URL parameters for tab selection
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const tabParam = urlParams.get("tab") || urlParams.get("activeTab")
+    if (tabParam) {
+      setActiveTab(tabParam)
+      console.log("URL tab parameter:", tabParam)
+    } else if (projectData) {
+      // Set default tab based on project stage
+      const isBiddingStage = projectData.project_stage_name === "Bidding"
+      setActiveTab(isBiddingStage ? "pre-construction" : "core")
+    }
+  }, [projectData])
 
   // Determine user role
   const userRole = useMemo((): UserRole => {
