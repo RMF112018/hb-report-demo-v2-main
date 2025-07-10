@@ -26,6 +26,7 @@
 "use client"
 
 import React, { useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ProjectContentProps } from "../../types/layout"
 import { useLayout } from "../../hooks/useLayout"
@@ -48,6 +49,7 @@ export function ProjectContent({
   className,
   children,
 }: ProjectContentProps) {
+  const router = useRouter()
   const { state: layoutState, responsive, utils } = useLayout()
   const contentRef = useRef<HTMLDivElement>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -127,7 +129,14 @@ export function ProjectContent({
           <h3 className="text-lg font-semibold text-gray-900">Something went wrong</h3>
           <p className="text-gray-600 mt-2">{error}</p>
         </div>
-        <Button onClick={() => window.location.reload()} className="mt-4">
+        <Button
+          onClick={() => {
+            // Use Next.js App Router refresh instead of full page reload
+            // This preserves browser history and React state while refreshing data
+            router.refresh()
+          }}
+          className="mt-4"
+        >
           <RefreshCw className="mr-2 h-4 w-4" />
           Try again
         </Button>

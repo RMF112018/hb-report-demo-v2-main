@@ -50,7 +50,7 @@ interface ModuleContentProps {
  * Main Application Page component
  */
 export default function MainApplicationPage() {
-  const { user } = useAuth()
+  const { user, isPresentationMode, viewingAs } = useAuth()
   const router = useRouter()
 
   // State management
@@ -138,6 +138,8 @@ export default function MainApplicationPage() {
         return "estimator"
       case "admin":
         return "admin"
+      case "presentation":
+        return "presentation"
       default:
         return "team-member"
     }
@@ -354,27 +356,30 @@ export default function MainApplicationPage() {
     }
 
     // Default dashboard tabs - role-based
-    if (userRole === "admin") {
+    // For presentation mode, use the viewing role for tab configuration
+    const effectiveRole = isPresentationMode && viewingAs ? viewingAs : userRole
+
+    if (effectiveRole === "admin") {
       return [
         { id: "overview", label: "Overview" },
         { id: "modules", label: "IT Modules" },
         { id: "analytics", label: "Analytics" },
         { id: "settings", label: "Settings" },
       ]
-    } else if (userRole === "executive") {
+    } else if (effectiveRole === "executive" || effectiveRole === "presentation") {
       return [
         { id: "overview", label: "Overview" },
         { id: "financial-review", label: "Financial Review" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
-    } else if (userRole === "project-executive") {
+    } else if (effectiveRole === "project-executive") {
       return [
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Overview" },
         { id: "financial-review", label: "Financial Review" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
-    } else if (userRole === "project-manager") {
+    } else if (effectiveRole === "project-manager") {
       return [
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Overview" },
@@ -385,6 +390,7 @@ export default function MainApplicationPage() {
       // Default for other roles (estimator, etc.)
       return [
         { id: "overview", label: "Overview" },
+        { id: "bid-management", label: "Bid Management" },
         { id: "analytics", label: "Analytics" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
@@ -401,6 +407,8 @@ export default function MainApplicationPage() {
         setActiveTab("portfolio")
       } else if (userRole === "project-executive" || userRole === "project-manager") {
         setActiveTab("action-items")
+      } else if (userRole === "estimator") {
+        setActiveTab("bid-management")
       } else {
         setActiveTab("overview")
       }
@@ -617,13 +625,17 @@ export default function MainApplicationPage() {
 
   // Get content configuration - determines layout and content
   const getContentConfig = (): ModuleContentProps => {
+    // Use effective role for presentation mode
+    const effectiveRole = isPresentationMode && viewingAs ? (viewingAs as any) : userRole
+    const isEffectiveITAdministrator = effectiveRole === "admin"
+
     if (selectedTool) {
       // Tools can provide left sidebar content
       return {
         rightContent: (
           <ToolContent
             toolName={selectedTool}
-            userRole={userRole}
+            userRole={effectiveRole}
             user={user!}
             onNavigateBack={() => handleToolSelect(null)}
             activeTab={activeTab}
@@ -641,7 +653,7 @@ export default function MainApplicationPage() {
           <ProjectContent
             projectId={selectedProject}
             projectData={selectedProjectData}
-            userRole={userRole}
+            userRole={effectiveRole}
             user={user!}
             onNavigateBack={() => handleProjectSelect(null)}
             activeTab={activeTab}
@@ -653,7 +665,7 @@ export default function MainApplicationPage() {
           <ProjectContent
             projectId={selectedProject}
             projectData={selectedProjectData}
-            userRole={userRole}
+            userRole={effectiveRole}
             user={user!}
             onNavigateBack={() => handleProjectSelect(null)}
             activeTab={activeTab}
@@ -665,7 +677,7 @@ export default function MainApplicationPage() {
       }
     }
 
-    if (isITAdministrator && selectedModule) {
+    if (isEffectiveITAdministrator && selectedModule) {
       // IT Command Center only when module is explicitly selected
       return {
         rightContent: (
@@ -685,7 +697,7 @@ export default function MainApplicationPage() {
     return {
       rightContent: (
         <RoleDashboard
-          userRole={userRole}
+          userRole={effectiveRole}
           user={user!}
           projects={projects}
           onProjectSelect={handleProjectSelect}
@@ -722,7 +734,7 @@ export default function MainApplicationPage() {
           onProjectSelect={handleProjectSelect}
           collapsed={false} // Not used in new system, but kept for compatibility
           onToggleCollapsed={() => {}} // Not used in new system, but kept for compatibility
-          userRole={userRole}
+          userRole={isPresentationMode && viewingAs ? (viewingAs as any) : userRole}
           onPanelStateChange={handleSidebarPanelStateChange}
           onModuleSelect={handleModuleSelect}
           onToolSelect={handleToolSelect}
@@ -749,6 +761,8 @@ export default function MainApplicationPage() {
             onNavigateToModule={headerConfig.onNavigateToModule}
             onNavigateToTool={headerConfig.onNavigateToTool}
             onNavigateToTab={headerConfig.onNavigateToTab}
+            isPresentationMode={isPresentationMode}
+            viewingAs={viewingAs}
           />
 
           {/* Main Content Container - 2 Column Layout */}

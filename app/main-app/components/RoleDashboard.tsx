@@ -11,6 +11,7 @@
 "use client"
 
 import React from "react"
+import { useRouter } from "next/navigation"
 import { DashboardLayout } from "../../../components/dashboard/DashboardLayout"
 import { useDashboardLayout } from "../../../hooks/use-dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
@@ -23,6 +24,8 @@ import Image from "next/image"
 import { ActionItemsInbox } from "../../../components/dashboard/ActionItemsInbox"
 import { ActionItemsToDo } from "../../../components/dashboard/ActionItemsToDo"
 import { ProjectActivityFeed } from "../../../components/feed/ProjectActivityFeed"
+import { BidManagementCenter } from "../../../components/estimating/bid-management"
+import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
 
 interface ProjectData {
   id: string
@@ -69,6 +72,8 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
   activeTab = "overview",
   onTabChange,
 }) => {
+  const router = useRouter()
+
   // Use the dashboard layout hook
   const {
     layout,
@@ -120,7 +125,15 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">Failed to load dashboard layout: {error}</p>
-            <Button onClick={() => window.location.reload()} variant="outline" className="w-full">
+            <Button
+              onClick={() => {
+                // Use Next.js App Router refresh method instead of full page reload
+                // This preserves browser history and React state while refreshing data
+                router.refresh()
+              }}
+              variant="outline"
+              className="w-full"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
@@ -271,6 +284,20 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               allowExport: true,
             }}
           />
+        )
+
+      case "bid-management":
+        return (
+          <EstimatingModuleWrapper
+            title="Bid Management Center"
+            description="Comprehensive bid management and BuildingConnected integration"
+            userRole={userRole}
+            isEmbedded={true}
+            showCard={false}
+            showHeader={false}
+          >
+            <BidManagementCenter userRole={userRole} onProjectSelect={onProjectSelect} />
+          </EstimatingModuleWrapper>
         )
 
       default:

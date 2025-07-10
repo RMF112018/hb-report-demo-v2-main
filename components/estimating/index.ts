@@ -39,9 +39,14 @@ export { CostAnalyticsDashboard } from "./CostAnalyticsDashboard"
 // Bid Processing and Management
 export { BidLeveling } from "./BidLeveling"
 export { BidLevelingContent } from "./BidLevelingContent"
-export { BidManagement } from "./BidManagement"
+export { default as ProjectBidManagement } from "./BidManagement"
 export { BidManagementCenter } from "./BidManagementCenter"
 export { BidTabManagement } from "./BidTabManagement"
+
+// NEW: BuildingConnected Integration Components
+export { default as ProjectList } from "./ProjectList"
+export { default as BidderTemplateManager } from "./BidderTemplateManager"
+export { default as BidFormBuilder } from "./BidFormBuilder"
 
 // ==========================================
 // PROJECT MANAGEMENT EXPORTS
@@ -118,9 +123,17 @@ export const LazyEstimatingTracker = lazy(() => import("./EstimatingTracker"))
 export const LazyCostSummaryModule = lazy(() =>
   import("./CostSummaryModule").then((m) => ({ default: m.CostSummaryModule }))
 )
-export const LazyBidManagement = lazy(() => import("./BidManagement").then((m) => ({ default: m.BidManagement })))
+export const LazyProjectBidManagement = lazy(() => import("./BidManagement"))
+export const LazyBidManagementCenter = lazy(() =>
+  import("./BidManagementCenter").then((m) => ({ default: m.BidManagementCenter }))
+)
 export const LazyProjectForm = lazy(() => import("./ProjectForm"))
 export const LazyDocumentLog = lazy(() => import("./DocumentLog"))
+
+// NEW: Lazy-loaded BuildingConnected integration components
+export const LazyProjectList = lazy(() => import("./ProjectList"))
+export const LazyBidderTemplateManager = lazy(() => import("./BidderTemplateManager"))
+export const LazyBidFormBuilder = lazy(() => import("./BidFormBuilder"))
 
 // ==========================================
 // MODULAR INJECTION UTILITIES
@@ -133,9 +146,13 @@ export const LazyDocumentLog = lazy(() => import("./DocumentLog"))
 export const estimatingComponents = {
   "estimating-tracker": LazyEstimatingTracker,
   "cost-summary": LazyCostSummaryModule,
-  "bid-management": LazyBidManagement,
+  "bid-management": LazyProjectBidManagement,
+  "bid-management-center": LazyBidManagementCenter,
   "project-form": LazyProjectForm,
   "document-log": LazyDocumentLog,
+  "project-list": LazyProjectList,
+  "bidder-template-manager": LazyBidderTemplateManager,
+  "bid-form-builder": LazyBidFormBuilder,
 } as const
 
 /**
@@ -169,6 +186,22 @@ export const estimatingModuleConfig = {
       className: "bid-management-module",
       showHeader: true,
     },
+    "bid-management-center": {
+      className: "bid-management-center-module",
+      showHeader: true,
+    },
+    "project-list": {
+      className: "project-list-module",
+      showHeader: true,
+    },
+    "bidder-template-manager": {
+      className: "bidder-template-manager-module",
+      showHeader: true,
+    },
+    "bid-form-builder": {
+      className: "bid-form-builder-module",
+      showHeader: true,
+    },
   },
 
   // Required providers for each module
@@ -176,15 +209,55 @@ export const estimatingModuleConfig = {
     "estimating-tracker": ["EstimatingProvider"],
     "cost-summary": ["EstimatingProvider"],
     "bid-management": ["EstimatingProvider"],
+    "bid-management-center": ["EstimatingProvider"],
     "project-form": ["EstimatingProvider"],
     "document-log": ["EstimatingProvider"],
+    "project-list": ["EstimatingProvider"],
+    "bidder-template-manager": ["EstimatingProvider"],
+    "bid-form-builder": ["EstimatingProvider"],
   },
 
   // Dependencies between modules
   dependencies: {
     "cost-summary": ["area-calculations", "allowances-log"],
     "bid-management": ["bid-leveling", "trade-partners"],
+    "bid-management-center": ["project-list", "bidder-template-manager", "bid-form-builder"],
     "project-overview": ["cost-analytics", "estimating-intelligence"],
+  },
+}
+
+// ==========================================
+// BUILDINGCONNECTED INTEGRATION CONFIG
+// ==========================================
+
+/**
+ * BuildingConnected API integration configuration
+ * For connecting to Autodesk BuildingConnected services
+ */
+export const buildingConnectedConfig = {
+  apiVersion: "v2",
+  baseUrl: "https://api.buildingconnected.com",
+  endpoints: {
+    projects: "/projects",
+    bidders: "/bidders",
+    templates: "/templates",
+    forms: "/forms",
+    invitations: "/invitations",
+    responses: "/responses",
+  },
+  features: {
+    realTimeSync: true,
+    webhookSupport: true,
+    bulkOperations: true,
+    advancedFiltering: true,
+    customFields: true,
+    analytics: true,
+  },
+  limits: {
+    maxProjectsPerRequest: 100,
+    maxBiddersPerTemplate: 500,
+    maxFieldsPerForm: 50,
+    maxAttachmentSize: 50, // MB
   },
 }
 
@@ -195,3 +268,7 @@ export const estimatingModuleConfig = {
 export const ESTIMATING_MODULE_VERSION = "3.0.0"
 export const LAST_UPDATED = "2025-01-14"
 export const ARCHITECTURE_STANDARD = "v-3.0.mdc"
+
+// NEW: BuildingConnected integration version
+export const BUILDING_CONNECTED_VERSION = "1.0.0"
+export const BUILDING_CONNECTED_LAST_UPDATED = "2025-01-14"

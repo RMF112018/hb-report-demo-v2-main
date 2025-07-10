@@ -18,6 +18,7 @@
 import React from "react"
 import { ChevronRight, Home } from "lucide-react"
 import Image from "next/image"
+import { Badge } from "@/components/ui/badge"
 
 export interface PageHeaderTab {
   id: string
@@ -71,6 +72,10 @@ export interface PageHeaderProps {
   activeTab?: string
   onTabChange?: (tabId: string) => void
 
+  // Presentation mode
+  isPresentationMode?: boolean
+  viewingAs?: string | null
+
   // Additional props
   className?: string
   isSticky?: boolean
@@ -89,6 +94,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   tabs = [],
   activeTab,
   onTabChange,
+  isPresentationMode = false,
+  viewingAs = null,
   className = "",
   isSticky = true,
 }) => {
@@ -330,6 +337,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 priority
               />
             </div>
+
+            {/* Row 2: Role Badge */}
+            {isPresentationMode && viewingAs && (
+              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
+                Viewing {viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")} Demo
+              </Badge>
+            )}
           </div>
         </div>
       </div>

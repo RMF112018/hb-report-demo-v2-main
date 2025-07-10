@@ -15,6 +15,7 @@
 "use client"
 
 import React, { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Badge } from "../../../components/ui/badge"
@@ -596,6 +597,7 @@ const FinancialHubContent: React.FC<{ userRole: UserRole; user: User; onNavigate
   user,
   onNavigateBack,
 }) => {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("overview")
 
   // Financial module definitions
@@ -955,7 +957,15 @@ const FinancialHubContent: React.FC<{ userRole: UserRole; user: User; onNavigate
             <p className="text-muted-foreground">Comprehensive financial management and analysis suite</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Use Next.js App Router refresh instead of full page reload
+                // This preserves browser history and React state
+                router.refresh()
+              }}
+            >
               <RefreshCw className="h-4 w-4 mr-1" />
               Refresh
             </Button>

@@ -1543,8 +1543,9 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
                     stats={fieldReportsStats}
                     userRole={userRole}
                     onRefresh={() => {
-                      // Refresh the data
-                      window.location.reload()
+                      // Use Next.js App Router refresh instead of full page reload
+                      // This preserves browser history and React state while refreshing data
+                      router.refresh()
                     }}
                   />
                 </div>
@@ -1558,8 +1559,9 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
                     stats={fieldReportsStats}
                     userRole={userRole}
                     onRefresh={() => {
-                      // Refresh the data
-                      window.location.reload()
+                      // Use Next.js App Router refresh instead of full page reload
+                      // This preserves browser history and React state while refreshing data
+                      router.refresh()
                     }}
                   />
                 </div>

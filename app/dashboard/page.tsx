@@ -551,7 +551,9 @@ function DashboardContent({ user }: { user: any }) {
                     <div className="p-1">
                       <button
                         onClick={() => {
-                          window.location.reload()
+                          // Use Next.js router refresh instead of window.location.reload()
+                          // This preserves browser history and React state
+                          router.refresh()
                           setMoreMenuOpen(false)
                         }}
                         className="w-full text-left px-3 py-2 rounded text-sm hover:bg-muted transition-colors flex items-center gap-2"
@@ -972,27 +974,50 @@ function DashboardContent({ user }: { user: any }) {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, isLoading, isClient } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (user === undefined) return
+    // Wait for client-side hydration and auth loading to complete
+    if (!isClient || isLoading) return
+
+    // Only redirect if user is not authenticated
     if (user === null) {
       router.push("/login")
       return
     }
 
-    // Redirect authenticated users to the new main app
-    router.replace("/main-app")
-  }, [user, router])
+    // For authenticated users, suggest using main-app but don't force redirect
+    // This preserves browser history and allows back navigation to work properly
+    if (user && window.location.pathname === "/dashboard") {
+      console.info("Consider navigating to /main-app for the updated interface")
+    }
+  }, [user, isLoading, isClient, router])
 
-  // Show loading state during redirect
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Redirecting to main application...</p>
+  // Show loading state during auth loading
+  if (!isClient || isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  // If user is not authenticated, show loading while redirecting
+  if (user === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Redirecting to login...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is authenticated, render the dashboard content
+  return <DashboardContent user={user} />
 }

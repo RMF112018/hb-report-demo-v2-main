@@ -103,6 +103,13 @@ export default function LoginPage() {
 
   const demoAccounts = [
     {
+      key: "presentation",
+      label: "Presentation",
+      email: "demo.presenter@hedrickbrothers.com",
+      icon: Monitor,
+      redirectTo: "/main-app",
+    },
+    {
       key: "executive",
       label: "Executive",
       email: "john.smith@hedrickbrothers.com",

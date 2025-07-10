@@ -23,6 +23,7 @@
 "use client"
 
 import React, { useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { NavigationProvider } from "./navigation/NavigationProvider"
 import { LayoutProvider } from "./layout/LayoutProvider"
 import { ProjectLayout } from "./layout/ProjectLayout"
@@ -74,6 +75,7 @@ export function ProjectPageWrapper({
   recentActivity = [],
   className,
 }: ProjectPageWrapperProps) {
+  const router = useRouter()
   // Transform project data to layout-compatible format
   const layoutProjectData = useMemo(() => {
     if (!projectData) return undefined
@@ -124,7 +126,9 @@ export function ProjectPageWrapper({
   const handleLayoutAction = (actionId: string) => {
     switch (actionId) {
       case "refresh":
-        window.location.reload()
+        // Use Next.js App Router refresh instead of full page reload
+        // This preserves browser history and React state while refreshing data
+        router.refresh()
         break
       case "settings":
         console.log("Opening settings...")

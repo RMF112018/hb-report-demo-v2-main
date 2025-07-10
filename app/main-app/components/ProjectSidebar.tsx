@@ -362,7 +362,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   selectedModule,
   selectedTool,
 }) => {
-  const { user, logout } = useAuth()
+  const { user, logout, isPresentationMode, viewingAs, switchRole, returnToPresentation } = useAuth()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
   const { toast } = useToast()
@@ -753,6 +753,13 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         {user?.firstName} {user?.lastName}
                       </p>
                       <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      {isPresentationMode && (
+                        <Badge variant="outline" className="mt-1 text-xs">
+                          {viewingAs
+                            ? `Viewing as ${viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")}`
+                            : "Presentation Mode"}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1033,6 +1040,59 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                 {activeSubCategory === "settings" && (
                   <div className="space-y-2">
+                    {/* Role Switching for Presentation Mode */}
+                    {isPresentationMode && (
+                      <div className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3">Switch Demo Role</p>
+                        <div className="space-y-1">
+                          <Button
+                            variant={viewingAs === "executive" ? "default" : "ghost"}
+                            className="w-full justify-start h-12"
+                            onClick={() => switchRole("executive")}
+                          >
+                            Executive
+                          </Button>
+                          <Button
+                            variant={viewingAs === "project-executive" ? "default" : "ghost"}
+                            className="w-full justify-start h-12"
+                            onClick={() => switchRole("project-executive")}
+                          >
+                            Project Executive
+                          </Button>
+                          <Button
+                            variant={viewingAs === "project-manager" ? "default" : "ghost"}
+                            className="w-full justify-start h-12"
+                            onClick={() => switchRole("project-manager")}
+                          >
+                            Project Manager
+                          </Button>
+                          <Button
+                            variant={viewingAs === "estimator" ? "default" : "ghost"}
+                            className="w-full justify-start h-12"
+                            onClick={() => switchRole("estimator")}
+                          >
+                            Estimator
+                          </Button>
+                          <Button
+                            variant={viewingAs === "admin" ? "default" : "ghost"}
+                            className="w-full justify-start h-12"
+                            onClick={() => switchRole("admin")}
+                          >
+                            Admin
+                          </Button>
+                          {viewingAs && (
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start h-12 mt-2"
+                              onClick={returnToPresentation}
+                            >
+                              Return to Presentation
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       variant="ghost"
                       className="w-full justify-start h-12"
@@ -1477,9 +1537,71 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                               {user?.firstName} {user?.lastName}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
+                            {isPresentationMode && (
+                              <Badge variant="outline" className="mt-1 text-xs">
+                                {viewingAs
+                                  ? `Viewing as ${
+                                      viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")
+                                    }`
+                                  : "Presentation Mode"}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
+
+                      {/* Role Switching for Presentation Mode */}
+                      {isPresentationMode && (
+                        <div className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700">
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Switch Demo Role</p>
+                          <div className="space-y-1">
+                            <Button
+                              variant={viewingAs === "executive" ? "default" : "ghost"}
+                              className="w-full justify-start text-sm"
+                              onClick={() => switchRole("executive")}
+                            >
+                              Executive
+                            </Button>
+                            <Button
+                              variant={viewingAs === "project-executive" ? "default" : "ghost"}
+                              className="w-full justify-start text-sm"
+                              onClick={() => switchRole("project-executive")}
+                            >
+                              Project Executive
+                            </Button>
+                            <Button
+                              variant={viewingAs === "project-manager" ? "default" : "ghost"}
+                              className="w-full justify-start text-sm"
+                              onClick={() => switchRole("project-manager")}
+                            >
+                              Project Manager
+                            </Button>
+                            <Button
+                              variant={viewingAs === "estimator" ? "default" : "ghost"}
+                              className="w-full justify-start text-sm"
+                              onClick={() => switchRole("estimator")}
+                            >
+                              Estimator
+                            </Button>
+                            <Button
+                              variant={viewingAs === "admin" ? "default" : "ghost"}
+                              className="w-full justify-start text-sm"
+                              onClick={() => switchRole("admin")}
+                            >
+                              Admin
+                            </Button>
+                            {viewingAs && (
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-sm mt-2"
+                                onClick={returnToPresentation}
+                              >
+                                Return to Presentation
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                       <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/profile")}>
                         <User className="h-4 w-4 mr-3" />
