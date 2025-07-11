@@ -287,9 +287,16 @@ const PreConstructionContent: React.FC<{
     switch (activePreconTab) {
       case "estimating":
         return (
-          <EstimatingProvider>
-            <EstimatingSuite projectId={projectId} projectData={projectData} user={user} userRole={userRole} />
-          </EstimatingProvider>
+          <Card>
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">
+                Estimating functionality is now available in the Core Project Tools tab.
+              </p>
+              <Button variant="outline" className="mt-4">
+                Go to Core Tools
+              </Button>
+            </CardContent>
+          </Card>
         )
 
       case "pre-construction":
@@ -3294,232 +3301,6 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   // Render core tab content
-  const renderCoreTabContent = () => {
-    switch (navigation.coreTab) {
-      case "dashboard":
-        return (
-          <div className="space-y-6 w-full max-w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Project Summary Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_type_name || "Commercial"}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
-                        <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
-                        <p className="font-medium text-sm text-foreground">
-                          ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_stage_name || "Construction"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Project Metrics Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.activeTeamMembers} members</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
-                      <p className="font-medium text-sm text-foreground">
-                        {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )
-
-      case "checklists":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="startup" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="startup">StartUp Checklist</TabsTrigger>
-                <TabsTrigger value="closeout">Closeout Checklist</TabsTrigger>
-              </TabsList>
-              <TabsContent value="startup" className="w-full max-w-full overflow-hidden">
-                <StartUpChecklist projectId={projectId} projectName={projectName} />
-              </TabsContent>
-              <TabsContent value="closeout" className="w-full max-w-full overflow-hidden">
-                <CloseoutChecklist projectId={projectId} />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "reports":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="project-reports">Project Reports</TabsTrigger>
-              </TabsList>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-                <ReportsDashboard
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  user={user}
-                  onTabChange={handleReportsSubTabChange}
-                />
-              </TabsContent>
-              <TabsContent value="project-reports" className="w-full max-w-full overflow-hidden">
-                <ProjectReports
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  user={user}
-                  activeTab={navigation.reportsSubTab || "overview"}
-                  onTabChange={handleReportsSubTabChange}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "responsibility-matrix":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold">Responsibility Matrix</h3>
-                <p className="text-xs text-muted-foreground">
-                  Manage task assignments and accountability across project teams
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Download className="h-3 w-3 mr-1" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Task
-                </Button>
-              </div>
-            </div>
-
-            <Card>
-              <CardContent>
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Responsibility Matrix content will be displayed here.</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
-
-      case "productivity":
-        return (
-          <div className="w-full max-w-full">
-            <ProjectProductivityContent
-              projectId={projectId}
-              projectData={projectData}
-              userRole={userRole}
-              user={user}
-              className="w-full"
-            />
-          </div>
-        )
-
-      case "staffing":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                <TabsTrigger value="spcr">SPCR</TabsTrigger>
-              </TabsList>
-              <TabsContent value="timeline" className="w-full max-w-full overflow-hidden">
-                <ProjectStaffingGantt
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  isReadOnly={userRole === "viewer"}
-                  className="w-full"
-                  height="600px"
-                />
-              </TabsContent>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-                <StaffingDashboard
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  className="w-full"
-                  isCompact={false}
-                  isFullScreen={isFocusMode}
-                />
-              </TabsContent>
-              <TabsContent value="spcr" className="w-full max-w-full overflow-hidden">
-                <ProjectSPCRManager
-                  projectId={parseInt(projectId)}
-                  projectData={projectData}
-                  userRole={userRole}
-                  className="h-full"
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "pre-construction":
-        return (
-          <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
-        )
-
-      case "field-management":
-        return getFieldManagementRightPanelContent(
-          projectData,
-          userRole,
-          projectId,
-          navigation.subTool || "scheduler",
-          onSidebarContentChange
-        )
-
-      default:
-        return null
-    }
-  }
 
   if (!mounted) {
     return (
@@ -3616,13 +3397,24 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       default:
         // Render Core Project Tools content with internal navigation
         return (
-          <ProjectTabsShell
-            projectId={projectId}
-            user={user}
-            userRole={userRole}
-            projectData={projectData}
-            onTabChange={onTabChange}
-          />
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="text-muted-foreground">Loading project tools...</span>
+                </div>
+              </div>
+            }
+          >
+            <ProjectTabsShell
+              projectId={projectId}
+              user={user}
+              userRole={userRole}
+              projectData={projectData}
+              onTabChange={onTabChange}
+            />
+          </Suspense>
         )
     }
   }

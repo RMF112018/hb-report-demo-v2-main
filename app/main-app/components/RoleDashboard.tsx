@@ -24,7 +24,7 @@ import Image from "next/image"
 import { ActionItemsInbox } from "../../../components/dashboard/ActionItemsInbox"
 import { ActionItemsToDo } from "../../../components/dashboard/ActionItemsToDo"
 import { ProjectActivityFeed } from "../../../components/feed/ProjectActivityFeed"
-import { BidManagementCenter } from "../../../components/estimating/bid-management"
+import BidManagementCenter from "../../../components/estimating/bid-management/BidManagementCenter"
 import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
 
 interface ProjectData {
@@ -287,16 +287,38 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         )
 
       case "bid-management":
+        // Map the broader UserRole to BidManagementCenter's expected UserRole
+        const bidManagementUserRole = (() => {
+          switch (userRole) {
+            case "project-executive":
+              return "executive" as const
+            case "project-manager":
+              return "project-manager" as const
+            case "estimator":
+              return "estimator" as const
+            case "admin":
+              return "admin" as const
+            case "executive":
+              return "executive" as const
+            default:
+              return "estimator" as const
+          }
+        })()
+
         return (
           <EstimatingModuleWrapper
             title="Bid Management Center"
-            description="Comprehensive bid management and BuildingConnected integration"
+            description="Comprehensive bid management and BuildingConnected integration with real-time data and export capabilities"
             userRole={userRole}
             isEmbedded={true}
             showCard={false}
             showHeader={false}
           >
-            <BidManagementCenter userRole={userRole} onProjectSelect={onProjectSelect} />
+            <BidManagementCenter
+              userRole={bidManagementUserRole}
+              onProjectSelect={onProjectSelect}
+              className="h-full"
+            />
           </EstimatingModuleWrapper>
         )
 
