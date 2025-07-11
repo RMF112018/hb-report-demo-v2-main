@@ -16,7 +16,7 @@
 
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -91,26 +91,13 @@ import { ReportHistory } from "@/components/reports/ReportHistory"
 import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
 import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
 import FieldManagementContent from "./content/FieldManagementContent"
-import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
-import { ProjectBidManagement } from "@/components/estimating/BidManagement"
-import BidMessagePanel from "@/components/estimating/bid-management/components/BidMessagePanel"
-import BiddersList from "@/components/estimating/bid-management/components/BiddersList"
-import BidLeveling from "@/components/estimating/bid-management/components/BidLeveling"
-import BiddingOverview from "@/components/estimating/BiddingOverview"
 import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
-import ProjectTabsShell from "@/components/project/ProjectTabsShell"
-import EstimatingSuite from "@/components/estimating/EstimatingSuite"
-import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
 import SidebarPanelRenderer from "@/components/project/sidebar/SidebarPanelRenderer"
-import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
-import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
 import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
 
-import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
-import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
-import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
-import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
+// Lazy load ProjectTabsShell for better performance
+const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
 
 interface ProjectControlCenterContentProps {
   projectId: string

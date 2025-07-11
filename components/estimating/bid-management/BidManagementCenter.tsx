@@ -49,6 +49,7 @@ import ColumnSettingsDialog, {
   STAGE_COLUMNS,
   ESTIMATES_COLUMNS,
 } from "./ColumnSettingsDialog"
+import ExportButton from "./ExportButton"
 
 // Enhanced TypeScript interfaces
 type UserRole = "estimator" | "project-manager" | "executive" | "admin"
@@ -817,6 +818,7 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
             <Eye className="h-4 w-4 mr-2" />
             {isEditMode ? "View Mode" : "Edit Mode"}
           </Button>
+          <ExportButton data={filteredProjects} fileName="BidTracking2025" />
         </div>
       </div>
 

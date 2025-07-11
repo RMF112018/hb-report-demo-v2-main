@@ -27,9 +27,9 @@ import { MessageSquare, CheckSquare, Activity, TrendingUp, RefreshCw, Settings, 
 import { cn } from "@/lib/utils"
 
 // Import sub-components
-import { TaskPanel } from "./TaskPanel"
-import { MessageThread } from "./MessageThread"
-import { ProductivityFeed } from "./ProductivityFeed"
+import TaskPanel from "./TaskPanel"
+import MessageThread from "./MessageThread"
+import ProductivityFeed from "./ProductivityFeed"
 
 // Import productivity data types and hooks
 import { useProductivityData } from "./hooks/useProductivityData"
