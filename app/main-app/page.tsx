@@ -643,6 +643,21 @@ export default function MainApplicationPage() {
     // Default dashboard (including IT administrators when no module selected)
     const roleLabel =
       userRole === "admin" ? "System Administrator" : `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} Access`
+
+    // Check for specific tabs that need custom titles
+    if (activeTab === "bid-management") {
+      return {
+        userName,
+        moduleTitle: "Bid Management Dashboard",
+        subHead:
+          "Comprehensive project bidding and delivery tracking system with real-time BuildingConnected integration",
+        tabs: getTabsForContent(),
+        navigationState,
+        ...navigationCallbacks,
+      }
+    }
+
+    // Default dashboard titles
     const dashboardTitle = userRole === "admin" ? "IT Administrator Dashboard" : "Dashboard"
     const dashboardSubHead =
       userRole === "admin"

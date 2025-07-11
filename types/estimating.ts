@@ -32,4 +32,9 @@ export interface ProjectPursuit {
   confidence: number
   riskLevel: string
   sqft: number
+  // Pre-Construction Projects specific fields
+  preconBudget?: number
+  designBudget?: number
+  leadEstimator?: string
+  px?: string
 }

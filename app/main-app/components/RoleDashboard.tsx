@@ -168,6 +168,17 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
     const projectStats = getProjectStats(projects, userRole)
     const accessDescription = getProjectAccessDescription(userRole)
 
+    // Special handling for bid-management tab
+    if (activeTab === "bid-management") {
+      return {
+        title: "Bid Management Dashboard",
+        subtitle:
+          "Comprehensive project bidding and delivery tracking system with real-time BuildingConnected integration",
+        badge: `${projectStats.total} Projects`,
+        accessInfo: accessDescription,
+      }
+    }
+
     switch (userRole) {
       case "executive":
         return {
@@ -318,6 +329,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               userRole={bidManagementUserRole}
               onProjectSelect={onProjectSelect}
               className="h-full"
+              showHeader={false}
             />
           </EstimatingModuleWrapper>
         )

@@ -95,6 +95,8 @@ import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
 import SidebarPanelRenderer from "@/components/project/sidebar/SidebarPanelRenderer"
 import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
+import EstimatingSuite from "@/components/estimating/EstimatingSuite"
+import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
 
 // Lazy load ProjectTabsShell for better performance
 const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
@@ -287,16 +289,9 @@ const PreConstructionContent: React.FC<{
     switch (activePreconTab) {
       case "estimating":
         return (
-          <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-muted-foreground">
-                Estimating functionality is now available in the Core Project Tools tab.
-              </p>
-              <Button variant="outline" className="mt-4">
-                Go to Core Tools
-              </Button>
-            </CardContent>
-          </Card>
+          <EstimatingProvider>
+            <EstimatingSuite projectId={projectId} projectData={projectData} user={user} userRole={userRole} />
+          </EstimatingProvider>
         )
 
       case "pre-construction":

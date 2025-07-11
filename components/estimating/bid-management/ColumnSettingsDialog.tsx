@@ -15,29 +15,37 @@ export interface ColumnDefinition {
 }
 
 export const DELIVERY_COLUMNS: ColumnDefinition[] = [
-  { id: "project", label: "Project", defaultVisible: true },
-  { id: "schedule", label: "Schedule", defaultVisible: true },
+  { id: "projectNumber", label: "Project #", defaultVisible: true },
+  { id: "projectName", label: "Project Name", defaultVisible: true },
+  { id: "source", label: "Source", defaultVisible: true },
   { id: "deliverable", label: "Deliverable", defaultVisible: true },
-  { id: "bidBookLog", label: "Bid Book Log", defaultVisible: true },
-  { id: "review", label: "Review", defaultVisible: true },
-  { id: "programming", label: "Programming", defaultVisible: true },
-  { id: "pricing", label: "Pricing", defaultVisible: true },
-  { id: "leanEstimating", label: "Lean Estimating", defaultVisible: true },
-  { id: "finalEstimate", label: "Final Estimate", defaultVisible: true },
+  { id: "subBidsDue", label: "Sub Bids Due", defaultVisible: true },
+  { id: "presubmissionReview", label: "Presubmission Review", defaultVisible: true },
+  { id: "winStrategyMeeting", label: "Win Strategy Meeting", defaultVisible: true },
+  { id: "dueDateOutTheDoor", label: "Due Date (Out The Door)", defaultVisible: true },
+  { id: "leadEstimator", label: "Lead Estimator", defaultVisible: true },
   { id: "contributors", label: "Contributors", defaultVisible: true },
-  { id: "bidBond", label: "Bid Bond", defaultVisible: true },
+  { id: "px", label: "PX", defaultVisible: true },
+  { id: "bidBondWanda", label: "Bid Bond (Wanda)", defaultVisible: true },
+  { id: "ppBond", label: "P&P Bond", defaultVisible: true },
+  { id: "schedule", label: "Schedule", defaultVisible: true },
+  { id: "logistics", label: "Logistics", defaultVisible: true },
+  { id: "bimProposal", label: "BIM Proposal", defaultVisible: true },
+  { id: "preconProposalRyan", label: "Precon Proposal (Ryan)", defaultVisible: true },
+  { id: "proposalTabsWanda", label: "Proposal Tabs (Wanda)", defaultVisible: true },
+  { id: "coordWithMarketing", label: "Coor. w/ Marketing Prior to Sending", defaultVisible: true },
   { id: "actions", label: "Actions", defaultVisible: true },
 ]
 
 export const STAGE_COLUMNS: ColumnDefinition[] = [
-  { id: "project", label: "Project", defaultVisible: true },
+  { id: "projectNumber", label: "Project #", defaultVisible: true },
+  { id: "projectName", label: "Project Name", defaultVisible: true },
   { id: "currentStage", label: "Current Stage", defaultVisible: true },
-  { id: "projectBudget", label: "Project Budget", defaultVisible: true },
-  { id: "originalBudget", label: "Original Budget", defaultVisible: true },
+  { id: "preconBudget", label: "Precon Budget", defaultVisible: true },
+  { id: "designBudget", label: "Design Budget", defaultVisible: true },
   { id: "billedToDate", label: "Billed to Date", defaultVisible: true },
-  { id: "remainingBudget", label: "Remaining Budget", defaultVisible: true },
-  { id: "budgetVariance", label: "Budget Variance", defaultVisible: true },
-  { id: "actions", label: "Actions", defaultVisible: true },
+  { id: "leadEstimator", label: "Lead Estimator", defaultVisible: true },
+  { id: "px", label: "PX", defaultVisible: true },
 ]
 
 export const ESTIMATES_COLUMNS: ColumnDefinition[] = [
@@ -61,6 +69,9 @@ interface ColumnSettingsDialogProps {
   columns: ColumnDefinition[]
   tabId: string
   onVisibilityChange: (visibility: ColumnVisibility) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
 }
 
 const getStorageKey = (tabId: string) => `columnSettings_${tabId}`
@@ -72,7 +83,14 @@ const getDefaultVisibility = (columns: ColumnDefinition[]): ColumnVisibility => 
   }, {} as ColumnVisibility)
 }
 
-const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({ columns, tabId, onVisibilityChange }) => {
+const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
+  columns,
+  tabId,
+  onVisibilityChange,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
+  showTrigger = true,
+}) => {
   const [visibility, setVisibility] = useState<ColumnVisibility>(() => {
     try {
       const stored = localStorage.getItem(getStorageKey(tabId))
@@ -85,7 +103,11 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({ columns, ta
     return getDefaultVisibility(columns)
   })
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  // Use external open state if provided, otherwise use internal state
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen
+  const setIsOpen = externalOnOpenChange || setInternalOpen
 
   // Update parent when visibility changes
   useEffect(() => {
@@ -119,12 +141,14 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({ columns, ta
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Settings className="h-4 w-4 mr-2" />
-          Columns ({visibleCount}/{totalCount})
-        </Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Settings className="h-4 w-4 mr-2" />
+            Columns ({visibleCount}/{totalCount})
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Column Settings</DialogTitle>
