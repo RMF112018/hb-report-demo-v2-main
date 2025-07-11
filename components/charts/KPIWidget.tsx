@@ -28,7 +28,7 @@ export function KPIWidget({
   unit,
   trend,
   caption,
-  emphasisColor = "text-primary",
+  emphasisColor = "text-[#0021A5]",
   compact = false,
   performance = "ok",
 }: KPIWidgetProps) {
@@ -40,17 +40,17 @@ export function KPIWidget({
       ? "text-red-500 dark:text-red-400"
       : "text-muted-foreground"
 
-  // Performance-based color coding
+  // Performance-based color coding with HB brand colors
   const getPerformanceStyles = () => {
     switch (performance) {
       case "good":
-        return "bg-green-50/30 dark:bg-green-950/20 border-green-200/50 dark:border-green-800/30 shadow-green-100/50 dark:shadow-green-900/10"
+        return "bg-green-50/30 dark:bg-green-950/20 border-green-200/50 dark:border-green-800/30 shadow-green-100/50 dark:shadow-green-900/10 border-l-4 border-l-green-500"
       case "warning":
-        return "bg-amber-50/30 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30 shadow-amber-100/50 dark:shadow-amber-900/10"
+        return "bg-[#FA4616]/5 dark:bg-[#FA4616]/10 border-[#FA4616]/20 dark:border-[#FA4616]/30 shadow-[#FA4616]/10 dark:shadow-[#FA4616]/10 border-l-4 border-l-[#FA4616]"
       case "bad":
-        return "bg-red-50/30 dark:bg-red-950/20 border-red-200/50 dark:border-red-800/30 shadow-red-100/50 dark:shadow-red-900/10"
+        return "bg-red-50/30 dark:bg-red-950/20 border-red-200/50 dark:border-red-800/30 shadow-red-100/50 dark:shadow-red-900/10 border-l-4 border-l-red-500"
       default: // 'ok'
-        return "bg-gray-50/30 dark:bg-gray-950/20 border-gray-200/50 dark:border-gray-800/30 shadow-gray-100/50 dark:shadow-gray-900/10"
+        return "bg-[#0021A5]/5 dark:bg-[#0021A5]/10 border-[#0021A5]/20 dark:border-[#0021A5]/30 shadow-[#0021A5]/10 dark:shadow-[#0021A5]/10 border-l-4 border-l-[#0021A5]"
     }
   }
 

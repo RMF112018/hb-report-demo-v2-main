@@ -176,33 +176,37 @@ export function ActionItemsToDo({ userRole, className }: ActionItemsToDoProps) {
   }
 
   return (
-    <Card className={cn("h-full border-l-4 border-l-[rgb(0,33,165)]", className)}>
+    <Card className={cn("h-full border-l-4 border-l-[#0021A5]", className)}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <CheckSquare className="h-5 w-5" style={{ color: "#0021A5" }} />
             To Do
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-sm">
+            <Badge variant="outline" className="text-sm border-[#FA4616]/20 text-[#FA4616]">
               {stats.pending} Pending
             </Badge>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Plus className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-[#0021A5]/10">
+              <Plus className="h-4 w-4" style={{ color: "#0021A5" }} />
             </Button>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="!p-0">
         {/* Statistics Banner */}
-        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b">
+        <div className="px-4 py-3 bg-gradient-to-r from-[#0021A5]/5 to-transparent border-b border-[#0021A5]/10">
           <div className="grid grid-cols-4 gap-3 text-center">
             <div>
-              <div className="text-xl font-semibold text-blue-600">{stats.total}</div>
+              <div className="text-xl font-semibold" style={{ color: "#0021A5" }}>
+                {stats.total}
+              </div>
               <div className="text-xs text-muted-foreground">Total Tasks</div>
             </div>
             <div>
-              <div className="text-xl font-semibold text-orange-600">{stats.pending}</div>
+              <div className="text-xl font-semibold" style={{ color: "#FA4616" }}>
+                {stats.pending}
+              </div>
               <div className="text-xs text-muted-foreground">Pending</div>
             </div>
             <div>

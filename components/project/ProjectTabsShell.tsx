@@ -23,7 +23,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { cn } from "@/lib/utils"
 import {
   BarChart3,
@@ -48,6 +50,7 @@ import ProductivityModule from "@/components/project/productivity/ProductivityMo
 import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
 import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
 import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
+import { ConstructionDashboard } from "@/components/project/core/ConstructionDashboard"
 
 // Tab configuration
 const coreTabsConfig = [
@@ -156,75 +159,88 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
   const renderTabContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return (
-          <div className="space-y-6 w-full max-w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Project Summary Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-4">
+        // Check if project is in Construction stage
+        const isConstructionStage = projectData?.project_stage_name === "Construction"
+
+        if (isConstructionStage) {
+          // Render comprehensive Construction dashboard
+          return (
+            <ConstructionDashboard projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+          )
+        } else {
+          // Render default dashboard for non-Construction projects
+          return (
+            <div className="space-y-6 w-full max-w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Project Summary Card */}
+                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
+                          <p className="font-medium text-sm text-foreground">
+                            {projectData?.project_type_name || "Commercial"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
+                          <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
+                          <p className="font-medium text-sm text-foreground">
+                            ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
+                          <p className="font-medium text-sm text-foreground">
+                            {projectData?.project_stage_name || "Construction"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Project Metrics Card */}
+                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
+                        <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
+                        <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
                         <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_type_name || "Commercial"}
+                          {projectMetrics.activeTeamMembers} members
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
-                        <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
                         <p className="font-medium text-sm text-foreground">
-                          ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_stage_name || "Construction"}
+                          {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
                         </p>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Project Metrics Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.activeTeamMembers} members</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
-                      <p className="font-medium text-sm text-foreground">
-                        {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
-        )
+          )
+        }
 
       case "checklists":
         return (
@@ -240,12 +256,41 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       case "reports":
         return (
           <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="project-reports">Project Reports</TabsTrigger>
-              </TabsList>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
+            {/* Card-based Reports Tab Navigation */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+              <div
+                onClick={() => setReportsSubTab("dashboard")}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  reportsSubTab === "dashboard"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <BarChart3 className="h-6 w-6" />
+                  <span className="text-sm font-medium">Dashboard</span>
+                  <span className="text-xs text-muted-foreground">Reports overview and analytics</span>
+                </div>
+              </div>
+              <div
+                onClick={() => setReportsSubTab("project-reports")}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  reportsSubTab === "project-reports"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <FileText className="h-6 w-6" />
+                  <span className="text-sm font-medium">Project Reports</span>
+                  <span className="text-xs text-muted-foreground">Comprehensive project reporting</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Conditional Content Rendering */}
+            {reportsSubTab === "dashboard" && (
+              <div className="w-full max-w-full overflow-hidden">
                 <ReportsDashboard
                   projectId={projectId}
                   projectData={projectData}
@@ -253,8 +298,10 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
                   user={user}
                   onTabChange={handleReportsSubTabChange}
                 />
-              </TabsContent>
-              <TabsContent value="project-reports" className="w-full max-w-full overflow-hidden">
+              </div>
+            )}
+            {reportsSubTab === "project-reports" && (
+              <div className="w-full max-w-full overflow-hidden">
                 <ProjectReports
                   projectId={projectId}
                   projectData={projectData}
@@ -263,8 +310,8 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
                   activeTab={reportsSubTab || "overview"}
                   onTabChange={handleReportsSubTabChange}
                 />
-              </TabsContent>
-            </Tabs>
+              </div>
+            )}
           </div>
         )
 
@@ -315,13 +362,54 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       case "staffing":
         return (
           <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                <TabsTrigger value="spcr">SPCR</TabsTrigger>
-              </TabsList>
-              <TabsContent value="timeline" className="w-full max-w-full overflow-hidden">
+            {/* Card-based Staffing Tab Navigation */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+              <div
+                onClick={() => setStaffingSubTab("dashboard")}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  staffingSubTab === "dashboard"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <BarChart3 className="h-6 w-6" />
+                  <span className="text-sm font-medium">Dashboard</span>
+                  <span className="text-xs text-muted-foreground">Team overview and metrics</span>
+                </div>
+              </div>
+              <div
+                onClick={() => setStaffingSubTab("timeline")}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  staffingSubTab === "timeline"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <Calendar className="h-6 w-6" />
+                  <span className="text-sm font-medium">Timeline</span>
+                  <span className="text-xs text-muted-foreground">Staffing timeline and scheduling</span>
+                </div>
+              </div>
+              <div
+                onClick={() => setStaffingSubTab("spcr")}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  staffingSubTab === "spcr"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <FileText className="h-6 w-6" />
+                  <span className="text-sm font-medium">SPCR</span>
+                  <span className="text-xs text-muted-foreground">Staffing plan change requests</span>
+                </div>
+              </div>
+            </div>
+            {/* Conditional Content Rendering */}
+            {staffingSubTab === "timeline" && (
+              <div className="w-full max-w-full overflow-hidden">
                 <ProjectStaffingGantt
                   projectId={projectId}
                   projectData={projectData}
@@ -330,8 +418,10 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
                   className="w-full"
                   height="600px"
                 />
-              </TabsContent>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
+              </div>
+            )}
+            {staffingSubTab === "dashboard" && (
+              <div className="w-full max-w-full overflow-hidden">
                 <StaffingDashboard
                   projectId={projectId}
                   projectData={projectData}
@@ -340,16 +430,18 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
                   isCompact={false}
                   isFullScreen={isFocusMode}
                 />
-              </TabsContent>
-              <TabsContent value="spcr" className="w-full max-w-full overflow-hidden">
+              </div>
+            )}
+            {staffingSubTab === "spcr" && (
+              <div className="w-full max-w-full overflow-hidden">
                 <ProjectSPCRManager
                   projectId={parseInt(projectId)}
                   projectData={projectData}
                   userRole={userRole}
                   className="h-full"
                 />
-              </TabsContent>
-            </Tabs>
+              </div>
+            )}
           </div>
         )
 
@@ -392,54 +484,26 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
         </div>
       </div>
 
-      {/* Responsive Core Tab Navigation */}
-      <div className="border-b border-border flex-shrink-0">
-        {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-        <div className="hidden sm:block">
-          <div className="flex space-x-6 overflow-x-auto">
-            {coreTabsConfig.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                }`}
-              >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile Dropdown Navigation - Only visible on mobile */}
-        <div className="sm:hidden py-3">
-          <Select value={activeTab || "dashboard"} onValueChange={(value) => handleTabChange(value)}>
-            <SelectTrigger className="w-full">
-              <div className="flex items-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Core Tools</span>
-                <Badge variant="secondary" className="ml-auto">
-                  {coreTabsConfig.find((tab) => tab.id === activeTab)?.label || "Dashboard"}
-                </Badge>
+      {/* Card-based Core Tab Navigation */}
+      <div className="mb-6 flex-shrink-0">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {coreTabsConfig.map((tab) => (
+            <div
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                activeTab === tab.id
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                  : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              }`}
+            >
+              <div className="flex flex-col items-center text-center space-y-2">
+                <tab.icon className="h-6 w-6" />
+                <span className="text-sm font-medium">{tab.label}</span>
+                <span className="text-xs text-muted-foreground">{tab.description}</span>
               </div>
-            </SelectTrigger>
-            <SelectContent>
-              {coreTabsConfig.map((tab) => (
-                <SelectItem key={tab.id} value={tab.id}>
-                  <div className="flex items-center space-x-2">
-                    <tab.icon className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">{tab.label}</div>
-                      <div className="text-xs text-muted-foreground">{tab.description}</div>
-                    </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            </div>
+          ))}
         </div>
       </div>
 

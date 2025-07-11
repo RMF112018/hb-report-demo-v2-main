@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 import { useRouter } from "next/navigation"
 import {
   Calendar,
@@ -37,7 +37,6 @@ import {
   Building2,
   FileText,
   MapPin,
-  Wrench,
   Plus,
   RefreshCw,
   Eye,
@@ -102,6 +101,15 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
   const [schedulerSubTab, setSchedulerSubTab] = useState("overview")
   const [procurementSubTab, setProcurementSubTab] = useState("overview")
   const [isFocusMode, setIsFocusMode] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   // Focus mode toggle handler
   const handleFocusToggle = () => {
@@ -1592,7 +1600,7 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Wrench className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
               Field Management Tools
             </CardTitle>
             <CardDescription>Content for {activeTab} will be displayed here</CardDescription>
@@ -1650,61 +1658,43 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
         </div>
       </div>
 
-      {/* Sub-tool Tabs */}
-      <div className="w-full">
-        {/* Responsive Tab Navigation */}
-        <div className="border-b border-border">
-          {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-          <div className="hidden sm:block">
-            <div className="flex space-x-6 overflow-x-auto">
-              {availableTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Horizontal Navigation Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {availableTabs.map((tab) => {
+          const IconComponent = tab.icon
+          const isActive = activeTab === tab.id
 
-          {/* Mobile Dropdown Navigation - Only visible on mobile */}
-          <div className="sm:hidden py-3">
-            <Select value={activeTab} onValueChange={handleTabChange}>
-              <SelectTrigger className="w-full">
-                <div className="flex items-center space-x-2">
-                  <Wrench className="h-4 w-4" />
-                  <span>Field Tools</span>
-                  <Badge variant="secondary" className="ml-auto">
-                    {availableTabs.find((tab) => tab.id === activeTab)?.label || "Overview"}
-                  </Badge>
+          return (
+            <Card
+              key={tab.id}
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                isActive ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "hover:border-gray-300"
+              }`}
+              onClick={() => handleTabChange(tab.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <div className="relative">
+                    <IconComponent className={`h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-600"}`} />
+                  </div>
+                  <div>
+                    <p
+                      className={`text-xs font-medium ${
+                        isActive ? "text-blue-600" : "text-gray-900 dark:text-gray-100"
+                      }`}
+                    >
+                      {tab.label}
+                    </p>
+                  </div>
                 </div>
-              </SelectTrigger>
-              <SelectContent>
-                {availableTabs.map((tab) => (
-                  <SelectItem key={tab.id} value={tab.id}>
-                    <div className="flex items-center space-x-2">
-                      <tab.icon className="h-4 w-4" />
-                      <div>
-                        <div className="font-medium">{tab.label}</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="w-full max-w-full overflow-hidden">{renderContent()}</div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
+
+      {/* Content */}
+      <div className="w-full max-w-full overflow-hidden">{renderContent()}</div>
 
       {/* Permit Form Modal */}
       <PermitForm

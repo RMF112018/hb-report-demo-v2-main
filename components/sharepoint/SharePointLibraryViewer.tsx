@@ -80,14 +80,124 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
   const [sortBy, setSortBy] = useState<"name" | "modified" | "size">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [showUploadDialog, setShowUploadDialog] = useState(false)
-  const [currentFolder, setCurrentFolder] = useState<string>("Root")
-  const [navigationHistory, setNavigationHistory] = useState<string[]>(["Root"])
-  const [historyIndex, setHistoryIndex] = useState(0)
+  const [currentFolder, setCurrentFolder] = useState<string>("00-Est")
+  const [navigationHistory, setNavigationHistory] = useState<string[]>(["Root", "00-Est"])
+  const [historyIndex, setHistoryIndex] = useState(1)
   const [showFilters, setShowFilters] = useState(false)
+
+  // Mock bid package estimation folders data
+  const mockEstimationFolders = useMemo(
+    () => [
+      {
+        id: "folder-01-finaldeliver",
+        name: "01 FinalDeliver",
+        folder: { childCount: 15 },
+        lastModifiedDateTime: "2025-01-06T10:30:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-02-biddoc",
+        name: "02 BidDoc",
+        folder: { childCount: 8 },
+        lastModifiedDateTime: "2025-01-06T14:15:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-03-estsummary",
+        name: "03 EstSummary",
+        folder: { childCount: 12 },
+        lastModifiedDateTime: "2025-01-06T09:45:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-04-qualifications",
+        name: "04 Qualifications",
+        folder: { childCount: 6 },
+        lastModifiedDateTime: "2025-01-06T16:20:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-06-bidscopes",
+        name: "06 Bid Scopes",
+        folder: { childCount: 23 },
+        lastModifiedDateTime: "2025-01-06T11:30:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-07-subproposal",
+        name: "07 SubProposal",
+        folder: { childCount: 18 },
+        lastModifiedDateTime: "2025-01-06T13:10:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-08-takeoffs",
+        name: "08 Takeoffs",
+        folder: { childCount: 34 },
+        lastModifiedDateTime: "2024-08-19T15:25:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-10-sitelogistics",
+        name: "10 SiteLogistics",
+        folder: { childCount: 7 },
+        lastModifiedDateTime: "2024-08-19T12:40:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-12-projectturnover",
+        name: "12 ProjectTurnover",
+        folder: { childCount: 9 },
+        lastModifiedDateTime: "2025-01-06T08:55:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+      {
+        id: "folder-12-accounting",
+        name: "12-Accounting",
+        folder: { childCount: 14 },
+        lastModifiedDateTime: "2025-01-06T17:30:00Z",
+        lastModifiedBy: { user: { displayName: "Sarah Mitchell" } },
+        size: 0,
+        webUrl: "#",
+      },
+    ],
+    []
+  )
+
+  // Override documents when in 00-Est folder
+  const getDisplayDocuments = React.useCallback(() => {
+    if (currentFolder === "00-Est") {
+      return mockEstimationFolders
+    }
+    return documents || []
+  }, [currentFolder, documents, mockEstimationFolders])
 
   // Filter and sort documents based on search query and sort options
   const filteredDocuments = useMemo(() => {
-    let docs = searchDocuments(searchQuery)
+    let docs = getDisplayDocuments()
+
+    // Apply search filter
+    if (searchQuery) {
+      docs = docs.filter((doc) => doc.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    }
 
     // Sort documents
     docs.sort((a, b) => {
@@ -109,7 +219,7 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
     })
 
     return docs
-  }, [searchDocuments, searchQuery, sortBy, sortOrder])
+  }, [getDisplayDocuments, searchQuery, sortBy, sortOrder, currentFolder])
 
   // Get file icon component
   const getFileIconComponent = (document: DriveItem) => {
@@ -141,14 +251,52 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
   // Handle document download
   const handleDownload = async (document: DriveItem) => {
     if (document.folder) {
-      // Demo: Navigate to folder
+      // Demo: Navigate to estimation folder
       const newFolder = document.name
       const newHistory = [...navigationHistory.slice(0, historyIndex + 1), newFolder]
       setNavigationHistory(newHistory)
       setHistoryIndex(newHistory.length - 1)
       setCurrentFolder(newFolder)
+
+      // Show specific content based on folder type
+      let folderDescription = ""
+      switch (newFolder) {
+        case "01 FinalDeliver":
+          folderDescription = "Final deliverable documents including contracts, bonds, and project closeout materials"
+          break
+        case "02 BidDoc":
+          folderDescription = "Bid documentation including specifications, drawings, and addenda"
+          break
+        case "03 EstSummary":
+          folderDescription = "Estimation summary reports, cost breakdowns, and analysis documents"
+          break
+        case "04 Qualifications":
+          folderDescription = "Contractor qualifications, certifications, and capability statements"
+          break
+        case "06 Bid Scopes":
+          folderDescription = "Detailed scope documents for each trade and work package"
+          break
+        case "07 SubProposal":
+          folderDescription = "Subcontractor proposals, quotes, and vendor responses"
+          break
+        case "08 Takeoffs":
+          folderDescription = "Quantity takeoffs, measurements, and calculation worksheets"
+          break
+        case "10 SiteLogistics":
+          folderDescription = "Site logistics plans, traffic control, and safety documentation"
+          break
+        case "12 ProjectTurnover":
+          folderDescription = "Project turnover documentation and closeout procedures"
+          break
+        case "12-Accounting":
+          folderDescription = "Project accounting files, cost tracking, and financial reports"
+          break
+        default:
+          folderDescription = "Project documents and files"
+      }
+
       alert(
-        `Demo: Navigated to folder "${newFolder}"\n\nIn a real implementation, this would load the folder contents.`
+        `Demo: Navigated to "${newFolder}"\n\n${folderDescription}\n\nIn a real implementation, this would load the folder contents with relevant documents.`
       )
       return
     }
@@ -216,12 +364,13 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
   }
 
   const handleNavigateUp = () => {
-    if (currentFolder !== "Root") {
-      const newFolder = "Root" // Simplified for demo
-      const newHistory = [...navigationHistory.slice(0, historyIndex + 1), newFolder]
+    if (currentFolder === "00-Est") {
+      const newFolder = "Root"
+      const newHistory = ["Root"]
       setNavigationHistory(newHistory)
-      setHistoryIndex(newHistory.length - 1)
+      setHistoryIndex(0)
       setCurrentFolder(newFolder)
+      alert("Demo: Navigated back to Root directory")
     }
   }
 
@@ -302,6 +451,16 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
   return (
     <Card className={`w-full ${className}`}>
       <CardHeader className="space-y-4 px-0">
+        {/* Current Path Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-2 rounded-md">
+          <Folder className="h-4 w-4" />
+          <span>SharePoint</span>
+          <ChevronRight className="h-3 w-3" />
+          <span>{projectName || "Project Files"}</span>
+          <ChevronRight className="h-3 w-3" />
+          <span className="font-medium text-foreground">{currentFolder}</span>
+        </div>
+
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -332,6 +491,14 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
             <Button variant="ghost" size="sm" onClick={handleNavigateUp} disabled={currentFolder === "Root"} title="Up">
               <ChevronUp className="h-4 w-4" />
             </Button>
+
+            {/* Current folder indicator */}
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <span>Current:</span>
+              <Badge variant="outline" className="text-xs">
+                {currentFolder}
+              </Badge>
+            </div>
 
             <div className="h-4 w-px bg-border mx-2" />
 
@@ -694,13 +861,20 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
         {!loading && !error && filteredDocuments.length > 0 && (
           <div className="text-sm text-muted-foreground flex items-center justify-between">
             <span>
-              {filteredDocuments.length} document{filteredDocuments.length !== 1 ? "s" : ""}
+              {filteredDocuments.length} {currentFolder === "00-Est" ? "estimation folder" : "document"}
+              {filteredDocuments.length !== 1 ? "s" : ""}
               {searchQuery && ` matching "${searchQuery}"`}
+              {currentFolder === "00-Est" && " in estimation directory"}
             </span>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-xs">
                 SharePoint Connected
               </Badge>
+              {currentFolder === "00-Est" && (
+                <Badge variant="secondary" className="text-xs">
+                  Estimation Workspace
+                </Badge>
+              )}
             </div>
           </div>
         )}

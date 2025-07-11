@@ -34,10 +34,16 @@
 
     --radius: 0.5rem;
 
-    /* Chart color variables for light theme */
-    --chart-1: 215 20% 45%;
-    --chart-2: 160 25% 45%;
-    --chart-3: 30 30% 50%;
+    /* HB Brand Colors */
+    --hb-blue: 222 100% 33%; /* #0021A5 */
+    --hb-orange: 15 96% 53%; /* #FA4616 */
+    --hb-blue-light: 222 100% 70%; /* Lighter variant */
+    --hb-orange-light: 15 96% 70%; /* Lighter variant */
+
+    /* Chart color variables for light theme - updated with HB colors */
+    --chart-1: 222 100% 33%; /* HB Blue */
+    --chart-2: 15 96% 53%; /* HB Orange */
+    --chart-3: 160 25% 45%;
     --chart-4: 280 25% 50%;
     --chart-5: 340 25% 45%;
   }
@@ -71,9 +77,15 @@
     --input: 240 3.7% 15.9%;
     --ring: 215 25% 45%;
 
-    /* Chart color variables for dark theme */
-    --chart-1: 215 25% 55%;
-    --chart-2: 160 30% 55%;
+    /* HB Brand Colors - Dark Mode */
+    --hb-blue: 222 100% 50%; /* Lighter blue for dark mode */
+    --hb-orange: 15 96% 60%; /* Lighter orange for dark mode */
+    --hb-blue-light: 222 100% 75%;
+    --hb-orange-light: 15 96% 75%;
+
+    /* Chart color variables for dark theme - updated with HB colors */
+    --chart-1: 222 100% 50%; /* HB Blue - lighter for dark mode */
+    --chart-2: 15 96% 60%; /* HB Orange - lighter for dark mode */
     --chart-3: 30 35% 60%;
     --chart-4: 280 30% 60%;
     --chart-5: 340 30% 55%;
@@ -481,6 +493,64 @@
 
   .row-span-12 {
     grid-row: span 12 / span 12;
+  }
+
+  /* HB Brand Color Utilities */
+  .text-hb-blue {
+    color: #0021a5;
+  }
+
+  .text-hb-orange {
+    color: #fa4616;
+  }
+
+  .bg-hb-blue {
+    background-color: #0021a5;
+  }
+
+  .bg-hb-orange {
+    background-color: #fa4616;
+  }
+
+  .border-hb-blue {
+    border-color: #0021a5;
+  }
+
+  .border-hb-orange {
+    border-color: #fa4616;
+  }
+
+  .hover\\:bg-hb-blue:hover {
+    background-color: #0021a5;
+  }
+
+  .hover\\:bg-hb-orange:hover {
+    background-color: #fa4616;
+  }
+
+  .hover\\:text-hb-blue:hover {
+    color: #0021a5;
+  }
+
+  .hover\\:text-hb-orange:hover {
+    color: #fa4616;
+  }
+
+  /* Dark mode variants */
+  .dark .text-hb-blue {
+    color: #4a7fd6;
+  }
+
+  .dark .text-hb-orange {
+    color: #ff8a67;
+  }
+
+  .dark .bg-hb-blue {
+    background-color: #1e3a8a;
+  }
+
+  .dark .bg-hb-orange {
+    background-color: #c2410c;
   }
 }
 

@@ -151,28 +151,32 @@ export function AccountabilityFeed({ userRole, className }: AccountabilityFeedPr
   }
 
   return (
-    <Card className={cn("", className)}>
+    <Card className={cn("border-l-4 border-l-[#FA4616]", className)}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Target className="h-5 w-5" style={{ color: "#FA4616" }} />
             {getCardTitle()}
           </div>
-          <Badge variant="outline" className="text-sm">
+          <Badge variant="outline" className="text-sm border-[#0021A5]/20 text-[#0021A5]">
             {stats.total} Total
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="!p-0">
         {/* Statistics Banner */}
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b">
+        <div className="px-6 py-4 bg-gradient-to-r from-[#FA4616]/5 to-transparent border-b border-[#FA4616]/10">
           <div className="grid grid-cols-4 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
+              <div className="text-2xl font-bold" style={{ color: "#0021A5" }}>
+                {stats.active}
+              </div>
               <div className="text-xs text-muted-foreground">Active</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+              <div className="text-2xl font-bold" style={{ color: "#FA4616" }}>
+                {stats.pending}
+              </div>
               <div className="text-xs text-muted-foreground">Pending</div>
             </div>
             <div>

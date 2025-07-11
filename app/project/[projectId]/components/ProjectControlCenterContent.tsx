@@ -583,42 +583,49 @@ const PreConstructionContent: React.FC<{
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation - Styled like Financial Hub */}
-      <div className="border-b border-border">
-        <div className="flex space-x-6 overflow-x-auto">
-          <button
-            onClick={() => setActivePreconTab("estimating")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "estimating"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Calculator className="h-4 w-4" />
-            <span>Estimating</span>
-          </button>
-          <button
-            onClick={() => setActivePreconTab("pre-construction")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "pre-construction"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Building2 className="h-4 w-4" />
-            <span>Pre-Construction</span>
-          </button>
-          <button
-            onClick={() => setActivePreconTab("ids-bim-coordination")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "ids-bim-coordination"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Brain className="h-4 w-4" />
-            <span>IDS & BIM Coordination</span>
-          </button>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div
+          onClick={() => setActivePreconTab("estimating")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "estimating"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Calculator className="h-6 w-6" />
+            <span className="text-sm font-medium">Estimating</span>
+            <span className="text-xs text-muted-foreground">Cost estimation and bidding tools</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActivePreconTab("pre-construction")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "pre-construction"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Building2 className="h-6 w-6" />
+            <span className="text-sm font-medium">Pre-Construction</span>
+            <span className="text-xs text-muted-foreground">Planning and coordination activities</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActivePreconTab("ids-bim-coordination")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "ids-bim-coordination"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Brain className="h-6 w-6" />
+            <span className="text-sm font-medium">IDS & BIM Coordination</span>
+            <span className="text-xs text-muted-foreground">Digital services and model coordination</span>
+          </div>
         </div>
       </div>
 
@@ -2225,24 +2232,25 @@ const WarrantyManagementContent: React.FC<{
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-border">
-        <nav className="-mb-px flex space-x-8">
-          {warrantyTabsConfig.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </nav>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        {warrantyTabsConfig.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+              activeTab === tab.id
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+            }`}
+          >
+            <div className="flex flex-col items-center text-center space-y-2">
+              <tab.icon className="h-6 w-6" />
+              <span className="text-sm font-medium">{tab.label}</span>
+              <span className="text-xs text-muted-foreground">{tab.description}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Content Area */}
@@ -2882,40 +2890,50 @@ const TradePartnersPanel: React.FC<{
 
   return (
     <div className="space-y-6 w-full max-w-full">
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveView("directory")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "directory"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Directory
-          </button>
-          <button
-            onClick={() => setActiveView("project")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "project"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Project View
-          </button>
-          <button
-            onClick={() => setActiveView("scorecard")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "scorecard"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Scorecards
-          </button>
-        </nav>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div
+          onClick={() => setActiveView("directory")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "directory"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Building className="h-6 w-6" />
+            <span className="text-sm font-medium">Directory</span>
+            <span className="text-xs text-muted-foreground">Complete regional directory</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActiveView("project")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "project"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Briefcase className="h-6 w-6" />
+            <span className="text-sm font-medium">Project View</span>
+            <span className="text-xs text-muted-foreground">Project-specific trade partners</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActiveView("scorecard")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "scorecard"
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Star className="h-6 w-6" />
+            <span className="text-sm font-medium">Scorecards</span>
+            <span className="text-xs text-muted-foreground">Internal performance reviews</span>
+          </div>
+        </div>
       </div>
 
       {/* View Content */}
@@ -2926,48 +2944,8 @@ const TradePartnersPanel: React.FC<{
   )
 }
 
-// Enhanced Contract Document Review Panel
-const ContractDocumentReviewPanel: React.FC<{
-  projectId: string
-  projectData: any
-  userRole: string
-}> = ({ projectId, projectData, userRole }) => {
-  const [selectedDocument, setSelectedDocument] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<"dashboard" | "review">("dashboard")
-  const [selectedClause, setSelectedClause] = useState<string | null>(null)
-  const [flaggedClauses, setFlaggedClauses] = useState<any[]>([])
-  const [aiInsights, setAiInsights] = useState<any[]>([])
-
-  const handleDocumentSelect = (documentId: string) => {
-    setSelectedDocument(documentId)
-    setViewMode("review")
-  }
-
-  const handleClauseSelect = (clauseId: string) => {
-    setSelectedClause(clauseId)
-  }
-
-  const handleFlagClause = (clauseId: string, category: string, comment: string) => {
-    // Implementation for flagging clauses
-  }
-
-  return (
-    <div className="space-y-6 w-full max-w-full">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Contract Document Review</CardTitle>
-          <p className="text-sm text-muted-foreground">AI-powered contract analysis and review</p>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">Contract document review interface</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+// Import the enhanced Contract Documents component
+import { EnhancedContractDocuments } from "@/components/compliance/EnhancedContractDocuments"
 
 // Compliance Management Content Component
 const ComplianceContent: React.FC<{
@@ -3002,7 +2980,9 @@ const ComplianceContent: React.FC<{
   const renderComplianceTabContent = () => {
     switch (activeTab) {
       case "contract-documents":
-        return <ContractDocumentReviewPanel projectId={projectId} projectData={projectData} userRole={userRole} />
+        return (
+          <EnhancedContractDocuments projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+        )
 
       case "trade-partners":
         return <TradePartnersPanel projectId={projectId} projectData={projectData} userRole={userRole} />
@@ -3038,24 +3018,25 @@ const ComplianceContent: React.FC<{
         </div>
       </div>
 
-      {/* Responsive Tab Navigation */}
-      <div className="border-b border-border flex-shrink-0">
-        <div className="flex space-x-6 overflow-x-auto">
-          {complianceTabsConfig.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 flex-shrink-0">
+        {complianceTabsConfig.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+              activeTab === tab.id
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+            }`}
+          >
+            <div className="flex flex-col items-center text-center space-y-2">
+              <tab.icon className="h-6 w-6" />
+              <span className="text-sm font-medium">{tab.label}</span>
+              <span className="text-xs text-muted-foreground">{tab.description}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Content Area */}
@@ -3172,6 +3153,24 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     )
   }
 
+  // Update sidebar content when activeTab changes
+  React.useEffect(() => {
+    if (onSidebarContentChange) {
+      onSidebarContentChange(getSidebarContent())
+    }
+  }, [
+    activeTab,
+    navigation.coreTab,
+    navigation.tool,
+    navigation.subTool,
+    onSidebarContentChange,
+    projectId,
+    projectData,
+    user,
+    userRole,
+    projectMetrics,
+  ])
+
   // Get quick actions based on current core tab
   const getQuickActions = () => {
     if (navigation.coreTab === "reports") {
@@ -3273,9 +3272,1017 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   const getHBIInsights = () => {
+    // Financial Management tabs - comprehensive insights for all financial sub-tabs
+    if (activeTab === "financial-management" || activeTab === "financial-hub") {
+      // Get current financial sub-tab from navigation
+      const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
+
+      // Budget Analysis insights
+      if (currentFinancialTab === "budget-analysis") {
+        return [
+          {
+            id: "budget-1",
+            type: "warning",
+            severity: "medium",
+            title: "Budget Variance Alert",
+            text: "Material costs are tracking 3.2% above budget. Steel and concrete prices have increased significantly.",
+            action: "Review variance",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "budget-2",
+            type: "success",
+            severity: "low",
+            title: "Labor Cost Efficiency",
+            text: "Labor costs are running 5% under budget due to improved productivity and scheduling optimization.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "budget-3",
+            type: "alert",
+            severity: "high",
+            title: "Change Order Impact",
+            text: "Pending change orders totaling $245K may impact current budget projections by Q3.",
+            action: "Review COs",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "budget-4",
+            type: "info",
+            severity: "low",
+            title: "Budget Milestone Achieved",
+            text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
+            action: "View milestone",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // JCHR insights
+      if (currentFinancialTab === "jchr") {
+        return [
+          {
+            id: "jchr-1",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Variance Detected",
+            text: "Electrical work showing 8% cost overrun. Recommend immediate review of labor allocation.",
+            action: "Review variance",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "jchr-2",
+            type: "info",
+            severity: "low",
+            title: "Spend Velocity Analysis",
+            text: "Current spend rate is 92% of forecasted velocity. Project financial health is stable.",
+            action: "View analysis",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "jchr-3",
+            type: "success",
+            severity: "low",
+            title: "Performance Tracking",
+            text: "Concrete work completed 15% ahead of schedule with cost savings of $12K.",
+            action: "View details",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "jchr-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Profitability Optimization",
+            text: "Identified opportunity to improve margins by 2.1% through resource reallocation.",
+            action: "Review opportunity",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // AR Aging insights
+      if (currentFinancialTab === "ar-aging") {
+        return [
+          {
+            id: "ar-1",
+            type: "alert",
+            severity: "high",
+            title: "Collection Priority Alert",
+            text: "Invoice #INV-2024-156 ($47K) is 45 days overdue. Immediate collection action required.",
+            action: "Initiate collection",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "ar-2",
+            type: "warning",
+            severity: "medium",
+            title: "Cash Flow Impact",
+            text: "Outstanding receivables over 30 days total $234K, affecting cash flow projections.",
+            action: "Review aging",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "ar-3",
+            type: "info",
+            severity: "low",
+            title: "Retainage Analysis",
+            text: "Total retainage held: $89K. First release eligible in 14 days upon milestone completion.",
+            action: "View retainage",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "ar-4",
+            type: "success",
+            severity: "low",
+            title: "Collection Efficiency",
+            text: "Payment collection rate improved to 94% this quarter, up from 87% last quarter.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Cash Flow insights
+      if (currentFinancialTab === "cash-flow") {
+        return [
+          {
+            id: "cash-1",
+            type: "warning",
+            severity: "medium",
+            title: "Liquidity Alert",
+            text: "Projected cash flow dips below $50K threshold in 3 weeks. Plan accelerated collections.",
+            action: "Review forecast",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "cash-2",
+            type: "success",
+            severity: "low",
+            title: "Forecast Accuracy",
+            text: "Cash flow projections were 96% accurate this month, exceeding 90% target.",
+            action: "View analysis",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "cash-3",
+            type: "info",
+            severity: "low",
+            title: "Seasonal Trends",
+            text: "Historical data shows 15% cash flow improvement expected in Q4 due to project completions.",
+            action: "View trends",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "cash-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Investment Opportunity",
+            text: "Excess cash position of $125K available for short-term investment opportunities.",
+            action: "Explore options",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Forecasting insights
+      if (currentFinancialTab === "forecasting") {
+        return [
+          {
+            id: "forecast-1",
+            type: "success",
+            severity: "low",
+            title: "Accuracy Improvement",
+            text: "Forecasting accuracy improved to 94% this quarter, up from 89% last quarter.",
+            action: "View metrics",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "forecast-2",
+            type: "info",
+            severity: "low",
+            title: "Revenue Projection",
+            text: "Q4 revenue forecast updated to $2.1M based on current project pipeline and completion rates.",
+            action: "Review projections",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "forecast-3",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Trend Analysis",
+            text: "Material cost inflation trending 4.2% above forecast. Adjust pricing models accordingly.",
+            action: "Review trends",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "forecast-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Schedule Impact",
+            text: "Early project completion could improve Q4 margins by 3.5% through accelerated revenue recognition.",
+            action: "Analyze impact",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Change Management insights
+      if (currentFinancialTab === "change-management") {
+        return [
+          {
+            id: "change-1",
+            type: "alert",
+            severity: "high",
+            title: "Change Order Volume",
+            text: "Change order volume increased 45% this month. Review change management processes.",
+            action: "Review process",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "change-2",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Bottleneck",
+            text: "Average change order approval time: 8.2 days. Target is 5 days for optimal cash flow.",
+            action: "Review workflow",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "change-3",
+            type: "info",
+            severity: "low",
+            title: "Cost Impact Analysis",
+            text: "Approved change orders total $145K (3.2% of contract value). Within acceptable range.",
+            action: "View analysis",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "change-4",
+            type: "success",
+            severity: "low",
+            title: "Efficiency Improvement",
+            text: "Change order processing time reduced by 25% through workflow optimization.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Pay Authorization insights
+      if (currentFinancialTab === "pay-authorization") {
+        return [
+          {
+            id: "pay-1",
+            type: "warning",
+            severity: "medium",
+            title: "Authorization Delay",
+            text: "3 payment authorizations pending approval for over 48 hours. Review approval workflow.",
+            action: "Review queue",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "pay-2",
+            type: "success",
+            severity: "low",
+            title: "Processing Efficiency",
+            text: "Payment processing time improved to 2.1 days average, down from 3.5 days last month.",
+            action: "View metrics",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "pay-3",
+            type: "info",
+            severity: "low",
+            title: "Compliance Monitoring",
+            text: "All payment authorizations meet compliance requirements. No regulatory issues identified.",
+            action: "View compliance",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "pay-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Automation Opportunity",
+            text: "65% of payment authorizations are routine and could benefit from automated processing.",
+            action: "Explore automation",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Pay Applications insights
+      if (currentFinancialTab === "pay-applications") {
+        return [
+          {
+            id: "payapp-1",
+            type: "success",
+            severity: "low",
+            title: "Application Submitted",
+            text: "Pay Application #08 submitted successfully. $234K requested for October progress.",
+            action: "Track status",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "payapp-2",
+            type: "info",
+            severity: "low",
+            title: "Cash Flow Optimization",
+            text: "Early submission of pay applications improved cash flow by 12% compared to last quarter.",
+            action: "View analysis",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "payapp-3",
+            type: "warning",
+            severity: "medium",
+            title: "Documentation Review",
+            text: "Pay Application #07 requires additional documentation. Submit within 48 hours to avoid delays.",
+            action: "Upload docs",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "payapp-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Retention Management",
+            text: "Opportunity to negotiate reduced retention rate based on project performance history.",
+            action: "Review options",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Retention insights
+      if (currentFinancialTab === "retention") {
+        return [
+          {
+            id: "retention-1",
+            type: "alert",
+            severity: "high",
+            title: "Retention Release Due",
+            text: "Retention release of $67K eligible for release upon completion of punch list items.",
+            action: "Review release",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "retention-2",
+            type: "success",
+            severity: "low",
+            title: "Retention Optimization",
+            text: "Negotiated retention rate reduced to 8% (from 10%) based on excellent performance record.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "retention-3",
+            type: "info",
+            severity: "low",
+            title: "Release Schedule",
+            text: "Planned retention releases: $45K in Q4, $67K in Q1 2025, subject to completion milestones.",
+            action: "View schedule",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "retention-4",
+            type: "warning",
+            severity: "medium",
+            title: "Risk Assessment",
+            text: "Total retention held: $234K. Monitor project completion closely to ensure timely release.",
+            action: "Review risk",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Default financial insights
+      return [
+        {
+          id: "financial-1",
+          type: "success",
+          severity: "low",
+          title: "Financial Health Score",
+          text: "Project financial health rated 'Excellent' with 94% budget efficiency and positive cash flow.",
+          action: "View dashboard",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "financial-2",
+          type: "info",
+          severity: "low",
+          title: "Budget Performance",
+          text: "Current budget utilization: 68% with remaining budget of $1.2M for project completion.",
+          action: "View budget",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "financial-3",
+          type: "opportunity",
+          severity: "medium",
+          title: "Cash Flow Monitoring",
+          text: "Optimize payment scheduling to maintain positive cash flow throughout project lifecycle.",
+          action: "Review schedule",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
+    // Field Management tabs
+    if (activeTab === "field-management") {
+      // Get current field management sub-tab from navigation
+      const currentFieldTab = navigation.tool === "field-management" ? navigation.subTool : "scheduler"
+
+      // Scheduler insights
+      if (currentFieldTab === "scheduler") {
+        return [
+          {
+            id: "scheduler-1",
+            type: "warning",
+            severity: "medium",
+            title: "Critical Path Delay Risk",
+            text: "Weather delays may impact concrete pour schedule. Consider accelerating prep work.",
+            action: "Review schedule",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "scheduler-2",
+            type: "opportunity",
+            severity: "medium",
+            title: "Weather Window Opportunity",
+            text: "Extended favorable weather forecast allows for advancing roofing activities by 5 days.",
+            action: "Optimize schedule",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "scheduler-3",
+            type: "success",
+            severity: "low",
+            title: "Resource Optimization",
+            text: "Crew scheduling optimization improved productivity by 12% this week.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "scheduler-4",
+            type: "alert",
+            severity: "high",
+            title: "Material Delivery Alert",
+            text: "Steel delivery delayed by 3 days. Coordinate with supplier to minimize schedule impact.",
+            action: "Contact supplier",
+            timestamp: "6 hours ago",
+          },
+        ]
+      }
+
+      // Field Reports insights
+      if (currentFieldTab === "field-reports") {
+        return [
+          {
+            id: "field-1",
+            type: "success",
+            severity: "low",
+            title: "Progress Trending",
+            text: "Daily progress reports show 15% ahead of schedule for structural work completion.",
+            action: "View progress",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "field-2",
+            type: "warning",
+            severity: "medium",
+            title: "Weather Impact",
+            text: "Rain delays accumulated 2.5 days this week. Adjust weekend crew schedule to compensate.",
+            action: "Review schedule",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "field-3",
+            type: "info",
+            severity: "low",
+            title: "Quality Milestone",
+            text: "Structural inspections completed with zero defects. Excellent quality control maintained.",
+            action: "View inspections",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "field-4",
+            type: "alert",
+            severity: "high",
+            title: "Safety Incident",
+            text: "Near-miss incident reported in Area C. Immediate safety briefing scheduled for tomorrow.",
+            action: "Review incident",
+            timestamp: "4 hours ago",
+          },
+        ]
+      }
+
+      // Constraints insights
+      if (currentFieldTab === "constraints") {
+        return [
+          {
+            id: "constraints-1",
+            type: "alert",
+            severity: "high",
+            title: "Critical Constraint Impact",
+            text: "Utility relocation delay affecting foundation work. Estimated 5-day schedule impact.",
+            action: "Review mitigation",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "constraints-2",
+            type: "warning",
+            severity: "medium",
+            title: "Material Supply Risk",
+            text: "Concrete supplier capacity constraints may affect pour schedule in November.",
+            action: "Secure backup",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "constraints-3",
+            type: "opportunity",
+            severity: "medium",
+            title: "Constraint Resolution",
+            text: "Permit approval received early. Electrical work can begin 3 days ahead of schedule.",
+            action: "Update schedule",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "constraints-4",
+            type: "info",
+            severity: "low",
+            title: "Constraint Monitoring",
+            text: "15 active constraints tracked. 3 resolved this week, 2 new constraints identified.",
+            action: "View all",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Permit Log insights
+      if (currentFieldTab === "permit-log") {
+        return [
+          {
+            id: "permit-1",
+            type: "warning",
+            severity: "medium",
+            title: "Permit Expiration Alert",
+            text: "Building permit #BP-2024-789 expires in 14 days. Renewal required to continue work.",
+            action: "Renew permit",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "permit-2",
+            type: "success",
+            severity: "low",
+            title: "Inspection Passed",
+            text: "Framing inspection completed successfully. Electrical rough-in can proceed as scheduled.",
+            action: "View report",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "permit-3",
+            type: "info",
+            severity: "low",
+            title: "Permit Application Status",
+            text: "Plumbing permit application submitted. Expected approval within 5-7 business days.",
+            action: "Track status",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "permit-4",
+            type: "alert",
+            severity: "high",
+            title: "Inspection Failure",
+            text: "Electrical inspection failed due to code violations. Rework required before re-inspection.",
+            action: "Review violations",
+            timestamp: "6 hours ago",
+          },
+        ]
+      }
+
+      // Default field management insights
+      return [
+        {
+          id: "field-default-1",
+          type: "info",
+          severity: "low",
+          title: "Field Operations Update",
+          text: "All field operations running smoothly with no critical issues reported.",
+          action: "View summary",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "field-default-2",
+          type: "success",
+          severity: "low",
+          title: "Progress Tracking",
+          text: "Project progress maintains steady pace with 72% completion and on-schedule delivery.",
+          action: "View progress",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
+    // Core Project Tools tabs
+    if (activeTab === "core" || !activeTab) {
+      // Dashboard tab (default)
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return [
+          {
+            id: "dashboard-1",
+            type: "success",
+            severity: "low",
+            title: "Project Health Score",
+            text: "Project health rated 'Excellent' with 94% efficiency across all key performance indicators.",
+            action: "View dashboard",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "dashboard-2",
+            type: "info",
+            severity: "low",
+            title: "Milestone Achievement",
+            text: "Structural milestone completed 3 days ahead of schedule. Team performance exceptional.",
+            action: "View milestones",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "dashboard-3",
+            type: "opportunity",
+            severity: "medium",
+            title: "Budget Variance Trending",
+            text: "Budget variance trending positive. Opportunity to reallocate savings to value-add items.",
+            action: "Review variance",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Tab-specific insights for core tools
+      switch (navigation.coreTab) {
+        case "checklists":
+          return [
+            {
+              id: "checklist-1",
+              type: "warning",
+              severity: "medium",
+              title: "StartUp Progress Alert",
+              text: "StartUp checklist 78% complete. 5 critical items require attention before project handoff.",
+              action: "Review items",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "checklist-2",
+              type: "success",
+              severity: "low",
+              title: "Safety Compliance",
+              text: "Safety checklist 100% complete. All regulatory requirements met for current phase.",
+              action: "View compliance",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "checklist-3",
+              type: "info",
+              severity: "low",
+              title: "Quality Review",
+              text: "Quality checklist items trending well. 92% completion rate across all categories.",
+              action: "View quality",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "checklist-4",
+              type: "alert",
+              severity: "high",
+              title: "Closeout Preparation",
+              text: "Closeout checklist preparation should begin. Schedule owner training and documentation.",
+              action: "Start closeout",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "productivity":
+          return [
+            {
+              id: "productivity-1",
+              type: "success",
+              severity: "low",
+              title: "Team Collaboration",
+              text: "Team collaboration metrics improved 18% this month. Message response time down to 2.1 hours.",
+              action: "View metrics",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "productivity-2",
+              type: "info",
+              severity: "low",
+              title: "Task Completion Trends",
+              text: "Task completion rate: 94% this week. Productivity tools driving efficiency gains.",
+              action: "View tasks",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "productivity-3",
+              type: "opportunity",
+              severity: "medium",
+              title: "Communication Efficiency",
+              text: "Opportunity to further streamline communication workflows. Consider automation tools.",
+              action: "Explore tools",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "productivity-4",
+              type: "warning",
+              severity: "medium",
+              title: "Overdue Tasks",
+              text: "3 tasks overdue by more than 48 hours. Review task assignments and capacity.",
+              action: "Review tasks",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "staffing":
+          return [
+            {
+              id: "staffing-1",
+              type: "success",
+              severity: "low",
+              title: "Resource Allocation",
+              text: "Staffing efficiency at 96% with optimal resource allocation across all project phases.",
+              action: "View allocation",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "staffing-2",
+              type: "info",
+              severity: "low",
+              title: "Team Efficiency",
+              text: "Team efficiency metrics show 15% improvement over baseline. Excellent performance.",
+              action: "View metrics",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "staffing-3",
+              type: "warning",
+              severity: "medium",
+              title: "Training Completion",
+              text: "2 team members pending safety training completion. Schedule before next phase begins.",
+              action: "Schedule training",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "staffing-4",
+              type: "opportunity",
+              severity: "medium",
+              title: "SPCR Review",
+              text: "Opportunity to optimize SPCR assignments based on current project performance data.",
+              action: "Review SPCR",
+              timestamp: "2 days ago",
+            },
+          ]
+
+        case "responsibility-matrix":
+          return [
+            {
+              id: "matrix-1",
+              type: "warning",
+              severity: "medium",
+              title: "Coverage Analysis",
+              text: "2 responsibility areas lack clear assignment. Define ownership before critical path activities.",
+              action: "Assign roles",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "matrix-2",
+              type: "success",
+              severity: "low",
+              title: "Matrix Optimization",
+              text: "Responsibility matrix updated with 97% coverage. Clear accountability established.",
+              action: "View matrix",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "matrix-3",
+              type: "info",
+              severity: "low",
+              title: "Role Clarity",
+              text: "Team feedback indicates 94% satisfaction with role clarity and responsibility definition.",
+              action: "View feedback",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "matrix-4",
+              type: "alert",
+              severity: "high",
+              title: "Conflict Resolution",
+              text: "Overlapping responsibilities identified between trades. Resolve conflicts immediately.",
+              action: "Resolve conflicts",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "reports":
+          return [
+            {
+              id: "reports-1",
+              type: "info",
+              severity: "low",
+              title: "Report Generation",
+              text: "Weekly progress report generated successfully. Distribution scheduled for 2 PM today.",
+              action: "View report",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "reports-2",
+              type: "warning",
+              severity: "medium",
+              title: "Approval Delays",
+              text: "2 reports pending approval for over 48 hours. Follow up with stakeholders needed.",
+              action: "Follow up",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "reports-3",
+              type: "success",
+              severity: "low",
+              title: "Data Quality",
+              text: "Report data quality score: 98%. Automated validation catching errors effectively.",
+              action: "View metrics",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "reports-4",
+              type: "opportunity",
+              severity: "medium",
+              title: "Reporting Efficiency",
+              text: "Opportunity to automate 65% of routine reports. Could save 8 hours per week.",
+              action: "Explore automation",
+              timestamp: "2 days ago",
+            },
+          ]
+
+        default:
+          return [
+            {
+              id: "core-1",
+              type: "success",
+              severity: "low",
+              title: "Project Health Score",
+              text: "Project health rated 'Excellent' with 94% efficiency across all key performance indicators.",
+              action: "View dashboard",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "core-2",
+              type: "info",
+              severity: "low",
+              title: "Milestone Achievement",
+              text: "Structural milestone completed 3 days ahead of schedule. Team performance exceptional.",
+              action: "View milestones",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "core-3",
+              type: "opportunity",
+              severity: "medium",
+              title: "Budget Variance Trending",
+              text: "Budget variance trending positive. Opportunity to reallocate savings to value-add items.",
+              action: "Review variance",
+              timestamp: "1 day ago",
+            },
+          ]
+      }
+    }
+
+    // Pre-Construction insights
+    if (activeTab === "pre-construction") {
+      return [
+        {
+          id: "precon-1",
+          type: "success",
+          severity: "low",
+          title: "Estimate Accuracy",
+          text: "Final estimate accuracy: 97.2%. Excellent alignment with actual costs and market conditions.",
+          action: "View estimate",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "precon-2",
+          type: "info",
+          severity: "low",
+          title: "BIM Coordination",
+          text: "BIM model coordination 85% complete. Clash detection identified and resolved 23 conflicts.",
+          action: "View model",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "precon-3",
+          type: "warning",
+          severity: "medium",
+          title: "Permit Timeline",
+          text: "Building permit application review may extend 2 weeks. Consider expedited processing option.",
+          action: "Review options",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "precon-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Value Engineering",
+          text: "Value engineering review identified $45K in potential savings without compromising quality.",
+          action: "Review options",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Warranty Management insights
+    if (activeTab === "warranty") {
+      return [
+        {
+          id: "warranty-1",
+          type: "alert",
+          severity: "high",
+          title: "Warranty Claim",
+          text: "New warranty claim submitted for HVAC system. Response required within 24 hours.",
+          action: "Review claim",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "warranty-2",
+          type: "success",
+          severity: "low",
+          title: "Claim Resolution",
+          text: "Roofing warranty claim resolved successfully. Customer satisfaction rating: 4.8/5.",
+          action: "View details",
+          timestamp: "3 hours ago",
+        },
+        {
+          id: "warranty-3",
+          type: "info",
+          severity: "low",
+          title: "Coverage Analysis",
+          text: "Current warranty coverage: $1.2M across 15 active projects. No coverage gaps identified.",
+          action: "View coverage",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "warranty-4",
+          type: "warning",
+          severity: "medium",
+          title: "Expiration Notice",
+          text: "3 warranty periods expiring within 60 days. Schedule final inspections and documentation.",
+          action: "Schedule inspections",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Compliance insights
+    if (activeTab === "compliance") {
+      return [
+        {
+          id: "compliance-1",
+          type: "success",
+          severity: "low",
+          title: "Compliance Rating",
+          text: "Current compliance rating: 98%. All regulatory requirements met or exceeded.",
+          action: "View details",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "compliance-2",
+          type: "info",
+          severity: "low",
+          title: "Contract Review",
+          text: "Quarterly contract review completed. All trade partner agreements current and compliant.",
+          action: "View contracts",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "compliance-3",
+          type: "warning",
+          severity: "medium",
+          title: "Documentation Gap",
+          text: "2 trade partners missing current insurance certificates. Obtain before work continuation.",
+          action: "Request certificates",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "compliance-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Process Improvement",
+          text: "Opportunity to streamline compliance workflow. Digital documentation could save 6 hours/week.",
+          action: "Explore options",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Default insights for any other tabs
     return [
       {
-        id: "core-1",
+        id: "default-1",
         type: "info",
         severity: "low",
         title: "Project Status Update",
@@ -3284,7 +4291,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         timestamp: "1 day ago",
       },
       {
-        id: "core-2",
+        id: "default-2",
         type: "opportunity",
         severity: "medium",
         title: "Process Optimization",
@@ -3575,6 +4582,7 @@ export const getProjectSidebarContent = (
   }
 
   const getHBIInsights = () => {
+    // Financial Management tabs - comprehensive insights for all financial sub-tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
       // Get current financial sub-tab from navigation
       const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
@@ -3617,24 +4625,6 @@ export const getProjectSidebarContent = (
             text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
             action: "View milestone",
             timestamp: "1 day ago",
-          },
-          {
-            id: "budget-5",
-            type: "warning",
-            severity: "medium",
-            title: "Contingency Usage",
-            text: "Contingency fund is at 45% utilization. Consider reviewing remaining scope for potential risks.",
-            action: "Analyze contingency",
-            timestamp: "2 days ago",
-          },
-          {
-            id: "budget-6",
-            type: "info",
-            severity: "low",
-            title: "Cost Forecast Update",
-            text: "Updated cost forecasting models show project completion within 2% of original budget.",
-            action: "View forecast",
-            timestamp: "3 days ago",
           },
         ]
       }
@@ -4016,6 +5006,180 @@ export const getProjectSidebarContent = (
       ]
     }
 
+    // Field Management tabs - unique insights for each field management sub-tool
+    if (activeTab === "field-management") {
+      const fieldSubTool = navigation.subTool || "scheduler"
+
+      // Scheduler insights
+      if (fieldSubTool === "scheduler") {
+        return [
+          {
+            id: "scheduler-1",
+            type: "warning",
+            severity: "medium",
+            title: "Critical Path Delay Risk",
+            text: "Foundation work is 3 days behind schedule. HBI recommends immediate mitigation to prevent cascade delays.",
+            action: "Review schedule",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "scheduler-2",
+            type: "success",
+            severity: "low",
+            title: "Weather Window Opportunity",
+            text: "7-day clear weather forecast allows acceleration of exterior work. Consider overtime to gain schedule.",
+            action: "Optimize schedule",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "scheduler-3",
+            type: "info",
+            severity: "medium",
+            title: "Resource Optimization",
+            text: "MEP trade coordination shows 95% efficiency. Excellent collaboration reducing typical conflicts.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "scheduler-4",
+            type: "alert",
+            severity: "high",
+            title: "Material Delivery Alert",
+            text: "Steel delivery delayed 5 days due to supplier issues. Critical path impact imminent without action.",
+            action: "Contact supplier",
+            timestamp: "2 hours ago",
+          },
+        ]
+      }
+
+      // Field Reports insights
+      if (fieldSubTool === "field-reports") {
+        return [
+          {
+            id: "field-reports-1",
+            type: "info",
+            severity: "low",
+            title: "Daily Progress Trending",
+            text: "Daily log completion rate at 98%. Excellent field documentation consistency maintained.",
+            action: "View reports",
+            timestamp: "30 minutes ago",
+          },
+          {
+            id: "field-reports-2",
+            type: "warning",
+            severity: "medium",
+            title: "Weather Impact Analysis",
+            text: "3 weather delays this week affecting masonry work. Total schedule impact: 1.5 days.",
+            action: "Review impacts",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "field-reports-3",
+            type: "success",
+            severity: "low",
+            title: "Quality Milestone Achieved",
+            text: "Zero quality defects reported in past 7 days. Strong craftwork and supervision performance.",
+            action: "View quality data",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "field-reports-4",
+            type: "alert",
+            severity: "high",
+            title: "Safety Incident Reported",
+            text: "Minor safety incident in Zone B requires immediate corrective action and crew briefing.",
+            action: "Review incident",
+            timestamp: "45 minutes ago",
+          },
+        ]
+      }
+
+      // Constraints insights
+      if (fieldSubTool === "constraints") {
+        return [
+          {
+            id: "constraints-1",
+            type: "alert",
+            severity: "high",
+            title: "Critical Constraint Impact",
+            text: "Electrical permit delay creating 7-day constraint on MEP rough-in. Immediate escalation required.",
+            action: "Escalate constraint",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "constraints-2",
+            type: "warning",
+            severity: "medium",
+            title: "Material Constraint Risk",
+            text: "Structural steel delivery showing high-risk indicators. Potential 5-day schedule impact.",
+            action: "Review delivery",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "constraints-3",
+            type: "success",
+            severity: "low",
+            title: "Constraint Resolution",
+            text: "Crane availability constraint resolved 2 days early. Schedule acceleration opportunity identified.",
+            action: "Optimize schedule",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "constraints-4",
+            type: "info",
+            severity: "medium",
+            title: "Constraint Trending",
+            text: "12 active constraints down from 18 last week. Strong constraint management performance.",
+            action: "View trends",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Permit Log insights
+      if (fieldSubTool === "permit-log") {
+        return [
+          {
+            id: "permit-1",
+            type: "warning",
+            severity: "medium",
+            title: "Permit Expiration Alert",
+            text: "Building permit expires in 15 days. Renewal process should begin immediately to avoid delays.",
+            action: "Begin renewal",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "permit-2",
+            type: "success",
+            severity: "low",
+            title: "Inspection Passed",
+            text: "Electrical rough-in inspection passed with zero defects. Work can proceed to next phase.",
+            action: "View inspection",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "permit-3",
+            type: "alert",
+            severity: "high",
+            title: "Failed Inspection",
+            text: "Plumbing inspection failed due to code violations. Immediate remediation required.",
+            action: "Review violations",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "permit-4",
+            type: "info",
+            severity: "low",
+            title: "Permit Application Status",
+            text: "3 new permit applications submitted and under review. Expected approval within 5-7 business days.",
+            action: "Track applications",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+    }
+
+    // Pre-Construction tab insights
     if (activeTab === "pre-construction") {
       return [
         {
@@ -4054,18 +5218,10 @@ export const getProjectSidebarContent = (
           action: "Review bids",
           timestamp: "4 days ago",
         },
-        {
-          id: "precon-5",
-          type: "info",
-          severity: "medium",
-          title: "Team Mobilization",
-          text: "Site team members identified and ready for project mobilization.",
-          action: "View team",
-          timestamp: "5 days ago",
-        },
       ]
     }
 
+    // Warranty Management tab insights
     if (activeTab === "warranty") {
       return [
         {
@@ -4107,50 +5263,307 @@ export const getProjectSidebarContent = (
       ]
     }
 
-    if (navigation.coreTab === "productivity") {
+    // Compliance tab insights
+    if (activeTab === "compliance") {
       return [
         {
-          id: "prod-1",
-          type: "success",
-          severity: "low",
-          title: "Team Collaboration Active",
-          text: "Team communication frequency has increased 25% this week, indicating good engagement.",
-          action: "View activity",
+          id: "compliance-1",
+          type: "warning",
+          severity: "medium",
+          title: "Contract Review Required",
+          text: "3 trade partner contracts require compliance review before execution. Legal review needed.",
+          action: "Schedule review",
           timestamp: "1 hour ago",
         },
         {
-          id: "prod-2",
-          type: "warning",
-          severity: "medium",
-          title: "Task Completion Trend",
-          text: "Task completion rate has dropped 15% from last week. Consider workload redistribution.",
-          action: "Review tasks",
-          timestamp: "4 hours ago",
+          id: "compliance-2",
+          type: "success",
+          severity: "low",
+          title: "Insurance Verification Complete",
+          text: "All subcontractor insurance certificates verified and current. 100% compliance achieved.",
+          action: "View certificates",
+          timestamp: "3 hours ago",
         },
         {
-          id: "prod-3",
-          type: "info",
-          severity: "low",
-          title: "Communication Efficiency",
-          text: "Average response time to messages has improved to 2.3 hours.",
-          action: "View metrics",
+          id: "compliance-3",
+          type: "alert",
+          severity: "high",
+          title: "License Expiration Alert",
+          text: "Electrical contractor license expires in 30 days. Renewal documentation required.",
+          action: "Request renewal",
           timestamp: "1 day ago",
         },
         {
-          id: "prod-4",
-          type: "alert",
-          severity: "high",
-          title: "Overdue Tasks Alert",
-          text: "3 tasks are approaching their due dates. Immediate attention required.",
-          action: "Review overdue",
+          id: "compliance-4",
+          type: "info",
+          severity: "low",
+          title: "Trade Partner Scorecard",
+          text: "Overall trade partner compliance score: 94%. Strong performance across all metrics.",
+          action: "View scorecard",
           timestamp: "2 days ago",
         },
       ]
     }
 
+    // Core Project Tools tabs - unique insights for each core tab
+    if (activeTab === "core" || !activeTab) {
+      // Dashboard tab (default)
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return [
+          {
+            id: "dashboard-1",
+            type: "info",
+            severity: "low",
+            title: "Project Health Score",
+            text: "Overall project health score of 87% indicates strong performance across all KPIs.",
+            action: "View details",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "dashboard-2",
+            type: "success",
+            severity: "low",
+            title: "Milestone Achievement",
+            text: "Foundation milestone completed 2 days ahead of schedule. Excellent progress momentum.",
+            action: "View milestone",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "dashboard-3",
+            type: "warning",
+            severity: "medium",
+            title: "Budget Variance Trending",
+            text: "Material costs trending 2.1% above baseline. Monitor for potential budget impact.",
+            action: "Review budget",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "dashboard-4",
+            type: "info",
+            severity: "medium",
+            title: "Team Performance",
+            text: "Project team productivity up 15% this month. Strong collaboration and efficiency.",
+            action: "View metrics",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Checklists tab
+      if (navigation.coreTab === "checklists") {
+        return [
+          {
+            id: "checklist-1",
+            type: "success",
+            severity: "low",
+            title: "StartUp Checklist Progress",
+            text: "78% of startup checklist items completed. On track for project launch milestone.",
+            action: "View checklist",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "checklist-2",
+            type: "warning",
+            severity: "medium",
+            title: "Safety Checklist Gap",
+            text: "5 safety checklist items require immediate attention before next phase can begin.",
+            action: "Complete items",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "checklist-3",
+            type: "info",
+            severity: "low",
+            title: "Quality Checklist Review",
+            text: "Quality control checklist shows 95% completion rate. Excellent quality management.",
+            action: "View quality data",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "checklist-4",
+            type: "alert",
+            severity: "high",
+            title: "Closeout Preparation",
+            text: "Closeout checklist preparation needed for upcoming substantial completion milestone.",
+            action: "Start closeout prep",
+            timestamp: "3 days ago",
+          },
+        ]
+      }
+
+      // Productivity tab
+      if (navigation.coreTab === "productivity") {
+        return [
+          {
+            id: "prod-1",
+            type: "success",
+            severity: "low",
+            title: "Team Collaboration Active",
+            text: "Team communication frequency has increased 25% this week, indicating good engagement.",
+            action: "View activity",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "prod-2",
+            type: "warning",
+            severity: "medium",
+            title: "Task Completion Trend",
+            text: "Task completion rate has dropped 15% from last week. Consider workload redistribution.",
+            action: "Review tasks",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "prod-3",
+            type: "info",
+            severity: "low",
+            title: "Communication Efficiency",
+            text: "Average response time to messages has improved to 2.3 hours.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "prod-4",
+            type: "alert",
+            severity: "high",
+            title: "Overdue Tasks Alert",
+            text: "3 tasks are approaching their due dates. Immediate attention required.",
+            action: "Review overdue",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Staffing tab
+      if (navigation.coreTab === "staffing") {
+        return [
+          {
+            id: "staffing-1",
+            type: "warning",
+            severity: "medium",
+            title: "Resource Allocation Gap",
+            text: "Electrical crew understaffed by 2 members for next phase. Consider reallocating resources.",
+            action: "Review staffing",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "staffing-2",
+            type: "success",
+            severity: "low",
+            title: "Team Efficiency High",
+            text: "Current team showing 112% productivity versus baseline. Excellent performance metrics.",
+            action: "View performance",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "staffing-3",
+            type: "info",
+            severity: "medium",
+            title: "Training Completion",
+            text: "Safety training completion rate at 95%. All team members current on certifications.",
+            action: "View training",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "staffing-4",
+            type: "alert",
+            severity: "high",
+            title: "SPCR Review Required",
+            text: "3 Staffing Plan Change Requests require approval before implementation.",
+            action: "Review SPCRs",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Responsibility Matrix tab
+      if (navigation.coreTab === "responsibility-matrix") {
+        return [
+          {
+            id: "responsibility-1",
+            type: "info",
+            severity: "low",
+            title: "Matrix Coverage Analysis",
+            text: "Responsibility matrix shows 87% role assignment coverage. Strong accountability structure.",
+            action: "View matrix",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "responsibility-2",
+            type: "warning",
+            severity: "medium",
+            title: "Unassigned Responsibilities",
+            text: "5 critical responsibilities lack clear ownership. Assign accountable parties immediately.",
+            action: "Assign roles",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "responsibility-3",
+            type: "success",
+            severity: "low",
+            title: "Decision Authority Clear",
+            text: "Decision-making authority clearly defined for 95% of project activities.",
+            action: "View decisions",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "responsibility-4",
+            type: "alert",
+            severity: "high",
+            title: "Role Conflict Identified",
+            text: "Overlapping responsibilities between trades creating coordination issues.",
+            action: "Resolve conflict",
+            timestamp: "3 days ago",
+          },
+        ]
+      }
+
+      // Reports tab
+      if (navigation.coreTab === "reports") {
+        return [
+          {
+            id: "reports-1",
+            type: "info",
+            severity: "low",
+            title: "Report Generation Status",
+            text: "Weekly project report generated automatically. 15 stakeholders notified via email distribution.",
+            action: "View report",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "reports-2",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Workflow Delay",
+            text: "2 reports pending executive approval for 5+ days. Consider expediting review process.",
+            action: "Expedite approval",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "reports-3",
+            type: "success",
+            severity: "low",
+            title: "Data Quality Excellent",
+            text: "Report data accuracy at 98.5%. High-quality information driving decision making.",
+            action: "View analytics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "reports-4",
+            type: "alert",
+            severity: "high",
+            title: "Critical Report Due",
+            text: "Monthly executive dashboard due in 24 hours. Finalize data validation immediately.",
+            action: "Complete report",
+            timestamp: "4 hours ago",
+          },
+        ]
+      }
+    }
+
+    // Default fallback insights
     return [
       {
-        id: "core-1",
+        id: "default-1",
         type: "info",
         severity: "low",
         title: "Project Status Update",
@@ -4159,7 +5572,7 @@ export const getProjectSidebarContent = (
         timestamp: "1 day ago",
       },
       {
-        id: "core-2",
+        id: "default-2",
         type: "warning",
         severity: "medium",
         title: "Budget Variance Alert",
@@ -4168,7 +5581,7 @@ export const getProjectSidebarContent = (
         timestamp: "2 days ago",
       },
       {
-        id: "core-3",
+        id: "default-3",
         type: "success",
         severity: "low",
         title: "Safety Milestone",
@@ -4177,7 +5590,7 @@ export const getProjectSidebarContent = (
         timestamp: "3 days ago",
       },
       {
-        id: "core-4",
+        id: "default-4",
         type: "info",
         severity: "medium",
         title: "Schedule Optimization",
@@ -4185,34 +5598,100 @@ export const getProjectSidebarContent = (
         action: "Update schedule",
         timestamp: "4 days ago",
       },
-      {
-        id: "core-5",
-        type: "alert",
-        severity: "high",
-        title: "Permit Expiration",
-        text: "Building permit expires in 30 days. Renewal required to continue work.",
-        action: "Renew permit",
-        timestamp: "5 days ago",
-      },
     ]
   }
 
   // Get HBI Insights title based on active tab
   const getHBIInsightsTitle = () => {
+    // Financial Management tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      return "HBI Financial Hub Insights"
-    } else if (activeTab === "pre-construction") {
-      return "HBI Pre-Construction Insights"
-    } else if (activeTab === "warranty") {
-      return "HBI Warranty Insights"
-    } else if (navigation.coreTab === "productivity") {
-      return "HBI Productivity Insights"
+      const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
+
+      switch (currentFinancialTab) {
+        case "budget-analysis":
+          return "HBI Budget Analysis Insights"
+        case "jchr":
+          return "HBI Job Cost History Insights"
+        case "ar-aging":
+          return "HBI AR Aging Insights"
+        case "cash-flow":
+          return "HBI Cash Flow Insights"
+        case "forecasting":
+          return "HBI Forecasting Insights"
+        case "change-management":
+          return "HBI Change Management Insights"
+        case "pay-authorization":
+          return "HBI Pay Authorization Insights"
+        case "pay-application":
+          return "HBI Pay Application Insights"
+        case "retention":
+          return "HBI Retention Management Insights"
+        default:
+          return "HBI Financial Hub Insights"
+      }
     }
-    return "HBI Core Tools Insights"
+
+    // Field Management tabs
+    if (activeTab === "field-management") {
+      const fieldSubTool = navigation.subTool || "scheduler"
+
+      switch (fieldSubTool) {
+        case "scheduler":
+          return "HBI Scheduler Insights"
+        case "field-reports":
+          return "HBI Field Reports Insights"
+        case "constraints":
+          return "HBI Constraints Management Insights"
+        case "permit-log":
+          return "HBI Permit Log Insights"
+        default:
+          return "HBI Field Management Insights"
+      }
+    }
+
+    // Pre-Construction tab
+    if (activeTab === "pre-construction") {
+      return "HBI Pre-Construction Insights"
+    }
+
+    // Warranty Management tab
+    if (activeTab === "warranty") {
+      return "HBI Warranty Management Insights"
+    }
+
+    // Compliance tab
+    if (activeTab === "compliance") {
+      return "HBI Compliance Insights"
+    }
+
+    // Core Project Tools tabs
+    if (activeTab === "core" || !activeTab) {
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return "HBI Project Dashboard Insights"
+      }
+
+      switch (navigation.coreTab) {
+        case "checklists":
+          return "HBI Checklists Insights"
+        case "productivity":
+          return "HBI Productivity Insights"
+        case "staffing":
+          return "HBI Staffing Insights"
+        case "responsibility-matrix":
+          return "HBI Responsibility Matrix Insights"
+        case "reports":
+          return "HBI Reports Insights"
+        default:
+          return "HBI Core Tools Insights"
+      }
+    }
+
+    return "HBI Project Insights"
   }
 
-  // Check if project is in bidding stage
+  // Check project stage
   const isBiddingStage = projectData?.project_stage_name === "Bidding"
+  const isConstructionStage = projectData?.project_stage_name === "Construction"
 
   // Calculate bidding-specific metrics
   const getBiddingMetrics = () => {
@@ -4239,7 +5718,30 @@ export const getProjectSidebarContent = (
     }
   }
 
+  // Calculate construction-specific metrics
+  const getConstructionMetrics = () => {
+    // Mock data for PCCOs and PCOs
+    const totalPCCOsApproved = 8
+    const pcosPendingPCCO = 3
+
+    // Get dates from projectData and format as mm/dd/yyyy
+    const formatDate = (dateString: string) => {
+      if (!dateString) return "N/A"
+      const date = new Date(dateString)
+      return date.toLocaleDateString("en-US")
+    }
+
+    return {
+      totalPCCOsApproved,
+      pcosPendingPCCO,
+      approvedExtensions: projectData?.approved_extensions || 0,
+      contractCompletionDate: formatDate(projectData?.original_completion_date),
+      projectedCompletionDate: formatDate(projectData?.projected_finish_date),
+    }
+  }
+
   const biddingMetrics = getBiddingMetrics()
+  const constructionMetrics = getConstructionMetrics()
 
   return (
     <div className="space-y-4">
@@ -4290,6 +5792,37 @@ export const getProjectSidebarContent = (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Win Strategy</span>
                   <span className="font-medium">{biddingMetrics.winStrategy}</span>
+                </div>
+              </>
+            ) : isConstructionStage ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Value</span>
+                  <span className="font-medium">${(projectMetrics?.totalBudget || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Job Cost to Date</span>
+                  <span className="font-medium">${(projectMetrics?.spentToDate || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total PCCOs Approved</span>
+                  <span className="font-medium">{constructionMetrics.totalPCCOsApproved}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">PCOs Pending PCCO</span>
+                  <span className="font-medium">{constructionMetrics.pcosPendingPCCO}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Approved Extensions</span>
+                  <span className="font-medium">{constructionMetrics.approvedExtensions}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Completion Date</span>
+                  <span className="font-medium">{constructionMetrics.contractCompletionDate}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Projected Completion Date</span>
+                  <span className="font-medium">{constructionMetrics.projectedCompletionDate}</span>
                 </div>
               </>
             ) : (
@@ -4362,14 +5895,7 @@ export const getProjectSidebarContent = (
       )}
 
       {/* HBI Insights Panel */}
-      <Card className="border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">{getHBIInsightsTitle()}</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ExpandableHBIInsights config={getHBIInsights()} title={getHBIInsightsTitle()} />
-        </CardContent>
-      </Card>
+      <ExpandableHBIInsights config={getHBIInsights()} title={getHBIInsightsTitle()} />
 
       {/* Quick Actions Panel */}
       <Card className="border-border">

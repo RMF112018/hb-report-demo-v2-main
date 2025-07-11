@@ -20,7 +20,7 @@ import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 import {
   BarChart3,
   Calculator,
@@ -39,7 +39,6 @@ import {
   Plus,
   RefreshCw,
   Settings,
-  ChevronDown,
 } from "lucide-react"
 
 // Import Financial Hub Components
@@ -115,9 +114,18 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   })
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
   // Extract project name from project data
@@ -271,12 +279,9 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
     setIsFocusMode(!isFocusMode)
   }
 
-  // Get current tab info for mobile dropdown
-  const currentTab = availableTabs.find((tab) => tab.id === navigation.financialTab) || availableTabs[0]
-
   // Financial Hub content
   const financialHubContent = (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full max-w-full overflow-x-auto overflow-y-hidden">
       {/* Module Title with Focus Button */}
       <div className="pb-2 mb-4">
         <div className="flex items-center justify-between">
@@ -310,64 +315,46 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
         </div>
       </div>
 
-      {/* Responsive Tab Navigation */}
-      <div className="border-b border-border">
-        {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-        <div className="hidden sm:block">
-          <div className="flex space-x-6 overflow-x-auto">
-            {availableTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleFinancialTabChange(tab.id)}
-                className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                  navigation.financialTab === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                }`}
-              >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Horizontal Navigation Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10 gap-3">
+        {availableTabs.map((tab) => {
+          const IconComponent = tab.icon
+          const isActive = navigation.financialTab === tab.id
 
-        {/* Mobile Dropdown Navigation - Only visible on mobile */}
-        <div className="sm:hidden py-3">
-          <Select
-            value={navigation.financialTab || "overview"}
-            onValueChange={(value) => handleFinancialTabChange(value)}
-          >
-            <SelectTrigger className="w-full">
-              <div className="flex items-center space-x-2">
-                <DollarSign className="h-4 w-4" />
-                <span>Financial Tools</span>
-                {currentTab && (
-                  <Badge variant="secondary" className="ml-auto">
-                    {currentTab.label}
-                  </Badge>
-                )}
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {availableTabs.map((tab) => (
-                <SelectItem key={tab.id} value={tab.id}>
-                  <div className="flex items-center space-x-2">
-                    <tab.icon className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">{tab.label}</div>
-                      <div className="text-xs text-muted-foreground">{tab.description}</div>
-                    </div>
+          return (
+            <Card
+              key={tab.id}
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                isActive ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "hover:border-gray-300"
+              }`}
+              onClick={() => handleFinancialTabChange(tab.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <div className="relative">
+                    <IconComponent className={`h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-600"}`} />
                   </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+                  <div>
+                    <p
+                      className={`text-xs font-medium ${
+                        isActive ? "text-blue-600" : "text-gray-900 dark:text-gray-100"
+                      }`}
+                    >
+                      {tab.label}
+                    </p>
+                    {!isMobile && (
+                      <p className="text-xs text-muted-foreground mt-1 leading-tight line-clamp-2">{tab.description}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {/* Content Area */}
-      <div className="min-h-96 w-full max-w-full overflow-hidden">{renderFinancialTabContent()}</div>
+      <div className="min-h-96 w-full max-w-full overflow-x-auto overflow-y-hidden">{renderFinancialTabContent()}</div>
     </div>
   )
 
@@ -375,7 +362,7 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   if (isFocusMode) {
     return (
       <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="flex-1 overflow-auto">
           <div className="p-6 h-full w-full max-w-full">{financialHubContent}</div>
         </div>
       </div>

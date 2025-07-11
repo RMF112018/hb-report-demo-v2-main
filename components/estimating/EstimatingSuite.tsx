@@ -59,6 +59,7 @@ import DocumentLog from "@/components/estimating/DocumentLog"
 import TradePartnerLog from "@/components/estimating/TradePartnerLog"
 import { ProjectEstimateOverview } from "@/components/estimating/ProjectEstimateOverview"
 import { EstimatingIntelligence } from "@/components/estimating/EstimatingIntelligence"
+import BiddingSubTab from "@/components/estimating/bid-management/components/BiddingSubTab"
 
 interface EstimatingSuiteProps {
   projectId: string
@@ -77,22 +78,11 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
   // Internal state management
   const [activeEstimatingSubTab, setActiveEstimatingSubTab] = useState("overview")
   const [selectedBidPackage, setSelectedBidPackage] = useState<string | null>(null)
-  const [activeBidPackageTab, setActiveBidPackageTab] = useState("overview")
 
-  // Helper function to get bid package name
-  const getBidPackageName = (packageId: string) => {
-    const packages: { [key: string]: string } = {
-      "01-00": "Materials Testing",
-      "02-21": "Surveying",
-      "03-33": "Concrete",
-      "04-21": "Masonry",
-      "05-12": "Structural Steel",
-      "06-10": "Carpentry",
-      "07-11": "Waterproofing",
-      "08-11": "Steel Doors",
-    }
-    return packages[packageId] || "Unknown Package"
-  }
+  // Note: Helper functions are now encapsulated within the BiddingSubTab component
+
+  // Note: Bid package data and handlers are now managed within the BiddingSubTab component
+  // for better encapsulation and modularity following v-3-0 standards
 
   // EstimatingTabsNav Component
   const EstimatingTabsNav = () => (
@@ -278,107 +268,8 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
     </div>
   )
 
-  // Bid Package Detail View
-  const BidPackageDetailView = () => (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <span className="cursor-pointer hover:text-blue-600" onClick={() => setSelectedBidPackage(null)}>
-          Bid Packages
-        </span>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">
-          {selectedBidPackage}: {selectedBidPackage ? getBidPackageName(selectedBidPackage) : "Unknown Package"}
-        </span>
-      </div>
-
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          {selectedBidPackage}: {selectedBidPackage ? getBidPackageName(selectedBidPackage) : "Unknown Package"}
-        </h1>
-      </div>
-
-      {/* Bid Package Tab Navigation */}
-      <div className="border-b border-border">
-        <div className="flex space-x-6 overflow-x-auto">
-          {["overview", "bids", "files", "messages", "evaluation"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveBidPackageTab(tab)}
-              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                activeBidPackageTab === tab
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300"
-              }`}
-            >
-              <span className="capitalize">{tab}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bid Package Content */}
-      <div className="mt-4">
-        {activeBidPackageTab === "overview" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Package Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Bid package overview and details will be displayed here.</p>
-            </CardContent>
-          </Card>
-        )}
-        {activeBidPackageTab === "bids" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Bid Responses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Bid responses and comparison tools will be displayed here.</p>
-            </CardContent>
-          </Card>
-        )}
-        {/* Add other bid package tabs as needed */}
-      </div>
-    </div>
-  )
-
-  // Bid Package List View
-  const BidPackageListView = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries({
-          "01-00": "Materials Testing",
-          "02-21": "Surveying",
-          "03-33": "Concrete",
-          "04-21": "Masonry",
-          "05-12": "Structural Steel",
-          "06-10": "Carpentry",
-          "07-11": "Waterproofing",
-          "08-11": "Steel Doors",
-        }).map(([id, name]) => (
-          <Card
-            key={id}
-            className="cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => setSelectedBidPackage(id)}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">{id}</CardTitle>
-              <p className="text-sm text-muted-foreground">{name}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="outline">5 Bids</Badge>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
+  // Note: Previous BidPackageDetailView and BidPackageListView functions have been
+  // replaced by the comprehensive BiddingSubTab component for better modularity
 
   return (
     <div className="space-y-6">
@@ -404,7 +295,13 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
         </TabsContent>
 
         <TabsContent value="bidding" className="mt-6">
-          {selectedBidPackage ? <BidPackageDetailView /> : <BidPackageListView />}
+          <BiddingSubTab
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            onPackageSelect={setSelectedBidPackage}
+          />
         </TabsContent>
 
         <TabsContent value="area-calculation" className="mt-6">

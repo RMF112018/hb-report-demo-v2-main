@@ -19,6 +19,71 @@ interface SidebarPanelRendererProps {
   activeTab?: string
 }
 
+// Contract Documents specific HBI Insights
+const getContractDocumentsInsights = () => {
+  return [
+    {
+      id: "contract-1",
+      type: "warning",
+      severity: "medium",
+      title: "Contract Review Required",
+      text: "3 contracts show potential for $125K savings through renegotiation",
+      action: "Schedule review",
+      timestamp: "1 hour ago",
+    },
+    {
+      id: "contract-2",
+      type: "success",
+      severity: "low",
+      title: "Insurance Verification Complete",
+      text: "All safety documentation is up to date",
+      action: "View certificates",
+      timestamp: "3 hours ago",
+    },
+    {
+      id: "contract-3",
+      type: "alert",
+      severity: "high",
+      title: "License Expiration Alert",
+      text: "New building code changes affect 5 active contracts",
+      action: "Request renewal",
+      timestamp: "1 day ago",
+    },
+    {
+      id: "contract-4",
+      type: "info",
+      severity: "low",
+      title: "Cost Optimization Opportunity",
+      text: "5 contracts show potential for $125K savings through renegotiation",
+      action: "View scorecard",
+      timestamp: "2 days ago",
+    },
+    {
+      id: "contract-5",
+      type: "warning",
+      severity: "medium",
+      title: "Risk Alert",
+      text: "New building code changes affect 5 active contracts",
+      action: "Review risks",
+      timestamp: "3 days ago",
+    },
+    {
+      id: "contract-6",
+      type: "success",
+      severity: "low",
+      title: "Compliance Achievement",
+      text: "All safety documentation is up to date",
+      action: "View compliance",
+      timestamp: "1 week ago",
+    },
+  ]
+}
+
+// Contract Documents specific HBI Insights title
+const getContractDocumentsInsightsTitle = () => {
+  return "HBI Compliance Insights"
+}
+
 export default function SidebarPanelRenderer({
   activePanel = "all",
   projectId,
@@ -31,6 +96,12 @@ export default function SidebarPanelRenderer({
   getHBIInsights,
   activeTab,
 }: SidebarPanelRendererProps) {
+  // Check if we're in Contract Documents tab and should hide insights panel
+  const isContractDocumentsTab = activeTab === "compliance" || activeTab === "contract-documents"
+
+  const currentInsightsTitle = isContractDocumentsTab ? getContractDocumentsInsightsTitle() : getHBIInsightsTitle()
+  const currentInsights = isContractDocumentsTab ? getContractDocumentsInsights() : getHBIInsights()
+
   // Render all panels by default (current behavior)
   if (activePanel === "all") {
     return (
@@ -43,15 +114,18 @@ export default function SidebarPanelRenderer({
           projectMetrics={projectMetrics}
         />
 
-        <InsightsPanel
-          projectId={projectId}
-          projectData={projectData}
-          user={user}
-          userRole={userRole}
-          activeTab={activeTab}
-          getHBIInsightsTitle={getHBIInsightsTitle}
-          getHBIInsights={getHBIInsights}
-        />
+        {/* Hide Insights Panel when Contract Documents tab is active */}
+        {!isContractDocumentsTab && (
+          <InsightsPanel
+            projectId={projectId}
+            projectData={projectData}
+            user={user}
+            userRole={userRole}
+            activeTab={activeTab}
+            getHBIInsightsTitle={() => currentInsightsTitle}
+            getHBIInsights={() => currentInsights}
+          />
+        )}
 
         <QuickActionsPanel
           projectId={projectId}
@@ -59,6 +133,7 @@ export default function SidebarPanelRenderer({
           user={user}
           userRole={userRole}
           navigation={navigation}
+          activeTab={activeTab}
         />
 
         <KeyMetricsPanel
@@ -87,6 +162,10 @@ export default function SidebarPanelRenderer({
       )
 
     case "insights":
+      // Don't render insights panel if Contract Documents tab is active
+      if (isContractDocumentsTab) {
+        return null
+      }
       return (
         <InsightsPanel
           projectId={projectId}
@@ -94,8 +173,8 @@ export default function SidebarPanelRenderer({
           user={user}
           userRole={userRole}
           activeTab={activeTab}
-          getHBIInsightsTitle={getHBIInsightsTitle}
-          getHBIInsights={getHBIInsights}
+          getHBIInsightsTitle={() => currentInsightsTitle}
+          getHBIInsights={() => currentInsights}
         />
       )
 
@@ -107,6 +186,7 @@ export default function SidebarPanelRenderer({
           user={user}
           userRole={userRole}
           navigation={navigation}
+          activeTab={activeTab}
         />
       )
 

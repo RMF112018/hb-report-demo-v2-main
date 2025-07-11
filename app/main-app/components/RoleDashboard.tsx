@@ -26,6 +26,7 @@ import { ActionItemsToDo } from "../../../components/dashboard/ActionItemsToDo"
 import { ProjectActivityFeed } from "../../../components/feed/ProjectActivityFeed"
 import BidManagementCenter from "../../../components/estimating/bid-management/BidManagementCenter"
 import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
+import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel"
 
 interface ProjectData {
   id: string
@@ -62,6 +63,7 @@ interface RoleDashboardProps {
   onProjectSelect: (projectId: string | null) => void
   activeTab?: string
   onTabChange?: (tabId: string) => void
+  renderMode?: "leftContent" | "rightContent"
 }
 
 export const RoleDashboard: React.FC<RoleDashboardProps> = ({
@@ -71,6 +73,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
   onProjectSelect,
   activeTab = "overview",
   onTabChange,
+  renderMode = "rightContent",
 }) => {
   const router = useRouter()
 
@@ -96,6 +99,50 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
     onToggleEdit,
     onDensityChange,
   } = useDashboardLayout(userRole)
+
+  // Determine if DueThisWeekPanel should be shown
+  const shouldShowDueThisWeekPanel = () => {
+    // Project Executive: All dashboard views
+    if (userRole === "project-executive") {
+      return true
+    }
+
+    // Project Manager: All dashboard views
+    if (userRole === "project-manager") {
+      return true
+    }
+
+    // Estimator: Only Overview, Analytics, and Activity Feed views
+    if (userRole === "estimator") {
+      return ["overview", "analytics", "activity-feed"].includes(activeTab)
+    }
+
+    return false
+  }
+
+  // Render left sidebar content
+  const renderLeftContent = () => {
+    if (!shouldShowDueThisWeekPanel()) {
+      return null
+    }
+
+    // Map estimator role to project-manager for DueThisWeekPanel compatibility
+    const dueThisWeekPanelRole =
+      userRole === "estimator" ? "project-manager" : (userRole as "project-executive" | "project-manager")
+
+    return (
+      <div className="space-y-4">
+        <DueThisWeekPanel userRole={dueThisWeekPanelRole} className="h-fit" />
+
+        {/* Additional left sidebar content can be added here for future enhancements */}
+      </div>
+    )
+  }
+
+  // If rendering left content only, return it
+  if (renderMode === "leftContent") {
+    return renderLeftContent()
+  }
 
   // Loading state
   if (isLoading) {
@@ -294,6 +341,27 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               itemsPerPage: 20,
               allowExport: true,
             }}
+          />
+        )
+
+      case "analytics":
+        return (
+          <DashboardLayout
+            cards={cards}
+            onLayoutChange={onLayoutChange}
+            onCardRemove={onCardRemove}
+            onCardConfigure={onCardConfigure}
+            onCardSizeChange={onCardSizeChange}
+            onCardAdd={onCardAdd}
+            onSave={onSave}
+            onReset={onReset}
+            isEditing={isEditing}
+            onToggleEdit={onToggleEdit}
+            layoutDensity={layoutDensity}
+            userRole={userRole}
+            dashboards={dashboards}
+            currentDashboardId={currentDashboardId ?? undefined}
+            onDashboardSelect={onDashboardSelect}
           />
         )
 

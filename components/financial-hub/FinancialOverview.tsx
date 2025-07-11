@@ -15,6 +15,9 @@ import {
   Clock,
   Calendar,
   CheckCircle2,
+  Gauge,
+  LineChart,
+  TimerIcon,
 } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,11 +36,30 @@ import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
+  LineChart as RechartsLineChart,
+  Line,
+  ComposedChart,
+  RadialBarChart,
+  RadialBar,
+  Legend,
 } from "recharts"
 
 interface FinancialOverviewProps {
   userRole: string
   projectData: any
+}
+
+// HB Branded Colors
+const HB_COLORS = {
+  blue: "#0021A5", // RGB(0, 33, 165)
+  orange: "#FA4616", // RGB(250, 70, 22)
+  blueLight: "#1E40AF", // Lighter blue variant
+  orangeLight: "#FB923C", // Lighter orange variant
+  gray: "#6B7280",
+  grayLight: "#9CA3AF",
+  success: "#10B981",
+  warning: "#F59E0B",
+  error: "#EF4444",
 }
 
 // Mock data for financial overview
@@ -57,48 +79,52 @@ const budgetData = [
   { category: "Subcontractors", budgeted: 1200000, actual: 1180000, variance: -20000 },
 ]
 
+// Updated with branded colors
 const expenseBreakdown = [
-  { name: "Labor", value: 2350000, color: "#3b82f6" },
-  { name: "Materials", value: 1950000, color: "#10b981" },
-  { name: "Equipment", value: 750000, color: "#f59e0b" },
-  { name: "Subcontractors", value: 1180000, color: "#ef4444" },
+  { name: "Labor", value: 2350000, color: HB_COLORS.blue },
+  { name: "Materials", value: 1950000, color: HB_COLORS.orange },
+  { name: "Equipment", value: 750000, color: HB_COLORS.blueLight },
+  { name: "Subcontractors", value: 1180000, color: HB_COLORS.orangeLight },
 ]
 
-// Cost Control Data
+// Cost Control Data with enhanced metrics
 const costControlCategories = [
-  { id: 1, name: "Labor", budgeted: 2500000, actual: 2350000, progress: 94 },
-  { id: 2, name: "Materials", budgeted: 1800000, actual: 1950000, progress: 108 },
-  { id: 3, name: "Equipment", budgeted: 800000, actual: 750000, progress: 94 },
-  { id: 4, name: "Subcontractors", budgeted: 1200000, actual: 1180000, progress: 98 },
+  {
+    name: "Labor",
+    budgeted: 2500000,
+    actual: 2350000,
+    progress: 94,
+    status: "good",
+    fill: HB_COLORS.blue,
+  },
+  {
+    name: "Materials",
+    budgeted: 1800000,
+    actual: 1950000,
+    progress: 108,
+    status: "warning",
+    fill: HB_COLORS.orange,
+  },
+  {
+    name: "Equipment",
+    budgeted: 800000,
+    actual: 750000,
+    progress: 94,
+    status: "good",
+    fill: HB_COLORS.blueLight,
+  },
+  {
+    name: "Subcontractors",
+    budgeted: 1200000,
+    actual: 1180000,
+    progress: 98,
+    status: "good",
+    fill: HB_COLORS.orangeLight,
+  },
 ]
 
 // Payment Performance Analytics Data
 const paymentPerformanceData = {
-  onTimeApplications: {
-    total: 24,
-    onTime: 22,
-    late: 2,
-    percentage: 91.7,
-  },
-  approvalTimes: {
-    averageDays: 3.2,
-    pmApprovalAvg: 1.8,
-    pxApprovalAvg: 1.4,
-    trend: "improving",
-  },
-  paymentTimes: {
-    approvalToPaymentAvg: 12.5,
-    contractualDays: 15,
-    variance: -2.5,
-    trend: "ahead",
-  },
-  paymentCompliance: {
-    totalPayments: 18,
-    onTimePayments: 16,
-    latePayments: 2,
-    averageVariance: -1.2, // negative means early
-    complianceRate: 88.9,
-  },
   monthlyTrends: [
     { month: "Jan", onTimeApps: 95, avgApproval: 3.5, avgPayment: 13.2, compliance: 85 },
     { month: "Feb", onTimeApps: 88, avgApproval: 4.1, avgPayment: 14.8, compliance: 82 },
@@ -109,39 +135,22 @@ const paymentPerformanceData = {
   ],
 }
 
-const recentPaymentActivity = [
-  {
-    type: "application_submitted",
-    description: "Pay Application #024 submitted",
-    amount: 285000,
-    date: "2 hours ago",
-    status: "on_time",
-    daysFromDue: -2,
-  },
-  {
-    type: "payment_received",
-    description: "Payment for Application #022 received",
-    amount: 195000,
-    date: "1 day ago",
-    status: "early",
-    daysFromDue: -3,
-  },
-  {
-    type: "approval_completed",
-    description: "Application #023 approved by PX",
-    amount: 167000,
-    date: "2 days ago",
-    status: "on_time",
-    daysFromDue: 0,
-  },
-  {
-    type: "payment_overdue",
-    description: "Payment for Application #020 overdue",
-    amount: 142000,
-    date: "5 days ago",
-    status: "late",
-    daysFromDue: 5,
-  },
+// Budget Variance Analysis Data
+const budgetVarianceData = [
+  { month: "Jan", variance: 50000, cumulative: 50000 },
+  { month: "Feb", variance: -25000, cumulative: 25000 },
+  { month: "Mar", variance: 75000, cumulative: 100000 },
+  { month: "Apr", variance: -30000, cumulative: 70000 },
+  { month: "May", variance: 45000, cumulative: 115000 },
+  { month: "Jun", variance: -20000, cumulative: 95000 },
+]
+
+// Project Performance KPIs
+const performanceKPIs = [
+  { name: "Schedule", value: 85, color: HB_COLORS.blue },
+  { name: "Budget", value: 92, color: HB_COLORS.orange },
+  { name: "Quality", value: 88, color: HB_COLORS.blueLight },
+  { name: "Safety", value: 96, color: HB_COLORS.success },
 ]
 
 /**
@@ -153,7 +162,9 @@ const recentPaymentActivity = [
  * - Budget vs actual analysis
  * - Expense breakdown
  * - Cost control analysis
- * - Recent financial activities
+ * - Payment performance trends
+ * - Budget variance analysis
+ * - Project performance metrics
  *
  * @param userRole - Current user role
  * @param projectData - Current project scope data
@@ -176,15 +187,36 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
   const costControlVariance = totalCostControlBudget - totalCostControlActual
   const avgProgress = costControlCategories.reduce((sum, cat) => sum + cat.progress, 0) / costControlCategories.length
 
+  // Custom label function for pie chart
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+    const RADIAN = Math.PI / 180
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+        className="text-xs font-medium"
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      {/* Charts Section */}
+      {/* First Row: Existing Charts */}
       <div className="grid gap-6 lg:grid-cols-2" data-tour="overview-charts">
         {/* Cash Flow Chart */}
         <Card className="col-span-1" data-tour="overview-cash-flow-chart">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-5 w-5" style={{ color: HB_COLORS.blue }} />
               Cash Flow Trend
             </CardTitle>
             <CardDescription>Monthly cash inflow, outflow, and net position</CardDescription>
@@ -203,8 +235,8 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                   type="monotone"
                   dataKey="inflow"
                   stackId="1"
-                  stroke="#10b981"
-                  fill="#10b981"
+                  stroke={HB_COLORS.success}
+                  fill={HB_COLORS.success}
                   fillOpacity={0.6}
                   name="Inflow"
                 />
@@ -212,8 +244,8 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                   type="monotone"
                   dataKey="outflow"
                   stackId="2"
-                  stroke="#ef4444"
-                  fill="#ef4444"
+                  stroke={HB_COLORS.error}
+                  fill={HB_COLORS.error}
                   fillOpacity={0.6}
                   name="Outflow"
                 />
@@ -221,8 +253,8 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                   type="monotone"
                   dataKey="net"
                   stackId="3"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
+                  stroke={HB_COLORS.blue}
+                  fill={HB_COLORS.blue}
                   fillOpacity={0.8}
                   name="Net Flow"
                 />
@@ -235,7 +267,7 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
         <Card className="col-span-1" data-tour="overview-budget-chart">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-green-600" />
+              <BarChart3 className="h-5 w-5" style={{ color: HB_COLORS.orange }} />
               Budget vs Actual
             </CardTitle>
             <CardDescription>Comparison by cost category</CardDescription>
@@ -247,10 +279,168 @@ export default function FinancialOverview({ userRole, projectData }: FinancialOv
                 <XAxis dataKey="category" />
                 <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
                 <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]} />
-                <Bar dataKey="budgeted" fill="#94a3b8" name="Budgeted" />
-                <Bar dataKey="actual" fill="#3b82f6" name="Actual" />
+                <Bar dataKey="budgeted" fill={HB_COLORS.gray} name="Budgeted" />
+                <Bar dataKey="actual" fill={HB_COLORS.blue} name="Actual" />
               </BarChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Second Row: New Visualizations */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Expense Breakdown Pie Chart */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="h-5 w-5" style={{ color: HB_COLORS.orange }} />
+              Expense Breakdown
+            </CardTitle>
+            <CardDescription>Distribution of project expenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <RechartsPieChart>
+                <Pie
+                  data={expenseBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {expenseBreakdown.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => [`$${(value / 1000).toFixed(0)}K`, "Amount"]} />
+                <Legend />
+              </RechartsPieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Cost Control Progress Chart */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" style={{ color: HB_COLORS.blue }} />
+              Cost Control Progress
+            </CardTitle>
+            <CardDescription>Budget utilization by category</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={costControlCategories}>
+                <RadialBar background dataKey="progress" />
+                <Legend iconSize={10} layout="horizontal" verticalAlign="bottom" />
+                <Tooltip formatter={(value: number) => [`${value}%`, "Progress"]} />
+              </RadialBarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Payment Performance Trends */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" style={{ color: HB_COLORS.orange }} />
+              Payment Performance
+            </CardTitle>
+            <CardDescription>Monthly payment compliance trends</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <RechartsLineChart data={paymentPerformanceData.monthlyTrends}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="onTimeApps"
+                  stroke={HB_COLORS.blue}
+                  strokeWidth={2}
+                  name="On-Time Apps (%)"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="compliance"
+                  stroke={HB_COLORS.orange}
+                  strokeWidth={2}
+                  name="Compliance (%)"
+                />
+              </RechartsLineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Third Row: Additional Analysis */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Budget Variance Analysis */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LineChart className="h-5 w-5" style={{ color: HB_COLORS.blue }} />
+              Budget Variance Analysis
+            </CardTitle>
+            <CardDescription>Monthly variance and cumulative impact</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <ComposedChart data={budgetVarianceData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="month" />
+                <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
+                <Tooltip formatter={(value: number, name: string) => [`$${(value / 1000).toFixed(0)}K`, name]} />
+                <Bar dataKey="variance" fill={HB_COLORS.orange} name="Monthly Variance" />
+                <Line
+                  type="monotone"
+                  dataKey="cumulative"
+                  stroke={HB_COLORS.blue}
+                  strokeWidth={2}
+                  name="Cumulative Variance"
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Project Performance KPIs */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gauge className="h-5 w-5" style={{ color: HB_COLORS.orange }} />
+              Project Performance KPIs
+            </CardTitle>
+            <CardDescription>Key performance indicators across all areas</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {performanceKPIs.map((kpi, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: kpi.color }} />
+                    <span className="text-sm font-medium">{kpi.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Progress value={kpi.value} className="w-20" />
+                    <span className="text-sm font-medium w-10">{kpi.value}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Overall Performance</span>
+                <Badge variant="outline" style={{ color: HB_COLORS.blue }}>
+                  {Math.round(performanceKPIs.reduce((sum, kpi) => sum + kpi.value, 0) / performanceKPIs.length)}%
+                </Badge>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

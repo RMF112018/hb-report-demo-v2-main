@@ -262,12 +262,23 @@ const NewPursuitModal: React.FC<NewPursuitModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-      <DialogContent className="max-w-6xl max-h-[75vh] w-[95vw] flex flex-col p-0 my-[12.5vh]">
-        <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
-          <DialogTitle className="flex items-center justify-between">
+      <DialogContent
+        className="max-w-6xl w-[95vw] flex flex-col p-0"
+        style={{
+          position: "fixed",
+          top: "1rem",
+          bottom: "1rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          height: "calc(100vh - 2rem)",
+          margin: "0",
+        }}
+      >
+        <DialogHeader className="px-4 py-2 border-b flex-shrink-0">
+          <DialogTitle className="flex items-center justify-between text-lg">
             {modalTitle}
             {mode !== "view" && (
-              <Badge variant="outline" className="ml-2">
+              <Badge variant="outline" className="ml-2 text-xs px-2 py-0.5">
                 {mode === "create" ? "New" : "Editing"}
               </Badge>
             )}
@@ -282,8 +293,8 @@ const NewPursuitModal: React.FC<NewPursuitModalProps> = ({
                 <h3 className="text-base font-semibold border-b pb-1">Project Information</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="jobName" className="text-sm">
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="jobName" className="text-sm font-medium w-24 flex-shrink-0">
                       Job Name *
                     </Label>
                     <Input
@@ -293,11 +304,12 @@ const NewPursuitModal: React.FC<NewPursuitModalProps> = ({
                       placeholder="Enter job name"
                       disabled={isReadonly}
                       required
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <Label htmlFor="jobNumber" className="text-sm">
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="jobNumber" className="text-sm font-medium w-24 flex-shrink-0">
                       Job Number *
                     </Label>
                     <Input
@@ -307,23 +319,27 @@ const NewPursuitModal: React.FC<NewPursuitModalProps> = ({
                       placeholder="Enter job number"
                       disabled={isReadonly}
                       required
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="architect">Architect</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="architect" className="text-sm font-medium w-24 flex-shrink-0">
+                      Architect
+                    </Label>
                     <Input
                       id="architect"
                       value={formData.architect}
                       onChange={(e) => setFormData((prev) => ({ ...prev, architect: e.target.value }))}
                       placeholder="Enter architect"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Proposal Due Date and Time</Label>
-                    <div className="flex space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <Label className="text-sm font-medium w-24 flex-shrink-0">Due Date</Label>
+                    <div className="flex space-x-2 flex-1">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -361,80 +377,101 @@ const NewPursuitModal: React.FC<NewPursuitModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="proposalDeliveredVia">Proposal to be Delivered Via</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="proposalDeliveredVia" className="text-sm font-medium w-24 flex-shrink-0">
+                      Delivery Via
+                    </Label>
                     <Input
                       id="proposalDeliveredVia"
                       value={formData.proposalDeliveredVia}
                       onChange={(e) => setFormData((prev) => ({ ...prev, proposalDeliveredVia: e.target.value }))}
                       placeholder="Enter delivery method"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="handDeliveredCopies">How many Copies if Hand Delivered</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="handDeliveredCopies" className="text-sm font-medium w-24 flex-shrink-0">
+                      Copies
+                    </Label>
                     <Input
                       id="handDeliveredCopies"
                       value={formData.handDeliveredCopies}
                       onChange={(e) => setFormData((prev) => ({ ...prev, handDeliveredCopies: e.target.value }))}
                       placeholder="Enter number of copies"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="typeOfProposal">Type of Proposal</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="typeOfProposal" className="text-sm font-medium w-24 flex-shrink-0">
+                      Proposal Type
+                    </Label>
                     <Input
                       id="typeOfProposal"
                       value={formData.typeOfProposal}
                       onChange={(e) => setFormData((prev) => ({ ...prev, typeOfProposal: e.target.value }))}
                       placeholder="Enter proposal type"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="rfiFormat">RFI Format (Excel or Procore)</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="rfiFormat" className="text-sm font-medium w-24 flex-shrink-0">
+                      RFI Format
+                    </Label>
                     <Input
                       id="rfiFormat"
                       value={formData.rfiFormat}
                       onChange={(e) => setFormData((prev) => ({ ...prev, rfiFormat: e.target.value }))}
                       placeholder="Enter RFI format"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="projectExecutive">Project Executive</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="projectExecutive" className="text-sm font-medium w-24 flex-shrink-0">
+                      Proj Executive
+                    </Label>
                     <Input
                       id="projectExecutive"
                       value={formData.projectExecutive}
                       onChange={(e) => setFormData((prev) => ({ ...prev, projectExecutive: e.target.value }))}
                       placeholder="Enter project executive"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="primaryContact">Primary Contact Person for Owner</Label>
+                  <div className="flex items-center space-x-3">
+                    <Label htmlFor="primaryContact" className="text-sm font-medium w-24 flex-shrink-0">
+                      Primary Contact
+                    </Label>
                     <Input
                       id="primaryContact"
                       value={formData.primaryContact}
                       onChange={(e) => setFormData((prev) => ({ ...prev, primaryContact: e.target.value }))}
                       placeholder="Enter primary contact"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="estimatorsAssigned">Estimator(s) Assigned</Label>
+                  <div className="flex items-center space-x-3 md:col-span-2">
+                    <Label htmlFor="estimatorsAssigned" className="text-sm font-medium w-24 flex-shrink-0">
+                      Estimators
+                    </Label>
                     <Input
                       id="estimatorsAssigned"
                       value={formData.estimatorsAssigned}
                       onChange={(e) => setFormData((prev) => ({ ...prev, estimatorsAssigned: e.target.value }))}
                       placeholder="Enter assigned estimators"
                       disabled={isReadonly}
+                      className="flex-1"
                     />
                   </div>
                 </div>

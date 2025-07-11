@@ -42,8 +42,9 @@ export default function ProjectOverviewPanel({
   userRole,
   projectMetrics,
 }: ProjectOverviewPanelProps) {
-  // Check if project is in bidding stage
+  // Check project stage
   const isBiddingStage = projectData?.project_stage_name === "Bidding"
+  const isConstructionStage = projectData?.project_stage_name === "Construction"
 
   // Calculate bidding-specific metrics
   const getBiddingMetrics = () => {
@@ -70,7 +71,30 @@ export default function ProjectOverviewPanel({
     }
   }
 
+  // Calculate construction-specific metrics
+  const getConstructionMetrics = () => {
+    // Mock data for PCCOs and PCOs
+    const totalPCCOsApproved = 8
+    const pcosPendingPCCO = 3
+
+    // Get dates from projectData and format as mm/dd/yyyy
+    const formatDate = (dateString: string) => {
+      if (!dateString) return "N/A"
+      const date = new Date(dateString)
+      return date.toLocaleDateString("en-US")
+    }
+
+    return {
+      totalPCCOsApproved,
+      pcosPendingPCCO,
+      approvedExtensions: projectData?.approved_extensions || 0,
+      contractCompletionDate: formatDate(projectData?.original_completion_date),
+      projectedCompletionDate: formatDate(projectData?.projected_completion_date),
+    }
+  }
+
   const biddingMetrics = getBiddingMetrics()
+  const constructionMetrics = getConstructionMetrics()
 
   return (
     <Card className="border-border">
@@ -121,6 +145,37 @@ export default function ProjectOverviewPanel({
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Win Strategy</span>
                 <span className="font-medium">{biddingMetrics.winStrategy}</span>
+              </div>
+            </>
+          ) : isConstructionStage ? (
+            <>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Contract Value</span>
+                <span className="font-medium">${projectMetrics.totalBudget.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Job Cost to Date</span>
+                <span className="font-medium">${projectMetrics.spentToDate.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Total PCCOs Approved</span>
+                <span className="font-medium">{constructionMetrics.totalPCCOsApproved}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">PCOs Pending PCCO</span>
+                <span className="font-medium">{constructionMetrics.pcosPendingPCCO}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Approved Extensions</span>
+                <span className="font-medium">{constructionMetrics.approvedExtensions}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Contract Completion Date</span>
+                <span className="font-medium">{constructionMetrics.contractCompletionDate}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Projected Completion Date</span>
+                <span className="font-medium">{constructionMetrics.projectedCompletionDate}</span>
               </div>
             </>
           ) : (

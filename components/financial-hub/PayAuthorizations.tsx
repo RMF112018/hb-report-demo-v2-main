@@ -97,65 +97,137 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
   const [isEditing, setIsEditing] = useState(false)
   const [showMessageThread, setShowMessageThread] = useState(false)
 
-  // Mock data - in real app this would come from API
-  const [paymentAuthorizations, setPaymentAuthorizations] = useState<PaymentAuthorization[]>([
-    {
-      id: "PA-001",
-      projectId: "2525840",
-      jobName: "PALM BEACH LUXURY ESTATE",
-      payAppNumber: 25,
-      periodThru: "2025-04-30",
-      dateReceived: "2025-06-19",
-      payAppValue: 2280257.6,
-      amountReceived: 2280257.58,
-      balanceDue: 0.02,
-      amountApprovedForPayment: 2033723.98,
-      status: "pending",
-      createdBy: "accounting@company.com",
-      createdAt: "2025-06-19T10:00:00Z",
-      updatedAt: "2025-06-19T10:00:00Z",
-      projectManager: "Wanda Johnson",
-      accountingContact: "Sarah Martinez",
-      compliance: {
-        correctProjectNumbers: false,
-        finalReleases: false,
-        timberscanApproved: false,
-        certificatesOnFile: false,
-        licensesOnFile: false,
-        executedPayApplications: false,
-      },
-      comments: "",
-      messageThreadId: "thread-001",
-      approvalHistory: [
-        {
-          step: "Created",
-          status: "created",
-          approvedBy: "Sarah Martinez",
-          approvedAt: "2025-06-19T10:00:00Z",
-          notes: "Payment authorization created for Pay App #25",
-        },
-      ],
-    },
-  ])
-
+  // Role-based API data - matching previous version requirements
   const getPayAuthData = () => {
-    const pending = paymentAuthorizations.filter((p) => p.status === "pending").length
-    const preliminaryApproved = paymentAuthorizations.filter((p) => p.status === "preliminary_approved").length
-    const finalApproved = paymentAuthorizations.filter((p) => p.status === "final_approved").length
-    const totalValue = paymentAuthorizations.reduce((sum, p) => sum + p.amountApprovedForPayment, 0)
-    const pendingValue = paymentAuthorizations
-      .filter((p) => p.status === "pending" || p.status === "preliminary_approved")
-      .reduce((sum, p) => sum + p.amountApprovedForPayment, 0)
-
-    return {
-      pendingApprovals: pending,
-      preliminaryApproved,
-      finalApproved,
-      totalRequests: paymentAuthorizations.length,
-      approvedAmount: totalValue - pendingValue,
-      pendingAmount: pendingValue,
+    switch (userRole) {
+      case "project-manager":
+        return {
+          pendingApprovals: 3,
+          preliminaryApproved: 1,
+          finalApproved: 8,
+          totalRequests: 12,
+          approvedAmount: 8500000,
+          pendingAmount: 2850000,
+        }
+      case "project-executive":
+        return {
+          pendingApprovals: 12,
+          preliminaryApproved: 4,
+          finalApproved: 32,
+          totalRequests: 48,
+          approvedAmount: 45200000,
+          pendingAmount: 8200000,
+        }
+      default:
+        return {
+          pendingApprovals: 23,
+          preliminaryApproved: 8,
+          finalApproved: 58,
+          totalRequests: 89,
+          approvedAmount: 85600000,
+          pendingAmount: 12500000,
+        }
     }
   }
+
+  // Mock data based on role - more sophisticated structure but role-based quantities
+  const generateMockData = (): PaymentAuthorization[] => {
+    const roleData = getPayAuthData()
+    const mockData: PaymentAuthorization[] = []
+
+    // Generate pending authorizations based on role
+    for (let i = 1; i <= roleData.pendingApprovals; i++) {
+      mockData.push({
+        id: `PA-${String(i).padStart(3, "0")}`,
+        projectId: "2525840",
+        jobName: "PALM BEACH LUXURY ESTATE",
+        payAppNumber: 25 + i,
+        periodThru: "2025-04-30",
+        dateReceived: "2025-06-19",
+        payAppValue: 2280257.6 + i * 100000,
+        amountReceived: 2280257.58 + i * 100000,
+        balanceDue: 0.02,
+        amountApprovedForPayment: 2033723.98 + i * 90000,
+        status: "pending",
+        createdBy: "accounting@company.com",
+        createdAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+        projectManager: "Wanda Johnson",
+        accountingContact: "Sarah Martinez",
+        compliance: {
+          correctProjectNumbers: false,
+          finalReleases: false,
+          timberscanApproved: false,
+          certificatesOnFile: false,
+          licensesOnFile: false,
+          executedPayApplications: false,
+        },
+        comments: "",
+        messageThreadId: `thread-${String(i).padStart(3, "0")}`,
+        approvalHistory: [
+          {
+            step: "Created",
+            status: "created",
+            approvedBy: "Sarah Martinez",
+            approvedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+            notes: `Payment authorization created for Pay App #${25 + i}`,
+          },
+        ],
+      })
+    }
+
+    // Add some preliminary approved based on role
+    for (let i = 1; i <= roleData.preliminaryApproved; i++) {
+      mockData.push({
+        id: `PA-P${String(i).padStart(2, "0")}`,
+        projectId: "2525840",
+        jobName: "PALM BEACH LUXURY ESTATE",
+        payAppNumber: 20 + i,
+        periodThru: "2025-03-31",
+        dateReceived: "2025-05-19",
+        payAppValue: 1800000 + i * 80000,
+        amountReceived: 1800000 + i * 80000,
+        balanceDue: 0,
+        amountApprovedForPayment: 1650000 + i * 75000,
+        status: "preliminary_approved",
+        createdBy: "accounting@company.com",
+        createdAt: new Date(Date.now() - (i + 10) * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - (i + 5) * 24 * 60 * 60 * 1000).toISOString(),
+        projectManager: "Wanda Johnson",
+        accountingContact: "Sarah Martinez",
+        compliance: {
+          correctProjectNumbers: true,
+          finalReleases: true,
+          timberscanApproved: true,
+          certificatesOnFile: true,
+          licensesOnFile: true,
+          executedPayApplications: true,
+        },
+        comments: "Preliminary approval completed",
+        messageThreadId: `thread-p${String(i).padStart(2, "0")}`,
+        approvalHistory: [
+          {
+            step: "Created",
+            status: "created",
+            approvedBy: "Sarah Martinez",
+            approvedAt: new Date(Date.now() - (i + 10) * 24 * 60 * 60 * 1000).toISOString(),
+            notes: `Payment authorization created for Pay App #${20 + i}`,
+          },
+          {
+            step: "Preliminary Approved",
+            status: "preliminary_approved",
+            approvedBy: userRole,
+            approvedAt: new Date(Date.now() - (i + 5) * 24 * 60 * 60 * 1000).toISOString(),
+            notes: "Preliminary approval granted",
+          },
+        ],
+      })
+    }
+
+    return mockData
+  }
+
+  const [paymentAuthorizations] = useState<PaymentAuthorization[]>(generateMockData())
 
   const data = getPayAuthData()
 
@@ -163,8 +235,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value)
   }
 
@@ -180,7 +252,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
     const statusConfig = {
       pending: {
         label: "Pending Review",
-        color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+        color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
       },
       preliminary_approved: {
         label: "Preliminary Approved",
@@ -245,15 +317,15 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
       .every(Boolean)
 
     return (
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="mt-4">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <CheckSquare className="h-5 w-5" />
             TIMBERSCAN Compliance Verification
           </CardTitle>
           <CardDescription>Complete all items to avoid payment delays</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           {!allCompleted && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
@@ -263,7 +335,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             </Alert>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-start space-x-3">
               <Checkbox
                 id="correctProjectNumbers"
@@ -273,7 +345,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="correctProjectNumbers" className="text-sm font-medium">
-                  Please confirm that the correct project numbers (ABOVE) were considered for the current payment.
+                  Confirm correct project numbers considered for current payment
                 </Label>
               </div>
             </div>
@@ -288,7 +360,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 />
                 <div className="grid gap-1.5 leading-none">
                   <Label htmlFor="finalReleases" className="text-sm font-medium">
-                    Please indicate any FINAL RELEASES that need to be requested with the current check run.
+                    Indicate any FINAL RELEASES needed with current check run
                   </Label>
                 </div>
               </div>
@@ -297,7 +369,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 value={notes}
                 onChange={(e) => handleNotesChange(e.target.value)}
                 disabled={!isEditing && userRole !== "project-manager"}
-                className="mt-2"
+                className="mt-2 h-20"
               />
             </div>
 
@@ -310,9 +382,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="timberscanApproved" className="text-sm font-medium">
-                  Please confirm that ANY TIMBERSCAN items selected and/or items attached for payment for this funding
-                  have been APPROVED through TIMBERSCAN. The check run will occur AFTER ALL items have been approved and
-                  posted to Sage.
+                  Confirm TIMBERSCAN items selected for payment have been APPROVED
                 </Label>
               </div>
             </div>
@@ -326,8 +396,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="certificatesOnFile" className="text-sm font-medium">
-                  Please confirm that you have CURRENT CERTIFICATES OF INSURANCE ON FILE for all payees for this check
-                  run.
+                  Confirm CURRENT CERTIFICATES OF INSURANCE ON FILE for all payees
                 </Label>
               </div>
             </div>
@@ -341,7 +410,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="licensesOnFile" className="text-sm font-medium">
-                  Please confirm that you have CURRENT APPLICABLE LICENSES ON FILE for all payees for this check run.
+                  Confirm CURRENT APPLICABLE LICENSES ON FILE for all payees
                 </Label>
               </div>
             </div>
@@ -355,7 +424,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
               />
               <div className="grid gap-1.5 leading-none">
                 <Label htmlFor="executedPayApplications" className="text-sm font-medium">
-                  Please ensure EXECUTED pay applications have been submitted AND SUB AFFIDAVIT is completed.
+                  Ensure EXECUTED pay applications submitted AND SUB AFFIDAVIT completed
                 </Label>
               </div>
             </div>
@@ -391,61 +460,75 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-4">
           <CardTitle>Payment Authorization Details</CardTitle>
           <CardDescription>Project: {authorization.jobName}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="projectId">Project ID:</Label>
+                  <Label htmlFor="projectId" className="text-sm">
+                    Project ID:
+                  </Label>
                   <Input
                     id="projectId"
                     value={formData.projectId}
                     onChange={(e) => handleInputChange("projectId", e.target.value)}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="payAppNumber">Pay App #</Label>
+                  <Label htmlFor="payAppNumber" className="text-sm">
+                    Pay App #
+                  </Label>
                   <Input
                     id="payAppNumber"
                     type="number"
                     value={formData.payAppNumber}
                     onChange={(e) => handleInputChange("payAppNumber", parseInt(e.target.value))}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="periodThru">Period thru:</Label>
+                  <Label htmlFor="periodThru" className="text-sm">
+                    Period thru:
+                  </Label>
                   <Input
                     id="periodThru"
                     type="date"
                     value={formData.periodThru}
                     onChange={(e) => handleInputChange("periodThru", e.target.value)}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="dateReceived">Date Received:</Label>
+                  <Label htmlFor="dateReceived" className="text-sm">
+                    Date Received:
+                  </Label>
                   <Input
                     id="dateReceived"
                     type="date"
                     value={formData.dateReceived}
                     onChange={(e) => handleInputChange("dateReceived", e.target.value)}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
                 <div>
-                  <Label htmlFor="payAppValue">Pay App Value:</Label>
+                  <Label htmlFor="payAppValue" className="text-sm">
+                    Pay App Value:
+                  </Label>
                   <Input
                     id="payAppValue"
                     type="number"
@@ -453,10 +536,13 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     value={formData.payAppValue}
                     onChange={(e) => handleInputChange("payAppValue", parseFloat(e.target.value))}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="amountReceived">Amount Received:</Label>
+                  <Label htmlFor="amountReceived" className="text-sm">
+                    Amount Received:
+                  </Label>
                   <Input
                     id="amountReceived"
                     type="number"
@@ -464,97 +550,61 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                     value={formData.amountReceived}
                     onChange={(e) => handleInputChange("amountReceived", parseFloat(e.target.value))}
                     disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="balanceDue">Balance Due:</Label>
-                  <Input
-                    id="balanceDue"
-                    type="number"
-                    step="0.01"
-                    value={formData.balanceDue}
-                    onChange={(e) => handleInputChange("balanceDue", parseFloat(e.target.value))}
-                    disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="invoiceNumber">INVOICE #</Label>
+                  <Label htmlFor="invoiceNumber" className="text-sm">
+                    INVOICE #
+                  </Label>
                   <Input
                     id="invoiceNumber"
                     value={formData.invoiceNumber || ""}
                     onChange={(e) => handleInputChange("invoiceNumber", e.target.value)}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="invoicePeriodThru">Period thru:</Label>
+                  <Label htmlFor="invoicePeriodThru" className="text-sm">
+                    Period thru:
+                  </Label>
                   <Input
                     id="invoicePeriodThru"
                     type="date"
                     value={formData.invoicePeriodThru || ""}
                     onChange={(e) => handleInputChange("invoicePeriodThru", e.target.value)}
                     disabled={!isEditing}
+                    className="h-8"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="invoiceDateReceived">Date Received:</Label>
+                <Label htmlFor="invoiceValue" className="text-sm">
+                  Invoice Value:
+                </Label>
                 <Input
-                  id="invoiceDateReceived"
-                  type="date"
-                  value={formData.invoiceDateReceived || ""}
-                  onChange={(e) => handleInputChange("invoiceDateReceived", e.target.value)}
+                  id="invoiceValue"
+                  type="number"
+                  step="0.01"
+                  value={formData.invoiceValue || ""}
+                  onChange={(e) => handleInputChange("invoiceValue", parseFloat(e.target.value))}
                   disabled={!isEditing}
+                  className="h-8"
                 />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label htmlFor="invoiceValue">Invoice Value:</Label>
-                  <Input
-                    id="invoiceValue"
-                    type="number"
-                    step="0.01"
-                    value={formData.invoiceValue || ""}
-                    onChange={(e) => handleInputChange("invoiceValue", parseFloat(e.target.value))}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="invoiceAmountReceived">Amount Received:</Label>
-                  <Input
-                    id="invoiceAmountReceived"
-                    type="number"
-                    step="0.01"
-                    value={formData.invoiceAmountReceived || ""}
-                    onChange={(e) => handleInputChange("invoiceAmountReceived", parseFloat(e.target.value))}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="invoiceBalanceDue">Balance Due:</Label>
-                  <Input
-                    id="invoiceBalanceDue"
-                    type="number"
-                    step="0.01"
-                    value={formData.invoiceBalanceDue || 0}
-                    onChange={(e) => handleInputChange("invoiceBalanceDue", parseFloat(e.target.value))}
-                    disabled={!isEditing}
-                  />
-                </div>
               </div>
             </div>
           </div>
 
           <Separator />
 
-          <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="bg-yellow-50 dark:bg-yellow-950/20 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800">
             <Label
               htmlFor="amountApprovedForPayment"
               className="text-sm font-medium text-yellow-800 dark:text-yellow-200"
@@ -569,7 +619,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 value={formData.amountApprovedForPayment}
                 onChange={(e) => handleInputChange("amountApprovedForPayment", parseFloat(e.target.value))}
                 disabled={!isEditing}
-                className="text-lg font-semibold bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700"
+                className="text-lg font-semibold bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 h-10"
               />
             </div>
             <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
@@ -592,13 +642,13 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Workflow Progress</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Workflow Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {steps.map((step) => (
-              <div key={step.id} className="flex items-center space-x-4">
+              <div key={step.id} className="flex items-center space-x-3">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step.id <= currentStep
@@ -627,7 +677,6 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
   }
 
   const handleUpdateAuthorization = (updated: PaymentAuthorization) => {
-    setPaymentAuthorizations((prev) => prev.map((auth) => (auth.id === updated.id ? updated : auth)))
     setSelectedAuthorization(updated)
   }
 
@@ -662,64 +711,65 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
   if (activeView === "details" && selectedAuthorization) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <Button variant="ghost" onClick={() => setActiveView("dashboard")} className="mb-4">
+            <Button variant="ghost" onClick={() => setActiveView("dashboard")} className="mb-2">
               ← Back to Dashboard
             </Button>
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold">Payment Authorization {selectedAuthorization.id}</h2>
+              <h2 className="text-xl font-bold">Payment Authorization {selectedAuthorization.id}</h2>
               {getStatusBadge(selectedAuthorization.status)}
             </div>
           </div>
           <div className="flex items-center gap-2">
             {!isEditing && userRole === "project-manager" && (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Button variant="outline" onClick={() => setIsEditing(true)} size="sm">
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit
               </Button>
             )}
             {isEditing && (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)} size="sm">
                   <X className="w-4 h-4 mr-2" />
                   Cancel
                 </Button>
-                <Button onClick={() => setIsEditing(false)}>
+                <Button onClick={() => setIsEditing(false)} size="sm">
                   <Save className="w-4 h-4 mr-2" />
                   Save
                 </Button>
               </>
             )}
-            <Button variant="outline" onClick={() => setShowMessageThread(!showMessageThread)}>
+            <Button variant="outline" onClick={() => setShowMessageThread(!showMessageThread)} size="sm">
               <MessageSquare className="w-4 h-4 mr-2" />
               Comments
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
             <PaymentDetailsForm authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
 
             <ComplianceChecklistCard authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
 
             {userRole === "project-manager" && selectedAuthorization.status === "pending" && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Project Manager Actions</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Project Manager Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleApprovalAction("preliminary_approve")}
                       className="bg-blue-600 hover:bg-blue-700"
+                      size="sm"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Preliminary Approval
                     </Button>
-                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")}>
+                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")} size="sm">
                       <X className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
@@ -730,22 +780,23 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
             {userRole === "project-manager" && selectedAuthorization.status === "preliminary_approved" && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Final Authorization</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Final Authorization</CardTitle>
                   <CardDescription>
                     Accounting has confirmed payment receipt from Owner. Please provide final authorization.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleApprovalAction("final_approve")}
                       className="bg-green-600 hover:bg-green-700"
+                      size="sm"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Final Approval
                     </Button>
-                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")}>
+                    <Button variant="destructive" onClick={() => handleApprovalAction("reject")} size="sm">
                       <X className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
@@ -755,16 +806,16 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <WorkflowProgress authorization={selectedAuthorization} />
 
             {showMessageThread && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Discussion Thread</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Discussion Thread</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="h-96">
+                  <div className="h-80">
                     <MessageBoard selectedThreadId={selectedAuthorization.messageThreadId} className="h-full" />
                   </div>
                 </CardContent>
@@ -778,40 +829,40 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
   return (
     <div className="space-y-6">
-      {/* Dashboard Overview */}
+      {/* Dashboard Overview - Role-based API data matching previous version */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
+            <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{data.pendingApprovals}</div>
-            <div className="text-xs text-muted-foreground">Awaiting PM review</div>
+            <div className="text-xs text-muted-foreground">Awaiting approval</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Preliminary Approved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{data.preliminaryApproved}</div>
-            <div className="text-xs text-muted-foreground">Awaiting final approval</div>
+            <div className="text-2xl font-bold">{data.totalRequests}</div>
+            <div className="text-xs text-muted-foreground">This month</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Approved</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Approved Amount</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(data.approvedAmount)}
             </div>
-            <div className="text-xs text-muted-foreground">This period</div>
+            <div className="text-xs text-muted-foreground">YTD approved</div>
           </CardContent>
         </Card>
 
@@ -824,31 +875,42 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {formatCurrency(data.pendingAmount)}
             </div>
-            <div className="text-xs text-muted-foreground">Requires authorization</div>
+            <div className="text-xs text-muted-foreground">Requires approval</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Payment Authorizations List */}
+      {/* Payment Authorizations List - Compact Design */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Payment Authorizations</CardTitle>
-              <CardDescription>Manage payment approvals and workflow</CardDescription>
+              <CardTitle>Payment Authorization Workflow</CardTitle>
+              <CardDescription>Streamlined approval process for payment authorizations</CardDescription>
             </div>
-            <Button onClick={() => setActiveView("create")}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Authorization
-            </Button>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                Approval Routing
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                Status Tracking
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                Audit Trail
+              </Badge>
+              <Button onClick={() => setActiveView("create")} size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                New Authorization
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {paymentAuthorizations.map((auth) => (
               <div
                 key={auth.id}
-                className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
                 onClick={() => {
                   setSelectedAuthorization(auth)
                   setActiveView("details")
@@ -857,7 +919,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium">
+                      <h4 className="font-medium text-sm">
                         {auth.id} - Pay App #{auth.payAppNumber}
                       </h4>
                       {getStatusBadge(auth.status)}
@@ -874,6 +936,16 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
                 </div>
               </div>
             ))}
+
+            {paymentAuthorizations.length === 0 && (
+              <div className="text-center py-8">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-sm font-medium mb-1">No Payment Authorizations</h3>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                  Payment authorizations will appear here as they are created and submitted for approval.
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

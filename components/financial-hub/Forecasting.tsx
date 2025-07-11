@@ -855,35 +855,35 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       <React.Fragment key={record.id}>
         {/* Row 1: Actual / Remaining Forecast */}
         <tr className="border-b hover:bg-muted/50">
-          <td className="p-2 font-medium text-sm text-left">
+          <td className="p-3 font-medium text-sm text-left">
             <div className="flex items-center gap-2">{displayName}</div>
           </td>
-          <td className="p-1 text-[10px] text-muted-foreground text-left">Actual / Remaining Forecast</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{formatCurrency(record.budget)}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{formatCurrency(record.cost_to_complete)}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">
+          <td className="p-2 text-[10px] text-muted-foreground text-left">Actual / Remaining Forecast</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{formatCurrency(record.budget)}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{formatCurrency(record.cost_to_complete)}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">
             {formatCurrency(record.estimated_at_completion)}
           </td>
           <td
-            className={`p-1 text-xs font-medium text-right ${record.variance >= 0 ? "text-green-600" : "text-red-600"}`}
+            className={`p-2 text-xs font-medium text-right ${record.variance >= 0 ? "text-green-600" : "text-red-600"}`}
           >
             {formatCurrency(record.variance)}
           </td>
-          <td className="p-1 text-right">
+          <td className="p-2 text-right">
             <InlineEdit
               value={record.start_date}
               onSave={(value) => updateRecord(record.id, "start_date", value)}
               type="text"
             />
           </td>
-          <td className="p-1 text-right">
+          <td className="p-2 text-right">
             <InlineEdit
               value={record.end_date}
               onSave={(value) => updateRecord(record.id, "end_date", value)}
               type="text"
             />
           </td>
-          <td className="p-1 text-right">
+          <td className="p-2 text-right">
             <div className="flex items-center gap-1 justify-end">
               {record.forecast_method === "HBI Forecast" && (
                 <Button
@@ -910,7 +910,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               />
             </div>
           </td>
-          <td className="p-1 text-right">
+          <td className="p-2 text-right">
             <InlineEdit
               value={record.weight}
               onSave={(value) => updateRecord(record.id, "weight", value)}
@@ -919,7 +919,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             />
           </td>
           {monthlyColumns.map((month) => (
-            <td key={`${record.id}-actual-${month.key}`} className="p-1 text-right">
+            <td key={`${record.id}-actual-${month.key}`} className="p-2 text-right">
               <InlineEdit
                 value={record.actual_remaining_forecast[month.key] || 0}
                 onSave={(value) => {
@@ -935,24 +935,24 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
 
         {/* Row 2: Previous Forecast */}
         <tr className="border-b bg-muted/20">
-          <td className="p-2"></td>
-          <td className="p-1 text-[10px] text-muted-foreground text-left">Previous Forecast</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{formatCurrency(record.budget * 0.95)}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">
+          <td className="p-3"></td>
+          <td className="p-2 text-[10px] text-muted-foreground text-left">Previous Forecast</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{formatCurrency(record.budget * 0.95)}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">
             {formatCurrency(record.cost_to_complete * 1.05)}
           </td>
-          <td className="p-1 text-xs text-muted-foreground text-right">
+          <td className="p-2 text-xs text-muted-foreground text-right">
             {formatCurrency(record.estimated_at_completion * 0.98)}
           </td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{formatCurrency(record.variance * 0.85)}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{record.start_date}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{record.end_date}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">{record.forecast_method}</td>
-          <td className="p-1 text-xs text-muted-foreground text-right">
+          <td className="p-2 text-xs text-muted-foreground text-right">{formatCurrency(record.variance * 0.85)}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{record.start_date}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{record.end_date}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">{record.forecast_method}</td>
+          <td className="p-2 text-xs text-muted-foreground text-right">
             {record.weight <= 3 ? "Front-Loaded" : record.weight >= 8 ? "Back-Loaded" : "Even"}
           </td>
           {monthlyColumns.map((month) => (
-            <td key={`${record.id}-previous-${month.key}`} className="p-1 text-right">
+            <td key={`${record.id}-previous-${month.key}`} className="p-2 text-right">
               <div className="text-xs text-muted-foreground">
                 {formatCurrency(record.previous_forecast[month.key] || 0)}
               </div>
@@ -962,24 +962,24 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
 
         {/* Row 3: Variance */}
         <tr className="border-b bg-muted/10">
-          <td className="p-2"></td>
-          <td className="p-1 text-[10px] text-muted-foreground text-left">Variance</td>
-          <td className="p-1 text-xs font-medium text-green-600 text-right">{formatCurrency(record.budget * 0.05)}</td>
-          <td className="p-1 text-xs font-medium text-red-600 text-right">
+          <td className="p-3"></td>
+          <td className="p-2 text-[10px] text-muted-foreground text-left">Variance</td>
+          <td className="p-2 text-xs font-medium text-green-600 text-right">{formatCurrency(record.budget * 0.05)}</td>
+          <td className="p-2 text-xs font-medium text-red-600 text-right">
             {formatCurrency(record.cost_to_complete * -0.05)}
           </td>
-          <td className="p-1 text-xs font-medium text-green-600 text-right">
+          <td className="p-2 text-xs font-medium text-green-600 text-right">
             {formatCurrency(record.estimated_at_completion * 0.02)}
           </td>
-          <td className="p-1 text-xs font-medium text-green-600 text-right">
+          <td className="p-2 text-xs font-medium text-green-600 text-right">
             {formatCurrency(record.variance * 0.15)}
           </td>
-          <td className="p-1 text-xs text-right">-</td>
-          <td className="p-1 text-xs text-right">-</td>
-          <td className="p-1 text-xs text-right">-</td>
-          <td className="p-1 text-xs text-right">-</td>
+          <td className="p-2 text-xs text-right">-</td>
+          <td className="p-2 text-xs text-right">-</td>
+          <td className="p-2 text-xs text-right">-</td>
+          <td className="p-2 text-xs text-right">-</td>
           {monthlyColumns.map((month) => (
-            <td key={`${record.id}-variance-${month.key}`} className="p-1 text-right">
+            <td key={`${record.id}-variance-${month.key}`} className="p-2 text-right">
               <div
                 className={`text-xs font-medium ${
                   (record.variance_amounts[month.key] || 0) >= 0 ? "text-green-600" : "text-red-600"
@@ -995,7 +995,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full">
       {/* Table Selection */}
       <div className="flex items-center justify-center">
         <Tabs value={activeTable} onValueChange={(value) => setActiveTable(value as "gcgr" | "draw")}>
@@ -1013,7 +1013,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       </div>
 
       {/* Interactive Forecast Table */}
-      <Card className={isFullscreen ? "fixed inset-0 z-[130] h-screen w-screen overflow-auto" : ""}>
+      <Card className={isFullscreen ? "fixed inset-0 z-[130] h-screen w-screen overflow-auto" : "w-full"}>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1034,23 +1034,23 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             Interactive forecasting with monthly distribution and AI-powered predictions
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
+            <table className="w-full text-xs border-collapse min-w-[1800px]">
               <thead>
                 <tr className="border-b-2 bg-muted/50">
-                  <th className="text-left p-2 w-48">Cost Code</th>
-                  <th className="text-left p-2 w-32">Forecast / Actual</th>
-                  <th className="text-right p-2 w-24">Budget</th>
-                  <th className="text-right p-2 w-24">Cost to Complete</th>
-                  <th className="text-right p-2 w-24">Est. at Completion</th>
-                  <th className="text-right p-2 w-24">Variance</th>
-                  <th className="text-right p-2 w-24">Start Date</th>
-                  <th className="text-right p-2 w-24">End Date</th>
-                  <th className="text-right p-2 w-32">Forecast Method</th>
-                  <th className="text-right p-2 w-20">Weight</th>
+                  <th className="text-left p-3 w-48">Cost Code</th>
+                  <th className="text-left p-3 w-32">Forecast / Actual</th>
+                  <th className="text-right p-3 w-24">Budget</th>
+                  <th className="text-right p-3 w-24">Cost to Complete</th>
+                  <th className="text-right p-3 w-24">Est. at Completion</th>
+                  <th className="text-right p-3 w-24">Variance</th>
+                  <th className="text-right p-3 w-24">Start Date</th>
+                  <th className="text-right p-3 w-24">End Date</th>
+                  <th className="text-right p-3 w-32">Forecast Method</th>
+                  <th className="text-right p-3 w-20">Weight</th>
                   {monthlyColumns.map((month) => (
-                    <th key={month.key} className="text-right p-2 w-20">
+                    <th key={month.key} className="text-right p-3 w-20">
                       {month.label}
                     </th>
                   ))}

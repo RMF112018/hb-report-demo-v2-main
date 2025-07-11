@@ -674,6 +674,26 @@ export default function MainApplicationPage() {
     }
   }
 
+  // Helper function to determine if dashboard should show left sidebar content
+  const shouldShowDashboardLeftContent = (role: UserRole, tab: string): boolean => {
+    // Project Executive: All dashboard views
+    if (role === "project-executive") {
+      return true
+    }
+
+    // Project Manager: All dashboard views
+    if (role === "project-manager") {
+      return true
+    }
+
+    // Estimator: Only Overview, Analytics, and Activity Feed views
+    if (role === "estimator") {
+      return ["overview", "analytics", "activity-feed"].includes(tab)
+    }
+
+    return false
+  }
+
   // Get content configuration - determines layout and content
   const getContentConfig = (): ModuleContentProps => {
     // Use effective role for presentation mode
@@ -745,7 +765,20 @@ export default function MainApplicationPage() {
     }
 
     // Default dashboard for all users (including IT administrators when no module selected)
+    const dashboardHasLeftContent = shouldShowDashboardLeftContent(effectiveRole, activeTab)
+
     return {
+      leftContent: dashboardHasLeftContent ? (
+        <RoleDashboard
+          userRole={effectiveRole}
+          user={user!}
+          projects={projects}
+          onProjectSelect={handleProjectSelect}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          renderMode="leftContent"
+        />
+      ) : undefined,
       rightContent: (
         <RoleDashboard
           userRole={effectiveRole}
@@ -754,9 +787,10 @@ export default function MainApplicationPage() {
           onProjectSelect={handleProjectSelect}
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          renderMode="rightContent"
         />
       ),
-      hasLeftContent: false,
+      hasLeftContent: dashboardHasLeftContent,
     }
   }
 
