@@ -43,6 +43,12 @@ import EditableField from "./EditableField"
 import MetricGrid from "./cards/MetricGrid"
 import { MetricData } from "./cards/MetricGrid"
 import { useBidPursuits } from "../../../hooks/useBidPursuits"
+import ColumnSettingsDialog, {
+  ColumnVisibility,
+  DELIVERY_COLUMNS,
+  STAGE_COLUMNS,
+  ESTIMATES_COLUMNS,
+} from "./ColumnSettingsDialog"
 
 // Enhanced TypeScript interfaces
 type UserRole = "estimator" | "project-manager" | "executive" | "admin"
@@ -86,6 +92,12 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
   const [searchTerm, setSearchTerm] = useState("")
   const [isMobile, setIsMobile] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
+
+  // Column visibility state for each tab
+  const [deliveryColumnVisibility, setDeliveryColumnVisibility] = useState<ColumnVisibility>({})
+  const [stageColumnVisibility, setStageColumnVisibility] = useState<ColumnVisibility>({})
+  const [estimatesColumnVisibility, setEstimatesColumnVisibility] = useState<ColumnVisibility>({})
+
   const router = useRouter()
   const { toast } = useToast()
 
@@ -375,176 +387,200 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Schedule</TableHead>
-                  <TableHead>Deliverable</TableHead>
-                  <TableHead>Bid Book Log</TableHead>
-                  <TableHead>Review</TableHead>
-                  <TableHead>Programming</TableHead>
-                  <TableHead>Pricing</TableHead>
-                  <TableHead>Lean Estimating</TableHead>
-                  <TableHead>Final Estimate</TableHead>
-                  <TableHead>Contributors</TableHead>
-                  <TableHead>Bid Bond</TableHead>
-                  <TableHead>Actions</TableHead>
+                  {deliveryColumnVisibility.project && <TableHead>Project</TableHead>}
+                  {deliveryColumnVisibility.schedule && <TableHead>Schedule</TableHead>}
+                  {deliveryColumnVisibility.deliverable && <TableHead>Deliverable</TableHead>}
+                  {deliveryColumnVisibility.bidBookLog && <TableHead>Bid Book Log</TableHead>}
+                  {deliveryColumnVisibility.review && <TableHead>Review</TableHead>}
+                  {deliveryColumnVisibility.programming && <TableHead>Programming</TableHead>}
+                  {deliveryColumnVisibility.pricing && <TableHead>Pricing</TableHead>}
+                  {deliveryColumnVisibility.leanEstimating && <TableHead>Lean Estimating</TableHead>}
+                  {deliveryColumnVisibility.finalEstimate && <TableHead>Final Estimate</TableHead>}
+                  {deliveryColumnVisibility.contributors && <TableHead>Contributors</TableHead>}
+                  {deliveryColumnVisibility.bidBond && <TableHead>Bid Bond</TableHead>}
+                  {deliveryColumnVisibility.actions && <TableHead>Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProjects.map((project) => (
                   <TableRow key={project.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{project.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {project.projectNumber} • {project.client}
-                        </div>
-                        <div className="text-sm text-muted-foreground">{project.location}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.schedule}
-                          onChange={(value) => handleFieldUpdate(project.id, "schedule", value)}
-                          type="select"
-                          options={scheduleOptions}
-                          className="min-w-[120px]"
-                        />
-                      ) : (
-                        <Badge variant="secondary" className={getScheduleColor(project.schedule)}>
-                          {project.schedule}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.deliverable}
-                          onChange={(value) => handleFieldUpdate(project.id, "deliverable", value)}
-                          type="select"
-                          options={deliverableOptions}
-                          className="min-w-[130px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.deliverable}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.bidBookLog}
-                          onChange={(value) => handleFieldUpdate(project.id, "bidBookLog", value)}
-                          type="select"
-                          options={statusOptions}
-                          className="min-w-[110px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.bidBookLog}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.review}
-                          onChange={(value) => handleFieldUpdate(project.id, "review", value)}
-                          type="select"
-                          options={statusOptions}
-                          className="min-w-[110px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.review}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.programming}
-                          onChange={(value) => handleFieldUpdate(project.id, "programming", value)}
-                          type="select"
-                          options={statusOptions}
-                          className="min-w-[110px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.programming}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.pricing}
-                          onChange={(value) => handleFieldUpdate(project.id, "pricing", value)}
-                          type="number"
-                          className="min-w-[80px]"
-                        />
-                      ) : (
+                    {deliveryColumnVisibility.project && (
+                      <TableCell>
                         <div className="space-y-1">
-                          <Progress value={project.pricing} className="h-2" />
-                          <div className="text-sm text-muted-foreground">{project.pricing}%</div>
+                          <div className="font-medium">{project.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {project.projectNumber} • {project.client}
+                          </div>
+                          <div className="text-sm text-muted-foreground">{project.location}</div>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.leanEstimating}
-                          onChange={(value) => handleFieldUpdate(project.id, "leanEstimating", value)}
-                          type="select"
-                          options={statusOptions}
-                          className="min-w-[110px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.leanEstimating}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.finalEstimate}
-                          onChange={(value) => handleFieldUpdate(project.id, "finalEstimate", value)}
-                          type="select"
-                          options={statusOptions}
-                          className="min-w-[110px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.finalEstimate}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.contributors}
-                          onChange={(value) => handleFieldUpdate(project.id, "contributors", value)}
-                          type="text"
-                          placeholder="Enter contributors"
-                          className="min-w-[100px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.contributors}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditMode ? (
-                        <EditableField
-                          value={project.bidBond}
-                          onChange={(value) => handleFieldUpdate(project.id, "bidBond", value)}
-                          type="select"
-                          options={bidBondOptions}
-                          className="min-w-[120px]"
-                        />
-                      ) : (
-                        <Badge variant="outline">{project.bidBond}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleProjectNavigation(project.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.schedule && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.schedule}
+                            onChange={(value) => handleFieldUpdate(project.id, "schedule", value)}
+                            type="select"
+                            options={scheduleOptions}
+                            className="min-w-[120px]"
+                          />
+                        ) : (
+                          <Badge variant="secondary" className={getScheduleColor(project.schedule)}>
+                            {project.schedule}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.deliverable && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.deliverable}
+                            onChange={(value) => handleFieldUpdate(project.id, "deliverable", value)}
+                            type="select"
+                            options={deliverableOptions}
+                            className="min-w-[130px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.deliverable}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.bidBookLog && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.bidBookLog}
+                            onChange={(value) => handleFieldUpdate(project.id, "bidBookLog", value)}
+                            type="select"
+                            options={statusOptions}
+                            className="min-w-[110px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.bidBookLog}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.review && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.review}
+                            onChange={(value) => handleFieldUpdate(project.id, "review", value)}
+                            type="select"
+                            options={statusOptions}
+                            className="min-w-[110px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.review}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.programming && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.programming}
+                            onChange={(value) => handleFieldUpdate(project.id, "programming", value)}
+                            type="select"
+                            options={statusOptions}
+                            className="min-w-[110px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.programming}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.pricing && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.pricing}
+                            onChange={(value) => handleFieldUpdate(project.id, "pricing", value)}
+                            type="number"
+                            className="min-w-[80px]"
+                          />
+                        ) : (
+                          <div className="space-y-1">
+                            <Progress value={project.pricing} className="h-2" />
+                            <div className="text-sm text-muted-foreground">{project.pricing}%</div>
+                          </div>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.leanEstimating && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.leanEstimating}
+                            onChange={(value) => handleFieldUpdate(project.id, "leanEstimating", value)}
+                            type="select"
+                            options={statusOptions}
+                            className="min-w-[110px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.leanEstimating}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.finalEstimate && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.finalEstimate}
+                            onChange={(value) => handleFieldUpdate(project.id, "finalEstimate", value)}
+                            type="select"
+                            options={statusOptions}
+                            className="min-w-[110px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.finalEstimate}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.contributors && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.contributors}
+                            onChange={(value) => handleFieldUpdate(project.id, "contributors", value)}
+                            type="text"
+                            placeholder="Enter contributors"
+                            className="min-w-[100px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.contributors}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.bidBond && (
+                      <TableCell>
+                        {isEditMode ? (
+                          <EditableField
+                            value={project.bidBond}
+                            onChange={(value) => handleFieldUpdate(project.id, "bidBond", value)}
+                            type="select"
+                            options={bidBondOptions}
+                            className="min-w-[120px]"
+                          />
+                        ) : (
+                          <Badge variant="outline">{project.bidBond}</Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {deliveryColumnVisibility.actions && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleProjectNavigation(project.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -568,56 +604,72 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Current Stage</TableHead>
-                  <TableHead>Project Budget</TableHead>
-                  <TableHead>Original Budget</TableHead>
-                  <TableHead>Billed to Date</TableHead>
-                  <TableHead>Remaining Budget</TableHead>
-                  <TableHead>Budget Variance</TableHead>
-                  <TableHead>Actions</TableHead>
+                  {stageColumnVisibility.project && <TableHead>Project</TableHead>}
+                  {stageColumnVisibility.currentStage && <TableHead>Current Stage</TableHead>}
+                  {stageColumnVisibility.projectBudget && <TableHead>Project Budget</TableHead>}
+                  {stageColumnVisibility.originalBudget && <TableHead>Original Budget</TableHead>}
+                  {stageColumnVisibility.billedToDate && <TableHead>Billed to Date</TableHead>}
+                  {stageColumnVisibility.remainingBudget && <TableHead>Remaining Budget</TableHead>}
+                  {stageColumnVisibility.budgetVariance && <TableHead>Budget Variance</TableHead>}
+                  {stageColumnVisibility.actions && <TableHead>Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProjects.map((project) => (
                   <TableRow key={project.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{project.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {project.projectNumber} • {project.client}
+                    {stageColumnVisibility.project && (
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-medium">{project.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {project.projectNumber} • {project.client}
+                          </div>
+                          <div className="text-sm text-muted-foreground">{project.location}</div>
                         </div>
-                        <div className="text-sm text-muted-foreground">{project.location}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{project.currentStage}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{formatCurrency(project.projectBudget)}</TableCell>
-                    <TableCell className="font-medium">{formatCurrency(project.originalBudget)}</TableCell>
-                    <TableCell>{formatCurrency(project.billedToDate)}</TableCell>
-                    <TableCell>{formatCurrency(project.remainingBudget)}</TableCell>
-                    <TableCell>
-                      {project.projectBudget === project.originalBudget ? (
-                        <Badge variant="default" className="bg-green-100 text-green-800">
-                          On Budget
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">
-                          {project.projectBudget > project.originalBudget ? "Over Budget" : "Under Budget"}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleProjectNavigation(project.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                      </TableCell>
+                    )}
+                    {stageColumnVisibility.currentStage && (
+                      <TableCell>
+                        <Badge variant="outline">{project.currentStage}</Badge>
+                      </TableCell>
+                    )}
+                    {stageColumnVisibility.projectBudget && (
+                      <TableCell className="font-medium">{formatCurrency(project.projectBudget)}</TableCell>
+                    )}
+                    {stageColumnVisibility.originalBudget && (
+                      <TableCell className="font-medium">{formatCurrency(project.originalBudget)}</TableCell>
+                    )}
+                    {stageColumnVisibility.billedToDate && (
+                      <TableCell>{formatCurrency(project.billedToDate)}</TableCell>
+                    )}
+                    {stageColumnVisibility.remainingBudget && (
+                      <TableCell>{formatCurrency(project.remainingBudget)}</TableCell>
+                    )}
+                    {stageColumnVisibility.budgetVariance && (
+                      <TableCell>
+                        {project.projectBudget === project.originalBudget ? (
+                          <Badge variant="default" className="bg-green-100 text-green-800">
+                            On Budget
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            {project.projectBudget > project.originalBudget ? "Over Budget" : "Under Budget"}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {stageColumnVisibility.actions && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleProjectNavigation(project.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -641,79 +693,93 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Estimate Type</TableHead>
-                  <TableHead>Estimated Cost</TableHead>
-                  <TableHead>Cost per SqFt</TableHead>
-                  <TableHead>Cost per LF</TableHead>
-                  <TableHead>Square Footage</TableHead>
-                  <TableHead>Submitted Date</TableHead>
-                  <TableHead>Awarded</TableHead>
-                  <TableHead>Precon</TableHead>
-                  <TableHead>Actions</TableHead>
+                  {estimatesColumnVisibility.project && <TableHead>Project</TableHead>}
+                  {estimatesColumnVisibility.estimateType && <TableHead>Estimate Type</TableHead>}
+                  {estimatesColumnVisibility.estimatedCost && <TableHead>Estimated Cost</TableHead>}
+                  {estimatesColumnVisibility.costPerSqf && <TableHead>Cost per SqFt</TableHead>}
+                  {estimatesColumnVisibility.costPerLft && <TableHead>Cost per LF</TableHead>}
+                  {estimatesColumnVisibility.squareFootage && <TableHead>Square Footage</TableHead>}
+                  {estimatesColumnVisibility.submittedDate && <TableHead>Submitted Date</TableHead>}
+                  {estimatesColumnVisibility.awarded && <TableHead>Awarded</TableHead>}
+                  {estimatesColumnVisibility.precon && <TableHead>Precon</TableHead>}
+                  {estimatesColumnVisibility.actions && <TableHead>Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProjects.map((project) => (
                   <TableRow key={project.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{project.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {project.projectNumber} • {project.client}
+                    {estimatesColumnVisibility.project && (
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-medium">{project.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {project.projectNumber} • {project.client}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{project.estimateType}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{formatCurrency(project.estimatedCost)}</TableCell>
-                    <TableCell>${project.costPerSqf.toFixed(2)}</TableCell>
-                    <TableCell>${project.costPerLft.toFixed(2)}</TableCell>
-                    <TableCell>{project.sqft.toLocaleString()} SqFt</TableCell>
-                    <TableCell>{formatDate(project.submitted)}</TableCell>
-                    <TableCell>
-                      {project.awarded ? (
-                        <Badge
-                          variant="default"
-                          className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      </TableCell>
+                    )}
+                    {estimatesColumnVisibility.estimateType && (
+                      <TableCell>
+                        <Badge variant="outline">{project.estimateType}</Badge>
+                      </TableCell>
+                    )}
+                    {estimatesColumnVisibility.estimatedCost && (
+                      <TableCell className="font-medium">{formatCurrency(project.estimatedCost)}</TableCell>
+                    )}
+                    {estimatesColumnVisibility.costPerSqf && <TableCell>${project.costPerSqf.toFixed(2)}</TableCell>}
+                    {estimatesColumnVisibility.costPerLft && <TableCell>${project.costPerLft.toFixed(2)}</TableCell>}
+                    {estimatesColumnVisibility.squareFootage && (
+                      <TableCell>{project.sqft.toLocaleString()} SqFt</TableCell>
+                    )}
+                    {estimatesColumnVisibility.submittedDate && <TableCell>{formatDate(project.submitted)}</TableCell>}
+                    {estimatesColumnVisibility.awarded && (
+                      <TableCell>
+                        {project.awarded ? (
+                          <Badge
+                            variant="default"
+                            className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Awarded
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Not Awarded
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {estimatesColumnVisibility.precon && (
+                      <TableCell>
+                        {project.awardedPrecon ? (
+                          <Badge
+                            variant="default"
+                            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Awarded
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Not Awarded
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {estimatesColumnVisibility.actions && (
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleProjectNavigation(project.id)}
+                          className="h-8 w-8 p-0"
                         >
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Awarded
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">
-                          <XCircle className="h-3 w-3 mr-1" />
-                          Not Awarded
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {project.awardedPrecon ? (
-                        <Badge
-                          variant="default"
-                          className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                        >
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Awarded
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">
-                          <XCircle className="h-3 w-3 mr-1" />
-                          Not Awarded
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleProjectNavigation(project.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -769,6 +835,23 @@ const BidManagementCenter: React.FC<BidManagementCenterProps> = ({
           <Filter className="h-4 w-4 mr-2" />
           Filter
         </Button>
+        {activeTab === "delivery" && (
+          <ColumnSettingsDialog
+            columns={DELIVERY_COLUMNS}
+            tabId="delivery"
+            onVisibilityChange={setDeliveryColumnVisibility}
+          />
+        )}
+        {activeTab === "stage" && (
+          <ColumnSettingsDialog columns={STAGE_COLUMNS} tabId="stage" onVisibilityChange={setStageColumnVisibility} />
+        )}
+        {activeTab === "estimates" && (
+          <ColumnSettingsDialog
+            columns={ESTIMATES_COLUMNS}
+            tabId="estimates"
+            onVisibilityChange={setEstimatesColumnVisibility}
+          />
+        )}
       </div>
 
       {/* Alert for role-specific information */}

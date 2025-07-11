@@ -44,7 +44,7 @@ import ChecklistModule from "@/components/project/checklists/ChecklistModule"
 import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
 import ResponsibilityMatrixModule from "@/components/project/responsibility-matrix/ResponsibilityMatrixModule"
-import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
+import ProductivityModule from "@/components/project/productivity/ProductivityModule"
 import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
 import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
 import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
@@ -302,7 +302,7 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       case "productivity":
         return (
           <div className="w-full max-w-full">
-            <ProjectProductivityContent
+            <ProductivityModule
               projectId={projectId}
               projectData={projectData}
               userRole={userRole}
