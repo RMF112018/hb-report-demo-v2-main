@@ -1,0 +1,35 @@
+export interface ProjectPursuit {
+  id: string
+  name: string
+  projectNumber: string
+  client: string
+  location: string
+  schedule: string
+  deliverable: string
+  bidBookLog: string
+  review: string
+  programming: string
+  pricing: number
+  leanEstimating: string
+  finalEstimate: string
+  contributors: string
+  bidBond: string
+  currentStage: string
+  projectBudget: number
+  originalBudget: number
+  billedToDate: number
+  remainingBudget: number
+  estimateType: string
+  costPerSqf: number
+  costPerLft: number
+  submitted: string
+  awarded: boolean
+  awardedPrecon: boolean
+  bidDueDate: string
+  status: string
+  estimatedCost: number
+  lead: string
+  confidence: number
+  riskLevel: string
+  sqft: number
+}

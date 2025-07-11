@@ -89,17 +89,7 @@ import { ReportViewer } from "@/components/reports/ReportViewer"
 import { ReportApprovalWorkflow } from "@/components/reports/ReportApprovalWorkflow"
 import { ReportHistory } from "@/components/reports/ReportHistory"
 import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
-import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
-import { ProjectReports } from "@/components/reports/ProjectReports"
-import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
-import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
-import ResponsibilityMatrixCore from "./ResponsibilityMatrixCore"
 import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
-import { ProjectManagerStaffingView } from "@/components/staffing/ProjectManagerStaffingView"
-import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
-import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
-import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
-import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
 import FieldManagementContent from "./content/FieldManagementContent"
 import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
 import { ProjectBidManagement } from "@/components/estimating/BidManagement"
@@ -108,7 +98,19 @@ import BiddersList from "@/components/estimating/bid-management/components/Bidde
 import BidLeveling from "@/components/estimating/bid-management/components/BidLeveling"
 import BiddingOverview from "@/components/estimating/BiddingOverview"
 import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
-import BidManagementNavigation from "./BidManagementNavigation"
+import ProjectTabsShell from "@/components/project/ProjectTabsShell"
+import EstimatingSuite from "@/components/estimating/EstimatingSuite"
+import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
+import SidebarPanelRenderer from "@/components/project/sidebar/SidebarPanelRenderer"
+import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
+import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
+import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
+import { ProjectReports } from "@/components/reports/ProjectReports"
+
+import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
+import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
+import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
+import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
 
 interface ProjectControlCenterContentProps {
   projectId: string
@@ -124,10 +126,9 @@ interface NavigationState {
   category: string | null
   tool: string | null
   subTool: string | null
-  coreTab: string | null
-  staffingSubTab: string | null
-  reportsSubTab: string | null
-  selectedBidPackage: string | null
+  coreTab?: string | null
+  staffingSubTab?: string
+  reportsSubTab?: string
 }
 
 // Expandable Description Component
@@ -204,1069 +205,104 @@ const PreConstructionContent: React.FC<{
   projectData: any
   userRole: string
   user: any
-  selectedBidPackage?: string | null
-  onBidPackageSelect?: (packageId: string) => void
-}> = ({ projectId, projectData, userRole, user, selectedBidPackage, onBidPackageSelect }) => {
-  const [activePreconTab, setActivePreconTab] = useState("estimating")
-  const [activeEstimatingSubTab, setActiveEstimatingSubTab] = useState("overview")
-  const [activeBidPackageTab, setActiveBidPackageTab] = useState("overview")
+}> = ({ projectId, projectData, userRole, user }) => {
+  const [activePreconTab, setActivePreconTab] = useState<string>("estimating")
 
-  // Helper function to get bid package name
   const getBidPackageName = (packageId: string) => {
     const packages: { [key: string]: string } = {
-      "01-00": "Materials Testing",
-      "02-21": "Surveying",
-      "03-33": "Concrete",
-      "04-21": "Masonry",
-      "05-12": "Structural Steel",
-      "06-10": "Carpentry",
-      "07-11": "Waterproofing",
-      "08-11": "Steel Doors",
+      "MRC-001": "Concrete Work",
+      "MRC-002": "Masonry Work",
+      "MRC-003": "Metals",
+      "MRC-004": "Wood, Plastics, and Composites",
+      "MRC-005": "Thermal and Moisture Protection",
+      "MRC-006": "Openings",
+      "MRC-007": "Finishes",
+      "MRC-008": "Specialties",
+      "MRC-009": "Equipment",
+      "MRC-010": "Furnishings",
+      "MRC-011": "Special Construction",
+      "MRC-012": "Conveying Equipment",
+      "MRC-013": "Fire Suppression",
+      "MRC-014": "Plumbing",
+      "MRC-015": "HVAC",
+      "MRC-016": "Electrical",
+      "MRC-017": "Communications",
+      "MRC-018": "Electronic Safety and Security",
+      "MRC-019": "Instrumentation",
+      "MRC-020": "Earthwork",
+      "MRC-021": "Exterior Improvements",
+      "MRC-022": "Utilities",
+      "MRC-023": "Transportation",
+      "MRC-024": "Hazardous Materials",
+      "MRC-025": "Pollution Control",
+      "MRC-026": "Process Equipment",
+      "MRC-027": "Process Instrumentation",
+      "MRC-028": "Process Electrical",
+      "MRC-029": "Process Controls",
+      "MRC-030": "General Requirements",
+      "MRC-031": "Existing Conditions",
+      "MRC-032": "Site Preparation",
+      "MRC-033": "Concrete",
+      "MRC-034": "Masonry",
+      "MRC-035": "Metals",
+      "MRC-036": "Wood and Plastics",
+      "MRC-037": "Thermal and Moisture Protection",
+      "MRC-038": "Doors and Windows",
+      "MRC-039": "Finishes",
+      "MRC-040": "Specialties",
+      "MRC-041": "Equipment",
+      "MRC-042": "Furnishings",
+      "MRC-043": "Special Construction",
+      "MRC-044": "Conveying Equipment",
+      "MRC-045": "Fire Suppression",
+      "MRC-046": "Plumbing",
+      "MRC-047": "HVAC",
+      "MRC-048": "Electrical",
+      "MRC-049": "Communications",
+      "MRC-050": "Electronic Safety and Security",
+      "MRC-051": "Instrumentation",
+      "MRC-052": "Earthwork",
+      "MRC-053": "Exterior Improvements",
+      "MRC-054": "Utilities",
+      "MRC-055": "Transportation",
+      "MRC-056": "Hazardous Materials",
+      "MRC-057": "Pollution Control",
+      "MRC-058": "Process Equipment",
+      "MRC-059": "Process Instrumentation",
+      "MRC-060": "Process Electrical",
+      "MRC-061": "Process Controls",
+      "MRC-062": "General Requirements",
+      "MRC-063": "Existing Conditions",
+      "MRC-064": "Site Preparation",
+      "MRC-065": "Concrete",
+      "MRC-066": "Masonry",
+      "MRC-067": "Metals",
+      "MRC-068": "Wood and Plastics",
+      "MRC-069": "Thermal and Moisture Protection",
+      "MRC-070": "Doors and Windows",
+      "MRC-071": "Finishes",
+      "MRC-072": "Specialties",
+      "MRC-073": "Equipment",
+      "MRC-074": "Furnishings",
+      "MRC-075": "Special Construction",
+      "MRC-076": "Conveying Equipment",
+      "MRC-077": "Fire Suppression",
+      "MRC-078": "Plumbing",
+      "MRC-079": "HVAC",
+      "MRC-080": "Electrical",
+      "MRC-081": "Communications",
+      "MRC-082": "Electronic Safety and Security",
     }
     return packages[packageId] || "Unknown Package"
   }
 
-  // Render content based on active tab
   const renderPreconTabContent = () => {
     switch (activePreconTab) {
       case "estimating":
         return (
-          <div className="space-y-6">
-            {/* Estimating Sub-Tab Navigation */}
-            <Tabs value={activeEstimatingSubTab} onValueChange={setActiveEstimatingSubTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 gap-1 h-auto p-1">
-                <TabsTrigger value="overview" className="text-xs px-2 py-1">
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="bidding" className="text-xs px-2 py-1">
-                  Bidding
-                </TabsTrigger>
-                <TabsTrigger value="area-calculation" className="text-xs px-2 py-1">
-                  Area Calc
-                </TabsTrigger>
-                <TabsTrigger value="allowances" className="text-xs px-2 py-1">
-                  Allowances
-                </TabsTrigger>
-                <TabsTrigger value="clarifications" className="text-xs px-2 py-1">
-                  Clarifications
-                </TabsTrigger>
-                <TabsTrigger value="value-analysis" className="text-xs px-2 py-1">
-                  Value Analysis
-                </TabsTrigger>
-                <TabsTrigger value="documents" className="text-xs px-2 py-1">
-                  Documents
-                </TabsTrigger>
-                <TabsTrigger value="trade-partners" className="text-xs px-2 py-1">
-                  Trade Partners
-                </TabsTrigger>
-                <TabsTrigger value="bid-leveling" className="text-xs px-2 py-1">
-                  Bid Leveling
-                </TabsTrigger>
-                <TabsTrigger value="cost-summary" className="text-xs px-2 py-1">
-                  Cost Summary
-                </TabsTrigger>
-                <TabsTrigger value="gc-gr" className="text-xs px-2 py-1">
-                  GC GR
-                </TabsTrigger>
-                <TabsTrigger value="bid-tabs" className="text-xs px-2 py-1">
-                  Bid Tabs
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="mt-6">
-                <div className="space-y-6">
-                  {/* Estimating Dashboard */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Calculator className="h-5 w-5" />
-                          Cost Analysis
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                              ${projectData?.contract_value ? (projectData.contract_value / 1000000).toFixed(1) : "0"}M
-                            </div>
-                            <p className="text-sm text-muted-foreground">Estimated Value</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <FileText className="h-4 w-4 mr-2" />
-                              View Cost Breakdown
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <BarChart3 className="h-4 w-4 mr-2" />
-                              Bid Leveling
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Target className="h-4 w-4 mr-2" />
-                              Accuracy Tracking
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Building2 className="h-5 w-5" />
-                          Project Scope
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                              {projectData?.project_type_name || "Commercial"}
-                            </div>
-                            <p className="text-sm text-muted-foreground">Project Type</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Scope Details
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Calculator className="h-4 w-4 mr-2" />
-                              Estimate Builder
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <TrendingUp className="h-5 w-5" />
-                          Estimating Progress
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">85%</div>
-                            <p className="text-sm text-muted-foreground">Complete</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <Plus className="h-4 w-4 mr-2" />
-                              New Estimate
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Download className="h-4 w-4 mr-2" />
-                              Export Templates
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Estimating Activities */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <ClipboardList className="h-5 w-5" />
-                        Estimating Activities
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {[
-                          { task: "Quantity Takeoff", status: "completed", progress: 100 },
-                          { task: "Material Pricing", status: "in-progress", progress: 75 },
-                          { task: "Labor Calculations", status: "in-progress", progress: 60 },
-                          { task: "Equipment Costs", status: "pending", progress: 30 },
-                          { task: "Final Review", status: "pending", progress: 0 },
-                        ].map((item, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className={`w-3 h-3 rounded-full ${
-                                  item.status === "completed"
-                                    ? "bg-green-500"
-                                    : item.status === "in-progress"
-                                    ? "bg-yellow-500"
-                                    : "bg-gray-300"
-                                }`}
-                              />
-                              <span className="font-medium">{item.task}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-20 bg-gray-200 rounded-full h-2">
-                                <div
-                                  className={`h-2 rounded-full ${
-                                    item.status === "completed"
-                                      ? "bg-green-500"
-                                      : item.status === "in-progress"
-                                      ? "bg-yellow-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  style={{ width: `${item.progress}%` }}
-                                />
-                              </div>
-                              <span className="text-sm text-muted-foreground w-12">{item.progress}%</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* All other estimating sub-tabs */}
-
-              <TabsContent value="bidding" className="mt-6">
-                {selectedBidPackage ? (
-                  <div className="space-y-6">
-                    {/* Breadcrumb */}
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <span
-                        className="cursor-pointer hover:text-blue-600"
-                        onClick={() => onBidPackageSelect && onBidPackageSelect("")}
-                      >
-                        Bid Packages
-                      </span>
-                      <span>&gt;</span>
-                      <span className="text-foreground font-medium">
-                        {selectedBidPackage}: {getBidPackageName(selectedBidPackage)}
-                      </span>
-                    </div>
-
-                    {/* Bid Package Detail View */}
-                    <div className="space-y-6">
-                      {/* Header */}
-                      <div>
-                        <h1 className="text-2xl font-semibold text-foreground">
-                          {selectedBidPackage}: {getBidPackageName(selectedBidPackage)}
-                        </h1>
-                      </div>
-
-                      {/* Tab Navigation */}
-                      <div className="border-b border-border">
-                        <div className="flex space-x-6 overflow-x-auto">
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "overview"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("overview")}
-                          >
-                            <span>Overview</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "files"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("files")}
-                          >
-                            <span>Files</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "messages"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("messages")}
-                          >
-                            <span>Messages</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bidders"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bidders")}
-                          >
-                            <span>Bidders</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bid-form"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bid-form")}
-                          >
-                            <span>Bid Form</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bid-leveling"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bid-leveling")}
-                          >
-                            <span>Bid Leveling</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      {activeBidPackageTab === "overview" && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                          {/* Left Column - Main Content */}
-                          <div className="lg:col-span-2 space-y-6">
-                            {/* Company Invitation Status */}
-                            <Card>
-                              <CardHeader>
-                                <CardTitle className="text-lg">13 companies invited</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="grid grid-cols-4 gap-4">
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="110"
-                                          className="text-gray-400"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">8</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Undecided</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="94"
-                                          className="text-teal-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">6</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Viewed</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="148"
-                                          className="text-green-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">2</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Bidding</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="175"
-                                          className="text-red-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">0</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Declined</div>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Files Tab Content */}
-                      {activeBidPackageTab === "files" && (
-                        <div className="space-y-6">
-                          {/* SharePoint Integration Header */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12.5,2.5h7C20.9,2.5,22,3.6,22,5v14c0,1.4-1.1,2.5-2.5,2.5h-15C3.1,21.5,2,20.4,2,19V5c0-1.4,1.1-2.5,2.5-2.5H12.5z M12.5,8h7C20.3,8,21,8.7,21,9.5S20.3,11,19.5,11h-7C11.7,11,11,10.3,11,9.5S11.7,8,12.5,8z M12.5,13h7c0.8,0,1.5,0.7,1.5,1.5S20.3,16,19.5,16h-7c-0.8,0-1.5-0.7-1.5-1.5S11.7,13,12.5,13z" />
-                                </svg>
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-semibold">SharePoint Document Library</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Microsoft Graph API Integration • Materials Testing Bid Package
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Badge variant="outline" className="text-xs">
-                                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                                Connected
-                              </Badge>
-                              <Button variant="outline" size="sm">
-                                <svg
-                                  className="w-4 h-4 mr-2"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                  <polyline points="7,10 12,15 17,10" />
-                                  <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg>
-                                Upload Files
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <svg
-                                  className="w-4 h-4 mr-2"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                </svg>
-                                New Folder
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            {/* Left Sidebar - Folder Structure */}
-                            <div className="lg:col-span-1">
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-sm font-medium">Folder Structure</CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-0">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                      </svg>
-                                      <span className="text-sm font-medium">📁 Materials Testing</span>
-                                    </div>
-                                    <div className="ml-6 space-y-1">
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📄 Specifications</span>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📋 Proposals</span>
-                                        <Badge variant="secondary" className="text-xs ml-auto">
-                                          3
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📑 Drawings</span>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded bg-blue-50 border-l-2 border-blue-600 cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm font-medium">📤 Submissions</span>
-                                        <Badge variant="default" className="text-xs ml-auto">
-                                          1
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">💬 Communications</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-
-                              {/* Graph API Status */}
-                              <Card className="mt-4">
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-sm font-medium">Microsoft Graph API</CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-0 space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">Connection Status</span>
-                                    <Badge variant="outline" className="text-xs">
-                                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                                      Active
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">Last Sync</span>
-                                    <span className="text-xs">2 min ago</span>
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">API Version</span>
-                                    <span className="text-xs">v1.0</span>
-                                  </div>
-                                  <Button variant="outline" size="sm" className="w-full text-xs">
-                                    <svg
-                                      className="w-3 h-3 mr-1"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    >
-                                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                      <circle cx="12" cy="12" r="3" />
-                                    </svg>
-                                    View Permissions
-                                  </Button>
-                                </CardContent>
-                              </Card>
-                            </div>
-
-                            {/* Main Content - File List */}
-                            <div className="lg:col-span-3">
-                              <Card>
-                                <CardHeader className="flex flex-row items-center justify-between pb-4">
-                                  <div>
-                                    <CardTitle className="text-base">Submissions Folder</CardTitle>
-                                    <CardDescription className="text-sm">
-                                      /Materials Testing/Submissions • SharePoint Online
-                                    </CardDescription>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Button variant="ghost" size="sm">
-                                      <svg
-                                        className="w-4 h-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                      </svg>
-                                    </Button>
-                                    <Button variant="ghost" size="sm">
-                                      <svg
-                                        className="w-4 h-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <line x1="8" y1="6" x2="21" y2="6" />
-                                        <line x1="8" y1="12" x2="21" y2="12" />
-                                        <line x1="8" y1="18" x2="21" y2="18" />
-                                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                                        <line x1="3" y1="18" x2="3.01" y2="18" />
-                                      </svg>
-                                    </Button>
-                                  </div>
-                                </CardHeader>
-                                <CardContent>
-                                  {/* File Upload Area */}
-                                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center mb-6 hover:border-blue-400 transition-colors">
-                                    <div className="flex flex-col items-center space-y-3">
-                                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <svg
-                                          className="w-6 h-6 text-blue-600"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                        >
-                                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                          <polyline points="7,10 12,15 17,10" />
-                                          <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium">Drag and drop files here</p>
-                                        <p className="text-xs text-muted-foreground">
-                                          Files uploaded here are automatically synced to SharePoint
-                                        </p>
-                                      </div>
-                                      <div className="flex items-center space-x-2">
-                                        <Button variant="outline" size="sm">
-                                          Upload Files
-                                        </Button>
-                                        <span className="text-xs text-muted-foreground">or</span>
-                                        <Button variant="ghost" size="sm" className="text-blue-600">
-                                          Connect to OneDrive
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* File List */}
-                                  <div className="space-y-1">
-                                    <div className="grid grid-cols-12 gap-4 py-2 px-3 text-xs font-medium text-muted-foreground border-b">
-                                      <div className="col-span-6">Name</div>
-                                      <div className="col-span-2">Modified</div>
-                                      <div className="col-span-2">Size</div>
-                                      <div className="col-span-1">Shared</div>
-                                      <div className="col-span-1">Actions</div>
-                                    </div>
-
-                                    {/* Deatrick Engineering Associates File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                                          <svg className="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">
-                                            Materials Testing Proposal - Deatrick Engineering.pdf
-                                          </div>
-                                          <div className="text-xs text-muted-foreground">Proposal • $178,994.58</div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/18/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">2.4 MB</div>
-                                      <div className="col-span-1">
-                                        <div className="flex -space-x-1">
-                                          <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            K
-                                          </div>
-                                          <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            W
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    {/* Specifications File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                                          <svg
-                                            className="w-4 h-4 text-blue-600"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                          >
-                                            <path d="M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">Testing Specifications.docx</div>
-                                          <div className="text-xs text-muted-foreground">
-                                            Project requirements • Updated by W. Stan
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/15/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">156 KB</div>
-                                      <div className="col-span-1">
-                                        <div className="flex -space-x-1">
-                                          <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            S
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    {/* Addendum File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                                          <svg
-                                            className="w-4 h-4 text-orange-600"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                          >
-                                            <path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">Addendum #1 - Clarifications.pdf</div>
-                                          <div className="text-xs text-muted-foreground">
-                                            Project clarification • Shared via link
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/16/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">842 KB</div>
-                                      <div className="col-span-1">
-                                        <Badge variant="outline" className="text-xs">
-                                          <svg
-                                            className="w-3 h-3 mr-1"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                                          </svg>
-                                          Public
-                                        </Badge>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* SharePoint Integration Footer */}
-                                  <div className="mt-6 pt-4 border-t border-border">
-                                    <div className="flex items-center justify-between text-sm">
-                                      <div className="flex items-center space-x-2 text-muted-foreground">
-                                        <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
-                                          <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12.5,2.5h7C20.9,2.5,22,3.6,22,5v14c0,1.4-1.1,2.5-2.5,2.5h-15C3.1,21.5,2,20.4,2,19V5c0-1.4,1.1-2.5,2.5-2.5H12.5z" />
-                                          </svg>
-                                        </div>
-                                        <span>Synced with SharePoint Online</span>
-                                        <Badge variant="outline" className="text-xs">
-                                          Real-time
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-4 text-muted-foreground">
-                                        <span>3 files • 3.4 MB total</span>
-                                        <Button variant="ghost" size="sm" className="text-xs">
-                                          <svg
-                                            className="w-3 h-3 mr-1"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
-                                          </svg>
-                                          Share Folder
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Messages Tab Content */}
-                      {activeBidPackageTab === "messages" && (
-                        <div className="space-y-6">
-                          <BidMessagePanel projectId={projectId} packageId={selectedBidPackage} className="h-[800px]" />
-                        </div>
-                      )}
-
-                      {/* Bidders Tab Content */}
-                      {activeBidPackageTab === "bidders" && (
-                        <div className="space-y-6">
-                          <BiddersList projectId={projectId} packageId={selectedBidPackage || ""} className="" />
-                        </div>
-                      )}
-
-                      {/* Bid Form Tab Content */}
-                      {activeBidPackageTab === "bid-form" && (
-                        <div className="space-y-6">
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Bid Form</CardTitle>
-                              <CardDescription>Bid form template and submissions</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              <p className="text-muted-foreground">
-                                Bid form template and submission details will be displayed here.
-                              </p>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      )}
-
-                      {/* Bid Leveling Tab Content */}
-                      {activeBidPackageTab === "bid-leveling" && (
-                        <div className="space-y-6">
-                          <BidLeveling projectId={projectId} packageId={selectedBidPackage || ""} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <BiddingOverview
-                    projectId={projectId}
-                    projectData={projectData}
-                    userRole={userRole}
-                    user={user}
-                    onPackageSelect={onBidPackageSelect || (() => {})}
-                    onPackageSelectWithTab={(packageId: string, tab: string) => {
-                      if (onBidPackageSelect) {
-                        onBidPackageSelect(packageId)
-                      }
-                      setActiveBidPackageTab(tab)
-                    }}
-                  />
-                )}
-              </TabsContent>
-
-              <TabsContent value="area-calculation" className="mt-6">
-                <AreaCalculationsModule
-                  projectId={projectId}
-                  projectName={projectData?.name || `Project ${projectId}`}
-                  onSave={(data) => {
-                    console.log("Area calculations saved:", data)
-                    // Handle save logic here
-                  }}
-                  onExport={(format) => {
-                    console.log("Exporting area calculations as:", format)
-                    // Handle export logic here
-                  }}
-                />
-              </TabsContent>
-
-              <TabsContent value="allowances" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Allowances</CardTitle>
-                    <CardDescription>Project allowances and contingency management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Allowances management and contingency tracking will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="clarifications" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Clarifications</CardTitle>
-                    <CardDescription>Bid clarifications and RFI management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Clarifications and RFI management interface will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="value-analysis" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Value Analysis</CardTitle>
-                    <CardDescription>Value engineering and cost optimization</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Value analysis and cost optimization tools will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="documents" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Documents</CardTitle>
-                    <CardDescription>Estimating documents and specifications</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Document management and specification viewer will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="trade-partners" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Trade Partners</CardTitle>
-                    <CardDescription>Subcontractor and vendor management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Trade partner management and vendor database will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="bid-leveling" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bid Leveling</CardTitle>
-                    <CardDescription>Bid comparison and leveling analysis</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Bid leveling and comparison tools will be displayed here.</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="cost-summary" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Cost Summary</CardTitle>
-                    <CardDescription>Comprehensive cost summary and breakdown</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Cost summary and detailed breakdown will be displayed here.</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="gc-gr" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>GC GR</CardTitle>
-                    <CardDescription>General contractor and general requirements</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      General contractor and general requirements management will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="bid-tabs" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bid Tabs</CardTitle>
-                    <CardDescription>Organized bid tabulation and comparison</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Bid tabulation and comparison interface will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
+          <EstimatingProvider>
+            <EstimatingSuite projectId={projectId} projectData={projectData} user={user} userRole={userRole} />
+          </EstimatingProvider>
         )
 
       case "pre-construction":
@@ -2052,7 +1088,7 @@ const WarrantyManagementContent: React.FC<{
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Supporting Files</label>
-                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center mb-6 hover:border-blue-400 transition-colors">
+                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                         <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">
                           Drag & drop photos or documents, or click to browse
@@ -4067,10 +3103,6 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     category: null,
     tool: null,
     subTool: null,
-    coreTab: "dashboard", // Default to dashboard tab
-    staffingSubTab: "dashboard", // Default to dashboard sub-tab
-    reportsSubTab: "dashboard", // Default to dashboard sub-tab
-    selectedBidPackage: null, // Default to no selected bid package
   })
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
@@ -4094,6 +3126,14 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     activeRFIs: 5,
     changeOrders: 3,
     riskItems: 2,
+  }
+
+  // Get HBI Insights title based on active tab
+  const getHBIInsightsTitle = () => {
+    if (activeTab === "financial-management" || activeTab === "financial-hub") {
+      return "HBI Financial Hub Insights"
+    }
+    return "HBI Core Tools Insights"
   }
 
   // Handle core tab changes
@@ -4125,36 +3165,25 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     }))
   }
 
-  // Handle bid package selection
-  const handleBidPackageSelect = (packageId: string) => {
-    setNavigation((prev) => ({
-      ...prev,
-      selectedBidPackage: packageId,
-    }))
-  }
-
-  // Get HBI Insights title based on active tab
-  const getHBIInsightsTitle = () => {
-    if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      return "HBI Financial Hub Insights"
-    }
-    return "HBI Core Tools Insights"
-  }
-
   // Get sidebar content for main app injection
   const getSidebarContent = () => {
-    if (onSidebarContentChange) {
-      const sidebarContent = getProjectSidebarContent(
-        projectData,
-        navigation,
-        projectMetrics,
-        activeTab,
-        handleBidPackageSelect
-      )
-      onSidebarContentChange(sidebarContent)
-    }
+    return (
+      <SidebarPanelRenderer
+        activePanel="all"
+        projectId={projectId}
+        projectData={projectData}
+        user={user}
+        userRole={userRole}
+        navigation={navigation}
+        projectMetrics={projectMetrics}
+        getHBIInsightsTitle={getHBIInsightsTitle}
+        getHBIInsights={getHBIInsights}
+        activeTab={activeTab}
+      />
+    )
   }
 
+  // Get quick actions based on current core tab
   const getQuickActions = () => {
     if (navigation.coreTab === "reports") {
       return [
@@ -4423,8 +3452,10 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
             </div>
 
             <Card>
-              <CardContent className="p-0">
-                <ResponsibilityMatrixCore projectId={projectId} userRole={userRole} className="border-0 shadow-none" />
+              <CardContent>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Responsibility Matrix content will be displayed here.</p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -4486,14 +3517,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
       case "pre-construction":
         return (
-          <PreConstructionContent
-            projectId={projectId}
-            projectData={projectData}
-            userRole={userRole}
-            user={user}
-            selectedBidPackage={navigation.selectedBidPackage}
-            onBidPackageSelect={handleBidPackageSelect}
-          />
+          <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
 
       case "field-management":
@@ -4576,8 +3600,6 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
                   projectData={projectData}
                   userRole={userRole}
                   user={user}
-                  selectedBidPackage={navigation.selectedBidPackage}
-                  onBidPackageSelect={handleBidPackageSelect}
                 />
               </div>
             </div>
@@ -4607,88 +3629,13 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       default:
         // Render Core Project Tools content with internal navigation
         return (
-          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
-            {/* Module Title with Focus Button */}
-            <div className="pb-2 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
-                  <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
-                  {isFocusMode ? (
-                    <>
-                      <Minimize2 className="h-3 w-3 mr-1" />
-                      Exit Focus
-                    </>
-                  ) : (
-                    <>
-                      <Maximize2 className="h-3 w-3 mr-1" />
-                      Focus
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {/* Responsive Core Tab Navigation */}
-            <div className="border-b border-border flex-shrink-0">
-              {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-              <div className="hidden sm:block">
-                <div className="flex space-x-6 overflow-x-auto">
-                  {coreTabsConfig.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleCoreTabChange(tab.id)}
-                      className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                        navigation.coreTab === tab.id
-                          ? "border-primary text-primary"
-                          : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                      }`}
-                    >
-                      <tab.icon className="h-4 w-4" />
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mobile Dropdown Navigation - Only visible on mobile */}
-              <div className="sm:hidden py-3">
-                <Select value={navigation.coreTab || "dashboard"} onValueChange={(value) => handleCoreTabChange(value)}>
-                  <SelectTrigger className="w-full">
-                    <div className="flex items-center space-x-2">
-                      <Settings className="h-4 w-4" />
-                      <span>Core Tools</span>
-                      <Badge variant="secondary" className="ml-auto">
-                        {coreTabsConfig.find((tab) => tab.id === navigation.coreTab)?.label || "Dashboard"}
-                      </Badge>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {coreTabsConfig.map((tab) => (
-                      <SelectItem key={tab.id} value={tab.id}>
-                        <div className="flex items-center space-x-2">
-                          <tab.icon className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">{tab.label}</div>
-                            <div className="text-xs text-muted-foreground">{tab.description}</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
-              <div className={cn("w-full min-w-0 max-w-full", isFocusMode ? "min-h-full" : "h-full overflow-hidden")}>
-                {renderCoreTabContent()}
-              </div>
-            </div>
-          </div>
+          <ProjectTabsShell
+            projectId={projectId}
+            user={user}
+            userRole={userRole}
+            projectData={projectData}
+            onTabChange={onTabChange}
+          />
         )
     }
   }
@@ -4716,8 +3663,7 @@ export const getProjectSidebarContent = (
   projectData: any,
   navigation: NavigationState,
   projectMetrics: any,
-  activeTab?: string,
-  onBidPackageSelect?: (packageId: string) => void
+  activeTab?: string
 ) => {
   const getQuickActions = () => {
     if (activeTab === "pre-construction") {
@@ -5602,11 +4548,43 @@ export const getProjectSidebarContent = (
 
       {/* Bid Management Navigation - Conditional for Pre-Construction Estimating */}
       {activeTab === "pre-construction" && (
-        <BidManagementNavigation
-          projectData={projectData}
-          onPackageSelect={onBidPackageSelect}
-          selectedBidPackage={navigation.selectedBidPackage}
-        />
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Bid Management</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <nav className="space-y-1 p-4">
+              {[
+                { id: "packages", label: "Bid Packages", icon: Package, count: 3 },
+                { id: "messages", label: "Messages", icon: MessageSquare, count: 3 },
+                { id: "files", label: "Files", icon: FileText, count: 12 },
+                { id: "forms", label: "Forms", icon: Settings, count: 1 },
+                { id: "team", label: "Team", icon: Users, count: 4 },
+                { id: "reports", label: "Reports", icon: BarChart3, count: 1 },
+                { id: "details", label: "Project Details", icon: Building2 },
+                { id: "bid-tabs", label: "Bid Tabs", icon: PieChart },
+              ].map((item) => {
+                const IconComponent = item.icon
+                return (
+                  <button
+                    key={item.id}
+                    className="flex items-center justify-between w-full p-2 rounded-lg text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <div className="flex items-center">
+                      <IconComponent className="h-4 w-4 mr-3" />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </div>
+                    {item.count !== undefined && (
+                      <Badge variant="secondary" className="text-xs">
+                        {item.count}
+                      </Badge>
+                    )}
+                  </button>
+                )
+              })}
+            </nav>
+          </CardContent>
+        </Card>
       )}
 
       {/* HBI Insights Panel */}
@@ -5674,7 +4652,6 @@ function getBidPackageName(packageId: string): string {
 }
 
 export default ProjectControlCenterContent
-
 // Export the Field Management content for right panel injection
 export const getFieldManagementRightPanelContent = (
   projectData: any,

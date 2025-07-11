@@ -15,9 +15,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useEstimating } from "./EstimatingProvider"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
+import { ProjectPursuit } from "@/types/estimating"
 
 // Lazy load components for better performance
 const BidLeveling = lazy(() => import("./bid-management/components/BidLeveling"))
+
+// Import modular tab components
+import DeliveryTrackingTab from "./bid-management/tabs/DeliveryTrackingTab"
+import CurrentStageTab from "./bid-management/tabs/CurrentStageTab"
+import EstimatesTab from "./bid-management/tabs/EstimatesTab"
 import {
   Building2,
   Plus,
@@ -142,14 +148,15 @@ const BidManagementSkeleton = () => (
   </div>
 )
 
-// Enhanced mock data that captures the comprehensive information from the image
-const mockProjectTrackingData = [
+// Enhanced mock data with real project IDs from system
+const mockProjectTrackingData: ProjectPursuit[] = [
   {
-    id: "bc-001",
-    name: "Downtown Medical Center",
-    client: "Healthcare Partners LLC",
-    location: "Atlanta, GA",
-    projectNumber: "2025-001",
+    // Miami Commercial Tower - Real project ID from system
+    id: "2525841",
+    name: "Miami Commercial Tower",
+    client: "Innovation Corp",
+    location: "Miami, FL",
+    projectNumber: "FL-SE-002",
 
     // Schedule & Delivery Tracking (from top table in image)
     schedule: "On Track",
@@ -157,7 +164,7 @@ const mockProjectTrackingData = [
     bidBookLog: "COMPLETE",
     review: "IN PROGRESS",
     programming: "COMPLETE",
-    pricing: "60%",
+    pricing: 60,
     leanEstimating: "SCHEDULED",
     finalEstimate: "PENDING",
     contributors: "DUKE",
@@ -165,144 +172,107 @@ const mockProjectTrackingData = [
 
     // Current Stage & Budget (from middle table in image)
     currentStage: "DD",
-    projectBudget: 45000000,
-    originalBudget: 42000000,
+    projectBudget: 250000000,
+    originalBudget: 250000000,
     billedToDate: 13139.0,
-    remainingBudget: 44986861.0,
+    remainingBudget: 249986861.0,
 
     // Estimates & Cost Analysis (from bottom table in image)
     estimateType: "CONCEPTUAL ESTIMATE",
-    costPerSqf: 425.5,
-    costPerLft: 850.0,
-    submitted: "01/15/2024",
+    costPerSqf: 500.0,
+    costPerLft: 1000.0,
+    submitted: "01/15/2025",
     awarded: false,
     awardedPrecon: false,
-    lastEstimation: "RYAN",
 
     // Additional tracking fields
     bidDueDate: "2025-02-15",
     status: "Open",
-    estimatedCost: 38000000,
-    scope: "General Contractor",
-    csiScopes: ["03 - Concrete", "04 - Masonry", "05 - Metals"],
+    estimatedCost: 250000000,
     lead: "Sarah Chen",
-    bidderCount: 12,
-    responseCount: 8,
-    createdDate: "2025-01-01",
-    lastActivity: "2025-01-14",
     confidence: 85,
     riskLevel: "Medium",
-    tags: ["Healthcare", "LEED", "Fast-track"],
-    sqft: 105000,
-    stories: 4,
-    constructionType: "Type II",
-    estimator: "DUKE",
-    architect: "HKS Inc",
-    engineer: "WSP USA",
+    sqft: 500000,
   },
   {
-    id: "bc-002",
-    name: "Riverside Office Complex",
-    client: "Metro Development",
-    location: "Charlotte, NC",
-    projectNumber: "2025-002",
+    // Coral Gables Luxury Condominium - Real project ID from system
+    id: "2525851",
+    name: "Coral Gables Luxury Condominium",
+    client: "Miami-Dade Development",
+    location: "Coral Gables, FL",
+    projectNumber: "FL-SE-006",
 
     schedule: "Delayed",
     deliverable: "LUMP SUM PROPOSAL",
     bidBookLog: "IN PROGRESS",
     review: "COMPLETE",
     programming: "COMPLETE",
-    pricing: "100%",
+    pricing: 100,
     leanEstimating: "COMPLETE",
     finalEstimate: "SUBMITTED",
     contributors: "SAM",
     bidBond: "WAIVED",
 
     currentStage: "CD",
-    projectBudget: 28000000,
-    originalBudget: 26500000,
+    projectBudget: 140000000,
+    originalBudget: 140000000,
     billedToDate: 24500.0,
-    remainingBudget: 27975500.0,
+    remainingBudget: 139975500.0,
 
     estimateType: "LUMP SUM PROPOSAL",
-    costPerSqf: 380.25,
-    costPerLft: 0,
+    costPerSqf: 500.0,
+    costPerLft: 800.0,
     submitted: "12/20/2024",
     awarded: true,
     awardedPrecon: true,
-    lastEstimation: "SAM",
 
     bidDueDate: "2025-01-25",
     status: "Awarded",
-    estimatedCost: 24500000,
-    scope: "General Contractor",
-    csiScopes: ["03 - Concrete", "07 - Thermal & Moisture", "09 - Finishes"],
+    estimatedCost: 140000000,
     lead: "Mike Rodriguez",
-    bidderCount: 15,
-    responseCount: 12,
-    createdDate: "2024-12-15",
-    lastActivity: "2025-01-10",
     confidence: 92,
     riskLevel: "Low",
-    tags: ["Commercial", "Office", "Sustainable"],
-    sqft: 73600,
-    stories: 8,
-    constructionType: "Type I",
-    estimator: "SAM",
-    architect: "Gensler",
-    engineer: "Thornton Tomasetti",
+    sqft: 280000,
   },
   {
-    id: "bc-003",
-    name: "University Research Lab",
-    client: "State University",
-    location: "Raleigh, NC",
-    projectNumber: "2025-003",
+    // Naples Waterfront Condominium - Real project ID from system
+    id: "2525843",
+    name: "Naples Waterfront Condominium",
+    client: "Naples Development LLC",
+    location: "Naples, FL",
+    projectNumber: "FL-SW-001",
 
     schedule: "Fast Track",
     deliverable: "CONCEPTUAL EST",
     bidBookLog: "PENDING",
     review: "SCHEDULED",
     programming: "IN PROGRESS",
-    pricing: "25%",
+    pricing: 25,
     leanEstimating: "NOT STARTED",
     finalEstimate: "TBD",
     contributors: "VITO",
     bidBond: "TBD",
 
     currentStage: "SD",
-    projectBudget: 15000000,
-    originalBudget: 14200000,
+    projectBudget: 120000000,
+    originalBudget: 120000000,
     billedToDate: 8500.0,
-    remainingBudget: 14991500.0,
+    remainingBudget: 119991500.0,
 
     estimateType: "CONCEPTUAL ESTIMATE",
-    costPerSqf: 520.75,
-    costPerLft: 0,
+    costPerSqf: 600.0,
+    costPerLft: 1200.0,
     submitted: "TBD",
     awarded: false,
     awardedPrecon: false,
-    lastEstimation: "VITO",
 
     bidDueDate: "2025-03-01",
     status: "Open",
-    estimatedCost: 13200000,
-    scope: "Design-Build",
-    csiScopes: ["11 - Equipment", "13 - Special Construction", "14 - Conveying"],
+    estimatedCost: 120000000,
     lead: "Jennifer Park",
-    bidderCount: 8,
-    responseCount: 5,
-    createdDate: "2025-01-10",
-    lastActivity: "2025-01-14",
     confidence: 78,
     riskLevel: "High",
-    tags: ["Education", "Research", "Specialized"],
-    sqft: 28800,
-    stories: 3,
-    constructionType: "Type II",
-    estimator: "VITO",
-    architect: "SmithGroup",
-    engineer: "Clark Nexsen",
+    sqft: 200000,
   },
   {
     id: "bc-004",
@@ -316,7 +286,7 @@ const mockProjectTrackingData = [
     bidBookLog: "COMPLETE",
     review: "COMPLETE",
     programming: "COMPLETE",
-    pricing: "85%",
+    pricing: 85,
     leanEstimating: "IN PROGRESS",
     finalEstimate: "IN PROGRESS",
     contributors: "HANK",
@@ -334,27 +304,14 @@ const mockProjectTrackingData = [
     submitted: "01/08/2025",
     awarded: false,
     awardedPrecon: true,
-    lastEstimation: "HANK",
 
     bidDueDate: "2025-02-28",
     status: "Open",
     estimatedCost: 78500000,
-    scope: "General Contractor",
-    csiScopes: ["03 - Concrete", "04 - Masonry", "05 - Metals", "09 - Finishes"],
     lead: "Alex Johnson",
-    bidderCount: 18,
-    responseCount: 14,
-    createdDate: "2024-11-15",
-    lastActivity: "2025-01-13",
     confidence: 88,
     riskLevel: "Medium",
-    tags: ["Hospitality", "Luxury", "Downtown"],
     sqft: 175000,
-    stories: 12,
-    constructionType: "Type I",
-    estimator: "HANK",
-    architect: "Skidmore Owings & Merrill",
-    engineer: "Arup",
   },
   {
     id: "bc-005",
@@ -368,7 +325,7 @@ const mockProjectTrackingData = [
     bidBookLog: "IN PROGRESS",
     review: "PENDING",
     programming: "COMPLETE",
-    pricing: "45%",
+    pricing: 45,
     leanEstimating: "SCHEDULED",
     finalEstimate: "PENDING",
     contributors: "PAUL",
@@ -386,27 +343,14 @@ const mockProjectTrackingData = [
     submitted: "TBD",
     awarded: false,
     awardedPrecon: false,
-    lastEstimation: "PAUL",
 
-    bidDueDate: "2025-03-15",
+    bidDueDate: "2025-04-10",
     status: "Open",
-    estimatedCost: 30200000,
-    scope: "General Contractor",
-    csiScopes: ["03 - Concrete", "05 - Metals", "13 - Special Construction"],
-    lead: "Sarah Williams",
-    bidderCount: 12,
-    responseCount: 7,
-    createdDate: "2024-12-01",
-    lastActivity: "2025-01-12",
-    confidence: 75,
+    estimatedCost: 32000000,
+    lead: "David Kim",
+    confidence: 71,
     riskLevel: "Medium",
-    tags: ["Industrial", "Manufacturing", "Expansion"],
-    sqft: 120000,
-    stories: 1,
-    constructionType: "Type III",
-    estimator: "PAUL",
-    architect: "Page",
-    engineer: "Burns & McDonnell",
+    sqft: 112000,
   },
 ]
 
@@ -502,6 +446,11 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
     const [lastSync, setLastSync] = useState(new Date())
     const [isMobile, setIsMobile] = useState(false)
 
+    // Add editing state for inline editing capabilities
+    const [editingProject, setEditingProject] = useState<string | null>(null)
+    const [editingField, setEditingField] = useState<string | null>(null)
+    const [editValues, setEditValues] = useState<Record<string, any>>({})
+
     const { projects, isLoading: contextLoading, bidTabs, tradeBids } = useEstimating()
 
     // Mobile detection effect (MANDATORY for v3.0 responsive design)
@@ -567,9 +516,6 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
       const awardedProjects = mockProjectTrackingData.filter((p) => p.status === "Awarded").length
       const totalValue = mockProjectTrackingData.reduce((sum, p) => sum + p.projectBudget, 0)
       const avgConfidence = mockProjectTrackingData.reduce((sum, p) => sum + p.confidence, 0) / totalProjects
-      const totalBidders = mockProjectTrackingData.reduce((sum, p) => sum + p.bidderCount, 0)
-      const totalResponses = mockProjectTrackingData.reduce((sum, p) => sum + p.responseCount, 0)
-      const responseRate = totalResponses > 0 ? (totalResponses / totalBidders) * 100 : 0
 
       return {
         totalProjects,
@@ -577,9 +523,9 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
         awardedProjects,
         totalValue,
         avgConfidence,
-        responseRate,
-        totalBidders,
-        totalResponses,
+        responseRate: 75.5, // Static value since bidderCount/responseCount removed
+        totalBidders: totalProjects * 12, // Estimated based on project count
+        totalResponses: Math.round(totalProjects * 12 * 0.755), // Calculated from response rate
       }
     }, [])
 
@@ -612,15 +558,32 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
       setActiveTab(value as TabId)
     }, [])
 
+    // Fixed routing logic to match ProjectSidebar behavior
     const handleProjectNavigation = useCallback(
       (projectId: string) => {
+        // Navigate to project page using the same pattern as ProjectSidebar
         if (onProjectSelect) {
+          // Call the parent onProjectSelect callback to update the main app state
           onProjectSelect(projectId)
+
+          // Show success toast
+          toast({
+            title: "Project Selected",
+            description: `Navigating to project ${projectId}`,
+            duration: 2000,
+          })
         } else {
+          // Fallback: Direct navigation to project page if no callback is provided
           router.push(`/project/${projectId}`)
+
+          toast({
+            title: "Project Navigation",
+            description: `Opening project ${projectId}`,
+            duration: 2000,
+          })
         }
       },
-      [router, onProjectSelect]
+      [onProjectSelect, router, toast]
     )
 
     // Enhanced keyboard navigation (MANDATORY for v3.0 accessibility)
@@ -685,661 +648,155 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
       return diffDays
     }
 
+    // Editing functionality callbacks
+    const handleStartEdit = useCallback((projectId: string, field: string, currentValue: any) => {
+      setEditingProject(projectId)
+      setEditingField(field)
+      setEditValues({ [field]: currentValue })
+    }, [])
+
+    const handleSaveEdit = useCallback(
+      async (projectId: string, field: string, newValue: any) => {
+        try {
+          // In a real application, this would make an API call to update the project
+          // For now, we'll just simulate the save operation
+          await new Promise((resolve) => setTimeout(resolve, 500))
+
+          toast({
+            title: "Field Updated",
+            description: `${field} has been updated successfully.`,
+          })
+
+          setEditingProject(null)
+          setEditingField(null)
+          setEditValues({})
+        } catch (error) {
+          toast({
+            title: "Update Failed",
+            description: "Failed to update the field. Please try again.",
+            variant: "destructive",
+          })
+        }
+      },
+      [toast]
+    )
+
+    const handleCancelEdit = useCallback(() => {
+      setEditingProject(null)
+      setEditingField(null)
+      setEditValues({})
+    }, [])
+
     // Project navigation handled by enhanced useCallback above
 
-    // Delivery Tracking Tab - matches the top table from the image
-    const DeliveryTrackingTab = () => (
-      <div className="space-y-6">
-        {/* Dashboard Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Projects</p>
-                  <p className="text-2xl font-bold">{dashboardMetrics.totalProjects}</p>
-                </div>
-                <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
+    // Editable Field Component for inline editing
+    const EditableField = ({
+      projectId,
+      field,
+      value,
+      type = "text",
+      className = "",
+      displayComponent,
+    }: {
+      projectId: string
+      field: string
+      value: any
+      type?: "text" | "number" | "currency" | "select"
+      className?: string
+      displayComponent?: React.ReactNode
+    }) => {
+      const isEditing = editingProject === projectId && editingField === field
+      const currentValue = editValues[field] !== undefined ? editValues[field] : value
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Open Bids</p>
-                  <p className="text-2xl font-bold text-green-600">{dashboardMetrics.openProjects}</p>
-                </div>
-                <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Complete Deliverables</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {mockProjectTrackingData.filter((p) => p.bidBookLog === "COMPLETE").length}
-                  </p>
-                </div>
-                <CheckCircle className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">In Progress</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {mockProjectTrackingData.filter((p) => p.review === "IN PROGRESS").length}
-                  </p>
-                </div>
-                <Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64"
-              />
-            </div>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="awarded">Awarded</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
+      if (isEditing) {
+        return (
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleSync} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Sync
-                </>
-              )}
+            {type === "currency" ? (
+              <Input
+                type="number"
+                value={currentValue}
+                onChange={(e) => setEditValues({ ...editValues, [field]: parseFloat(e.target.value) || 0 })}
+                className="w-32"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit(projectId, field, currentValue)
+                  if (e.key === "Escape") handleCancelEdit()
+                }}
+                autoFocus
+              />
+            ) : type === "number" ? (
+              <Input
+                type="number"
+                value={currentValue}
+                onChange={(e) => setEditValues({ ...editValues, [field]: parseFloat(e.target.value) || 0 })}
+                className="w-24"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit(projectId, field, currentValue)
+                  if (e.key === "Escape") handleCancelEdit()
+                }}
+                autoFocus
+              />
+            ) : (
+              <Input
+                type="text"
+                value={currentValue}
+                onChange={(e) => setEditValues({ ...editValues, [field]: e.target.value })}
+                className="w-32"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit(projectId, field, currentValue)
+                  if (e.key === "Escape") handleCancelEdit()
+                }}
+                autoFocus
+              />
+            )}
+            <Button size="sm" onClick={() => handleSaveEdit(projectId, field, currentValue)}>
+              <CheckCircle className="h-3 w-3" />
             </Button>
-            <Button size="sm" onClick={() => setShowCreateProject(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Project
+            <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+              <XCircle className="h-3 w-3" />
             </Button>
           </div>
-        </div>
+        )
+      }
 
-        {/* Comprehensive Delivery Tracking Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Project Delivery Tracking</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Project Name</TableHead>
-                    <TableHead>Schedule</TableHead>
-                    <TableHead>Deliverable</TableHead>
-                    <TableHead>Bid Book Log</TableHead>
-                    <TableHead>Review</TableHead>
-                    <TableHead>Programming</TableHead>
-                    <TableHead>Pricing</TableHead>
-                    <TableHead>Lean Estimating</TableHead>
-                    <TableHead>Final Estimate</TableHead>
-                    <TableHead>Contributors</TableHead>
-                    <TableHead>Bid Bond</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProjects.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell className="font-medium">
-                        <Button
-                          variant="link"
-                          className="p-0 text-left justify-start"
-                          onClick={() => handleProjectNavigation(project.id)}
-                        >
-                          {project.name}
-                        </Button>
-                        <div className="text-xs text-gray-500">{project.client}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.schedule === "On Track"
-                              ? "default"
-                              : project.schedule === "Delayed"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                        >
-                          {project.schedule}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{project.deliverable}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.bidBookLog === "COMPLETE"
-                              ? "default"
-                              : project.bidBookLog === "IN PROGRESS"
-                              ? "secondary"
-                              : "outline"
-                          }
-                        >
-                          {project.bidBookLog}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.review === "COMPLETE"
-                              ? "default"
-                              : project.review === "IN PROGRESS"
-                              ? "secondary"
-                              : "outline"
-                          }
-                        >
-                          {project.review}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.programming === "COMPLETE"
-                              ? "default"
-                              : project.programming === "IN PROGRESS"
-                              ? "secondary"
-                              : "outline"
-                          }
-                        >
-                          {project.programming}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress value={parseInt(project.pricing.replace("%", ""))} className="w-16" />
-                          <span className="text-xs">{project.pricing}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.leanEstimating === "COMPLETE"
-                              ? "default"
-                              : project.leanEstimating === "IN PROGRESS"
-                              ? "secondary"
-                              : project.leanEstimating === "SCHEDULED"
-                              ? "outline"
-                              : "destructive"
-                          }
-                        >
-                          {project.leanEstimating}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.finalEstimate === "SUBMITTED"
-                              ? "default"
-                              : project.finalEstimate === "IN PROGRESS"
-                              ? "secondary"
-                              : "outline"
-                          }
-                        >
-                          {project.finalEstimate}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{project.contributors}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.bidBond === "REQUIRED"
-                              ? "destructive"
-                              : project.bidBond === "OBTAINED"
-                              ? "default"
-                              : "outline"
-                          }
-                        >
-                          {project.bidBond}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">{formatDate(project.bidDueDate)}</div>
-                        <div className="text-xs text-gray-500">
-                          {getDaysUntilDue(project.bidDueDate) > 0
-                            ? `${getDaysUntilDue(project.bidDueDate)} days`
-                            : "Overdue"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleProjectNavigation(project.id)}>
-                            View
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+      return (
+        <div className={`group flex items-center gap-2 ${className}`}>
+          {displayComponent || (
+            <span className={type === "currency" ? "font-medium" : ""}>
+              {type === "currency" ? formatCurrency(value) : value}
+            </span>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+            onClick={() => handleStartEdit(projectId, field, value)}
+          >
+            <Edit className="h-3 w-3" />
+          </Button>
+        </div>
+      )
+    }
+
+    // Project Name Link Component
+    const ProjectNameLink = ({ project }: { project: ProjectPursuit }) => (
+      <div className="space-y-1">
+        <Button
+          variant="link"
+          className="p-0 text-left justify-start font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+          onClick={() => handleProjectNavigation(project.id)}
+        >
+          {project.name}
+        </Button>
+        <div className="text-sm text-muted-foreground">
+          {project.projectNumber} • {project.client}
+        </div>
+        <div className="text-sm text-muted-foreground">{project.location}</div>
       </div>
     )
 
-    // Current Stage Tab - matches the middle table from the image
-    const CurrentStageTab = () => (
-      <div className="space-y-6">
-        {/* Stage Overview Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Design Development</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {mockProjectTrackingData.filter((p) => p.currentStage === "DD").length}
-                  </p>
-                </div>
-                <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
+    // Delivery Tracking Tab - Now using modular component
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Construction Documents</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {mockProjectTrackingData.filter((p) => p.currentStage === "CD").length}
-                  </p>
-                </div>
-                <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Schematic Design</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {mockProjectTrackingData.filter((p) => p.currentStage === "SD").length}
-                  </p>
-                </div>
-                <Layers className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Budget</p>
-                  <p className="text-2xl font-bold">
-                    {formatCurrency(mockProjectTrackingData.reduce((sum, p) => sum + p.projectBudget, 0))}
-                  </p>
-                </div>
-                <DollarSign className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64"
-              />
-            </div>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Filter by stage" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Stages</SelectItem>
-                <SelectItem value="DD">Design Development</SelectItem>
-                <SelectItem value="CD">Construction Documents</SelectItem>
-                <SelectItem value="SD">Schematic Design</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleSync} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Sync
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* Current Stage Budget Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Stage & Budget Tracking</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Project Name</TableHead>
-                    <TableHead>Current Stage</TableHead>
-                    <TableHead>Project Budget</TableHead>
-                    <TableHead>Original Budget</TableHead>
-                    <TableHead>Billed to Date</TableHead>
-                    <TableHead>Remaining Budget</TableHead>
-                    <TableHead>Budget Variance</TableHead>
-                    <TableHead>Estimator</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProjects.map((project) => {
-                    const budgetVariance = project.projectBudget - project.originalBudget
-                    const variancePercentage = (budgetVariance / project.originalBudget) * 100
-
-                    return (
-                      <TableRow key={project.id}>
-                        <TableCell className="font-medium">
-                          <Button
-                            variant="link"
-                            className="p-0 text-left justify-start"
-                            onClick={() => handleProjectNavigation(project.id)}
-                          >
-                            {project.name}
-                          </Button>
-                          <div className="text-xs text-gray-500">{project.client}</div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              project.currentStage === "CD"
-                                ? "default"
-                                : project.currentStage === "DD"
-                                ? "secondary"
-                                : "outline"
-                            }
-                          >
-                            {project.currentStage}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">{formatCurrency(project.projectBudget)}</TableCell>
-                        <TableCell>{formatCurrency(project.originalBudget)}</TableCell>
-                        <TableCell>{formatCurrency(project.billedToDate)}</TableCell>
-                        <TableCell>{formatCurrency(project.remainingBudget)}</TableCell>
-                        <TableCell>
-                          <div className={`font-medium ${budgetVariance > 0 ? "text-red-600" : "text-green-600"}`}>
-                            {budgetVariance > 0 ? "+" : ""}
-                            {formatCurrency(budgetVariance)}
-                            <div className="text-xs text-gray-500">
-                              {variancePercentage > 0 ? "+" : ""}
-                              {variancePercentage.toFixed(1)}%
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{project.estimator}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleProjectNavigation(project.id)}>
-                              View
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-
-    // Estimates Tab - matches the bottom table from the image
-    const EstimatesTab = () => (
-      <div className="space-y-6">
-        {/* Estimates Overview Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Conceptual Estimates</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {mockProjectTrackingData.filter((p) => p.estimateType === "CONCEPTUAL ESTIMATE").length}
-                  </p>
-                </div>
-                <Calculator className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">GMP Estimates</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {mockProjectTrackingData.filter((p) => p.estimateType === "GMP ESTIMATE").length}
-                  </p>
-                </div>
-                <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Lump Sum Proposals</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {mockProjectTrackingData.filter((p) => p.estimateType === "LUMP SUM PROPOSAL").length}
-                  </p>
-                </div>
-                <FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Cost/SF</p>
-                  <p className="text-2xl font-bold">
-                    $
-                    {(
-                      mockProjectTrackingData.reduce((sum, p) => sum + p.costPerSqf, 0) / mockProjectTrackingData.length
-                    ).toFixed(0)}
-                  </p>
-                </div>
-                <BarChart3 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64"
-              />
-            </div>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="CONCEPTUAL ESTIMATE">Conceptual</SelectItem>
-                <SelectItem value="GMP ESTIMATE">GMP</SelectItem>
-                <SelectItem value="LUMP SUM PROPOSAL">Lump Sum</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleSync} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Sync
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* Estimates Cost Analysis Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Estimates & Cost Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Project Name</TableHead>
-                    <TableHead>Estimate Type</TableHead>
-                    <TableHead>Cost Per SF</TableHead>
-                    <TableHead>Cost Per LF</TableHead>
-                    <TableHead>Total Estimate</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Awarded</TableHead>
-                    <TableHead>Awarded Precon</TableHead>
-                    <TableHead>Last Estimation</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProjects.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell className="font-medium">
-                        <Button
-                          variant="link"
-                          className="p-0 text-left justify-start"
-                          onClick={() => handleProjectNavigation(project.id)}
-                        >
-                          {project.name}
-                        </Button>
-                        <div className="text-xs text-gray-500">{project.client}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            project.estimateType === "GMP ESTIMATE"
-                              ? "default"
-                              : project.estimateType === "LUMP SUM PROPOSAL"
-                              ? "secondary"
-                              : "outline"
-                          }
-                        >
-                          {project.estimateType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">${project.costPerSqf.toFixed(2)}</TableCell>
-                      <TableCell>{project.costPerLft > 0 ? `$${project.costPerLft.toFixed(2)}` : "N/A"}</TableCell>
-                      <TableCell className="font-medium">{formatCurrency(project.estimatedCost)}</TableCell>
-                      <TableCell>{project.submitted !== "TBD" ? formatDate(project.submitted) : "TBD"}</TableCell>
-                      <TableCell>
-                        <Badge variant={project.awarded ? "default" : "outline"}>
-                          {project.awarded ? "Yes" : "No"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={project.awardedPrecon ? "default" : "outline"}>
-                          {project.awardedPrecon ? "Yes" : "No"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{project.lastEstimation}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleProjectNavigation(project.id)}>
-                            View
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    // Tab functions have been extracted to modular components
 
     const ProjectsTab = () => (
       <div className="space-y-6">
@@ -1483,13 +940,14 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
                         <TableCell>
                           <div className="space-y-1">
                             <div className="font-medium">{project.name}</div>
-                            <div className="text-sm text-gray-500">{project.scope}</div>
+                            <div className="text-sm text-gray-500">{project.projectNumber}</div>
                             <div className="flex gap-1">
-                              {project.tags.map((tag, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
+                              <Badge variant="outline" className="text-xs">
+                                {project.currentStage}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {project.riskLevel}
+                              </Badge>
                             </div>
                           </div>
                         </TableCell>
@@ -1522,10 +980,8 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
                         </TableCell>
                         <TableCell>
                           <div className="space-y-1">
-                            <div className="font-medium">
-                              {project.responseCount}/{project.bidderCount}
-                            </div>
-                            <Progress value={(project.responseCount / project.bidderCount) * 100} className="h-2" />
+                            <div className="font-medium">{project.confidence}% confidence</div>
+                            <Progress value={project.confidence} className="h-2" />
                           </div>
                         </TableCell>
                         <TableCell>
@@ -1886,15 +1342,48 @@ const BidManagementCenterComponent = React.memo<BidManagementCenterProps>(
             </TabsList>
 
             <TabsContent value="delivery" className="space-y-4">
-              <DeliveryTrackingTab />
+              <DeliveryTrackingTab
+                filteredProjects={filteredProjects}
+                dashboardMetrics={dashboardMetrics}
+                onProjectNavigation={handleProjectNavigation}
+                isEditMode={true}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                isLoading={isLoading}
+                onSync={handleSync}
+              />
             </TabsContent>
 
             <TabsContent value="stage" className="space-y-4">
-              <CurrentStageTab />
+              <CurrentStageTab
+                filteredProjects={filteredProjects}
+                dashboardMetrics={dashboardMetrics}
+                onProjectNavigation={handleProjectNavigation}
+                isEditMode={true}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                isLoading={isLoading}
+                onSync={handleSync}
+              />
             </TabsContent>
 
             <TabsContent value="estimates" className="space-y-4">
-              <EstimatesTab />
+              <EstimatesTab
+                filteredProjects={filteredProjects}
+                dashboardMetrics={dashboardMetrics}
+                onProjectNavigation={handleProjectNavigation}
+                isEditMode={true}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                isLoading={isLoading}
+                onSync={handleSync}
+              />
             </TabsContent>
 
             <TabsContent value="bidders" className="space-y-4">
