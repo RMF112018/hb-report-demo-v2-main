@@ -78,7 +78,7 @@ export function ProjectContent({
     "transition-all",
     "duration-300",
     "ease-in-out",
-    !scrollable && "overflow-x-auto overflow-y-hidden",
+    !scrollable && "overflow-hidden",
     scrollable && !loading && "overflow-auto",
     className
   )
@@ -87,7 +87,7 @@ export function ProjectContent({
     "w-full",
     "h-full",
     "max-w-full",
-    "overflow-x-auto overflow-y-hidden",
+    "overflow-hidden",
     "transition-all",
     "duration-300",
     "ease-in-out",

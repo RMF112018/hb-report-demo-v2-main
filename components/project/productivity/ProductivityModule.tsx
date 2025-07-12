@@ -1,19 +1,19 @@
 "use client"
 
 /**
- * @fileoverview Productivity Module Component
+ * @fileoverview Productivity Module Component - Microsoft Teams Integration
  * @module ProductivityModule
  * @version 3.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Main module component for productivity tools following v-3.0.mdc standards:
- * - Modular architecture with separated concerns
- * - Task and message management
- * - TypeScript type safety
- * - Error boundaries and loading states
- * - Real-time collaboration features
- * - Performance optimization
+ * Enhanced productivity module with Microsoft Teams integration:
+ * - Microsoft Graph API integration for Teams, Planner, and Calendar
+ * - Real-time messaging through Teams channels
+ * - Task management via Microsoft Planner
+ * - Calendar integration for project scheduling
+ * - Enterprise-grade Microsoft 365 integration
+ * - Backward compatibility with legacy productivity features
  */
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react"
@@ -21,12 +21,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EnhancedMessageComposer } from "@/components/productivity/EnhancedMessageComposer"
-import { EnhancedTaskComposer } from "@/components/productivity/EnhancedTaskComposer"
-import { MessageSquare, CheckSquare, Activity, TrendingUp, RefreshCw, Settings, Plus } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  MessageSquare,
+  CheckSquare,
+  Activity,
+  TrendingUp,
+  RefreshCw,
+  Settings,
+  Plus,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  ArrowRight,
+  Maximize2,
+  Minimize2,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// Import sub-components
+// Import Microsoft Teams productivity component
+import { TeamsProductivityContent } from "@/components/productivity/TeamsProductivityContent"
+
+// Import legacy productivity components for backward compatibility
+import { EnhancedMessageComposer } from "@/components/productivity/EnhancedMessageComposer"
+import { EnhancedTaskComposer } from "@/components/productivity/EnhancedTaskComposer"
 import TaskPanel from "./TaskPanel"
 import MessageThread from "./MessageThread"
 import ProductivityFeed from "./ProductivityFeed"
@@ -63,7 +82,7 @@ const useIntersectionObserver = (ref: React.RefObject<Element | null>, options: 
   return isIntersecting
 }
 
-// Statistics Summary Component
+// Statistics Summary Component for Legacy Mode
 const ProductivityStats: React.FC<{
   stats: {
     totalThreads: number
@@ -123,22 +142,24 @@ const ProductivityStats: React.FC<{
 
 ProductivityStats.displayName = "ProductivityStats"
 
-// Main ProductivityModule Component
+// Main ProductivityModule Component with Teams Integration
 const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
   ({ projectId, projectData, user, userRole = "pm", className = "", initialTab = "feed", onActivityChange }) => {
     const [activeTab, setActiveTab] = useState(initialTab)
     const [isRendering, setIsRendering] = useState(true)
     const [showEnhancedMessageComposer, setShowEnhancedMessageComposer] = useState(false)
     const [showEnhancedTaskComposer, setShowEnhancedTaskComposer] = useState(false)
+    const [isTeamsMode, setIsTeamsMode] = useState(true) // Default to Teams mode
+    const [isFocusMode, setIsFocusMode] = useState(false)
 
     const containerRef = useRef<HTMLDivElement>(null)
     const isVisible = useIntersectionObserver(containerRef, { threshold: 0.1 })
 
-    // Use the productivity data hook
+    // Use the productivity data hook for legacy mode
     const { threads, tasks, addMessage, addTask, updateTaskStatus, refreshData, loading } =
       useProductivityData(projectId)
 
-    // Calculate statistics
+    // Calculate statistics for legacy mode
     const stats = useMemo(
       () => ({
         totalThreads: threads.length,
@@ -153,17 +174,16 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
       [threads, tasks]
     )
 
-    // Handle tab change
+    // Handle tab change for legacy mode
     const handleTabChange = useCallback((tabId: string) => {
       if (tabId === "messages" || tabId === "tasks" || tabId === "feed") {
         setActiveTab(tabId)
       }
     }, [])
 
-    // Enhanced message creation handler
+    // Enhanced message creation handler for legacy mode
     const handleCreateEnhancedMessage = useCallback(
       (messageData: any) => {
-        // Create a new thread with the enhanced message data
         const newThreadData = {
           title: messageData.title,
           participants: [user?.id || "current-user", ...messageData.participants],
@@ -172,7 +192,6 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
           linkedData: messageData.linkedData,
         }
 
-        // For now, add to existing thread or create simple message
         if (messageData.content && threads.length > 0) {
           addMessage(threads[0].id, `[${messageData.title}] ${messageData.content}`)
         }
@@ -180,7 +199,7 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
       [addMessage, threads, user]
     )
 
-    // Enhanced task creation handler
+    // Enhanced task creation handler for legacy mode
     const handleCreateEnhancedTask = useCallback(
       (taskData: any) => {
         const newTask = {
@@ -199,162 +218,214 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
 
     // Report activity changes to parent
     useEffect(() => {
-      onActivityChange?.(stats)
-    }, [stats, onActivityChange])
-
-    // Progressive rendering
-    useEffect(() => {
-      if (isVisible && !loading) {
-        const timer = setTimeout(() => {
-          setIsRendering(false)
-        }, 100)
-        return () => clearTimeout(timer)
+      if (onActivityChange && !isTeamsMode) {
+        onActivityChange(stats)
       }
-    }, [isVisible, loading])
+    }, [onActivityChange, stats, isTeamsMode])
 
-    // Intersection observer placeholder
-    if (!isVisible) {
-      return <div ref={containerRef} className={cn("h-64", className)} />
-    }
+    // Handle focus mode toggle
+    const handleFocusToggle = useCallback(() => {
+      setIsFocusMode((prev) => !prev)
+    }, [])
 
-    // Loading state
-    if (loading) {
+    // Handle Teams mode toggle
+    const handleTeamsModeToggle = useCallback((enabled: boolean) => {
+      setIsTeamsMode(enabled)
+    }, [])
+
+    // Render legacy productivity content
+    const renderLegacyContent = () => {
       return (
-        <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-            <span className="text-muted-foreground">Loading productivity tools...</span>
-          </div>
+        <div className="space-y-4">
+          {/* Legacy Mode Warning */}
+          <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950/20">
+            <AlertTriangle className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-700 dark:text-orange-300">
+              <strong>Legacy Mode:</strong> You're using the deprecated productivity system. Switch to Microsoft Teams
+              mode for enhanced collaboration features.
+            </AlertDescription>
+          </Alert>
+
+          {/* Legacy Statistics */}
+          <ProductivityStats stats={stats} />
+
+          {/* Legacy Tab Navigation */}
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="messages">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Messages
+              </TabsTrigger>
+              <TabsTrigger value="tasks">
+                <CheckSquare className="h-4 w-4 mr-2" />
+                Tasks
+              </TabsTrigger>
+              <TabsTrigger value="feed">
+                <Activity className="h-4 w-4 mr-2" />
+                Feed
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="messages" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Message Threads</h3>
+                <Button onClick={() => setShowEnhancedMessageComposer(true)} size="sm" className="h-8">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Thread
+                </Button>
+              </div>
+              <MessageThread
+                threads={threads}
+                onSendMessage={addMessage}
+                currentUser={user}
+                className="min-h-[400px]"
+              />
+            </TabsContent>
+
+            <TabsContent value="tasks" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Task Management</h3>
+                <Button onClick={() => setShowEnhancedTaskComposer(true)} size="sm" className="h-8">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Task
+                </Button>
+              </div>
+              <TaskPanel
+                tasks={tasks}
+                onUpdateTask={updateTaskStatus}
+                onAddTask={addTask}
+                currentUser={user}
+                className="min-h-[400px]"
+              />
+            </TabsContent>
+
+            <TabsContent value="feed" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Activity Feed</h3>
+                <Button onClick={refreshData} size="sm" variant="outline" className="h-8">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+              <ProductivityFeed
+                threads={threads}
+                tasks={tasks}
+                currentUser={user}
+                onSendMessage={addMessage}
+                onUpdateTask={updateTaskStatus}
+                className="min-h-[400px]"
+              />
+            </TabsContent>
+          </Tabs>
+
+          {/* Legacy Enhanced Composers */}
+          {showEnhancedMessageComposer && (
+            <EnhancedMessageComposer
+              isOpen={showEnhancedMessageComposer}
+              onClose={() => setShowEnhancedMessageComposer(false)}
+              onCreateMessage={handleCreateEnhancedMessage}
+              projectId={projectId}
+              currentUser={user}
+            />
+          )}
+
+          {showEnhancedTaskComposer && (
+            <EnhancedTaskComposer
+              isOpen={showEnhancedTaskComposer}
+              onClose={() => setShowEnhancedTaskComposer(false)}
+              onCreateTask={handleCreateEnhancedTask}
+              projectId={projectId}
+              currentUser={user}
+            />
+          )}
         </div>
       )
     }
 
-    // Rendering state
-    if (isRendering) {
+    // Render Teams productivity content
+    const renderTeamsContent = () => {
       return (
-        <div ref={containerRef} className={className}>
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 animate-pulse text-muted-foreground" />
-              <span className="text-muted-foreground text-sm">Loading productivity tools...</span>
-            </div>
-          </div>
+        <div className="space-y-4">
+          {/* Teams Mode Success Alert */}
+          <Alert className="border-green-200 bg-green-50 dark:bg-green-950/20">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-700 dark:text-green-300">
+              <strong>Enterprise Ready:</strong> Microsoft Teams integration active. Connected to Microsoft 365 for
+              enhanced collaboration.
+            </AlertDescription>
+          </Alert>
+
+          {/* Teams Productivity Content */}
+          <TeamsProductivityContent
+            projectId={projectId}
+            projectData={projectData}
+            user={user}
+            userRole={userRole}
+            className="w-full"
+          />
         </div>
       )
     }
 
-    // Render content based on active tab
-    const renderTabContent = () => {
-      switch (activeTab) {
-        case "messages":
-          return <MessageThread threads={threads} onSendMessage={addMessage} currentUser={user} className="w-full" />
-        case "tasks":
-          return (
-            <TaskPanel
-              tasks={tasks}
-              onAddTask={addTask}
-              onUpdateTask={updateTaskStatus}
-              currentUser={user}
-              className="w-full"
-            />
-          )
-        case "feed":
-          return (
-            <ProductivityFeed
-              threads={threads}
-              tasks={tasks}
-              onSendMessage={addMessage}
-              onUpdateTask={updateTaskStatus}
-              currentUser={user}
-              className="w-full"
-            />
-          )
-        default:
-          return null
-      }
-    }
-
-    return (
-      <div ref={containerRef} className={cn("space-y-4 w-full max-w-full overflow-hidden", className)}>
-        {/* Header with Quick Actions */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border">
+    // Main content
+    const mainContent = (
+      <div ref={containerRef} className={cn("space-y-6", className)}>
+        {/* Header with Mode Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Productivity Tools</h2>
+            <p className="text-sm text-muted-foreground">
+              {isTeamsMode
+                ? "Microsoft Teams integration for enterprise collaboration"
+                : "Legacy productivity system with basic messaging and tasks"}
+            </p>
+          </div>
           <div className="flex items-center gap-4">
-            <div className="text-sm">
-              <span className="font-medium text-gray-900 dark:text-gray-100">Productivity Tools</span>
-              <p className="text-xs text-muted-foreground">Threaded messaging and task management</p>
+            {/* Mode Toggle */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium">Legacy Mode</label>
+              <Switch
+                checked={isTeamsMode}
+                onCheckedChange={handleTeamsModeToggle}
+                className="data-[state=checked]:bg-blue-600"
+              />
+              <label className="text-sm font-medium">Teams Mode</label>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setShowEnhancedMessageComposer(true)}
-              size="sm"
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">New Message</span>
-            </Button>
-            <Button onClick={() => setShowEnhancedTaskComposer(true)} size="sm" className="flex items-center gap-2">
-              <CheckSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">New Task</span>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={refreshData}>
-              <RefreshCw className="w-4 h-4" />
+
+            {/* Focus Mode Toggle */}
+            <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+              {isFocusMode ? (
+                <>
+                  <Minimize2 className="h-3 w-3 mr-1" />
+                  Exit Focus
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="h-3 w-3 mr-1" />
+                  Focus
+                </>
+              )}
             </Button>
           </div>
         </div>
 
-        {/* Statistics Overview */}
-        <ProductivityStats stats={stats} />
-
-        {/* Main Content Tabs */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="feed" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Activity Feed
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Messages
-              <Badge variant="secondary" className="text-xs">
-                {stats.totalThreads}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="tasks" className="flex items-center gap-2">
-              <CheckSquare className="w-4 h-4" />
-              Tasks
-              <Badge variant="secondary" className="text-xs">
-                {stats.activeTasks}
-              </Badge>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="mt-4">
-            <Card>
-              <CardContent className="p-0">{renderTabContent()}</CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Enhanced Composers */}
-        <EnhancedMessageComposer
-          isOpen={showEnhancedMessageComposer}
-          onClose={() => setShowEnhancedMessageComposer(false)}
-          onCreateMessage={handleCreateEnhancedMessage}
-          projectId={projectId}
-          currentUser={user}
-        />
-
-        <EnhancedTaskComposer
-          isOpen={showEnhancedTaskComposer}
-          onClose={() => setShowEnhancedTaskComposer(false)}
-          onCreateTask={handleCreateEnhancedTask}
-          projectId={projectId}
-          currentUser={user}
-        />
+        {/* Content Area */}
+        <div className="w-full min-w-0 max-w-full">{isTeamsMode ? renderTeamsContent() : renderLegacyContent()}</div>
       </div>
     )
+
+    // Return focus mode if active
+    if (isFocusMode) {
+      return (
+        <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+            <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+          </div>
+        </div>
+      )
+    }
+
+    return mainContent
   }
 )
 

@@ -22,6 +22,8 @@ interface DashboardLayoutProps {
   dashboards?: Array<{ id: string; name: string }>
   currentDashboardId?: string
   onDashboardSelect?: (dashboardId: string) => void
+  // Beta dashboard toggle
+  useBetaDashboard?: boolean
 }
 
 /**
@@ -46,6 +48,7 @@ export function DashboardLayout({
   dashboards = [],
   currentDashboardId,
   onDashboardSelect,
+  useBetaDashboard,
 }: DashboardLayoutProps) {
   const router = useRouter()
 
@@ -98,6 +101,7 @@ export function DashboardLayout({
               isCompact={isCompact}
               spacingClass={getSpacingClass()}
               userRole={userRole}
+              useBetaDashboard={useBetaDashboard}
             />
           </div>
         </div>

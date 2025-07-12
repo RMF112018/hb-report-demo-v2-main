@@ -410,7 +410,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
           isCollapsed ? "max-h-0 overflow-hidden opacity-0" : "max-h-[200px] opacity-100"
         } lg:max-h-none lg:opacity-100`}
       >
-        <div className="px-0 sm:px-0 lg:px-0 pb-0 sm:pb-0 lg:pb-0">
+        <div className="px-0 sm:px-0 lg:px-0 pb-3">
           {/* Mobile Layout - 3 KPIs filling full width */}
           {responsiveKpis.mobile.length > 0 && (
             <div className="grid grid-cols-3 gap-1 sm:hidden">

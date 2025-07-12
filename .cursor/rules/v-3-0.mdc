@@ -39,6 +39,38 @@ All components, pages, and content elements MUST be fully responsive across the 
 - **Desktop Standard:** 1920px width, 1080px height
 - **Large Display Maximum:** 110" presentation displays (up to 3840px+ width)
 
+### Responsive Layout Architecture
+
+#### Main Content Area Positioning
+The main content area automatically adjusts its position based on the sidebar state:
+
+**Implementation:**
+```typescript
+// State management for sidebar width
+const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
+
+// Callback handler for sidebar state changes
+const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
+  setSidebarWidth(totalWidth)
+}
+
+// Responsive main content positioning
+<main 
+  className="flex-1 overflow-hidden flex flex-col transition-all duration-300 ease-in-out"
+  style={{ marginLeft: isMobile ? '0px' : `${sidebarWidth}px` }}
+>
+```
+
+**Width Values:**
+- **Collapsed Sidebar:** 64px (w-16)
+- **Expanded Sidebar:** 384px (w-[384px])
+- **Mobile Layout:** 0px (floating overlay)
+
+**Responsive Behavior:**
+- **Desktop/Tablet:** Main content starts at sidebar's right edge with smooth transitions
+- **Mobile:** Main content uses full width with floating sidebar overlay
+- **Transitions:** 300ms ease-in-out for smooth state changes
+
 ### Responsive Design Principles
 
 #### 1. Mobile-First Architecture

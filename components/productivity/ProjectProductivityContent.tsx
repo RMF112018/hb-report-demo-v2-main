@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { EnhancedMessageComposer } from "@/components/productivity/EnhancedMessageComposer"
 import { EnhancedTaskComposer } from "@/components/productivity/EnhancedTaskComposer"
+import { TeamsProductivityContent } from "@/components/productivity/TeamsProductivityContent"
 import {
   MessageSquare,
   CheckSquare,
@@ -612,6 +613,7 @@ export const ProjectProductivityContent: React.FC<ProjectProductivityContentProp
   user,
   className = "",
 }) => {
+  const [useTeamsIntegration, setUseTeamsIntegration] = useState(true)
   const { threads, tasks, addMessage, addTask, updateTaskStatus } = useProductivityData(projectId)
   const [showEnhancedMessageComposer, setShowEnhancedMessageComposer] = useState(false)
   const [showEnhancedTaskComposer, setShowEnhancedTaskComposer] = useState(false)
@@ -685,8 +687,78 @@ export const ProjectProductivityContent: React.FC<ProjectProductivityContentProp
     [addTask]
   )
 
+  // Use Microsoft Teams integration by default
+  if (useTeamsIntegration) {
+    return (
+      <div className={`space-y-4 w-full max-w-full ${className}`}>
+        {/* Integration Status Header */}
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+              <span className="font-medium text-blue-900 dark:text-blue-100">Microsoft Teams Integration</span>
+            </div>
+            <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">
+              Enterprise Ready
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-blue-600 dark:text-blue-300">Connected to Microsoft 365</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setUseTeamsIntegration(false)}
+              className="text-xs border-blue-300 text-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900"
+            >
+              Use Legacy Mode
+            </Button>
+          </div>
+        </div>
+
+        {/* Teams Productivity Content */}
+        <div className="min-h-[600px]">
+          <TeamsProductivityContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            className="h-full"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Legacy productivity system (original implementation)
   return (
     <div className={`space-y-4 w-full max-w-full ${className}`}>
+      {/* Legacy Mode Header */}
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-orange-50 dark:from-gray-950/20 dark:to-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+        <div className="flex items-center gap-4">
+          <div className="text-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium text-gray-900 dark:text-gray-100">Legacy Productivity System</span>
+              <Badge variant="outline" className="text-xs border-orange-300 text-orange-700">
+                Deprecated
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Mock system for demonstration. Switch to Teams integration for full functionality.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setUseTeamsIntegration(true)}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <MessageSquare className="w-4 h-4 mr-1" />
+            Enable Teams Integration
+          </Button>
+        </div>
+      </div>
+
       {/* Enhanced Action Bar */}
       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border">
         <div className="flex items-center gap-4">

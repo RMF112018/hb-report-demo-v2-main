@@ -1,532 +1,289 @@
-# HB Report Platform - Storybook Documentation
+# HB Report Demo v3.0
 
 ## Overview
 
-This directory contains Storybook stories and documentation for the HB Report Platform's Subcontract Buyout and Material Procurement feature. The stories demonstrate component usage across different user roles and scenarios with comprehensive AIA compliance support.
+Enterprise-grade construction project management platform with comprehensive Microsoft Teams integration.
 
-## Quick Start
+## Microsoft Teams Productivity Integration
 
-### Prerequisites
-- Node.js 18+
-- Storybook 7+
-- All project dependencies installed
+### Overview
 
-### Running Storybook
+The HB Report Demo v3.0 includes comprehensive Microsoft Teams integration aligned with the Microsoft Graph Planner API, providing enterprise-grade productivity features for Microsoft 365 customers.
 
-\`\`\`bash
-# Install Storybook (if not already installed)
-npx storybook@latest init
+### Key Features
 
-# Start Storybook development server
-npm run storybook
-\`\`\`
+#### Microsoft Planner Integration
 
-### Building Storybook
+- **Plans as Containers**: Plans are contained within Microsoft 365 groups following the official API structure
+- **Task Management**: Full CRUD operations for tasks with proper assignments and metadata
+- **Board Visualization**: Support for assignee boards, progress boards, and custom bucket boards
+- **Task Details**: Rich task descriptions, checklists, and external references
+- **Order Hints**: Proper task ordering and positioning as per Microsoft's specification
 
-\`\`\`bash
-# Build static Storybook for deployment
-npm run build-storybook
-\`\`\`
+#### Microsoft Teams Integration
 
-## Story Structure
+- **Team Operations**: Get teams, team members, and team channels
+- **Real-time Messaging**: Send and receive messages through Teams channels
+- **Channel Management**: Full channel operations within teams
+- **Chat Integration**: Direct messaging and group chat support
 
-### Buyout Stories (`/stories/buyout/`)
+#### Calendar Integration
 
-1. **buyout-schedule.stories.tsx** - Main dashboard interface
-2. **buyout-analytics.stories.tsx** - Analytics and performance metrics
-3. **enhanced-buyout-form.stories.tsx** - Comprehensive buyout form
-4. **material-procurement-table.stories.tsx** - Material management table
-5. **bid-comparison-tool.stories.tsx** - Vendor bid analysis tool
-6. **hbi-buyout-insights.stories.tsx** - AI-powered insights
-7. **buyout-distribution-modal.stories.tsx** - Email distribution system
+- **Event Management**: Create and manage calendar events
+- **Online Meetings**: Automatic Teams meeting creation
+- **Attendee Management**: Add attendees and track responses
+- **Project Scheduling**: Integrate project milestones with calendar
 
-## User Role Scenarios
+### Technical Implementation
 
-### Project Manager (PM) Stories
-- Creating new buyout records from templates
-- Managing material procurement and specifications
-- Using bid comparison tools for vendor selection
-- Submitting records for approval workflow
-- Distributing contracts and documentation
+#### Core Architecture
 
-### Project Executive (PX) Stories
-- Reviewing submitted buyout records
-- Approving/rejecting with detailed comments
-- Managing multi-project oversight
-- Monitoring compliance and risk metrics
-- Accessing approval analytics
+```typescript
+// Microsoft Graph Service
+class MicrosoftGraphService {
+  // Teams Operations
+  async getMyTeams(): Promise<Team[]>
+  async getTeamMembers(teamId: string): Promise<TeamMember[]>
+  async getTeamChannels(teamId: string): Promise<Channel[]>
+  async getChannelMessages(teamId: string, channelId: string): Promise<ChatMessage[]>
+  async sendChannelMessage(teamId: string, channelId: string, content: string): Promise<ChatMessage>
 
-### Executive Stories
-- Company-wide buyout overview
-- Read-only access to approved records
-- Portfolio analytics and trend visualization
-- Strategic insights and market intelligence
-- Executive dashboard exports
+  // Planner Operations (aligned with Microsoft API)
+  async getPlannerPlans(groupId: string): Promise<PlannerPlan[]>
+  async getPlannerTasks(planId: string): Promise<PlannerTask[]>
+  async createPlannerTask(
+    planId: string,
+    title: string,
+    bucketId?: string,
+    assigneeIds?: string[]
+  ): Promise<PlannerTask>
+  async updatePlannerTaskProgress(taskId: string, percentComplete: number, etag: string): Promise<PlannerTask>
 
-## Mock Data
-
-Stories use realistic mock data from:
-- `/data/mock-buyout-records.json` - Buyout data and metadata
-- `/data/mock-material-procurement.json` - Material procurement records
-
-### Mock Data Structure
-
-**Buyout Records**:
-\`\`\`json
-{
-  "buyoutRecords": [
-    {
-      "id": "bo_001",
-      "projectId": "proj_001",
-      "name": "Site Work & Excavation",
-      "vendorName": "Pacific Excavation Inc.",
-      "status": "active",
-      "contractAmount": 1180000,
-      "budgetAmount": 1200000,
-      "complianceStatus": "compliant"
-    }
-  ]
+  // Calendar Operations
+  async getCalendarEvents(startDateTime?: string, endDateTime?: string): Promise<CalendarEvent[]>
+  async createCalendarEvent(
+    subject: string,
+    start: string,
+    end: string,
+    attendeeEmails: string[]
+  ): Promise<CalendarEvent>
 }
-\`\`\`
-
-**Material Procurement**:
-\`\`\`json
-{
-  "materialProcurementRecords": [
-    {
-      "id": "mp_001",
-      "projectId": "proj_001",
-      "item": {
-        "name": "Structural Steel Beams",
-        "quantity": 50,
-        "unit": "tons"
-      },
-      "vendor": {
-        "name": "Steel Supply Co"
-      },
-      "orderedStatus": "Delivered"
-    }
-  ]
-}
-\`\`\`
-
-## Component Props Documentation
-
-Each story includes comprehensive props documentation with:
-- **Control types** for interactive testing
-- **Description text** explaining prop usage
-- **Default values** and expected formats
-- **Validation rules** and constraints
-- **AIA compliance** requirements
-
-### Example Props Documentation
-
-\`\`\`typescript
-interface BuyoutAnalyticsProps {
-  buyoutRecords: BuyoutRecord[]
-  materialRecords: MaterialProcurement[]
-  onDrillDown?: (metric: string, filters: any) => void
-  className?: string
-}
-\`\`\`
-
-## Interactive Features
-
-### Controls Panel
-Use Storybook's Controls panel to:
-- Switch between user roles (PM, PX, Executive)
-- Modify component props in real-time
-- Test different data scenarios
-- Simulate API connection states
-- Adjust compliance settings
-
-### Actions Panel
-Monitor component interactions:
-- Form submissions and validations
-- API call simulations
-- State changes and updates
-- Error handling scenarios
-- Approval workflow actions
-
-## AIA Compliance Testing
-
-### Compliance Scenarios
-
-Stories include specific scenarios for testing AIA compliance:
-
-1. **Complete Compliance**: All requirements met
-2. **Partial Compliance**: Some requirements pending
-3. **Non-Compliance**: Critical requirements missing
-4. **Waiver Scenarios**: Approved compliance waivers
-
-### AIA Document Generation
-
-Test AIA-compliant document generation:
-- **G702 Forms**: Application and Certificate for Payment
-- **G703 Forms**: Continuation Sheet
-- **Schedule of Values**: Detailed cost breakdown
-- **Retention Calculations**: Proper retention handling
-- **Lien Waivers**: Conditional and unconditional waivers
-
-### Compliance Validation
-
-Stories demonstrate compliance validation:
-\`\`\`typescript
-// Example compliance check
-const complianceChecks = [
-  { requirement: 'General Liability Insurance', status: 'approved' },
-  { requirement: 'Performance Bond', status: 'pending' },
-  { requirement: 'W-9 Form', status: 'missing' }
-]
-\`\`\`
-
-## API Integration Testing
-
-### Mock API Responses
-
-Stories simulate various API integration states:
-
-**BuildingConnected API**:
-- Vendor performance data
-- Bid history and win rates
-- Project completion metrics
-
-**Compass API**:
-- Compliance status monitoring
-- Risk assessment scores
-- Documentation tracking
-
-**SiteMate API**:
-- Safety incident reports
-- Quality inspection results
-- Performance ratings
-
-**Procore API**:
-- Cost code integration
-- Budget variance tracking
-- Progress monitoring
-
-**Sage 300 API**:
-- Financial data integration
-- Payment history tracking
-- Vendor credit ratings
-
-### Connection States
-
-Test different API connection scenarios:
-- **Connected**: Full API integration active
-- **Disconnected**: Offline mode with cached data
-- **Loading**: Connection in progress
-- **Error**: API connection failures
-
-## Development Workflow
-
-### Adding New Stories
-
-1. **Create Story File**
-\`\`\`typescript
-// stories/buyout/new-component.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react'
-import { NewComponent } from '../../components/buyout/new-component'
-
-const meta: Meta<typeof NewComponent> = {
-  title: 'Buyout/NewComponent',
-  component: NewComponent,
-  parameters: {
-    docs: {
-      description: {
-        component: 'Component description here'
-      }
-    }
-  }
-}
-
-export default meta
-type Story = StoryObj<typeof NewComponent>
-
-export const Default: Story = {
-  args: {
-    // Default props
-  }
-}
-\`\`\`
-
-2. **Add Role-Based Variations**
-\`\`\`typescript
-export const PMView: Story = {
-  args: {
-    userRole: 'PM',
-    // PM-specific props
-  }
-}
-
-export const PXView: Story = {
-  args: {
-    userRole: 'PX',
-    // PX-specific props
-  }
-}
-
-export const ExecutiveView: Story = {
-  args: {
-    userRole: 'Executive',
-    // Executive-specific props
-  }
-}
-\`\`\`
-
-3. **Include AIA Compliance Scenarios**
-\`\`\`typescript
-export const AIACompliant: Story = {
-  args: {
-    complianceStatus: 'compliant',
-    aiaDocuments: {
-      g702: true,
-      g703: true,
-      scheduleOfValues: true
-    }
-  }
-}
-
-export const AIANonCompliant: Story = {
-  args: {
-    complianceStatus: 'non-compliant',
-    missingDocuments: ['insurance', 'bond']
-  }
-}
-\`\`\`
-
-### Testing Stories
-
-\`\`\`bash
-# Run story tests
-npm run test-storybook
-
-# Visual regression testing
-npm run chromatic
-
-# Accessibility testing
-npm run test-storybook -- --testNamePattern="a11y"
-\`\`\`
-
-## Deployment
-
-### Static Build
-\`\`\`bash
-# Build for deployment
-npm run build-storybook
-
-# Deploy to hosting service
-# (Configure based on your deployment target)
-\`\`\`
-
-### Integration with CI/CD
-Add Storybook builds to your CI pipeline:
-
-\`\`\`yaml
-# .github/workflows/storybook.yml
-name: Build Storybook
-on: [push, pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: npm ci
-      - run: npm run build-storybook
-      - run: npm run test-storybook
-\`\`\`
-
-## Best Practices
-
-### Story Organization
-- Group related stories by feature area
-- Use consistent naming conventions
-- Include comprehensive prop documentation
-- Provide realistic mock data
-- Test all user role scenarios
-
-### Documentation
-- Write clear component descriptions
-- Include usage examples and code snippets
-- Document AIA compliance requirements
-- Explain complex interactions
-- Provide troubleshooting guidance
-
-### Testing
-- Cover all major user scenarios
-- Test error states and edge cases
-- Include accessibility testing
-- Validate responsive behavior
-- Test API integration states
-
-### AIA Compliance
-- Test all compliance scenarios
-- Validate document generation
-- Check retention calculations
-- Verify lien waiver processing
-- Test approval workflows
-
-## Troubleshooting
-
-### Common Issues
-
-**Stories Not Loading**
-- Check import paths are correct
-- Verify component exports match imports
-- Ensure mock data files exist
-- Check TypeScript compilation errors
-
-**Controls Not Working**
-- Verify argTypes configuration
-- Check prop types match controls
-- Ensure component accepts props correctly
-- Review default values
-
-**Mock Data Issues**
-- Validate JSON syntax in data files
-- Check file paths in story imports
-- Verify data structure matches interfaces
-- Ensure all required fields are present
-
-**AIA Compliance Issues**
-- Check compliance data structure
-- Verify document generation logic
-- Test retention calculations
-- Validate approval workflows
-
-### Debug Mode
-
-Enable Storybook debug logging:
-\`\`\`bash
-DEBUG=storybook:* npm run storybook
-\`\`\`
-
-### Performance Issues
-
-Optimize large datasets:
-\`\`\`typescript
-// Use React.memo for expensive components
-const ExpensiveComponent = React.memo(({ data }) => {
-  // Component implementation
-})
-
-// Implement virtual scrolling for large lists
-import { FixedSizeList as List } from 'react-window'
-\`\`\`
-
-## Contributing
-
-1. Follow established story patterns
-2. Include comprehensive documentation
-3. Test stories across different viewports
-4. Ensure AIA compliance scenarios
-5. Update this README for new features
-
-## Resources
-
-- [Storybook Documentation](https://storybook.js.org/docs)
-- [Component Documentation](/docs/buyout-procurement.md)
-- [TypeScript Interfaces](/types/procurement.ts)
-- [Mock Data Schemas](/data/)
-- [AIA Standards](https://www.aia.org/resources/6076-standard-form-documents)
-
-## Support
-
-For questions about Storybook setup or story development:
-1. Check the troubleshooting section above
-2. Review existing stories for patterns
-3. Consult the main project documentation
-4. Contact the development team
+```
+
+#### Microsoft Planner API Alignment
+
+The implementation follows the official Microsoft Planner API structure:
+
+1. **Plans are containers** - Plans are contained within Microsoft 365 groups
+2. **Tasks with assignments** - Tasks have proper assignment objects with orderHint
+3. **Task details** - Extended task properties for rich content
+4. **Buckets for visualization** - Custom columns for board views
+5. **Proper order hints** - Task ordering following Microsoft's specification
+
+#### React Hooks Integration
+
+```typescript
+// Individual hooks
+const { teams, loading, error } = useTeams()
+const { members } = useTeamMembers(teamId)
+const { channels } = useTeamChannels(teamId)
+const { messages, sendMessage } = useChannelMessages(teamId, channelId)
+const { plans } = usePlannerPlans(groupId)
+const { tasks, createTask, updateTaskProgress } = usePlannerTasks(planId)
+const { events, createEvent } = useCalendarEvents()
+
+// Composite hooks
+const { currentTeam, members, channels, plans, chats, events } = useTeamsProductivity(teamId)
+const { currentChannel, messages, sendMessage } = useTeamsChannel(teamId, channelId)
+```
+
+### Component Integration
+
+#### Core Project Tools > Productivity Tab
+
+The Microsoft Teams integration is injected into the Core Project Tools > Productivity tab, replacing the legacy productivity system:
+
+```typescript
+// ProjectControlCenterContent.tsx Core > Productivity Tab
+<ProjectTabsShell
+  projectId={projectId}
+  user={user}
+  userRole={userRole}
+  projectData={projectData}
+  onTabChange={onTabChange}
+/>
+```
+
+#### Teams Productivity Content
+
+The `TeamsProductivityContent` component provides:
+
+- **4-tab interface**: Messages, Tasks, Calendar, Team
+- **Real Teams messaging**: Send and receive messages through Teams channels
+- **Microsoft Planner tasks**: Create, assign, and track tasks
+- **Calendar integration**: Schedule events and meetings
+- **Team management**: View and manage team members
+
+#### Legacy Compatibility
+
+The system maintains backward compatibility with the legacy productivity system:
+
+- **Mode toggle**: Switch between Teams mode and legacy mode
+- **Deprecation warnings**: Clear indication of legacy system status
+- **Upgrade prompts**: Encourage migration to Teams integration
+
+### Enterprise Features
+
+#### Microsoft 365 Integration
+
+- **Single Sign-On**: Seamless authentication with Microsoft 365
+- **Graph API**: Full Microsoft Graph API integration
+- **Enterprise Security**: Follows Microsoft security best practices
+- **Compliance**: Meets enterprise compliance requirements
+
+#### Production-Ready Features
+
+- **Error Handling**: Comprehensive error boundaries and fallbacks
+- **Loading States**: Professional loading indicators
+- **Performance**: Optimized for enterprise-scale usage
+- **Responsive Design**: Works across all device sizes
+- **Dark Mode**: Full dark mode support
+
+### Usage
+
+#### Accessing Teams Integration
+
+1. Navigate to Project > Core Project Tools > Productivity
+2. Ensure Teams mode is enabled (default)
+3. Connect to Microsoft 365 (automatic with SSO)
+4. Select your project team and channel
+5. Start collaborating with real Teams messaging and Planner tasks
+
+#### Task Management with Microsoft Planner
+
+1. Tasks are organized within Microsoft Planner plans
+2. Plans are contained within Microsoft 365 groups (project teams)
+3. Tasks can be assigned to team members with proper orderHint
+4. Board views support assignee, progress, and custom bucket visualization
+5. Task details include descriptions, checklists, and external references
+
+#### Messaging with Teams Channels
+
+1. Messages are sent through actual Microsoft Teams channels
+2. Real-time messaging with team members
+3. Support for message priorities and mentions
+4. Integration with Teams mobile and desktop apps
+
+### Development
+
+#### Environment Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Configure Microsoft Graph permissions
+# Required scopes: Teams.ReadWrite.All, Group.ReadWrite.All, Calendars.ReadWrite, Tasks.ReadWrite
+```
+
+#### API Configuration
+
+```typescript
+// Microsoft Graph Service Configuration
+const microsoftGraphService = MicrosoftGraphService.getInstance()
+microsoftGraphService.setAccessToken(accessToken)
+```
+
+### Security & Compliance
+
+#### Microsoft Graph Permissions
+
+- **Teams.ReadWrite.All**: Full Teams integration
+- **Group.ReadWrite.All**: Microsoft 365 group operations
+- **Calendars.ReadWrite**: Calendar and meeting management
+- **Tasks.ReadWrite**: Microsoft Planner task operations
+
+#### Data Security
+
+- All data remains within Microsoft 365 tenant
+- No data stored outside Microsoft ecosystem
+- Enterprise-grade security and compliance
+- Audit trail through Microsoft 365 logging
+
+### Support
+
+For Microsoft Teams integration support:
+
+1. Ensure Microsoft 365 subscription includes Teams and Planner
+2. Verify Graph API permissions are configured
+3. Check enterprise SSO configuration
+4. Contact Microsoft support for Graph API issues
 
 ---
 
-## Story Examples
+## Additional Features
 
-### Basic Story Structure
-\`\`\`typescript
-export const Default: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: 'Description of what this story demonstrates'
-      }
-    }
-  },
-  args: {
-    // Component props
-  }
-}
-\`\`\`
+### Field Management
 
-### Role-Based Story
-\`\`\`typescript
-export const ProjectManagerView: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: 'PM-specific functionality and permissions'
-      }
-    },
-    mockData: {
-      user: { role: 'PM', permissions: ['create', 'edit'] }
-    }
-  },
-  args: {
-    userRole: 'PM'
-  }
-}
-\`\`\`
+- Scheduler with weather integration
+- Field reports and daily logs
+- Constraints management
+- Permit log tracking
 
-### AIA Compliance Story
-\`\`\`typescript
-export const AIACompliantBuyout: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: 'Buyout record meeting all AIA requirements'
-      }
-    }
-  },
-  args: {
-    buyoutRecord: {
-      complianceStatus: 'compliant',
-      aiaDocuments: {
-        g702: true,
-        g703: true,
-        scheduleOfValues: true,
-        insurance: true,
-        bond: true
-      }
-    }
-  }
-}
-\`\`\`
+### Financial Hub
 
-### API Integration Story
-\`\`\`typescript
-export const WithAPIIntegration: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story: 'Component with full API integration'
-      }
-    },
-    mockData: {
-      apiStatus: {
-        buildingConnected: 'connected',
-        compass: 'connected',
-        siteMate: 'connected',
-        procore: 'connected',
-        sage300: 'connected'
-      }
-    }
-  },
-  args: {
-    // Component props
-  }
-}
-\`\`\`
+- Budget analysis and forecasting
+- AR aging and cash flow
+- Change order management
+- Pay application processing
 
-This comprehensive Storybook setup provides thorough testing and documentation for the HB Report Platform's Buyout & Procurement features, ensuring proper functionality across all user roles and AIA compliance scenarios.
+### Pre-Construction Suite
+
+- Estimating with BidManagement integration
+- BIM coordination and clash detection
+- Permit and regulatory compliance
+
+### Core Project Tools
+
+- Interactive dashboards
+- Checklist management
+- Responsibility matrix
+- Comprehensive reporting
+
+### Compliance & Trade Partners
+
+- Contract document management
+- Trade partner scorecards
+- Compass API integration
+- Certification tracking
+
+### Warranty Management
+
+- Claim processing workflows
+- Document repository
+- Manufacturer integration
+- Labor warranty tracking
+
+---
+
+## Technology Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **UI Components**: shadcn/ui, Tailwind CSS
+- **State Management**: React hooks, Context API
+- **Microsoft Integration**: Microsoft Graph API, Teams SDK
+- **Charts**: Recharts, Chart.js
+- **Date Handling**: date-fns
+- **Icons**: Lucide React
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Configure Microsoft Graph API credentials
+4. Set up environment variables
+5. Run development server: `npm run dev`
+
+## License
+
+Enterprise license - Contact HB Development Team for licensing information.

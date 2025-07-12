@@ -16,7 +16,7 @@
  * - Progress tracking across all checklists
  */
 
-import React, { useState, useMemo, useCallback, useRef, useEffect } from "react"
+import React, { useState, useMemo, useCallback, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -67,24 +67,7 @@ const checklistTabs = [
   },
 ]
 
-// Intersection Observer Hook for performance optimization
-const useIntersectionObserver = (ref: React.RefObject<Element | null>, options: IntersectionObserverInit = {}) => {
-  const [isIntersecting, setIsIntersecting] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting)
-    }, options)
-
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
-
-    return () => observer.disconnect()
-  }, [ref, options])
-
-  return isIntersecting
-}
+// Intersection observer removed to prevent flashing
 
 // Progress Summary Component
 const ProgressSummary: React.FC<{
@@ -135,13 +118,9 @@ ProgressSummary.displayName = "ProgressSummary"
 const ChecklistModule: React.FC<ChecklistModuleProps> = React.memo(
   ({ projectId, projectData, user, userRole = "pm", className = "", initialTab = "startup", onProgressChange }) => {
     const [activeTab, setActiveTab] = useState<ChecklistTab>(initialTab)
-    const [isRendering, setIsRendering] = useState(true)
     const [startupProgress, setStartupProgress] = useState(0)
     const [precoProgress, setPrecoProgress] = useState(0)
     const [closeoutProgress, setCloseoutProgress] = useState(0)
-
-    const containerRef = useRef<HTMLDivElement>(null)
-    const isVisible = useIntersectionObserver(containerRef, { threshold: 0.1 })
 
     // Project name from projectData
     const projectName = useMemo(() => {
@@ -180,34 +159,8 @@ const ChecklistModule: React.FC<ChecklistModuleProps> = React.memo(
       [onProgressChange]
     )
 
-    // Progressive rendering
-    useEffect(() => {
-      if (isVisible) {
-        const timer = setTimeout(() => {
-          setIsRendering(false)
-        }, 100)
-        return () => clearTimeout(timer)
-      }
-    }, [isVisible])
-
-    // Intersection observer placeholder
-    if (!isVisible) {
-      return <div ref={containerRef} className={cn("h-64", className)} />
-    }
-
-    // Rendering state
-    if (isRendering) {
-      return (
-        <div ref={containerRef} className={className}>
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center gap-2">
-              <CheckSquare className="h-4 w-4 animate-pulse text-muted-foreground" />
-              <span className="text-muted-foreground text-sm">Loading checklists...</span>
-            </div>
-          </div>
-        </div>
-      )
-    }
+    // Remove progressive rendering - it causes flashing
+    // Just render the content directly
 
     // Render checklist content based on active tab
     const renderChecklistContent = () => {
@@ -256,7 +209,7 @@ const ChecklistModule: React.FC<ChecklistModuleProps> = React.memo(
     }
 
     return (
-      <div ref={containerRef} className={cn("space-y-4 w-full max-w-full overflow-hidden", className)}>
+      <div className={cn("space-y-4 w-full max-w-full overflow-hidden", className)}>
         {/* Header with Progress Summary */}
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -311,4 +264,4 @@ const ChecklistModule: React.FC<ChecklistModuleProps> = React.memo(
 
 ChecklistModule.displayName = "ChecklistModule"
 
-export default ChecklistModule
+export default React.memo(ChecklistModule)

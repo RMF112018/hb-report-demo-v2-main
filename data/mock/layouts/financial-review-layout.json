@@ -9,7 +9,7 @@
       "title": "HBI Financial Insights",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
-      "span": { "cols": 8, "rows": 6 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "financialMode": true,
@@ -23,7 +23,7 @@
       "title": "Portfolio Overview",
       "size": "optimal",
       "position": { "x": 8, "y": 0 },
-      "span": { "cols": 8, "rows": 6 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "financialMode": true,
@@ -31,23 +31,11 @@
       }
     },
     {
-      "id": "schedule-performance-1",
-      "type": "schedule-performance",
-      "title": "Schedule Performance",
-      "size": "optimal",
-      "position": { "x": 0, "y": 6 },
-      "span": { "cols": 8, "rows": 4 },
-      "visible": true,
-      "config": {
-        "compactMode": true
-      }
-    },
-    {
       "id": "financial-status-1",
       "type": "financial-status",
       "title": "Financial Status",
       "size": "optimal",
-      "position": { "x": 0, "y": 10 },
+      "position": { "x": 0, "y": 5 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -55,35 +43,11 @@
       }
     },
     {
-      "id": "general-conditions-1",
-      "type": "general-conditions",
-      "title": "General Conditions",
-      "size": "optimal",
-      "position": { "x": 8, "y": 6 },
-      "span": { "cols": 8, "rows": 5 },
-      "visible": true,
-      "config": {
-        "compactMode": true
-      }
-    },
-    {
-      "id": "contingency-analysis-1",
-      "type": "contingency-analysis",
-      "title": "Contingency Analysis",
-      "size": "optimal",
-      "position": { "x": 8, "y": 11 },
-      "span": { "cols": 8, "rows": 5 },
-      "visible": true,
-      "config": {
-        "detailedAnalysis": true
-      }
-    },
-    {
       "id": "cash-flow-1",
       "type": "cash-flow",
       "title": "Cash Flow Analysis",
       "size": "optimal",
-      "position": { "x": 0, "y": 14 },
+      "position": { "x": 8, "y": 5 },
       "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
@@ -92,12 +56,48 @@
       }
     },
     {
+      "id": "contingency-analysis-1",
+      "type": "contingency-analysis",
+      "title": "Contingency Analysis",
+      "size": "optimal",
+      "position": { "x": 0, "y": 10 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "detailedAnalysis": true
+      }
+    },
+    {
+      "id": "schedule-performance-1",
+      "type": "schedule-performance",
+      "title": "Schedule Performance",
+      "size": "optimal",
+      "position": { "x": 8, "y": 10 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "compactMode": true
+      }
+    },
+    {
+      "id": "general-conditions-1",
+      "type": "general-conditions",
+      "title": "General Conditions",
+      "size": "optimal",
+      "position": { "x": 0, "y": 15 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "compactMode": true
+      }
+    },
+    {
       "id": "procurement-1",
       "type": "procurement",
       "title": "Procurement Management",
       "size": "optimal",
-      "position": { "x": 8, "y": 16 },
-      "span": { "cols": 8, "rows": 5 },
+      "position": { "x": 8, "y": 15 },
+      "span": { "cols": 8, "rows": 4 },
       "visible": true,
       "config": {
         "compactMode": true
@@ -109,7 +109,7 @@
       "title": "Draw Forecast",
       "size": "optimal",
       "position": { "x": 0, "y": 19 },
-      "span": { "cols": 8, "rows": 5 },
+      "span": { "cols": 16, "rows": 4 },
       "visible": true,
       "config": {
         "forecastPeriod": "quarterly"

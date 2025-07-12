@@ -46,10 +46,14 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  TestTube,
+  Clock,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DashboardCardWrapper } from "./DashboardCardWrapper"
+import { Badge } from "@/components/ui/badge"
 
 // Modern card components
 import PortfolioOverview from "@/components/cards/PortfolioOverview"
@@ -79,6 +83,37 @@ import { HealthCard } from "@/components/cards/HealthCard"
 import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
 import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
+import PowerBIDashboardCard from "@/components/cards/PowerBIDashboardCard"
+
+// Beta card components
+import BetaPortfolioOverview from "@/components/cards/beta/BetaPortfolioOverview"
+import BetaEnhancedHBIInsights from "@/components/cards/beta/BetaEnhancedHBIInsights"
+import BetaFinancialStatus from "@/components/cards/beta/BetaFinancialStatus"
+import BetaCashFlowAnalysis from "@/components/cards/beta/BetaCashFlowAnalysis"
+import BetaContingencyAnalysis from "@/components/cards/beta/BetaContingencyAnalysis"
+import BetaFinancialOverview from "@/components/cards/beta/BetaFinancialOverview"
+import BetaSchedulePerformance from "@/components/cards/beta/BetaSchedulePerformance"
+import BetaGeneralConditions from "@/components/cards/beta/BetaGeneralConditions"
+import BetaMarketIntelligence from "@/components/cards/beta/BetaMarketIntelligence"
+import BetaPipelineAnalytics from "@/components/cards/beta/BetaPipelineAnalytics"
+import BetaCriticalDates from "@/components/cards/beta/BetaCriticalDates"
+import BetaScheduleMonitor from "@/components/cards/beta/BetaScheduleMonitor"
+import BetaHealth from "@/components/cards/beta/BetaHealth"
+import BetaChangeOrderAnalysis from "@/components/cards/beta/BetaChangeOrderAnalysis"
+import BetaBDOpportunities from "@/components/cards/beta/BetaBDOpportunities"
+
+// Add the 7 new beta card imports
+import BetaStartup from "@/components/cards/beta/BetaStartup"
+import BetaFieldReports from "@/components/cards/beta/BetaFieldReports"
+import BetaSafety from "@/components/cards/beta/BetaSafety"
+import BetaQualityControl from "@/components/cards/beta/BetaQualityControl"
+import BetaRFI from "@/components/cards/beta/BetaRFI"
+import BetaSubmittal from "@/components/cards/beta/BetaSubmittal"
+import BetaCloseout from "@/components/cards/beta/BetaCloseout"
+
+// Add the financial panel beta card imports
+import BetaProjectOverview from "@/components/cards/beta/BetaProjectOverview"
+import BetaProcurement from "@/components/cards/beta/BetaProcurement"
 
 // IT Command Center placeholder cards
 import {
@@ -131,6 +166,7 @@ interface DashboardGridProps {
   isCompact?: boolean
   spacingClass?: string
   userRole?: string
+  useBetaDashboard?: boolean
 }
 
 // Responsive grid configuration
@@ -145,13 +181,13 @@ const GRID_CONFIG = {
   },
   // Base row height (in pixels)
   rowHeight: {
-    compact: 60,
-    normal: 80,
+    compact: 55,
+    normal: 70,
   },
   // Grid gaps
   gap: {
-    compact: 16,
-    normal: 24,
+    compact: 12,
+    normal: 16,
   },
 }
 
@@ -222,6 +258,7 @@ export function DashboardGrid({
   isCompact = false,
   spacingClass = "gap-6",
   userRole,
+  useBetaDashboard,
 }: DashboardGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [draggedCard, setDraggedCard] = useState<DashboardCard | null>(null)
@@ -263,20 +300,36 @@ export function DashboardGrid({
     let maxY = 0
     const occupiedPositions = new Set<string>()
 
-    // First pass: track existing positions
-    cards.forEach((card) => {
+    // First pass: validate and fix existing positions, track occupied spaces
+    const validatedCards = cards.map((card) => {
       if (card.position && card.span) {
-        for (let x = card.position.x; x < card.position.x + card.span.cols; x++) {
-          for (let y = card.position.y; y < card.position.y + card.span.rows; y++) {
+        // Validate position is within grid bounds
+        const validatedPosition = {
+          x: Math.max(0, Math.min(card.position.x, 15)), // Ensure x is within 0-15
+          y: Math.max(0, card.position.y),
+        }
+
+        // Validate span doesn't exceed grid bounds
+        const validatedSpan = {
+          cols: Math.min(card.span.cols, 16 - validatedPosition.x), // Ensure span doesn't exceed grid width
+          rows: Math.max(1, card.span.rows),
+        }
+
+        // Track occupied positions
+        for (let x = validatedPosition.x; x < validatedPosition.x + validatedSpan.cols; x++) {
+          for (let y = validatedPosition.y; y < validatedPosition.y + validatedSpan.rows; y++) {
             occupiedPositions.add(`${x},${y}`)
             maxY = Math.max(maxY, y + 1)
           }
         }
+
+        return { ...card, position: validatedPosition, span: validatedSpan }
       }
+      return card
     })
 
     // Second pass: assign positions to cards without them
-    return cards.map((card) => {
+    return validatedCards.map((card) => {
       if (card.position) return card
 
       const span = card.span || getOptimalSize(card.type)
@@ -329,10 +382,10 @@ export function DashboardGrid({
     const endX = position.x + span.cols
     const endY = position.y + span.rows
 
-    // Check bounds
-    if (position.x < 0 || position.y < 0 || endX > 16) return false
+    // Check bounds - ensure position is within 16-column grid
+    if (position.x < 0 || position.y < 0 || position.x >= 16 || endX > 16) return false
 
-    return !cards.some((card) => {
+    return !initializedCards.some((card) => {
       if (card.id === excludeCardId) return false
       if (!card.position || !card.span) return false
 
@@ -350,9 +403,15 @@ export function DashboardGrid({
     span: { cols: number; rows: number },
     excludeCardId?: string
   ) => {
+    // Ensure target position is within bounds
+    const boundedTarget = {
+      x: Math.max(0, Math.min(targetPosition.x, 16 - span.cols)),
+      y: Math.max(0, targetPosition.y),
+    }
+
     // Try the exact position first
-    if (isPositionAvailable(targetPosition, span, excludeCardId)) {
-      return targetPosition
+    if (isPositionAvailable(boundedTarget, span, excludeCardId)) {
+      return boundedTarget
     }
 
     // Search in expanding circles around the target position
@@ -361,8 +420,8 @@ export function DashboardGrid({
         for (let dy = -radius; dy <= radius; dy++) {
           if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
             const testPosition = {
-              x: Math.max(0, Math.min(targetPosition.x + dx, 16 - span.cols)),
-              y: Math.max(0, targetPosition.y + dy),
+              x: Math.max(0, Math.min(boundedTarget.x + dx, 16 - span.cols)),
+              y: Math.max(0, boundedTarget.y + dy),
             }
 
             if (isPositionAvailable(testPosition, span, excludeCardId)) {
@@ -373,8 +432,8 @@ export function DashboardGrid({
       }
     }
 
-    // Fallback to original position if no space found
-    return targetPosition
+    // Fallback to a safe position if no space found
+    return boundedTarget
   }
 
   // Initialize cards with positions on first render
@@ -499,6 +558,7 @@ export function DashboardGrid({
                 onCardFocus={handleCardFocus}
                 height={getCardHeight(card, isCompact)}
                 userRole={userRole}
+                useBetaDashboard={useBetaDashboard}
               />
             ))}
           </div>
@@ -517,7 +577,12 @@ export function DashboardGrid({
               "transition-transform duration-200"
             )}
           >
-            <CardContent card={draggedCard} isCompact={isCompact} userRole={userRole} />
+            <CardContent
+              card={draggedCard}
+              isCompact={isCompact}
+              userRole={userRole}
+              useBetaDashboard={useBetaDashboard}
+            />
           </div>
         ) : null}
       </DragOverlay>
@@ -536,6 +601,7 @@ interface SortableCardProps {
   onCardFocus?: (card: DashboardCard) => void
   height: number | "auto"
   userRole?: string
+  useBetaDashboard?: boolean
 }
 
 function SortableCard({
@@ -548,6 +614,7 @@ function SortableCard({
   onCardFocus,
   height,
   userRole,
+  useBetaDashboard,
 }: SortableCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
 
@@ -558,6 +625,36 @@ function SortableCard({
     ...gridArea,
     ...(typeof height === "number" && card.type !== "pipeline-analytics" ? { minHeight: `${height}px` } : {}),
   }
+
+  // Beta cards that don't need DashboardCardWrapper (they're self-contained)
+  const betaCards = [
+    "portfolio-overview",
+    "enhanced-hbi-insights",
+    "financial-review-panel",
+    "pipeline-analytics",
+    "market-intelligence",
+    "critical-dates",
+    "schedule-monitor",
+    "health",
+    "change-order-analysis",
+    "bd-opportunities",
+    "schedule-performance",
+    "financial-status",
+    "general-conditions",
+    "contingency-analysis",
+    "cash-flow",
+    "startup",
+    "field-reports",
+    "safety",
+    "quality-control",
+    "rfi",
+    "submittal",
+    "closeout",
+    "project-overview",
+    "procurement",
+  ]
+
+  const isBetaCard = useBetaDashboard && betaCards.includes(card.type)
 
   return (
     <div
@@ -572,23 +669,39 @@ function SortableCard({
       {...attributes}
       {...(isEditing ? listeners : {})}
     >
-      <DashboardCardWrapper
-        card={card}
-        onRemove={onCardRemove}
-        onConfigure={onCardConfigure}
-        onSizeChange={onCardSizeChange}
-        dragHandleClass="cursor-grab active:cursor-grabbing"
-        isEditing={isEditing}
-        isCompact={isCompact}
-      >
-        <CardContent card={card} isCompact={isCompact} userRole={userRole} />
-      </DashboardCardWrapper>
+      {isBetaCard ? (
+        // Beta cards render directly without wrapper (they're self-contained)
+        <CardContent card={card} isCompact={isCompact} userRole={userRole} useBetaDashboard={useBetaDashboard} />
+      ) : (
+        // Legacy cards use wrapper for consistent styling
+        <DashboardCardWrapper
+          card={card}
+          onRemove={onCardRemove}
+          onConfigure={onCardConfigure}
+          onSizeChange={onCardSizeChange}
+          dragHandleClass="cursor-grab active:cursor-grabbing"
+          isEditing={isEditing}
+          isCompact={isCompact}
+        >
+          <CardContent card={card} isCompact={isCompact} userRole={userRole} useBetaDashboard={useBetaDashboard} />
+        </DashboardCardWrapper>
+      )}
     </div>
   )
 }
 
 // Card content renderer
-function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCompact: boolean; userRole?: string }) {
+function CardContent({
+  card,
+  isCompact,
+  userRole,
+  useBetaDashboard,
+}: {
+  card: DashboardCard
+  isCompact: boolean
+  userRole?: string
+  useBetaDashboard?: boolean
+}) {
   // Calculate span for components that need it
   const span = card.span || getOptimalSize(card.type)
 
@@ -616,57 +729,93 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
 
   switch (card.type) {
     case "portfolio-overview":
-      return <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      return useBetaDashboard ? (
+        <BetaPortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      ) : (
+        <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      )
     case "enhanced-hbi-insights":
-      return <EnhancedHBIInsights {...commonProps} />
+      return useBetaDashboard ? <BetaEnhancedHBIInsights {...commonProps} /> : <EnhancedHBIInsights {...commonProps} />
     case "financial-review-panel":
-      return <FinancialReviewPanel {...commonProps} />
+      return useBetaDashboard ? <BetaFinancialOverview {...commonProps} /> : <FinancialReviewPanel {...commonProps} />
     case "pipeline-analytics":
-      return <PipelineAnalytics {...commonProps} />
+      return useBetaDashboard ? <BetaPipelineAnalytics {...commonProps} /> : <PipelineAnalytics {...commonProps} />
     case "market-intelligence":
-      return <MarketIntelligence {...commonProps} />
+      return useBetaDashboard ? <BetaMarketIntelligence {...commonProps} /> : <MarketIntelligence {...commonProps} />
+    case "critical-dates":
+      return useBetaDashboard ? <BetaCriticalDates {...commonProps} /> : <CriticalDatesCard {...commonProps} />
+    case "schedule-monitor":
+      return useBetaDashboard ? <BetaScheduleMonitor {...commonProps} /> : <ScheduleMonitorCard {...commonProps} />
+    case "health":
+      return useBetaDashboard ? <BetaHealth {...commonProps} /> : <HealthCard {...commonProps} />
+    case "change-order-analysis":
+      return useBetaDashboard ? (
+        <BetaChangeOrderAnalysis {...commonProps} />
+      ) : (
+        <ChangeOrderAnalysisCard {...commonProps} />
+      )
+    case "bd-opportunities":
+      return useBetaDashboard ? <BetaBDOpportunities {...commonProps} /> : <BDOpportunitiesCard {...commonProps} />
     case "project-overview":
-      return <ProjectOverviewCard {...commonProps} />
+      return useBetaDashboard ? <BetaProjectOverview {...commonProps} /> : <ProjectOverviewCard {...commonProps} />
     case "schedule-performance":
-      return <SchedulePerformanceCard {...commonProps} />
+      return useBetaDashboard ? (
+        <BetaSchedulePerformance {...commonProps} />
+      ) : (
+        <SchedulePerformanceCard {...commonProps} />
+      )
     case "financial-status":
-      return <FinancialStatusCard {...commonProps} />
+      return useBetaDashboard ? <BetaFinancialStatus {...commonProps} /> : <FinancialStatusCard {...commonProps} />
+    // Add beta placeholders for other common cards
     case "general-conditions":
-      return <GeneralConditionsCard {...commonProps} />
+      return useBetaDashboard ? <BetaGeneralConditions {...commonProps} /> : <GeneralConditionsCard {...commonProps} />
     case "contingency-analysis":
-      return <ContingencyAnalysisCard {...commonProps} />
+      return useBetaDashboard ? (
+        <BetaContingencyAnalysis {...commonProps} />
+      ) : (
+        <ContingencyAnalysisCard {...commonProps} />
+      )
     case "cash-flow":
-      return <CashFlowCard {...commonProps} />
+      return useBetaDashboard ? <BetaCashFlowAnalysis {...commonProps} /> : <CashFlowCard {...commonProps} />
     case "procurement":
-      return <ProcurementCard {...commonProps} />
+      return useBetaDashboard ? <BetaProcurement {...commonProps} /> : <ProcurementCard {...commonProps} />
     case "draw-forecast":
-      return <DrawForecastCard {...commonProps} />
+      return useBetaDashboard ? (
+        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border border-[#FA4616]/20 dark:border-[#FA4616]/40 rounded-lg">
+          <div className="text-center p-6">
+            <div className="p-3 bg-[#FA4616] rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+              <Target className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-base font-semibold text-[#FA4616] dark:text-[#FF8A67] mb-2">Beta Draw Forecast</h3>
+            <p className="text-xs text-[#FA4616]/70 dark:text-[#FF8A67]/80 mb-3">Enhanced with Power BI integration</p>
+            <Badge
+              variant="outline"
+              className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67] text-xs"
+            >
+              <Sparkles className="h-3 w-3 mr-1" />
+              Beta
+            </Badge>
+          </div>
+        </div>
+      ) : (
+        <DrawForecastCard {...commonProps} />
+      )
     case "quality-control":
-      return <QualityControlCard {...commonProps} />
+      return useBetaDashboard ? <BetaQualityControl {...commonProps} /> : <QualityControlCard {...commonProps} />
     case "safety":
-      return <SafetyCard {...commonProps} />
+      return useBetaDashboard ? <BetaSafety {...commonProps} /> : <SafetyCard {...commonProps} />
     case "staffing-distribution":
       return <StaffingDistributionCard {...commonProps} />
-    case "change-order-analysis":
-      return <ChangeOrderAnalysisCard {...commonProps} />
-    case "closeout":
-      return <CloseoutCard {...commonProps} />
     case "startup":
-      return <StartupCard {...commonProps} />
-    case "critical-dates":
-      return <CriticalDatesCard {...commonProps} />
+      return useBetaDashboard ? <BetaStartup {...commonProps} /> : <StartupCard {...commonProps} />
     case "field-reports":
-      return <FieldReportsCard {...commonProps} />
+      return useBetaDashboard ? <BetaFieldReports {...commonProps} /> : <FieldReportsCard {...commonProps} />
     case "rfi":
-      return <RFICard {...commonProps} />
+      return useBetaDashboard ? <BetaRFI {...commonProps} /> : <RFICard {...commonProps} />
     case "submittal":
-      return <SubmittalCard {...commonProps} />
-    case "health":
-      return <HealthCard {...commonProps} />
-    case "schedule-monitor":
-      return <ScheduleMonitorCard {...commonProps} />
-    case "bd-opportunities":
-      return <BDOpportunitiesCard {...commonProps} />
+      return useBetaDashboard ? <BetaSubmittal {...commonProps} /> : <SubmittalCard {...commonProps} />
+    case "closeout":
+      return useBetaDashboard ? <BetaCloseout {...commonProps} /> : <CloseoutCard {...commonProps} />
     // IT Command Center cards
     case "user-access-summary":
       return <UserAccessSummaryCard {...commonProps} />
@@ -713,6 +862,8 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
       return <ProjectStaffingOverviewCard {...commonProps} projectId={card.config?.projectId} />
     case "staffing-alerts":
       return <StaffingAlertsCard {...commonProps} projectId={card.config?.projectId} />
+    case "power-bi-dashboard":
+      return <PowerBIDashboardCard {...commonProps} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -729,25 +880,37 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 16, rows: 6 }
+      return { cols: 16, rows: 5 }
     case "financial-dashboard":
-      return { cols: 16, rows: 20 }
+      return { cols: 16, rows: 18 }
     case "enhanced-hbi-insights":
-      return { cols: 8, rows: 5 }
+      return { cols: 8, rows: 4 }
     case "portfolio-overview":
-      return { cols: 8, rows: 5 }
+      return { cols: 8, rows: 4 }
     case "pipeline-analytics":
       return { cols: 10, rows: 4 }
     case "market-intelligence":
-      return { cols: 6, rows: 5 }
+      return { cols: 6, rows: 4 }
     case "staffing-distribution":
-      return { cols: 8, rows: 5 }
+      return { cols: 8, rows: 4 }
     case "quality-control":
-      return { cols: 4, rows: 5 }
+      return { cols: 4, rows: 4 }
     case "safety":
-      return { cols: 4, rows: 5 }
+      return { cols: 4, rows: 4 }
     case "cash-flow":
       return { cols: 8, rows: 4 }
+    case "power-bi-dashboard":
+      return { cols: 8, rows: 5 }
+    case "critical-dates":
+      return { cols: 6, rows: 4 }
+    case "schedule-monitor":
+      return { cols: 8, rows: 4 }
+    case "health":
+      return { cols: 6, rows: 4 }
+    case "change-order-analysis":
+      return { cols: 8, rows: 4 }
+    case "bd-opportunities":
+      return { cols: 6, rows: 4 }
     default:
       return { cols: 6, rows: 4 }
   }

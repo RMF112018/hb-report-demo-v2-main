@@ -17,7 +17,9 @@ import { useDashboardLayout } from "../../../hooks/use-dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
-import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
+import { Switch } from "../../../components/ui/switch"
+import { Label } from "../../../components/ui/label"
+import { AlertCircle, Loader2, RefreshCw, TestTube } from "lucide-react"
 import { getProjectStats, getProjectAccessDescription } from "../../../lib/project-access-utils"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import Image from "next/image"
@@ -25,6 +27,7 @@ import { ActionItemsInbox } from "../../../components/dashboard/ActionItemsInbox
 import { ActionItemsToDo } from "../../../components/dashboard/ActionItemsToDo"
 import { ProjectActivityFeed } from "../../../components/feed/ProjectActivityFeed"
 import BidManagementCenter from "../../../components/estimating/bid-management/BidManagementCenter"
+import BidManagementBetaTables from "../../../components/estimating/bid-management/BidManagementBetaTables"
 import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
 import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel"
 
@@ -76,6 +79,9 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
   renderMode = "rightContent",
 }) => {
   const router = useRouter()
+
+  // Beta toggle state
+  const [useBetaDashboard, setUseBetaDashboard] = React.useState(false)
 
   // Use the dashboard layout hook
   const {
@@ -276,26 +282,48 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
   // Render content based on active tab
   const renderTabContent = () => {
+    // Show beta information banner when beta mode is active
+    const betaBanner = useBetaDashboard ? (
+      <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
+        <div className="flex items-center gap-2">
+          <TestTube className="h-5 w-5 text-orange-600" />
+          <span className="font-medium text-orange-800 dark:text-orange-200">Beta Dashboard Mode Active</span>
+          <Badge variant="outline" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+            Power BI Integration
+          </Badge>
+        </div>
+        <p className="text-sm text-orange-800 dark:text-orange-200 mt-2">
+          🚀 <strong>New Experience:</strong> All dashboard cards now feature enhanced Power BI integration with
+          real-time analytics, advanced visualizations, embedded reports, and enterprise-grade data insights. Toggle off
+          to return to legacy dashboard views.
+        </p>
+      </div>
+    ) : null
+
     switch (activeTab) {
       case "overview":
         return (
-          <DashboardLayout
-            cards={cards}
-            onLayoutChange={onLayoutChange}
-            onCardRemove={onCardRemove}
-            onCardConfigure={onCardConfigure}
-            onCardSizeChange={onCardSizeChange}
-            onCardAdd={onCardAdd}
-            onSave={onSave}
-            onReset={onReset}
-            isEditing={isEditing}
-            onToggleEdit={onToggleEdit}
-            layoutDensity={layoutDensity}
-            userRole={userRole}
-            dashboards={dashboards}
-            currentDashboardId={currentDashboardId ?? undefined}
-            onDashboardSelect={onDashboardSelect}
-          />
+          <div>
+            {betaBanner}
+            <DashboardLayout
+              cards={cards}
+              onLayoutChange={onLayoutChange}
+              onCardRemove={onCardRemove}
+              onCardConfigure={onCardConfigure}
+              onCardSizeChange={onCardSizeChange}
+              onCardAdd={onCardAdd}
+              onSave={onSave}
+              onReset={onReset}
+              isEditing={isEditing}
+              onToggleEdit={onToggleEdit}
+              layoutDensity={layoutDensity}
+              userRole={userRole}
+              dashboards={dashboards}
+              currentDashboardId={currentDashboardId ?? undefined}
+              onDashboardSelect={onDashboardSelect}
+              useBetaDashboard={useBetaDashboard}
+            />
+          </div>
         )
 
       case "financial-review":
@@ -304,23 +332,27 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         const financialCards = financialLayout?.cards || cards
 
         return (
-          <DashboardLayout
-            cards={financialCards}
-            onLayoutChange={onLayoutChange}
-            onCardRemove={onCardRemove}
-            onCardConfigure={onCardConfigure}
-            onCardSizeChange={onCardSizeChange}
-            onCardAdd={onCardAdd}
-            onSave={onSave}
-            onReset={onReset}
-            isEditing={isEditing}
-            onToggleEdit={onToggleEdit}
-            layoutDensity={layoutDensity}
-            userRole={userRole}
-            dashboards={dashboards}
-            currentDashboardId={currentDashboardId ?? undefined}
-            onDashboardSelect={onDashboardSelect}
-          />
+          <div>
+            {betaBanner}
+            <DashboardLayout
+              cards={financialCards}
+              onLayoutChange={onLayoutChange}
+              onCardRemove={onCardRemove}
+              onCardConfigure={onCardConfigure}
+              onCardSizeChange={onCardSizeChange}
+              onCardAdd={onCardAdd}
+              onSave={onSave}
+              onReset={onReset}
+              isEditing={isEditing}
+              onToggleEdit={onToggleEdit}
+              layoutDensity={layoutDensity}
+              userRole={userRole}
+              dashboards={dashboards}
+              currentDashboardId={currentDashboardId ?? undefined}
+              onDashboardSelect={onDashboardSelect}
+              useBetaDashboard={useBetaDashboard}
+            />
+          </div>
         )
 
       case "action-items":
@@ -346,8 +378,53 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
       case "analytics":
         return (
+          <div>
+            {betaBanner}
+            <DashboardLayout
+              cards={cards}
+              onLayoutChange={onLayoutChange}
+              onCardRemove={onCardRemove}
+              onCardConfigure={onCardConfigure}
+              onCardSizeChange={onCardSizeChange}
+              onCardAdd={onCardAdd}
+              onSave={onSave}
+              onReset={onReset}
+              isEditing={isEditing}
+              onToggleEdit={onToggleEdit}
+              layoutDensity={layoutDensity}
+              userRole={userRole}
+              dashboards={dashboards}
+              currentDashboardId={currentDashboardId ?? undefined}
+              onDashboardSelect={onDashboardSelect}
+              useBetaDashboard={useBetaDashboard}
+            />
+          </div>
+        )
+
+      case "power-bi-beta":
+        // Power BI Beta Dashboard with enhanced cards
+        const powerBICards = [
+          {
+            id: "power-bi-enterprise-dashboard",
+            type: "power-bi-dashboard",
+            title: "Power BI Enterprise Dashboard",
+            size: "optimal",
+            position: { x: 0, y: 0 },
+            span: { cols: 16, rows: 8 },
+            visible: true,
+            config: {
+              executiveMode: true,
+              showRealTime: true,
+              compactMode: false,
+              enableDrillDown: true,
+              beta: true,
+            },
+          },
+        ]
+
+        return (
           <DashboardLayout
-            cards={cards}
+            cards={powerBICards}
             onLayoutChange={onLayoutChange}
             onCardRemove={onCardRemove}
             onCardConfigure={onCardConfigure}
@@ -362,6 +439,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
             dashboards={dashboards}
             currentDashboardId={currentDashboardId ?? undefined}
             onDashboardSelect={onDashboardSelect}
+            useBetaDashboard={true} // Always use beta for power-bi-beta tab
           />
         )
 
@@ -384,6 +462,20 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
           }
         })()
 
+        // Show beta tables when beta mode is active
+        if (useBetaDashboard) {
+          return (
+            <div>
+              {betaBanner}
+              <BidManagementBetaTables
+                userRole={bidManagementUserRole}
+                onProjectSelect={onProjectSelect}
+                className="h-full"
+              />
+            </div>
+          )
+        }
+
         return (
           <EstimatingModuleWrapper
             title="Bid Management Center"
@@ -405,29 +497,49 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
       default:
         // Default to overview if tab not recognized
         return (
-          <DashboardLayout
-            cards={cards}
-            onLayoutChange={onLayoutChange}
-            onCardRemove={onCardRemove}
-            onCardConfigure={onCardConfigure}
-            onCardSizeChange={onCardSizeChange}
-            onCardAdd={onCardAdd}
-            onSave={onSave}
-            onReset={onReset}
-            isEditing={isEditing}
-            onToggleEdit={onToggleEdit}
-            layoutDensity={layoutDensity}
-            userRole={userRole}
-            dashboards={dashboards}
-            currentDashboardId={currentDashboardId ?? undefined}
-            onDashboardSelect={onDashboardSelect}
-          />
+          <div>
+            {betaBanner}
+            <DashboardLayout
+              cards={cards}
+              onLayoutChange={onLayoutChange}
+              onCardRemove={onCardRemove}
+              onCardConfigure={onCardConfigure}
+              onCardSizeChange={onCardSizeChange}
+              onCardAdd={onCardAdd}
+              onSave={onSave}
+              onReset={onReset}
+              isEditing={isEditing}
+              onToggleEdit={onToggleEdit}
+              layoutDensity={layoutDensity}
+              userRole={userRole}
+              dashboards={dashboards}
+              currentDashboardId={currentDashboardId ?? undefined}
+              onDashboardSelect={onDashboardSelect}
+              useBetaDashboard={useBetaDashboard}
+            />
+          </div>
         )
     }
   }
 
   return (
     <div className="h-full w-full">
+      {/* Beta Toggle */}
+      <div className="flex items-center justify-between mb-4 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-2">
+          <TestTube className="h-4 w-4 text-primary" />
+          <Label htmlFor="beta-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Beta Dashboard
+          </Label>
+        </div>
+        <Switch
+          id="beta-toggle"
+          checked={useBetaDashboard}
+          onCheckedChange={setUseBetaDashboard}
+          className="data-[state=checked]:bg-primary"
+        />
+      </div>
+
       {/* Layout Density Controls - Show when editing and on overview tab */}
       {isEditing && (activeTab === "overview" || activeTab === "financial-review") && (
         <div className="mb-4 flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">

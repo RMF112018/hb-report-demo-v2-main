@@ -1763,29 +1763,21 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <Card className="bg-slate-900/95 dark:bg-slate-900/95 light:bg-blue-50/80 border-slate-800/50 dark:border-slate-800/50 light:border-blue-200/30">
-        <CardHeader className="bg-gradient-to-r from-slate-800/30 to-blue-900/20 dark:from-slate-800/30 dark:to-blue-900/20 light:from-blue-100/40 light:to-blue-200/30">
+      <Card className="bg-card border-border">
+        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted/30">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2 text-blue-100 dark:text-blue-100 light:text-blue-900">
-                <Building className="h-5 w-5 text-blue-400 dark:text-blue-400 light:text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-card-foreground">
+                <Building className="h-5 w-5 text-primary" />
                 Start-Up Checklist
-                <Badge
-                  variant="secondary"
-                  className="bg-blue-800/50 text-blue-100 dark:bg-blue-800/50 dark:text-blue-100 light:bg-blue-200 light:text-blue-800"
-                >
-                  {projectName}
-                </Badge>
+                <Badge variant="secondary">{projectName}</Badge>
               </CardTitle>
-              <p className="text-sm text-slate-300 dark:text-slate-300 light:text-blue-700/80 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Digital project startup checklist for Construction stage
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge
-                variant="outline"
-                className="text-sm border-blue-400/50 text-blue-200 dark:border-blue-400/50 dark:text-blue-200 light:border-blue-600/50 light:text-blue-800"
-              >
+              <Badge variant="outline" className="text-sm">
                 {overallStats.completionRate}% Complete
               </Badge>
               <div className="flex items-center gap-2">
@@ -1793,8 +1785,8 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                   variant="outline"
                   className={
                     currentMode === "review"
-                      ? "bg-orange-800/30 text-orange-200 border-orange-600/50 dark:bg-orange-800/30 dark:text-orange-200 dark:border-orange-600/50 light:bg-orange-100 light:text-orange-800 light:border-orange-400"
-                      : "bg-green-800/30 text-green-200 border-green-600/50 dark:bg-green-800/30 dark:text-green-200 dark:border-green-600/50 light:bg-green-100 light:text-green-800 light:border-green-400"
+                      ? "bg-orange-500/10 text-orange-600 border-orange-500/30 dark:bg-orange-500/20 dark:text-orange-400 dark:border-orange-500/50"
+                      : "bg-green-500/10 text-green-600 border-green-500/30 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/50"
                   }
                 >
                   {currentMode === "review" ? "Review Mode" : "Edit Mode"}
@@ -1802,7 +1794,6 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
                   onClick={() => {
                     const newMode = currentMode === "editable" ? "review" : "editable"
                     setCurrentMode(newMode)
@@ -1818,38 +1809,30 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="bg-slate-850/50 dark:bg-slate-850/50 light:bg-blue-50/50">
+        <CardContent className="bg-muted/20">
           {/* Statistics Bar */}
           <div className="grid grid-cols-5 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-100 dark:text-blue-100 light:text-blue-900">
-                {overallStats.totalItems}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Total Items</div>
+              <div className="text-2xl font-bold text-foreground">{overallStats.totalItems}</div>
+              <div className="text-sm text-muted-foreground">Total Items</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400 dark:text-green-400 light:text-green-700">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {overallStats.conformingItems}
               </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Conforming</div>
+              <div className="text-sm text-muted-foreground">Conforming</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-400 dark:text-red-400 light:text-red-700">
-                {overallStats.deficientItems}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Deficient</div>
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">{overallStats.deficientItems}</div>
+              <div className="text-sm text-muted-foreground">Deficient</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-400 dark:text-slate-400 light:text-slate-600">
-                {overallStats.neutralItems}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Neutral</div>
+              <div className="text-2xl font-bold text-muted-foreground">{overallStats.neutralItems}</div>
+              <div className="text-sm text-muted-foreground">Neutral</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400 dark:text-blue-400 light:text-blue-700">
-                {overallStats.naItems}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">N/A</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{overallStats.naItems}</div>
+              <div className="text-sm text-muted-foreground">N/A</div>
             </div>
           </div>
 
@@ -1883,41 +1866,21 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                 </SelectContent>
               </Select>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={() => setShowCompleted(!showCompleted)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowCompleted(!showCompleted)}>
                 {showCompleted ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 {showCompleted ? "Hide" : "Show"} Completed
               </Button>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={() => setViewMode(viewMode === "full" ? "compact" : "full")}
-              >
+              <Button variant="outline" size="sm" onClick={() => setViewMode(viewMode === "full" ? "compact" : "full")}>
                 {viewMode === "full" ? "Compact" : "Full"} View
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={() => exportChecklist("pdf")}
-              >
+              <Button variant="outline" size="sm" onClick={() => exportChecklist("pdf")}>
                 <Download className="h-4 w-4 mr-2" />
                 Export PDF
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={() => exportChecklist("excel")}
-              >
+              <Button variant="outline" size="sm" onClick={() => exportChecklist("excel")}>
                 <Download className="h-4 w-4 mr-2" />
                 Export Excel
               </Button>
@@ -1929,37 +1892,27 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
       {/* Checklist Sections */}
       <div className="space-y-4">
         {sections.map((section) => (
-          <Card
-            key={section.id}
-            className="bg-slate-800/80 dark:bg-slate-800/80 light:bg-blue-100/60 border-slate-700/50 dark:border-slate-700/50 light:border-blue-300/40"
-          >
+          <Card key={section.id} className="bg-card border-border">
             <Collapsible open={section.isExpanded} onOpenChange={() => toggleSection(section.id)}>
               <CollapsibleTrigger asChild>
-                <CardHeader className="cursor-pointer hover:bg-slate-700/30 dark:hover:bg-slate-700/30 light:hover:bg-blue-200/40 transition-colors bg-gradient-to-r from-slate-700/20 to-blue-800/15 dark:from-slate-700/20 dark:to-blue-800/15 light:from-blue-200/30 light:to-blue-300/20">
+                <CardHeader className="cursor-pointer hover:bg-muted/40 transition-colors bg-gradient-to-r from-muted/30 to-muted/20">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {section.isExpanded ? (
-                        <ChevronDown className="h-5 w-5 text-blue-300 dark:text-blue-300 light:text-blue-700" />
+                        <ChevronDown className="h-5 w-5 text-primary" />
                       ) : (
-                        <ChevronRight className="h-5 w-5 text-blue-300 dark:text-blue-300 light:text-blue-700" />
+                        <ChevronRight className="h-5 w-5 text-primary" />
                       )}
                       <div>
-                        <CardTitle className="text-lg text-blue-200 dark:text-blue-200 light:text-blue-900">
-                          {section.title}
-                        </CardTitle>
-                        <p className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80">
-                          {section.description}
-                        </p>
+                        <CardTitle className="text-lg text-card-foreground">{section.title}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{section.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="text-sm border-blue-300/50 text-blue-200 dark:border-blue-300/50 dark:text-blue-200 light:border-blue-600/60 light:text-blue-800"
-                      >
+                      <Badge variant="outline" className="text-sm">
                         {section.completionRate}% Complete
                       </Badge>
-                      <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80">
+                      <div className="text-sm text-muted-foreground">
                         {section.items.filter((item) => item.status === "Conforming").length} / {section.items.length}
                       </div>
                     </div>
@@ -1967,12 +1920,12 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                 </CardHeader>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <CardContent className="pt-0 bg-slate-750/60 dark:bg-slate-750/60 light:bg-blue-150/40">
+                <CardContent className="pt-0 bg-muted/10">
                   <div className="space-y-3">
                     {getFilteredItems(section.items).map((item) => (
                       <div
                         key={item.id}
-                        className="border border-slate-600/40 dark:border-slate-600/40 light:border-blue-400/30 rounded-lg hover:bg-slate-700/30 dark:hover:bg-slate-700/30 light:hover:bg-blue-200/30 transition-colors bg-slate-700/20 dark:bg-slate-700/20 light:bg-blue-200/20"
+                        className="border border-border rounded-lg hover:bg-muted/30 transition-colors bg-muted/10"
                       >
                         {/* Collapsed Item Header - Always Visible */}
                         <div
@@ -1981,29 +1934,23 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                         >
                           <div className="flex items-center gap-3">
                             {expandedItems.has(item.id) ? (
-                              <ChevronDown className="h-4 w-4 text-blue-400 dark:text-blue-400 light:text-blue-700 flex-shrink-0" />
+                              <ChevronDown className="h-4 w-4 text-primary flex-shrink-0" />
                             ) : (
-                              <ChevronRight className="h-4 w-4 text-blue-400 dark:text-blue-400 light:text-blue-700 flex-shrink-0" />
+                              <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
                             )}
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-blue-100 dark:text-blue-100 light:text-blue-900">
-                                  {item.title}
-                                </span>
+                                <span className="font-medium text-foreground">{item.title}</span>
                                 <Badge variant="outline" className={getPriorityColor(item.priority)}>
                                   {item.priority}
                                 </Badge>
                                 {item.tags.slice(0, 2).map((tag) => (
-                                  <Badge
-                                    key={tag}
-                                    variant="secondary"
-                                    className="text-xs bg-blue-700/30 text-blue-200 dark:bg-blue-700/30 dark:text-blue-200 light:bg-blue-300/50 light:text-blue-800"
-                                  >
+                                  <Badge key={tag} variant="secondary" className="text-xs">
                                     {tag}
                                   </Badge>
                                 ))}
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 {item.assignedTo && (
                                   <span className="flex items-center gap-1">
                                     <User className="h-3 w-3" />
@@ -2026,7 +1973,7 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
 
                         {/* Expanded Item Content */}
                         {expandedItems.has(item.id) && (
-                          <div className="px-4 pb-4 space-y-3 bg-gradient-to-b from-slate-600/30 to-blue-900/20 dark:from-slate-600/30 dark:to-blue-900/20 light:from-blue-300/25 light:to-blue-400/15 border-t border-slate-600/40 dark:border-slate-600/40 light:border-blue-400/30">
+                          <div className="px-4 pb-4 space-y-3 bg-gradient-to-b from-muted/30 to-muted/20 border-t border-border">
                             {/* Title Editing */}
                             <div className="flex items-center gap-2">
                               {editingItem === item.id ? (
@@ -2067,18 +2014,14 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                 </div>
                               ) : (
                                 <>
-                                  <Label className="text-sm font-medium text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Title:
-                                  </Label>
-                                  <span className="flex-1 text-blue-100 dark:text-blue-100 light:text-blue-800">
-                                    {item.title}
-                                  </span>
+                                  <Label className="text-sm font-medium text-foreground">Title:</Label>
+                                  <span className="flex-1 text-foreground">{item.title}</span>
                                   {currentMode === "editable" && (
                                     <Button
                                       size="sm"
                                       variant="ghost"
                                       onClick={() => setEditingItem(item.id)}
-                                      className="h-6 w-6 p-0 hover:bg-blue-800/30 dark:hover:bg-blue-800/30 light:hover:bg-blue-300/30"
+                                      className="h-6 w-6 p-0"
                                     >
                                       <Settings className="h-3 w-3" />
                                     </Button>
@@ -2093,9 +2036,9 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                 {item.isContractItem && item.contractData ? (
                                   <>
                                     {/* Contract Fields */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-950/30 dark:bg-blue-950/30 light:bg-blue-400/15 rounded-lg border border-blue-800/30 dark:border-blue-800/30 light:border-blue-500/20">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg border border-border">
                                       <div className="md:col-span-2">
-                                        <h4 className="font-medium text-sm text-blue-200 dark:text-blue-200 light:text-blue-900 mb-3 flex items-center gap-2">
+                                        <h4 className="font-medium text-sm text-foreground mb-3 flex items-center gap-2">
                                           <FileText className="h-4 w-4" />
                                           Contract Information
                                         </h4>
@@ -2125,16 +2068,14 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                     </div>
 
                                     {/* Contract Links */}
-                                    <div className="p-4 bg-blue-950/30 dark:bg-blue-950/30 light:bg-blue-400/15 rounded-lg border border-blue-800/30 dark:border-blue-800/30 light:border-blue-500/20">
+                                    <div className="p-4 bg-muted/30 rounded-lg border border-border">
                                       {renderContractLinks(item.contractData, section.id, item.id)}
                                     </div>
                                   </>
                                 ) : (
                                   /* Regular Status Selection for non-contract items */
                                   <div className="flex items-center gap-2">
-                                    <Label className="text-sm font-medium min-w-[60px] text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                      Status:
-                                    </Label>
+                                    <Label className="text-sm font-medium min-w-[60px] text-foreground">Status:</Label>
                                     <Select
                                       value={item.status}
                                       onValueChange={(value) =>
@@ -2142,7 +2083,7 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                       }
                                       disabled={currentMode === "review"}
                                     >
-                                      <SelectTrigger className="w-[140px] border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50">
+                                      <SelectTrigger className="w-[140px]">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -2157,15 +2098,13 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
 
                                 {/* Assignment */}
                                 <div className="flex items-center gap-2">
-                                  <Label className="text-sm font-medium min-w-[60px] text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Assign:
-                                  </Label>
+                                  <Label className="text-sm font-medium min-w-[60px] text-foreground">Assign:</Label>
                                   <Select
                                     value={item.assignedTo || ""}
                                     onValueChange={(value) => handleAssignment(section.id, item.id, value)}
                                     disabled={currentMode === "review"}
                                   >
-                                    <SelectTrigger className="w-[180px] border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50">
+                                    <SelectTrigger className="w-[180px]">
                                       <SelectValue placeholder="Select assignee" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -2180,28 +2119,24 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
 
                                 {/* Comments */}
                                 <div className="space-y-2">
-                                  <Label className="text-sm font-medium text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Comments:
-                                  </Label>
+                                  <Label className="text-sm font-medium text-foreground">Comments:</Label>
                                   <Textarea
                                     placeholder="Add comments or notes..."
                                     value={item.comments}
                                     onChange={(e) => handleCommentUpdate(section.id, item.id, e.target.value)}
-                                    className="min-h-[60px] border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50 bg-slate-600/20 dark:bg-slate-600/20 light:bg-blue-100/30 text-blue-100 dark:text-blue-100 light:text-blue-900"
+                                    className="min-h-[60px]"
                                     disabled={currentMode === "review"}
                                   />
                                 </div>
 
                                 {/* Attachments */}
                                 <div className="space-y-2">
-                                  <Label className="text-sm font-medium text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Attachments:
-                                  </Label>
+                                  <Label className="text-sm font-medium text-foreground">Attachments:</Label>
                                   <div className="flex flex-wrap gap-2">
                                     {item.attachments.map((attachment, index) => (
                                       <div
                                         key={index}
-                                        className="flex items-center gap-1 bg-blue-900/30 dark:bg-blue-900/30 light:bg-blue-300/30 rounded px-2 py-1 text-sm text-blue-200 dark:text-blue-200 light:text-blue-800"
+                                        className="flex items-center gap-1 bg-muted/50 rounded px-2 py-1 text-sm text-muted-foreground"
                                       >
                                         <Paperclip className="h-3 w-3" />
                                         <span>{attachment}</span>
@@ -2210,7 +2145,7 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                             size="sm"
                                             variant="ghost"
                                             onClick={() => removeAttachment(section.id, item.id, attachment)}
-                                            className="h-4 w-4 p-0 ml-1 hover:bg-blue-800/30 dark:hover:bg-blue-800/30 light:hover:bg-blue-400/30"
+                                            className="h-4 w-4 p-0 ml-1"
                                           >
                                             <X className="h-3 w-3" />
                                           </Button>
@@ -2227,7 +2162,7 @@ export const StartupChecklist: React.FC<StartupChecklistProps> = ({
                                             addAttachment(section.id, item.id, fileName)
                                           }
                                         }}
-                                        className="h-8 border-blue-600/40 text-blue-200 hover:bg-blue-800/30 dark:border-blue-600/40 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-500/50 light:text-blue-800 light:hover:bg-blue-300/30"
+                                        className="h-8"
                                       >
                                         <Plus className="h-3 w-3 mr-1" />
                                         Add File

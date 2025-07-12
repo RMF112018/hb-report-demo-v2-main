@@ -39,6 +39,7 @@ import {
   Plus,
   RefreshCw,
   Settings,
+  Filter,
 } from "lucide-react"
 
 // Import Financial Hub Components
@@ -115,6 +116,8 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
+  const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -190,7 +193,7 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
       case "budget-analysis":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full max-w-full" style={{ maxWidth: "100%", width: "100%" }}>
             <BudgetAnalysisProjectContent
               projectId={projectId}
               projectData={projectScope}
@@ -224,7 +227,7 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
       case "forecasting":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full max-w-full" style={{ maxWidth: "100%", width: "100%" }}>
             <Forecasting userRole={userRole} projectData={projectScope} />
           </div>
         )
@@ -281,80 +284,68 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
   // Financial Hub content
   const financialHubContent = (
-    <div className="space-y-6 w-full max-w-full overflow-x-auto overflow-y-hidden">
-      {/* Module Title with Focus Button */}
-      <div className="pb-2 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">Financial Hub</h2>
-            <p className="text-sm text-muted-foreground">Comprehensive financial management and analysis suite</p>
+    <div className="h-full w-full">
+      {/* Financial Tabs - Mobile dropdown, Desktop horizontal */}
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold">Financial Hub</h1>
+            <p className="text-muted-foreground">Comprehensive financial management and analysis for {projectName}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Refresh
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-              <Download className="h-3 w-3 mr-1" />
-              Export
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
-              {isFocusMode ? (
-                <>
-                  <Minimize2 className="h-3 w-3 mr-1" />
-                  Exit Focus
-                </>
-              ) : (
-                <>
-                  <Maximize2 className="h-3 w-3 mr-1" />
-                  Focus
-                </>
-              )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFocusToggle}
+              className={`${
+                isFocusMode
+                  ? "bg-[#FA4616] text-white border-[#FA4616] hover:bg-[#FA4616]/90"
+                  : "text-[#FA4616] border-[#FA4616] hover:bg-[#FA4616]/10"
+              }`}
+            >
+              {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              {isFocusMode ? "Exit Focus" : "Focus Mode"}
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Horizontal Navigation Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10 gap-3">
-        {availableTabs.map((tab) => {
-          const IconComponent = tab.icon
-          const isActive = navigation.financialTab === tab.id
-
-          return (
-            <Card
-              key={tab.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                isActive ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "hover:border-gray-300"
-              }`}
-              onClick={() => handleFinancialTabChange(tab.id)}
-            >
-              <CardContent className="p-4">
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <div className="relative">
-                    <IconComponent className={`h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-600"}`} />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-xs font-medium ${
-                        isActive ? "text-blue-600" : "text-gray-900 dark:text-gray-100"
-                      }`}
-                    >
-                      {tab.label}
-                    </p>
-                    {!isMobile && (
-                      <p className="text-xs text-muted-foreground mt-1 leading-tight line-clamp-2">{tab.description}</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+        {/* Financial Tabs Navigation */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          {availableTabs.map((tab) => {
+            const IconComponent = tab.icon
+            const isActive = navigation.financialTab === tab.id
+            return (
+              <Button
+                key={tab.id}
+                variant={isActive ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleFinancialTabChange(tab.id)}
+                className={`
+                  flex items-center gap-2 whitespace-nowrap transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-[#FA4616] text-white hover:bg-[#FA4616]/90 border-[#FA4616]"
+                      : "hover:bg-[#FA4616]/10 hover:text-[#FA4616] hover:border-[#FA4616]/30"
+                  }
+                `}
+              >
+                <IconComponent className="h-4 w-4" />
+                {tab.label}
+                {tab.id === "change-management" && (
+                  <Badge variant="secondary" className="bg-[#0021A5] text-white text-xs ml-1 border-[#0021A5]">
+                    New
+                  </Badge>
+                )}
+              </Button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Content Area */}
-      <div className="min-h-96 w-full max-w-full overflow-x-auto overflow-y-hidden">{renderFinancialTabContent()}</div>
+      <div className="min-h-96 w-full max-w-full overflow-hidden" style={{ maxWidth: "100%", width: "100%" }}>
+        {renderFinancialTabContent()}
+      </div>
     </div>
   )
 
@@ -370,7 +361,11 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   }
 
   // Return the main content
-  return financialHubContent
+  return (
+    <div className="flex-1 p-6 overflow-auto" style={{ maxWidth: "100%", width: "100%" }}>
+      <div style={{ maxWidth: "100%", width: "100%" }}>{financialHubContent}</div>
+    </div>
+  )
 }
 
 export default FinancialHubProjectContent

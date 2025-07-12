@@ -97,6 +97,7 @@ import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
 import EstimatingSuite from "@/components/estimating/EstimatingSuite"
 import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
+import { ProjectActivityFeed } from "@/components/feed/ProjectActivityFeed"
 
 // Lazy load ProjectTabsShell for better performance
 const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
@@ -589,8 +590,8 @@ const PreConstructionContent: React.FC<{
           onClick={() => setActivePreconTab("estimating")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activePreconTab === "estimating"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -603,8 +604,8 @@ const PreConstructionContent: React.FC<{
           onClick={() => setActivePreconTab("pre-construction")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activePreconTab === "pre-construction"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -617,8 +618,8 @@ const PreConstructionContent: React.FC<{
           onClick={() => setActivePreconTab("ids-bim-coordination")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activePreconTab === "ids-bim-coordination"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -2240,8 +2241,8 @@ const WarrantyManagementContent: React.FC<{
             onClick={() => setActiveTab(tab.id)}
             className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
               activeTab === tab.id
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+                : "border-border hover:border-[#FA4616]/30"
             }`}
           >
             <div className="flex flex-col items-center text-center space-y-2">
@@ -2896,8 +2897,8 @@ const TradePartnersPanel: React.FC<{
           onClick={() => setActiveView("directory")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activeView === "directory"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -2910,8 +2911,8 @@ const TradePartnersPanel: React.FC<{
           onClick={() => setActiveView("project")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activeView === "project"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -2924,8 +2925,8 @@ const TradePartnersPanel: React.FC<{
           onClick={() => setActiveView("scorecard")}
           className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
             activeView === "scorecard"
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-              : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
           }`}
         >
           <div className="flex flex-col items-center text-center space-y-2">
@@ -3026,8 +3027,8 @@ const ComplianceContent: React.FC<{
             onClick={() => setActiveTab(tab.id)}
             className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
               activeTab === tab.id
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+                : "border-border hover:border-[#FA4616]/30"
             }`}
           >
             <div className="flex flex-col items-center text-center space-y-2">
@@ -3042,6 +3043,78 @@ const ComplianceContent: React.FC<{
       {/* Content Area */}
       <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
         <div className="w-full min-w-0 max-w-full h-full overflow-hidden">{renderComplianceTabContent()}</div>
+      </div>
+    </div>
+  )
+
+  // Return focus mode if active
+  if (isFocusMode) {
+    return (
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+        </div>
+      </div>
+    )
+  }
+
+  return mainContent
+}
+
+// Recent Activity Management Content Component
+const RecentActivityContent: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+  user: any
+}> = ({ projectId, projectData, userRole, user }) => {
+  const [isFocusMode, setIsFocusMode] = useState(false)
+
+  const handleFocusToggle = () => {
+    setIsFocusMode(!isFocusMode)
+  }
+
+  // Main content
+  const mainContent = (
+    <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+      {/* Module Title with Focus Button */}
+      <div className="pb-2 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Recent Activity</h2>
+            <p className="text-sm text-muted-foreground">Real-time project activities, updates, and communications</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+            {isFocusMode ? (
+              <>
+                <Minimize2 className="h-3 w-3 mr-1" />
+                Exit Focus
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3 w-3 mr-1" />
+                Focus
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+        <div className="w-full min-w-0 max-w-full h-full overflow-hidden">
+          <ProjectActivityFeed
+            config={{
+              userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+              projectId: parseInt(projectId),
+              showFilters: true,
+              showPagination: true,
+              itemsPerPage: 20,
+              allowExport: true,
+            }}
+            className="h-full"
+          />
+        </div>
       </div>
     </div>
   )
@@ -4381,6 +4454,9 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           <WarrantyManagementContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
 
+      case "recent-activity":
+        return <RecentActivityContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+
       case "compliance":
         return <ComplianceContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
 
@@ -4468,6 +4544,13 @@ export const getProjectSidebarContent = (
         { label: "Trade Partner Review", icon: Users, onClick: () => {} },
         { label: "Compliance Report", icon: FileText, onClick: () => {} },
       ]
+    } else if (activeTab === "recent-activity") {
+      return [
+        { label: "Refresh Activity", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Activity", icon: Download, onClick: () => {} },
+        { label: "Filter Activity", icon: Filter, onClick: () => {} },
+        { label: "Activity Search", icon: Search, onClick: () => {} },
+      ]
     } else if (navigation.coreTab === "reports") {
       return [
         { label: "Create Report", icon: Plus, onClick: () => {} },
@@ -4528,6 +4611,13 @@ export const getProjectSidebarContent = (
         { label: "Trade Partners", value: "18", color: "green" },
         { label: "Compliance Rate", value: "94%", color: "green" },
         { label: "Expiring Soon", value: "3", color: "orange" },
+      ]
+    } else if (activeTab === "recent-activity") {
+      return [
+        { label: "Today's Activities", value: "15", color: "blue" },
+        { label: "This Week", value: "89", color: "green" },
+        { label: "Active Users", value: "8", color: "purple" },
+        { label: "Latest Update", value: "2m ago", color: "orange" },
       ]
     } else if (navigation.coreTab === "reports") {
       return [
@@ -5305,6 +5395,48 @@ export const getProjectSidebarContent = (
       ]
     }
 
+    // Recent Activity tab insights
+    if (activeTab === "recent-activity") {
+      return [
+        {
+          id: "activity-1",
+          type: "info",
+          severity: "low",
+          title: "High Activity Detected",
+          text: "Project activity level 35% above baseline this week. Strong collaboration and progress momentum.",
+          action: "View trends",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "activity-2",
+          type: "success",
+          severity: "low",
+          title: "Communication Efficiency",
+          text: "Response time to RFIs improved by 40% this month. Excellent project coordination.",
+          action: "View metrics",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "activity-3",
+          type: "warning",
+          severity: "medium",
+          title: "Change Order Activity",
+          text: "Increased change order activity detected. 3 new change events this week require attention.",
+          action: "Review changes",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "activity-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Automation Opportunity",
+          text: "Routine reporting activities could benefit from automation. Potential 6-hour weekly savings.",
+          action: "Explore automation",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
     // Core Project Tools tabs - unique insights for each core tab
     if (activeTab === "core" || !activeTab) {
       // Dashboard tab (default)
@@ -5664,6 +5796,11 @@ export const getProjectSidebarContent = (
       return "HBI Compliance Insights"
     }
 
+    // Recent Activity tab
+    if (activeTab === "recent-activity") {
+      return "HBI Activity Insights"
+    }
+
     // Core Project Tools tabs
     if (activeTab === "core" || !activeTab) {
       if (!navigation.coreTab || navigation.coreTab === "dashboard") {
@@ -5972,4 +6109,58 @@ export const getFieldManagementRightPanelContent = (
       />
     </div>
   )
+}
+
+// Brand color utilities
+const getBrandColorClasses = (type: "orange" | "blue", variant: "primary" | "secondary" | "accent" = "primary") => {
+  if (type === "orange") {
+    switch (variant) {
+      case "primary":
+        return "bg-[#FA4616] text-white border-[#FA4616]"
+      case "secondary":
+        return "text-[#FA4616] border-[#FA4616]"
+      case "accent":
+        return "border-l-[#FA4616] bg-gradient-to-r from-[#FA4616]/10 to-transparent"
+      default:
+        return "bg-[#FA4616] text-white"
+    }
+  } else {
+    switch (variant) {
+      case "primary":
+        return "bg-[#0021A5] text-white border-[#0021A5]"
+      case "secondary":
+        return "text-[#0021A5] border-[#0021A5]"
+      case "accent":
+        return "border-l-[#0021A5] bg-gradient-to-r from-[#0021A5]/10 to-transparent"
+      default:
+        return "bg-[#0021A5] text-white"
+    }
+  }
+}
+
+const getBadgeColorForStatus = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "active":
+    case "in-progress":
+    case "current":
+      return getBrandColorClasses("orange", "primary")
+    case "completed":
+    case "approved":
+      return "bg-green-500 text-white"
+    case "pending":
+    case "review":
+      return getBrandColorClasses("blue", "primary")
+    case "overdue":
+    case "critical":
+      return "bg-red-500 text-white"
+    default:
+      return "bg-gray-500 text-white"
+  }
+}
+
+const getSectionBorderClass = (isActive: boolean, isPrimary: boolean = false) => {
+  if (isActive) {
+    return isPrimary ? getBrandColorClasses("orange", "accent") : getBrandColorClasses("blue", "accent")
+  }
+  return "border-l-gray-200 dark:border-l-gray-700"
 }

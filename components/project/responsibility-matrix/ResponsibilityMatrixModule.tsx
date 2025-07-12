@@ -16,7 +16,7 @@
  * - Responsive design
  */
 
-import React, { useState, useMemo, useCallback, useRef, useEffect } from "react"
+import React, { useState, useMemo, useCallback } from "react"
 import { useResponsibilityMatrix } from "@/hooks/use-responsibility-matrix"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -37,24 +37,7 @@ interface ResponsibilityMatrixModuleProps {
   className?: string
 }
 
-// Intersection Observer Hook for performance optimization
-const useIntersectionObserver = (ref: React.RefObject<Element | null>, options: IntersectionObserverInit = {}) => {
-  const [isIntersecting, setIsIntersecting] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting)
-    }, options)
-
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
-
-    return () => observer.disconnect()
-  }, [ref, options])
-
-  return isIntersecting
-}
+// Intersection observer removed to prevent flashing
 
 // Memoized Summary Cards Component
 const SummaryCards: React.FC<{ metrics: any }> = React.memo(({ metrics }) => {
@@ -127,11 +110,7 @@ const ResponsibilityMatrixModule: React.FC<ResponsibilityMatrixModuleProps> = Re
 
     const [filterStatus, setFilterStatus] = useState<"all" | "active" | "pending" | "completed">("all")
     const [filterCategory, setFilterCategory] = useState<string>("all")
-    const [isRendering, setIsRendering] = useState(true)
     const [showAllRoles, setShowAllRoles] = useState(false)
-
-    const containerRef = useRef<HTMLDivElement>(null)
-    const isVisible = useIntersectionObserver(containerRef, { threshold: 0.1 })
 
     // Memoized filtered tasks
     const filteredTasks = useMemo(() => {
@@ -171,20 +150,7 @@ const ResponsibilityMatrixModule: React.FC<ResponsibilityMatrixModuleProps> = Re
       console.log("Export functionality triggered")
     }, [])
 
-    // Progressive rendering
-    useEffect(() => {
-      if (isVisible && !loading) {
-        const timer = setTimeout(() => {
-          setIsRendering(false)
-        }, 100)
-        return () => clearTimeout(timer)
-      }
-    }, [isVisible, loading, filteredTasks])
-
-    // Reset rendering state when tasks change
-    useEffect(() => {
-      setIsRendering(true)
-    }, [tasks])
+    // Progressive rendering removed to prevent flashing
 
     // Loading state
     if (loading) {
@@ -198,29 +164,10 @@ const ResponsibilityMatrixModule: React.FC<ResponsibilityMatrixModuleProps> = Re
       )
     }
 
-    // Intersection observer placeholder
-    if (!isVisible) {
-      return <div ref={containerRef} className={cn("h-64", className)} />
-    }
-
-    // Rendering state
-    if (isRendering) {
-      return (
-        <div ref={containerRef} className={className}>
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-muted-foreground text-sm">Rendering matrix...</span>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
     // Error state
     if (!tasks || tasks.length === 0) {
       return (
-        <div ref={containerRef} className={cn("space-y-4", className)}>
+        <div className={cn("space-y-4", className)}>
           <Card>
             <CardContent className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -241,7 +188,7 @@ const ResponsibilityMatrixModule: React.FC<ResponsibilityMatrixModuleProps> = Re
     }
 
     return (
-      <div ref={containerRef} className={cn("space-y-4 w-full max-w-full overflow-hidden", className)}>
+      <div className={cn("space-y-4 w-full max-w-full overflow-hidden", className)}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

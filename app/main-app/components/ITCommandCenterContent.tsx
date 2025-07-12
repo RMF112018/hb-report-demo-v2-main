@@ -645,6 +645,7 @@ function ITCommandCenterMainContent({ user, selectedModule, onModuleSelect }: IT
                 alt="Hedrick Brothers Construction"
                 width={180}
                 height={60}
+                style={{ width: "auto", height: "auto" }}
                 className="object-contain"
                 priority
               />

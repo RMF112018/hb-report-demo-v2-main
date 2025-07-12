@@ -155,6 +155,22 @@
         "compactMode": true,
         "timeframe": "quarterly"
       }
+    },
+    {
+      "id": "power-bi-enterprise-dashboard",
+      "type": "power-bi-dashboard",
+      "title": "Power BI Enterprise Dashboard",
+      "size": "optimal",
+      "position": { "x": 0, "y": 20 },
+      "span": { "cols": 16, "rows": 6 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showRealTime": true,
+        "compactMode": false,
+        "enableDrillDown": true,
+        "beta": true
+      }
     }
   ]
 }

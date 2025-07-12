@@ -18,7 +18,7 @@
 
 "use client"
 
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -104,16 +104,11 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
   const [staffingSubTab, setStaffingSubTab] = useState("dashboard")
   const [reportsSubTab, setReportsSubTab] = useState("dashboard")
   const [isFocusMode, setIsFocusMode] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Extract project name from project data - memoized
+  const projectName = useMemo(() => projectData?.name || `Project ${projectId}`, [projectData?.name, projectId])
 
-  // Extract project name from project data
-  const projectName = projectData?.name || `Project ${projectId}`
-
-  // Project metrics (calculated or from data)
+  // Project metrics (calculated or from data) - memoized
   const projectMetrics = useMemo(
     () => ({
       totalBudget: projectData?.contract_value || 75000000,
@@ -127,131 +122,188 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       changeOrders: 3,
       riskItems: 2,
     }),
-    [projectData]
+    [projectData?.contract_value]
   )
 
-  // Handle tab changes
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId)
-    setStaffingSubTab("dashboard") // Reset sub-tabs when changing main tab
-    setReportsSubTab("dashboard")
-    if (onTabChange) {
-      onTabChange(tabId)
-    }
-  }
+  // Handle tab changes - memoized callback
+  const handleTabChange = useCallback(
+    (tabId: string) => {
+      setActiveTab(tabId)
+      setStaffingSubTab("dashboard") // Reset sub-tabs when changing main tab
+      setReportsSubTab("dashboard")
+      if (onTabChange) {
+        onTabChange(tabId)
+      }
+    },
+    [onTabChange]
+  )
 
-  // Handle staffing sub-tab changes
-  const handleStaffingSubTabChange = (tabId: string) => {
+  // Handle staffing sub-tab changes - memoized callback
+  const handleStaffingSubTabChange = useCallback((tabId: string) => {
     setStaffingSubTab(tabId)
-  }
+  }, [])
 
-  // Handle reports sub-tab changes
-  const handleReportsSubTabChange = (tabId: string) => {
+  // Handle reports sub-tab changes - memoized callback
+  const handleReportsSubTabChange = useCallback((tabId: string) => {
     setReportsSubTab(tabId)
-  }
+  }, [])
 
-  // Handle focus mode toggle
-  const handleFocusToggle = () => {
-    setIsFocusMode(!isFocusMode)
-  }
+  // Handle focus mode toggle - memoized callback
+  const handleFocusToggle = useCallback(() => {
+    setIsFocusMode((prev) => !prev)
+  }, [])
 
-  // Render tab content based on activeTab
-  const renderTabContent = () => {
+  // Memoized dashboard content to prevent re-renders
+  const dashboardContent = useMemo(() => {
+    const isConstructionStage = projectData?.project_stage_name === "Construction"
+
+    if (isConstructionStage) {
+      return <ConstructionDashboard projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+    }
+
+    return (
+      <div className="space-y-6 w-full max-w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Project Summary Card */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
+                    <p className="font-medium text-sm text-foreground">
+                      {projectData?.project_type_name || "Commercial"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
+                    <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
+                    <p className="font-medium text-sm text-foreground">
+                      ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
+                    <p className="font-medium text-sm text-foreground">
+                      {projectData?.project_stage_name || "Construction"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Project Metrics Card */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
+                  <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
+                  <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
+                  <p className="font-medium text-sm text-foreground">{projectMetrics.activeTeamMembers} members</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
+                  <p className="font-medium text-sm text-foreground">
+                    {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }, [projectData, projectMetrics, projectId, userRole, user])
+
+  // Memoized checklist content to prevent re-renders
+  const checklistContent = useMemo(
+    () => (
+      <ChecklistModule
+        projectId={projectId}
+        projectData={projectData}
+        user={user}
+        userRole={userRole}
+        className="w-full"
+      />
+    ),
+    [projectId, projectData, user, userRole]
+  )
+
+  // Memoized responsibility matrix content to prevent re-renders
+  const responsibilityMatrixContent = useMemo(
+    () => (
+      <div className="space-y-4 w-full max-w-full">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold">Responsibility Matrix</h3>
+            <p className="text-xs text-muted-foreground">
+              Manage task assignments and accountability across project teams
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              <Download className="h-3 w-3 mr-1" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              <Plus className="h-3 w-3 mr-1" />
+              Add Task
+            </Button>
+          </div>
+        </div>
+
+        <ResponsibilityMatrixModule
+          projectId={projectId}
+          user={user}
+          userRole={userRole}
+          className="border-0 shadow-none"
+        />
+      </div>
+    ),
+    [projectId, user, userRole]
+  )
+
+  // Memoized productivity content to prevent re-renders
+  const productivityContent = useMemo(
+    () => (
+      <div className="w-full max-w-full">
+        <ProductivityModule
+          projectId={projectId}
+          projectData={projectData}
+          userRole={userRole}
+          user={user}
+          className="w-full"
+        />
+      </div>
+    ),
+    [projectId, projectData, userRole, user]
+  )
+
+  // Render tab content based on activeTab - memoized to prevent unnecessary re-renders
+  const renderTabContent = useMemo(() => {
     switch (activeTab) {
       case "dashboard":
-        // Check if project is in Construction stage
-        const isConstructionStage = projectData?.project_stage_name === "Construction"
-
-        if (isConstructionStage) {
-          // Render comprehensive Construction dashboard
-          return (
-            <ConstructionDashboard projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
-          )
-        } else {
-          // Render default dashboard for non-Construction projects
-          return (
-            <div className="space-y-6 w-full max-w-full">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Project Summary Card */}
-                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
-                          <p className="font-medium text-sm text-foreground">
-                            {projectData?.project_type_name || "Commercial"}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
-                          <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
-                          <p className="font-medium text-sm text-foreground">
-                            ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
-                          <p className="font-medium text-sm text-foreground">
-                            {projectData?.project_stage_name || "Construction"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Project Metrics Card */}
-                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
-                        <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
-                        <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectMetrics.activeTeamMembers} members
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )
-        }
+        return dashboardContent
 
       case "checklists":
-        return (
-          <ChecklistModule
-            projectId={projectId}
-            projectData={projectData}
-            user={user}
-            userRole={userRole}
-            className="w-full"
-          />
-        )
+        return checklistContent
 
       case "reports":
         return (
@@ -316,48 +368,10 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
         )
 
       case "responsibility-matrix":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold">Responsibility Matrix</h3>
-                <p className="text-xs text-muted-foreground">
-                  Manage task assignments and accountability across project teams
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Download className="h-3 w-3 mr-1" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Task
-                </Button>
-              </div>
-            </div>
-
-            <ResponsibilityMatrixModule
-              projectId={projectId}
-              user={user}
-              userRole={userRole}
-              className="border-0 shadow-none"
-            />
-          </div>
-        )
+        return responsibilityMatrixContent
 
       case "productivity":
-        return (
-          <div className="w-full max-w-full">
-            <ProductivityModule
-              projectId={projectId}
-              projectData={projectData}
-              userRole={userRole}
-              user={user}
-              className="w-full"
-            />
-          </div>
-        )
+        return productivityContent
 
       case "staffing":
         return (
@@ -448,72 +462,81 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       default:
         return null
     }
-  }
-
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
+  }, [
+    activeTab,
+    dashboardContent,
+    checklistContent,
+    responsibilityMatrixContent,
+    productivityContent,
+    reportsSubTab,
+    staffingSubTab,
+    projectId,
+    projectData,
+    userRole,
+    user,
+    isFocusMode,
+    handleReportsSubTabChange,
+  ])
 
   // Main content
-  const mainContent = (
-    <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
-      {/* Module Title with Focus Button */}
-      <div className="pb-2 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
-            <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
-            {isFocusMode ? (
-              <>
-                <Minimize2 className="h-3 w-3 mr-1" />
-                Exit Focus
-              </>
-            ) : (
-              <>
-                <Maximize2 className="h-3 w-3 mr-1" />
-                Focus
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Card-based Core Tab Navigation */}
-      <div className="mb-6 flex-shrink-0">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {coreTabsConfig.map((tab) => (
-            <div
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
-                activeTab === tab.id
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                  : "border-border hover:border-gray-300 dark:hover:border-gray-600"
-              }`}
-            >
-              <div className="flex flex-col items-center text-center space-y-2">
-                <tab.icon className="h-6 w-6" />
-                <span className="text-sm font-medium">{tab.label}</span>
-                <span className="text-xs text-muted-foreground">{tab.description}</span>
-              </div>
+  const mainContent = useMemo(
+    () => (
+      <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+        {/* Module Title with Focus Button */}
+        <div className="pb-2 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
+              <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
             </div>
-          ))}
+            <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+              {isFocusMode ? (
+                <>
+                  <Minimize2 className="h-3 w-3 mr-1" />
+                  Exit Focus
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="h-3 w-3 mr-1" />
+                  Focus
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
-        <div className={cn("w-full min-w-0 max-w-full", isFocusMode ? "min-h-full" : "h-full overflow-hidden")}>
-          {renderTabContent()}
+        {/* Card-based Core Tab Navigation */}
+        <div className="mb-6 flex-shrink-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {coreTabsConfig.map((tab) => (
+              <div
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                  activeTab === tab.id
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <tab.icon className="h-6 w-6" />
+                  <span className="text-sm font-medium">{tab.label}</span>
+                  <span className="text-xs text-muted-foreground">{tab.description}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+          <div className={cn("w-full min-w-0 max-w-full", isFocusMode ? "min-h-full" : "h-full overflow-hidden")}>
+            {renderTabContent}
+          </div>
         </div>
       </div>
-    </div>
+    ),
+    [activeTab, handleTabChange, handleFocusToggle, isFocusMode, renderTabContent]
   )
 
   // Return focus mode if active

@@ -51,17 +51,20 @@ interface ResponsibilityMatrixCoreProps {
 const useIntersectionObserver = (ref: React.RefObject<Element | null>, options: IntersectionObserverInit = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false)
 
+  // Memoize the options to prevent unnecessary re-renders
+  const memoizedOptions = useMemo(() => options, [options.threshold, options.rootMargin, options.root])
+
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsIntersecting(entry.isIntersecting)
-    }, options)
+    }, memoizedOptions)
 
     if (ref.current) {
       observer.observe(ref.current)
     }
 
     return () => observer.disconnect()
-  }, [ref, options])
+  }, [memoizedOptions])
 
   return isIntersecting
 }
@@ -527,28 +530,14 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
       setIsRendering(true)
     }, [tasks])
 
-    if (loading) {
+    // Render loading state if loading, not visible, or still rendering
+    if (loading || !isVisible || isRendering) {
       return (
-        <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-            <span className="text-muted-foreground">Loading responsibility matrix...</span>
-          </div>
-        </div>
-      )
-    }
-
-    if (!isVisible) {
-      return <div ref={containerRef} className={`h-64 ${className}`} />
-    }
-
-    if (isRendering) {
-      return (
-        <div ref={containerRef} className={`${className}`}>
+        <div ref={containerRef} className={`space-y-4 ${className}`}>
           <div className="flex items-center justify-center h-64">
             <div className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-muted-foreground text-sm">Rendering matrix...</span>
+              <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+              <span className="text-muted-foreground">Loading responsibility matrix...</span>
             </div>
           </div>
         </div>

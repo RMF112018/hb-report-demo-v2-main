@@ -378,7 +378,7 @@ export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({
       {/* Main Content */}
       <div className="space-y-4">
         {/* Tab-specific KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-3">
           {getFinancialKPIs(activeTab).map((kpi, index) => (
             <Card key={index}>
               <CardContent className="p-4">

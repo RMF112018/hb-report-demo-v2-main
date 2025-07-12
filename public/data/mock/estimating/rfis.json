@@ -1,0 +1,82 @@
+[
+  {
+    "id": "rfi-001",
+    "number": "RFI-001",
+    "title": "Concrete Foundation Specifications",
+    "description": "Request clarification on concrete mix design for foundation work in Section 03 11 00",
+    "status": "open",
+    "priority": "medium",
+    "submittedBy": "John Smith",
+    "assignedTo": "Sarah Chen",
+    "dateSubmitted": "2025-01-10",
+    "dateRequired": "2025-01-17",
+    "dateResponsed": null,
+    "category": "Specification",
+    "scope": "03 - Concrete",
+    "attachments": [
+      {
+        "name": "foundation-detail.pdf",
+        "url": "/documents/foundation-detail.pdf",
+        "size": "2.3 MB"
+      }
+    ],
+    "responses": [],
+    "tags": ["foundation", "concrete", "specification"]
+  },
+  {
+    "id": "rfi-002",
+    "number": "RFI-002",
+    "title": "HVAC Equipment Access",
+    "description": "Need clarification on access requirements for rooftop HVAC units",
+    "status": "responded",
+    "priority": "high",
+    "submittedBy": "Mike Rodriguez",
+    "assignedTo": "Jennifer Park",
+    "dateSubmitted": "2025-01-08",
+    "dateRequired": "2025-01-15",
+    "dateResponsed": "2025-01-12",
+    "category": "Design",
+    "scope": "23 - HVAC",
+    "attachments": [],
+    "responses": [
+      {
+        "id": "resp-001",
+        "text": "Provide 3-foot clearance on all sides of equipment",
+        "author": "Jennifer Park",
+        "date": "2025-01-12"
+      }
+    ],
+    "tags": ["hvac", "access", "rooftop"]
+  },
+  {
+    "id": "rfi-003",
+    "number": "RFI-003",
+    "title": "Electrical Panel Location",
+    "description": "Request approval for alternate electrical panel location due to space constraints",
+    "status": "closed",
+    "priority": "low",
+    "submittedBy": "Alex Johnson",
+    "assignedTo": "Sarah Chen",
+    "dateSubmitted": "2025-01-05",
+    "dateRequired": "2025-01-12",
+    "dateResponsed": "2025-01-10",
+    "category": "Coordination",
+    "scope": "26 - Electrical",
+    "attachments": [
+      {
+        "name": "electrical-layout.dwg",
+        "url": "/documents/electrical-layout.dwg",
+        "size": "1.8 MB"
+      }
+    ],
+    "responses": [
+      {
+        "id": "resp-002",
+        "text": "Approved as submitted",
+        "author": "Sarah Chen",
+        "date": "2025-01-10"
+      }
+    ],
+    "tags": ["electrical", "coordination", "approved"]
+  }
+]

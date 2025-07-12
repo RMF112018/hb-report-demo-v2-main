@@ -1650,7 +1650,11 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
             variant="outline"
             size="sm"
             onClick={handleFocusToggle}
-            className={isFocusMode ? "bg-primary text-primary-foreground" : ""}
+            className={
+              isFocusMode
+                ? "bg-[#FA4616] text-white border-[#FA4616] hover:bg-[#FA4616]/90"
+                : "hover:bg-[#FA4616]/10 hover:border-[#FA4616]/30"
+            }
           >
             <Focus className="h-4 w-4 mr-2" />
             {isFocusMode ? "Exit Focus" : "Focus"}
@@ -1668,19 +1672,23 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
             <Card
               key={tab.id}
               className={`cursor-pointer transition-all hover:shadow-md ${
-                isActive ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "hover:border-gray-300"
+                isActive
+                  ? "border-[#FA4616] bg-[#FA4616]/5 ring-1 ring-[#FA4616]/20"
+                  : "hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
               }`}
               onClick={() => handleTabChange(tab.id)}
             >
               <CardContent className="p-4">
                 <div className="flex flex-col items-center text-center space-y-2">
                   <div className="relative">
-                    <IconComponent className={`h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-600"}`} />
+                    <IconComponent
+                      className={`h-6 w-6 ${isActive ? "text-[#FA4616]" : "text-gray-600 dark:text-gray-400"}`}
+                    />
                   </div>
                   <div>
                     <p
                       className={`text-xs font-medium ${
-                        isActive ? "text-blue-600" : "text-gray-900 dark:text-gray-100"
+                        isActive ? "text-[#FA4616]" : "text-gray-900 dark:text-gray-100"
                       }`}
                     >
                       {tab.label}

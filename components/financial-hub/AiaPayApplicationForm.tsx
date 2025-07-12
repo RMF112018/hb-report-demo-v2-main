@@ -12,18 +12,18 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { 
-  Save, 
-  Send, 
-  Download, 
-  Plus, 
-  Trash2, 
-  AlertTriangle, 
+import {
+  Save,
+  Send,
+  Download,
+  Plus,
+  Trash2,
+  AlertTriangle,
   CheckCircle,
   Calculator,
   Calendar,
   FileText,
-  Building
+  Building,
 } from "lucide-react"
 import type { AiaPayApplication, AiaLineItem } from "@/types/aia-pay-application"
 
@@ -58,9 +58,9 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
         changeOrdersApproved: 0,
         retentionPercentage: 5.0,
         status: "draft",
-        periodStartDate: new Date().toISOString().split('T')[0],
-        periodEndDate: new Date().toISOString().split('T')[0],
-        applicationDate: new Date().toISOString().split('T')[0]
+        periodStartDate: new Date().toISOString().split("T")[0],
+        periodEndDate: new Date().toISOString().split("T")[0],
+        applicationDate: new Date().toISOString().split("T")[0],
       }
       setFormData(newApp)
       loadLineItemsFromProcore()
@@ -91,10 +91,10 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
           procoreData: {
             budgetCode: "03100",
             committedCost: 2450000,
-            lastSync: new Date().toISOString()
+            lastSync: new Date().toISOString(),
           },
           annotations: [],
-          hasDiscrepancy: false
+          hasDiscrepancy: false,
         },
         {
           id: "li_new_002",
@@ -114,11 +114,11 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
           procoreData: {
             budgetCode: "05120",
             committedCost: 2845000,
-            lastSync: new Date().toISOString()
+            lastSync: new Date().toISOString(),
           },
           annotations: [],
-          hasDiscrepancy: false
-        }
+          hasDiscrepancy: false,
+        },
       ]
       setLineItems(mockLineItems)
     } catch (error) {
@@ -147,39 +147,50 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
       revisedContractSum,
       balanceToFinish,
       currentPaymentDue,
-      netAmountDue: currentPaymentDue
+      netAmountDue: currentPaymentDue,
     }
   }
 
   const totals = calculateTotals()
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }))
+      setErrors((prev) => ({ ...prev, [field]: "" }))
     }
   }
 
   const handleLineItemChange = (itemId: string, field: string, value: number) => {
-    setLineItems(prev => prev.map(item => 
-      item.id === itemId 
-        ? { 
-            ...item, 
-            [field]: value,
-            workCompletedToDate: field === "workCompletedThisPeriod" 
-              ? item.workCompletedPrevious + value 
-              : item.workCompletedToDate,
-            totalCompleted: field === "workCompletedThisPeriod" || field === "materialsStoredThisPeriod"
-              ? (item.workCompletedPrevious + (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod)) + 
-                (item.materialsStoredPrevious + (field === "materialsStoredThisPeriod" ? value : item.materialsStoredThisPeriod))
-              : item.totalCompleted,
-            percentComplete: item.scheduledValue > 0 
-              ? ((item.workCompletedPrevious + (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod)) / item.scheduledValue) * 100
-              : 0,
-            balanceToFinish: item.scheduledValue - (item.workCompletedPrevious + (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod))
-          }
-        : item
-    ))
+    setLineItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              [field]: value,
+              workCompletedToDate:
+                field === "workCompletedThisPeriod" ? item.workCompletedPrevious + value : item.workCompletedToDate,
+              totalCompleted:
+                field === "workCompletedThisPeriod" || field === "materialsStoredThisPeriod"
+                  ? item.workCompletedPrevious +
+                    (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod) +
+                    (item.materialsStoredPrevious +
+                      (field === "materialsStoredThisPeriod" ? value : item.materialsStoredThisPeriod))
+                  : item.totalCompleted,
+              percentComplete:
+                item.scheduledValue > 0
+                  ? ((item.workCompletedPrevious +
+                      (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod)) /
+                      item.scheduledValue) *
+                    100
+                  : 0,
+              balanceToFinish:
+                item.scheduledValue -
+                (item.workCompletedPrevious +
+                  (field === "workCompletedThisPeriod" ? value : item.workCompletedThisPeriod)),
+            }
+          : item
+      )
+    )
   }
 
   const validateForm = () => {
@@ -190,7 +201,9 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
     if (!formData.contractSum || formData.contractSum <= 0) newErrors.contractSum = "Valid contract sum is required"
 
     // Validate line items
-    const hasWorkThisPeriod = lineItems.some(item => item.workCompletedThisPeriod > 0 || item.materialsStoredThisPeriod > 0)
+    const hasWorkThisPeriod = lineItems.some(
+      (item) => item.workCompletedThisPeriod > 0 || item.materialsStoredThisPeriod > 0
+    )
     if (!hasWorkThisPeriod && !isDraft) {
       newErrors.lineItems = "At least one line item must have work completed this period"
     }
@@ -211,7 +224,7 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
         status: submit ? "submitted" : "draft",
         submittedDate: submit ? new Date().toISOString() : undefined,
         lastModifiedDate: new Date().toISOString(),
-        version: (formData.version || 0) + 1
+        version: (formData.version || 0) + 1,
       } as AiaPayApplication
 
       onSave(applicationData)
@@ -246,36 +259,44 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="applicationNumber" className="text-sm font-medium text-foreground">Application Number</Label>
+              <Label htmlFor="applicationNumber" className="text-sm font-medium text-foreground">
+                Application Number
+              </Label>
               <Input
                 id="applicationNumber"
                 type="number"
                 value={formData.applicationNumber || ""}
                 onChange={(e) => handleInputChange("applicationNumber", parseInt(e.target.value))}
                 placeholder="Auto-generated"
-                className={`${errors.applicationNumber ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"} bg-background text-foreground`}
+                className={`${
+                  errors.applicationNumber
+                    ? "border-destructive focus:ring-destructive"
+                    : "border-input focus:ring-ring"
+                } bg-background text-foreground`}
               />
-              {errors.applicationNumber && (
-                <p className="text-sm text-destructive mt-1">{errors.applicationNumber}</p>
-              )}
+              {errors.applicationNumber && <p className="text-sm text-destructive mt-1">{errors.applicationNumber}</p>}
             </div>
 
             <div>
-              <Label htmlFor="periodEndDate" className="text-sm font-medium text-foreground">Period Ending</Label>
+              <Label htmlFor="periodEndDate" className="text-sm font-medium text-foreground">
+                Period Ending
+              </Label>
               <Input
                 id="periodEndDate"
                 type="date"
                 value={formData.periodEndDate || ""}
                 onChange={(e) => handleInputChange("periodEndDate", e.target.value)}
-                className={`${errors.periodEndDate ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"} bg-background text-foreground`}
+                className={`${
+                  errors.periodEndDate ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"
+                } bg-background text-foreground`}
               />
-              {errors.periodEndDate && (
-                <p className="text-sm text-destructive mt-1">{errors.periodEndDate}</p>
-              )}
+              {errors.periodEndDate && <p className="text-sm text-destructive mt-1">{errors.periodEndDate}</p>}
             </div>
 
             <div>
-              <Label htmlFor="applicationDate" className="text-sm font-medium text-foreground">Application Date</Label>
+              <Label htmlFor="applicationDate" className="text-sm font-medium text-foreground">
+                Application Date
+              </Label>
               <Input
                 id="applicationDate"
                 type="date"
@@ -286,21 +307,25 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
             </div>
 
             <div>
-              <Label htmlFor="contractSum" className="text-sm font-medium text-foreground">Original Contract Sum</Label>
+              <Label htmlFor="contractSum" className="text-sm font-medium text-foreground">
+                Original Contract Sum
+              </Label>
               <Input
                 id="contractSum"
                 type="number"
                 value={formData.contractSum || ""}
                 onChange={(e) => handleInputChange("contractSum", parseFloat(e.target.value))}
-                className={`${errors.contractSum ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"} bg-background text-foreground`}
+                className={`${
+                  errors.contractSum ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"
+                } bg-background text-foreground`}
               />
-              {errors.contractSum && (
-                <p className="text-sm text-destructive mt-1">{errors.contractSum}</p>
-              )}
+              {errors.contractSum && <p className="text-sm text-destructive mt-1">{errors.contractSum}</p>}
             </div>
 
             <div>
-              <Label htmlFor="changeOrders" className="text-sm font-medium text-foreground">Change Orders Approved</Label>
+              <Label htmlFor="changeOrders" className="text-sm font-medium text-foreground">
+                Change Orders Approved
+              </Label>
               <Input
                 id="changeOrders"
                 type="number"
@@ -311,7 +336,9 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
             </div>
 
             <div>
-              <Label htmlFor="retention" className="text-sm font-medium text-foreground">Retention %</Label>
+              <Label htmlFor="retention" className="text-sm font-medium text-foreground">
+                Retention %
+              </Label>
               <Input
                 id="retention"
                 type="number"
@@ -372,27 +399,37 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
                       </div>
                     </TableCell>
                     <TableCell className="text-right text-foreground">{formatCurrency(item.scheduledValue)}</TableCell>
-                    <TableCell className="text-right text-foreground">{formatCurrency(item.workCompletedPrevious)}</TableCell>
+                    <TableCell className="text-right text-foreground">
+                      {formatCurrency(item.workCompletedPrevious)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Input
                         type="number"
                         value={item.workCompletedThisPeriod}
-                        onChange={(e) => handleLineItemChange(item.id, "workCompletedThisPeriod", parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleLineItemChange(item.id, "workCompletedThisPeriod", parseFloat(e.target.value) || 0)
+                        }
                         className="w-24 text-right bg-background text-foreground border-input focus:ring-ring"
                         min="0"
                       />
                     </TableCell>
-                    <TableCell className="text-right font-medium text-foreground">{formatCurrency(item.workCompletedToDate)}</TableCell>
+                    <TableCell className="text-right font-medium text-foreground">
+                      {formatCurrency(item.workCompletedToDate)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Input
                         type="number"
                         value={item.materialsStoredThisPeriod}
-                        onChange={(e) => handleLineItemChange(item.id, "materialsStoredThisPeriod", parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleLineItemChange(item.id, "materialsStoredThisPeriod", parseFloat(e.target.value) || 0)
+                        }
                         className="w-24 text-right bg-background text-foreground border-input focus:ring-ring"
                         min="0"
                       />
                     </TableCell>
-                    <TableCell className="text-right font-medium text-foreground">{formatCurrency(item.totalCompleted)}</TableCell>
+                    <TableCell className="text-right font-medium text-foreground">
+                      {formatCurrency(item.totalCompleted)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant={item.percentComplete === 100 ? "default" : "secondary"}>
                         {item.percentComplete.toFixed(1)}%
@@ -401,21 +438,38 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
                     <TableCell className="text-right text-foreground">{formatCurrency(item.balanceToFinish)}</TableCell>
                   </TableRow>
                 ))}
-                
+
                 {/* Totals Row */}
                 <TableRow className="border-t-2 border-primary/20 bg-muted/50">
-                  <TableCell colSpan={3} className="font-bold text-foreground">TOTALS</TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.workCompletedToDate - totals.workCompletedThisPeriod)}</TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.workCompletedThisPeriod)}</TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.workCompletedToDate)}</TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.materialsStoredToDate)}</TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.totalEarned)}</TableCell>
+                  <TableCell colSpan={3} className="font-bold text-foreground">
+                    TOTALS
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.workCompletedToDate - totals.workCompletedThisPeriod)}
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.workCompletedThisPeriod)}
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.workCompletedToDate)}
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.materialsStoredToDate)}
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.totalEarned)}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Badge variant="default">
-                      {totals.revisedContractSum > 0 ? ((totals.totalEarned / totals.revisedContractSum) * 100).toFixed(1) : 0}%
+                      {totals.revisedContractSum > 0
+                        ? ((totals.totalEarned / totals.revisedContractSum) * 100).toFixed(1)
+                        : 0}
+                      %
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right font-bold text-foreground">{formatCurrency(totals.balanceToFinish)}</TableCell>
+                  <TableCell className="text-right font-bold text-foreground">
+                    {formatCurrency(totals.balanceToFinish)}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -440,7 +494,9 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
               </div>
               <div className="flex justify-between">
                 <span className="text-foreground">Change Orders Approved:</span>
-                <span className="font-medium text-foreground">{formatCurrency(formData.changeOrdersApproved || 0)}</span>
+                <span className="font-medium text-foreground">
+                  {formatCurrency(formData.changeOrdersApproved || 0)}
+                </span>
               </div>
               <div className="flex justify-between border-t border-border pt-2">
                 <span className="font-medium text-foreground">Revised Contract Sum:</span>
@@ -455,7 +511,7 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
                 <span className="font-medium text-destructive">-{formatCurrency(totals.retentionAmount)}</span>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-foreground">Previous Payments:</span>
@@ -463,11 +519,15 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
               </div>
               <div className="flex justify-between border-t border-border pt-2">
                 <span className="font-medium text-foreground">Current Payment Due:</span>
-                <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(totals.currentPaymentDue)}</span>
+                <span className="font-bold text-green-600 dark:text-green-400">
+                  {formatCurrency(totals.currentPaymentDue)}
+                </span>
               </div>
               <div className="flex justify-between border-t border-border pt-2">
                 <span className="font-bold text-lg text-foreground">Net Amount Due:</span>
-                <span className="font-bold text-lg text-green-600 dark:text-green-400">{formatCurrency(totals.netAmountDue)}</span>
+                <span className="font-bold text-lg text-green-600 dark:text-green-400">
+                  {formatCurrency(totals.netAmountDue)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-foreground">Balance to Finish:</span>
@@ -485,19 +545,12 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
         </Button>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => handleSave(false)}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => handleSave(false)} disabled={isLoading}>
             <Save className="h-4 w-4 mr-2" />
             Save Draft
           </Button>
 
-          <Button
-            onClick={() => handleSave(true)}
-            disabled={isLoading || totals.netAmountDue <= 0}
-          >
+          <Button onClick={() => handleSave(true)} disabled={isLoading || totals.netAmountDue <= 0}>
             <Send className="h-4 w-4 mr-2" />
             Submit for Approval
           </Button>
@@ -505,4 +558,4 @@ export function AiaPayApplicationForm({ application, projectId, onSave, onCancel
       </div>
     </div>
   )
-} 
+}

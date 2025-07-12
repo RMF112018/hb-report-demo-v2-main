@@ -19,7 +19,7 @@
 
 "use client"
 
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo, useRef } from "react"
 import { useAuth } from "../../context/auth-context"
 import { ProjectSidebar } from "./components/ProjectSidebar"
 import { RoleDashboard } from "./components/RoleDashboard"
@@ -29,7 +29,21 @@ import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
 import type { PageHeaderTab } from "./components/PageHeader"
 import { useRouter } from "next/navigation"
-import { Calendar, Users, Activity } from "lucide-react"
+import {
+  Calendar,
+  Users,
+  Activity,
+  Building,
+  MapPin,
+  DollarSign,
+  Calendar as CalendarIcon,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Badge } from "../../components/ui/badge"
+import { Button } from "../../components/ui/button"
 
 // Mock data imports
 import projectsData from "../../data/mock/projects.json"
@@ -44,6 +58,142 @@ interface ModuleContentProps {
   rightContent: React.ReactNode
   hasLeftContent?: boolean
   tabs?: PageHeaderTab[]
+}
+
+/**
+ * My Projects Component - Shows user's assigned projects
+ */
+interface MyProjectsProps {
+  projects: any[]
+  userRole: UserRole
+  onProjectSelect: (projectId: string) => void
+  selectedProject: string | null
+}
+
+const MyProjects: React.FC<MyProjectsProps> = ({ projects, userRole, onProjectSelect, selectedProject }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
+  // Get projects for the user based on role
+  const userProjects = useMemo(() => {
+    const activeProjects = projects.filter((p) => p.active)
+
+    switch (userRole) {
+      case "project-executive":
+        return activeProjects.slice(0, 6) // First 6 active projects
+      case "project-manager":
+        // For PM, prioritize construction stage projects
+        const constructionProjects = activeProjects.filter((p) => p.project_stage_name === "Construction")
+        const otherProjects = activeProjects.filter((p) => p.project_stage_name !== "Construction")
+        return [...constructionProjects, ...otherProjects].slice(0, 4) // Up to 4 projects
+      default:
+        return []
+    }
+  }, [projects, userRole])
+
+  // Format currency
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`
+    }
+    return `$${value.toLocaleString()}`
+  }
+
+  // Get project status color
+  const getProjectStatusColor = (project: any) => {
+    if (!project.active) {
+      return "bg-gray-100 dark:bg-gray-950/30 text-gray-800 dark:text-gray-200"
+    }
+
+    switch (project.project_stage_name) {
+      case "Pre-Construction":
+      case "Bidding":
+        return "bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-200"
+      case "BIM Coordination":
+        return "bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-200"
+      case "Construction":
+        return "bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-200"
+      case "Closeout":
+        return "bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200"
+      case "Warranty":
+        return "bg-orange-100 dark:bg-orange-950/30 text-orange-800 dark:text-orange-200"
+      default:
+        return "bg-gray-100 dark:bg-gray-950/30 text-gray-800 dark:text-gray-200"
+    }
+  }
+
+  if (userProjects.length === 0) {
+    return null
+  }
+
+  return (
+    <Card className="w-full mb-6 border-l-4 border-l-[#FA4616] bg-gradient-to-r from-[#FA4616]/5 to-transparent">
+      <CardHeader className="px-6 !py-3">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Building className="h-5 w-5" style={{ color: "#FA4616" }} />
+            <div>
+              <div className="text-sm font-semibold">My Projects</div>
+              <div className="text-xs text-muted-foreground">{userProjects.length} active projects</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs border-[#0021A5]/20 text-[#0021A5]">
+              {userProjects.length}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-8 w-8 p-0 hover:bg-[#FA4616]/10"
+            >
+              {isCollapsed ? (
+                <ChevronDown className="h-4 w-4" style={{ color: "#FA4616" }} />
+              ) : (
+                <ChevronUp className="h-4 w-4" style={{ color: "#FA4616" }} />
+              )}
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      {!isCollapsed && (
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {userProjects.map((project) => (
+              <Card
+                key={project.id}
+                className={`cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+                  selectedProject === project.id
+                    ? "border-[#FA4616] bg-[#FA4616]/5"
+                    : "border-border hover:border-[#FA4616]/50"
+                }`}
+                onClick={() => onProjectSelect(project.id)}
+              >
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {/* Project Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm truncate">{project.name}</h3>
+                        <p className="text-xs text-muted-foreground">#{project.project_number}</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    </div>
+
+                    {/* Project Status */}
+                    <Badge variant="secondary" className={`text-xs ${getProjectStatusColor(project)}`}>
+                      {project.project_stage_name}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  )
 }
 
 /**
@@ -62,6 +212,8 @@ export default function MainApplicationPage() {
   const [activeTab, setActiveTab] = useState<string>("overview")
   const [initialTabSet, setInitialTabSet] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
+  const [headerHeight, setHeaderHeight] = useState(140) // Default header height
+  const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -77,6 +229,34 @@ export default function MainApplicationPage() {
 
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
+
+  // Measure header height dynamically
+  useEffect(() => {
+    if (headerRef.current) {
+      const updateHeaderHeight = () => {
+        const height = headerRef.current?.offsetHeight || 140
+        setHeaderHeight(height)
+      }
+
+      updateHeaderHeight()
+
+      // Update header height on resize
+      window.addEventListener("resize", updateHeaderHeight)
+
+      // Use ResizeObserver if available for more accurate tracking
+      if (window.ResizeObserver) {
+        const resizeObserver = new ResizeObserver(updateHeaderHeight)
+        resizeObserver.observe(headerRef.current)
+
+        return () => {
+          window.removeEventListener("resize", updateHeaderHeight)
+          resizeObserver.disconnect()
+        }
+      }
+
+      return () => window.removeEventListener("resize", updateHeaderHeight)
+    }
+  }, [mounted])
 
   // Handle URL navigation - Clear selections when directly navigating to /main-app
   useEffect(() => {
@@ -377,12 +557,14 @@ export default function MainApplicationPage() {
         { id: "overview", label: "Overview" },
         { id: "modules", label: "IT Modules" },
         { id: "analytics", label: "Analytics" },
+        { id: "power-bi-beta", label: "Power BI Beta" },
         { id: "settings", label: "Settings" },
       ]
     } else if (effectiveRole === "executive" || effectiveRole === "presentation") {
       return [
         { id: "overview", label: "Overview" },
         { id: "financial-review", label: "Financial Review" },
+        { id: "power-bi-beta", label: "Power BI Beta" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else if (effectiveRole === "project-executive") {
@@ -390,6 +572,7 @@ export default function MainApplicationPage() {
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Overview" },
         { id: "financial-review", label: "Financial Review" },
+        { id: "power-bi-beta", label: "Power BI Beta" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else if (effectiveRole === "project-manager") {
@@ -397,6 +580,7 @@ export default function MainApplicationPage() {
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Overview" },
         { id: "financial-review", label: "Financial Review" },
+        { id: "power-bi-beta", label: "Power BI Beta" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else {
@@ -405,6 +589,7 @@ export default function MainApplicationPage() {
         { id: "overview", label: "Overview" },
         { id: "bid-management", label: "Bid Management" },
         { id: "analytics", label: "Analytics" },
+        { id: "power-bi-beta", label: "Power BI Beta" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     }
@@ -767,6 +952,13 @@ export default function MainApplicationPage() {
     // Default dashboard for all users (including IT administrators when no module selected)
     const dashboardHasLeftContent = shouldShowDashboardLeftContent(effectiveRole, activeTab)
 
+    // Check if we should show My Projects section
+    const shouldShowMyProjects =
+      (effectiveRole === "project-executive" || effectiveRole === "project-manager") &&
+      !selectedProject &&
+      !selectedTool &&
+      !selectedModule
+
     return {
       leftContent: dashboardHasLeftContent ? (
         <RoleDashboard
@@ -780,15 +972,25 @@ export default function MainApplicationPage() {
         />
       ) : undefined,
       rightContent: (
-        <RoleDashboard
-          userRole={effectiveRole}
-          user={user!}
-          projects={projects}
-          onProjectSelect={handleProjectSelect}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          renderMode="rightContent"
-        />
+        <div className="w-full">
+          {shouldShowMyProjects && (
+            <MyProjects
+              projects={projects}
+              userRole={effectiveRole}
+              onProjectSelect={handleProjectSelect}
+              selectedProject={selectedProject}
+            />
+          )}
+          <RoleDashboard
+            userRole={effectiveRole}
+            user={user!}
+            projects={projects}
+            onProjectSelect={handleProjectSelect}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            renderMode="rightContent"
+          />
+        </div>
       ),
       hasLeftContent: dashboardHasLeftContent,
     }
@@ -811,67 +1013,75 @@ export default function MainApplicationPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
-      <div className="flex flex-1">
-        {/* Enhanced Project Sidebar with fluid navigation */}
-        <ProjectSidebar
-          projects={projects}
-          selectedProject={selectedProject}
-          onProjectSelect={handleProjectSelect}
-          collapsed={false} // Not used in new system, but kept for compatibility
-          onToggleCollapsed={() => {}} // Not used in new system, but kept for compatibility
-          userRole={isPresentationMode && viewingAs ? (viewingAs as any) : userRole}
-          onPanelStateChange={handleSidebarPanelStateChange}
-          onModuleSelect={handleModuleSelect}
-          onToolSelect={handleToolSelect}
-          selectedModule={selectedModule}
-          selectedTool={selectedTool}
+      {/* Enhanced Project Sidebar with fluid navigation */}
+      <ProjectSidebar
+        projects={projects}
+        selectedProject={selectedProject}
+        onProjectSelect={handleProjectSelect}
+        collapsed={false} // Not used in new system, but kept for compatibility
+        onToggleCollapsed={() => {}} // Not used in new system, but kept for compatibility
+        userRole={isPresentationMode && viewingAs ? (viewingAs as any) : userRole}
+        onPanelStateChange={handleSidebarPanelStateChange}
+        onModuleSelect={handleModuleSelect}
+        onToolSelect={handleToolSelect}
+        selectedModule={selectedModule}
+        selectedTool={selectedTool}
+      />
+
+      {/* Sticky Page Header - Always visible at top */}
+      <div
+        className="fixed top-0 right-0 z-50 transition-all duration-300 ease-in-out shadow-sm"
+        style={{ left: isMobile ? "0px" : `${sidebarWidth}px` }}
+        ref={headerRef}
+      >
+        <PageHeader
+          userName={headerConfig.userName}
+          moduleTitle={headerConfig.moduleTitle}
+          subHead={headerConfig.subHead}
+          tabs={headerConfig.tabs}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          navigationState={headerConfig.navigationState}
+          onNavigateToHome={headerConfig.onNavigateToHome}
+          onNavigateToProject={headerConfig.onNavigateToProject}
+          onNavigateToModule={headerConfig.onNavigateToModule}
+          onNavigateToTool={headerConfig.onNavigateToTool}
+          onNavigateToTab={headerConfig.onNavigateToTab}
+          isPresentationMode={isPresentationMode}
+          viewingAs={viewingAs}
+          isSticky={true}
         />
+      </div>
 
-        {/* Main Content Area - Positioned to account for sidebar width */}
-        <main
-          className="flex-1 overflow-hidden flex flex-col transition-all duration-300 ease-in-out"
-          style={{ marginLeft: isMobile ? "0px" : `${sidebarWidth}px` }}
-        >
-          {/* Consistent Page Header */}
-          <PageHeader
-            userName={headerConfig.userName}
-            moduleTitle={headerConfig.moduleTitle}
-            subHead={headerConfig.subHead}
-            tabs={headerConfig.tabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            navigationState={headerConfig.navigationState}
-            onNavigateToHome={headerConfig.onNavigateToHome}
-            onNavigateToProject={headerConfig.onNavigateToProject}
-            onNavigateToModule={headerConfig.onNavigateToModule}
-            onNavigateToTool={headerConfig.onNavigateToTool}
-            onNavigateToTab={headerConfig.onNavigateToTab}
-            isPresentationMode={isPresentationMode}
-            viewingAs={viewingAs}
-          />
+      {/* Main Content Area - Positioned to account for sidebar width and header height */}
+      <main
+        className="flex-1 overflow-hidden flex flex-col transition-all duration-300 ease-in-out"
+        style={{
+          marginLeft: isMobile ? "0px" : `${sidebarWidth}px`,
+          paddingTop: `${headerHeight}px`, // Account for header height
+        }}
+      >
+        {/* Main Content Container - 2 Column Layout */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Column - 20% width (hidden if no content) */}
+          {contentConfig.hasLeftContent && (
+            <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-scroll overflow-x-hidden bg-gray-50/20 dark:bg-gray-900/20 scrollbar-hide">
+              <div className="p-4 space-y-1">{contentConfig.leftContent}</div>
+            </div>
+          )}
 
-          {/* Main Content Container - 2 Column Layout */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Left Column - 20% width (hidden if no content) */}
-            {contentConfig.hasLeftContent && (
-              <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-gray-50/20 dark:bg-gray-900/20">
-                <div className="p-4 space-y-1">{contentConfig.leftContent}</div>
-              </div>
-            )}
-
-            {/* Right Column - 80% width (100% if no left content) */}
-            <div
-              className={`${
-                contentConfig.hasLeftContent ? "w-4/5" : "w-full"
-              } overflow-y-auto overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col`}
-            >
-              <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-hidden flex flex-col">
-                <div className="flex-1 min-w-0 w-full max-w-full overflow-hidden">{contentConfig.rightContent}</div>
-              </div>
+          {/* Right Column - 80% width (100% if no left content) */}
+          <div
+            className={`${
+              contentConfig.hasLeftContent ? "w-4/5" : "w-full"
+            } overflow-y-scroll overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col scrollbar-hide`}
+          >
+            <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-x-hidden flex flex-col">
+              <div className="flex-1 min-w-0 w-full max-w-full overflow-x-hidden">{contentConfig.rightContent}</div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Footer Container - Full width of window */}
       <footer className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
@@ -880,20 +1090,20 @@ export default function MainApplicationPage() {
             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
               <span>© 2025 Hedrick Brothers Construction</span>
               <span className="text-gray-400">•</span>
-              <span>HB Report Demo v3.0</span>
+              <span className="text-[#0021A5] font-medium">HB Report Demo v3.0</span>
               <span className="text-gray-400">•</span>
               <span className="flex items-center gap-1">
-                <Activity className="h-3 w-3" />
-                System Status: Operational
+                <Activity className="h-3 w-3 text-[#FA4616]" />
+                System Status: <span className="text-[#FA4616] font-medium">Operational</span>
               </span>
             </div>
             <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
               <span className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
+                <Users className="h-3 w-3 text-[#0021A5]" />
                 {projects.length} Projects
               </span>
               <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
+                <Calendar className="h-3 w-3 text-[#0021A5]" />
                 Last Updated: {new Date().toLocaleDateString()}
               </span>
             </div>

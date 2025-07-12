@@ -272,12 +272,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
   const breadcrumbItems = buildBreadcrumb()
 
-  const stickyClasses = isSticky ? "sticky top-0 z-50" : ""
-
   return (
-    <div
-      className={`bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 ${stickyClasses} ${className}`}
-    >
+    <div className={`bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 ${className}`}>
       {/* Header Content */}
       <div className="px-6 py-4">
         <div className="flex items-start justify-between">
@@ -331,8 +327,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               <Image
                 src="/images/HB_Logo_Large.png"
                 alt="Hedrick Brothers Construction"
-                width={270}
-                height={90}
+                width={203}
+                height={68}
+                style={{ width: "auto", height: "auto" }}
                 className="object-contain"
                 priority
               />
@@ -350,8 +347,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* Tab Navigation - Full Width - Executive Dashboard Style */}
       {tabs.length > 0 && (
-        <div className="px-6 pb-0">
-          <div className="flex items-center gap-1 mb-6">
+        <div className="px-6">
+          <div className="flex items-center gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

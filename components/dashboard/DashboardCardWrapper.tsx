@@ -64,7 +64,7 @@ const getCardCategory = (cardType: string): "financial" | "operational" | "analy
     "contingency-analysis",
   ]
   const operationalCards = ["safety", "quality-control", "field-reports", "staffing-distribution"]
-  const analyticsCards = ["enhanced-hbi-insights", "pipeline-analytics", "market-intelligence"]
+  const analyticsCards = ["enhanced-hbi-insights", "pipeline-analytics", "market-intelligence", "power-bi-dashboard"]
   const projectCards = ["project-overview", "portfolio-overview", "bd-opportunities"]
   const scheduleCards = ["schedule-performance", "schedule-monitor", "critical-dates"]
 
@@ -178,6 +178,8 @@ const getCardIcon = (cardType: string) => {
       return <Calendar className={iconClass} style={iconStyle} />
     case "bd-opportunities":
       return <Building2 className={iconClass} style={iconStyle} />
+    case "power-bi-dashboard":
+      return <BarChart3 className={iconClass} style={iconStyle} />
     default:
       return <TrendingUp className={iconClass} style={iconStyle} />
   }
@@ -216,6 +218,8 @@ const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
       return { cols: 4, rows: 5 }
     case "cash-flow":
       return { cols: 8, rows: 4 }
+    case "power-bi-dashboard":
+      return { cols: 8, rows: 6 }
     default:
       return { cols: 6, rows: 4 }
   }

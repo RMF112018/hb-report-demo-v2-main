@@ -59,6 +59,7 @@ import {
   Gavel,
   Server,
   Drill,
+  MessageSquare,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
 
@@ -688,7 +689,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                   <div className="flex items-center gap-3">
                     <div
                       className="text-white rounded-lg flex items-center justify-center text-sm font-bold"
-                      style={{ width: "2.5rem", height: "2.5rem", backgroundColor: "rgba(250, 70, 22, 1)" }}
+                      style={{ width: "2.5rem", height: "2.5rem", backgroundColor: "#FA4616" }}
                     >
                       HBI
                     </div>
@@ -759,6 +760,25 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                       )}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (selectedProject) {
+                        onToolSelect?.("Productivity")
+                        router.push(`/project/${selectedProject}?tab=productivity`)
+                      } else {
+                        handleCategorySelect("tools")
+                      }
+                      setMobileMenuOpen(false)
+                    }}
+                    className="h-8 w-8 p-0 relative"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    {productivityNotifications > 0 && (
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-[#FA4616] rounded-full"></div>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1121,7 +1141,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Desktop/Tablet Layout
   if (!isMobile) {
     return (
-      <div className="fixed top-0 left-0 z-40 h-screen">
+      <div className="fixed top-0 left-0 z-60 h-screen">
         {/* Sidebar Container - Dynamic width based on expanded state */}
         <div
           className={`
@@ -1147,7 +1167,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
             {/* Logo */}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="w-full flex items-center justify-center">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#FA4616] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">HBI</span>
                 </div>
               </div>
@@ -1173,14 +1193,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 selectedProject === null &&
                                 selectedModule === null &&
                                 selectedTool === null)
-                                ? "bg-primary text-primary-foreground"
+                                ? "bg-[#FA4616] text-white"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-800"
                             }
                           `}
                         >
                           <IconComponent className="h-4 w-4" />
                           {category.id === "notifications" && productivityNotifications > 0 && (
-                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center">
                               <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                             </div>
                           )}
@@ -1193,6 +1213,41 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                   </TooltipProvider>
                 )
               })}
+            </div>
+
+            {/* Productivity Quick Access */}
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Navigate to productivity features in the selected project
+                        if (selectedProject) {
+                          onToolSelect?.("Productivity")
+                          router.push(`/project/${selectedProject}?tab=productivity`)
+                        } else {
+                          // If no project selected, show all productivity tools
+                          handleCategorySelect("tools")
+                        }
+                      }}
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      {productivityNotifications > 0 && (
+                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center">
+                          <span className="text-xs text-white font-bold">{productivityNotifications}</span>
+                        </div>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Quick Productivity Access</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             {/* User Avatar */}
@@ -1208,16 +1263,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         w-full h-10 p-0 rounded-lg
                         ${
                           activeCategory === "settings"
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-[#FA4616] text-white"
                             : "hover:bg-gray-100 dark:hover:bg-gray-800"
                         }
                       `}
                     >
                       <Avatar className="h-5 w-5">
                         <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
-                        <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                          {getUserInitials()}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-xs bg-[#FA4616] text-white">{getUserInitials()}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </TooltipTrigger>
