@@ -468,7 +468,7 @@ const ModularStaffingContent: React.FC<{
           </div>
         }
       >
-        {userRole === "executive" && <ExecutiveStaffingView />}
+        {userRole === "executive" && <ExecutiveStaffingView activeTab={activeTab} />}
         {userRole === "project-executive" && <ProjectExecutiveStaffingView />}
         {userRole === "project-manager" && <ProjectManagerStaffingView />}
         {!["executive", "project-executive", "project-manager"].includes(userRole) && (
