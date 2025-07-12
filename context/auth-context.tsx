@@ -136,6 +136,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Only access localStorage after client-side hydration
     if (typeof window !== "undefined") {
       try {
+        // Track if authentication data gets cleared
+        let authDataCleared = false
+
         // ENHANCED AUTO-CLEAR SYSTEM FOR DEVELOPMENT
         if (process.env.NODE_ENV === "development") {
           // Check if auto-clear is disabled (for persistent development testing)
@@ -164,6 +167,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
           if (isLikelyFreshSession && !autoCleanDisabled) {
             console.log("🔄 Fresh development session detected - clearing all authentication data")
+            authDataCleared = true
 
             // Clear all HB Report related localStorage data
             const keysToRemove = [
@@ -217,6 +221,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log(`   📊 Cleared ${keysToRemove.length} auth keys + ${additionalCleared} additional keys`)
             console.log(`   💡 To disable auto-clear: localStorage.setItem('hb-disable-auto-clean', 'true')`)
             console.log(`   🔓 App will now show login screen`)
+
+            // Ensure user state is null when auth data is cleared
+            setUser(null)
+            setViewingAs(null)
           } else if (autoCleanDisabled) {
             console.log("🔒 Auto-clean disabled - preserving localStorage across dev sessions")
             // Still mark session as active and update server start time
@@ -229,36 +237,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         }
 
-        // AUTHENTICATION RESTORATION (only if not cleared above)
-        // Check if we want to disable auto-login (for testing)
-        const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
+        // AUTHENTICATION RESTORATION (only if auth data was NOT cleared)
+        if (!authDataCleared) {
+          // Check if we want to disable auto-login (for testing)
+          const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
 
-        if (!disableAutoLogin) {
-          const stored = localStorage.getItem("hb-demo-user")
-          const storedViewingAs = localStorage.getItem("hb-viewing-as")
+          if (!disableAutoLogin) {
+            const stored = localStorage.getItem("hb-demo-user")
+            const storedViewingAs = localStorage.getItem("hb-viewing-as")
 
-          if (stored) {
-            try {
-              const parsedUser = JSON.parse(stored)
-              console.log("🔐 Restoring authenticated user:", parsedUser.email, `(${parsedUser.role})`)
-              setUser(parsedUser)
+            if (stored) {
+              try {
+                const parsedUser = JSON.parse(stored)
+                console.log("🔐 Restoring authenticated user:", parsedUser.email, `(${parsedUser.role})`)
+                setUser(parsedUser)
 
-              // Restore viewing role for presentation users
-              if (parsedUser.role === "presentation" && storedViewingAs) {
-                setViewingAs(storedViewingAs as DemoRole)
-                console.log("👁️ Restored presentation viewing role:", storedViewingAs)
+                // Restore viewing role for presentation users
+                if (parsedUser.role === "presentation" && storedViewingAs) {
+                  setViewingAs(storedViewingAs as DemoRole)
+                  console.log("👁️ Restored presentation viewing role:", storedViewingAs)
+                }
+              } catch (parseError) {
+                console.error("❌ Failed to parse stored user data:", parseError)
+                // Clear corrupted data
+                localStorage.removeItem("hb-demo-user")
+                localStorage.removeItem("hb-viewing-as")
+                setUser(null)
+                setViewingAs(null)
               }
-            } catch (parseError) {
-              console.error("❌ Failed to parse stored user data:", parseError)
-              // Clear corrupted data
-              localStorage.removeItem("hb-demo-user")
-              localStorage.removeItem("hb-viewing-as")
+            } else {
+              console.log("🔓 No stored user data found - will show login screen")
             }
           } else {
-            console.log("🔓 No stored user data found - will show login screen")
+            console.log("🚫 Auto-login disabled - will show login screen")
           }
         } else {
-          console.log("🚫 Auto-login disabled - will show login screen")
+          console.log("🔓 Auth data was cleared - ensuring clean state for login screen")
         }
       } catch (error) {
         console.error("❌ Error during authentication initialization:", error)
