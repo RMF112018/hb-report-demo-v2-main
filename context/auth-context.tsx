@@ -136,16 +136,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Only access localStorage after client-side hydration
     if (typeof window !== "undefined") {
       try {
-        // AUTO-CLEAR LOCALSTORAGE ON NEW DEV SESSIONS
+        // ENHANCED AUTO-CLEAR SYSTEM FOR DEVELOPMENT
         if (process.env.NODE_ENV === "development") {
           // Check if auto-clear is disabled (for persistent development testing)
           const autoCleanDisabled = localStorage.getItem("hb-disable-auto-clean") === "true"
 
-          // Check if this is a fresh browser session (no sessionStorage marker)
+          // Multiple detection methods for fresh development sessions
           const hasActiveSession = sessionStorage.getItem("hb-dev-session-active")
+          const lastServerStart = localStorage.getItem("hb-last-server-start")
+          const currentTime = Date.now()
+          const serverRestartThreshold = 5 * 60 * 1000 // 5 minutes
 
-          if (!hasActiveSession && !autoCleanDisabled) {
-            console.log("🔄 Fresh development session detected - clearing localStorage")
+          // Check if this appears to be a fresh server session
+          const isLikelyFreshSession =
+            !hasActiveSession || (lastServerStart && currentTime - parseInt(lastServerStart) > serverRestartThreshold)
+
+          console.log("🔍 Development session analysis:", {
+            hasActiveSession: !!hasActiveSession,
+            lastServerStart: lastServerStart ? new Date(parseInt(lastServerStart)).toLocaleTimeString() : "never",
+            timeSinceLastStart: lastServerStart
+              ? `${Math.round((currentTime - parseInt(lastServerStart)) / 1000)}s`
+              : "n/a",
+            isLikelyFreshSession,
+            autoCleanDisabled,
+            userInStorage: !!localStorage.getItem("hb-demo-user"),
+          })
+
+          if (isLikelyFreshSession && !autoCleanDisabled) {
+            console.log("🔄 Fresh development session detected - clearing all authentication data")
 
             // Clear all HB Report related localStorage data
             const keysToRemove = [
@@ -159,40 +177,59 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               "hb-tour-available", // Tour availability setting
               "staffing-needing-filter", // Staffing filter preference
               "hb-disable-auto-login", // Auto-login disable flag
+              "hb-last-server-start", // Last server start time
               // Note: hb-disable-auto-clean is preserved to maintain developer preferences
             ]
 
             // Remove predefined keys
             keysToRemove.forEach((key) => {
-              localStorage.removeItem(key)
+              if (localStorage.getItem(key)) {
+                localStorage.removeItem(key)
+                console.log(`   ✓ Cleared ${key}`)
+              }
             })
 
             // Clear all tour-related data, report configuration data, and responsibility matrix data
             const allKeys = Object.keys(localStorage)
+            let additionalCleared = 0
             allKeys.forEach((key) => {
               if (
                 key.startsWith("report-config-") ||
                 key.startsWith("hb-tour-shown-") ||
                 key.startsWith("hb-welcome-") ||
-                key.startsWith("responsibility-matrix-")
+                key.startsWith("responsibility-matrix-") ||
+                key.startsWith("productivity-data-") ||
+                key.startsWith("startup-checklist-") ||
+                key.startsWith("preco-checklist-") ||
+                key.startsWith("financial-hub-storage") ||
+                key.startsWith("pursuits")
               ) {
                 localStorage.removeItem(key)
+                additionalCleared++
               }
             })
 
-            // Mark this session as active to prevent clearing on subsequent page loads
+            // Mark this session as active and record server start time
             sessionStorage.setItem("hb-dev-session-active", "true")
-            console.log("✅ localStorage cleared - starting fresh development session")
-            console.log(
-              "💡 To disable auto-clear in development: localStorage.setItem('hb-disable-auto-clean', 'true')"
-            )
+            localStorage.setItem("hb-last-server-start", currentTime.toString())
+
+            console.log(`✅ Authentication data cleared - starting fresh development session`)
+            console.log(`   📊 Cleared ${keysToRemove.length} auth keys + ${additionalCleared} additional keys`)
+            console.log(`   💡 To disable auto-clear: localStorage.setItem('hb-disable-auto-clean', 'true')`)
+            console.log(`   🔓 App will now show login screen`)
           } else if (autoCleanDisabled) {
             console.log("🔒 Auto-clean disabled - preserving localStorage across dev sessions")
-            // Still mark session as active
+            // Still mark session as active and update server start time
             sessionStorage.setItem("hb-dev-session-active", "true")
+            localStorage.setItem("hb-last-server-start", currentTime.toString())
+          } else {
+            console.log("🔄 Continuing existing development session")
+            // Update server start time for existing session
+            localStorage.setItem("hb-last-server-start", currentTime.toString())
           }
         }
 
+        // AUTHENTICATION RESTORATION (only if not cleared above)
         // Check if we want to disable auto-login (for testing)
         const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
 
@@ -201,17 +238,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const storedViewingAs = localStorage.getItem("hb-viewing-as")
 
           if (stored) {
-            const parsedUser = JSON.parse(stored)
-            setUser(parsedUser)
+            try {
+              const parsedUser = JSON.parse(stored)
+              console.log("🔐 Restoring authenticated user:", parsedUser.email, `(${parsedUser.role})`)
+              setUser(parsedUser)
 
-            // Restore viewing role for presentation users
-            if (parsedUser.role === "presentation" && storedViewingAs) {
-              setViewingAs(storedViewingAs as DemoRole)
+              // Restore viewing role for presentation users
+              if (parsedUser.role === "presentation" && storedViewingAs) {
+                setViewingAs(storedViewingAs as DemoRole)
+                console.log("👁️ Restored presentation viewing role:", storedViewingAs)
+              }
+            } catch (parseError) {
+              console.error("❌ Failed to parse stored user data:", parseError)
+              // Clear corrupted data
+              localStorage.removeItem("hb-demo-user")
+              localStorage.removeItem("hb-viewing-as")
             }
+          } else {
+            console.log("🔓 No stored user data found - will show login screen")
           }
+        } else {
+          console.log("🚫 Auto-login disabled - will show login screen")
         }
       } catch (error) {
-        console.error("Error reading from localStorage:", error)
+        console.error("❌ Error during authentication initialization:", error)
         // Clear potentially corrupted data
         localStorage.removeItem("hb-demo-user")
         localStorage.removeItem("hb-viewing-as")
@@ -245,6 +295,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setViewingAs(null)
           localStorage.removeItem("hb-viewing-as")
         }
+
+        // Mark session as active in development mode
+        if (process.env.NODE_ENV === "development") {
+          sessionStorage.setItem("hb-dev-session-active", "true")
+          localStorage.setItem("hb-last-server-start", Date.now().toString())
+        }
+
+        console.log("✅ User logged in successfully:", match.email, `(${match.role})`)
       } catch (error) {
         console.error("Error saving to localStorage:", error)
       }
@@ -316,15 +374,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             key.startsWith("report-config-") ||
             key.startsWith("hb-tour-shown-") ||
             key.startsWith("hb-welcome-") ||
-            key.startsWith("responsibility-matrix-")
+            key.startsWith("responsibility-matrix-") ||
+            key.startsWith("productivity-data-") ||
+            key.startsWith("startup-checklist-") ||
+            key.startsWith("preco-checklist-") ||
+            key.startsWith("financial-hub-storage") ||
+            key.startsWith("pursuits")
           ) {
             localStorage.removeItem(key)
           }
         })
 
-        console.log("Cleared all user-specific localStorage data on logout")
+        // Clear session tracking data
+        sessionStorage.removeItem("hb-dev-session-active")
+
+        console.log("🔓 User logged out - cleared all user-specific data")
       } catch (error) {
-        console.error("Error clearing localStorage on logout:", error)
+        console.error("❌ Error clearing localStorage on logout:", error)
       }
     }
     setUser(null)
