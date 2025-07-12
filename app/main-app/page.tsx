@@ -440,12 +440,30 @@ export default function MainApplicationPage() {
   const getTabsForContent = () => {
     if (selectedTool) {
       switch (selectedTool) {
-        case "staffing":
-          return [
-            { id: "portfolio", label: "Portfolio Overview" },
-            { id: "management", label: "Resource Management" },
-            { id: "analytics", label: "Analytics & Insights" },
-          ]
+        case "Staffing":
+          // Role-based tab configuration for staffing tool
+          if (userRole === "executive") {
+            return [
+              { id: "overview", label: "Overview" },
+              { id: "assignments", label: "Assignments" },
+            ]
+          } else if (userRole === "project-executive") {
+            return [
+              { id: "portfolio", label: "Portfolio" },
+              { id: "timeline", label: "Timeline" },
+              { id: "analytics", label: "Analytics" },
+              { id: "spcr", label: "SPCR Management" },
+            ]
+          } else if (userRole === "project-manager") {
+            return [
+              { id: "team", label: "Team Management" },
+              { id: "timeline", label: "Timeline" },
+              { id: "spcr", label: "SPCR Creation" },
+              { id: "analytics", label: "Analytics" },
+            ]
+          } else {
+            return [{ id: "overview", label: "Overview" }]
+          }
         case "financial-hub":
           const allFinancialTabs = [
             { id: "overview", label: "Overview" },
@@ -603,8 +621,17 @@ export default function MainApplicationPage() {
         // Check if project is in bidding stage
         const isBiddingStage = selectedProjectData?.project_stage_name === "Bidding"
         setActiveTab(isBiddingStage ? "pre-construction" : "core")
-      } else if (selectedTool === "staffing") {
-        setActiveTab("portfolio")
+      } else if (selectedTool === "Staffing") {
+        // Set role-specific default tab for staffing
+        if (userRole === "executive") {
+          setActiveTab("overview")
+        } else if (userRole === "project-executive") {
+          setActiveTab("portfolio")
+        } else if (userRole === "project-manager") {
+          setActiveTab("team")
+        } else {
+          setActiveTab("overview")
+        }
       } else if (userRole === "project-executive" || userRole === "project-manager") {
         setActiveTab("action-items")
       } else if (userRole === "estimator") {
@@ -628,13 +655,22 @@ export default function MainApplicationPage() {
   // Handle tool selection changes
   useEffect(() => {
     if (selectedTool) {
-      if (selectedTool === "staffing") {
-        setActiveTab("portfolio")
+      if (selectedTool === "Staffing") {
+        // Set role-specific default tab for staffing
+        if (userRole === "executive") {
+          setActiveTab("overview")
+        } else if (userRole === "project-executive") {
+          setActiveTab("portfolio")
+        } else if (userRole === "project-manager") {
+          setActiveTab("team")
+        } else {
+          setActiveTab("overview")
+        }
       } else {
         setActiveTab("overview")
       }
     }
-  }, [selectedTool])
+  }, [selectedTool, userRole])
 
   // Restore saved selections on mount
   useEffect(() => {

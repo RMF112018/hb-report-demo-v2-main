@@ -82,6 +82,23 @@ import { useToast } from "../../../hooks/use-toast"
 import { useAuth } from "../../../context/auth-context"
 import { cn } from "../../../lib/utils"
 
+// Lazy-loaded staffing components for production-ready loading
+const ExecutiveStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ExecutiveStaffingView").then((module) => ({
+    default: module.ExecutiveStaffingView,
+  }))
+)
+const ProjectExecutiveStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ProjectExecutiveStaffingView").then((module) => ({
+    default: module.ProjectExecutiveStaffingView,
+  }))
+)
+const ProjectManagerStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ProjectManagerStaffingView").then((module) => ({
+    default: module.ProjectManagerStaffingView,
+  }))
+)
+
 // Import staffing components
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
 import { InteractiveStaffingGantt } from "../../dashboard/staff-planning/components/InteractiveStaffingGantt"
@@ -409,6 +426,80 @@ const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: str
   }
 
   return null
+}
+
+// Production-Ready Role-Based Staffing Content with ExecutiveStaffingView Integration
+const ModularStaffingContent: React.FC<{
+  userRole: UserRole
+  user: User
+  onNavigateBack?: () => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, onNavigateBack, activeTab = "overview", onTabChange }) => {
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Handle component loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading staffing management...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Role-based content injection following v-3-0 modular architecture
+  const renderRoleSpecificContent = () => {
+    return (
+      <React.Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading staffing content...</p>
+            </div>
+          </div>
+        }
+      >
+        {userRole === "executive" && <ExecutiveStaffingView />}
+        {userRole === "project-executive" && <ProjectExecutiveStaffingView />}
+        {userRole === "project-manager" && <ProjectManagerStaffingView />}
+        {!["executive", "project-executive", "project-manager"].includes(userRole) && (
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Limited Access</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Your current role has limited access to staffing management features. Contact your administrator for
+              additional permissions.
+            </p>
+          </div>
+        )}
+      </React.Suspense>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation - Following v-3-0 standards */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Staffing</span>
+      </div>
+
+      {/* Role-Specific Content Injection */}
+      {renderRoleSpecificContent()}
+    </div>
+  )
 }
 
 // New Role-Based Staffing Content using modular components
@@ -3960,10 +4051,10 @@ export const ToolContent: React.FC<ToolContentProps> = ({
     )
   }
 
-  // Use legacy layout for Staffing tool
+  // Use modular layout for Staffing tool with proper ExecutiveStaffingView integration
   if (toolName === "Staffing") {
     return (
-      <StaffingLegacyContent
+      <ModularStaffingContent
         userRole={userRole}
         user={user}
         onNavigateBack={onNavigateBack}
