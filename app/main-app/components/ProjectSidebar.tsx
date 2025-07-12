@@ -58,7 +58,6 @@ import {
   Monitor,
   Gavel,
   Server,
-  Eye,
   Drill,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
@@ -905,14 +904,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                 {activeSubCategory === "tools" && (
                   <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start h-12">
-                      <Eye className="h-5 w-5 mr-3" />
-                      Construction Analytics
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start h-12">
-                      <Monitor className="h-5 w-5 mr-3" />
-                      Report Generator
-                    </Button>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 p-4">
+                      No tools available in this category.
+                    </div>
                   </div>
                 )}
 
@@ -1367,14 +1361,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                   {activeCategory === "tools" && (
                     <div className="p-4 space-y-2">
-                      <Button variant="ghost" className="w-full justify-start">
-                        <Eye className="h-4 w-4 mr-3" />
-                        Construction Analytics
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start">
-                        <Monitor className="h-4 w-4 mr-3" />
-                        Report Generator
-                      </Button>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        No tools available in this category.
+                      </div>
                     </div>
                   )}
 
