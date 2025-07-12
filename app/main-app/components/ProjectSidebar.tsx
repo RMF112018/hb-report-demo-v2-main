@@ -37,8 +37,6 @@ import {
   ChevronRight,
   Search,
   Home,
-  Folder,
-  FolderOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Moon,
@@ -116,7 +114,7 @@ const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
   { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Main Dashboard" },
   { id: "projects", label: "Projects", icon: Building, tooltip: "Project Navigation" },
   { id: "it-modules", label: "IT Modules", icon: Microchip, tooltip: "IT Command Center Modules", adminOnly: true },
-  { id: "tools", label: "Tools", icon: Folder, tooltip: "Application Tools" },
+  { id: "tools", label: "Tools", icon: Settings, tooltip: "Application Tools" },
   { id: "tools-menu", label: "Tools Menu", icon: Drill, tooltip: "Advanced Tools Menu", executiveOnly: true },
   { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Notifications & Updates" },
   { id: "settings", label: "Settings", icon: Settings, tooltip: "User Settings" },
@@ -871,11 +869,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                             ) : (
                               <ChevronRight className="h-4 w-4 mr-2" />
                             )}
-                            {expandedStages.has(stage) ? (
-                              <FolderOpen className="h-4 w-4 mr-2" />
-                            ) : (
-                              <Folder className="h-4 w-4 mr-2" />
-                            )}
                             <span className="flex-1 text-left">{stage}</span>
                             <Badge variant="secondary" className="text-xs">
                               {stageProjects.length}
@@ -1332,11 +1325,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 <ChevronDown className="h-4 w-4 mr-2" />
                               ) : (
                                 <ChevronRight className="h-4 w-4 mr-2" />
-                              )}
-                              {expandedStages.has(stage) ? (
-                                <FolderOpen className="h-4 w-4 mr-2" />
-                              ) : (
-                                <Folder className="h-4 w-4 mr-2" />
                               )}
                               <span className="flex-1 text-left">{stage}</span>
                               <Badge variant="secondary" className="text-xs">
