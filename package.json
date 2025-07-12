@@ -5,9 +5,13 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
     "start": "next start",
-    "vercel-build": "pnpm run build"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "generate-tour-screenshots": "tsx scripts/generate-tour-screenshots.ts",
+    "clear-auth": "node scripts/clear-auth-cache.js"
   },
   "dependencies": {
     "@apollo/client": "latest",
