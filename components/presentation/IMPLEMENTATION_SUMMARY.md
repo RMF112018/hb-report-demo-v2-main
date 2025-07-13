@@ -68,9 +68,11 @@ The presentation follows a logical narrative flow:
 
 Features an interactive **Tangled Tools Visualization** that dramatically illustrates the current fragmented technology ecosystem:
 
-- **12 Real Tools**: Procore, Bluebeam, Excel, Email, SharePoint, Compass by Bespoke Metrics, Sitemate, Sage 300, Autodesk BuildingConnected, On Screen Takeoff, Unanet, and Manual Processes
+- **16 Real Tools**: Procore, Bluebeam, Excel, Microsoft Word, Microsoft Teams, MS Project, Oracle Primavera P6, Email, SharePoint, Compass by Bespoke Metrics, Sitemate, Sage 300, Autodesk BuildingConnected, On Screen Takeoff, Unanet, and Manual Processes
 - **Animated Connections**: Tangled red lines showing chaotic interconnections
 - **Interactive Elements**: Tool badges with hover tooltips showing categories
+- **Document Silo Visualization**: Special interactive view for Excel and Word showing scattered documents across departments
+- **Department Silos**: Estimating (47 files), Ops (32 files), Field (28 files), Residential (19 files), Winter Park (15 files), Melbourne (23 files), WPB (12 files)
 - **Dynamic Legend**: Live stats showing tool count and data silo indicators
 - **Professional Design**: Subtle grid background with chaos indicator
 
