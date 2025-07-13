@@ -59,27 +59,18 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
     }
   }, [isPresentationMode, forceShow])
 
-  // Monitor showCarousel state changes
-  useEffect(() => {
-    // Reserved for debugging if needed
-  }, [showCarousel])
-
-  // Monitor isVisible state changes
-  useEffect(() => {
-    // Reserved for debugging if needed
-  }, [isVisible])
-
   // Initialize component with entrance animation (no delay - main app handles timing)
   useEffect(() => {
     if (!showCarousel) return
 
-    // Show immediately since main app already handled the delay
+    // Show immediately with smooth entrance animation since main app already handled the delay
+    // Animation is now controlled by the animate prop using isVisible state
     setIsVisible(true)
-  }, [showCarousel, controls])
+  }, [showCarousel])
 
   // Keyboard navigation
   useEffect(() => {
-    if (!isVisible) return
+    if (!showCarousel) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
@@ -96,7 +87,7 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isVisible, currentSlide])
+  }, [showCarousel, currentSlide])
 
   const handleNext = useCallback(() => {
     if (currentSlide < HBI_INTEL_TOUR_SLIDES.length - 1) {
@@ -124,17 +115,16 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
 
   const handleExplorePlatform = useCallback(async () => {
     setIsExiting(true)
-    await controls.start("exit")
 
     // Mark tour as completed
     localStorage.setItem("intelTourCompleted", "true")
 
+    // Start exit animation - component cleanup will be handled by onAnimationComplete
+    setIsVisible(false)
+    await controls.start("exit")
+
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: "smooth" })
-
-    // Hide carousel and remove from DOM
-    setShowCarousel(false)
-    setIsVisible(false)
 
     // Optional: Highlight suggested feature (Executive Dashboard)
     setTimeout(() => {
@@ -168,21 +158,20 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
 
   const handleExit = useCallback(async () => {
     setIsExiting(true)
-    await controls.start("exit")
 
     // Mark tour as completed even if exited early
     localStorage.setItem("intelTourCompleted", "true")
 
+    // Start exit animation - component cleanup will be handled by onAnimationComplete
+    setIsVisible(false)
+    await controls.start("exit")
+
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: "smooth" })
-
-    // Hide carousel and remove from DOM
-    setShowCarousel(false)
-    setIsVisible(false)
   }, [controls])
 
   // Don't render if not showing carousel
-  if (!showCarousel || !isVisible) {
+  if (!showCarousel) {
     return null
   }
 
@@ -190,8 +179,8 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
   const containerVariants = {
     hidden: {
       opacity: 0,
-      y: 100,
-      scale: 0.95,
+      y: 60,
+      scale: 0.96,
     },
     visible: {
       opacity: 1,
@@ -199,18 +188,18 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
       scale: 1,
       transition: {
         type: "spring" as const,
-        stiffness: 100,
-        damping: 15,
-        duration: 1.2,
-        staggerChildren: 0.1,
+        stiffness: 120,
+        damping: 20,
+        duration: 0.8,
+        staggerChildren: 0.15,
       },
     },
     exit: {
       opacity: 0,
-      y: -50,
-      scale: 1.05,
+      y: -30,
+      scale: 1.02,
       transition: {
-        duration: 0.8,
+        duration: 0.6,
       },
     },
   }
@@ -256,150 +245,162 @@ export const HbiIntelTourCarousel: React.FC<HbiIntelTourCarouselProps> = ({
   const isLastSlide = currentSlide === HBI_INTEL_TOUR_SLIDES.length - 1
 
   return (
-    <div
-      className={`h-screen w-screen fixed top-0 left-0 z-50 bg-gradient-to-tr from-slate-50 to-blue-100 overflow-hidden ${className}`}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        zIndex: 50,
-        opacity: 1,
-      }}
-    >
-      {/* Header with Logo, Progress, and Exit */}
-      <header className="absolute top-0 left-0 right-0 z-20 p-6 lg:p-8">
-        <div className="flex items-center justify-between">
-          {/* Logo Section */}
-          <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-xl shadow-lg">
-              <Building2 className="h-8 w-8 text-[#003087]" />
+    <AnimatePresence mode="wait">
+      <motion.div
+        key="intel-tour-carousel"
+        className={`h-screen w-screen fixed top-0 left-0 z-[150] bg-gradient-to-tr from-slate-50 to-blue-100 overflow-hidden ${className}`}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 150,
+        }}
+        variants={containerVariants}
+        initial="hidden"
+        animate={isVisible ? "visible" : "hidden"}
+        exit="exit"
+        onAnimationComplete={() => {
+          if (isExiting) {
+            setShowCarousel(false)
+            setIsVisible(false)
+          }
+        }}
+      >
+        {/* Header with Logo, Progress, and Exit */}
+        <header className="absolute top-0 left-0 right-0 z-20 p-6 lg:p-8">
+          <div className="flex items-center justify-between">
+            {/* Logo Section */}
+            <div className="flex items-center space-x-4">
+              <div className="bg-white p-3 rounded-xl shadow-lg">
+                <Building2 className="h-8 w-8 text-[#003087]" />
+              </div>
+              <div>
+                <h1 className="text-xl lg:text-2xl font-bold text-slate-800">HBI Intel Tour</h1>
+                <p className="text-muted-foreground text-sm lg:text-base">
+                  Discover AI-Powered Construction Intelligence
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-slate-800">HBI Intel Tour</h1>
-              <p className="text-muted-foreground text-sm lg:text-base">
-                Discover AI-Powered Construction Intelligence
-              </p>
+
+            {/* Progress Indicator and Exit Button */}
+            <div className="flex items-center space-x-4">
+              <Badge
+                variant="secondary"
+                className="bg-slate-100 text-slate-800 border-slate-200 px-4 py-2 text-sm font-medium"
+              >
+                {currentSlide + 1} of {HBI_INTEL_TOUR_SLIDES.length}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleExit}
+                disabled={isExiting}
+                className="text-slate-700 hover:bg-slate-100 text-sm font-medium px-4 py-2 border border-slate-200 hover:border-slate-300 transition-all duration-200"
+                aria-label="Exit Intel tour"
+              >
+                Skip Tour
+              </Button>
             </div>
           </div>
+        </header>
 
-          {/* Progress Indicator and Exit Button */}
-          <div className="flex items-center space-x-4">
-            <Badge
-              variant="secondary"
-              className="bg-slate-100 text-slate-800 border-slate-200 px-4 py-2 text-sm font-medium"
-            >
-              {currentSlide + 1} of {HBI_INTEL_TOUR_SLIDES.length}
-            </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExit}
-              disabled={isExiting}
-              className="text-slate-700 hover:bg-slate-100 text-sm font-medium px-4 py-2 border border-slate-200 hover:border-slate-300 transition-all duration-200"
-              aria-label="Exit Intel tour"
-            >
-              Skip Tour
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <div className="relative h-full flex items-center justify-center">
-        <div className="w-full max-w-4xl mx-auto px-6 py-12">
-          {/* Slide Container */}
-          <div className="relative h-[70vh] flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full text-center">
-                {/* Slide Icon */}
-                <div className="mb-8 lg:mb-12 flex justify-center">
-                  <div className="p-6 rounded-full bg-white/20 backdrop-blur-sm shadow-lg">{current?.icon}</div>
-                </div>
-
-                {/* Slide Title */}
-                <h2 className="text-3xl md:text-5xl font-semibold text-slate-800 mb-6 lg:mb-8 leading-tight">
-                  {current?.title}
-                </h2>
-
-                {/* Slide Content */}
-                <div className="text-muted-foreground leading-relaxed">{current?.content}</div>
-
-                {/* CTA Button for Final Slide */}
-                {current?.isFinalSlide && (
-                  <div className="mt-12">
-                    <Button
-                      onClick={handleExplorePlatform}
-                      size="lg"
-                      className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D14D20] text-white font-semibold px-8 lg:px-12 py-4 lg:py-6 text-lg lg:text-xl shadow-lg transform transition-all duration-300 hover:scale-105 group"
-                      disabled={isExiting}
-                    >
-                      <Brain className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
-                      Explore the Platform
-                      <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+        {/* Main Content Area */}
+        <div className="relative h-full flex items-center justify-center">
+          <div className="w-full max-w-4xl mx-auto px-6 py-12">
+            {/* Slide Container */}
+            <div className="relative h-[70vh] flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-full text-center">
+                  {/* Slide Icon */}
+                  <div className="mb-8 lg:mb-12 flex justify-center">
+                    <div className="p-6 rounded-full bg-white/20 backdrop-blur-sm shadow-lg">{current?.icon}</div>
                   </div>
-                )}
+
+                  {/* Slide Title */}
+                  <h2 className="text-3xl md:text-5xl font-semibold text-slate-800 mb-6 lg:mb-8 leading-tight">
+                    {current?.title}
+                  </h2>
+
+                  {/* Slide Content */}
+                  <div className="text-muted-foreground leading-relaxed">{current?.content}</div>
+
+                  {/* CTA Button for Final Slide */}
+                  {current?.isFinalSlide && (
+                    <div className="mt-12">
+                      <Button
+                        onClick={handleExplorePlatform}
+                        size="lg"
+                        className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D14D20] text-white font-semibold px-8 lg:px-12 py-4 lg:py-6 text-lg lg:text-xl shadow-lg transform transition-all duration-300 hover:scale-105 group"
+                        disabled={isExiting}
+                      >
+                        <Brain className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
+                        Explore the Platform
+                        <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Navigation Controls */}
-      <div className="absolute bottom-8 inset-x-0 z-20 flex justify-center">
-        <div className="flex items-center justify-center space-x-6">
-          {/* Previous Button */}
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={handlePrevious}
-            disabled={currentSlide === 0 || isExiting}
-            className="text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
+        {/* Navigation Controls */}
+        <div className="absolute bottom-8 inset-x-0 z-20 flex justify-center">
+          <div className="flex items-center justify-center space-x-6">
+            {/* Previous Button */}
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={handlePrevious}
+              disabled={currentSlide === 0 || isExiting}
+              className="text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
 
-          {/* Slide Dots */}
-          <div className="flex items-center justify-center space-x-3">
-            {HBI_INTEL_TOUR_SLIDES.map((_: any, index: number) => (
-              <button
-                key={index}
-                onClick={() => handleSlideSelect(index)}
-                disabled={isExiting}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? "bg-slate-600 shadow-lg scale-125" : "bg-slate-300 hover:bg-slate-400"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+            {/* Slide Dots */}
+            <div className="flex items-center justify-center space-x-3">
+              {HBI_INTEL_TOUR_SLIDES.map((_: any, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => handleSlideSelect(index)}
+                  disabled={isExiting}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide ? "bg-slate-600 shadow-lg scale-125" : "bg-slate-300 hover:bg-slate-400"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
 
-          {/* Next Button */}
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={handleNext}
-            disabled={isLastSlide || isExiting}
-            className="text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Loading overlay during exit */}
-      {isExiting && (
-        <div className="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center">
-          <div className="text-center text-slate-800">
-            <div className="w-8 h-8 border-2 border-slate-600 border-t-transparent rounded-full mx-auto mb-4 animate-spin" />
-            <p className="text-lg font-medium">Loading HBI Intel...</p>
+            {/* Next Button */}
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={handleNext}
+              disabled={isLastSlide || isExiting}
+              className="text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </Button>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Loading overlay during exit */}
+        {isExiting && (
+          <div className="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center">
+            <div className="text-center text-slate-800">
+              <div className="w-8 h-8 border-2 border-slate-600 border-t-transparent rounded-full mx-auto mb-4 animate-spin" />
+              <p className="text-lg font-medium">Loading HBI Intel...</p>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   )
 }
