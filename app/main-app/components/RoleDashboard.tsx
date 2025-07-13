@@ -17,7 +17,22 @@ import { useDashboardLayout } from "../../../hooks/use-dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
-import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
+import { Progress } from "../../../components/ui/progress"
+import {
+  AlertCircle,
+  Loader2,
+  RefreshCw,
+  Brain,
+  Activity,
+  Target,
+  BarChart3,
+  Calculator,
+  DollarSign,
+  TrendingUp,
+  Globe,
+  Building2,
+  Users,
+} from "lucide-react"
 import { getProjectStats, getProjectAccessDescription } from "../../../lib/project-access-utils"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import Image from "next/image"
@@ -29,6 +44,17 @@ import BidManagementBetaTables from "../../../components/estimating/bid-manageme
 import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
 import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel"
 import PowerBIControlBar from "../../../components/dashboard/PowerBIControlBar"
+import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
+import BetaPipelineAnalytics from "../../../components/cards/beta/BetaPipelineAnalytics"
+import PowerBIDashboardCard from "../../../components/cards/PowerBIDashboardCard"
+import { CustomBarChart } from "../../../components/charts/BarChart"
+import { CustomLineChart } from "../../../components/charts/LineChart"
+import { AreaChart } from "../../../components/charts/AreaChart"
+import { PieChartCard } from "../../../components/charts/PieChart"
+import { FunnelChart } from "../../../components/charts/FunnelChart"
+import { RadarChart } from "../../../components/charts/RadarChart"
+import { ComposedKPIChart } from "../../../components/charts/ComposedKPIChart"
+import { HeatmapChart } from "../../../components/charts/HeatmapChart"
 
 interface ProjectData {
   id: string
@@ -356,26 +382,443 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               className={isFocusMode ? "rounded-none" : ""}
             />
 
-            {/* Dashboard Content */}
-            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
-              <DashboardLayout
-                cards={preconCards}
-                onLayoutChange={onLayoutChange}
-                onCardRemove={onCardRemove}
-                onCardConfigure={onCardConfigure}
-                onCardSizeChange={onCardSizeChange}
-                onCardAdd={onCardAdd}
-                onSave={onSave}
-                onReset={onReset}
-                isEditing={isEditing}
-                onToggleEdit={onToggleEdit}
-                layoutDensity={layoutDensity}
-                userRole={userRole}
-                dashboards={dashboards}
-                currentDashboardId={currentDashboardId ?? undefined}
-                onDashboardSelect={onDashboardSelect}
-                useBetaDashboard={true}
-              />
+            {/* Dashboard Content - Enhanced Power BI Embedded Cards */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "p-6"}>
+              <div className="grid grid-cols-16 gap-6 auto-rows-[100px]">
+                {/* HBI Pre-Construction Intelligence - Enhanced with AI Insights */}
+                <div className="col-span-8 row-span-6">
+                  <Card className="h-full bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border-[#FA4616]/20 dark:border-[#FA4616]/40">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-[#FA4616] rounded-lg">
+                            <Brain className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-[#FA4616] dark:text-[#FF8A67]">
+                              HBI Pre-Construction Intelligence
+                            </CardTitle>
+                            <p className="text-sm text-[#FA4616]/70 dark:text-[#FF8A67]/80">
+                              AI-powered insights for estimating and business development
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
+                          >
+                            <Brain className="h-3 w-3 mr-1" />
+                            AI Enhanced
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Live
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3">
+                      <EnhancedHBIInsights
+                        config={{
+                          executiveMode: true,
+                          scope: "pre-construction",
+                          maxVisibleInsights: 6,
+                          compactMode: false,
+                        }}
+                        cardId="hbi-precon"
+                        span={{ cols: 8, rows: 6 }}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Pipeline Funnel Analytics - Power BI Funnel Chart */}
+                <div className="col-span-8 row-span-6">
+                  <Card className="h-full bg-gradient-to-br from-[#0021A5]/5 to-[#0021A5]/10 dark:from-[#0021A5]/20 dark:to-[#0021A5]/30 border-[#0021A5]/20 dark:border-[#0021A5]/40">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-[#0021A5] rounded-lg">
+                            <Target className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-[#0021A5] dark:text-[#4A7FD6]">
+                              Pipeline Funnel Analytics
+                            </CardTitle>
+                            <p className="text-sm text-[#0021A5]/70 dark:text-[#4A7FD6]/80">
+                              Conversion rates and opportunity flow
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                          >
+                            <Target className="h-3 w-3 mr-1" />
+                            Funnel View
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-green-500/10 text-green-600 dark:bg-green-500/30 dark:text-green-400"
+                          >
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <FunnelChart
+                        title=""
+                        data={[
+                          { name: "Leads", value: 2500000, fill: "#dc2626" },
+                          { name: "Qualified", value: 1800000, fill: "#d97706" },
+                          { name: "Proposals", value: 1200000, fill: "#2563eb" },
+                          { name: "Negotiations", value: 850000, fill: "#059669" },
+                          { name: "Awards", value: 450000, fill: "#7c3aed" },
+                        ]}
+                        xKey="name"
+                        yKey="value"
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Estimating Performance Trends - Power BI Line Chart */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 border-blue-200/50 dark:border-blue-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-blue-600 rounded-lg">
+                            <BarChart3 className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-blue-700 dark:text-blue-300">
+                              Estimating Performance Trends
+                            </CardTitle>
+                            <p className="text-sm text-blue-600/70 dark:text-blue-400/80">
+                              Cost accuracy and timeline metrics
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-blue-500/10 text-blue-600 dark:bg-blue-500/30 dark:text-blue-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-green-500/10 text-green-600 dark:bg-green-500/30 dark:text-green-400"
+                          >
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            Trending Up
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <CustomLineChart
+                        title=""
+                        data={[
+                          { name: "Jan", value: 85, accuracy: 85, timeline: 78 },
+                          { name: "Feb", value: 88, accuracy: 88, timeline: 82 },
+                          { name: "Mar", value: 90, accuracy: 90, timeline: 85 },
+                          { name: "Apr", value: 87, accuracy: 87, timeline: 88 },
+                          { name: "May", value: 92, accuracy: 92, timeline: 90 },
+                          { name: "Jun", value: 94, accuracy: 94, timeline: 92 },
+                        ]}
+                        dataKeys={["accuracy", "timeline"]}
+                        colors={["#2563eb", "#059669"]}
+                        showLegend={true}
+                        compact={true}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Trade Distribution - Power BI Pie Chart */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-purple-50/80 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 border-purple-200/50 dark:border-purple-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-purple-600 rounded-lg">
+                            <Building2 className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-purple-700 dark:text-purple-300">
+                              Trade Distribution Analysis
+                            </CardTitle>
+                            <p className="text-sm text-purple-600/70 dark:text-purple-400/80">
+                              Cost breakdown by trade category
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-purple-500/10 text-purple-600 dark:bg-purple-500/30 dark:text-purple-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
+                          >
+                            <Calculator className="h-3 w-3 mr-1" />
+                            Cost Analysis
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <PieChartCard
+                        title=""
+                        data={[
+                          { name: "Concrete", value: 2800000 },
+                          { name: "Steel", value: 1950000 },
+                          { name: "Electrical", value: 1200000 },
+                          { name: "Plumbing", value: 850000 },
+                          { name: "HVAC", value: 1100000 },
+                          { name: "Finishes", value: 950000 },
+                        ]}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Project Portfolio Performance - Power BI Bar Chart */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-green-50/80 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20 border-green-200/50 dark:border-green-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-green-600 rounded-lg">
+                            <Globe className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-green-700 dark:text-green-300">
+                              Project Portfolio Performance
+                            </CardTitle>
+                            <p className="text-sm text-green-600/70 dark:text-green-400/80">
+                              Active projects by value and status
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-green-500/10 text-green-600 dark:bg-green-500/30 dark:text-green-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                          >
+                            <Building2 className="h-3 w-3 mr-1" />
+                            Portfolio
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <CustomBarChart
+                        title=""
+                        data={[
+                          { name: "Healthcare", value: 45000000 },
+                          { name: "Education", value: 32000000 },
+                          { name: "Commercial", value: 28000000 },
+                          { name: "Industrial", value: 22000000 },
+                          { name: "Government", value: 18000000 },
+                          { name: "Retail", value: 15000000 },
+                        ]}
+                        colors={["#059669", "#2563eb", "#7c3aed", "#dc2626", "#d97706", "#0891b2"]}
+                        showValues={true}
+                        compact={true}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Risk Assessment Matrix - Power BI Heatmap */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-orange-50/80 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 border-orange-200/50 dark:border-orange-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-orange-600 rounded-lg">
+                            <AlertCircle className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-orange-700 dark:text-orange-300">
+                              Risk Assessment Matrix
+                            </CardTitle>
+                            <p className="text-sm text-orange-600/70 dark:text-orange-400/80">
+                              Project risk distribution and probability
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-orange-500/10 text-orange-600 dark:bg-orange-500/30 dark:text-orange-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-red-500/10 text-red-600 dark:bg-red-500/30 dark:text-red-400"
+                          >
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Risk Analysis
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <HeatmapChart
+                        title=""
+                        data={[
+                          { x: 1, y: 1, z: 150 },
+                          { x: 2, y: 1, z: 300 },
+                          { x: 3, y: 1, z: 200 },
+                          { x: 1, y: 2, z: 400 },
+                          { x: 2, y: 2, z: 600 },
+                          { x: 3, y: 2, z: 500 },
+                          { x: 1, y: 3, z: 250 },
+                          { x: 2, y: 3, z: 450 },
+                          { x: 3, y: 3, z: 750 },
+                        ]}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Market Positioning Radar - Power BI Radar Chart */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-cyan-50/80 to-cyan-100/50 dark:from-cyan-950/30 dark:to-cyan-900/20 border-cyan-200/50 dark:border-cyan-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-cyan-600 rounded-lg">
+                            <Target className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-cyan-700 dark:text-cyan-300">
+                              Market Positioning Analysis
+                            </CardTitle>
+                            <p className="text-sm text-cyan-600/70 dark:text-cyan-400/80">
+                              Competitive positioning across key metrics
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-cyan-500/10 text-cyan-600 dark:bg-cyan-500/30 dark:text-cyan-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                          >
+                            <Brain className="h-3 w-3 mr-1" />
+                            Market Intel
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <RadarChart
+                        title=""
+                        data={[
+                          { subject: "Cost", value: 85 },
+                          { subject: "Quality", value: 92 },
+                          { subject: "Speed", value: 78 },
+                          { subject: "Innovation", value: 88 },
+                          { subject: "Safety", value: 95 },
+                          { subject: "Sustainability", value: 82 },
+                        ]}
+                        dataKey="subject"
+                        valueKey="value"
+                        strokeColor="#0891b2"
+                        fillColor="rgba(8, 145, 178, 0.4)"
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Executive KPI Dashboard - Power BI Area Chart */}
+                <div className="col-span-8 row-span-5">
+                  <Card className="h-full bg-gradient-to-br from-slate-50/80 to-slate-100/50 dark:from-slate-950/30 dark:to-slate-900/20 border-slate-200/50 dark:border-slate-800/30">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-slate-600 rounded-lg">
+                            <DollarSign className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold text-slate-700 dark:text-slate-300">
+                              Revenue & Margin Trends
+                            </CardTitle>
+                            <p className="text-sm text-slate-600/70 dark:text-slate-400/80">
+                              Monthly revenue and profit margin analysis
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="bg-slate-500/10 text-slate-600 dark:bg-slate-500/30 dark:text-slate-400"
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Power BI
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-green-500/10 text-green-600 dark:bg-green-500/30 dark:text-green-400"
+                          >
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            Revenue Growth
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 h-[calc(100%-80px)]">
+                      <AreaChart
+                        title=""
+                        data={[
+                          { name: "Jan", value: 28000000 },
+                          { name: "Feb", value: 32000000 },
+                          { name: "Mar", value: 35000000 },
+                          { name: "Apr", value: 38000000 },
+                          { name: "May", value: 42000000 },
+                          { name: "Jun", value: 45000000 },
+                        ]}
+                        color="#10b981"
+                        compact={true}
+                        showGrid={true}
+                        animated={true}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           </div>
         )

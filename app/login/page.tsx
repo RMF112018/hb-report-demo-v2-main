@@ -31,6 +31,8 @@ import {
   Monitor,
 } from "lucide-react"
 import Link from "next/link"
+import { PresentationCarousel } from "@/components/presentation/PresentationCarousel"
+import { slides } from "@/components/presentation/slide-definitions"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -44,10 +46,18 @@ export default function LoginPage() {
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
   })
+  const [presentationMode, setPresentationMode] = useState(false)
   const { login, isLoading: authIsLoading, isClient } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const { startTour, isTourAvailable, resetTourState } = useTour()
+
+  // Clear presentation mode on page load for clean start
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("presentationMode")
+    }
+  }, [])
 
   // Show loading screen during SSR/hydration
   if (!isClient || authIsLoading) {
@@ -265,11 +275,22 @@ export default function LoginPage() {
 
     try {
       await login(account.email, "demo123")
-      toast({
-        title: `Welcome, ${account.label}`,
-        description: `You're logged in as a demo ${account.label}.`,
-      })
-      router.push(account.redirectTo)
+
+      // Special handling for presentation account
+      if (account.key === "presentation") {
+        localStorage.setItem("presentationMode", "true")
+        setPresentationMode(true)
+        toast({
+          title: `Welcome to HB Intel`,
+          description: `Starting executive presentation...`,
+        })
+      } else {
+        toast({
+          title: `Welcome, ${account.label}`,
+          description: `You're logged in as a demo ${account.label}.`,
+        })
+        router.push(account.redirectTo)
+      }
     } catch (error) {
       toast({
         title: "Demo login failed",
@@ -281,6 +302,12 @@ export default function LoginPage() {
     }
   }
 
+  const handlePresentationComplete = () => {
+    localStorage.removeItem("presentationMode")
+    setPresentationMode(false)
+    router.push("/dashboard")
+  }
+
   const CurrentFeatureIcon = features[currentFeature].icon
   const isSmallScreen = windowSize.width < 768
   const isMediumScreen = windowSize.width >= 768 && windowSize.width < 1024
@@ -289,6 +316,9 @@ export default function LoginPage() {
   return (
     // Force light mode for the entire login page, regardless of global theme
     <div className="login-page-container">
+      {/* Presentation Carousel - renders above login UI when in presentation mode */}
+      {presentationMode && <PresentationCarousel slides={slides} onComplete={handlePresentationComplete} />}
+
       <style jsx global>{`
         .login-page-container {
           --background: 0 0% 100%;
