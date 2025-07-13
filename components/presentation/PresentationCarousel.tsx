@@ -125,13 +125,11 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
     setIsExiting(true)
     await controls.start("exit")
 
-    // Navigate to dashboard after exit animation
-    router.push("/main-app")
-
+    // Let parent component handle navigation via onComplete callback
     if (onComplete) {
       onComplete()
     }
-  }, [controls, router, onComplete])
+  }, [controls, onComplete])
 
   const handleExit = useCallback(async () => {
     setIsExiting(true)

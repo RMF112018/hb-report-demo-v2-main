@@ -28,6 +28,7 @@ import { ToolContent } from "./components/ToolContent"
 import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
 import type { PageHeaderTab } from "./components/PageHeader"
+import { HbiIntelTourCarousel } from "../../components/presentation/HbiIntelTourCarousel"
 import { useRouter } from "next/navigation"
 import {
   Calendar,
@@ -213,6 +214,7 @@ export default function MainApplicationPage() {
   const [initialTabSet, setInitialTabSet] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
   const [headerHeight, setHeaderHeight] = useState(140) // Default header height
+  const [showIntelTour, setShowIntelTour] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -296,6 +298,33 @@ export default function MainApplicationPage() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [router])
+
+  // Intel Tour logic triggered by successful login
+  useEffect(() => {
+    if (mounted && isPresentationMode) {
+      // Check if Intel tour should be triggered (set at login)
+      const triggerTimestamp = localStorage.getItem("triggerIntelTour")
+      const intelTourCompleted = localStorage.getItem("intelTourCompleted")
+      const presentationMode = localStorage.getItem("presentationMode")
+
+      // Trigger Intel tour if:
+      // 1. Trigger flag is set OR presentation mode is active
+      // 2. Tour hasn't been completed yet
+      if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
+        console.log("🚀 Starting Intel Tour (5 seconds)")
+
+        // Clean up the trigger flag
+        localStorage.removeItem("triggerIntelTour")
+
+        // Set timer for 5 seconds after main app loads
+        const tourTimer = setTimeout(() => {
+          setShowIntelTour(true)
+        }, 5000) // 5 second delay
+
+        return () => clearTimeout(tourTimer)
+      }
+    }
+  }, [isPresentationMode, mounted])
 
   // Handle sidebar panel state changes - updates layout to account for sidebar width
   const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
@@ -435,6 +464,34 @@ export default function MainApplicationPage() {
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
   }
+
+  const handleIntelTourComplete = () => {
+    setShowIntelTour(false)
+  }
+
+  // Handle manual carousel launch from PageHeader badge
+  const handleCarouselLaunch = (carouselType: string) => {
+    console.log(`🎠 Launching carousel: ${carouselType}`)
+
+    switch (carouselType) {
+      case "hbi-intel-tour":
+        // Clear any previous completion flags and launch Intel Tour
+        localStorage.removeItem("intelTourCompleted")
+        setShowIntelTour(true)
+        break
+      case "login-presentation":
+        // Navigate to login page to trigger presentation carousel
+        router.push("/login?showPresentation=true")
+        break
+      default:
+        console.log(`❌ Unknown carousel type: ${carouselType}`)
+    }
+  }
+
+  // Monitor showIntelTour state changes (for debugging if needed)
+  useEffect(() => {
+    // Reserved for debugging if needed
+  }, [showIntelTour])
 
   // Get tabs for different content types
   const getTabsForContent = () => {
@@ -576,11 +633,9 @@ export default function MainApplicationPage() {
 
     if (effectiveRole === "admin") {
       return [
-        { id: "overview", label: "Overview" },
-        { id: "modules", label: "IT Modules" },
-        { id: "analytics", label: "Analytics" },
+        { id: "overview", label: "IT Overview" },
         { id: "my-dashboard", label: "My Dashboard" },
-        { id: "settings", label: "Settings" },
+        { id: "activity-feed", label: "Recent Activity" },
       ]
     } else if (effectiveRole === "executive" || effectiveRole === "presentation") {
       return [
@@ -609,9 +664,8 @@ export default function MainApplicationPage() {
     } else {
       // Default for other roles (estimator, etc.)
       return [
-        { id: "overview", label: "Ops Overview" },
+        { id: "pre-con-overview", label: "Pre-Con Overview" },
         { id: "bid-management", label: "Bid Management" },
-        { id: "analytics", label: "Analytics" },
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
@@ -912,9 +966,9 @@ export default function MainApplicationPage() {
       return true
     }
 
-    // Estimator: Only Overview, Analytics, and Activity Feed views
+    // Estimator: Only Pre-Con Overview and Activity Feed views
     if (role === "estimator") {
-      return ["overview", "analytics", "activity-feed"].includes(tab)
+      return ["pre-con-overview", "activity-feed"].includes(tab)
     }
 
     return false
@@ -1093,6 +1147,7 @@ export default function MainApplicationPage() {
           onRoleSwitch={switchRole}
           onReturnToPresentation={returnToPresentation}
           isSticky={true}
+          onLaunchCarousel={handleCarouselLaunch}
         />
       </div>
 
@@ -1153,6 +1208,9 @@ export default function MainApplicationPage() {
           </div>
         </div>
       </footer>
+
+      {/* Intel Tour Carousel - Overlays entire dashboard for presentation users */}
+      {showIntelTour && <HbiIntelTourCarousel onComplete={handleIntelTourComplete} forceShow={true} />}
     </div>
   )
 }

@@ -1,26 +1,41 @@
 {
   "id": "estimator-layout",
   "name": "Estimator Dashboard",
-  "description": "Bid management and cost analysis tools",
+  "description": "Bid management and cost analysis tools with Power BI analytics",
   "role": "estimator",
   "cards": [
     {
-      "id": "bid-tracker",
-      "type": "bid-tracker",
-      "title": "Active Bids",
+      "id": "bd-opportunities",
+      "type": "bd-opportunities",
+      "title": "BD Opportunities",
       "size": "large",
       "position": { "x": 0, "y": 0 },
       "span": { "cols": 8, "rows": 6 },
-      "visible": true
+      "visible": true,
+      "config": {
+        "showPipeline": true,
+        "showAnalysis": true,
+        "showPerformance": true,
+        "showTeams": true,
+        "userRole": "estimator",
+        "detailLevel": "tactical"
+      }
     },
     {
-      "id": "cost-analysis",
-      "type": "cost-analysis",
-      "title": "Cost Analysis",
+      "id": "financial-review-panel",
+      "type": "financial-review-panel",
+      "title": "Financial Overview",
       "size": "medium",
       "position": { "x": 8, "y": 0 },
       "span": { "cols": 8, "rows": 6 },
-      "visible": true
+      "visible": true,
+      "config": {
+        "showOverview": true,
+        "showBreakdown": true,
+        "showTrends": true,
+        "userRole": "estimator",
+        "detailLevel": "tactical"
+      }
     },
     {
       "id": "market-intelligence",
@@ -33,6 +48,9 @@
       "config": {
         "showTrends": true,
         "showBidSuccess": true,
+        "showCompetitiveAnalysis": true,
+        "showMarketData": true,
+        "userRole": "estimator",
         "detailLevel": "tactical"
       }
     }

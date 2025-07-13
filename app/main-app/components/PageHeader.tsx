@@ -16,7 +16,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { ChevronRight, Home, ChevronDown } from "lucide-react"
+import { ChevronRight, Home, ChevronDown, Play } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -80,6 +80,9 @@ export interface PageHeaderProps {
   onRoleSwitch?: (role: "executive" | "project-executive" | "project-manager" | "estimator" | "admin") => void
   onReturnToPresentation?: () => void
 
+  // Carousel controls
+  onLaunchCarousel?: (carouselType: string) => void
+
   // Additional props
   className?: string
   isSticky?: boolean
@@ -102,10 +105,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   viewingAs = null,
   onRoleSwitch,
   onReturnToPresentation,
+  onLaunchCarousel,
   className = "",
   isSticky = true,
 }) => {
   const [roleSwitchPopoverOpen, setRoleSwitchPopoverOpen] = useState(false)
+  const [carouselPopoverOpen, setCarouselPopoverOpen] = useState(false)
 
   // Capitalize first letter of each word
   const capitalizeTitle = (title: string) => {
@@ -126,6 +131,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     setRoleSwitchPopoverOpen(false)
   }
 
+  // Handle carousel selection
+  const handleCarouselSelection = (carouselType: string) => {
+    onLaunchCarousel?.(carouselType)
+    setCarouselPopoverOpen(false)
+  }
+
   // Demo roles configuration
   const demoRoles = [
     { id: "executive", label: "Executive" },
@@ -134,6 +145,33 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     { id: "estimator", label: "Estimator" },
     { id: "admin", label: "Admin" },
   ]
+
+  // Available carousels based on user role/presentation mode
+  const getAvailableCarousels = () => {
+    const carousels = []
+
+    // Login Presentation (intro) - available for presentation users, shown first
+    if (isPresentationMode) {
+      carousels.push({
+        id: "login-presentation",
+        label: "Login Presentation",
+        description: "Welcome presentation carousel from login experience",
+      })
+    }
+
+    // HBI Intel Tour - available for presentation users, shown second
+    if (isPresentationMode) {
+      carousels.push({
+        id: "hbi-intel-tour",
+        label: "HBI Intel Tour",
+        description: "15-slide comprehensive tour of AI-powered construction intelligence",
+      })
+    }
+
+    return carousels
+  }
+
+  const availableCarousels = getAvailableCarousels()
 
   // Build dynamic breadcrumb based on navigation state
   const buildBreadcrumb = (): BreadcrumbItem[] => {
@@ -337,7 +375,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </nav>
 
             {/* Row 2: Module Title */}
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{capitalizeTitle(moduleTitle)}</h1>
+            <h1
+              className="text-2xl font-bold text-gray-900 dark:text-gray-100"
+              {...(moduleTitle.toLowerCase().includes("executive dashboard") && {
+                "data-tour-highlight": "executive-dashboard",
+              })}
+            >
+              {capitalizeTitle(moduleTitle)}
+            </h1>
 
             {/* Row 3: Sub-head */}
             {subHead && <p className="text-sm text-gray-600 dark:text-gray-400">{subHead}</p>}
@@ -404,6 +449,52 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                         </Button>
                       </>
                     )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {/* Row 3: Tour Carousel Badge */}
+            {isPresentationMode && availableCarousels.length > 0 && (
+              <Popover open={carouselPopoverOpen} onOpenChange={setCarouselPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-auto px-3 py-1 text-xs bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                  >
+                    <Play className="mr-1 h-3 w-3" />
+                    Tour Carousel
+                    <ChevronDown className="ml-1 h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-3" align="end">
+                  <div className="space-y-2">
+                    <div className="px-1 py-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Launch Tour Carousel
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700"></div>
+                    <div className="space-y-1">
+                      {availableCarousels.map((carousel) => (
+                        <Button
+                          key={carousel.id}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-left h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          onClick={() => handleCarouselSelection(carousel.id)}
+                        >
+                          <div className="flex items-start space-x-3 w-full">
+                            <Play className="mt-0.5 h-4 w-4 text-blue-600 flex-shrink-0" />
+                            <div className="flex flex-col items-start text-left min-w-0 flex-1">
+                              <span className="font-medium text-gray-900 dark:text-gray-100">{carousel.label}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                {carousel.description}
+                              </span>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </PopoverContent>
               </Popover>

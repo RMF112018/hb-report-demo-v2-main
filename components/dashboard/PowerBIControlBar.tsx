@@ -51,6 +51,13 @@ interface ProjectFilter {
   value: number
 }
 
+interface ITSystemFilter {
+  id: string
+  name: string
+  status: "operational" | "warning" | "critical"
+  uptime: number
+}
+
 export default function PowerBIControlBar({
   userRole = "executive",
   onFocusToggle,
@@ -60,6 +67,7 @@ export default function PowerBIControlBar({
   const [isLiveDataEnabled, setIsLiveDataEnabled] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [selectedProject, setSelectedProject] = useState<string>("all")
+  const [selectedITSystem, setSelectedITSystem] = useState<string>("all")
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
   const [dataQuality, setDataQuality] = useState<"excellent" | "good" | "fair">("excellent")
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "reconnecting" | "offline">("connected")
@@ -91,6 +99,24 @@ export default function PowerBIControlBar({
   }
 
   const projects = getProjectsForRole()
+
+  // Role-based IT system data for admin users
+  const getITSystemsForAdmin = (): ITSystemFilter[] => {
+    return [
+      { id: "all", name: "All Systems", status: "operational", uptime: 99.8 },
+      { id: "infrastructure", name: "Infrastructure", status: "operational", uptime: 99.9 },
+      { id: "security", name: "Security & Compliance", status: "operational", uptime: 99.7 },
+      { id: "backup", name: "Backup & Recovery", status: "operational", uptime: 99.5 },
+      { id: "email", name: "Email Security", status: "warning", uptime: 98.2 },
+      { id: "network", name: "Network & Connectivity", status: "operational", uptime: 99.9 },
+      { id: "assets", name: "Asset Management", status: "operational", uptime: 99.6 },
+      { id: "siem", name: "SIEM & Monitoring", status: "operational", uptime: 99.8 },
+      { id: "access", name: "User Access Management", status: "operational", uptime: 99.4 },
+      { id: "ai", name: "AI/ML Pipeline", status: "operational", uptime: 97.3 },
+    ]
+  }
+
+  const itSystems = getITSystemsForAdmin()
 
   // Auto-refresh when live data is enabled
   useEffect(() => {
@@ -201,31 +227,72 @@ export default function PowerBIControlBar({
 
           {/* Center Section - Controls */}
           <div className="flex items-center gap-3">
-            {/* Project Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-muted-foreground" />
-              <Select value={selectedProject} onValueChange={setSelectedProject}>
-                <SelectTrigger className="w-48 h-8">
-                  <SelectValue placeholder="Select project..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{project.name}</span>
-                        <Badge variant={project.status === "active" ? "default" : "secondary"} className="ml-2 text-xs">
-                          {project.status === "active"
-                            ? "Active"
-                            : project.status === "completed"
-                            ? "Complete"
-                            : "On Hold"}
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Conditional Filter - Project Filter for non-admin, IT System Filter for admin */}
+            {userRole === "admin" ? (
+              /* IT System Filter for Admin */
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-muted-foreground" />
+                <Select value={selectedITSystem} onValueChange={setSelectedITSystem}>
+                  <SelectTrigger className="w-48 h-8">
+                    <SelectValue placeholder="Select system..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {itSystems.map((system) => (
+                      <SelectItem key={system.id} value={system.id}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{system.name}</span>
+                          <Badge
+                            variant={
+                              system.status === "operational"
+                                ? "default"
+                                : system.status === "warning"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                            className="ml-2 text-xs"
+                          >
+                            {system.status === "operational"
+                              ? "Operational"
+                              : system.status === "warning"
+                              ? "Warning"
+                              : "Critical"}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              /* Project Filter for other roles */
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-muted-foreground" />
+                <Select value={selectedProject} onValueChange={setSelectedProject}>
+                  <SelectTrigger className="w-48 h-8">
+                    <SelectValue placeholder="Select project..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{project.name}</span>
+                          <Badge
+                            variant={project.status === "active" ? "default" : "secondary"}
+                            className="ml-2 text-xs"
+                          >
+                            {project.status === "active"
+                              ? "Active"
+                              : project.status === "completed"
+                              ? "Complete"
+                              : "On Hold"}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Live Data Toggle */}
             <div className="flex items-center gap-2">
@@ -355,17 +422,25 @@ export default function PowerBIControlBar({
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-4">
               <span>
-                Financial Review Dashboard •{" "}
+                {userRole === "admin" ? "IT Administrator Dashboard" : "Financial Review Dashboard"} •{" "}
                 {userRole === "executive"
                   ? "Executive"
                   : userRole === "project-executive"
                   ? "Project Executive"
                   : userRole === "project-manager"
                   ? "Project Manager"
+                  : userRole === "admin"
+                  ? "System Administrator"
                   : "User"}{" "}
                 View
               </span>
-              {selectedProject !== "all" && (
+              {userRole === "admin" && selectedITSystem !== "all" && (
+                <span>
+                  • {itSystems.find((s) => s.id === selectedITSystem)?.name} •{" "}
+                  {itSystems.find((s) => s.id === selectedITSystem)?.uptime}% uptime
+                </span>
+              )}
+              {userRole !== "admin" && selectedProject !== "all" && (
                 <span>
                   • {projects.find((p) => p.id === selectedProject)?.name} •{" "}
                   {formatCurrency(projects.find((p) => p.id === selectedProject)?.value || 0)}

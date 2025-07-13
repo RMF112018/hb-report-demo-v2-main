@@ -46,6 +46,9 @@ import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel
 import PowerBIControlBar from "../../../components/dashboard/PowerBIControlBar"
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
 import BetaPipelineAnalytics from "../../../components/cards/beta/BetaPipelineAnalytics"
+import BetaBDOpportunities from "../../../components/cards/beta/BetaBDOpportunities"
+import BetaFinancialOverview from "../../../components/cards/beta/BetaFinancialOverview"
+import BetaMarketIntelligence from "../../../components/cards/beta/BetaMarketIntelligence"
 import PowerBIDashboardCard from "../../../components/cards/PowerBIDashboardCard"
 import { CustomBarChart } from "../../../components/charts/BarChart"
 import { CustomLineChart } from "../../../components/charts/LineChart"
@@ -167,9 +170,9 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
       return true
     }
 
-    // Estimator: Only Overview, Analytics, and Activity Feed views
+    // Estimator: Only Pre-Con Overview and Activity Feed views
     if (userRole === "estimator") {
-      return ["overview", "analytics", "activity-feed"].includes(activeTab)
+      return ["pre-con-overview", "activity-feed"].includes(activeTab)
     }
 
     return false
@@ -361,7 +364,12 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
                 dashboards={dashboards}
                 currentDashboardId={currentDashboardId ?? undefined}
                 onDashboardSelect={onDashboardSelect}
-                useBetaDashboard={userRole === "project-executive" || userRole === "project-manager"}
+                useBetaDashboard={
+                  userRole === "project-executive" ||
+                  userRole === "project-manager" ||
+                  userRole === "estimator" ||
+                  userRole === "admin"
+                }
               />
             </div>
           </div>
@@ -874,7 +882,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         return (
           <ProjectActivityFeed
             config={{
-              userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+              userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator" | "admin",
               showFilters: true,
               showPagination: true,
               itemsPerPage: 20,
@@ -908,125 +916,280 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         )
 
       case "my-dashboard":
-        // My Dashboard with varied card sizes and shapes - demonstrates dashboard customization capabilities
-        const myDashboardCards = [
-          // Top Row - Wide Header Card
-          {
-            id: "simple-project-metrics",
-            type: "simple-project-metrics",
-            title: "Project Metrics Overview",
-            size: "full-width",
-            position: { x: 0, y: 0 },
-            span: { cols: 16, rows: 4 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              headerMode: true,
+        // Role-specific My Dashboard customization
+        let myDashboardCards: any[]
+
+        if (userRole === "admin") {
+          // Admin-specific IT dashboard with granular monitoring cards
+          myDashboardCards = [
+            // Top Row - System Status Overview
+            {
+              id: "admin-system-health",
+              type: "infrastructure-monitor",
+              title: "System Health Monitor",
+              size: "wide",
+              position: { x: 0, y: 0 },
+              span: { cols: 10, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                detailLevel: "comprehensive",
+                focus: "system-health",
+              },
             },
-          },
-          // Second Row - Two Equal Cards
-          {
-            id: "simple-financial-summary",
-            type: "simple-financial-summary",
-            title: "Financial Summary",
-            size: "half-width",
-            position: { x: 0, y: 4 },
-            span: { cols: 8, rows: 5 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              expandedView: true,
+            {
+              id: "admin-security-status",
+              type: "user-access-summary",
+              title: "Security & Access",
+              size: "medium",
+              position: { x: 10, y: 0 },
+              span: { cols: 6, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "security-overview",
+              },
             },
-          },
-          {
-            id: "simple-activity-trends",
-            type: "simple-activity-trends",
-            title: "Activity Trends",
-            size: "half-width",
-            position: { x: 8, y: 4 },
-            span: { cols: 8, rows: 5 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              expandedView: true,
+            // Second Row - Network and Performance
+            {
+              id: "admin-network-performance",
+              type: "system-logs",
+              title: "Network Performance",
+              size: "medium",
+              position: { x: 0, y: 4 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "network-metrics",
+                detailLevel: "operational",
+              },
             },
-          },
-          // Third Row - Three Cards (varied sizes)
-          {
-            id: "simple-procurement-analytics",
-            type: "simple-procurement-analytics",
-            title: "Procurement Analytics",
-            size: "large",
-            position: { x: 0, y: 9 },
-            span: { cols: 6, rows: 4 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              detailedView: true,
+            {
+              id: "admin-ai-pipeline",
+              type: "ai-pipeline-status",
+              title: "AI Pipeline Status",
+              size: "medium",
+              position: { x: 5, y: 4 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "ai-operations",
+              },
             },
-          },
-          {
-            id: "simple-permit-tracking",
-            type: "simple-permit-tracking",
-            title: "Permit Tracking",
-            size: "medium",
-            position: { x: 6, y: 9 },
-            span: { cols: 5, rows: 4 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              compactView: true,
+            {
+              id: "admin-asset-tracking",
+              type: "asset-tracker",
+              title: "Asset Management",
+              size: "medium",
+              position: { x: 10, y: 4 },
+              span: { cols: 6, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "asset-overview",
+              },
             },
-          },
-          {
-            id: "simple-rfi-status",
-            type: "simple-rfi-status",
-            title: "RFI Status",
-            size: "small",
-            position: { x: 11, y: 9 },
-            span: { cols: 5, rows: 4 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              compactView: true,
+            // Third Row - Detailed Operations
+            {
+              id: "admin-endpoint-health",
+              type: "endpoint-health",
+              title: "Endpoint Health",
+              size: "medium",
+              position: { x: 0, y: 8 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "endpoint-monitoring",
+              },
             },
-          },
-          // Fourth Row - Two Cards (different aspect ratios)
-          {
-            id: "simple-market-insights",
-            type: "simple-market-insights",
-            title: "Market Insights",
-            size: "wide",
-            position: { x: 0, y: 13 },
-            span: { cols: 10, rows: 3 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              chartFocused: true,
+            {
+              id: "admin-email-security",
+              type: "email-security-health",
+              title: "Email Security",
+              size: "medium",
+              position: { x: 5, y: 8 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "email-security",
+              },
             },
-          },
-          {
-            id: "simple-estimating-progress",
-            type: "simple-estimating-progress",
-            title: "Estimating Progress",
-            size: "tall",
-            position: { x: 10, y: 13 },
-            span: { cols: 6, rows: 3 },
-            visible: true,
-            config: {
-              userRole: userRole,
-              showRealTime: true,
-              verticalLayout: true,
+            {
+              id: "admin-backup-restore",
+              type: "backup-restore-status",
+              title: "Backup & Recovery",
+              size: "medium",
+              position: { x: 10, y: 8 },
+              span: { cols: 6, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "backup-status",
+              },
             },
-          },
-        ]
+            // Fourth Row - Intelligence and Analytics
+            {
+              id: "admin-siem-overview",
+              type: "siem-log-overview",
+              title: "SIEM Analytics",
+              size: "wide",
+              position: { x: 0, y: 12 },
+              span: { cols: 8, rows: 3 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "siem-dashboard",
+              },
+            },
+            {
+              id: "admin-hb-intel",
+              type: "hb-intel-management",
+              title: "HB Intelligence",
+              size: "medium",
+              position: { x: 8, y: 12 },
+              span: { cols: 8, rows: 3 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                focus: "intel-management",
+              },
+            },
+          ]
+        } else {
+          // Default My Dashboard with varied card sizes for other roles
+          myDashboardCards = [
+            // Top Row - Wide Header Card
+            {
+              id: "simple-project-metrics",
+              type: "simple-project-metrics",
+              title: "Project Metrics Overview",
+              size: "full-width",
+              position: { x: 0, y: 0 },
+              span: { cols: 16, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                headerMode: true,
+              },
+            },
+            // Second Row - Two Equal Cards
+            {
+              id: "simple-financial-summary",
+              type: "simple-financial-summary",
+              title: "Financial Summary",
+              size: "half-width",
+              position: { x: 0, y: 4 },
+              span: { cols: 8, rows: 5 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                expandedView: true,
+              },
+            },
+            {
+              id: "simple-activity-trends",
+              type: "simple-activity-trends",
+              title: "Activity Trends",
+              size: "half-width",
+              position: { x: 8, y: 4 },
+              span: { cols: 8, rows: 5 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                expandedView: true,
+              },
+            },
+            // Third Row - Three Cards (varied sizes)
+            {
+              id: "simple-procurement-analytics",
+              type: "simple-procurement-analytics",
+              title: "Procurement Analytics",
+              size: "large",
+              position: { x: 0, y: 9 },
+              span: { cols: 6, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                detailedView: true,
+              },
+            },
+            {
+              id: "simple-permit-tracking",
+              type: "simple-permit-tracking",
+              title: "Permit Tracking",
+              size: "medium",
+              position: { x: 6, y: 9 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                compactView: true,
+              },
+            },
+            {
+              id: "simple-rfi-status",
+              type: "simple-rfi-status",
+              title: "RFI Status",
+              size: "small",
+              position: { x: 11, y: 9 },
+              span: { cols: 5, rows: 4 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                compactView: true,
+              },
+            },
+            // Fourth Row - Two Cards (different aspect ratios)
+            {
+              id: "simple-market-insights",
+              type: "simple-market-insights",
+              title: "Market Insights",
+              size: "wide",
+              position: { x: 0, y: 13 },
+              span: { cols: 10, rows: 3 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                chartFocused: true,
+              },
+            },
+            {
+              id: "simple-estimating-progress",
+              type: "simple-estimating-progress",
+              title: "Estimating Progress",
+              size: "tall",
+              position: { x: 10, y: 13 },
+              span: { cols: 6, rows: 3 },
+              visible: true,
+              config: {
+                userRole: userRole,
+                showRealTime: true,
+                verticalLayout: true,
+              },
+            },
+          ]
+        }
 
         return (
           <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>

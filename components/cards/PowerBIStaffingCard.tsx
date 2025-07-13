@@ -306,8 +306,8 @@ export default function PowerBIStaffingCard({ className, userRole, config }: Pow
               </h4>
               <div className="flex items-center gap-4">
                 <div className="flex-shrink-0">
-                  <ResponsiveContainer width={80} height={80}>
-                    <PieChart>
+                  <div style={{ width: 80, height: 80 }}>
+                    <PieChart width={80} height={80}>
                       <Pie data={spcrStatusData} cx="50%" cy="50%" innerRadius={20} outerRadius={35} dataKey="value">
                         {spcrStatusData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -315,7 +315,7 @@ export default function PowerBIStaffingCard({ className, userRole, config }: Pow
                       </Pie>
                       <Tooltip />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </div>
                 </div>
                 <div className="flex-1 space-y-1">
                   {spcrStatusData.map((item, index) => (

@@ -2,288 +2,311 @@
 
 ## Overview
 
-Enterprise-grade construction project management platform with comprehensive Microsoft Teams integration.
+Enterprise-grade construction project management platform with comprehensive role-based dashboards, fluid navigation architecture, and integrated IT operations management. HB Report Demo v3.0 represents the next evolution in construction intelligence with enterprise-grade production standards and responsive design across all device sizes.
 
-## Microsoft Teams Productivity Integration
+## Architecture Overview
 
-### Overview
+### Fluid Navigation System
 
-The HB Report Demo v3.0 includes comprehensive Microsoft Teams integration aligned with the Microsoft Graph Planner API, providing enterprise-grade productivity features for Microsoft 365 customers.
+HB Report Demo v3.0 features a sophisticated fluid navigation architecture designed for enterprise productivity:
 
-### Key Features
+- **64px Perpetual Collapsed Sidebar**: Always-visible navigation with quick access to core functions
+- **320px Expandable Content Panels**: Rich content areas that expand on demand
+- **HB Logo Integration**: Professional 180x60px branding with responsive header positioning
+- **Mobile-Responsive Design**: Optimized for all device sizes with adaptive UI elements
+- **Role-Based Content Loading**: Dynamic content delivery based on user permissions
 
-#### Microsoft Planner Integration
+### Authentication & Role Management
 
-- **Plans as Containers**: Plans are contained within Microsoft 365 groups following the official API structure
-- **Task Management**: Full CRUD operations for tasks with proper assignments and metadata
-- **Board Visualization**: Support for assignee boards, progress boards, and custom bucket boards
-- **Task Details**: Rich task descriptions, checklists, and external references
-- **Order Hints**: Proper task ordering and positioning as per Microsoft's specification
-
-#### Microsoft Teams Integration
-
-- **Team Operations**: Get teams, team members, and team channels
-- **Real-time Messaging**: Send and receive messages through Teams channels
-- **Channel Management**: Full channel operations within teams
-- **Chat Integration**: Direct messaging and group chat support
-
-#### Calendar Integration
-
-- **Event Management**: Create and manage calendar events
-- **Online Meetings**: Automatic Teams meeting creation
-- **Attendee Management**: Add attendees and track responses
-- **Project Scheduling**: Integrate project milestones with calendar
-
-### Technical Implementation
-
-#### Core Architecture
+The platform supports comprehensive role-based access control:
 
 ```typescript
-// Microsoft Graph Service
-class MicrosoftGraphService {
-  // Teams Operations
-  async getMyTeams(): Promise<Team[]>
-  async getTeamMembers(teamId: string): Promise<TeamMember[]>
-  async getTeamChannels(teamId: string): Promise<Channel[]>
-  async getChannelMessages(teamId: string, channelId: string): Promise<ChatMessage[]>
-  async sendChannelMessage(teamId: string, channelId: string, content: string): Promise<ChatMessage>
-
-  // Planner Operations (aligned with Microsoft API)
-  async getPlannerPlans(groupId: string): Promise<PlannerPlan[]>
-  async getPlannerTasks(planId: string): Promise<PlannerTask[]>
-  async createPlannerTask(
-    planId: string,
-    title: string,
-    bucketId?: string,
-    assigneeIds?: string[]
-  ): Promise<PlannerTask>
-  async updatePlannerTaskProgress(taskId: string, percentComplete: number, etag: string): Promise<PlannerTask>
-
-  // Calendar Operations
-  async getCalendarEvents(startDateTime?: string, endDateTime?: string): Promise<CalendarEvent[]>
-  async createCalendarEvent(
-    subject: string,
-    start: string,
-    end: string,
-    attendeeEmails: string[]
-  ): Promise<CalendarEvent>
-}
+type UserRole = "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "presentation"
 ```
 
-#### Microsoft Planner API Alignment
+Each role provides tailored dashboard experiences and access to specific tools and features.
 
-The implementation follows the official Microsoft Planner API structure:
+## Core Application Flow
 
-1. **Plans are containers** - Plans are contained within Microsoft 365 groups
-2. **Tasks with assignments** - Tasks have proper assignment objects with orderHint
-3. **Task details** - Extended task properties for rich content
-4. **Buckets for visualization** - Custom columns for board views
-5. **Proper order hints** - Task ordering following Microsoft's specification
+### 1. Login & Authentication
 
-#### React Hooks Integration
+**Route**: `/login`
 
-```typescript
-// Individual hooks
-const { teams, loading, error } = useTeams()
-const { members } = useTeamMembers(teamId)
-const { channels } = useTeamChannels(teamId)
-const { messages, sendMessage } = useChannelMessages(teamId, channelId)
-const { plans } = usePlannerPlans(groupId)
-const { tasks, createTask, updateTaskProgress } = usePlannerTasks(planId)
-const { events, createEvent } = useCalendarEvents()
+- **Role-based authentication** with demo users for each role type
+- **Seamless role switching** for demonstration purposes
+- **Presentation mode** with guided tours and showcases
+- **Enterprise SSO ready** for production deployment
 
-// Composite hooks
-const { currentTeam, members, channels, plans, chats, events } = useTeamsProductivity(teamId)
-const { currentChannel, messages, sendMessage } = useTeamsChannel(teamId, channelId)
-```
+### 2. Role-Based Dashboard Routing
 
-### Component Integration
+#### Executive Dashboard
 
-#### Core Project Tools > Productivity Tab
+**Route**: `/main-app` (Executive role)
 
-The Microsoft Teams integration is injected into the Core Project Tools > Productivity tab, replacing the legacy productivity system:
+- **Portfolio Overview**: Comprehensive company-wide project metrics
+- **Financial Review Panel**: Budget health, forecast indices, and cash flow analysis
+- **Market Intelligence**: Business development opportunities and market positioning
+- **Performance Metrics**: Schedule health, quality scores, and risk assessments
+- **Strategic KPIs**: Executive-level dashboard cards with enterprise insights
 
-```typescript
-// ProjectControlCenterContent.tsx Core > Productivity Tab
-<ProjectTabsShell
-  projectId={projectId}
-  user={user}
-  userRole={userRole}
-  projectData={projectData}
-  onTabChange={onTabChange}
-/>
-```
+#### Project Executive Dashboard
 
-#### Teams Productivity Content
+**Route**: `/main-app` (Project Executive role)
 
-The `TeamsProductivityContent` component provides:
+- **Project Portfolio Management**: Multi-project oversight and coordination
+- **Resource Allocation**: Staffing and equipment distribution across projects
+- **Risk Management**: Project-level risk assessment and mitigation strategies
+- **Performance Analytics**: Project health scores and trend analysis
+- **Responsibility Overview**: Task assignments and accountability tracking
 
-- **4-tab interface**: Messages, Tasks, Calendar, Team
-- **Real Teams messaging**: Send and receive messages through Teams channels
-- **Microsoft Planner tasks**: Create, assign, and track tasks
-- **Calendar integration**: Schedule events and meetings
-- **Team management**: View and manage team members
+#### Project Manager Dashboard
 
-#### Legacy Compatibility
+**Route**: `/main-app` (Project Manager role)
 
-The system maintains backward compatibility with the legacy productivity system:
+- **Active Project Management**: Real-time project status and progress tracking
+- **Schedule Coordination**: Gantt charts, look-ahead scheduling, and milestone tracking
+- **Team Management**: Staff assignments, productivity metrics, and communication
+- **Quality Control**: Inspection schedules, compliance tracking, and documentation
+- **Budget Monitoring**: Cost tracking, change orders, and financial health
 
-- **Mode toggle**: Switch between Teams mode and legacy mode
-- **Deprecation warnings**: Clear indication of legacy system status
-- **Upgrade prompts**: Encourage migration to Teams integration
+#### Estimator Dashboard
+
+**Route**: `/main-app` (Estimator role)
+
+- **BidManagementCenter**: Primary tab with comprehensive bid management tools
+- **BuildingConnected Integration**: Projects dashboard with API synchronization
+- **Bid Form Templates**: Dynamic form builder with CSI scopes and regions
+- **Cost Analytics**: Pricing analysis, historical data, and market trends
+- **Proposal Management**: Bid tracking, submission workflows, and client communication
+
+#### IT Administrator Dashboard
+
+**Route**: `/it-command-center`
+
+- **IT Command Center**: Comprehensive IT operations dashboard
+- **System Overview**: Infrastructure monitoring and performance metrics
+- **Help Desk Management**: Ticket tracking, priorities, and resolution metrics
+- **Security Operations**: SIEM integration, threat monitoring, and compliance
+- **Asset Management**: Hardware inventory, software licenses, and maintenance schedules
+
+## Core Features & Modules
+
+### 1. Project Management Suite
+
+#### Scheduler & Planning
+
+- **Project Schedule Gantt Chart**: Columnar layout with sticky columns (Activity ID, Activity, BL Start, BL Finish, Start, Finish)
+- **Look Ahead System**: Streamlined single-column interface with 1-12 week planning windows
+- **Update Management**: Progress tracking with previous update column support
+- **Critical Path Analysis**: Schedule health monitoring and variance tracking
+
+#### Field Operations
+
+- **Field Reports**: Daily logs, weather integration, and progress documentation
+- **Constraints Management**: Issue tracking, resolution workflows, and impact analysis
+- **Permit Log**: Regulatory compliance tracking and submission management
+- **Safety Management**: Incident reporting, certification tracking, and compliance monitoring
+
+#### Financial Management
+
+- **Budget Analysis**: Real-time budget health and variance tracking
+- **Cash Flow Management**: Forecasting, AR aging, and payment processing
+- **Change Order Management**: Approval workflows and cost impact analysis
+- **Pay Application Processing**: AIA forms, billing cycles, and payment tracking
+
+### 2. Pre-Construction Suite
+
+#### Estimating & Bidding
+
+- **BidManagementCenter**: Complete bid lifecycle management
+- **BuildingConnected Platform**: API integration with filtering, sorting, and search
+- **Bidder List Templates**: CSI scope organization and regional templates
+- **Cost Summary Module**: Detailed cost breakdowns and analysis
+- **Area Calculations**: Automated quantity takeoffs and measurements
+
+#### Business Development
+
+- **Pipeline Management**: Opportunity tracking and conversion analysis
+- **Market Intelligence**: Competitive analysis and market positioning
+- **Proposal Generation**: Automated proposal creation and customization
+- **Client Relationship Management**: Contact tracking and communication history
+
+### 3. IT Command Center
+
+#### Comprehensive IT Operations
+
+- **AI Pipelines**: Machine learning workflow management and monitoring
+- **Asset Management**: Hardware and software inventory with lifecycle tracking
+- **Backup Systems**: Data protection, recovery planning, and compliance
+- **Consultant Management**: External IT service provider coordination
+- **Email Security**: Threat protection, compliance, and user training
+- **Endpoint Management**: Device security, policy enforcement, and updates
+- **Governance**: IT policy management and compliance tracking
+- **Infrastructure**: Network monitoring, performance optimization, and capacity planning
+- **Management Tools**: IT service management and workflow automation
+- **SIEM Integration**: Security information and event management
+
+#### Help Desk Operations
+
+- **Ticket Management**: Comprehensive issue tracking and resolution
+- **Priority Classification**: Automated priority assignment and escalation
+- **Performance Metrics**: Response times, resolution rates, and satisfaction scores
+- **Knowledge Base**: Self-service documentation and troubleshooting guides
+
+### 4. Advanced Analytics & Reporting
+
+#### Power BI Integration
+
+- **Embedded Visualizations**: Professional chart libraries with real-time data
+- **Custom Chart Types**: Funnel charts, line charts, pie charts, bar charts, heatmaps, radar charts, and area charts
+- **Performance Dashboards**: Live data badges and HB brand styling
+- **Trend Analysis**: Historical data analysis and predictive modeling
+
+#### Business Intelligence
+
+- **KPI Dashboards**: Executive-level metrics and performance indicators
+- **Operational Reporting**: Detailed operational reports and analytics
+- **Compliance Reporting**: Regulatory compliance tracking and documentation
+- **Custom Report Builder**: User-defined reports and visualizations
+
+## Technical Architecture
+
+### Technology Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **UI Framework**: shadcn/ui components with Tailwind CSS
+- **State Management**: React Context API with custom hooks
+- **Data Visualization**: Recharts, Chart.js, and custom Power BI components
+- **Authentication**: Enterprise-ready authentication system
+- **Icons**: Lucide React icon library
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
+
+### Performance & Scalability
+
+- **Lazy Loading**: Dynamic component loading for optimal performance
+- **Error Boundaries**: Comprehensive error handling and recovery
+- **TypeScript Safety**: Full type safety throughout the application
+- **Code Splitting**: Optimized bundle loading and caching
+- **SEO Optimization**: Server-side rendering and metadata management
 
 ### Enterprise Features
 
-#### Microsoft 365 Integration
+- **Accessibility Compliance**: WCAG 2.1 AA compliance throughout
+- **Security Standards**: Enterprise-grade security implementation
+- **Audit Trail**: Comprehensive logging and activity tracking
+- **Multi-tenancy Ready**: Scalable architecture for enterprise deployment
+- **API Integration**: RESTful APIs with comprehensive documentation
 
-- **Single Sign-On**: Seamless authentication with Microsoft 365
-- **Graph API**: Full Microsoft Graph API integration
-- **Enterprise Security**: Follows Microsoft security best practices
-- **Compliance**: Meets enterprise compliance requirements
+## Navigation Structure
 
-#### Production-Ready Features
+### Primary Navigation
 
-- **Error Handling**: Comprehensive error boundaries and fallbacks
-- **Loading States**: Professional loading indicators
-- **Performance**: Optimized for enterprise-scale usage
-- **Responsive Design**: Works across all device sizes
-- **Dark Mode**: Full dark mode support
-
-### Usage
-
-#### Accessing Teams Integration
-
-1. Navigate to Project > Core Project Tools > Productivity
-2. Ensure Teams mode is enabled (default)
-3. Connect to Microsoft 365 (automatic with SSO)
-4. Select your project team and channel
-5. Start collaborating with real Teams messaging and Planner tasks
-
-#### Task Management with Microsoft Planner
-
-1. Tasks are organized within Microsoft Planner plans
-2. Plans are contained within Microsoft 365 groups (project teams)
-3. Tasks can be assigned to team members with proper orderHint
-4. Board views support assignee, progress, and custom bucket visualization
-5. Task details include descriptions, checklists, and external references
-
-#### Messaging with Teams Channels
-
-1. Messages are sent through actual Microsoft Teams channels
-2. Real-time messaging with team members
-3. Support for message priorities and mentions
-4. Integration with Teams mobile and desktop apps
-
-### Development
-
-#### Environment Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Configure Microsoft Graph permissions
-# Required scopes: Teams.ReadWrite.All, Group.ReadWrite.All, Calendars.ReadWrite, Tasks.ReadWrite
+```
+├── Login (/login)
+├── Main App (/main-app)
+│   ├── Executive Dashboard (role: executive)
+│   ├── Project Executive Dashboard (role: project-executive)
+│   ├── Project Manager Dashboard (role: project-manager)
+│   └── Estimator Dashboard (role: estimator)
+├── IT Command Center (/it-command-center)
+├── Project Pages (/project/[projectId])
+│   ├── Core Project Tools
+│   ├── Scheduler
+│   ├── Field Reports
+│   ├── Financial Hub
+│   ├── Quality Control
+│   └── Safety Management
+└── Pre-Construction (/pre-con)
+    ├── Estimating
+    ├── Business Development
+    └── Pipeline Management
 ```
 
-#### API Configuration
+### Responsive Design
 
-```typescript
-// Microsoft Graph Service Configuration
-const microsoftGraphService = MicrosoftGraphService.getInstance()
-microsoftGraphService.setAccessToken(accessToken)
-```
+- **Desktop**: Full feature set with expanded navigation and panels
+- **Tablet**: Optimized layout with collapsible panels and touch-friendly controls
+- **Mobile**: Streamlined interface with hidden elements and gesture navigation
+- **iPhone Specific**: Optimized badge and button visibility
 
-### Security & Compliance
+## Development & Deployment
 
-#### Microsoft Graph Permissions
+### Getting Started
 
-- **Teams.ReadWrite.All**: Full Teams integration
-- **Group.ReadWrite.All**: Microsoft 365 group operations
-- **Calendars.ReadWrite**: Calendar and meeting management
-- **Tasks.ReadWrite**: Microsoft Planner task operations
+1. **Clone Repository**
 
-#### Data Security
+   ```bash
+   git clone <repository-url>
+   cd hb-report-demo
+   ```
 
-- All data remains within Microsoft 365 tenant
-- No data stored outside Microsoft ecosystem
-- Enterprise-grade security and compliance
-- Audit trail through Microsoft 365 logging
+2. **Install Dependencies**
 
-### Support
+   ```bash
+   npm install
+   # or
+   pnpm install
+   ```
 
-For Microsoft Teams integration support:
+3. **Environment Configuration**
 
-1. Ensure Microsoft 365 subscription includes Teams and Planner
-2. Verify Graph API permissions are configured
-3. Check enterprise SSO configuration
-4. Contact Microsoft support for Graph API issues
+   ```bash
+   cp .env.example .env.local
+   # Configure environment variables
+   ```
+
+4. **Run Development Server**
+
+   ```bash
+   npm run dev
+   # or
+   pnpm dev
+   ```
+
+5. **Access Application**
+   - Local: `http://localhost:3000`
+   - Login with demo credentials for each role
+
+### Production Deployment
+
+- **Build Optimization**: `npm run build`
+- **Static Export**: `npm run export`
+- **Docker Ready**: Container deployment configuration
+- **CDN Integration**: Asset optimization and delivery
+- **Environment Management**: Multi-environment configuration
+
+## Documentation & Support
+
+### Component Documentation
+
+- **Storybook Integration**: Comprehensive component documentation
+- **API Documentation**: RESTful API specifications
+- **Type Definitions**: Complete TypeScript type documentation
+- **Code Examples**: Implementation examples and best practices
+
+### Enterprise Support
+
+- **Training Materials**: User guides and training documentation
+- **Implementation Support**: Technical implementation assistance
+- **Customization Services**: Tailored feature development
+- **Integration Support**: Third-party system integration
+
+## Version Information
+
+**Current Version**: 3.0.0  
+**Release Date**: 2024  
+**License**: Enterprise License - Contact HB Development Team
+
+### Key Improvements in v3.0
+
+- **Complete architectural redesign** with fluid navigation
+- **Enhanced role-based access control** and personalized dashboards
+- **Comprehensive IT Command Center** with full operations management
+- **Advanced Power BI integration** with custom visualizations
+- **Mobile-responsive design** with optimized user experience
+- **Enterprise-grade security** and compliance features
+- **Modular architecture** for scalability and maintainability
 
 ---
 
-## Additional Features
-
-### Field Management
-
-- Scheduler with weather integration
-- Field reports and daily logs
-- Constraints management
-- Permit log tracking
-
-### Financial Hub
-
-- Budget analysis and forecasting
-- AR aging and cash flow
-- Change order management
-- Pay application processing
-
-### Pre-Construction Suite
-
-- Estimating with BidManagement integration
-- BIM coordination and clash detection
-- Permit and regulatory compliance
-
-### Core Project Tools
-
-- Interactive dashboards
-- Checklist management
-- Responsibility matrix
-- Comprehensive reporting
-
-### Compliance & Trade Partners
-
-- Contract document management
-- Trade partner scorecards
-- Compass API integration
-- Certification tracking
-
-### Warranty Management
-
-- Claim processing workflows
-- Document repository
-- Manufacturer integration
-- Labor warranty tracking
-
----
-
-## Technology Stack
-
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **UI Components**: shadcn/ui, Tailwind CSS
-- **State Management**: React hooks, Context API
-- **Microsoft Integration**: Microsoft Graph API, Teams SDK
-- **Charts**: Recharts, Chart.js
-- **Date Handling**: date-fns
-- **Icons**: Lucide React
-
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure Microsoft Graph API credentials
-4. Set up environment variables
-5. Run development server: `npm run dev`
-
-## License
-
-Enterprise license - Contact HB Development Team for licensing information.
+_For technical support, customization requests, or enterprise licensing information, contact the HB Development Team._

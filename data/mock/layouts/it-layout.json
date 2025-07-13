@@ -1,116 +1,152 @@
 {
   "id": "it-layout",
   "name": "IT Command Center",
-  "description": "Optimized IT layout for system monitoring and infrastructure management",
+  "description": "Comprehensive IT dashboard showcasing Power BI embedded analytics with diverse visualizations",
   "role": "admin",
   "cards": [
-    {
-      "id": "hb-intel-management",
-      "type": "hb-intel-management",
-      "title": "HB Intel Management",
-      "size": "large",
-      "position": { "x": 0, "y": 0 },
-      "span": { "cols": 8, "rows": 4 },
-      "visible": true
-    },
     {
       "id": "infrastructure-monitor",
       "type": "infrastructure-monitor",
       "title": "Infrastructure Monitor",
       "size": "large",
-      "position": { "x": 8, "y": 0 },
-      "span": { "cols": 8, "rows": 4 },
-      "visible": true
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "showSystemHealth": true,
+        "showPerformance": true,
+        "showAlerts": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     },
     {
       "id": "user-access-summary",
       "type": "user-access-summary",
       "title": "User Access Summary",
-      "size": "medium",
-      "position": { "x": 0, "y": 4 },
-      "span": { "cols": 5, "rows": 3 },
-      "visible": true
-    },
-    {
-      "id": "siem-log-overview",
-      "type": "siem-log-overview",
-      "title": "SIEM & Event Monitor",
-      "size": "medium",
-      "position": { "x": 5, "y": 4 },
-      "span": { "cols": 6, "rows": 3 },
-      "visible": true
-    },
-    {
-      "id": "endpoint-health",
-      "type": "endpoint-health",
-      "title": "Endpoint Health",
-      "size": "medium",
-      "position": { "x": 11, "y": 4 },
-      "span": { "cols": 5, "rows": 3 },
-      "visible": true
+      "size": "large",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "showUsers": true,
+        "showAccess": true,
+        "showRoles": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     },
     {
       "id": "system-logs",
       "type": "system-logs",
-      "title": "System Logs",
+      "title": "System Logs & Events",
       "size": "medium",
-      "position": { "x": 0, "y": 7 },
-      "span": { "cols": 5, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "email-security-health",
-      "type": "email-security-health",
-      "title": "Email Security Health",
-      "size": "medium",
-      "position": { "x": 5, "y": 7 },
-      "span": { "cols": 6, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "backup-restore-status",
-      "type": "backup-restore-status",
-      "title": "Backup & DR Status",
-      "size": "medium",
-      "position": { "x": 11, "y": 7 },
-      "span": { "cols": 5, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "asset-tracker",
-      "type": "asset-tracker",
-      "title": "Asset & License Tracker",
-      "size": "wide",
-      "position": { "x": 0, "y": 11 },
-      "span": { "cols": 7, "rows": 3 },
-      "visible": true
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "showLogs": true,
+        "showEvents": true,
+        "showAlerts": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     },
     {
       "id": "ai-pipeline-status",
       "type": "ai-pipeline-status",
       "title": "AI Pipeline Status",
       "size": "medium",
-      "position": { "x": 7, "y": 11 },
-      "span": { "cols": 4, "rows": 3 },
-      "visible": true
+      "position": { "x": 8, "y": 6 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "showPipelines": true,
+        "showStatus": true,
+        "showAnalytics": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     },
     {
-      "id": "consultant-dashboard",
-      "type": "consultant-dashboard",
-      "title": "Consultant Dashboard",
+      "id": "asset-tracker",
+      "type": "asset-tracker",
+      "title": "Asset & License Tracker",
       "size": "medium",
-      "position": { "x": 11, "y": 11 },
-      "span": { "cols": 5, "rows": 3 },
-      "visible": true
+      "position": { "x": 0, "y": 11 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "showAssets": true,
+        "showLicenses": true,
+        "showTracking": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     },
     {
-      "id": "change-governance-panel",
-      "type": "change-governance-panel",
-      "title": "Change Management & Governance",
-      "size": "extra-wide",
-      "position": { "x": 0, "y": 14 },
-      "span": { "cols": 16, "rows": 3 },
-      "visible": true
+      "id": "endpoint-health",
+      "type": "endpoint-health",
+      "title": "Endpoint Health",
+      "size": "medium",
+      "position": { "x": 8, "y": 11 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "showEndpoints": true,
+        "showHealth": true,
+        "showCompliance": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
+    },
+    {
+      "id": "email-security-health",
+      "type": "email-security-health",
+      "title": "Email Security Health",
+      "size": "small",
+      "position": { "x": 0, "y": 17 },
+      "span": { "cols": 5, "rows": 3 },
+      "visible": true,
+      "config": {
+        "showSecurity": true,
+        "showThreats": true,
+        "showCompliance": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
+    },
+    {
+      "id": "backup-restore-status",
+      "type": "backup-restore-status",
+      "title": "Backup & DR Status",
+      "size": "small",
+      "position": { "x": 5, "y": 17 },
+      "span": { "cols": 6, "rows": 3 },
+      "visible": true,
+      "config": {
+        "showBackup": true,
+        "showRestore": true,
+        "showStatus": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
+    },
+    {
+      "id": "siem-log-overview",
+      "type": "siem-log-overview",
+      "title": "SIEM & Security",
+      "size": "small",
+      "position": { "x": 11, "y": 17 },
+      "span": { "cols": 5, "rows": 3 },
+      "visible": true,
+      "config": {
+        "showSIEM": true,
+        "showSecurityEvents": true,
+        "showCompliance": true,
+        "userRole": "admin",
+        "detailLevel": "operational"
+      }
     }
   ]
 }

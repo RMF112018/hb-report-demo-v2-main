@@ -118,6 +118,19 @@ import BetaFieldReports from "@/components/cards/beta/BetaFieldReports"
 import BetaSafety from "@/components/cards/beta/BetaSafety"
 import BetaQualityControl from "@/components/cards/beta/BetaQualityControl"
 import BetaRFI from "@/components/cards/beta/BetaRFI"
+
+// Add the new IT beta card imports
+import BetaHbIntelManagement from "@/components/cards/beta/BetaHbIntelManagement"
+import BetaInfrastructureMonitor from "@/components/cards/beta/BetaInfrastructureMonitor"
+import BetaUserAccessSummary from "@/components/cards/beta/BetaUserAccessSummary"
+import BetaAiPipelineStatus from "@/components/cards/beta/BetaAiPipelineStatus"
+import BetaAssetTracker from "@/components/cards/beta/BetaAssetTracker"
+import BetaSystemLogs from "@/components/cards/beta/BetaSystemLogs"
+import BetaNetworkPerformance from "@/components/cards/beta/BetaNetworkPerformance"
+import BetaEndpointHealth from "@/components/cards/beta/BetaEndpointHealth"
+import BetaEmailSecurityHealth from "@/components/cards/beta/BetaEmailSecurityHealth"
+import BetaBackupRestoreStatus from "@/components/cards/beta/BetaBackupRestoreStatus"
+import BetaSiemLogOverview from "@/components/cards/beta/BetaSiemLogOverview"
 import BetaSubmittal from "@/components/cards/beta/BetaSubmittal"
 import BetaCloseout from "@/components/cards/beta/BetaCloseout"
 
@@ -692,6 +705,17 @@ function SortableCard({
     "project-overview",
     "procurement",
     "staffing-distribution",
+    // IT Command Center Beta Cards
+    "hb-intel-management",
+    "infrastructure-monitor",
+    "user-access-summary",
+    "ai-pipeline-status",
+    "asset-tracker",
+    "system-logs",
+    "endpoint-health",
+    "email-security-health",
+    "backup-restore-status",
+    "siem-log-overview",
     // Simple Power BI embedded cards (My Dashboard)
     "simple-project-metrics",
     "simple-financial-summary",
@@ -956,29 +980,73 @@ function CardContent({
       return useEnhancedDashboard ? <BetaCloseout {...commonProps} /> : <CloseoutCard {...commonProps} />
     // IT Command Center cards
     case "user-access-summary":
-      return <UserAccessSummaryCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaUserAccessSummary {...commonProps} />
+      ) : (
+        <UserAccessSummaryCard {...commonProps} />
+      )
     case "system-logs":
-      return <SystemLogsCard {...commonProps} />
+      // Check if this is a network performance focused card
+      if (card.config?.focus === "network-metrics") {
+        return <BetaNetworkPerformance {...commonProps} />
+      }
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaSystemLogs {...commonProps} />
+      ) : (
+        <SystemLogsCard {...commonProps} />
+      )
     case "infrastructure-monitor":
-      return <InfrastructureMonitorCard {...commonProps} />
-    case "endpoint-health":
-      return <EndpointHealthCard {...commonProps} />
-    case "siem-log-overview":
-      return <SiemLogOverviewCard {...commonProps} />
-    case "email-security-health":
-      return <EmailSecurityHealthCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaInfrastructureMonitor {...commonProps} />
+      ) : (
+        <InfrastructureMonitorCard {...commonProps} />
+      )
+    case "hb-intel-management":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaHbIntelManagement {...commonProps} />
+      ) : (
+        <HbIntelManagementCard {...commonProps} />
+      )
+    case "ai-pipeline-status":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaAiPipelineStatus {...commonProps} />
+      ) : (
+        <AiPipelineStatusCard {...commonProps} />
+      )
     case "asset-tracker":
-      return <AssetTrackerCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaAssetTracker {...commonProps} />
+      ) : (
+        <AssetTrackerCard {...commonProps} />
+      )
+    case "endpoint-health":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaEndpointHealth {...commonProps} />
+      ) : (
+        <EndpointHealthCard {...commonProps} />
+      )
+    case "siem-log-overview":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaSiemLogOverview {...commonProps} />
+      ) : (
+        <SiemLogOverviewCard {...commonProps} />
+      )
+    case "email-security-health":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaEmailSecurityHealth {...commonProps} />
+      ) : (
+        <EmailSecurityHealthCard {...commonProps} />
+      )
     case "change-governance-panel":
       return <ChangeGovernancePanelCard {...commonProps} />
     case "backup-restore-status":
-      return <BackupRestoreStatusCard {...commonProps} />
-    case "ai-pipeline-status":
-      return <AiPipelineStatusCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaBackupRestoreStatus {...commonProps} />
+      ) : (
+        <BackupRestoreStatusCard {...commonProps} />
+      )
     case "consultant-dashboard":
       return <ConsultantDashboardCard {...commonProps} />
-    case "hb-intel-management":
-      return <HbIntelManagementCard {...commonProps} />
     case "financial-dashboard":
       return (
         <FinancialDashboard

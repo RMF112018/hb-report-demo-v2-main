@@ -52,10 +52,31 @@ export default function LoginPage() {
   const { toast } = useToast()
   const { startTour, isTourAvailable, resetTourState } = useTour()
 
-  // Clear presentation mode on page load for clean start
+  // Clear presentation mode and Intel tour trigger on page load for clean start
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("presentationMode")
+      localStorage.removeItem("triggerIntelTour")
+      // Uncomment the line below to reset the Intel tour for testing
+      // localStorage.removeItem("intelTourCompleted")
+    }
+  }, [])
+
+  // Check for showPresentation query parameter to trigger presentation carousel
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search)
+      const showPresentation = urlParams.get("showPresentation")
+
+      if (showPresentation === "true") {
+        console.log("🎠 Triggering presentation carousel from query parameter")
+        localStorage.setItem("presentationMode", "true")
+        setPresentationMode(true)
+
+        // Clean up the URL parameter
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, document.title, newUrl)
+      }
     }
   }, [])
 
@@ -234,6 +255,23 @@ export default function LoginPage() {
 
     try {
       const { redirectTo } = await login(email, password)
+
+      // Check if this is a presentation user and trigger Intel tour
+      const demoUsers = [
+        { email: "demo.presenter@hedrickbrothers.com", role: "presentation" },
+        { email: "john.smith@hedrickbrothers.com", role: "executive" },
+        { email: "sarah.johnson@hedrickbrothers.com", role: "project-executive" },
+        { email: "mike.davis@hedrickbrothers.com", role: "project-manager" },
+        { email: "john.doe@hedrickbrothers.com", role: "estimator" },
+        { email: "markey.mark@hedrickbrothers.com", role: "admin" },
+      ]
+
+      const loggedInUser = demoUsers.find((u) => u.email === email)
+      if (loggedInUser?.role === "presentation") {
+        // Set a flag to trigger Intel tour with 5-second delay
+        localStorage.setItem("triggerIntelTour", Date.now().toString())
+      }
+
       toast({
         title: "Welcome back!",
         description: "Successfully logged in to HB Report Platform.",
@@ -279,6 +317,8 @@ export default function LoginPage() {
       // Special handling for presentation account
       if (account.key === "presentation") {
         localStorage.setItem("presentationMode", "true")
+        // Set flag to trigger Intel tour with 5-second delay
+        localStorage.setItem("triggerIntelTour", Date.now().toString())
         setPresentationMode(true)
         toast({
           title: `Welcome to HB Intel`,
@@ -304,8 +344,10 @@ export default function LoginPage() {
 
   const handlePresentationComplete = () => {
     localStorage.removeItem("presentationMode")
+    // Set flag to trigger Intel tour with 5-second delay
+    localStorage.setItem("triggerIntelTour", Date.now().toString())
     setPresentationMode(false)
-    router.push("/dashboard")
+    router.push("/main-app")
   }
 
   const CurrentFeatureIcon = features[currentFeature].icon

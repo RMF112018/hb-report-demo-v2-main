@@ -3,8 +3,39 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Heart, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Shield, Clock, DollarSign, Activity, Brain, Zap, Target } from "lucide-react"
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
+import {
+  Heart,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  CheckCircle,
+  Shield,
+  Clock,
+  DollarSign,
+  Activity,
+  Brain,
+  Zap,
+  Target,
+} from "lucide-react"
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts"
 import type { DashboardCard } from "@/types/dashboard"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
@@ -18,11 +49,11 @@ interface HealthCardProps {
 }
 
 const HEALTH_COLORS = [
-  'hsl(var(--chart-1))', 
-  'hsl(var(--chart-2))', 
-  'hsl(var(--chart-3))', 
-  'hsl(var(--chart-4))', 
-  'hsl(var(--chart-5))'
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
 ]
 
 export function HealthCard({ card, config, span, isCompact, userRole }: HealthCardProps) {
@@ -31,54 +62,54 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
   // Listen for drill down events from DashboardCardWrapper
   useEffect(() => {
     const handleDrillDownEvent = (event: CustomEvent) => {
-      if (event.detail.cardId === card.id || event.detail.cardType === 'health') {
-        const shouldShow = event.detail.action === 'show'
+      if (event.detail.cardId === card.id || event.detail.cardType === "health") {
+        const shouldShow = event.detail.action === "show"
         setShowDrillDown(shouldShow)
-        
+
         // Notify wrapper of state change
-        const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+        const stateEvent = new CustomEvent("cardDrillDownStateChange", {
           detail: {
             cardId: card.id,
-            cardType: 'health',
-            isActive: shouldShow
-          }
+            cardType: "health",
+            isActive: shouldShow,
+          },
         })
         window.dispatchEvent(stateEvent)
       }
-    };
+    }
 
-    window.addEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    
+    window.addEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+
     return () => {
-      window.removeEventListener('cardDrillDown', handleDrillDownEvent as EventListener);
-    };
-  }, [card.id]);
+      window.removeEventListener("cardDrillDown", handleDrillDownEvent as EventListener)
+    }
+  }, [card.id])
 
   // Function to handle closing the drill down overlay
   const handleCloseDrillDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowDrillDown(false)
-    
+
     // Notify wrapper that drill down is closed
-    const stateEvent = new CustomEvent('cardDrillDownStateChange', {
+    const stateEvent = new CustomEvent("cardDrillDownStateChange", {
       detail: {
         cardId: card.id,
-        cardType: 'health',
-        isActive: false
-      }
+        cardType: "health",
+        isActive: false,
+      },
     })
     window.dispatchEvent(stateEvent)
   }
 
   // Mock data based on role
   const getRoleBasedData = () => {
-    const role = userRole || 'project-manager'
-    
+    const role = userRole || "project-manager"
+
     const baseData = {
-      'project-manager': {
+      "project-manager": {
         overallHealth: 84.2,
-        healthGrade: 'B+',
-        trendDirection: 'up',
+        healthGrade: "B+",
+        trendDirection: "up",
         trendValue: 2.3,
         healthDimensions: {
           schedule: 87.5,
@@ -86,19 +117,19 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           quality: 91.2,
           safety: 95.8,
           risk: 76.4,
-          communication: 88.9
+          communication: 88.9,
         },
         healthTrend: [
-          { month: 'Jan', overall: 78.2, schedule: 82.1, budget: 85.3, quality: 89.1, safety: 94.2, risk: 71.8 },
-          { month: 'Feb', overall: 80.5, schedule: 84.3, budget: 83.7, quality: 90.2, safety: 95.1, risk: 73.5 },
-          { month: 'Mar', overall: 82.8, schedule: 86.1, budget: 81.9, quality: 90.8, safety: 95.6, risk: 74.9 },
-          { month: 'Apr', overall: 83.6, schedule: 87.2, budget: 82.0, quality: 91.0, safety: 95.7, risk: 75.8 },
-          { month: 'May', overall: 84.2, schedule: 87.5, budget: 82.1, quality: 91.2, safety: 95.8, risk: 76.4 }
+          { month: "Jan", overall: 78.2, schedule: 82.1, budget: 85.3, quality: 89.1, safety: 94.2, risk: 71.8 },
+          { month: "Feb", overall: 80.5, schedule: 84.3, budget: 83.7, quality: 90.2, safety: 95.1, risk: 73.5 },
+          { month: "Mar", overall: 82.8, schedule: 86.1, budget: 81.9, quality: 90.8, safety: 95.6, risk: 74.9 },
+          { month: "Apr", overall: 83.6, schedule: 87.2, budget: 82.0, quality: 91.0, safety: 95.7, risk: 75.8 },
+          { month: "May", overall: 84.2, schedule: 87.5, budget: 82.1, quality: 91.2, safety: 95.8, risk: 76.4 },
         ],
         alerts: [
-          { type: 'warning', category: 'Budget', message: 'Labor costs trending 3% over forecast', severity: 'medium' },
-          { type: 'info', category: 'Schedule', message: 'Weather delays resolved, back on track', severity: 'low' },
-          { type: 'success', category: 'Quality', message: '15 consecutive days without rework', severity: 'positive' }
+          { type: "warning", category: "Budget", message: "Labor costs trending 3% over forecast", severity: "medium" },
+          { type: "info", category: "Schedule", message: "Weather delays resolved, back on track", severity: "low" },
+          { type: "success", category: "Quality", message: "15 consecutive days without rework", severity: "positive" },
         ],
         keyMetrics: {
           scheduleVariance: -2.1, // days behind
@@ -106,14 +137,14 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           qualityScore: 91.2,
           safetyDays: 127, // days without incident
           riskExposure: 245000,
-          stakeholderSatisfaction: 88.9
+          stakeholderSatisfaction: 88.9,
         },
-        projectName: "Tropical World Nursery"
+        projectName: "Tropical World Nursery",
       },
-      'project-executive': {
+      "project-executive": {
         overallHealth: 81.7,
-        healthGrade: 'B',
-        trendDirection: 'down',
+        healthGrade: "B",
+        trendDirection: "down",
         trendValue: -1.2,
         healthDimensions: {
           schedule: 83.2,
@@ -121,22 +152,70 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           quality: 88.5,
           safety: 92.1,
           risk: 74.8,
-          communication: 85.6
+          communication: 85.6,
         },
         healthTrend: [
-          { month: 'Jan', overall: 84.1, schedule: 85.8, budget: 82.3, quality: 87.9, safety: 91.2, risk: 76.8 },
-          { month: 'Feb', overall: 83.5, schedule: 84.6, budget: 81.1, quality: 88.2, safety: 91.8, risk: 75.9 },
-          { month: 'Mar', overall: 82.9, schedule: 83.9, budget: 80.5, quality: 88.6, safety: 92.0, risk: 75.2 },
-          { month: 'Apr', overall: 82.1, schedule: 83.4, budget: 79.9, quality: 88.4, safety: 92.1, risk: 74.9 },
-          { month: 'May', overall: 81.7, schedule: 83.2, budget: 79.8, quality: 88.5, safety: 92.1, risk: 74.8 }
+          { month: "Jan", overall: 84.1, schedule: 85.8, budget: 82.3, quality: 87.9, safety: 91.2, risk: 76.8 },
+          { month: "Feb", overall: 83.5, schedule: 84.6, budget: 81.1, quality: 88.2, safety: 91.8, risk: 75.9 },
+          { month: "Mar", overall: 82.9, schedule: 83.9, budget: 80.5, quality: 88.6, safety: 92.0, risk: 75.2 },
+          { month: "Apr", overall: 82.1, schedule: 83.4, budget: 79.9, quality: 88.4, safety: 92.1, risk: 74.9 },
+          { month: "May", overall: 81.7, schedule: 83.2, budget: 79.8, quality: 88.5, safety: 92.1, risk: 74.8 },
         ],
         portfolioBreakdown: [
-          { project: 'Medical Center East', health: 89.3, schedule: 92.1, budget: 87.5, quality: 94.2, risk: 82.1, trend: 'up' },
-          { project: 'Tech Campus Phase 2', health: 85.7, schedule: 88.9, budget: 83.2, quality: 91.1, risk: 78.5, trend: 'stable' },
-          { project: 'Marina Bay Plaza', health: 78.2, schedule: 76.8, budget: 74.9, quality: 85.3, risk: 71.2, trend: 'down' },
-          { project: 'Tropical World', health: 84.2, schedule: 87.5, budget: 82.1, quality: 91.2, risk: 76.4, trend: 'up' },
-          { project: 'Grandview Heights', health: 76.9, schedule: 73.2, budget: 75.8, quality: 82.4, risk: 69.8, trend: 'down' },
-          { project: 'Riverside Plaza', health: 82.8, schedule: 85.1, budget: 81.2, quality: 87.6, risk: 77.3, trend: 'stable' }
+          {
+            project: "Medical Center East",
+            health: 89.3,
+            schedule: 92.1,
+            budget: 87.5,
+            quality: 94.2,
+            risk: 82.1,
+            trend: "up",
+          },
+          {
+            project: "Tech Campus Phase 2",
+            health: 85.7,
+            schedule: 88.9,
+            budget: 83.2,
+            quality: 91.1,
+            risk: 78.5,
+            trend: "stable",
+          },
+          {
+            project: "Marina Bay Plaza",
+            health: 78.2,
+            schedule: 76.8,
+            budget: 74.9,
+            quality: 85.3,
+            risk: 71.2,
+            trend: "down",
+          },
+          {
+            project: "Tropical World",
+            health: 84.2,
+            schedule: 87.5,
+            budget: 82.1,
+            quality: 91.2,
+            risk: 76.4,
+            trend: "up",
+          },
+          {
+            project: "Grandview Heights",
+            health: 76.9,
+            schedule: 73.2,
+            budget: 75.8,
+            quality: 82.4,
+            risk: 69.8,
+            trend: "down",
+          },
+          {
+            project: "Riverside Plaza",
+            health: 82.8,
+            schedule: 85.1,
+            budget: 81.2,
+            quality: 87.6,
+            risk: 77.3,
+            trend: "stable",
+          },
         ],
         keyMetrics: {
           avgScheduleVariance: -3.8,
@@ -144,13 +223,13 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           portfolioRisk: 1850000,
           criticalProjects: 2,
           onTrackProjects: 4,
-          stakeholderSatisfaction: 85.6
-        }
+          stakeholderSatisfaction: 85.6,
+        },
       },
-      'executive': {
+      executive: {
         overallHealth: 79.4,
-        healthGrade: 'B-',
-        trendDirection: 'stable',
+        healthGrade: "B-",
+        trendDirection: "stable",
         trendValue: 0.2,
         healthDimensions: {
           schedule: 81.5,
@@ -158,14 +237,14 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           quality: 85.8,
           safety: 89.7,
           risk: 72.1,
-          communication: 82.9
+          communication: 82.9,
         },
         healthTrend: [
-          { month: 'Jan', overall: 78.9, schedule: 81.2, budget: 76.8, quality: 85.1, safety: 89.2, risk: 71.5 },
-          { month: 'Feb', overall: 79.1, schedule: 81.3, budget: 77.0, quality: 85.4, safety: 89.5, risk: 71.8 },
-          { month: 'Mar', overall: 79.3, schedule: 81.4, budget: 77.1, quality: 85.6, safety: 89.6, risk: 72.0 },
-          { month: 'Apr', overall: 79.2, schedule: 81.4, budget: 77.0, quality: 85.7, safety: 89.7, risk: 72.1 },
-          { month: 'May', overall: 79.4, schedule: 81.5, budget: 77.2, quality: 85.8, safety: 89.7, risk: 72.1 }
+          { month: "Jan", overall: 78.9, schedule: 81.2, budget: 76.8, quality: 85.1, safety: 89.2, risk: 71.5 },
+          { month: "Feb", overall: 79.1, schedule: 81.3, budget: 77.0, quality: 85.4, safety: 89.5, risk: 71.8 },
+          { month: "Mar", overall: 79.3, schedule: 81.4, budget: 77.1, quality: 85.6, safety: 89.6, risk: 72.0 },
+          { month: "Apr", overall: 79.2, schedule: 81.4, budget: 77.0, quality: 85.7, safety: 89.7, risk: 72.1 },
+          { month: "May", overall: 79.4, schedule: 81.5, budget: 77.2, quality: 85.8, safety: 89.7, risk: 72.1 },
         ],
         companyMetrics: {
           totalProjects: 12,
@@ -175,34 +254,129 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
           totalRiskExposure: 5240000,
           avgStakeholderSatisfaction: 82.9,
           avgProjectHealth: 79.4,
-          companyReputation: 87.2
-        }
-      }
+          companyReputation: 87.2,
+        },
+      },
+      admin: {
+        overallHealth: 88.6,
+        healthGrade: "A-",
+        trendDirection: "up",
+        trendValue: 3.2,
+        healthDimensions: {
+          infrastructure: 91.4,
+          security: 87.8,
+          performance: 89.2,
+          availability: 94.7,
+          compliance: 85.3,
+          userSatisfaction: 88.9,
+        },
+        healthTrend: [
+          {
+            month: "Jan",
+            overall: 84.2,
+            infrastructure: 89.1,
+            security: 83.5,
+            performance: 86.8,
+            availability: 92.3,
+            compliance: 82.1,
+          },
+          {
+            month: "Feb",
+            overall: 85.8,
+            infrastructure: 90.2,
+            security: 85.1,
+            performance: 87.6,
+            availability: 93.1,
+            compliance: 83.5,
+          },
+          {
+            month: "Mar",
+            overall: 87.1,
+            infrastructure: 90.8,
+            security: 86.4,
+            performance: 88.9,
+            availability: 94.2,
+            compliance: 84.2,
+          },
+          {
+            month: "Apr",
+            overall: 87.9,
+            infrastructure: 91.1,
+            security: 87.2,
+            performance: 89.1,
+            availability: 94.5,
+            compliance: 84.8,
+          },
+          {
+            month: "May",
+            overall: 88.6,
+            infrastructure: 91.4,
+            security: 87.8,
+            performance: 89.2,
+            availability: 94.7,
+            compliance: 85.3,
+          },
+        ],
+        alerts: [
+          {
+            type: "info",
+            category: "Security",
+            message: "Endpoint compliance scan completed successfully",
+            severity: "low",
+          },
+          {
+            type: "warning",
+            category: "Infrastructure",
+            message: "Server utilization reaching 75% capacity",
+            severity: "medium",
+          },
+          {
+            type: "success",
+            category: "Performance",
+            message: "Application response times improved by 12%",
+            severity: "positive",
+          },
+        ],
+        keyMetrics: {
+          systemUptime: 99.7,
+          securityIncidents: 0,
+          performanceScore: 89.2,
+          userSatisfaction: 88.9,
+          complianceScore: 85.3,
+          incidentResponse: 2.1, // average hours
+        },
+        projectName: "IT Infrastructure",
+      },
     }
 
     return baseData[role as keyof typeof baseData]
   }
 
   const data = getRoleBasedData()
-  const role = userRole || 'project-manager'
-  
-  const healthGradeColor = data.overallHealth >= 90 ? 'text-green-600 dark:text-green-400' : 
-                          data.overallHealth >= 80 ? 'text-blue-600 dark:text-blue-400' : 
-                          data.overallHealth >= 70 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
+  const role = userRole || "project-manager"
+
+  const healthGradeColor =
+    data.overallHealth >= 90
+      ? "text-green-600 dark:text-green-400"
+      : data.overallHealth >= 80
+      ? "text-blue-600 dark:text-blue-400"
+      : data.overallHealth >= 70
+      ? "text-yellow-600 dark:text-yellow-400"
+      : "text-red-600 dark:text-red-400"
 
   // Color-coded radar data with health-based colors
   const radarData = Object.entries(data.healthDimensions).map(([key, value]) => ({
     dimension: key.charAt(0).toUpperCase() + key.slice(1),
     value: value,
     fullMark: 100,
-    color: value >= 90 ? '#10b981' : value >= 80 ? '#3b82f6' : value >= 70 ? '#f59e0b' : '#ef4444'
+    color: value >= 90 ? "#10b981" : value >= 80 ? "#3b82f6" : value >= 70 ? "#f59e0b" : "#ef4444",
   }))
 
   const getTrendIcon = (direction: string) => {
     switch (direction) {
-      case 'up':
+      case "up":
         return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-      case 'down':
+      case "down":
         return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
         return <div className="h-4 w-4 rounded-full bg-muted-foreground" />
@@ -210,28 +384,25 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
   }
 
   const getHealthColor = (health: number) => {
-    if (health >= 90) return 'text-green-600 dark:text-green-400'
-    if (health >= 80) return 'text-blue-600 dark:text-blue-400'
-    if (health >= 70) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
+    if (health >= 90) return "text-green-600 dark:text-green-400"
+    if (health >= 80) return "text-blue-600 dark:text-blue-400"
+    if (health >= 70) return "text-yellow-600 dark:text-yellow-400"
+    return "text-red-600 dark:text-red-400"
   }
 
   const getHealthBgColor = (health: number) => {
-    if (health >= 90) return '#10b981'
-    if (health >= 80) return '#3b82f6'
-    if (health >= 70) return '#f59e0b'
-    return '#ef4444'
+    if (health >= 90) return "#10b981"
+    if (health >= 80) return "#3b82f6"
+    if (health >= 70) return "#f59e0b"
+    return "#ef4444"
   }
 
   // Count critical health dimensions (below 80%)
-  const criticalDimensions = Object.values(data.healthDimensions).filter(v => v < 80).length
-  const healthyDimensions = Object.values(data.healthDimensions).filter(v => v >= 90).length
+  const criticalDimensions = Object.values(data.healthDimensions).filter((v) => v < 80).length
+  const healthyDimensions = Object.values(data.healthDimensions).filter((v) => v >= 90).length
 
   return (
-    <div 
-      className="relative h-full"
-      data-tour="health-card"
-    >
+    <div className="relative h-full" data-tour="health-card">
       <div className="h-full flex flex-col bg-transparent overflow-hidden">
         {/* Health Stats Header */}
         <div className="flex-shrink-0 p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 border-b border-gray-200 dark:border-gray-600">
@@ -245,12 +416,18 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
             </div>
             <div className="flex items-center gap-1 ml-auto">
               {getTrendIcon(data.trendDirection)}
-              <Badge className={cn("text-xs", healthGradeColor, "bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500")}>
+              <Badge
+                className={cn(
+                  "text-xs",
+                  healthGradeColor,
+                  "bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500"
+                )}
+              >
                 {data.healthGrade}
               </Badge>
             </div>
           </div>
-          
+
           {/* Compact Stats - Darker Background */}
           <div className="grid grid-cols-3 gap-1 sm:gap-1.5 lg:gap-2">
             <div className="text-center p-1.5 sm:p-2 lg:p-2.5 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
@@ -282,51 +459,61 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                     <div className="text-xs text-muted-foreground">Health</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-1 -right-1">
-                  {getTrendIcon(data.trendDirection)}
-                </div>
+                <div className="absolute -bottom-1 -right-1">{getTrendIcon(data.trendDirection)}</div>
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {data.trendDirection === 'up' ? '+' : data.trendDirection === 'down' ? '-' : '±'}{Math.abs(data.trendValue)}% vs last month
+                {data.trendDirection === "up" ? "+" : data.trendDirection === "down" ? "-" : "±"}
+                {Math.abs(data.trendValue)}% vs last month
               </div>
             </div>
 
             {/* Top Health Dimensions */}
             <div className="space-y-2">
-              {Object.entries(data.healthDimensions).slice(0, 4).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30">
-                  <div className="flex items-center gap-2">
-                    <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0" 
-                      style={{ backgroundColor: getHealthBgColor(value) }}
-                    />
-                    <span className="text-xs text-muted-foreground capitalize font-medium">{key}</span>
+              {Object.entries(data.healthDimensions)
+                .slice(0, 4)
+                .map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: getHealthBgColor(value) }}
+                      />
+                      <span className="text-xs text-muted-foreground capitalize font-medium">{key}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Progress value={value} className="h-1.5 w-16" />
+                      <span className={cn("text-xs font-semibold min-w-[2rem]", getHealthColor(value))}>
+                        {(value ?? 0).toFixed(0)}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Progress value={value} className="h-1.5 w-16" />
-                    <span className={cn("text-xs font-semibold min-w-[2rem]", getHealthColor(value))}>
-                      {(value ?? 0).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {/* Key Metrics */}
             <div className="grid grid-cols-2 gap-2">
               <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
                 <div className="text-sm font-medium text-foreground">
-                  {role === 'executive' ? ((data as any).companyMetrics?.avgProjectHealth ?? 0).toFixed(0) : 
-                   role === 'project-executive' ? ((data as any).keyMetrics?.projectHealth ?? data.overallHealth).toFixed(0) : 
-                   data.overallHealth.toFixed(0)}%
+                  {role === "executive"
+                    ? ((data as any).companyMetrics?.avgProjectHealth ?? 0).toFixed(0)
+                    : role === "project-executive"
+                    ? ((data as any).keyMetrics?.projectHealth ?? data.overallHealth).toFixed(0)
+                    : data.overallHealth.toFixed(0)}
+                  %
                 </div>
                 <div className="text-xs text-muted-foreground">Project Health</div>
               </div>
               <div className="text-center p-2 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
                 <div className="text-sm font-medium text-foreground">
-                  {role === 'executive' ? ((data as any).companyMetrics?.avgStakeholderSatisfaction ?? 0).toFixed(0) : 
-                   role === 'project-executive' ? ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0) : 
-                   ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0)}%
+                  {role === "executive"
+                    ? ((data as any).companyMetrics?.avgStakeholderSatisfaction ?? 0).toFixed(0)
+                    : role === "project-executive"
+                    ? ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0)
+                    : ((data as any).keyMetrics?.stakeholderSatisfaction ?? 0).toFixed(0)}
+                  %
                 </div>
                 <div className="text-xs text-muted-foreground">Satisfaction</div>
               </div>
@@ -339,8 +526,10 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
       {showDrillDown && (
         <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-lg p-2 sm:p-1.5 sm:p-2 lg:p-2.5 lg:p-2 sm:p-2.5 lg:p-1.5 sm:p-2 lg:p-2.5 text-white transition-all duration-300 ease-in-out overflow-y-auto z-50">
           <div className="h-full">
-            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">Health Analytics Deep Dive</h3>
-            
+            <h3 className="text-base sm:text-lg lg:text-base sm:text-lg lg:text-xl font-medium mb-1.5 sm:mb-2 lg:mb-1 sm:mb-1.5 lg:mb-2 text-center">
+              Health Analytics Deep Dive
+            </h3>
+
             <div className="grid grid-cols-2 gap-2 sm:gap-1 sm:gap-1.5 lg:gap-2 lg:gap-1.5 sm:gap-2 lg:gap-1 sm:gap-1.5 lg:gap-2 h-[calc(100%-60px)]">
               {/* Health Radar */}
               <div className="space-y-4">
@@ -363,15 +552,15 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                           fillOpacity={0.3}
                           strokeWidth={2}
                         />
-                        <Tooltip 
+                        <Tooltip
                           contentStyle={{
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            border: '1px solid #ffffff40',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            color: 'white'
+                            backgroundColor: "rgba(0,0,0,0.8)",
+                            border: "1px solid #ffffff40",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            color: "white",
                           }}
-                          formatter={(value: number) => [`${value.toFixed(1)}%`, 'Health']}
+                          formatter={(value: number) => [`${value.toFixed(1)}%`, "Health"]}
                         />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -380,11 +569,10 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                   <div className="grid grid-cols-2 gap-1 text-xs mt-2">
                     {radarData.map((item) => (
                       <div key={item.dimension} className="flex items-center gap-1">
-                        <div 
-                          className="w-2 h-2 rounded-full flex-shrink-0" 
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-white truncate">{item.dimension}: {item.value.toFixed(0)}%</span>
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-white truncate">
+                          {item.dimension}: {item.value.toFixed(0)}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -406,17 +594,29 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                     </div>
                     <div className="flex justify-between">
                       <span>Trend Direction:</span>
-                      <span className={cn("font-medium", 
-                        data.trendDirection === 'up' ? 'text-green-400' : 
-                        data.trendDirection === 'down' ? 'text-red-400' : 'text-yellow-400'
-                      )}>
-                        {data.trendDirection === 'up' ? 'Improving' : 
-                         data.trendDirection === 'down' ? 'Declining' : 'Stable'}
+                      <span
+                        className={cn(
+                          "font-medium",
+                          data.trendDirection === "up"
+                            ? "text-green-400"
+                            : data.trendDirection === "down"
+                            ? "text-red-400"
+                            : "text-yellow-400"
+                        )}
+                      >
+                        {data.trendDirection === "up"
+                          ? "Improving"
+                          : data.trendDirection === "down"
+                          ? "Declining"
+                          : "Stable"}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Monthly Change:</span>
-                      <span className="font-medium text-purple-300">{data.trendValue > 0 ? '+' : ''}{data.trendValue}%</span>
+                      <span className="font-medium text-purple-300">
+                        {data.trendValue > 0 ? "+" : ""}
+                        {data.trendValue}%
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -435,16 +635,22 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                         <XAxis dataKey="month" fontSize={9} stroke="white" />
                         <YAxis domain={[60, 100]} fontSize={9} stroke="white" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'rgba(0,0,0,0.8)', 
-                            border: '1px solid #ffffff40',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            color: 'white'
-                          }} 
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "rgba(0,0,0,0.8)",
+                            border: "1px solid #ffffff40",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            color: "white",
+                          }}
                         />
-                        <Line type="monotone" dataKey="overall" stroke="#60a5fa" strokeWidth={3} name="Overall Health" />
+                        <Line
+                          type="monotone"
+                          dataKey="overall"
+                          stroke="#60a5fa"
+                          strokeWidth={3}
+                          name="Overall Health"
+                        />
                         <Line type="monotone" dataKey="schedule" stroke="#10b981" strokeWidth={2} name="Schedule" />
                         <Line type="monotone" dataKey="budget" stroke="#f59e0b" strokeWidth={2} name="Budget" />
                       </LineChart>
@@ -465,7 +671,7 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                     <div className="flex justify-between">
                       <span>Good (80-89%):</span>
                       <span className="font-medium text-blue-400">
-                        {Object.values(data.healthDimensions).filter(v => v >= 80 && v < 90).length} dimensions
+                        {Object.values(data.healthDimensions).filter((v) => v >= 80 && v < 90).length} dimensions
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -475,15 +681,18 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
                     <div className="flex justify-between">
                       <span>Project Status:</span>
                       <span className="font-medium text-purple-300">
-                        {role === 'project-manager' ? ((data as any).projectName ?? 'Project View') : 
-                         role === 'project-executive' ? 'Portfolio View' : 'Company View'}
+                        {role === "project-manager"
+                          ? (data as any).projectName ?? "Project View"
+                          : role === "project-executive"
+                          ? "Portfolio View"
+                          : "Company View"}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* Close Button */}
             <div className="absolute bottom-4 right-4">
               <button
@@ -498,4 +707,4 @@ export function HealthCard({ card, config, span, isCompact, userRole }: HealthCa
       )}
     </div>
   )
-} 
+}
