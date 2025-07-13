@@ -281,7 +281,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
         />
       </div>
 
-      {/* Header with Logo and Progress */}
+      {/* Header with Logo, Progress, and Exit */}
       <motion.header className="absolute top-0 left-0 right-0 z-20 p-6 lg:p-8" variants={contentVariants}>
         <div className="flex items-center justify-between">
           {/* Logo Section */}
@@ -295,11 +295,21 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
             </div>
           </div>
 
-          {/* Progress Indicator */}
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 px-3 py-1">
+          {/* Progress Indicator and Exit Button */}
+          <div className="flex items-center space-x-4">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm font-medium">
               {currentSlide + 1} of {slides.length}
             </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExit}
+              disabled={isExiting}
+              className="text-white hover:bg-white/20 text-sm font-medium px-4 py-2 border border-white/30 hover:border-white/50 transition-all duration-200"
+              aria-label="Exit presentation"
+            >
+              Exit
+            </Button>
           </div>
         </div>
       </motion.header>
@@ -383,8 +393,8 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
       </div>
 
       {/* Navigation Controls */}
-      <motion.div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20" variants={contentVariants}>
-        <div className="flex items-center space-x-6">
+      <motion.div className="absolute bottom-8 inset-x-0 z-20 flex justify-center" variants={contentVariants}>
+        <div className="flex items-center justify-center space-x-6">
           {/* Previous Button */}
           <Button
             variant="ghost"
@@ -398,7 +408,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
           </Button>
 
           {/* Slide Dots */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center space-x-3">
             {slides.map((_, index) => (
               <button
                 key={index}
@@ -424,20 +434,6 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
             <ChevronRight className="h-6 w-6" />
           </Button>
         </div>
-      </motion.div>
-
-      {/* Exit Button */}
-      <motion.div className="absolute top-6 right-6 lg:top-8 lg:right-8 z-20" variants={contentVariants}>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleExit}
-          disabled={isExiting}
-          className="text-white hover:bg-white/20 text-sm"
-          aria-label="Exit presentation"
-        >
-          Exit
-        </Button>
       </motion.div>
 
       {/* Auto-play indicator */}

@@ -22,7 +22,9 @@ export const slides: PresentationSlide[] = [
     title: "Welcome to HB Intel",
     content: (
       <div className="space-y-4">
-        <p className="text-xl text-muted-foreground">Where continuity becomes your competitive advantage.</p>
+        <p className="text-xl" style={{ color: "rgb(250, 70, 22)" }}>
+          Where <span className="font-bold underline">continuity</span> becomes your competitive advantage.
+        </p>
         <p className="text-lg">
           For four decades, Hedrick Brothers has built more than structures—we&apos;ve built trust, relationships, and a
           reputation for excellence that defines who we are.
@@ -58,29 +60,30 @@ export const slides: PresentationSlide[] = [
     id: "chaos-of-today",
     title: "The Chaos of Today",
     content: (
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <p className="text-lg">
-            Right now, our project information lives in dozens of different places: spreadsheets, email chains,
-            third-party platforms, and individual hard drives.
-          </p>
-          <p className="text-lg">
-            When someone leaves, their knowledge walks out the door. When a project moves between phases, critical
-            details get lost in translation.
-          </p>
-        </div>
-
-        {/* Visualization of tangled tools */}
-        <div className="my-8">
+      <>
+        {/* Background visualization - absolute positioned behind everything */}
+        <div className="absolute inset-0 -z-10 w-full h-full">
           <TangledToolsVisualization />
         </div>
 
-        <p className="text-lg">
-          We&apos;re spending more time hunting for information than using it to make decisions. This isn&apos;t
-          sustainable at our current size—and it&apos;s impossible at 4x scale.
-        </p>
-      </div>
+        {/* Text content - positioned above background */}
+        <div className="relative z-10 space-y-6">
+          <p className="text-lg lg:text-xl">
+            Right now, our project information lives in dozens of different places: spreadsheets, email chains,
+            third-party platforms, and individual hard drives.
+          </p>
+          <p className="text-lg lg:text-xl">
+            When someone leaves, their knowledge walks out the door. When a project moves between phases, critical
+            details get lost in translation.
+          </p>
+          <p className="text-base lg:text-lg text-blue-100 mt-8">
+            We're spending more time hunting for information than using it to make decisions. This isn't sustainable at
+            our current size—and it's impossible at 4x scale.
+          </p>
+        </div>
+      </>
     ),
+    backgroundGradient: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%)",
   },
   {
     id: "risk-of-fragmentation",
