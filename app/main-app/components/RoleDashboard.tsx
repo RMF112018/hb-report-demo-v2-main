@@ -17,9 +17,7 @@ import { useDashboardLayout } from "../../../hooks/use-dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
-import { Switch } from "../../../components/ui/switch"
-import { Label } from "../../../components/ui/label"
-import { AlertCircle, Loader2, RefreshCw, TestTube } from "lucide-react"
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
 import { getProjectStats, getProjectAccessDescription } from "../../../lib/project-access-utils"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import Image from "next/image"
@@ -30,6 +28,7 @@ import BidManagementCenter from "../../../components/estimating/bid-management/B
 import BidManagementBetaTables from "../../../components/estimating/bid-management/BidManagementBetaTables"
 import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers/EstimatingModuleWrapper"
 import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel"
+import PowerBIControlBar from "../../../components/dashboard/PowerBIControlBar"
 
 interface ProjectData {
   id: string
@@ -80,8 +79,32 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 }) => {
   const router = useRouter()
 
-  // Beta toggle state
-  const [useBetaDashboard, setUseBetaDashboard] = React.useState(false)
+  // Enhanced dashboard is now always enabled for Financial Review
+  const isFinancialReview = activeTab === "financial-review"
+
+  // Focus mode state for Power BI control bar
+  const [isFocusMode, setIsFocusMode] = React.useState(false)
+
+  // Handle ESC key to exit focus mode
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFocusMode) {
+        setIsFocusMode(false)
+      }
+    }
+
+    if (isFocusMode) {
+      document.addEventListener("keydown", handleEscape)
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape)
+      document.body.style.overflow = "auto"
+    }
+  }, [isFocusMode])
 
   // Use the dashboard layout hook
   const {
@@ -282,47 +305,78 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
   // Render content based on active tab
   const renderTabContent = () => {
-    // Show beta information banner when beta mode is active
-    const betaBanner = useBetaDashboard ? (
-      <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
-        <div className="flex items-center gap-2">
-          <TestTube className="h-5 w-5 text-orange-600" />
-          <span className="font-medium text-orange-800 dark:text-orange-200">Beta Dashboard Mode Active</span>
-          <Badge variant="outline" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-            Power BI Integration
-          </Badge>
-        </div>
-        <p className="text-sm text-orange-800 dark:text-orange-200 mt-2">
-          🚀 <strong>New Experience:</strong> All dashboard cards now feature enhanced Power BI integration with
-          real-time analytics, advanced visualizations, embedded reports, and enterprise-grade data insights. Toggle off
-          to return to legacy dashboard views.
-        </p>
-      </div>
-    ) : null
-
     switch (activeTab) {
       case "overview":
         return (
-          <div>
-            {betaBanner}
-            <DashboardLayout
-              cards={cards}
-              onLayoutChange={onLayoutChange}
-              onCardRemove={onCardRemove}
-              onCardConfigure={onCardConfigure}
-              onCardSizeChange={onCardSizeChange}
-              onCardAdd={onCardAdd}
-              onSave={onSave}
-              onReset={onReset}
-              isEditing={isEditing}
-              onToggleEdit={onToggleEdit}
-              layoutDensity={layoutDensity}
+          <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+            {/* Power BI Control Bar */}
+            <PowerBIControlBar
               userRole={userRole}
-              dashboards={dashboards}
-              currentDashboardId={currentDashboardId ?? undefined}
-              onDashboardSelect={onDashboardSelect}
-              useBetaDashboard={useBetaDashboard}
+              onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+              isFocusMode={isFocusMode}
+              className={isFocusMode ? "rounded-none" : ""}
             />
+
+            {/* Dashboard Content */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
+              <DashboardLayout
+                cards={cards}
+                onLayoutChange={onLayoutChange}
+                onCardRemove={onCardRemove}
+                onCardConfigure={onCardConfigure}
+                onCardSizeChange={onCardSizeChange}
+                onCardAdd={onCardAdd}
+                onSave={onSave}
+                onReset={onReset}
+                isEditing={isEditing}
+                onToggleEdit={onToggleEdit}
+                layoutDensity={layoutDensity}
+                userRole={userRole}
+                dashboards={dashboards}
+                currentDashboardId={currentDashboardId ?? undefined}
+                onDashboardSelect={onDashboardSelect}
+                useBetaDashboard={userRole === "project-executive" || userRole === "project-manager"}
+              />
+            </div>
+          </div>
+        )
+
+      case "pre-con-overview":
+        // Get pre-con dashboard layout
+        const preconLayout = layouts?.find((l) => l.name.toLowerCase().includes("pre-con")) || layout
+        const preconCards = preconLayout?.cards || cards
+
+        return (
+          <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+            {/* Power BI Control Bar */}
+            <PowerBIControlBar
+              userRole={userRole}
+              onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+              isFocusMode={isFocusMode}
+              className={isFocusMode ? "rounded-none" : ""}
+            />
+
+            {/* Dashboard Content */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
+              <DashboardLayout
+                cards={preconCards}
+                onLayoutChange={onLayoutChange}
+                onCardRemove={onCardRemove}
+                onCardConfigure={onCardConfigure}
+                onCardSizeChange={onCardSizeChange}
+                onCardAdd={onCardAdd}
+                onSave={onSave}
+                onReset={onReset}
+                isEditing={isEditing}
+                onToggleEdit={onToggleEdit}
+                layoutDensity={layoutDensity}
+                userRole={userRole}
+                dashboards={dashboards}
+                currentDashboardId={currentDashboardId ?? undefined}
+                onDashboardSelect={onDashboardSelect}
+                useBetaDashboard={true}
+              />
+            </div>
           </div>
         )
 
@@ -332,26 +386,36 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         const financialCards = financialLayout?.cards || cards
 
         return (
-          <div>
-            {betaBanner}
-            <DashboardLayout
-              cards={financialCards}
-              onLayoutChange={onLayoutChange}
-              onCardRemove={onCardRemove}
-              onCardConfigure={onCardConfigure}
-              onCardSizeChange={onCardSizeChange}
-              onCardAdd={onCardAdd}
-              onSave={onSave}
-              onReset={onReset}
-              isEditing={isEditing}
-              onToggleEdit={onToggleEdit}
-              layoutDensity={layoutDensity}
+          <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+            {/* Power BI Control Bar */}
+            <PowerBIControlBar
               userRole={userRole}
-              dashboards={dashboards}
-              currentDashboardId={currentDashboardId ?? undefined}
-              onDashboardSelect={onDashboardSelect}
-              useBetaDashboard={useBetaDashboard}
+              onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+              isFocusMode={isFocusMode}
+              className={isFocusMode ? "rounded-none" : ""}
             />
+
+            {/* Dashboard Content */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
+              <DashboardLayout
+                cards={financialCards}
+                onLayoutChange={onLayoutChange}
+                onCardRemove={onCardRemove}
+                onCardConfigure={onCardConfigure}
+                onCardSizeChange={onCardSizeChange}
+                onCardAdd={onCardAdd}
+                onSave={onSave}
+                onReset={onReset}
+                isEditing={isEditing}
+                onToggleEdit={onToggleEdit}
+                layoutDensity={layoutDensity}
+                userRole={userRole}
+                dashboards={dashboards}
+                currentDashboardId={currentDashboardId ?? undefined}
+                onDashboardSelect={onDashboardSelect}
+                useBetaDashboard={true}
+              />
+            </div>
           </div>
         )
 
@@ -379,7 +443,6 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
       case "analytics":
         return (
           <div>
-            {betaBanner}
             <DashboardLayout
               cards={cards}
               onLayoutChange={onLayoutChange}
@@ -396,51 +459,164 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               dashboards={dashboards}
               currentDashboardId={currentDashboardId ?? undefined}
               onDashboardSelect={onDashboardSelect}
-              useBetaDashboard={useBetaDashboard}
+              useBetaDashboard={false}
             />
           </div>
         )
 
-      case "power-bi-beta":
-        // Power BI Beta Dashboard with enhanced cards
-        const powerBICards = [
+      case "my-dashboard":
+        // My Dashboard with varied card sizes and shapes - demonstrates dashboard customization capabilities
+        const myDashboardCards = [
+          // Top Row - Wide Header Card
           {
-            id: "power-bi-enterprise-dashboard",
-            type: "power-bi-dashboard",
-            title: "Power BI Enterprise Dashboard",
-            size: "optimal",
+            id: "simple-project-metrics",
+            type: "simple-project-metrics",
+            title: "Project Metrics Overview",
+            size: "full-width",
             position: { x: 0, y: 0 },
-            span: { cols: 16, rows: 8 },
+            span: { cols: 16, rows: 4 },
             visible: true,
             config: {
-              executiveMode: true,
+              userRole: userRole,
               showRealTime: true,
-              compactMode: false,
-              enableDrillDown: true,
-              beta: true,
+              headerMode: true,
+            },
+          },
+          // Second Row - Two Equal Cards
+          {
+            id: "simple-financial-summary",
+            type: "simple-financial-summary",
+            title: "Financial Summary",
+            size: "half-width",
+            position: { x: 0, y: 4 },
+            span: { cols: 8, rows: 5 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              expandedView: true,
+            },
+          },
+          {
+            id: "simple-activity-trends",
+            type: "simple-activity-trends",
+            title: "Activity Trends",
+            size: "half-width",
+            position: { x: 8, y: 4 },
+            span: { cols: 8, rows: 5 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              expandedView: true,
+            },
+          },
+          // Third Row - Three Cards (varied sizes)
+          {
+            id: "simple-procurement-analytics",
+            type: "simple-procurement-analytics",
+            title: "Procurement Analytics",
+            size: "large",
+            position: { x: 0, y: 9 },
+            span: { cols: 6, rows: 4 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              detailedView: true,
+            },
+          },
+          {
+            id: "simple-permit-tracking",
+            type: "simple-permit-tracking",
+            title: "Permit Tracking",
+            size: "medium",
+            position: { x: 6, y: 9 },
+            span: { cols: 5, rows: 4 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              compactView: true,
+            },
+          },
+          {
+            id: "simple-rfi-status",
+            type: "simple-rfi-status",
+            title: "RFI Status",
+            size: "small",
+            position: { x: 11, y: 9 },
+            span: { cols: 5, rows: 4 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              compactView: true,
+            },
+          },
+          // Fourth Row - Two Cards (different aspect ratios)
+          {
+            id: "simple-market-insights",
+            type: "simple-market-insights",
+            title: "Market Insights",
+            size: "wide",
+            position: { x: 0, y: 13 },
+            span: { cols: 10, rows: 3 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              chartFocused: true,
+            },
+          },
+          {
+            id: "simple-estimating-progress",
+            type: "simple-estimating-progress",
+            title: "Estimating Progress",
+            size: "tall",
+            position: { x: 10, y: 13 },
+            span: { cols: 6, rows: 3 },
+            visible: true,
+            config: {
+              userRole: userRole,
+              showRealTime: true,
+              verticalLayout: true,
             },
           },
         ]
 
         return (
-          <DashboardLayout
-            cards={powerBICards}
-            onLayoutChange={onLayoutChange}
-            onCardRemove={onCardRemove}
-            onCardConfigure={onCardConfigure}
-            onCardSizeChange={onCardSizeChange}
-            onCardAdd={onCardAdd}
-            onSave={onSave}
-            onReset={onReset}
-            isEditing={isEditing}
-            onToggleEdit={onToggleEdit}
-            layoutDensity={layoutDensity}
-            userRole={userRole}
-            dashboards={dashboards}
-            currentDashboardId={currentDashboardId ?? undefined}
-            onDashboardSelect={onDashboardSelect}
-            useBetaDashboard={true} // Always use beta for power-bi-beta tab
-          />
+          <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+            {/* Power BI Control Bar */}
+            <PowerBIControlBar
+              userRole={userRole}
+              onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+              isFocusMode={isFocusMode}
+              className={isFocusMode ? "rounded-none" : ""}
+            />
+
+            {/* Dashboard Content */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
+              <DashboardLayout
+                cards={myDashboardCards}
+                onLayoutChange={onLayoutChange}
+                onCardRemove={onCardRemove}
+                onCardConfigure={onCardConfigure}
+                onCardSizeChange={onCardSizeChange}
+                onCardAdd={onCardAdd}
+                onSave={onSave}
+                onReset={onReset}
+                isEditing={isEditing}
+                onToggleEdit={onToggleEdit}
+                layoutDensity={layoutDensity}
+                userRole={userRole}
+                dashboards={dashboards}
+                currentDashboardId={currentDashboardId ?? undefined}
+                onDashboardSelect={onDashboardSelect}
+                useBetaDashboard={true}
+              />
+            </div>
+          </div>
         )
 
       case "bid-management":
@@ -462,20 +638,18 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
           }
         })()
 
-        // Show beta tables when beta mode is active
-        if (useBetaDashboard) {
-          return (
-            <div>
-              {betaBanner}
-              <BidManagementBetaTables
-                userRole={bidManagementUserRole}
-                onProjectSelect={onProjectSelect}
-                className="h-full"
-              />
-            </div>
-          )
-        }
+        // Show enhanced tables by default for bid management
+        return (
+          <div>
+            <BidManagementBetaTables
+              userRole={bidManagementUserRole}
+              onProjectSelect={onProjectSelect}
+              className="h-full"
+            />
+          </div>
+        )
 
+        // Fallback to legacy bid management if needed
         return (
           <EstimatingModuleWrapper
             title="Bid Management Center"
@@ -498,7 +672,6 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         // Default to overview if tab not recognized
         return (
           <div>
-            {betaBanner}
             <DashboardLayout
               cards={cards}
               onLayoutChange={onLayoutChange}
@@ -515,7 +688,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               dashboards={dashboards}
               currentDashboardId={currentDashboardId ?? undefined}
               onDashboardSelect={onDashboardSelect}
-              useBetaDashboard={useBetaDashboard}
+              useBetaDashboard={false}
             />
           </div>
         )
@@ -524,22 +697,6 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
   return (
     <div className="h-full w-full">
-      {/* Beta Toggle */}
-      <div className="flex items-center justify-between mb-4 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <TestTube className="h-4 w-4 text-primary" />
-          <Label htmlFor="beta-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Beta Dashboard
-          </Label>
-        </div>
-        <Switch
-          id="beta-toggle"
-          checked={useBetaDashboard}
-          onCheckedChange={setUseBetaDashboard}
-          className="data-[state=checked]:bg-primary"
-        />
-      </div>
-
       {/* Layout Density Controls - Show when editing and on overview tab */}
       {isEditing && (activeTab === "overview" || activeTab === "financial-review") && (
         <div className="mb-4 flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">

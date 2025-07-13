@@ -200,7 +200,7 @@ const MyProjects: React.FC<MyProjectsProps> = ({ projects, userRole, onProjectSe
  * Main Application Page component
  */
 export default function MainApplicationPage() {
-  const { user, isPresentationMode, viewingAs } = useAuth()
+  const { user, isPresentationMode, viewingAs, switchRole, returnToPresentation } = useAuth()
   const router = useRouter()
 
   // State management
@@ -538,22 +538,26 @@ export default function MainApplicationPage() {
       const isBiddingStage = selectedProjectData.project_stage_name === "Bidding"
 
       if (isBiddingStage) {
-        // Only show Core, Pre-Construction, and Field Management tabs for bidding projects
+        // Only show Core, Pre-Construction, Field Management, and Activity Feed tabs for bidding projects
         return [
           { id: "core", label: "Core" },
+          { id: "documents", label: "Documents" },
           { id: "pre-construction", label: "Pre-Construction" },
           { id: "field-management", label: "Field Management" },
+          { id: "activity-feed", label: "Activity Feed" },
         ]
       }
 
       // Default full tab set for non-bidding projects
       return [
         { id: "core", label: "Core" },
+        { id: "documents", label: "Documents" },
         { id: "pre-construction", label: "Pre-Construction" },
         { id: "financial-management", label: "Financial Management" },
         { id: "field-management", label: "Field Management" },
         { id: "compliance", label: "Compliance" },
         { id: "warranty", label: "Warranty" },
+        { id: "activity-feed", label: "Activity Feed" },
       ]
     }
 
@@ -575,39 +579,40 @@ export default function MainApplicationPage() {
         { id: "overview", label: "Overview" },
         { id: "modules", label: "IT Modules" },
         { id: "analytics", label: "Analytics" },
-        { id: "power-bi-beta", label: "Power BI Beta" },
+        { id: "my-dashboard", label: "My Dashboard" },
         { id: "settings", label: "Settings" },
       ]
     } else if (effectiveRole === "executive" || effectiveRole === "presentation") {
       return [
-        { id: "overview", label: "Overview" },
+        { id: "overview", label: "Ops Overview" },
+        { id: "pre-con-overview", label: "Pre-Con Overview" },
         { id: "financial-review", label: "Financial Review" },
-        { id: "power-bi-beta", label: "Power BI Beta" },
+        { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else if (effectiveRole === "project-executive") {
       return [
         { id: "action-items", label: "Action Items" },
-        { id: "overview", label: "Overview" },
+        { id: "overview", label: "Ops Overview" },
         { id: "financial-review", label: "Financial Review" },
-        { id: "power-bi-beta", label: "Power BI Beta" },
+        { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else if (effectiveRole === "project-manager") {
       return [
         { id: "action-items", label: "Action Items" },
-        { id: "overview", label: "Overview" },
+        { id: "overview", label: "Ops Overview" },
         { id: "financial-review", label: "Financial Review" },
-        { id: "power-bi-beta", label: "Power BI Beta" },
+        { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     } else {
       // Default for other roles (estimator, etc.)
       return [
-        { id: "overview", label: "Overview" },
+        { id: "overview", label: "Ops Overview" },
         { id: "bid-management", label: "Bid Management" },
         { id: "analytics", label: "Analytics" },
-        { id: "power-bi-beta", label: "Power BI Beta" },
+        { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
     }
@@ -1085,6 +1090,8 @@ export default function MainApplicationPage() {
           onNavigateToTab={headerConfig.onNavigateToTab}
           isPresentationMode={isPresentationMode}
           viewingAs={viewingAs}
+          onRoleSwitch={switchRole}
+          onReturnToPresentation={returnToPresentation}
           isSticky={true}
         />
       </div>

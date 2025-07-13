@@ -73,9 +73,9 @@ export default function ProjectOverviewPanel({
 
   // Calculate construction-specific metrics
   const getConstructionMetrics = () => {
-    // Mock data for PCCOs and PCOs
-    const totalPCCOsApproved = 8
-    const pcosPendingPCCO = 3
+    // Mock dollar data for PCCOs and PCOs
+    const totalPCCOsApproved = 245000 // $245,000
+    const pcosPendingPCCO = 67500 // $67,500
 
     // Get dates from projectData and format as mm/dd/yyyy
     const formatDate = (dateString: string) => {
@@ -84,12 +84,32 @@ export default function ProjectOverviewPanel({
       return date.toLocaleDateString("en-US")
     }
 
+    // Get projected completion date with fallback logic
+    const getProjectedCompletionDate = () => {
+      // Try projected_completion_date first
+      if (projectData?.projected_completion_date) {
+        return formatDate(projectData.projected_completion_date)
+      }
+      // Fall back to original_completion_date
+      if (projectData?.original_completion_date) {
+        return formatDate(projectData.original_completion_date)
+      }
+      // Calculate estimated completion (contract date + typical buffer)
+      if (projectData?.original_completion_date) {
+        const contractDate = new Date(projectData.original_completion_date)
+        contractDate.setDate(contractDate.getDate() + 30) // Add 30 days buffer
+        return formatDate(contractDate.toISOString())
+      }
+      // Final fallback
+      return "03/15/2027"
+    }
+
     return {
       totalPCCOsApproved,
       pcosPendingPCCO,
       approvedExtensions: projectData?.approved_extensions || 0,
       contractCompletionDate: formatDate(projectData?.original_completion_date),
-      projectedCompletionDate: formatDate(projectData?.projected_completion_date),
+      projectedCompletionDate: getProjectedCompletionDate(),
     }
   }
 
@@ -159,11 +179,11 @@ export default function ProjectOverviewPanel({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total PCCOs Approved</span>
-                <span className="font-medium">{constructionMetrics.totalPCCOsApproved}</span>
+                <span className="font-medium">${constructionMetrics.totalPCCOsApproved.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">PCOs Pending PCCO</span>
-                <span className="font-medium">{constructionMetrics.pcosPendingPCCO}</span>
+                <span className="font-medium">${constructionMetrics.pcosPendingPCCO.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Approved Extensions</span>

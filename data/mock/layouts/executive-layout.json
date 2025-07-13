@@ -168,8 +168,7 @@
         "executiveMode": true,
         "showRealTime": true,
         "compactMode": false,
-        "enableDrillDown": true,
-        "beta": true
+        "enableDrillDown": true
       }
     }
   ]

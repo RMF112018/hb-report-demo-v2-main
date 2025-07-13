@@ -1,0 +1,545 @@
+{
+  "formId": "SSI-001",
+  "title": "Site Safety Inspection",
+  "description": "Comprehensive site-wide safety inspection to identify hazards and ensure compliance",
+  "category": "inspection",
+  "version": "1.8",
+  "requiredFields": ["inspectorName", "date", "areas", "deficiencies"],
+  "estimatedTime": "30-60 minutes",
+  "frequency": "Weekly",
+  "applicablePhases": ["construction", "pre-construction", "closeout"],
+  "applicableTrades": ["all"],
+  "priority": "high",
+  "regulatoryRequirements": [
+    {
+      "agency": "OSHA",
+      "standard": "29 CFR 1926.20(b)(2)",
+      "description": "Frequent and regular inspections"
+    },
+    {
+      "agency": "Company Policy",
+      "standard": "HBC-SAF-002",
+      "description": "Site safety inspection requirement"
+    }
+  ],
+  "formStructure": {
+    "sections": [
+      {
+        "id": "inspection-details",
+        "title": "Inspection Details",
+        "required": true,
+        "fields": [
+          {
+            "id": "inspectionDate",
+            "label": "Inspection Date",
+            "type": "date",
+            "required": true,
+            "defaultValue": "today"
+          },
+          {
+            "id": "inspectionTime",
+            "label": "Inspection Time",
+            "type": "time",
+            "required": true,
+            "defaultValue": "now"
+          },
+          {
+            "id": "inspectorName",
+            "label": "Inspector Name",
+            "type": "text",
+            "required": true,
+            "placeholder": "Name of person conducting inspection"
+          },
+          {
+            "id": "inspectorTitle",
+            "label": "Inspector Title/Position",
+            "type": "text",
+            "required": true,
+            "placeholder": "Safety Officer, Project Manager, etc."
+          },
+          {
+            "id": "weatherConditions",
+            "label": "Weather Conditions",
+            "type": "select",
+            "required": true,
+            "options": ["Clear", "Overcast", "Light rain", "Heavy rain", "Snow", "High winds", "Extreme temperature"]
+          },
+          {
+            "id": "temperature",
+            "label": "Temperature (°F)",
+            "type": "number",
+            "required": false,
+            "min": -20,
+            "max": 120
+          }
+        ]
+      },
+      {
+        "id": "general-housekeeping",
+        "title": "General Housekeeping & Site Conditions",
+        "required": true,
+        "fields": [
+          {
+            "id": "housekeeping",
+            "label": "Site Cleanliness and Organization",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "wasteManagement",
+            "label": "Waste Management",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "accessRoutes",
+            "label": "Access Routes and Walkways",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "materialStorage",
+            "label": "Material Storage",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "signageBarricades",
+            "label": "Signage and Barricades",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "personal-protective-equipment",
+        "title": "Personal Protective Equipment (PPE)",
+        "required": true,
+        "fields": [
+          {
+            "id": "hardHatCompliance",
+            "label": "Hard Hat Usage",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "100", "label": "100% Compliance", "color": "green" },
+              { "value": "partial", "label": "Partial Compliance", "color": "yellow" },
+              { "value": "poor", "label": "Poor Compliance", "color": "red" }
+            ]
+          },
+          {
+            "id": "eyeProtection",
+            "label": "Eye Protection",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "100", "label": "100% Compliance", "color": "green" },
+              { "value": "partial", "label": "Partial Compliance", "color": "yellow" },
+              { "value": "poor", "label": "Poor Compliance", "color": "red" }
+            ]
+          },
+          {
+            "id": "hearingProtection",
+            "label": "Hearing Protection",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "100", "label": "100% Compliance", "color": "green" },
+              { "value": "partial", "label": "Partial Compliance", "color": "yellow" },
+              { "value": "poor", "label": "Poor Compliance", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "respiratoryProtection",
+            "label": "Respiratory Protection",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "100", "label": "100% Compliance", "color": "green" },
+              { "value": "partial", "label": "Partial Compliance", "color": "yellow" },
+              { "value": "poor", "label": "Poor Compliance", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "fallProtection",
+            "label": "Fall Protection",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "100", "label": "100% Compliance", "color": "green" },
+              { "value": "partial", "label": "Partial Compliance", "color": "yellow" },
+              { "value": "poor", "label": "Poor Compliance", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "equipment-tools",
+        "title": "Equipment and Tools",
+        "required": true,
+        "fields": [
+          {
+            "id": "toolCondition",
+            "label": "Tool Condition and Maintenance",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "powerToolSafety",
+            "label": "Power Tool Safety",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "heavyEquipment",
+            "label": "Heavy Equipment Operation",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "ladderScaffold",
+            "label": "Ladders and Scaffolds",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "electrical-safety",
+        "title": "Electrical Safety",
+        "required": true,
+        "fields": [
+          {
+            "id": "electricalConnections",
+            "label": "Electrical Connections and Cords",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "gfciProtection",
+            "label": "GFCI Protection",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          },
+          {
+            "id": "electricalPanels",
+            "label": "Electrical Panels and Access",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" },
+              { "value": "na", "label": "Not Applicable", "color": "gray" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fire-safety",
+        "title": "Fire Safety and Emergency Preparedness",
+        "required": true,
+        "fields": [
+          {
+            "id": "fireExtinguishers",
+            "label": "Fire Extinguishers",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "emergencyExits",
+            "label": "Emergency Exits and Routes",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "firstAidSupplies",
+            "label": "First Aid Supplies",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "satisfactory", "label": "Satisfactory", "color": "green" },
+              { "value": "needs_improvement", "label": "Needs Improvement", "color": "yellow" },
+              { "value": "unsatisfactory", "label": "Unsatisfactory", "color": "red" }
+            ]
+          },
+          {
+            "id": "emergencyContactsPosted",
+            "label": "Emergency Contacts Posted",
+            "type": "radio",
+            "required": true,
+            "options": [
+              { "value": "yes", "label": "Yes", "color": "green" },
+              { "value": "no", "label": "No", "color": "red" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "deficiencies",
+        "title": "Safety Deficiencies and Observations",
+        "required": true,
+        "fields": [
+          {
+            "id": "deficiencies",
+            "label": "Safety Deficiencies",
+            "type": "repeatable-group",
+            "required": false,
+            "minItems": 0,
+            "maxItems": 20,
+            "fields": [
+              {
+                "id": "deficiencyNumber",
+                "label": "Item #",
+                "type": "number",
+                "required": true,
+                "auto": true
+              },
+              {
+                "id": "location",
+                "label": "Location/Area",
+                "type": "text",
+                "required": true,
+                "placeholder": "Specific location of deficiency"
+              },
+              {
+                "id": "description",
+                "label": "Description of Deficiency",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "Detailed description of the safety issue"
+              },
+              {
+                "id": "severity",
+                "label": "Severity Level",
+                "type": "select",
+                "required": true,
+                "options": [
+                  { "value": "low", "label": "Low", "color": "green" },
+                  { "value": "medium", "label": "Medium", "color": "yellow" },
+                  { "value": "high", "label": "High", "color": "orange" },
+                  { "value": "immediate", "label": "Immediate Action Required", "color": "red" }
+                ]
+              },
+              {
+                "id": "corrective_action",
+                "label": "Corrective Action Required",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "What needs to be done to fix this issue?"
+              },
+              {
+                "id": "responsible_party",
+                "label": "Responsible Party",
+                "type": "text",
+                "required": true,
+                "placeholder": "Who is responsible for correction?"
+              },
+              {
+                "id": "due_date",
+                "label": "Due Date",
+                "type": "date",
+                "required": true
+              },
+              {
+                "id": "photo_required",
+                "label": "Photo Required",
+                "type": "radio",
+                "required": true,
+                "options": ["Yes", "No"]
+              }
+            ]
+          },
+          {
+            "id": "positiveObservations",
+            "label": "Positive Safety Observations",
+            "type": "textarea",
+            "required": false,
+            "placeholder": "Note any exemplary safety practices or improvements observed",
+            "rows": 3
+          }
+        ]
+      },
+      {
+        "id": "summary",
+        "title": "Inspection Summary",
+        "required": true,
+        "fields": [
+          {
+            "id": "overallRating",
+            "label": "Overall Site Safety Rating",
+            "type": "select",
+            "required": true,
+            "options": [
+              { "value": "excellent", "label": "Excellent (90-100%)", "color": "green" },
+              { "value": "good", "label": "Good (80-89%)", "color": "green" },
+              { "value": "fair", "label": "Fair (70-79%)", "color": "yellow" },
+              { "value": "poor", "label": "Poor (60-69%)", "color": "orange" },
+              { "value": "unacceptable", "label": "Unacceptable (<60%)", "color": "red" }
+            ]
+          },
+          {
+            "id": "immediateActionRequired",
+            "label": "Immediate Action Required",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "workStoppage",
+            "label": "Work Stoppage Required",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "followUpInspection",
+            "label": "Follow-up Inspection Required",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "followUpDate",
+            "label": "Follow-up Inspection Date",
+            "type": "date",
+            "required": false,
+            "condition": "followUpInspection = Yes"
+          },
+          {
+            "id": "generalComments",
+            "label": "General Comments",
+            "type": "textarea",
+            "required": false,
+            "placeholder": "Additional comments or recommendations",
+            "rows": 4
+          }
+        ]
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "condition": "weekly_schedule",
+      "values": ["monday"],
+      "description": "Weekly safety inspection required"
+    },
+    {
+      "condition": "new_phase_start",
+      "values": ["any"],
+      "description": "Safety inspection required when new phase begins"
+    },
+    {
+      "condition": "incident_followup",
+      "values": ["any"],
+      "description": "Inspection required after safety incidents"
+    }
+  ],
+  "automationRules": [
+    {
+      "field": "inspectorName",
+      "source": "user.full_name",
+      "auto": true
+    },
+    {
+      "field": "inspectorTitle",
+      "source": "user.position",
+      "auto": true
+    }
+  ],
+  "validationRules": [
+    {
+      "rule": "immediate_action_requires_details",
+      "condition": "immediateActionRequired = Yes",
+      "requires": "deficiencies.length > 0",
+      "message": "Immediate action items must be documented in deficiencies"
+    },
+    {
+      "rule": "work_stoppage_requires_justification",
+      "condition": "workStoppage = Yes",
+      "requires": "generalComments != empty",
+      "message": "Work stoppage decision must be justified in comments"
+    }
+  ],
+  "metadata": {
+    "createdBy": "HB Safety Team",
+    "createdDate": "2024-01-15",
+    "lastModified": "2024-12-15",
+    "modifiedBy": "Safety Department",
+    "language": "en-US",
+    "tags": ["safety", "inspection", "compliance", "osha", "site-conditions"]
+  }
+}

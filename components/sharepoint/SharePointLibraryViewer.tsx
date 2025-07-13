@@ -56,6 +56,7 @@ import {
 interface SharePointLibraryViewerProps {
   projectId?: string
   projectName?: string
+  projectData?: any
   className?: string
 }
 
@@ -71,6 +72,7 @@ interface SharePointLibraryViewerProps {
 export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = ({
   projectId,
   projectName,
+  projectData,
   className = "",
 }) => {
   const { documents, loading, error, refresh, downloadDocument, searchDocuments } = useSharePointDocs(projectId)
@@ -80,9 +82,33 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
   const [sortBy, setSortBy] = useState<"name" | "modified" | "size">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [showUploadDialog, setShowUploadDialog] = useState(false)
-  const [currentFolder, setCurrentFolder] = useState<string>("00-Est")
-  const [navigationHistory, setNavigationHistory] = useState<string[]>(["Root", "00-Est"])
-  const [historyIndex, setHistoryIndex] = useState(1)
+  // Determine default folder based on project stage
+  const getDefaultFolder = () => {
+    if (projectData?.project_stage_name === "Construction") {
+      return "Root"
+    }
+    return "00-Est"
+  }
+
+  const [currentFolder, setCurrentFolder] = useState<string>(getDefaultFolder())
+
+  // Set initial navigation history based on project stage
+  const getInitialNavigation = () => {
+    if (projectData?.project_stage_name === "Construction") {
+      return {
+        history: ["Root"],
+        index: 0,
+      }
+    }
+    return {
+      history: ["Root", "00-Est"],
+      index: 1,
+    }
+  }
+
+  const initialNav = getInitialNavigation()
+  const [navigationHistory, setNavigationHistory] = useState<string[]>(initialNav.history)
+  const [historyIndex, setHistoryIndex] = useState(initialNav.index)
   const [showFilters, setShowFilters] = useState(false)
 
   // Mock bid package estimation folders data
@@ -182,11 +208,13 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
     []
   )
 
-  // Override documents when in 00-Est folder
+  // Override documents based on folder and project stage
   const getDisplayDocuments = React.useCallback(() => {
+    // For Bidding projects or when explicitly in 00-Est folder, show estimation folders
     if (currentFolder === "00-Est") {
       return mockEstimationFolders
     }
+    // For Construction projects at Root, or any other folder, show real documents
     return documents || []
   }, [currentFolder, documents, mockEstimationFolders])
 
@@ -457,6 +485,12 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
           <span>SharePoint</span>
           <ChevronRight className="h-3 w-3" />
           <span>{projectName || "Project Files"}</span>
+          {projectData?.project_stage_name && (
+            <>
+              <ChevronRight className="h-3 w-3" />
+              <span className="text-xs px-2 py-1 bg-muted/50 rounded">{projectData.project_stage_name}</span>
+            </>
+          )}
           <ChevronRight className="h-3 w-3" />
           <span className="font-medium text-foreground">{currentFolder}</span>
         </div>
@@ -865,6 +899,9 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
               {filteredDocuments.length !== 1 ? "s" : ""}
               {searchQuery && ` matching "${searchQuery}"`}
               {currentFolder === "00-Est" && " in estimation directory"}
+              {currentFolder === "Root" &&
+                projectData?.project_stage_name === "Construction" &&
+                " in construction project"}
             </span>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-xs">
@@ -873,6 +910,11 @@ export const SharePointLibraryViewer: React.FC<SharePointLibraryViewerProps> = (
               {currentFolder === "00-Est" && (
                 <Badge variant="secondary" className="text-xs">
                   Estimation Workspace
+                </Badge>
+              )}
+              {currentFolder === "Root" && projectData?.project_stage_name === "Construction" && (
+                <Badge variant="secondary" className="text-xs">
+                  Construction Documents
                 </Badge>
               )}
             </div>

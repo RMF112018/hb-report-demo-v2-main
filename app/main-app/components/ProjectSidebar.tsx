@@ -23,6 +23,7 @@ import { useTheme } from "next-themes"
 import { useToast } from "../../../components/ui/use-toast"
 import { ProductivityPopover } from "../../../components/layout/ProductivityPopover"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
+import { TeamsSlideOutPanel } from "../../../components/productivity/TeamsSlideOutPanel"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,7 +100,7 @@ interface ProjectSidebarProps {
 }
 
 // Define sidebar categories
-type SidebarCategory = "dashboard" | "projects" | "tools" | "tools-menu" | "settings" | "notifications" | "it-modules"
+type SidebarCategory = "dashboard" | "projects" | "tools-menu" | "notifications" | "it-modules"
 
 interface SidebarCategoryConfig {
   id: SidebarCategory
@@ -111,13 +112,23 @@ interface SidebarCategoryConfig {
 }
 
 const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
-  { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Main Dashboard" },
-  { id: "projects", label: "Projects", icon: Building, tooltip: "Project Navigation" },
-  { id: "it-modules", label: "IT Modules", icon: Microchip, tooltip: "IT Command Center Modules", adminOnly: true },
-  { id: "tools", label: "Tools", icon: Settings, tooltip: "Application Tools" },
-  { id: "tools-menu", label: "Tools Menu", icon: Drill, tooltip: "Advanced Tools Menu", executiveOnly: true },
-  { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Notifications & Updates" },
-  { id: "settings", label: "Settings", icon: Settings, tooltip: "User Settings" },
+  { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Return to Main Dashboard" },
+  { id: "projects", label: "Projects", icon: Building, tooltip: "Browse & Select Projects" },
+  {
+    id: "it-modules",
+    label: "IT Modules",
+    icon: Microchip,
+    tooltip: "IT Command Center & System Management",
+    adminOnly: true,
+  },
+  {
+    id: "tools-menu",
+    label: "Tools Menu",
+    icon: Drill,
+    tooltip: "Advanced Project Tools & Features",
+    executiveOnly: true,
+  },
+  { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Messages, Tasks & System Alerts" },
 ]
 
 // IT Modules configuration for IT Administrator
@@ -303,6 +314,18 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     category: "Compliance",
     description: "Comprehensive subcontractor and vendor management system",
   },
+  {
+    name: "Safety",
+    href: "/dashboard/safety",
+    category: "Compliance",
+    description: "Safety management, incident reporting, and compliance tracking",
+  },
+  {
+    name: "Quality Control & Warranty",
+    href: "/dashboard/quality-warranty",
+    category: "Compliance",
+    description: "Quality control processes, inspections, and warranty management",
+  },
 
   // Pre-Construction
   {
@@ -370,23 +393,16 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [productivityNotifications] = useState(3)
+  const [showTeamsPanel, setShowTeamsPanel] = useState(false)
 
   // New state for fluid navigation
   const [activeCategory, setActiveCategory] = useState<SidebarCategory | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSubMenuOpen, setMobileSubMenuOpen] = useState(false)
-  const [activeSubCategory, setActiveSubCategory] = useState<SidebarCategory | null>(null)
+  const [activeSubCategory, setActiveSubCategory] = useState<SidebarCategory | "settings" | "tools" | null>(null)
   const [collapsedToolsCategories, setCollapsedToolsCategories] = useState<Set<string>>(
-    new Set([
-      "Core Tools",
-      "Pre-Construction",
-      "Financial Management",
-      "Field Management",
-      "Compliance",
-      "Warranty",
-      "Historical Projects",
-    ])
+    new Set(["Core Tools", "Pre-Construction", "Compliance", "Warranty"])
   )
 
   // Refs for click outside detection
@@ -557,6 +573,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     return TOOLS_MENU.filter((tool) => {
       // Filter by role visibility for individual tools
       const isRoleVisible = !tool.visibleRoles || tool.visibleRoles.includes(userRole)
+
+      // Hide specific tools
+      if (tool.name === "Responsibility Matrix") {
+        return false
+      }
+
       return isRoleVisible
     })
   }, [userRole])
@@ -565,24 +587,25 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const toolsByCategory = useMemo(() => {
     const categories = new Map<string, ToolMenuConfig[]>()
 
+    // Hidden categories that should not appear in the UI
+    const hiddenCategories = new Set(["Financial Management", "Field Management", "Historical Projects"])
+
     filteredTools.forEach((tool) => {
       const category = tool.category
+
+      // Skip hidden categories
+      if (hiddenCategories.has(category)) {
+        return
+      }
+
       if (!categories.has(category)) {
         categories.set(category, [])
       }
       categories.get(category)!.push(tool)
     })
 
-    // Sort categories by logical order
-    const categoryOrder = [
-      "Core Tools",
-      "Pre-Construction",
-      "Financial Management",
-      "Field Management",
-      "Compliance",
-      "Warranty",
-      "Historical Projects",
-    ]
+    // Sort categories by logical order (excluding hidden categories)
+    const categoryOrder = ["Core Tools", "Pre-Construction", "Compliance", "Warranty"]
 
     const sortedCategories = Array.from(categories.entries()).sort(([a], [b]) => {
       return categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
@@ -656,6 +679,16 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     }
   }
 
+  // Handle user avatar click
+  const handleUserAvatarClick = () => {
+    if (isMobile) {
+      setActiveSubCategory("settings")
+      setMobileSubMenuOpen(true)
+    } else {
+      setShowUserMenu(!showUserMenu)
+    }
+  }
+
   // Handle IT module navigation
   const handleITModuleClick = (moduleId: string) => {
     onModuleSelect?.(moduleId)
@@ -671,12 +704,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Mobile floating button
   if (isMobile) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-[115]">
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button
               size="lg"
-              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
+              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 z-[120]"
             >
               <Menu className="h-6 w-6" />
             </Button>
@@ -726,13 +759,19 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         <IconComponent className="h-5 w-5 mr-3" />
                         {category.label}
                         {category.id === "notifications" && productivityNotifications > 0 && (
-                          <Badge variant="destructive" className="ml-auto">
+                          <Badge variant="destructive" className="ml-auto z-[125]">
                             {productivityNotifications}
                           </Badge>
                         )}
                       </Button>
                     )
                   })}
+
+                  {/* User Settings Button for Mobile */}
+                  <Button variant="ghost" onClick={handleUserAvatarClick} className="w-full justify-start h-12">
+                    <User className="h-5 w-5 mr-3" />
+                    User Settings
+                  </Button>
                 </div>
               </div>
 
@@ -764,19 +803,15 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      if (selectedProject) {
-                        onToolSelect?.("Productivity")
-                        router.push(`/project/${selectedProject}?tab=productivity`)
-                      } else {
-                        handleCategorySelect("tools")
-                      }
+                      // Show Microsoft Teams integration slide-out panel
+                      setShowTeamsPanel(true)
                       setMobileMenuOpen(false)
                     }}
                     className="h-8 w-8 p-0 relative"
                   >
                     <MessageSquare className="h-4 w-4" />
                     {productivityNotifications > 0 && (
-                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-[#FA4616] rounded-full"></div>
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-[#FA4616] rounded-full z-[125]"></div>
                     )}
                   </Button>
                 </div>
@@ -1141,7 +1176,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Desktop/Tablet Layout
   if (!isMobile) {
     return (
-      <div className="fixed top-0 left-0 z-60 h-screen">
+      <div className="fixed top-0 left-0 z-[110] h-screen">
         {/* Sidebar Container - Dynamic width based on expanded state */}
         <div
           className={`
@@ -1162,7 +1197,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           {/* Collapsed Sidebar - Always visible */}
           <aside
             id="collapsed-sidebar"
-            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-30"
+            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-[115]"
           >
             {/* Logo */}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -1186,7 +1221,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                           size="sm"
                           onClick={() => handleCategorySelect(category.id)}
                           className={`
-                            w-full h-10 p-0 rounded-lg relative
+                            w-full h-10 p-0 rounded-lg relative z-[120]
                             ${
                               activeCategory === category.id ||
                               (category.id === "dashboard" &&
@@ -1200,13 +1235,13 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         >
                           <IconComponent className="h-4 w-4" />
                           {category.id === "notifications" && productivityNotifications > 0 && (
-                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center">
+                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[125]">
                               <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                             </div>
                           )}
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
+                      <TooltipContent side="right" className="z-[130]">
                         <p>{category.tooltip}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -1224,27 +1259,21 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        // Navigate to productivity features in the selected project
-                        if (selectedProject) {
-                          onToolSelect?.("Productivity")
-                          router.push(`/project/${selectedProject}?tab=productivity`)
-                        } else {
-                          // If no project selected, show all productivity tools
-                          handleCategorySelect("tools")
-                        }
+                        // Show Microsoft Teams integration slide-out panel
+                        setShowTeamsPanel(true)
                       }}
-                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[120]"
                     >
                       <MessageSquare className="h-4 w-4" />
                       {productivityNotifications > 0 && (
-                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center">
+                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[125]">
                           <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                         </div>
                       )}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>Quick Productivity Access</p>
+                  <TooltipContent side="right" className="z-[130]">
+                    <p>Microsoft Teams & Productivity Tools</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -1252,33 +1281,99 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
             {/* User Avatar */}
             <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCategorySelect("settings")}
-                      className={`
-                        w-full h-10 p-0 rounded-lg
-                        ${
-                          activeCategory === "settings"
-                            ? "bg-[#FA4616] text-white"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }
-                      `}
-                    >
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
-                        <AvatarFallback className="text-xs bg-[#FA4616] text-white">{getUserInitials()}</AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>User menu</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <div className="relative" ref={userMenuRef}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleUserAvatarClick}
+                        className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 z-[120]"
+                      >
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                          <AvatarFallback className="text-xs bg-[#FA4616] text-white">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="z-[130]">
+                      <p>User Settings & Profile</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                {/* User Menu Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute bottom-full left-16 mb-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[135]">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">
+                            {user?.firstName} {user?.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          router.push("/profile")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <User className="h-4 w-4 mr-3" />
+                        Profile
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          router.push("/settings")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <Settings className="h-4 w-4 mr-3" />
+                        Settings
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setTheme(theme === "dark" ? "light" : "dark")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        {theme === "dark" ? <Sun className="h-4 w-4 mr-3" /> : <Moon className="h-4 w-4 mr-3" />}
+                        Toggle Theme
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          handleLogout()
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-3" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </aside>
 
@@ -1286,7 +1381,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           {activeCategory && (
             <aside
               ref={expandedContentRef}
-              className="w-80 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-xl"
+              className="w-80 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-xl z-[112]"
             >
               <div className="flex flex-col h-full">
                 {/* Content Header */}
@@ -1295,8 +1390,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     <h2 className="text-lg font-semibold">
                       {activeCategory === "projects"
                         ? "Projects"
-                        : activeCategory === "tools"
-                        ? "Tools"
                         : activeCategory === "tools-menu"
                         ? "Tools Menu"
                         : activeCategory === "notifications"
@@ -1408,14 +1501,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                             )}
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeCategory === "tools" && (
-                    <div className="p-4 space-y-2">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        No tools available in this category.
                       </div>
                     </div>
                   )}
@@ -1551,114 +1636,22 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                       </div>
                     </div>
                   )}
-
-                  {activeCategory === "settings" && (
-                    <div className="p-4 space-y-2">
-                      <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              {getUserInitials()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">
-                              {user?.firstName} {user?.lastName}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
-                            {isPresentationMode && (
-                              <Badge variant="outline" className="mt-1 text-xs">
-                                {viewingAs
-                                  ? `Viewing as ${
-                                      viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")
-                                    }`
-                                  : "Presentation Mode"}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Role Switching for Presentation Mode */}
-                      {isPresentationMode && (
-                        <div className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Switch Demo Role</p>
-                          <div className="space-y-1">
-                            <Button
-                              variant={viewingAs === "executive" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("executive")}
-                            >
-                              Executive
-                            </Button>
-                            <Button
-                              variant={viewingAs === "project-executive" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("project-executive")}
-                            >
-                              Project Executive
-                            </Button>
-                            <Button
-                              variant={viewingAs === "project-manager" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("project-manager")}
-                            >
-                              Project Manager
-                            </Button>
-                            <Button
-                              variant={viewingAs === "estimator" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("estimator")}
-                            >
-                              Estimator
-                            </Button>
-                            <Button
-                              variant={viewingAs === "admin" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("admin")}
-                            >
-                              Admin
-                            </Button>
-                            {viewingAs && (
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start text-sm mt-2"
-                                onClick={returnToPresentation}
-                              >
-                                Return to Presentation
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/profile")}>
-                        <User className="h-4 w-4 mr-3" />
-                        Profile
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/settings")}>
-                        <Settings className="h-4 w-4 mr-3" />
-                        Settings
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                      >
-                        {theme === "dark" ? <Sun className="h-4 w-4 mr-3" /> : <Moon className="h-4 w-4 mr-3" />}
-                        Toggle Theme
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-3" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </div>
             </aside>
           )}
+        </div>
+
+        {/* Microsoft Teams Integration Slide-Out Panel */}
+        <div className="z-[140]">
+          <TeamsSlideOutPanel
+            isOpen={showTeamsPanel}
+            onClose={() => setShowTeamsPanel(false)}
+            projectId={selectedProject || undefined}
+            projectName={selectedProject ? projects.find((p) => p.id === selectedProject)?.name : undefined}
+            userRole={userRole}
+            currentUser={user}
+          />
         </div>
       </div>
     )

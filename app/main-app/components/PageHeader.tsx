@@ -15,10 +15,12 @@
 
 "use client"
 
-import React from "react"
-import { ChevronRight, Home } from "lucide-react"
+import React, { useState } from "react"
+import { ChevronRight, Home, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export interface PageHeaderTab {
   id: string
@@ -75,6 +77,8 @@ export interface PageHeaderProps {
   // Presentation mode
   isPresentationMode?: boolean
   viewingAs?: string | null
+  onRoleSwitch?: (role: "executive" | "project-executive" | "project-manager" | "estimator" | "admin") => void
+  onReturnToPresentation?: () => void
 
   // Additional props
   className?: string
@@ -96,9 +100,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   onTabChange,
   isPresentationMode = false,
   viewingAs = null,
+  onRoleSwitch,
+  onReturnToPresentation,
   className = "",
   isSticky = true,
 }) => {
+  const [roleSwitchPopoverOpen, setRoleSwitchPopoverOpen] = useState(false)
+
   // Capitalize first letter of each word
   const capitalizeTitle = (title: string) => {
     return title.replace(/\b\w/g, (l) => l.toUpperCase())
@@ -111,6 +119,21 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ")
   }
+
+  // Handle demo role selection
+  const handleRoleSelection = (role: string) => {
+    onRoleSwitch?.(role as "executive" | "project-executive" | "project-manager" | "estimator" | "admin")
+    setRoleSwitchPopoverOpen(false)
+  }
+
+  // Demo roles configuration
+  const demoRoles = [
+    { id: "executive", label: "Executive" },
+    { id: "project-executive", label: "Project Executive" },
+    { id: "project-manager", label: "Project Manager" },
+    { id: "estimator", label: "Estimator" },
+    { id: "admin", label: "Admin" },
+  ]
 
   // Build dynamic breadcrumb based on navigation state
   const buildBreadcrumb = (): BreadcrumbItem[] => {
@@ -335,11 +358,55 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               />
             </div>
 
-            {/* Row 2: Role Badge */}
+            {/* Row 2: Role Badge with Popover */}
             {isPresentationMode && viewingAs && (
-              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
-                Viewing {viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")} Demo
-              </Badge>
+              <Popover open={roleSwitchPopoverOpen} onOpenChange={setRoleSwitchPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-auto px-3 py-1 text-xs bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+                  >
+                    Viewing {viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")} Demo
+                    <ChevronDown className="ml-1 h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-2" align="end">
+                  <div className="space-y-1">
+                    <div className="px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Switch Demo Role
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    {demoRoles.map((role) => (
+                      <Button
+                        key={role.id}
+                        variant={viewingAs === role.id ? "default" : "ghost"}
+                        size="sm"
+                        className="w-full justify-start text-sm h-8"
+                        onClick={() => handleRoleSelection(role.id)}
+                      >
+                        {role.label}
+                      </Button>
+                    ))}
+                    {viewingAs && (
+                      <>
+                        <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start text-sm h-8"
+                          onClick={() => {
+                            onReturnToPresentation?.()
+                            setRoleSwitchPopoverOpen(false)
+                          }}
+                        >
+                          Return to Presentation
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
           </div>
         </div>

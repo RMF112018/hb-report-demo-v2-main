@@ -1,0 +1,739 @@
+{
+  "formId": "IR-001",
+  "title": "Incident Report",
+  "description": "Comprehensive incident reporting for workplace injuries, near misses, and safety events",
+  "category": "incident-reporting",
+  "version": "2.3",
+  "requiredFields": ["incidentDate", "reporterName", "incidentType", "description", "injuredPerson"],
+  "estimatedTime": "20-45 minutes",
+  "frequency": "As needed",
+  "applicablePhases": ["pre-construction", "construction", "closeout"],
+  "applicableTrades": ["all"],
+  "priority": "immediate",
+  "regulatoryRequirements": [
+    {
+      "agency": "OSHA",
+      "standard": "29 CFR 1904",
+      "description": "Recording and reporting occupational injuries and illnesses"
+    },
+    {
+      "agency": "Company Policy",
+      "standard": "HBC-SAF-003",
+      "description": "Incident reporting requirement - 24 hour notification"
+    }
+  ],
+  "formStructure": {
+    "sections": [
+      {
+        "id": "incident-details",
+        "title": "Incident Details",
+        "required": true,
+        "fields": [
+          {
+            "id": "incidentDate",
+            "label": "Date of Incident",
+            "type": "date",
+            "required": true
+          },
+          {
+            "id": "incidentTime",
+            "label": "Time of Incident",
+            "type": "time",
+            "required": true
+          },
+          {
+            "id": "reportDate",
+            "label": "Date Reported",
+            "type": "date",
+            "required": true,
+            "defaultValue": "today"
+          },
+          {
+            "id": "reportTime",
+            "label": "Time Reported",
+            "type": "time",
+            "required": true,
+            "defaultValue": "now"
+          },
+          {
+            "id": "incidentLocation",
+            "label": "Exact Location of Incident",
+            "type": "text",
+            "required": true,
+            "placeholder": "Building, floor, room, specific area"
+          },
+          {
+            "id": "weatherConditions",
+            "label": "Weather Conditions",
+            "type": "multiselect",
+            "required": true,
+            "options": ["Clear", "Cloudy", "Rain", "Snow", "High winds", "Extreme heat", "Extreme cold", "Ice", "Fog"]
+          },
+          {
+            "id": "lightingConditions",
+            "label": "Lighting Conditions",
+            "type": "select",
+            "required": true,
+            "options": ["Adequate natural light", "Adequate artificial light", "Poor lighting", "Dark", "Glare present"]
+          }
+        ]
+      },
+      {
+        "id": "reporter-information",
+        "title": "Reporter Information",
+        "required": true,
+        "fields": [
+          {
+            "id": "reporterName",
+            "label": "Reporter Name",
+            "type": "text",
+            "required": true,
+            "placeholder": "Name of person reporting incident"
+          },
+          {
+            "id": "reporterPosition",
+            "label": "Reporter Position/Title",
+            "type": "text",
+            "required": true,
+            "placeholder": "Job title or position"
+          },
+          {
+            "id": "reporterPhone",
+            "label": "Reporter Phone Number",
+            "type": "tel",
+            "required": true,
+            "placeholder": "(xxx) xxx-xxxx"
+          },
+          {
+            "id": "reporterEmail",
+            "label": "Reporter Email",
+            "type": "email",
+            "required": false,
+            "placeholder": "email@company.com"
+          },
+          {
+            "id": "reporterWitness",
+            "label": "Was reporter a witness to the incident?",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          }
+        ]
+      },
+      {
+        "id": "incident-classification",
+        "title": "Incident Classification",
+        "required": true,
+        "fields": [
+          {
+            "id": "incidentType",
+            "label": "Type of Incident",
+            "type": "select",
+            "required": true,
+            "options": [
+              "Work-related injury",
+              "Work-related illness",
+              "Near miss",
+              "Property damage",
+              "Environmental incident",
+              "Security incident",
+              "Fire/explosion",
+              "Chemical spill",
+              "Equipment failure",
+              "Vehicle accident",
+              "Other"
+            ]
+          },
+          {
+            "id": "severityLevel",
+            "label": "Severity Level",
+            "type": "select",
+            "required": true,
+            "options": [
+              { "value": "fatality", "label": "Fatality", "color": "red" },
+              { "value": "lost_time", "label": "Lost Time Injury", "color": "red" },
+              { "value": "medical_treatment", "label": "Medical Treatment", "color": "orange" },
+              { "value": "restricted_duty", "label": "Restricted Duty", "color": "yellow" },
+              { "value": "first_aid", "label": "First Aid Only", "color": "yellow" },
+              { "value": "near_miss", "label": "Near Miss", "color": "blue" },
+              { "value": "property_damage", "label": "Property Damage Only", "color": "gray" }
+            ]
+          },
+          {
+            "id": "bodyPart",
+            "label": "Body Part Affected",
+            "type": "multiselect",
+            "required": false,
+            "condition": "incidentType contains injury OR illness",
+            "options": [
+              "Head",
+              "Eye(s)",
+              "Face",
+              "Neck",
+              "Shoulder",
+              "Arm",
+              "Elbow",
+              "Wrist",
+              "Hand",
+              "Finger(s)",
+              "Back",
+              "Chest",
+              "Abdomen",
+              "Hip",
+              "Leg",
+              "Knee",
+              "Ankle",
+              "Foot",
+              "Toe(s)",
+              "Multiple body parts",
+              "Other"
+            ]
+          },
+          {
+            "id": "injuryType",
+            "label": "Nature of Injury/Illness",
+            "type": "select",
+            "required": false,
+            "condition": "incidentType contains injury OR illness",
+            "options": [
+              "Cut/laceration",
+              "Bruise/contusion",
+              "Sprain/strain",
+              "Fracture",
+              "Burn",
+              "Chemical burn",
+              "Eye injury",
+              "Puncture wound",
+              "Crushing injury",
+              "Amputation",
+              "Concussion",
+              "Respiratory illness",
+              "Skin condition",
+              "Hearing loss",
+              "Other"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "injured-person",
+        "title": "Injured/Affected Person Information",
+        "required": true,
+        "condition": "incidentType contains injury OR illness",
+        "fields": [
+          {
+            "id": "injuredPersonName",
+            "label": "Name of Injured Person",
+            "type": "text",
+            "required": true,
+            "placeholder": "Full name"
+          },
+          {
+            "id": "injuredPersonAge",
+            "label": "Age",
+            "type": "number",
+            "required": true,
+            "min": 16,
+            "max": 80
+          },
+          {
+            "id": "injuredPersonGender",
+            "label": "Gender",
+            "type": "select",
+            "required": true,
+            "options": ["Male", "Female", "Other", "Prefer not to say"]
+          },
+          {
+            "id": "injuredPersonPosition",
+            "label": "Job Title/Position",
+            "type": "text",
+            "required": true,
+            "placeholder": "Job title or trade"
+          },
+          {
+            "id": "injuredPersonEmployer",
+            "label": "Employer",
+            "type": "text",
+            "required": true,
+            "placeholder": "Company name"
+          },
+          {
+            "id": "injuredPersonExperience",
+            "label": "Experience in Current Position",
+            "type": "select",
+            "required": true,
+            "options": [
+              "Less than 1 month",
+              "1-3 months",
+              "3-6 months",
+              "6 months - 1 year",
+              "1-2 years",
+              "2-5 years",
+              "5+ years"
+            ]
+          },
+          {
+            "id": "injuredPersonTraining",
+            "label": "Safety Training Completed",
+            "type": "multiselect",
+            "required": true,
+            "options": [
+              "OSHA 10-hour",
+              "OSHA 30-hour",
+              "Site orientation",
+              "Job-specific training",
+              "Fall protection",
+              "Confined space",
+              "Hazcom training",
+              "Equipment-specific training",
+              "None",
+              "Unknown"
+            ]
+          },
+          {
+            "id": "injuredPersonShift",
+            "label": "Work Shift",
+            "type": "select",
+            "required": true,
+            "options": [
+              "Day shift (6 AM - 3 PM)",
+              "Evening shift (3 PM - 11 PM)",
+              "Night shift (11 PM - 6 AM)",
+              "Overtime",
+              "Other"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "incident-description",
+        "title": "Incident Description",
+        "required": true,
+        "fields": [
+          {
+            "id": "taskBeingPerformed",
+            "label": "Task Being Performed",
+            "type": "textarea",
+            "required": true,
+            "placeholder": "Describe what the person was doing when the incident occurred",
+            "rows": 3
+          },
+          {
+            "id": "incidentDescription",
+            "label": "Detailed Description of Incident",
+            "type": "textarea",
+            "required": true,
+            "placeholder": "Provide a detailed description of what happened, how it happened, and sequence of events",
+            "rows": 5
+          },
+          {
+            "id": "equipmentInvolved",
+            "label": "Equipment/Tools Involved",
+            "type": "text",
+            "required": false,
+            "placeholder": "List any equipment, tools, or machinery involved"
+          },
+          {
+            "id": "materialsInvolved",
+            "label": "Materials/Substances Involved",
+            "type": "text",
+            "required": false,
+            "placeholder": "List any materials, chemicals, or substances involved"
+          },
+          {
+            "id": "ppeWorn",
+            "label": "Personal Protective Equipment Worn",
+            "type": "multiselect",
+            "required": true,
+            "options": [
+              "Hard hat",
+              "Safety glasses",
+              "Hearing protection",
+              "Respirator",
+              "Safety harness",
+              "Work gloves",
+              "Cut-resistant gloves",
+              "Chemical-resistant gloves",
+              "Steel-toed boots",
+              "High-visibility vest",
+              "Face shield",
+              "None",
+              "Unknown"
+            ]
+          },
+          {
+            "id": "ppeAdequate",
+            "label": "Was PPE adequate for the task?",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No", "Unknown"]
+          }
+        ]
+      },
+      {
+        "id": "immediate-actions",
+        "title": "Immediate Actions Taken",
+        "required": true,
+        "fields": [
+          {
+            "id": "firstAidGiven",
+            "label": "First Aid Given",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "firstAidBy",
+            "label": "First Aid Given By",
+            "type": "text",
+            "required": false,
+            "condition": "firstAidGiven = Yes",
+            "placeholder": "Name and qualifications"
+          },
+          {
+            "id": "medicalTreatment",
+            "label": "Medical Treatment Required",
+            "type": "select",
+            "required": true,
+            "options": ["None", "First aid only", "Clinic/doctor visit", "Emergency room", "Hospitalization", "Unknown"]
+          },
+          {
+            "id": "hospitalName",
+            "label": "Hospital/Clinic Name",
+            "type": "text",
+            "required": false,
+            "condition": "medicalTreatment contains clinic OR room OR hospitalization",
+            "placeholder": "Name and address of medical facility"
+          },
+          {
+            "id": "returnToWork",
+            "label": "Return to Work Status",
+            "type": "select",
+            "required": true,
+            "options": [
+              "Returned same day",
+              "Lost time - days away",
+              "Restricted duty",
+              "Job transfer",
+              "Unknown/pending",
+              "Not applicable"
+            ]
+          },
+          {
+            "id": "workAreaSecured",
+            "label": "Was work area secured/made safe?",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No", "Not applicable"]
+          }
+        ]
+      },
+      {
+        "id": "witnesses",
+        "title": "Witnesses",
+        "required": false,
+        "fields": [
+          {
+            "id": "witnesses",
+            "label": "Witness Information",
+            "type": "repeatable-group",
+            "required": false,
+            "minItems": 0,
+            "maxItems": 10,
+            "fields": [
+              {
+                "id": "witnessNumber",
+                "label": "Witness #",
+                "type": "number",
+                "required": true,
+                "auto": true
+              },
+              {
+                "id": "witnessName",
+                "label": "Witness Name",
+                "type": "text",
+                "required": true,
+                "placeholder": "Full name"
+              },
+              {
+                "id": "witnessPosition",
+                "label": "Position/Title",
+                "type": "text",
+                "required": true,
+                "placeholder": "Job title"
+              },
+              {
+                "id": "witnessEmployer",
+                "label": "Employer",
+                "type": "text",
+                "required": true,
+                "placeholder": "Company name"
+              },
+              {
+                "id": "witnessPhone",
+                "label": "Phone Number",
+                "type": "tel",
+                "required": true,
+                "placeholder": "(xxx) xxx-xxxx"
+              },
+              {
+                "id": "witnessStatement",
+                "label": "Witness Statement",
+                "type": "textarea",
+                "required": false,
+                "placeholder": "Brief statement of what the witness observed",
+                "rows": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "root-cause-analysis",
+        "title": "Root Cause Analysis",
+        "required": true,
+        "fields": [
+          {
+            "id": "immediateCauses",
+            "label": "Immediate Causes",
+            "type": "multiselect",
+            "required": true,
+            "options": [
+              "Unsafe act",
+              "Unsafe condition",
+              "Equipment failure",
+              "Inadequate training",
+              "Inadequate supervision",
+              "Rushing/time pressure",
+              "Fatigue",
+              "Distraction",
+              "Poor housekeeping",
+              "Weather conditions",
+              "Communication failure",
+              "Other"
+            ]
+          },
+          {
+            "id": "rootCauses",
+            "label": "Root Causes",
+            "type": "multiselect",
+            "required": true,
+            "options": [
+              "Inadequate procedures",
+              "Lack of training",
+              "Poor communication",
+              "Inadequate supervision",
+              "Equipment design flaw",
+              "Maintenance issues",
+              "Work environment",
+              "Personal factors",
+              "Management system failure",
+              "Cultural issues",
+              "Time pressures",
+              "Other"
+            ]
+          },
+          {
+            "id": "contributingFactors",
+            "label": "Contributing Factors",
+            "type": "textarea",
+            "required": false,
+            "placeholder": "Describe any additional factors that may have contributed to the incident",
+            "rows": 3
+          }
+        ]
+      },
+      {
+        "id": "corrective-actions",
+        "title": "Corrective Actions",
+        "required": true,
+        "fields": [
+          {
+            "id": "correctiveActions",
+            "label": "Corrective Actions",
+            "type": "repeatable-group",
+            "required": true,
+            "minItems": 1,
+            "maxItems": 10,
+            "fields": [
+              {
+                "id": "actionNumber",
+                "label": "Action #",
+                "type": "number",
+                "required": true,
+                "auto": true
+              },
+              {
+                "id": "actionDescription",
+                "label": "Corrective Action Description",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "Describe the specific action to be taken"
+              },
+              {
+                "id": "actionType",
+                "label": "Action Type",
+                "type": "select",
+                "required": true,
+                "options": [
+                  "Immediate",
+                  "Short-term",
+                  "Long-term",
+                  "Administrative",
+                  "Engineering",
+                  "Training",
+                  "Policy change"
+                ]
+              },
+              {
+                "id": "responsiblePerson",
+                "label": "Responsible Person",
+                "type": "text",
+                "required": true,
+                "placeholder": "Who will implement this action?"
+              },
+              {
+                "id": "targetDate",
+                "label": "Target Completion Date",
+                "type": "date",
+                "required": true
+              },
+              {
+                "id": "actionStatus",
+                "label": "Status",
+                "type": "select",
+                "required": true,
+                "options": ["Planned", "In progress", "Completed", "Overdue", "Cancelled"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "management-review",
+        "title": "Management Review",
+        "required": true,
+        "fields": [
+          {
+            "id": "reviewedBy",
+            "label": "Reviewed By",
+            "type": "text",
+            "required": true,
+            "placeholder": "Name and title of reviewer"
+          },
+          {
+            "id": "reviewDate",
+            "label": "Review Date",
+            "type": "date",
+            "required": true
+          },
+          {
+            "id": "oshaRecordable",
+            "label": "OSHA Recordable",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No", "Pending determination"]
+          },
+          {
+            "id": "oshaReportable",
+            "label": "OSHA Reportable (8-hour notification)",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "regulatoryNotification",
+            "label": "Regulatory Notifications Required",
+            "type": "multiselect",
+            "required": false,
+            "options": [
+              "OSHA",
+              "Workers compensation",
+              "Insurance carrier",
+              "Client notification",
+              "Local authorities",
+              "EPA",
+              "None required"
+            ]
+          },
+          {
+            "id": "managementComments",
+            "label": "Management Comments",
+            "type": "textarea",
+            "required": false,
+            "placeholder": "Additional comments from management review",
+            "rows": 3
+          }
+        ]
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "condition": "incident_occurs",
+      "values": ["any"],
+      "description": "Incident report required for all workplace incidents"
+    },
+    {
+      "condition": "near_miss_reported",
+      "values": ["any"],
+      "description": "Near miss incidents must be documented"
+    }
+  ],
+  "automationRules": [
+    {
+      "field": "reporterName",
+      "source": "user.full_name",
+      "auto": true
+    },
+    {
+      "field": "reporterPosition",
+      "source": "user.position",
+      "auto": true
+    },
+    {
+      "field": "reporterPhone",
+      "source": "user.phone",
+      "auto": false
+    },
+    {
+      "field": "reporterEmail",
+      "source": "user.email",
+      "auto": false
+    }
+  ],
+  "validationRules": [
+    {
+      "rule": "injury_requires_body_part",
+      "condition": "incidentType contains injury",
+      "requires": "bodyPart != empty",
+      "message": "Body part affected must be specified for injuries"
+    },
+    {
+      "rule": "medical_treatment_requires_details",
+      "condition": "medicalTreatment contains clinic OR room OR hospitalization",
+      "requires": "hospitalName != empty",
+      "message": "Hospital/clinic name required for medical treatment"
+    },
+    {
+      "rule": "corrective_actions_required",
+      "condition": "always",
+      "requires": "correctiveActions.length > 0",
+      "message": "At least one corrective action is required"
+    },
+    {
+      "rule": "serious_incident_notification",
+      "condition": "severityLevel = fatality OR lost_time",
+      "requires": "oshaReportable = Yes",
+      "message": "Serious incidents require OSHA notification"
+    }
+  ],
+  "metadata": {
+    "createdBy": "HB Safety Team",
+    "createdDate": "2024-01-15",
+    "lastModified": "2024-12-15",
+    "modifiedBy": "Safety Department",
+    "language": "en-US",
+    "tags": ["safety", "incident", "injury", "reporting", "osha", "investigation"]
+  }
+}

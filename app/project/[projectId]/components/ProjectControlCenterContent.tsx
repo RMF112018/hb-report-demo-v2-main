@@ -92,12 +92,17 @@ import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
 import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
 import FieldManagementContent from "./content/FieldManagementContent"
 import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
+import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibraryViewer"
 import SidebarPanelRenderer from "@/components/project/sidebar/SidebarPanelRenderer"
 import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
 import EstimatingSuite from "@/components/estimating/EstimatingSuite"
 import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
 import { ProjectActivityFeed } from "@/components/feed/ProjectActivityFeed"
+import ProjectSafetyForms from "@/components/project/safety/ProjectSafetyForms"
+import QualityProjectContent from "./content/QualityProjectContent"
+import QualityControlProjectContent from "./content/QualityControlProjectContent"
+import SafetyProjectContent from "./content/SafetyProjectContent"
 
 // Lazy load ProjectTabsShell for better performance
 const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
@@ -2955,15 +2960,27 @@ const ComplianceContent: React.FC<{
   userRole: string
   user: any
 }> = ({ projectId, projectData, userRole, user }) => {
-  const [activeTab, setActiveTab] = useState("contract-documents")
+  const [activeTab, setActiveTab] = useState("safety")
   const [isFocusMode, setIsFocusMode] = useState(false)
 
   const handleFocusToggle = () => {
     setIsFocusMode(!isFocusMode)
   }
 
-  // Tab configuration
+  // Tab configuration with all four categories
   const complianceTabsConfig = [
+    {
+      id: "safety",
+      label: "Safety",
+      icon: Shield,
+      description: "Safety management and compliance",
+    },
+    {
+      id: "quality-control",
+      label: "Quality Control",
+      icon: CheckCircle,
+      description: "Quality control programs and inspections",
+    },
     {
       id: "contract-documents",
       label: "Contract Documents",
@@ -2980,6 +2997,30 @@ const ComplianceContent: React.FC<{
 
   const renderComplianceTabContent = () => {
     switch (activeTab) {
+      case "safety":
+        return (
+          <SafetyProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        )
+
+      case "quality-control":
+        return (
+          <QualityControlProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        )
+
       case "contract-documents":
         return (
           <EnhancedContractDocuments projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
@@ -3000,8 +3041,10 @@ const ComplianceContent: React.FC<{
       <div className="pb-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">Compliance Tools</h2>
-            <p className="text-sm text-muted-foreground">Contract management and trade partner compliance</p>
+            <h2 className="text-xl font-semibold text-foreground">Compliance & Safety</h2>
+            <p className="text-sm text-muted-foreground">
+              Safety, quality control, contracts, and trade partner compliance
+            </p>
           </div>
           <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
             {isFocusMode ? (
@@ -3019,8 +3062,8 @@ const ComplianceContent: React.FC<{
         </div>
       </div>
 
-      {/* Card-based Tab Navigation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 flex-shrink-0">
+      {/* Card-based Tab Navigation - 2x2 Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 flex-shrink-0">
         {complianceTabsConfig.map((tab) => (
           <div
             key={tab.id}
@@ -3173,6 +3216,12 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
   // Get HBI Insights title based on active tab
   const getHBIInsightsTitle = () => {
+    if (activeTab === "activity-feed") {
+      return "HBI Activity Feed Insights"
+    }
+    if (activeTab === "documents") {
+      return "HBI Document Management Insights"
+    }
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
       return "HBI Financial Hub Insights"
     }
@@ -3246,6 +3295,25 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
   // Get quick actions based on current core tab
   const getQuickActions = () => {
+    // Handle main module tabs first
+    if (activeTab === "activity-feed") {
+      return [
+        { label: "Refresh Feed", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Feed", icon: Download, onClick: () => {} },
+        { label: "Filter Activities", icon: Filter, onClick: () => {} },
+        { label: "Search Activities", icon: Search, onClick: () => {} },
+      ]
+    }
+
+    if (activeTab === "documents") {
+      return [
+        { label: "Upload Files", icon: Upload, onClick: () => {} },
+        { label: "New Folder", icon: Folder, onClick: () => {} },
+        { label: "Sync SharePoint", icon: RefreshCw, onClick: () => {} },
+        { label: "Export List", icon: Download, onClick: () => {} },
+      ]
+    }
+
     if (navigation.coreTab === "reports") {
       return [
         { label: "Create Report", icon: Plus, onClick: () => {} },
@@ -3294,6 +3362,25 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
   // Get key metrics based on current core tab
   const getKeyMetrics = () => {
+    // Handle main module tabs first
+    if (activeTab === "activity-feed") {
+      return [
+        { label: "Total Activities", value: "147", color: "blue" },
+        { label: "Today's Updates", value: "23", color: "green" },
+        { label: "Active RFIs", value: "5", color: "orange" },
+        { label: "Change Orders", value: "3", color: "purple" },
+      ]
+    }
+
+    if (activeTab === "documents") {
+      return [
+        { label: "Total Documents", value: "1,247", color: "blue" },
+        { label: "Recent Uploads", value: "28", color: "green" },
+        { label: "Shared Files", value: "156", color: "orange" },
+        { label: "Storage Used", value: "2.4 GB", color: "purple" },
+      ]
+    }
+
     if (navigation.coreTab === "reports") {
       return [
         { label: "Total Reports", value: "0", color: "blue" },
@@ -3345,6 +3432,90 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   const getHBIInsights = () => {
+    // Activity Feed insights
+    if (activeTab === "activity-feed") {
+      return [
+        {
+          id: "activity-1",
+          type: "info",
+          severity: "low",
+          title: "High Activity Period",
+          text: "Project activity is 40% above average with 23 updates today. Multiple teams are actively collaborating.",
+          action: "View details",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "activity-2",
+          type: "warning",
+          severity: "medium",
+          title: "Pending RFI Response",
+          text: "RFI-2024-047 regarding electrical specifications has been pending for 3 days and needs immediate attention.",
+          action: "Review RFI",
+          timestamp: "3 hours ago",
+        },
+        {
+          id: "activity-3",
+          type: "success",
+          severity: "low",
+          title: "Change Order Approved",
+          text: "Change Order CO-2024-012 for additional electrical outlets has been approved and is ready for execution.",
+          action: "View CO",
+          timestamp: "5 hours ago",
+        },
+        {
+          id: "activity-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Communication Pattern",
+          text: "Identified frequent questions about material specifications. Consider proactive documentation updates.",
+          action: "View patterns",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
+    // Documents insights
+    if (activeTab === "documents") {
+      return [
+        {
+          id: "doc-1",
+          type: "info",
+          severity: "low",
+          title: "Storage Optimization",
+          text: "SharePoint library is using 2.4 GB of 5 GB capacity. Consider archiving older documents to optimize storage.",
+          action: "Manage storage",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "doc-2",
+          type: "warning",
+          severity: "medium",
+          title: "Sync Required",
+          text: "28 documents have been modified externally and need to be synced. Ensure all team members have latest versions.",
+          action: "Sync documents",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "doc-3",
+          type: "success",
+          severity: "low",
+          title: "Version Control Active",
+          text: "All critical project documents are under version control with automatic backup enabled.",
+          action: "View history",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "doc-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Collaboration Efficiency",
+          text: "156 files are shared with external stakeholders. Consider access review for security optimization.",
+          action: "Review access",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
     // Financial Management tabs - comprehensive insights for all financial sub-tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
       // Get current financial sub-tab from navigation
@@ -4457,6 +4628,61 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
       case "recent-activity":
         return <RecentActivityContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
 
+      case "activity-feed":
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title */}
+            <div className="pb-4 flex-shrink-0">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-foreground">Project Activity Feed</h2>
+                <p className="text-sm text-muted-foreground">
+                  Real-time project activity, updates, and collaboration feed
+                </p>
+              </div>
+            </div>
+
+            {/* Activity Feed Content */}
+            <div className="flex-1 w-full min-w-0 max-w-full min-h-0 overflow-hidden">
+              <ProjectActivityFeed
+                config={{
+                  userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+                  projectId: parseInt(projectId),
+                  showFilters: true,
+                  showPagination: true,
+                  itemsPerPage: 15,
+                  allowExport: true,
+                }}
+                className="h-full"
+              />
+            </div>
+          </div>
+        )
+
+      case "documents":
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title */}
+            <div className="pb-4 flex-shrink-0">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-foreground">Project Documents</h2>
+                <p className="text-sm text-muted-foreground">
+                  SharePoint document library with file management and collaboration tools
+                </p>
+              </div>
+            </div>
+
+            {/* SharePoint Library Viewer Component */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <SharePointLibraryViewer
+                projectId={projectId}
+                projectName={projectData?.name || "Project"}
+                projectData={projectData}
+                className="h-full"
+              />
+            </div>
+          </div>
+        )
+
       case "compliance":
         return <ComplianceContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
 
@@ -4467,6 +4693,55 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           projectId,
           navigation.subTool || "scheduler",
           onSidebarContentChange
+        )
+
+      case "safety":
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title with Focus Button */}
+            <div className="pb-2 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h2 className="text-xl font-semibold text-foreground">Project Safety</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Safety forms management, assignments, and compliance tracking
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+                  {isFocusMode ? (
+                    <>
+                      <Minimize2 className="h-3 w-3 mr-1" />
+                      Exit Focus
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-3 w-3 mr-1" />
+                      Focus
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+              <div className="w-full min-w-0 max-w-full h-full overflow-auto">
+                <ProjectSafetyForms projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+              </div>
+            </div>
+          </div>
+        )
+
+      case "quality":
+        return (
+          <QualityProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+          />
         )
 
       case "core":
@@ -4551,6 +4826,20 @@ export const getProjectSidebarContent = (
         { label: "Filter Activity", icon: Filter, onClick: () => {} },
         { label: "Activity Search", icon: Search, onClick: () => {} },
       ]
+    } else if (activeTab === "activity-feed") {
+      return [
+        { label: "Refresh Feed", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Feed", icon: Download, onClick: () => {} },
+        { label: "Filter Activities", icon: Filter, onClick: () => {} },
+        { label: "Search Activities", icon: Search, onClick: () => {} },
+      ]
+    } else if (activeTab === "documents") {
+      return [
+        { label: "Upload Files", icon: Upload, onClick: () => {} },
+        { label: "New Folder", icon: Folder, onClick: () => {} },
+        { label: "Sync SharePoint", icon: RefreshCw, onClick: () => {} },
+        { label: "Export List", icon: Download, onClick: () => {} },
+      ]
     } else if (navigation.coreTab === "reports") {
       return [
         { label: "Create Report", icon: Plus, onClick: () => {} },
@@ -4619,6 +4908,13 @@ export const getProjectSidebarContent = (
         { label: "Active Users", value: "8", color: "purple" },
         { label: "Latest Update", value: "2m ago", color: "orange" },
       ]
+    } else if (activeTab === "documents") {
+      return [
+        { label: "Total Documents", value: "1,247", color: "blue" },
+        { label: "Recent Uploads", value: "28", color: "green" },
+        { label: "Shared Files", value: "156", color: "orange" },
+        { label: "Storage Used", value: "2.4 GB", color: "purple" },
+      ]
     } else if (navigation.coreTab === "reports") {
       return [
         { label: "Total Reports", value: "0", color: "blue" },
@@ -4672,6 +4968,48 @@ export const getProjectSidebarContent = (
   }
 
   const getHBIInsights = () => {
+    // Documents insights
+    if (activeTab === "documents") {
+      return [
+        {
+          id: "doc-1",
+          type: "info",
+          severity: "low",
+          title: "Storage Optimization",
+          text: "SharePoint library is using 2.4 GB of 5 GB capacity. Consider archiving older documents to optimize storage.",
+          action: "Manage storage",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "doc-2",
+          type: "warning",
+          severity: "medium",
+          title: "Sync Required",
+          text: "28 documents have been modified externally and need to be synced. Ensure all team members have latest versions.",
+          action: "Sync documents",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "doc-3",
+          type: "success",
+          severity: "low",
+          title: "Version Control Active",
+          text: "All critical project documents are under version control with automatic backup enabled.",
+          action: "View history",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "doc-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Collaboration Efficiency",
+          text: "156 files are shared with external stakeholders. Consider access review for security optimization.",
+          action: "Review access",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
     // Financial Management tabs - comprehensive insights for all financial sub-tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
       // Get current financial sub-tab from navigation
@@ -5801,6 +6139,11 @@ export const getProjectSidebarContent = (
       return "HBI Activity Insights"
     }
 
+    // Documents tab
+    if (activeTab === "documents") {
+      return "HBI Document Management Insights"
+    }
+
     // Core Project Tools tabs
     if (activeTab === "core" || !activeTab) {
       if (!navigation.coreTab || navigation.coreTab === "dashboard") {
@@ -5857,9 +6200,9 @@ export const getProjectSidebarContent = (
 
   // Calculate construction-specific metrics
   const getConstructionMetrics = () => {
-    // Mock data for PCCOs and PCOs
-    const totalPCCOsApproved = 8
-    const pcosPendingPCCO = 3
+    // Mock dollar data for PCCOs and PCOs
+    const totalPCCOsApproved = "$245,000"
+    const pcosPendingPCCO = "$67,500"
 
     // Get dates from projectData and format as mm/dd/yyyy
     const formatDate = (dateString: string) => {
@@ -5868,12 +6211,32 @@ export const getProjectSidebarContent = (
       return date.toLocaleDateString("en-US")
     }
 
+    // Calculate projected completion date with fallback
+    const getProjectedCompletionDate = () => {
+      // Try to use projectData first
+      if (projectData?.projected_finish_date) {
+        return formatDate(projectData.projected_finish_date)
+      }
+
+      // Fallback: if we have a contract completion date, use that
+      if (projectData?.original_completion_date) {
+        return formatDate(projectData.original_completion_date)
+      }
+
+      // Final fallback: calculate from contract value and typical duration
+      const contractValue = projectData?.contract_value || 75000000
+      const estimatedDurationMonths = Math.ceil((contractValue / 10000000) * 12) // Rough estimate: $10M = 12 months
+      const fallbackDate = new Date()
+      fallbackDate.setMonth(fallbackDate.getMonth() + estimatedDurationMonths)
+      return fallbackDate.toLocaleDateString("en-US")
+    }
+
     return {
       totalPCCOsApproved,
       pcosPendingPCCO,
       approvedExtensions: projectData?.approved_extensions || 0,
       contractCompletionDate: formatDate(projectData?.original_completion_date),
-      projectedCompletionDate: formatDate(projectData?.projected_finish_date),
+      projectedCompletionDate: getProjectedCompletionDate(),
     }
   }
 

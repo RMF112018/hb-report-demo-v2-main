@@ -1,0 +1,120 @@
+{
+  "id": "executive-precon-layout",
+  "name": "Executive Pre-Con Overview",
+  "description": "Pre-construction analytics with Power BI embedded insights for estimating, pursuits, and business development",
+  "role": "executive",
+  "cards": [
+    {
+      "id": "enhanced-hbi-insights-precon",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Pre-Construction Intelligence",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "scope": "pre-construction",
+        "insightTypes": ["estimating", "pursuits", "business-development"],
+        "maxVisibleInsights": 6,
+        "compactMode": false,
+        "dataSource": "precon-analytics",
+        "includeCostAnalysis": true,
+        "includePipelineMetrics": true,
+        "includeWinRateAnalysis": true
+      }
+    },
+    {
+      "id": "beta-pipeline-analytics",
+      "type": "beta-pipeline-analytics",
+      "title": "Business Development Pipeline",
+      "size": "optimal",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showTrends": true,
+        "showConversionRate": true,
+        "showOpportunities": true,
+        "detailLevel": "executive",
+        "compactMode": false,
+        "dataSource": "pursuits",
+        "includeEstimatingMetrics": true,
+        "focusAreas": ["pipeline", "conversion", "win-rate", "revenue-forecast"]
+      }
+    },
+    {
+      "id": "power-bi-estimating-dashboard",
+      "type": "power-bi-embedded",
+      "title": "Estimating Performance Analytics",
+      "size": "optimal",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 10, "rows": 5 },
+      "visible": true,
+      "config": {
+        "reportType": "estimating-analytics",
+        "executiveMode": true,
+        "showLiveData": true,
+        "includeMetrics": ["accuracy", "speed", "cost-trends", "trade-analysis"],
+        "dataSource": "estimates",
+        "refreshInterval": 300000,
+        "theme": "executive"
+      }
+    },
+    {
+      "id": "power-bi-pursuits-summary",
+      "type": "power-bi-embedded",
+      "title": "Pursuit Summary",
+      "size": "optimal",
+      "position": { "x": 10, "y": 6 },
+      "span": { "cols": 6, "rows": 5 },
+      "visible": true,
+      "config": {
+        "reportType": "pursuits-summary",
+        "executiveMode": true,
+        "showLiveData": true,
+        "includeMetrics": ["total-value", "active-pursuits", "bid-due-dates", "risk-assessment"],
+        "dataSource": "pursuits",
+        "refreshInterval": 300000,
+        "theme": "executive"
+      }
+    },
+    {
+      "id": "power-bi-market-intelligence",
+      "type": "power-bi-embedded",
+      "title": "Market Intelligence",
+      "size": "optimal",
+      "position": { "x": 0, "y": 11 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "reportType": "market-intelligence",
+        "executiveMode": true,
+        "showLiveData": true,
+        "includeMetrics": ["market-trends", "competitor-analysis", "pricing-insights", "opportunity-scoring"],
+        "dataSource": "combined",
+        "refreshInterval": 600000,
+        "theme": "executive"
+      }
+    },
+    {
+      "id": "precon-kpi-summary",
+      "type": "kpi-summary",
+      "title": "Pre-Construction KPIs",
+      "size": "optimal",
+      "position": { "x": 8, "y": 11 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "kpiTypes": ["win-rate", "average-proposal-time", "pipeline-value", "cost-accuracy", "resource-utilization"],
+        "timeframe": "quarterly",
+        "compactDisplay": false,
+        "dataSource": "precon-metrics",
+        "showTrends": true,
+        "showComparisons": true
+      }
+    }
+  ]
+}

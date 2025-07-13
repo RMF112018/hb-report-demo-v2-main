@@ -5,8 +5,8 @@
   "role": "executive",
   "cards": [
     {
-      "id": "project-overview-executive",
-      "type": "project-overview",
+      "id": "portfolio-overview-executive",
+      "type": "portfolio-overview",
       "title": "Portfolio Overview",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
@@ -14,7 +14,16 @@
       "visible": true,
       "config": {
         "executiveMode": true,
-        "scope": "portfolio"
+        "scope": "portfolio",
+        "totalProjects": 20,
+        "activeProjects": 17,
+        "completedThisYear": 12,
+        "averageDuration": 185,
+        "averageContractValue": 45000000,
+        "totalSqFt": 2850000,
+        "totalValue": 850000000,
+        "netCashFlow": 42500000,
+        "averageWorkingCapital": 125000000
       }
     },
     {

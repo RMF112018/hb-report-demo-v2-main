@@ -68,10 +68,10 @@ import GeneralConditionsCard from "@/components/cards/GeneralConditionsCard"
 import ContingencyAnalysisCard from "@/components/cards/ContingencyAnalysisCard"
 import CashFlowCard from "@/components/cards/CashFlowCard"
 import ProcurementCard from "@/components/cards/ProcurementCard"
-import DrawForecastCard from "@/components/cards/DrawForecastCard"
+import PowerBIDrawForecastCard from "@/components/cards/PowerBIDrawForecastCard"
 import QualityControlCard from "@/components/cards/QualityControlCard"
 import SafetyCard from "@/components/cards/SafetyCard"
-import StaffingDistributionCard from "@/components/cards/StaffingDistributionCard"
+import PowerBIStaffingCard from "@/components/cards/PowerBIStaffingCard"
 import ChangeOrderAnalysisCard from "@/components/cards/ChangeOrderAnalysisCard"
 import CloseoutCard from "@/components/cards/CloseoutCard"
 import StartupCard from "@/components/cards/StartupCard"
@@ -84,6 +84,16 @@ import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
 import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
 import PowerBIDashboardCard from "@/components/cards/PowerBIDashboardCard"
+
+// Simplified My Dashboard cards
+import SimpleProjectMetricsCard from "@/components/cards/SimpleProjectMetricsCard"
+import SimpleFinancialSummaryCard from "@/components/cards/SimpleFinancialSummaryCard"
+import SimpleActivityTrendsCard from "@/components/cards/SimpleActivityTrendsCard"
+import SimpleProcurementAnalyticsCard from "@/components/cards/SimpleProcurementAnalyticsCard"
+import SimplePermitTrackingCard from "@/components/cards/SimplePermitTrackingCard"
+import SimpleRFIStatusCard from "@/components/cards/SimpleRFIStatusCard"
+import SimpleMarketInsightsCard from "@/components/cards/SimpleMarketInsightsCard"
+import SimpleEstimatingProgressCard from "@/components/cards/SimpleEstimatingProgressCard"
 
 // Beta card components
 import BetaPortfolioOverview from "@/components/cards/beta/BetaPortfolioOverview"
@@ -114,6 +124,7 @@ import BetaCloseout from "@/components/cards/beta/BetaCloseout"
 // Add the financial panel beta card imports
 import BetaProjectOverview from "@/components/cards/beta/BetaProjectOverview"
 import BetaProcurement from "@/components/cards/beta/BetaProcurement"
+import BetaProcurementStatsPanel from "@/components/cards/beta/BetaProcurementStatsPanel"
 
 // IT Command Center placeholder cards
 import {
@@ -546,21 +557,49 @@ export function DashboardGrid({
               width: "100%",
             }}
           >
-            {sortedCards.map((card) => (
-              <SortableCard
-                key={card.id}
-                card={card}
-                isEditing={isEditing}
-                isCompact={isCompact}
-                onCardRemove={onCardRemove}
-                onCardConfigure={onCardConfigure}
-                onCardSizeChange={onCardSizeChange}
-                onCardFocus={handleCardFocus}
-                height={getCardHeight(card, isCompact)}
-                userRole={userRole}
-                useBetaDashboard={useBetaDashboard}
-              />
-            ))}
+            {sortedCards.map((card) => {
+              // Detect if we're in a Financial Review context based on card IDs
+              const isFinancialReviewContext =
+                card.id.includes("financial") ||
+                card.id.includes("procurement-executive") ||
+                card.id.includes("procurement-pe") ||
+                card.id.includes("procurement-pm") ||
+                card.id.includes("procurement-1")
+
+              // Detect if we're in an Executive Overview context based on role and card patterns
+              const isExecutiveOverviewContext =
+                userRole === "executive" &&
+                (card.id.includes("portfolio-overview") ||
+                  card.id.includes("enhanced-hbi-insights") ||
+                  card.id.includes("pipeline-analytics") ||
+                  card.id.includes("market-intelligence") ||
+                  card.id.includes("executive-kpi-summary") ||
+                  card.id.includes("cash-flow-summary") ||
+                  card.id.includes("power-bi-enterprise-dashboard") ||
+                  card.type === "financial-review-panel" ||
+                  card.type === "staffing-distribution" ||
+                  card.type === "quality-control" ||
+                  card.type === "safety")
+
+              // Use enhanced dashboard for Financial Review contexts, Executive Overview contexts, or when beta is enabled
+              const useEnhancedDashboard = isFinancialReviewContext || isExecutiveOverviewContext || useBetaDashboard
+
+              return (
+                <SortableCard
+                  key={card.id}
+                  card={card}
+                  isEditing={isEditing}
+                  isCompact={isCompact}
+                  onCardRemove={onCardRemove}
+                  onCardConfigure={onCardConfigure}
+                  onCardSizeChange={onCardSizeChange}
+                  onCardFocus={handleCardFocus}
+                  height={getCardHeight(card, isCompact)}
+                  userRole={userRole}
+                  useBetaDashboard={useEnhancedDashboard}
+                />
+              )
+            })}
           </div>
         </SortableContext>
       </div>
@@ -652,6 +691,17 @@ function SortableCard({
     "closeout",
     "project-overview",
     "procurement",
+    "staffing-distribution",
+    // Simple Power BI embedded cards (My Dashboard)
+    "simple-project-metrics",
+    "simple-financial-summary",
+    "simple-activity-trends",
+    "simple-procurement-analytics",
+    "simple-permit-tracking",
+    "simple-rfi-status",
+    "simple-market-insights",
+    "simple-estimating-progress",
+    "draw-forecast",
   ]
 
   const isBetaCard = useBetaDashboard && betaCards.includes(card.type)
@@ -702,6 +752,31 @@ function CardContent({
   userRole?: string
   useBetaDashboard?: boolean
 }) {
+  // Detect if we're in a Financial Review context based on card IDs
+  const isFinancialReviewContext =
+    card.id.includes("financial") ||
+    card.id.includes("procurement-executive") ||
+    card.id.includes("procurement-pe") ||
+    card.id.includes("procurement-pm") ||
+    card.id.includes("procurement-1")
+
+  // Detect if we're in an Executive Overview context based on role and card patterns
+  const isExecutiveOverviewContext =
+    userRole === "executive" &&
+    (card.id.includes("portfolio-overview") ||
+      card.id.includes("enhanced-hbi-insights") ||
+      card.id.includes("pipeline-analytics") ||
+      card.id.includes("market-intelligence") ||
+      card.id.includes("executive-kpi-summary") ||
+      card.id.includes("cash-flow-summary") ||
+      card.id.includes("power-bi-enterprise-dashboard") ||
+      card.type === "financial-review-panel" ||
+      card.type === "staffing-distribution" ||
+      card.type === "quality-control" ||
+      card.type === "safety")
+
+  // Use enhanced dashboard for Financial Review contexts, Executive Overview contexts, or when beta is enabled
+  const useEnhancedDashboard = isFinancialReviewContext || isExecutiveOverviewContext || useBetaDashboard
   // Calculate span for components that need it
   const span = card.span || getOptimalSize(card.type)
 
@@ -729,93 +804,156 @@ function CardContent({
 
   switch (card.type) {
     case "portfolio-overview":
-      return useBetaDashboard ? (
+      return useEnhancedDashboard ? (
         <BetaPortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
       ) : (
         <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
       )
     case "enhanced-hbi-insights":
-      return useBetaDashboard ? <BetaEnhancedHBIInsights {...commonProps} /> : <EnhancedHBIInsights {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaEnhancedHBIInsights {...commonProps} />
+      ) : (
+        <EnhancedHBIInsights {...commonProps} />
+      )
     case "financial-review-panel":
-      return useBetaDashboard ? <BetaFinancialOverview {...commonProps} /> : <FinancialReviewPanel {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaFinancialOverview {...commonProps} />
+      ) : (
+        <FinancialReviewPanel {...commonProps} />
+      )
     case "pipeline-analytics":
-      return useBetaDashboard ? <BetaPipelineAnalytics {...commonProps} /> : <PipelineAnalytics {...commonProps} />
+    case "beta-pipeline-analytics":
+      return useEnhancedDashboard ? <BetaPipelineAnalytics {...commonProps} /> : <PipelineAnalytics {...commonProps} />
     case "market-intelligence":
-      return useBetaDashboard ? <BetaMarketIntelligence {...commonProps} /> : <MarketIntelligence {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaMarketIntelligence {...commonProps} />
+      ) : (
+        <MarketIntelligence {...commonProps} />
+      )
     case "critical-dates":
-      return useBetaDashboard ? <BetaCriticalDates {...commonProps} /> : <CriticalDatesCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaCriticalDates {...commonProps} /> : <CriticalDatesCard {...commonProps} />
     case "schedule-monitor":
-      return useBetaDashboard ? <BetaScheduleMonitor {...commonProps} /> : <ScheduleMonitorCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaScheduleMonitor {...commonProps} /> : <ScheduleMonitorCard {...commonProps} />
     case "health":
-      return useBetaDashboard ? <BetaHealth {...commonProps} /> : <HealthCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaHealth {...commonProps} /> : <HealthCard {...commonProps} />
     case "change-order-analysis":
-      return useBetaDashboard ? (
+      return useEnhancedDashboard ? (
         <BetaChangeOrderAnalysis {...commonProps} />
       ) : (
         <ChangeOrderAnalysisCard {...commonProps} />
       )
     case "bd-opportunities":
-      return useBetaDashboard ? <BetaBDOpportunities {...commonProps} /> : <BDOpportunitiesCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaBDOpportunities {...commonProps} /> : <BDOpportunitiesCard {...commonProps} />
     case "project-overview":
-      return useBetaDashboard ? <BetaProjectOverview {...commonProps} /> : <ProjectOverviewCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaProjectOverview {...commonProps} /> : <ProjectOverviewCard {...commonProps} />
     case "schedule-performance":
-      return useBetaDashboard ? (
+      return useEnhancedDashboard ? (
         <BetaSchedulePerformance {...commonProps} />
       ) : (
         <SchedulePerformanceCard {...commonProps} />
       )
     case "financial-status":
-      return useBetaDashboard ? <BetaFinancialStatus {...commonProps} /> : <FinancialStatusCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaFinancialStatus {...commonProps} /> : <FinancialStatusCard {...commonProps} />
     // Add beta placeholders for other common cards
     case "general-conditions":
-      return useBetaDashboard ? <BetaGeneralConditions {...commonProps} /> : <GeneralConditionsCard {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaGeneralConditions {...commonProps} />
+      ) : (
+        <GeneralConditionsCard {...commonProps} />
+      )
     case "contingency-analysis":
-      return useBetaDashboard ? (
+      return useEnhancedDashboard ? (
         <BetaContingencyAnalysis {...commonProps} />
       ) : (
         <ContingencyAnalysisCard {...commonProps} />
       )
     case "cash-flow":
-      return useBetaDashboard ? <BetaCashFlowAnalysis {...commonProps} /> : <CashFlowCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaCashFlowAnalysis {...commonProps} /> : <CashFlowCard {...commonProps} />
     case "procurement":
-      return useBetaDashboard ? <BetaProcurement {...commonProps} /> : <ProcurementCard {...commonProps} />
+      // Use stats panel for Financial Review dashboards, regular procurement card for others
+      const isFinancialReview =
+        card.id.includes("procurement-executive") ||
+        card.id.includes("procurement-pe") ||
+        card.id.includes("procurement-pm") ||
+        card.id.includes("procurement-1")
+
+      return useEnhancedDashboard ? (
+        isFinancialReview ? (
+          <BetaProcurementStatsPanel {...commonProps} />
+        ) : (
+          <BetaProcurement {...commonProps} />
+        )
+      ) : (
+        <ProcurementCard {...commonProps} />
+      )
     case "draw-forecast":
-      return useBetaDashboard ? (
-        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border border-[#FA4616]/20 dark:border-[#FA4616]/40 rounded-lg">
-          <div className="text-center p-6">
-            <div className="p-3 bg-[#FA4616] rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
-              <Target className="h-6 w-6 text-white" />
+      return <PowerBIDrawForecastCard {...commonProps} />
+    case "quality-control":
+      return useEnhancedDashboard ? <BetaQualityControl {...commonProps} /> : <QualityControlCard {...commonProps} />
+    case "safety":
+      return useEnhancedDashboard ? <BetaSafety {...commonProps} /> : <SafetyCard {...commonProps} />
+    case "staffing-distribution":
+      return <PowerBIStaffingCard {...commonProps} />
+    case "startup":
+      return useEnhancedDashboard ? <BetaStartup {...commonProps} /> : <StartupCard {...commonProps} />
+    case "field-reports":
+      return useEnhancedDashboard ? <BetaFieldReports {...commonProps} /> : <FieldReportsCard {...commonProps} />
+    case "power-bi-embedded":
+      // Generic Power BI embedded card - customize based on config
+      return (
+        <div className="h-full p-4 bg-background border rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">{card.title}</h3>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-muted-foreground">Live Data</span>
             </div>
-            <h3 className="text-base font-semibold text-[#FA4616] dark:text-[#FF8A67] mb-2">Beta Draw Forecast</h3>
-            <p className="text-xs text-[#FA4616]/70 dark:text-[#FF8A67]/80 mb-3">Enhanced with Power BI integration</p>
-            <Badge
-              variant="outline"
-              className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67] text-xs"
-            >
-              <Sparkles className="h-3 w-3 mr-1" />
-              Beta
-            </Badge>
+          </div>
+          <div className="h-[calc(100%-3rem)] bg-gradient-to-br from-[#0021A5]/5 to-[#FA4616]/5 rounded border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📊</div>
+              <div className="text-lg font-medium">Power BI Report</div>
+              <div className="text-sm text-muted-foreground">{card.config?.reportType || "Embedded Analytics"}</div>
+            </div>
           </div>
         </div>
-      ) : (
-        <DrawForecastCard {...commonProps} />
       )
-    case "quality-control":
-      return useBetaDashboard ? <BetaQualityControl {...commonProps} /> : <QualityControlCard {...commonProps} />
-    case "safety":
-      return useBetaDashboard ? <BetaSafety {...commonProps} /> : <SafetyCard {...commonProps} />
-    case "staffing-distribution":
-      return <StaffingDistributionCard {...commonProps} />
-    case "startup":
-      return useBetaDashboard ? <BetaStartup {...commonProps} /> : <StartupCard {...commonProps} />
-    case "field-reports":
-      return useBetaDashboard ? <BetaFieldReports {...commonProps} /> : <FieldReportsCard {...commonProps} />
+    case "kpi-summary":
+      // Pre-construction KPI summary card
+      return (
+        <div className="h-full p-4 bg-background border rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">{card.title}</h3>
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-muted-foreground">Q1 2025</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-primary">45%</div>
+              <div className="text-xs text-muted-foreground">Win Rate</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-green-600">$850M</div>
+              <div className="text-xs text-muted-foreground">Pipeline Value</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-blue-600">12</div>
+              <div className="text-xs text-muted-foreground">Active Pursuits</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-purple-600">92%</div>
+              <div className="text-xs text-muted-foreground">Cost Accuracy</div>
+            </div>
+          </div>
+        </div>
+      )
     case "rfi":
-      return useBetaDashboard ? <BetaRFI {...commonProps} /> : <RFICard {...commonProps} />
+      return useEnhancedDashboard ? <BetaRFI {...commonProps} /> : <RFICard {...commonProps} />
     case "submittal":
-      return useBetaDashboard ? <BetaSubmittal {...commonProps} /> : <SubmittalCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaSubmittal {...commonProps} /> : <SubmittalCard {...commonProps} />
     case "closeout":
-      return useBetaDashboard ? <BetaCloseout {...commonProps} /> : <CloseoutCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaCloseout {...commonProps} /> : <CloseoutCard {...commonProps} />
     // IT Command Center cards
     case "user-access-summary":
       return <UserAccessSummaryCard {...commonProps} />
@@ -864,6 +1002,23 @@ function CardContent({
       return <StaffingAlertsCard {...commonProps} projectId={card.config?.projectId} />
     case "power-bi-dashboard":
       return <PowerBIDashboardCard {...commonProps} />
+    // Simplified My Dashboard cards
+    case "simple-project-metrics":
+      return <SimpleProjectMetricsCard {...commonProps} />
+    case "simple-financial-summary":
+      return <SimpleFinancialSummaryCard {...commonProps} />
+    case "simple-activity-trends":
+      return <SimpleActivityTrendsCard {...commonProps} />
+    case "simple-procurement-analytics":
+      return <SimpleProcurementAnalyticsCard {...commonProps} />
+    case "simple-permit-tracking":
+      return <SimplePermitTrackingCard {...commonProps} />
+    case "simple-rfi-status":
+      return <SimpleRFIStatusCard {...commonProps} />
+    case "simple-market-insights":
+      return <SimpleMarketInsightsCard {...commonProps} />
+    case "simple-estimating-progress":
+      return <SimpleEstimatingProgressCard {...commonProps} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">

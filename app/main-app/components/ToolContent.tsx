@@ -162,6 +162,10 @@ import type { Permit, PermitFilters as PermitFiltersType } from "../../../types/
 // Import permit mock data
 import permitsData from "../../../data/mock/logs/permits.json"
 
+// Import Safety components
+import { SafetyDashboard } from "../../../components/safety/SafetyDashboard"
+import { QualityDashboard } from "../../../components/quality/QualityDashboard"
+
 interface User {
   firstName: string
   lastName: string
@@ -282,6 +286,40 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
     tabs: [
       { id: "overview", label: "Overview" },
       { id: "log", label: "Constraints Log" },
+    ],
+  },
+  Safety: {
+    title: "Safety",
+    description: "Safety management, incident reporting, and compliance tracking",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "certifications", label: "Certifications" },
+      { id: "forms", label: "Forms" },
+      { id: "programs", label: "Programs" },
+      { id: "notices", label: "Notices" },
+      { id: "emergency", label: "Emergency" },
+    ],
+  },
+  "Quality Control": {
+    title: "Quality Control",
+    description: "Quality management, metrics tracking, warranty management, and compliance monitoring",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "metrics", label: "Quality Metrics" },
+      { id: "warranty", label: "Warranty Log" },
+      { id: "programs", label: "Programs & Procedures" },
+      { id: "notices", label: "Notices & Updates" },
+    ],
+  },
+  "Quality Control & Warranty": {
+    title: "Quality Control & Warranty",
+    description: "Quality management, metrics tracking, warranty management, and compliance monitoring",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "metrics", label: "Quality Metrics" },
+      { id: "warranty", label: "Warranty Log" },
+      { id: "programs", label: "Programs & Procedures" },
+      { id: "notices", label: "Notices & Updates" },
     ],
   },
 }
@@ -449,7 +487,7 @@ const ModularStaffingContent: React.FC<{
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading staffing management...</p>
+          <p className="text-muted-foreground">Loading staffing content...</p>
         </div>
       </div>
     )
@@ -4028,6 +4066,68 @@ const PermitLogContent: React.FC<{ userRole: UserRole; user: User; onNavigateBac
   )
 }
 
+// Safety Content Component
+const SafetyContent: React.FC<{ userRole: UserRole; user: User; onNavigateBack?: () => void }> = ({
+  userRole,
+  user,
+  onNavigateBack,
+}) => {
+  // Role-based access control - Executive users only
+  if (userRole !== "executive") {
+    return (
+      <div className="text-center py-8">
+        <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Access Restricted</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Safety Control Center access is restricted to Executive users only. Contact your administrator for access.
+        </p>
+        <Button variant="outline" onClick={onNavigateBack} className="mt-4">
+          Back to Dashboard
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Safety Control Center</span>
+      </div>
+
+      {/* Safety Dashboard Content */}
+      <SafetyDashboard user={user} />
+    </div>
+  )
+}
+
+// Quality Control & Warranty Content Component
+const QualityControlContent: React.FC<{ userRole: UserRole; user: User; onNavigateBack?: () => void }> = ({
+  userRole,
+  user,
+  onNavigateBack,
+}) => {
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Quality Control & Warranty</span>
+      </div>
+
+      {/* Quality Control Dashboard */}
+      <QualityDashboard userRole={userRole} user={user} />
+    </div>
+  )
+}
+
 export const ToolContent: React.FC<ToolContentProps> = ({
   toolName,
   userRole,
@@ -4082,6 +4182,16 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   // Use Constraints Log layout for Constraints Log tool
   if (toolName === "Constraints Log") {
     return <ConstraintsLogContent onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Safety layout for Safety tool
+  if (toolName === "Safety") {
+    return <SafetyContent userRole={userRole} user={user} onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Quality Control layout for Quality Control & Warranty tool
+  if (toolName === "Quality Control & Warranty") {
+    return <QualityControlContent userRole={userRole} user={user} onNavigateBack={onNavigateBack} />
   }
 
   // For other tools, use a simple layout without app-header

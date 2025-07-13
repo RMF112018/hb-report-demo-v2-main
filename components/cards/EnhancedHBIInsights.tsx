@@ -128,6 +128,76 @@ export function EnhancedHBIInsights({ config, cardId, span }: EnhancedHBIInsight
   // Handle both array and object config formats
   const insights = Array.isArray(config) ? config : []
 
+  // Pre-construction specific insights for estimating, pursuits, and business development
+  const preconInsights: HBIInsight[] = [
+    {
+      id: "precon-1",
+      type: "opportunity",
+      severity: "high",
+      title: "High-Value Pursuit Identified",
+      text: "Miami Commercial Tower - $250M opportunity with 85% win probability.",
+      action: "Prioritize technical proposal development and strengthen client relationships.",
+      confidence: 92,
+      relatedMetrics: ["Win Rate", "Project Value", "Pursuit Strategy"],
+      project_id: "2525841",
+    },
+    {
+      id: "precon-2",
+      type: "performance",
+      severity: "medium",
+      title: "Estimating Accuracy Improvement",
+      text: "Last 6 estimates show 12% improvement in cost accuracy vs. actual.",
+      action: "Document and standardize improved estimating methodologies.",
+      confidence: 88,
+      relatedMetrics: ["Cost Accuracy", "Estimating Performance", "Historical Analysis"],
+      project_id: "global",
+    },
+    {
+      id: "precon-3",
+      type: "risk",
+      severity: "medium",
+      title: "Bid Pipeline Concentration Risk",
+      text: "75% of active pursuits concentrated in single market sector.",
+      action: "Diversify pursuit strategy across multiple sectors and regions.",
+      confidence: 85,
+      relatedMetrics: ["Market Diversification", "Pipeline Health", "Risk Management"],
+      project_id: "global",
+    },
+    {
+      id: "precon-4",
+      type: "forecast",
+      severity: "low",
+      title: "Win Rate Trending Positive",
+      text: "Q1 2025 win rate projected at 45% - 8% above historical average.",
+      action: "Continue current pursuit qualification and proposal strategies.",
+      confidence: 79,
+      relatedMetrics: ["Win Rate", "Pursuit Qualification", "Proposal Quality"],
+      project_id: "global",
+    },
+    {
+      id: "precon-5",
+      type: "alert",
+      severity: "high",
+      title: "Critical Bid Due Date Alert",
+      text: "Coral Gables Luxury project proposal due in 3 days - 65% complete.",
+      action: "Allocate additional estimating resources to meet deadline.",
+      confidence: 96,
+      relatedMetrics: ["Proposal Completion", "Resource Allocation", "Deadline Management"],
+      project_id: "2525851",
+    },
+    {
+      id: "precon-6",
+      type: "opportunity",
+      severity: "medium",
+      title: "Market Pricing Advantage",
+      text: "Current steel pricing 8% below market average creates competitive edge.",
+      action: "Accelerate bids on steel-intensive projects while advantage exists.",
+      confidence: 91,
+      relatedMetrics: ["Material Pricing", "Competitive Advantage", "Market Analysis"],
+      project_id: "global",
+    },
+  ]
+
   // Financial-specific insights if this is a financial review card
   const financialInsights: HBIInsight[] = [
     {
@@ -237,7 +307,8 @@ export function EnhancedHBIInsights({ config, cardId, span }: EnhancedHBIInsight
 
   // Determine which insights to use based on card context
   const isFinancialReview = cardId?.includes("financial") || cardId?.includes("fin-")
-  const defaultInsights = isFinancialReview ? financialInsights : mockInsights
+  const isPreconReview = cardId?.includes("precon") || config?.scope === "pre-construction"
+  const defaultInsights = isFinancialReview ? financialInsights : isPreconReview ? preconInsights : mockInsights
   const displayInsights = insights.length > 0 ? insights : defaultInsights
   const visibleInsights = showAll ? displayInsights : displayInsights.slice(0, responsive.maxVisibleInsights)
   const avgConfidence = Math.round(
