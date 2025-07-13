@@ -14,6 +14,7 @@
 
 import React from "react"
 import { PresentationSlide } from "./PresentationCarousel"
+import { TangledToolsVisualization } from "./TangledToolsVisualization"
 
 export const slides: PresentationSlide[] = [
   {
@@ -57,15 +58,23 @@ export const slides: PresentationSlide[] = [
     id: "chaos-of-today",
     title: "The Chaos of Today",
     content: (
-      <div className="space-y-4">
-        <p className="text-lg">
-          Right now, our project information lives in dozens of different places: spreadsheets, email chains,
-          third-party platforms, and individual hard drives.
-        </p>
-        <p className="text-lg">
-          When someone leaves, their knowledge walks out the door. When a project moves between phases, critical details
-          get lost in translation.
-        </p>
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <p className="text-lg">
+            Right now, our project information lives in dozens of different places: spreadsheets, email chains,
+            third-party platforms, and individual hard drives.
+          </p>
+          <p className="text-lg">
+            When someone leaves, their knowledge walks out the door. When a project moves between phases, critical
+            details get lost in translation.
+          </p>
+        </div>
+
+        {/* Visualization of tangled tools */}
+        <div className="my-8">
+          <TangledToolsVisualization />
+        </div>
+
         <p className="text-lg">
           We&apos;re spending more time hunting for information than using it to make decisions. This isn&apos;t
           sustainable at our current size—and it&apos;s impossible at 4x scale.
