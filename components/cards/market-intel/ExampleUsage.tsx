@@ -10,9 +10,12 @@
 
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { ActivityTrendsCard, EstimatingProgressCard, PowerBIEmbedCard } from "./index"
-import { TrendingUp, BarChart3, Monitor, DollarSign, Target, Users, CheckCircle } from "lucide-react"
+import { TrendingUp, BarChart3, Monitor, DollarSign, Target, Users, CheckCircle, Brain, Zap, Play } from "lucide-react"
+import { Button } from "../../ui/button"
+import { Badge } from "../../ui/badge"
+import { useHBIAnalysis } from "../../../hooks/use-hbi-analysis"
 
 // Example data for ActivityTrendsCard
 const marketGrowthData = [
@@ -142,12 +145,14 @@ export default function ExampleUsage() {
                 formatValue: (val) => `$${val.toLocaleString()}`,
                 icon: TrendingUp,
               }}
-              aiSummary={{
+              hbiSummary={{
                 insight:
-                  "Growth trend shows consistent expansion with Q2 2025 moderating to stabilize around 5% growth rate",
+                  "HBI trajectory analysis shows consistent expansion with Q2 2025 moderating to stabilize around 5% growth rate",
                 confidence: 87,
                 trend: "up",
                 recommendation: "Consider increasing capacity in high-growth regions",
+                keyFactors: ["Population Growth", "Infrastructure Investment", "Corporate Relocations"],
+                dataQuality: 94,
               }}
             />
 
@@ -163,11 +168,13 @@ export default function ExampleUsage() {
                 formatValue: (val) => `${val.toFixed(0)} projects`,
                 icon: BarChart3,
               }}
-              aiSummary={{
-                insight: "Project starts maintaining steady pace with seasonal variations",
+              hbiSummary={{
+                insight: "HBI analysis shows project starts maintaining steady pace with seasonal variations",
                 confidence: 92,
                 trend: "stable",
                 recommendation: "Monitor Q3 seasonal adjustments",
+                keyFactors: ["Seasonal Patterns", "Market Stability", "Permit Activity"],
+                dataQuality: 91,
               }}
             />
           </div>
@@ -189,13 +196,15 @@ export default function ExampleUsage() {
                 primaryColor: "#8b5cf6",
                 icon: Target,
               }}
-              aiSummary={{
+              hbiSummary={{
                 insight:
-                  "Developer sentiment shows mixed signals with rising insurance costs offset by positive job growth and GDP expansion",
+                  "HBI sentiment analysis reveals mixed developer confidence with rising insurance costs offset by positive job growth and GDP expansion",
                 confidence: 82,
                 trend: "up",
                 keyMetrics: ["Insurance Impact", "Job Growth", "GDP Correlation"],
                 recommendation: "Focus on risk mitigation strategies for insurance cost volatility",
+                keyFactors: ["Insurance Costs", "Economic Growth", "Market Confidence"],
+                dataQuality: 89,
               }}
             />
           </div>

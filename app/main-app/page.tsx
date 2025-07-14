@@ -312,15 +312,15 @@ export default function MainApplicationPage() {
       // 1. Trigger flag is set OR presentation mode is active
       // 2. Tour hasn't been completed yet
       if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
-        console.log("🚀 Starting Intel Tour (5 seconds)")
+        console.log("🚀 Starting Intel Tour (3 seconds)")
 
         // Clean up the trigger flag
         localStorage.removeItem("triggerIntelTour")
 
-        // Set timer for 5 seconds after main app loads
+        // Set timer for 3 seconds after main app loads
         const tourTimer = setTimeout(() => {
           setShowIntelTour(true)
-        }, 5000) // 5 second delay
+        }, 3000) // 3 second delay
 
         return () => clearTimeout(tourTimer)
       }

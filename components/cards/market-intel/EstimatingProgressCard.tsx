@@ -122,7 +122,8 @@ export default function EstimatingProgressCard({
 
   // Configuration defaults
   const primaryColor = config?.primaryColor || "#3b82f6"
-  const showAISummary = config?.showAISummary ?? true
+  const showHBISummary = config?.showHBISummary ?? true
+  const enableHBIForecast = config?.enableHBIForecast ?? false
   const showDistribution = config?.showDistribution ?? true
   const showProgress = config?.showProgress ?? true
   const IconComponent = config?.icon || Calculator
