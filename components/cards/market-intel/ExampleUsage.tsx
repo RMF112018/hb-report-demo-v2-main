@@ -51,7 +51,7 @@ const sentimentData = {
       value: 459000000,
       format: "currency" as const,
       trend: "up" as const,
-      color: "text-purple-600",
+      color: "text-orange-600",
       icon: DollarSign,
     },
     {

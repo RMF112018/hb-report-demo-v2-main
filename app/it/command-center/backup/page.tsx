@@ -118,7 +118,7 @@ export default function BackupPage() {
       type: "opportunity",
       severity: "medium",
       title: "Deduplication Optimization",
-      text: "AI analysis identifies 15% additional storage savings through enhanced deduplication policies.",
+      text: "HBI Analysis identifies 15% additional storage savings through enhanced deduplication policies.",
       action: "Update deduplication rules for Project Files and Exchange databases.",
       confidence: 87,
       relatedMetrics: ["Storage Efficiency", "Cost Optimization", "Deduplication"],

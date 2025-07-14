@@ -546,7 +546,7 @@ export const QualityMetricsPanel: React.FC<QualityMetricsPanelProps> = ({ userRo
     }
 
     // In a real implementation, this would call the HBI AI API
-    console.log("AI Analysis Request:", aiAnalysisPrompt)
+    console.log("HBI Analysis Request:", aiAnalysisPrompt)
 
     // Show notification that lessons learned is being generated
     // This would integrate with the LessonsLearnedNotices component

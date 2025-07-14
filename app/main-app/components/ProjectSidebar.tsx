@@ -24,6 +24,9 @@ import { useToast } from "../../../components/ui/use-toast"
 import { ProductivityPopover } from "../../../components/layout/ProductivityPopover"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
 import { TeamsSlideOutPanel } from "../../../components/productivity/TeamsSlideOutPanel"
+import { QualityWarrantyCarousel } from "../../../components/quality/QualityWarrantyCarousel"
+import { ProjectPageCarousel } from "../../../components/presentation/ProjectPageCarousel"
+import { CoreTabCarousel } from "../../../components/presentation/CoreTabCarousel"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -277,7 +280,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   {
     name: "Market Intelligence",
     href: "/dashboard/market-intel",
-    category: "Financial Management",
+    category: "Core Tools",
     description: "AI-powered market analysis, competitive positioning, and predictive insights",
     visibleRoles: ["executive", "project-executive", "project-manager", "estimator"],
   },
@@ -401,6 +404,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const [mounted, setMounted] = useState(false)
   const [productivityNotifications] = useState(3)
   const [showTeamsPanel, setShowTeamsPanel] = useState(false)
+  const [showQualityCarousel, setShowQualityCarousel] = useState(false)
+  const [qualityCarouselTimeout, setQualityCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showProjectPageCarousel, setShowProjectPageCarousel] = useState(false)
+  const [projectPageCarouselTimeout, setProjectPageCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showCoreTabCarousel, setShowCoreTabCarousel] = useState(false)
+  const [coreTabCarouselTimeout, setCoreTabCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
 
   // New state for fluid navigation
   const [activeCategory, setActiveCategory] = useState<SidebarCategory | null>(null)
@@ -427,8 +436,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     checkMobile()
     window.addEventListener("resize", checkMobile)
 
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [])
+    return () => {
+      window.removeEventListener("resize", checkMobile)
+      // Cleanup timeouts on unmount
+      if (qualityCarouselTimeout) {
+        clearTimeout(qualityCarouselTimeout)
+      }
+      if (projectPageCarouselTimeout) {
+        clearTimeout(projectPageCarouselTimeout)
+      }
+      if (coreTabCarouselTimeout) {
+        clearTimeout(coreTabCarouselTimeout)
+      }
+    }
+  }, [qualityCarouselTimeout, projectPageCarouselTimeout, coreTabCarouselTimeout])
 
   // Helper function to determine the dashboard path based on user role
   const getDashboardPath = useCallback(() => {
@@ -565,6 +586,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Filter categories based on user role
   const visibleCategories = useMemo(() => {
     return SIDEBAR_CATEGORIES.filter((category) => {
+      // Hide notifications category (bell icon)
+      if (category.id === "notifications") {
+        return false
+      }
+
       if (category.adminOnly) {
         return userRole === "admin"
       }
@@ -586,6 +612,18 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         return false
       }
 
+      if (tool.name === "Dashboard") {
+        return false
+      }
+
+      if (tool.name === "Market Intelligence") {
+        return false
+      }
+
+      if (tool.name === "Contract Documents") {
+        return false
+      }
+
       return isRoleVisible
     })
   }, [userRole])
@@ -595,7 +633,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     const categories = new Map<string, ToolMenuConfig[]>()
 
     // Hidden categories that should not appear in the UI
-    const hiddenCategories = new Set(["Financial Management", "Field Management", "Historical Projects"])
+    const hiddenCategories = new Set(["Financial Management", "Field Management", "Historical Projects", "Warranty"])
 
     filteredTools.forEach((tool) => {
       const category = tool.category
@@ -706,6 +744,64 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     } else {
       setActiveCategory(null)
     }
+  }
+
+  // Handle quality carousel completion
+  const handleQualityCarouselComplete = () => {
+    setShowQualityCarousel(false)
+    // Clear the timeout if it exists
+    if (qualityCarouselTimeout) {
+      clearTimeout(qualityCarouselTimeout)
+      setQualityCarouselTimeout(null)
+    }
+  }
+
+  // Handle project page carousel completion
+  const handleProjectPageCarouselComplete = () => {
+    setShowProjectPageCarousel(false)
+    // Clear the timeout if it exists
+    if (projectPageCarouselTimeout) {
+      clearTimeout(projectPageCarouselTimeout)
+      setProjectPageCarouselTimeout(null)
+    }
+
+    // Trigger Core Tab carousel with 2-second delay
+    if (isPresentationMode) {
+      const timeout = setTimeout(() => {
+        setShowCoreTabCarousel(true)
+      }, 2000)
+      setCoreTabCarouselTimeout(timeout)
+    }
+  }
+
+  // Handle core tab carousel completion
+  const handleCoreTabCarouselComplete = () => {
+    setShowCoreTabCarousel(false)
+    // Clear the timeout if it exists
+    if (coreTabCarouselTimeout) {
+      clearTimeout(coreTabCarouselTimeout)
+      setCoreTabCarouselTimeout(null)
+    }
+  }
+
+  // Helper function to handle project selection with carousel logic
+  const handleProjectSelect = (projectId: string) => {
+    // Check if user is in presentation mode and a project is being selected
+    if (isPresentationMode && projectId) {
+      // Clear any existing timeout
+      if (projectPageCarouselTimeout) {
+        clearTimeout(projectPageCarouselTimeout)
+      }
+
+      // Set 3-second delay before showing carousel
+      const timeout = setTimeout(() => {
+        setShowProjectPageCarousel(true)
+      }, 3000)
+      setProjectPageCarouselTimeout(timeout)
+    }
+
+    // Call the original project selection function
+    onProjectSelect(projectId)
   }
 
   // Mobile floating button
@@ -887,7 +983,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                               key={project.id}
                               variant={selectedProject === project.id ? "default" : "ghost"}
                               onClick={() => {
-                                onProjectSelect(project.id)
+                                handleProjectSelect(project.id)
                                 setMobileSubMenuOpen(false)
                                 setMobileMenuOpen(false)
                               }}
@@ -943,7 +1039,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                   key={project.id}
                                   variant={selectedProject === project.id ? "default" : "ghost"}
                                   onClick={() => {
-                                    onProjectSelect(project.id)
+                                    handleProjectSelect(project.id)
                                     setMobileSubMenuOpen(false)
                                     setMobileMenuOpen(false)
                                   }}
@@ -1065,6 +1161,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 key={tool.name}
                                 variant="ghost"
                                 onClick={() => {
+                                  // Check if Quality Control & Warranty is selected and trigger carousel
+                                  if (tool.name === "Quality Control & Warranty") {
+                                    // Clear any existing timeout
+                                    if (qualityCarouselTimeout) {
+                                      clearTimeout(qualityCarouselTimeout)
+                                    }
+
+                                    // Set 3-second delay before showing carousel
+                                    const timeout = setTimeout(() => {
+                                      setShowQualityCarousel(true)
+                                    }, 3000)
+                                    setQualityCarouselTimeout(timeout)
+                                  }
+
                                   onToolSelect?.(tool.name)
                                   setActiveSubCategory(null) // Close the panel after selection
                                 }}
@@ -1427,7 +1537,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 key={project.id}
                                 variant={selectedProject === project.id ? "default" : "ghost"}
                                 size="sm"
-                                onClick={() => onProjectSelect(project.id)}
+                                onClick={() => handleProjectSelect(project.id)}
                                 className="w-full justify-start px-3 py-2 h-auto text-left"
                               >
                                 <Building className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -1486,7 +1596,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     key={project.id}
                                     variant={selectedProject === project.id ? "default" : "ghost"}
                                     size="sm"
-                                    onClick={() => onProjectSelect(project.id)}
+                                    onClick={() => handleProjectSelect(project.id)}
                                     className="w-full justify-start px-3 py-1.5 h-auto text-left"
                                   >
                                     <Building className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -1621,6 +1731,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     key={tool.name}
                                     variant="ghost"
                                     onClick={() => {
+                                      // Check if Quality Control & Warranty is selected and trigger carousel
+                                      if (tool.name === "Quality Control & Warranty") {
+                                        // Clear any existing timeout
+                                        if (qualityCarouselTimeout) {
+                                          clearTimeout(qualityCarouselTimeout)
+                                        }
+
+                                        // Set 3-second delay before showing carousel
+                                        const timeout = setTimeout(() => {
+                                          setShowQualityCarousel(true)
+                                        }, 3000)
+                                        setQualityCarouselTimeout(timeout)
+                                      }
+
                                       onToolSelect?.(tool.name)
                                       setActiveCategory(null) // Close the panel after selection
                                     }}
@@ -1660,6 +1784,15 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
             currentUser={user}
           />
         </div>
+
+        {/* Quality Control & Warranty Carousel */}
+        {showQualityCarousel && <QualityWarrantyCarousel onComplete={handleQualityCarouselComplete} />}
+
+        {/* Project Page Carousel */}
+        {showProjectPageCarousel && <ProjectPageCarousel onComplete={handleProjectPageCarouselComplete} />}
+
+        {/* Core Tab Carousel */}
+        {showCoreTabCarousel && <CoreTabCarousel onComplete={handleCoreTabCarouselComplete} />}
       </div>
     )
   }

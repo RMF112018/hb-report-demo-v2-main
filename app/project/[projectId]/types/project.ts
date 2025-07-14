@@ -165,7 +165,7 @@ export interface StageConfig {
 }
 
 /**
- * Project insights from AI analysis
+ * Project insights from HBI Analysis
  */
 export interface ProjectInsight {
   /** Unique insight identifier */

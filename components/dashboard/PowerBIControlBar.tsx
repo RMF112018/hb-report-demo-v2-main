@@ -35,6 +35,7 @@ import {
   AlertCircle,
   CheckCircle,
   Activity,
+  Globe,
 } from "lucide-react"
 
 interface PowerBIControlBarProps {
@@ -42,6 +43,12 @@ interface PowerBIControlBarProps {
   onFocusToggle?: () => void
   isFocusMode?: boolean
   className?: string
+  // Market Intelligence specific props
+  isMarketIntelligence?: boolean
+  selectedSector?: string
+  selectedRegion?: string
+  onSectorChange?: (sector: string) => void
+  onRegionChange?: (region: string) => void
 }
 
 interface ProjectFilter {
@@ -63,6 +70,11 @@ export default function PowerBIControlBar({
   onFocusToggle,
   isFocusMode = false,
   className = "",
+  isMarketIntelligence = false,
+  selectedSector = "all",
+  selectedRegion = "all",
+  onSectorChange,
+  onRegionChange,
 }: PowerBIControlBarProps) {
   const [isLiveDataEnabled, setIsLiveDataEnabled] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -117,6 +129,22 @@ export default function PowerBIControlBar({
   }
 
   const itSystems = getITSystemsForAdmin()
+
+  // Market Intelligence filter options
+  const sectorOptions = [
+    { id: "all", name: "All Sectors" },
+    { id: "residential", name: "Residential" },
+    { id: "commercial", name: "Commercial" },
+    { id: "multi-family", name: "Multi-Family" },
+  ]
+
+  const regionOptions = [
+    { id: "all", name: "All Regions" },
+    { id: "north", name: "North Florida" },
+    { id: "central", name: "Central Florida" },
+    { id: "southeast", name: "Southeast Florida" },
+    { id: "southwest", name: "Southwest Florida" },
+  ]
 
   // Auto-refresh when live data is enabled
   useEffect(() => {
@@ -227,8 +255,45 @@ export default function PowerBIControlBar({
 
           {/* Center Section - Controls */}
           <div className="flex items-center gap-3">
-            {/* Conditional Filter - Project Filter for non-admin, IT System Filter for admin */}
-            {userRole === "admin" ? (
+            {/* Conditional Filter - Market Intelligence, IT System Filter for admin, or Project Filter for other roles */}
+            {isMarketIntelligence ? (
+              /* Market Intelligence Filters */
+              <div className="flex items-center gap-2">
+                {/* Sector Filter */}
+                <div className="flex items-center gap-2">
+                  <Filter className="h-5 w-5 text-muted-foreground" />
+                  <Select value={selectedSector} onValueChange={onSectorChange}>
+                    <SelectTrigger className="w-36 h-8">
+                      <SelectValue placeholder="Select sector..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sectorOptions.map((sector) => (
+                        <SelectItem key={sector.id} value={sector.id}>
+                          <span>{sector.name}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Region Filter */}
+                <div className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-muted-foreground" />
+                  <Select value={selectedRegion} onValueChange={onRegionChange}>
+                    <SelectTrigger className="w-40 h-8">
+                      <SelectValue placeholder="Select region..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {regionOptions.map((region) => (
+                        <SelectItem key={region.id} value={region.id}>
+                          <span>{region.name}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : userRole === "admin" ? (
               /* IT System Filter for Admin */
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-muted-foreground" />
@@ -422,7 +487,12 @@ export default function PowerBIControlBar({
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-4">
               <span>
-                {userRole === "admin" ? "IT Administrator Dashboard" : "Financial Review Dashboard"} •{" "}
+                {isMarketIntelligence
+                  ? "Market Intelligence Dashboard"
+                  : userRole === "admin"
+                  ? "IT Administrator Dashboard"
+                  : "Financial Review Dashboard"}{" "}
+                •{" "}
                 {userRole === "executive"
                   ? "Executive"
                   : userRole === "project-executive"
@@ -434,13 +504,19 @@ export default function PowerBIControlBar({
                   : "User"}{" "}
                 View
               </span>
-              {userRole === "admin" && selectedITSystem !== "all" && (
+              {isMarketIntelligence && (selectedSector !== "all" || selectedRegion !== "all") && (
+                <span>
+                  {selectedSector !== "all" && <>• {sectorOptions.find((s) => s.id === selectedSector)?.name}</>}
+                  {selectedRegion !== "all" && <>• {regionOptions.find((r) => r.id === selectedRegion)?.name}</>}
+                </span>
+              )}
+              {!isMarketIntelligence && userRole === "admin" && selectedITSystem !== "all" && (
                 <span>
                   • {itSystems.find((s) => s.id === selectedITSystem)?.name} •{" "}
                   {itSystems.find((s) => s.id === selectedITSystem)?.uptime}% uptime
                 </span>
               )}
-              {userRole !== "admin" && selectedProject !== "all" && (
+              {!isMarketIntelligence && userRole !== "admin" && selectedProject !== "all" && (
                 <span>
                   • {projects.find((p) => p.id === selectedProject)?.name} •{" "}
                   {formatCurrency(projects.find((p) => p.id === selectedProject)?.value || 0)}

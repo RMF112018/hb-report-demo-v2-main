@@ -112,7 +112,7 @@ export default function ConsultantsPage() {
       type: "opportunity",
       severity: "medium",
       title: "Cost Optimization Potential",
-      text: "AI analysis identifies 18% cost savings through contract consolidation and renegotiation.",
+      text: "HBI Analysis identifies 18% cost savings through contract consolidation and renegotiation.",
       action: "Consolidate overlapping services and renegotiate contracts expiring in Q1.",
       confidence: 85,
       relatedMetrics: ["Cost Optimization", "Contract Management", "Procurement"],

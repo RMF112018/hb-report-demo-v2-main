@@ -278,36 +278,36 @@ export default function EstimatingProgressCard({
           </div>
         )}
 
-        {/* AI Summary */}
-        {showAISummary && aiSummary && (
-          <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+        {/* HBI Summary */}
+        {showHBISummary && hbiSummary && (
+          <div className="mt-3 p-3 bg-gradient-to-r from-orange-50 to-blue-50 dark:from-orange-950/20 dark:to-blue-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+              <Brain className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-purple-900 dark:text-purple-100">AI Insight</span>
-                  <Badge variant="outline" className="text-xs text-purple-600 border-purple-200 bg-purple-50">
-                    {aiSummary.confidence}% confidence
+                  <span className="text-sm font-semibold text-orange-900 dark:text-orange-100">HBI Insight</span>
+                  <Badge variant="outline" className="text-xs text-orange-600 border-orange-200 bg-orange-50">
+                    {hbiSummary.confidence}% confidence
                   </Badge>
                 </div>
-                <p className="text-sm text-purple-800 dark:text-purple-200 mb-2">{aiSummary.insight}</p>
-                {aiSummary.keyMetrics && aiSummary.keyMetrics.length > 0 && (
+                <p className="text-sm text-orange-800 dark:text-orange-200 mb-2">{hbiSummary.insight}</p>
+                {hbiSummary.keyMetrics && hbiSummary.keyMetrics.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {aiSummary.keyMetrics.map((metric, index) => (
+                    {hbiSummary.keyMetrics.map((metric: string, index: number) => (
                       <Badge
                         key={index}
                         variant="outline"
-                        className="text-xs text-purple-600 border-purple-200 bg-purple-50"
+                        className="text-xs text-orange-600 border-orange-200 bg-orange-50"
                       >
                         {metric}
                       </Badge>
                     ))}
                   </div>
                 )}
-                {aiSummary.recommendation && (
+                {hbiSummary.recommendation && (
                   <div className="flex items-start gap-1 mt-2">
                     <Lightbulb className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-purple-700 dark:text-purple-300">{aiSummary.recommendation}</p>
+                    <p className="text-xs text-orange-700 dark:text-orange-300">{hbiSummary.recommendation}</p>
                   </div>
                 )}
               </div>

@@ -250,7 +250,7 @@ export const WarrantyLog: React.FC = () => {
 
   useEffect(() => {
     setMounted(true)
-    // Load warranty issues with AI analysis
+    // Load warranty issues with HBI Analysis
     loadWarrantyIssuesWithAI()
   }, [])
 
@@ -1049,7 +1049,7 @@ export const WarrantyLog: React.FC = () => {
     }
 
     // In a real implementation, this would call the HBI AI API
-    console.log("AI Analysis Request:", aiAnalysisPrompt)
+    console.log("HBI Analysis Request:", aiAnalysisPrompt)
 
     // Show notification that lessons learned is being generated
     // This would integrate with the LessonsLearnedNotices component
@@ -1157,7 +1157,7 @@ export const WarrantyLog: React.FC = () => {
     },
     {
       field: "aiAnalysis",
-      headerName: "AI Analysis",
+      headerName: "HBI Analysis",
       width: 120,
       cellRenderer: (params: any) => {
         const ai = params.value

@@ -895,7 +895,7 @@ export const LessonsLearnedNotices: React.FC = () => {
     // Simulate AI generation
     setShowAIGenerationDialog(true)
 
-    // Mock AI analysis generation
+    // Mock HBI Analysis generation
     setTimeout(() => {
       const newNotice: LessonsLearnedNotice = {
         id: `LL${String(notices.length + 1).padStart(3, "0")}`,
@@ -919,7 +919,7 @@ export const LessonsLearnedNotices: React.FC = () => {
           locations: ["Site Wide"],
         },
         rootCauseAnalysis: {
-          primaryCause: "AI analysis in progress...",
+          primaryCause: "HBI Analysis in progress...",
           contributingFactors: [],
           systemicIssues: [],
           humanFactors: [],

@@ -722,7 +722,7 @@ export const QCProgramGenerator: React.FC = () => {
 
   // AI Generation Helper Functions
   const generateExecutiveSummary = (request: AIGenerationRequest, data: AIDataIntegrationResult): string => {
-    return `This comprehensive quality control program for ${request.projectName} has been generated using AI analysis of ${data.integrationSummary.totalSpecifications} project specifications, ${data.integrationSummary.totalSubmittals} approved submittals, ${data.integrationSummary.totalGuidelines} manufacturer guidelines, and ${data.integrationSummary.totalCodes} building code requirements. The program ensures consistent quality delivery through systematic quality control procedures, testing protocols, and documentation requirements tailored to the specific project requirements and industry best practices.`
+    return `This comprehensive quality control program for ${request.projectName} has been generated using HBI Analysis of ${data.integrationSummary.totalSpecifications} project specifications, ${data.integrationSummary.totalSubmittals} approved submittals, ${data.integrationSummary.totalGuidelines} manufacturer guidelines, and ${data.integrationSummary.totalCodes} building code requirements. The program ensures consistent quality delivery through systematic quality control procedures, testing protocols, and documentation requirements tailored to the specific project requirements and industry best practices.`
   }
 
   const generateScopeOfWork = (data: AIDataIntegrationResult): string[] => {

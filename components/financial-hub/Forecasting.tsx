@@ -1964,7 +1964,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                   </Badge>
                 </DialogTitle>
                 <DialogDescription className="text-base">
-                  Interactive AI analysis for{" "}
+                  Interactive HBI Analysis for{" "}
                   {chatRecord.forecast_type === "gcgr"
                     ? `${chatRecord.cost_code} - ${chatRecord.cost_code_description}`
                     : `${chatRecord.csi_code} - ${chatRecord.csi_description}`}
@@ -2474,7 +2474,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
               </Badge>
             </DialogTitle>
             <DialogDescription className="text-base">
-              Comprehensive AI analysis of forecast accuracy using historical data, project schedules, and industry
+              Comprehensive HBI Analysis of forecast accuracy using historical data, project schedules, and industry
               insights
             </DialogDescription>
           </DialogHeader>

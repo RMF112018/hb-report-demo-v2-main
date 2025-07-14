@@ -58,7 +58,7 @@ export default function ITCommandCenterPage() {
       type: "opportunity",
       severity: "medium",
       title: "License Optimization Potential",
-      text: "AI analysis identifies $127K annual savings through software license rightsizing and consolidation.",
+      text: "HBI Analysis identifies $127K annual savings through software license rightsizing and consolidation.",
       action: "Review underutilized licenses and negotiate enterprise agreements.",
       confidence: 88,
       relatedMetrics: ["Asset Management", "Cost Optimization", "License Usage"],

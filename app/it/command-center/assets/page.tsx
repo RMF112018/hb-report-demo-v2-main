@@ -75,7 +75,7 @@ export default function AssetTrackerPage() {
       type: "opportunity",
       severity: "medium",
       title: "License Optimization Opportunity",
-      text: "AI analysis identifies $127K annual savings through software license rightsizing.",
+      text: "HBI Analysis identifies $127K annual savings through software license rightsizing.",
       action: "Review underutilized licenses and negotiate enterprise volume discounts.",
       confidence: 89,
       relatedMetrics: ["Cost Optimization", "License Utilization", "Procurement"],

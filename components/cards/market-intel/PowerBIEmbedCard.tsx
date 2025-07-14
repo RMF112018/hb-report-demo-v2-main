@@ -136,7 +136,6 @@ export default function PowerBIEmbedCard({
   const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(config?.showRealTime ?? true)
   const [isLoading, setIsLoading] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
-  const [currentData, setCurrentData] = useState(data)
   const [isEmbedLoaded, setIsEmbedLoaded] = useState(false)
   const [activeTab, setActiveTab] = useState(config?.tabsData?.[0]?.value || "overview")
 
@@ -156,15 +155,7 @@ export default function PowerBIEmbedCard({
     if (!isRealTimeEnabled) return
 
     const interval = setInterval(() => {
-      setCurrentData((prev) => {
-        if (!prev || prev.length === 0) return prev
-
-        return prev.map((item) => ({
-          ...item,
-          value: item.value * (1 + (Math.random() - 0.5) * 0.05),
-          ...(item.secondary && { secondary: item.secondary * (1 + (Math.random() - 0.5) * 0.05) }),
-        }))
-      })
+      // For now, just update the timestamp - we can enhance this later
       setLastUpdated(new Date())
     }, refreshInterval)
 
@@ -177,7 +168,6 @@ export default function PowerBIEmbedCard({
     setTimeout(() => {
       setIsLoading(false)
       setLastUpdated(new Date())
-      setCurrentData(data)
       setIsEmbedLoaded(true)
     }, 1500)
   }
@@ -192,7 +182,11 @@ export default function PowerBIEmbedCard({
   }
 
   // Render chart based on type
-  const renderChart = (chartData: any[] = currentData) => {
+  const renderChart = (chartData: any[] = data) => {
+    if (!chartData || chartData.length === 0) {
+      return <div className="h-[300px] flex items-center justify-center text-gray-500">No data available</div>
+    }
+
     const commonProps = {
       data: chartData,
       margin: { top: 20, right: 30, left: 20, bottom: 5 },
@@ -357,14 +351,40 @@ export default function PowerBIEmbedCard({
           </TabsList>
           {config.tabsData.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-4">
-              {renderChart(tab.data)}
+              {renderChart(
+                tab.data.map((item: any) => {
+                  const normalized = { ...item }
+                  // Map common key names to 'name' for consistent chart rendering
+                  if (item.category && !item.name) normalized.name = item.category
+                  if (item.month && !item.name) normalized.name = item.month
+                  if (item.region && !item.name) normalized.name = item.region
+                  if (item.metric && !item.name) normalized.name = item.metric
+                  if (item.stage && !item.name) normalized.name = item.stage
+                  if (item.quarter && !item.name) normalized.name = item.quarter
+                  return normalized
+                })
+              )}
             </TabsContent>
           ))}
         </Tabs>
       )
     }
 
-    return reportId && workspaceId ? renderPowerBIEmbed() : renderChart()
+    // Normalize data directly at render time
+    const renderData = data.map((item: any) => {
+      const normalized = { ...item }
+      // Map common key names to 'name' for consistent chart rendering
+      if (item.category && !item.name) normalized.name = item.category
+      if (item.month && !item.name) normalized.name = item.month
+      if (item.region && !item.name) normalized.name = item.region
+      if (item.metric && !item.name) normalized.name = item.metric
+      if (item.stage && !item.name) normalized.name = item.stage
+      if (item.quarter && !item.name) normalized.name = item.quarter
+      return normalized
+    })
+
+    // Always show charts when data is available, prioritize charts over Power BI embed loading
+    return data && data.length > 0 ? renderChart(renderData) : renderPowerBIEmbed()
   }
 
   return (
@@ -382,11 +402,17 @@ export default function PowerBIEmbedCard({
           </div>
           <div className="flex items-center gap-2">
             {showPowerBIBadge && (
-              <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+              <Badge
+                variant="outline"
+                className="text-blue-600 border-blue-200 bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:bg-blue-950/30"
+              >
                 Power BI
               </Badge>
             )}
-            <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-50">
+            <Badge
+              variant="outline"
+              className="text-gray-600 border-gray-200 bg-gray-50 dark:text-gray-400 dark:border-gray-700 dark:bg-gray-800/50"
+            >
               {chartType.charAt(0).toUpperCase() + chartType.slice(1)}
             </Badge>
             {showExternalLink && (
@@ -423,29 +449,35 @@ export default function PowerBIEmbedCard({
 
         {/* AI Summary */}
         {showAISummary && aiSummary && (
-          <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+          <div className="mt-3 p-3 bg-gradient-to-r from-orange-50 to-blue-50 dark:from-orange-950/20 dark:to-blue-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+              <Brain className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-purple-900 dark:text-purple-100">AI Analysis</span>
-                  <Badge variant="outline" className="text-xs text-purple-600 border-purple-200 bg-purple-50">
+                  <span className="text-sm font-semibold text-orange-900 dark:text-orange-100">HBI Analysis</span>
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-orange-600 border-orange-200 bg-orange-50 dark:text-orange-400 dark:border-orange-800 dark:bg-orange-950/30"
+                  >
                     {aiSummary.confidence}% confidence
                   </Badge>
                   {aiSummary.dataQuality && (
-                    <Badge variant="outline" className="text-xs text-green-600 border-green-200 bg-green-50">
+                    <Badge
+                      variant="outline"
+                      className="text-xs text-green-600 border-green-200 bg-green-50 dark:text-green-400 dark:border-green-800 dark:bg-green-950/30"
+                    >
                       {aiSummary.dataQuality}% data quality
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-purple-800 dark:text-purple-200 mb-2">{aiSummary.insight}</p>
+                <p className="text-sm text-orange-800 dark:text-orange-200 mb-2">{aiSummary.insight}</p>
                 {aiSummary.keyFindings && aiSummary.keyFindings.length > 0 && (
                   <div className="space-y-1 mb-2">
-                    <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Key Findings:</span>
+                    <span className="text-xs font-medium text-orange-700 dark:text-orange-300">Key Findings:</span>
                     {aiSummary.keyFindings.map((finding, index) => (
                       <div key={index} className="flex items-start gap-1">
-                        <Target className="h-3 w-3 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-xs text-purple-700 dark:text-purple-300">{finding}</span>
+                        <Target className="h-3 w-3 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-xs text-orange-700 dark:text-orange-300">{finding}</span>
                       </div>
                     ))}
                   </div>
@@ -453,7 +485,7 @@ export default function PowerBIEmbedCard({
                 {aiSummary.recommendation && (
                   <div className="flex items-start gap-1 mt-2">
                     <Lightbulb className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-purple-700 dark:text-purple-300">{aiSummary.recommendation}</p>
+                    <p className="text-xs text-orange-700 dark:text-orange-300">{aiSummary.recommendation}</p>
                   </div>
                 )}
               </div>

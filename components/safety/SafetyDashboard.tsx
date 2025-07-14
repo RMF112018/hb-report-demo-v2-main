@@ -17,11 +17,14 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { PresentationCarousel } from "../presentation/PresentationCarousel"
+import { safetySlides } from "../presentation/safetySlides"
 import {
   Shield,
   FileText,
@@ -104,9 +107,15 @@ export const SafetyDashboard: React.FC<SafetyDashboardProps> = ({
   const [mounted, setMounted] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(projectId || null)
   const [selectedProjectData, setSelectedProjectData] = useState<any>(projectData || null)
+  const [showSafetyTour, setShowSafetyTour] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Auto-launch safety tour on component mount
+    const timer = setTimeout(() => {
+      setShowSafetyTour(true)
+    }, 500)
+    return () => clearTimeout(timer)
   }, [])
 
   // Mock safety metrics data
@@ -135,6 +144,10 @@ export const SafetyDashboard: React.FC<SafetyDashboardProps> = ({
     const project = mockProjects.find((p) => p.id === projectId)
     setSelectedProjectId(projectId)
     setSelectedProjectData(project)
+  }
+
+  const handleSafetyTourEnd = () => {
+    setShowSafetyTour(false)
   }
 
   // Tab configuration
@@ -493,11 +506,19 @@ export const SafetyDashboard: React.FC<SafetyDashboardProps> = ({
     )
   }
 
+  // Safety Tour - render using portal similar to staffing tour
+  const safetyTour = showSafetyTour && mounted && (
+    <PresentationCarousel slides={safetySlides} onComplete={handleSafetyTourEnd} className="fixed inset-0 z-[9999]" />
+  )
+
   return (
-    <div className="h-screen bg-white dark:bg-gray-950 flex flex-col">
-      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
-        <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+    <>
+      <div className="h-screen bg-white dark:bg-gray-950 flex flex-col">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+        </div>
       </div>
-    </div>
+      {safetyTour && createPortal(safetyTour, document.body)}
+    </>
   )
 }

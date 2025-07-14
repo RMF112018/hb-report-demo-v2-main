@@ -286,7 +286,7 @@ export function EnhancedHBIInsights({ config, cardId, span }: EnhancedHBIInsight
       type: "performance",
       severity: "high",
       title: "Resource Optimization Alert",
-      text: "AI analysis shows 12% efficiency gain possible through reallocation.",
+      text: "HBI Analysis shows 12% efficiency gain possible through reallocation.",
       action: "Implement resource optimization across critical projects.",
       confidence: 94,
       relatedMetrics: ["Resource Allocation", "Efficiency", "Critical Path"],

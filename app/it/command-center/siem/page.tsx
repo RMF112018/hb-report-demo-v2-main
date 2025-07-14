@@ -115,7 +115,7 @@ export default function SIEMEventMonitorPage() {
       type: "opportunity",
       severity: "medium",
       title: "Correlation Rule Optimization",
-      text: "AI analysis suggests 18% improvement in threat detection through rule optimization.",
+      text: "HBI Analysis suggests 18% improvement in threat detection through rule optimization.",
       action: "Review and optimize SIEM correlation rules based on recent attack patterns.",
       confidence: 85,
       relatedMetrics: ["Rule Optimization", "Detection Accuracy", "False Positives"],

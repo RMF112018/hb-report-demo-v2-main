@@ -15,7 +15,7 @@ The Lessons Learned Notices system has been successfully integrated into the Qua
 
 ### 2. Comprehensive Data Model
 
-- **LessonsLearnedNotice Interface**: Complete data structure with source tracking, AI analysis, metrics, and publishing capabilities
+- **LessonsLearnedNotice Interface**: Complete data structure with source tracking, HBI Analysis, metrics, and publishing capabilities
 - **Source Integration**: Links to both QC issues and warranty claims
 - **Tagging System**: Categorizes by trades, phases, scopes, disciplines, components, and locations
 - **Effectiveness Tracking**: Monitors views, likes, shares, implementations, and feedback
@@ -43,14 +43,14 @@ The Lessons Learned Notices system has been successfully integrated into the Qua
 
 ### Key Functions
 
-- `triggerLessonsLearnedGeneration()` - Initiates AI analysis
+- `triggerLessonsLearnedGeneration()` - Initiates HBI Analysis
 - `handleResolveIssue()` - QC issue resolution with lessons learned trigger
 - `handleResolveWarrantyClaim()` - Warranty claim resolution with lessons learned trigger
 
 ### Data Flow
 
 1. QC Issue or Warranty Claim marked as resolved with failure reason
-2. System triggers AI analysis generation
+2. System triggers HBI Analysis generation
 3. HBI AI model processes the data and generates comprehensive analysis
 4. Lessons learned notice is created with AI confidence scoring
 5. Notice is stored in knowledge base with appropriate tagging

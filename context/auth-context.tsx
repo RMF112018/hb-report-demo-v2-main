@@ -17,6 +17,9 @@ interface AuthContextType {
   switchRole: (role: DemoRole) => void
   returnToPresentation: () => void
   isPresentationMode: boolean
+  // Market Intelligence feature flags
+  hasMarketIntelPreload: boolean
+  hasAutoInsightsMode: boolean
 }
 
 const demoUsers: DemoUser[] = [
@@ -239,10 +242,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // AUTHENTICATION RESTORATION (only if auth data was NOT cleared)
         if (!authDataCleared) {
-          // Check if we want to disable auto-login (for testing)
+          // Check if we want to disable auto-login (for testing or production)
           const disableAutoLogin = localStorage.getItem("hb-disable-auto-login") === "true"
 
-          if (!disableAutoLogin) {
+          // Always disable auto-login in production builds
+          const isProductionBuild = process.env.NODE_ENV === "production" || process.env.VERCEL === "1"
+
+          if (isProductionBuild) {
+            console.log("🚀 Production build detected - auto-login disabled, showing login screen")
+          }
+
+          if (!disableAutoLogin && !isProductionBuild) {
             const stored = localStorage.getItem("hb-demo-user")
             const storedViewingAs = localStorage.getItem("hb-viewing-as")
 
@@ -415,6 +425,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const effectiveUser = getEffectiveUser()
   const isPresentationMode = user?.role === "presentation"
 
+  // Market Intelligence feature flags for demo users
+  const hasMarketIntelPreload = Boolean(
+    effectiveUser?.role &&
+      ["executive", "project-executive", "project-manager", "estimator"].includes(effectiveUser.role)
+  )
+  const hasAutoInsightsMode = Boolean(
+    effectiveUser?.role &&
+      ["executive", "project-executive", "project-manager", "estimator"].includes(effectiveUser.role)
+  )
+
   return (
     <AuthContext.Provider
       value={{
@@ -427,6 +447,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         switchRole,
         returnToPresentation,
         isPresentationMode,
+        hasMarketIntelPreload,
+        hasAutoInsightsMode,
       }}
     >
       {children}

@@ -64,7 +64,7 @@ Successfully implemented a comprehensive AI-powered QC Program Generator system 
 ### AI Generation Process
 
 1. **Data Integration**: Pulls from project specifications, submittals, manufacturer guidelines, building codes
-2. **AI Analysis**: Processes integrated data with 91% confidence rating
+2. **HBI Analysis**: Processes integrated data with 91% confidence rating
 3. **Program Generation**: Creates comprehensive QC programs with:
    - Quality standards and procedures
    - Testing protocols and checkpoints
@@ -238,7 +238,7 @@ interface QCProgram {
 ### Potential Improvements
 
 1. **Real API Integration**: Connect to actual project management systems
-2. **Advanced AI Models**: Implement more sophisticated AI analysis
+2. **Advanced AI Models**: Implement more sophisticated HBI Analysis
 3. **Template Library**: Pre-built QC program templates
 4. **Collaboration Tools**: Real-time collaborative editing
 5. **Mobile App**: Dedicated mobile application for field use

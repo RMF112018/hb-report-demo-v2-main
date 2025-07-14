@@ -21,7 +21,6 @@ A flexible component for displaying time-based charts with trend analysis.
 
 ```tsx
 import { ActivityTrendsCard } from "@/components/cards/market-intel"
-
 ;<ActivityTrendsCard
   title="Florida Market Growth"
   description="Monthly nonresidential construction trends"
@@ -63,7 +62,6 @@ A comprehensive component for displaying summary metrics with progress indicator
 
 ```tsx
 import { EstimatingProgressCard } from "@/components/cards/market-intel"
-
 ;<EstimatingProgressCard
   title="Developer Sentiment Index"
   description="Market sentiment analysis"
@@ -104,7 +102,7 @@ A professional component for embedding Power BI reports and complex visualizatio
 - Power BI embed support with report/workspace IDs
 - Tabbed interface for multiple datasets
 - External link integration
-- AI analysis with key findings
+- HBI Analysis with key findings
 - Custom actions and filters support
 - Professional Power BI styling
 
@@ -112,7 +110,6 @@ A professional component for embedding Power BI reports and complex visualizatio
 
 ```tsx
 import { PowerBIEmbedCard } from "@/components/cards/market-intel"
-
 ;<PowerBIEmbedCard
   title="Regional Hotspots Analysis"
   description="Deal activity by region"

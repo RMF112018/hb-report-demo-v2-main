@@ -39,6 +39,8 @@ export interface PresentationCarouselProps {
   autoPlay?: boolean
   autoPlayInterval?: number
   className?: string
+  ctaText?: string
+  ctaIcon?: React.ComponentType<any>
 }
 
 export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
@@ -47,6 +49,8 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
   autoPlay = false,
   autoPlayInterval = 5000,
   className = "",
+  ctaText = "Explore what continuity looks like",
+  ctaIcon: CTAIcon = Sparkles,
 }) => {
   const router = useRouter()
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -134,8 +138,14 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
   const handleExit = useCallback(async () => {
     setIsExiting(true)
     await controls.start("exit")
-    router.push("/login")
-  }, [controls, router])
+
+    // Call onComplete if provided, otherwise fallback to login redirect
+    if (onComplete) {
+      onComplete()
+    } else {
+      router.push("/login")
+    }
+  }, [controls, router, onComplete])
 
   // Animation variants
   const containerVariants = {
@@ -202,8 +212,18 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
 
   return (
     <motion.div
-      className={`fixed inset-0 h-screen w-screen z-[9999] overflow-hidden ${className}`}
+      className={`fixed z-[9999] overflow-hidden ${className}`}
       style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        zIndex: 9999,
         background:
           current?.backgroundGradient ||
           current?.background ||
@@ -316,7 +336,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
       <div className="relative h-full flex items-center justify-center px-6 lg:px-12">
         <div className="w-full max-w-7xl mx-auto">
           {/* Slide Container */}
-          <div className="relative h-[70vh] flex items-center justify-center">
+          <div className="relative h-[75vh] flex items-center justify-center">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentSlide}
@@ -366,7 +386,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
                   {/* CTA Button for Final Slide */}
                   {current?.isFinalSlide && (
                     <motion.div
-                      className="mt-12"
+                      className="mt-6 lg:mt-8"
                       initial={{ opacity: 0, y: 30, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ delay: 0.6, duration: 0.7, type: "spring" }}
@@ -377,8 +397,8 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
                         className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D14D20] text-white font-semibold px-8 lg:px-12 py-4 lg:py-6 text-lg lg:text-xl shadow-2xl transform transition-all duration-300 hover:scale-105 group"
                         disabled={isExiting}
                       >
-                        <Sparkles className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
-                        Explore what continuity looks like
+                        <CTAIcon className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
+                        {ctaText}
                         <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </motion.div>

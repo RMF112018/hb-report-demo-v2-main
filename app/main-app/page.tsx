@@ -29,6 +29,7 @@ import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
 import type { PageHeaderTab } from "./components/PageHeader"
 import { PresentationCarousel } from "../../components/presentation/PresentationCarousel"
+import { PreconCarousel } from "../../components/presentation/PreconCarousel"
 import intelTourSlides from "../../components/presentation/intelTourSlides"
 import { useRouter } from "next/navigation"
 import {
@@ -216,6 +217,7 @@ export default function MainApplicationPage() {
   const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
   const [headerHeight, setHeaderHeight] = useState(140) // Default header height
   const [showIntelTour, setShowIntelTour] = useState(false)
+  const [showPreconCarousel, setShowPreconCarousel] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -308,6 +310,13 @@ export default function MainApplicationPage() {
       const intelTourCompleted = localStorage.getItem("intelTourCompleted")
       const presentationMode = localStorage.getItem("presentationMode")
 
+      console.log("🔍 Intel Tour check:", {
+        triggerTimestamp: !!triggerTimestamp,
+        intelTourCompleted: !!intelTourCompleted,
+        presentationMode: !!presentationMode,
+        mounted,
+      })
+
       // Trigger Intel tour if:
       // 1. Trigger flag is set OR presentation mode is active
       // 2. Tour hasn't been completed yet
@@ -320,9 +329,12 @@ export default function MainApplicationPage() {
         // Set timer for 3 seconds after main app loads
         const tourTimer = setTimeout(() => {
           setShowIntelTour(true)
+          console.log("🎯 Intel Tour launched!")
         }, 3000) // 3 second delay
 
         return () => clearTimeout(tourTimer)
+      } else {
+        console.log("⏭️ Intel Tour skipped - conditions not met")
       }
     }
   }, [mounted])
@@ -451,6 +463,20 @@ export default function MainApplicationPage() {
       setSelectedProject(null)
     }
 
+    // Special handling for Staffing tool - trigger tour with 3-second delay
+    if (toolName === "Staffing") {
+      console.log("🎯 Staffing tool selected from sidebar - triggering tour with 3-second delay")
+
+      // Set a flag to indicate the tour was triggered from sidebar navigation
+      localStorage.setItem("staffingTourFromSidebar", "true")
+      localStorage.setItem("staffingTourTimestamp", Date.now().toString())
+
+      // Clear any existing tour flags to prevent conflicts
+      localStorage.removeItem("execStaffingTour")
+
+      console.log("💾 Staffing Tour: Set sidebar trigger flag and timestamp")
+    }
+
     // Save selection to localStorage
     if (typeof window !== "undefined") {
       if (toolName) {
@@ -464,9 +490,18 @@ export default function MainApplicationPage() {
   // Handle tab changes
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
+
+    // Check if user is in presentation mode and selected "pre-construction" tab
+    if (isPresentationMode && tabId === "pre-construction") {
+      // Trigger Pre-Construction carousel with 2-second delay
+      setTimeout(() => {
+        setShowPreconCarousel(true)
+      }, 2000)
+    }
   }
 
   const handleIntelTourComplete = () => {
+    console.log("🏁 Intel Tour: Tour completed, marking as completed")
     // Mark tour as completed
     localStorage.setItem("intelTourCompleted", "true")
 
@@ -477,28 +512,59 @@ export default function MainApplicationPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handlePreconCarouselComplete = () => {
+    console.log("🏁 Pre-Construction Carousel: Tour completed")
+    // Hide the Pre-Construction carousel
+    setShowPreconCarousel(false)
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   // Handle manual carousel launch from PageHeader badge
   const handleCarouselLaunch = (carouselType: string) => {
-    console.log(`🎠 Launching carousel: ${carouselType}`)
+    console.log(`🎠 Launching carousel: "${carouselType}" (length: ${carouselType.length})`)
 
     switch (carouselType) {
       case "hbi-intel-tour":
         // Clear any previous completion flags and launch Intel Tour
         localStorage.removeItem("intelTourCompleted")
+        console.log("🧹 Intel Tour: Cleared completion flag, launching immediately")
+        console.log("🎯 Intel Tour: Setting showIntelTour to true")
         setShowIntelTour(true)
         break
       case "login-presentation":
         // Navigate to login page to trigger presentation carousel
         router.push("/login?showPresentation=true")
         break
+      case "executive-staffing-tour":
+        console.log("✅ Executive Staffing Tour case matched!")
+        // Set localStorage flag and navigate to executive staffing view
+        localStorage.setItem("execStaffingTour", "true")
+        console.log("💾 Executive Staffing Tour: localStorage flag set to:", localStorage.getItem("execStaffingTour"))
+        // Add a timestamp to help with debugging
+        localStorage.setItem("execStaffingTourTimestamp", Date.now().toString())
+        console.log("⏰ Executive Staffing Tour: Timestamp set:", localStorage.getItem("execStaffingTourTimestamp"))
+        // Switch to staffing tool and executive tab if not already there
+        handleToolSelect("Staffing")
+        handleTabChange("overview")
+        console.log("🎯 Executive Staffing Tour: Navigation initiated to staffing view")
+        // Log localStorage state after navigation
+        setTimeout(() => {
+          console.log("🕵️ Executive Staffing Tour: Post-navigation localStorage check:", {
+            execStaffingTour: localStorage.getItem("execStaffingTour"),
+            timestamp: localStorage.getItem("execStaffingTourTimestamp"),
+          })
+        }, 100)
+        break
       default:
-        console.log(`❌ Unknown carousel type: ${carouselType}`)
+        console.log(`❌ Unknown carousel type: "${carouselType}" (length: ${carouselType.length})`)
     }
   }
 
   // Monitor showIntelTour state changes (for debugging if needed)
   useEffect(() => {
-    // Reserved for debugging if needed
+    console.log("🎬 Intel Tour: showIntelTour state changed to:", showIntelTour)
   }, [showIntelTour])
 
   // Get tabs for different content types
@@ -649,6 +715,7 @@ export default function MainApplicationPage() {
       return [
         { id: "overview", label: "Ops Overview" },
         { id: "pre-con-overview", label: "Pre-Con Overview" },
+        { id: "market-intelligence", label: "Market Intelligence" },
         { id: "financial-review", label: "Financial Review" },
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
@@ -657,6 +724,7 @@ export default function MainApplicationPage() {
       return [
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Ops Overview" },
+        { id: "market-intelligence", label: "Market Intelligence" },
         { id: "financial-review", label: "Financial Review" },
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
@@ -665,6 +733,7 @@ export default function MainApplicationPage() {
       return [
         { id: "action-items", label: "Action Items" },
         { id: "overview", label: "Ops Overview" },
+        { id: "market-intelligence", label: "Market Intelligence" },
         { id: "financial-review", label: "Financial Review" },
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
@@ -674,6 +743,7 @@ export default function MainApplicationPage() {
       return [
         { id: "pre-con-overview", label: "Pre-Con Overview" },
         { id: "bid-management", label: "Bid Management" },
+        { id: "market-intelligence", label: "Market Intelligence" },
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
@@ -939,6 +1009,18 @@ export default function MainApplicationPage() {
         moduleTitle: "Bid Management Dashboard",
         subHead:
           "Comprehensive project bidding and delivery tracking system with real-time BuildingConnected integration",
+        tabs: getTabsForContent(),
+        navigationState,
+        ...navigationCallbacks,
+      }
+    }
+
+    if (activeTab === "market-intelligence") {
+      return {
+        userName,
+        moduleTitle: "Market Intelligence Dashboard",
+        subHead:
+          "HBI-powered market analysis, competitive positioning, and predictive insights for strategic decision-making",
         tabs: getTabsForContent(),
         navigationState,
         ...navigationCallbacks,
@@ -1219,7 +1301,27 @@ export default function MainApplicationPage() {
 
       {/* Intel Tour Carousel - Overlays entire dashboard for presentation users */}
       {/* Uses standard PresentationCarousel with Intel Tour slides for consistency */}
-      {showIntelTour && <PresentationCarousel slides={intelTourSlides} onComplete={handleIntelTourComplete} />}
+      {showIntelTour && (
+        <>
+          {(() => {
+            console.log("🎬 Intel Tour: Rendering PresentationCarousel")
+            return null
+          })()}
+          <PresentationCarousel slides={intelTourSlides} onComplete={handleIntelTourComplete} />
+        </>
+      )}
+
+      {/* Pre-Construction Carousel - Overlays entire dashboard for presentation users */}
+      {/* Uses standard PreconCarousel with Precon slides for consistency */}
+      {showPreconCarousel && (
+        <>
+          {(() => {
+            console.log("🎬 Pre-Construction Carousel: Rendering PreconCarousel")
+            return null
+          })()}
+          <PreconCarousel onComplete={handlePreconCarouselComplete} />
+        </>
+      )}
     </div>
   )
 }

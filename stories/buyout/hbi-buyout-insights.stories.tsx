@@ -37,7 +37,7 @@ to provide actionable insights, risk alerts, and optimization opportunities.
 - **Opportunity**: Optimization and improvement possibilities
 - **Info**: General information and market intelligence
 
-## AI Analysis Sources
+## HBI Analysis Sources
 - **Historical Data**: Past project performance and patterns
 - **Market Intelligence**: Industry trends and benchmarks
 - **Vendor Performance**: Supplier reliability and quality metrics
@@ -422,7 +422,7 @@ Shows:
 - Analysis progress
 - Processing feedback
 
-Provides feedback during AI analysis operations.
+Provides feedback during HBI Analysis operations.
         `,
       },
     },

@@ -45,6 +45,7 @@ import { EstimatingModuleWrapper } from "../../../components/estimating/wrappers
 import { DueThisWeekPanel } from "../../../components/dashboard/DueThisWeekPanel"
 import PowerBIControlBar from "../../../components/dashboard/PowerBIControlBar"
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
+import { ActivityTrendsCard, EstimatingProgressCard, PowerBIEmbedCard } from "../../../components/cards/market-intel"
 import BetaPipelineAnalytics from "../../../components/cards/beta/BetaPipelineAnalytics"
 import BetaBDOpportunities from "../../../components/cards/beta/BetaBDOpportunities"
 import BetaFinancialOverview from "../../../components/cards/beta/BetaFinancialOverview"
@@ -113,6 +114,10 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
   // Focus mode state for Power BI control bar
   const [isFocusMode, setIsFocusMode] = React.useState(false)
+
+  // Market Intelligence filter states
+  const [selectedSector, setSelectedSector] = React.useState<string>("all")
+  const [selectedRegion, setSelectedRegion] = React.useState<string>("all")
 
   // Handle ESC key to exit focus mode
   React.useEffect(() => {
@@ -1255,23 +1260,362 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
           </div>
         )
 
-        // Fallback to legacy bid management if needed
+      case "market-intelligence":
         return (
-          <EstimatingModuleWrapper
-            title="Bid Management Center"
-            description="Comprehensive bid management and BuildingConnected integration with real-time data and export capabilities"
-            userRole={userRole}
-            isEmbedded={true}
-            showCard={false}
-            showHeader={false}
-          >
-            <BidManagementCenter
-              userRole={bidManagementUserRole}
-              onProjectSelect={onProjectSelect}
-              className="h-full"
-              showHeader={false}
+          <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+            {/* Power BI Control Bar - Market Intelligence */}
+            <PowerBIControlBar
+              userRole={userRole}
+              onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+              isFocusMode={isFocusMode}
+              className={isFocusMode ? "rounded-none" : ""}
+              isMarketIntelligence={true}
+              selectedSector={selectedSector}
+              selectedRegion={selectedRegion}
+              onSectorChange={setSelectedSector}
+              onRegionChange={setSelectedRegion}
             />
-          </EstimatingModuleWrapper>
+
+            {/* Dashboard Content */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "space-y-6 p-6"}>
+              {/* Market Intelligence Cards Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {/* Activity Trends Card */}
+                <ActivityTrendsCard
+                  userRole={userRole}
+                  className="h-[400px]"
+                  title="Market Activity Trends"
+                  description="Florida commercial construction market trends and forecasting"
+                  data={[
+                    { period: "Jan", value: 85 },
+                    { period: "Feb", value: 92 },
+                    { period: "Mar", value: 78 },
+                    { period: "Apr", value: 96 },
+                    { period: "May", value: 103 },
+                    { period: "Jun", value: 118 },
+                  ]}
+                  config={{
+                    chartType: "line",
+                    showRealTime: true,
+                    trendIndicator: true,
+                    showHBISummary: true,
+                    primaryColor: "#0021A5",
+                  }}
+                  hbiSummary={{
+                    insight:
+                      "28% growth in commercial activity over the past 6 months, driven by luxury multifamily projects",
+                    confidence: 91,
+                    trend: "up",
+                    recommendation: "Increase capacity allocation for luxury multifamily segments",
+                    keyFactors: ["Developer sentiment", "Interest rate stability", "Regional population growth"],
+                    dataQuality: 94,
+                  }}
+                />
+
+                {/* Estimating Progress Card */}
+                <EstimatingProgressCard
+                  userRole={userRole}
+                  className="h-[400px]"
+                  title="Market Intelligence Metrics"
+                  description="Key performance indicators and market insights"
+                  data={{
+                    metrics: [
+                      { label: "Market Size", value: "$459B", format: "text", trend: "up", change: 8.5 },
+                      { label: "Growth Rate", value: 28, format: "percentage", trend: "up", change: 12.3 },
+                      { label: "Confidence Level", value: 91.5, format: "percentage", trend: "stable" },
+                      { label: "Data Sources", value: "127+", format: "text", trend: "up" },
+                    ],
+                    progressData: [
+                      { category: "Southeast FL", value: 85, target: 90, color: "#0021A5" },
+                      { category: "Southwest FL", value: 72, target: 80, color: "#FA4616" },
+                      { category: "Central FL", value: 68, target: 75, color: "#2563eb" },
+                      { category: "North FL", value: 45, target: 60, color: "#64748b" },
+                    ],
+                  }}
+                  config={{
+                    showRealTime: true,
+                    showDistribution: true,
+                    showProgress: true,
+                    showHBISummary: true,
+                    primaryColor: "#0021A5",
+                  }}
+                  hbiSummary={{
+                    insight: "Florida commercial market shows strong fundamentals with Southeast region leading growth",
+                    confidence: 88,
+                    trend: "up",
+                    recommendation: "Focus investment in Southeast FL luxury multifamily projects",
+                    keyMetrics: ["Market penetration", "Regional diversity", "Growth velocity"],
+                    dataQuality: 92,
+                  }}
+                />
+
+                {/* Power BI Embed Card - Bar Chart */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[400px]"
+                  title="Market Intelligence Dashboard"
+                  description="Interactive Power BI report with real-time market data"
+                  reportId="market-intelligence-overview"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { category: "Luxury Multifamily", value: 45, trend: 12, volume: 285 },
+                    { category: "Commercial Office", value: 28, trend: -3, volume: 178 },
+                    { category: "Mixed Use", value: 18, trend: 8, volume: 95 },
+                    { category: "Hospitality", value: 9, trend: 15, volume: 52 },
+                    { category: "Industrial", value: 12, trend: 6, volume: 73 },
+                    { category: "Retail", value: 8, trend: -1, volume: 41 },
+                  ]}
+                  config={{
+                    chartType: "bar",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "Luxury multifamily segment driving 67% of new project volume in Florida market",
+                    confidence: 94,
+                    trend: "up",
+                    recommendation: "Prioritize luxury multifamily project pipeline development",
+                    keyFindings: ["Regional concentration", "Price point trends", "Developer activity"],
+                    dataQuality: 96,
+                  }}
+                />
+              </div>
+
+              {/* Power BI Chart Variety Showcase */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {/* Line Chart - Performance Trends */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Performance Trends"
+                  description="Monthly performance metrics and KPI tracking"
+                  reportId="performance-trends"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { month: "Jan", revenue: 125, projects: 8, efficiency: 92 },
+                    { month: "Feb", revenue: 142, projects: 11, efficiency: 89 },
+                    { month: "Mar", revenue: 158, projects: 13, efficiency: 94 },
+                    { month: "Apr", revenue: 176, projects: 15, efficiency: 96 },
+                    { month: "May", revenue: 195, projects: 18, efficiency: 91 },
+                    { month: "Jun", revenue: 218, projects: 22, efficiency: 98 },
+                  ]}
+                  config={{
+                    chartType: "line",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "Consistent upward trend in revenue and project volume with efficiency optimization",
+                    confidence: 89,
+                    trend: "up",
+                    keyFindings: ["Revenue growth", "Project scaling", "Efficiency gains"],
+                    dataQuality: 93,
+                  }}
+                />
+
+                {/* Area Chart - Regional Growth */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Regional Growth Analysis"
+                  description="Market expansion across Florida regions"
+                  reportId="regional-growth"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { region: "Southeast FL", q1: 45, q2: 52, q3: 58, q4: 63 },
+                    { region: "Southwest FL", q1: 32, q2: 38, q3: 41, q4: 47 },
+                    { region: "Central FL", q1: 28, q2: 31, q3: 35, q4: 39 },
+                    { region: "North FL", q1: 18, q2: 22, q3: 26, q4: 29 },
+                  ]}
+                  config={{
+                    chartType: "area",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    gradientColors: ["#0021A5", "#FA4616"],
+                  }}
+                  aiSummary={{
+                    insight: "Southeast Florida leads growth with 40% year-over-year increase",
+                    confidence: 91,
+                    trend: "up",
+                    keyFindings: ["Regional dominance", "Consistent growth", "Market penetration"],
+                    dataQuality: 95,
+                  }}
+                />
+
+                {/* Composed Chart - Financial Metrics */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Financial Performance"
+                  description="Combined revenue, profit margin, and project metrics"
+                  reportId="financial-performance"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { month: "Jan", revenue: 125, margin: 15, projects: 8 },
+                    { month: "Feb", revenue: 142, margin: 18, projects: 11 },
+                    { month: "Mar", revenue: 158, margin: 16, projects: 13 },
+                    { month: "Apr", revenue: 176, margin: 20, projects: 15 },
+                    { month: "May", revenue: 195, margin: 22, projects: 18 },
+                    { month: "Jun", revenue: 218, margin: 24, projects: 22 },
+                  ]}
+                  config={{
+                    chartType: "composed",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "Strong correlation between project volume and profit margin improvement",
+                    confidence: 87,
+                    trend: "up",
+                    keyFindings: ["Profit optimization", "Scale benefits", "Operational efficiency"],
+                    dataQuality: 92,
+                  }}
+                />
+              </div>
+
+              {/* Advanced Power BI Visualizations */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Radar Chart - Performance Metrics */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Performance Radar"
+                  description="Multi-dimensional performance analysis across key metrics"
+                  reportId="performance-radar"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { metric: "Quality", value: 88, fullMark: 100 },
+                    { metric: "Schedule", value: 92, fullMark: 100 },
+                    { metric: "Budget", value: 85, fullMark: 100 },
+                    { metric: "Safety", value: 96, fullMark: 100 },
+                    { metric: "Client Satisfaction", value: 90, fullMark: 100 },
+                    { metric: "Team Efficiency", value: 87, fullMark: 100 },
+                  ]}
+                  config={{
+                    chartType: "radar",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "Safety leads performance metrics at 96%, with schedule adherence close behind at 92%",
+                    confidence: 88,
+                    trend: "stable",
+                    keyFindings: ["Safety excellence", "Strong scheduling", "Budget optimization needed"],
+                    dataQuality: 91,
+                  }}
+                />
+
+                {/* Funnel Chart - Project Pipeline */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Project Pipeline Funnel"
+                  description="Lead-to-project conversion analysis and pipeline health"
+                  reportId="pipeline-funnel"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { stage: "Initial Leads", value: 450, conversion: 100 },
+                    { stage: "Qualified Prospects", value: 285, conversion: 63 },
+                    { stage: "Proposal Stage", value: 156, conversion: 35 },
+                    { stage: "Negotiation", value: 78, conversion: 17 },
+                    { stage: "Contract Awarded", value: 34, conversion: 8 },
+                    { stage: "Project Started", value: 32, conversion: 7 },
+                  ]}
+                  config={{
+                    chartType: "funnel",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "8% lead-to-contract conversion rate indicates strong qualification process",
+                    confidence: 90,
+                    trend: "up",
+                    keyFindings: ["Efficient filtering", "High close rate", "Pipeline health"],
+                    dataQuality: 94,
+                  }}
+                />
+              </div>
+
+              {/* Additional Market Intelligence Content */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Market Forecast Trends */}
+                <ActivityTrendsCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Market Forecast Trends"
+                  description="3-month forward-looking market projections"
+                  data={[
+                    { period: "Jul", value: 125 },
+                    { period: "Aug", value: 132 },
+                    { period: "Sep", value: 128 },
+                  ]}
+                  config={{
+                    chartType: "area",
+                    showRealTime: true,
+                    gradientColors: ["#0021A5", "#FA4616"],
+                    enableHBIForecast: true,
+                  }}
+                  hbiSummary={{
+                    insight:
+                      "Forecasted 15% growth in Q3 driven by seasonal construction activity and project launches",
+                    confidence: 85,
+                    trend: "up",
+                    keyFactors: ["Seasonal patterns", "Project pipeline", "Economic indicators"],
+                    dataQuality: 89,
+                  }}
+                />
+
+                {/* Competitive Analysis - Pie Chart */}
+                <PowerBIEmbedCard
+                  userRole={userRole}
+                  className="h-[350px]"
+                  title="Competitive Positioning"
+                  description="Market share and competitive analysis dashboard"
+                  reportId="competitive-analysis"
+                  workspaceId="hb-market-intel"
+                  data={[
+                    { name: "HB Construction", value: 23, growth: 18, color: "#0021A5" },
+                    { name: "Turner Construction", value: 19, growth: 8, color: "#FA4616" },
+                    { name: "Skanska USA", value: 15, growth: -2, color: "#2563eb" },
+                    { name: "Balfour Beatty", value: 12, growth: 5, color: "#7c3aed" },
+                    { name: "PCL Construction", value: 10, growth: 3, color: "#059669" },
+                    { name: "Other Competitors", value: 21, growth: 1, color: "#64748b" },
+                  ]}
+                  config={{
+                    chartType: "pie",
+                    showRealTime: true,
+                    showPowerBIBadge: true,
+                    showExternalLink: true,
+                    primaryColor: "#0021A5",
+                    secondaryColor: "#FA4616",
+                  }}
+                  aiSummary={{
+                    insight: "HB Construction maintains market leadership with 23% share and highest growth rate",
+                    confidence: 92,
+                    trend: "up",
+                    keyFindings: ["Market dominance", "Growth trajectory", "Competitive advantage"],
+                    dataQuality: 94,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         )
 
       default:
@@ -1304,32 +1648,33 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
   return (
     <div className="h-full w-full">
       {/* Layout Density Controls - Show when editing and on overview tab */}
-      {isEditing && (activeTab === "overview" || activeTab === "financial-review") && (
-        <div className="mb-4 flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-          <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 mr-2">Density:</span>
-          <div className="flex gap-1">
-            {(["compact", "normal", "spacious"] as const).map((density) => (
-              <Button
-                key={density}
-                variant={layoutDensity === density ? "default" : "outline"}
-                size="sm"
-                onClick={() => onDensityChange(density)}
-                className="text-[10px] capitalize h-5 px-1.5"
-              >
-                {density}
+      {isEditing &&
+        (activeTab === "overview" || activeTab === "financial-review" || activeTab === "market-intelligence") && (
+          <div className="mb-4 flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+            <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 mr-2">Density:</span>
+            <div className="flex gap-1">
+              {(["compact", "normal", "spacious"] as const).map((density) => (
+                <Button
+                  key={density}
+                  variant={layoutDensity === density ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onDensityChange(density)}
+                  className="text-[10px] capitalize h-5 px-1.5"
+                >
+                  {density}
+                </Button>
+              ))}
+            </div>
+            <div className="ml-auto flex gap-1">
+              <Button variant="outline" size="sm" onClick={onReset} className="text-[10px] h-5 px-1.5">
+                Reset
               </Button>
-            ))}
+              <Button variant="default" size="sm" onClick={onSave} className="text-[10px] h-5 px-1.5">
+                Save
+              </Button>
+            </div>
           </div>
-          <div className="ml-auto flex gap-1">
-            <Button variant="outline" size="sm" onClick={onReset} className="text-[10px] h-5 px-1.5">
-              Reset
-            </Button>
-            <Button variant="default" size="sm" onClick={onSave} className="text-[10px] h-5 px-1.5">
-              Save
-            </Button>
-          </div>
-        </div>
-      )}
+        )}
 
       {/* Dashboard Content */}
       <div className="dashboard-content">{renderTabContent()}</div>

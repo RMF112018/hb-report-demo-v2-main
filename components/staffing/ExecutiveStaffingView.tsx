@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { createPortal } from "react-dom"
 import { useAuth } from "@/context/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,10 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { AppHeader } from "@/components/layout/app-header"
+
+// Import presentation components
+import { PresentationCarousel } from "@/components/presentation/PresentationCarousel"
+import { executiveStaffingSlides } from "@/components/presentation/executiveStaffingSlides"
 
 // Import components
 import { InteractiveStaffingGantt } from "@/app/dashboard/staff-planning/components/InteractiveStaffingGantt"
@@ -132,6 +137,7 @@ interface AssignmentModal {
 }
 
 export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ activeTab = "overview" }) => {
+  console.log("🏗️ ExecutiveStaffingView: Component loading...")
   const { user } = useAuth()
   const { toast } = useToast()
 
@@ -144,6 +150,10 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Presentation mode state
+  const [showTour, setShowTour] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [assignmentModal, setAssignmentModal] = useState<AssignmentModal>({
     isOpen: false,
     spcr: null,
@@ -160,6 +170,87 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     setProjects(projectsData as Project[])
     setSpcrs(spcrData as SPCR[])
   }, [])
+
+  // Handle component mount
+  useEffect(() => {
+    console.log("🔧 Executive Staffing Tour: Setting mounted to true")
+    setMounted(true)
+  }, [])
+
+  // Handle tour logic - separate useEffect that depends on mounted state
+  useEffect(() => {
+    console.log("🔍 Executive Staffing Tour: Checking conditions...", { mounted })
+    if (mounted) {
+      // Check if tour should be triggered (sidebar has priority)
+      const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
+      const regularTourFlag = localStorage.getItem("execStaffingTour")
+      const timestamp = localStorage.getItem("execStaffingTourTimestamp")
+      const sidebarTimestamp = localStorage.getItem("staffingTourTimestamp")
+
+      console.log("🔍 Executive Staffing Tour: localStorage check result:", {
+        sidebarTourFlag,
+        regularTourFlag,
+        timestamp,
+        sidebarTimestamp,
+      })
+      console.log("🗄️ Executive Staffing Tour: All localStorage keys:", Object.keys(localStorage))
+
+      // Check for sidebar-triggered tour first (has priority)
+      if (sidebarTourFlag === "true") {
+        console.log("✅ Executive Staffing Tour: Sidebar trigger flag found, launching tour in 3 seconds...")
+        const timer = setTimeout(() => {
+          setShowTour(true)
+          console.log("🎯 Executive Staffing Tour: Tour launched from sidebar trigger!")
+        }, 3000)
+
+        return () => clearTimeout(timer)
+      }
+      // Check for regular tour flag (from page header carousel menu)
+      else if (regularTourFlag === "true") {
+        console.log("✅ Executive Staffing Tour: Regular tour flag found, launching tour in 3 seconds...")
+        const timer = setTimeout(() => {
+          setShowTour(true)
+          console.log("🎯 Executive Staffing Tour: Tour launched from header trigger!")
+        }, 3000)
+
+        return () => clearTimeout(timer)
+      } else {
+        console.log("⏭️ Executive Staffing Tour: No tour flags found, skipping tour")
+        // Also check for any remaining flags that might indicate a timing issue
+        const allLocalStorageKeys = Object.keys(localStorage)
+        const tourRelatedKeys = allLocalStorageKeys.filter((key) => key.includes("tour") || key.includes("Tour"))
+        console.log("🔍 Executive Staffing Tour: Tour-related localStorage keys:", tourRelatedKeys)
+      }
+    }
+  }, [mounted])
+
+  // Additional check for localStorage flag that might be set after component mount
+  useEffect(() => {
+    if (mounted && !showTour) {
+      const checkForTourFlag = () => {
+        const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
+        const regularTourFlag = localStorage.getItem("execStaffingTour")
+
+        if (sidebarTourFlag === "true") {
+          console.log("🎯 Executive Staffing Tour: Late sidebar flag detected, triggering tour now!")
+          setShowTour(true)
+        } else if (regularTourFlag === "true") {
+          console.log("🎯 Executive Staffing Tour: Late regular flag detected, triggering tour now!")
+          setShowTour(true)
+        }
+      }
+
+      // Check immediately and then periodically for a few seconds
+      checkForTourFlag()
+      const interval = setInterval(checkForTourFlag, 500)
+      const timeout = setTimeout(() => clearInterval(interval), 5000)
+
+      return () => {
+        clearInterval(interval)
+        clearTimeout(timeout)
+      }
+    }
+  }, [mounted, showTour])
 
   // Mock data for staff needing assignment (3-6 members with assignments ending in 4-62 days)
   const needingAssignmentData = useMemo(() => {
@@ -539,90 +630,102 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     }
   }
 
-  return (
-    <div
-      className={cn(
-        "space-y-6",
-        isFullScreen && "fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-6 overflow-auto"
-      )}
-    >
-      {/* Main Content with Sidebar Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
-        {/* Sidebar - Hidden on mobile, shown on xl+ */}
-        <div className="hidden xl:block xl:col-span-3 space-y-4">
-          {/* Executive Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                Executive Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Total Staff</span>
-                <span className="font-medium">{overviewAnalytics.totalStaff}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Utilization Rate</span>
-                <span className="font-medium text-green-600">{overviewAnalytics.utilizationRate.toFixed(1)}%</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Monthly Labor Cost</span>
-                <span className="font-medium">${(2032000 / 1000000).toFixed(2)}M</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Cash Inflow on Labor</span>
-                <span className="font-medium text-blue-600">${(2819400).toLocaleString()}</span>
-              </div>
-            </CardContent>
-          </Card>
+  // Handle tour completion
+  const handleTourComplete = () => {
+    console.log("🏁 Executive Staffing Tour: Tour completed, clearing localStorage")
+    localStorage.removeItem("execStaffingTour")
+    localStorage.removeItem("execStaffingTourTimestamp")
+    localStorage.removeItem("staffingTourFromSidebar")
+    localStorage.removeItem("staffingTourTimestamp")
+    setShowTour(false)
+    console.log("✅ Executive Staffing Tour: Tour completed and all localStorage flags cleared")
+  }
 
-          {/* Needing Assignment */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                Needing Assignment ({needingAssignmentData.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-2">
-              <div className="h-48 overflow-auto">
-                {/* Temporary simple table for debugging */}
-                {needingAssignmentData.length > 0 ? (
-                  <div className="space-y-1">
-                    {needingAssignmentData.map((staff) => (
-                      <div
-                        key={staff.id}
-                        className="flex justify-between items-center py-1 px-2 text-xs border-b border-border"
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium">{staff.name}</div>
-                          <div className="text-muted-foreground text-[10px]">{staff.position}</div>
+  return (
+    <>
+      <div
+        className={cn(
+          "space-y-6 relative",
+          isFullScreen && "fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-6 overflow-auto"
+        )}
+      >
+        {/* Main Content with Sidebar Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
+          {/* Sidebar - Hidden on mobile, shown on xl+ */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4">
+            {/* Executive Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  Executive Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Staff</span>
+                  <span className="font-medium">{overviewAnalytics.totalStaff}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Utilization Rate</span>
+                  <span className="font-medium text-green-600">{overviewAnalytics.utilizationRate.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Monthly Labor Cost</span>
+                  <span className="font-medium">${(2032000 / 1000000).toFixed(2)}M</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Cash Inflow on Labor</span>
+                  <span className="font-medium text-blue-600">${(2819400).toLocaleString()}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Needing Assignment */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  Needing Assignment ({needingAssignmentData.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="h-48 overflow-auto">
+                  {/* Temporary simple table for debugging */}
+                  {needingAssignmentData.length > 0 ? (
+                    <div className="space-y-1">
+                      {needingAssignmentData.map((staff) => (
+                        <div
+                          key={staff.id}
+                          className="flex justify-between items-center py-1 px-2 text-xs border-b border-border"
+                        >
+                          <div className="flex-1">
+                            <div className="font-medium">{staff.name}</div>
+                            <div className="text-muted-foreground text-[10px]">{staff.position}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`font-medium ${
+                                staff.endsInDays <= 14
+                                  ? "text-red-600"
+                                  : staff.endsInDays <= 30
+                                  ? "text-yellow-600"
+                                  : "text-green-600"
+                              }`}
+                            >
+                              {staff.endsInDays}d
+                            </span>
+                            <span className="text-muted-foreground">${staff.laborRate}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`font-medium ${
-                              staff.endsInDays <= 14
-                                ? "text-red-600"
-                                : staff.endsInDays <= 30
-                                ? "text-yellow-600"
-                                : "text-green-600"
-                            }`}
-                          >
-                            {staff.endsInDays}d
-                          </span>
-                          <span className="text-muted-foreground">${staff.laborRate}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-muted-foreground p-4 text-center">
-                    No data available. Check console for debugging info.
-                  </div>
-                )}
-                {/* 
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground p-4 text-center">
+                      No data available. Check console for debugging info.
+                    </div>
+                  )}
+                  {/* 
                 <ProtectedGrid
                   columnDefs={needingAssignmentColumns}
                   rowData={needingAssignmentData}
@@ -631,393 +734,423 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
                   className="text-xs"
                 />
                 */}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Approved SPCRs for Executive Action */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                Approved SPCRs ({approvedSpcrs.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-2">
-              <div className="h-64 overflow-auto">
-                {approvedSpcrs.length > 0 ? (
-                  <div className="space-y-3">
-                    {approvedSpcrs.map((spcr) => (
-                      <div
-                        key={spcr.id}
-                        className="p-3 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="space-y-2">
-                          {/* Header */}
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="font-medium text-xs">{spcr.position}</div>
-                              <div className="text-[10px] text-muted-foreground">{getProjectName(spcr.project_id)}</div>
-                            </div>
-                            <div className="text-right">
-                              <div
-                                className={`text-xs font-medium ${
-                                  spcr.type === "increase" ? "text-green-600" : "text-orange-600"
-                                }`}
-                              >
-                                {spcr.type === "increase" ? "+" : "-"}
-                              </div>
-                              <div className="text-[10px] text-muted-foreground">
-                                ${(spcr.budget / 1000).toFixed(0)}K
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Details */}
-                          <div className="text-[10px] text-muted-foreground">
-                            <div>Activity: {spcr.schedule_activity}</div>
-                            <div className="truncate" title={spcr.explanation}>
-                              {spcr.explanation.length > 40
-                                ? `${spcr.explanation.substring(0, 40)}...`
-                                : spcr.explanation}
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-1 pt-1">
-                            <Button
-                              size="sm"
-                              className="h-6 px-2 text-[10px] bg-green-600 hover:bg-green-700"
-                              onClick={() => handleSpcrAssignment(spcr)}
-                            >
-                              <UserCheck className="h-3 w-3 mr-1" />
-                              Assign Staff
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-6 px-2 text-[10px]">
-                              <Eye className="h-3 w-3 mr-1" />
-                              Details
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-muted-foreground p-4 text-center">
-                    <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <div>No approved SPCRs pending assignment</div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content - Executive Management */}
-        <div className="xl:col-span-9">
-          {/* Overview Content */}
-          {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Overview Collapsible Section */}
-              <Collapsible open={isOverviewExpanded} onOpenChange={setIsOverviewExpanded}>
-                <Card>
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                          <BarChart3 className="h-5 w-5" />
-                          Staffing Overview
-                        </CardTitle>
-                        {isOverviewExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                      </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <CardContent className="space-y-6">
-                      {/* Key Metrics */}
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Users className="h-4 w-4 text-blue-600" />
-                              <span className="text-sm font-medium">Staff Utilization</span>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="text-2xl font-bold">{overviewAnalytics.utilizationRate.toFixed(1)}%</div>
-                              <Progress value={overviewAnalytics.utilizationRate} className="h-2" />
-                              <div className="text-xs text-muted-foreground">
-                                {overviewAnalytics.assignedStaff} of {overviewAnalytics.totalStaff} assigned
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <DollarSign className="h-4 w-4 text-green-600" />
-                              <span className="text-sm font-medium">Monthly Labor Cost</span>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="text-2xl font-bold">${(2032000 / 1000000).toFixed(2)}M</div>
-                              <div className="text-xs text-muted-foreground">
-                                +${(overviewAnalytics.burden / 1000).toFixed(0)}K burden
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <TrendingUp className="h-4 w-4 text-purple-600" />
-                              <span className="text-sm font-medium">Cash Inflow on Labor</span>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="text-2xl font-bold">${(2819400).toLocaleString()}</div>
-                              <div className="text-xs text-muted-foreground">
-                                Last: ${(overviewAnalytics.lastInflow / 1000).toFixed(0)}K
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <FileText className="h-4 w-4 text-orange-600" />
-                              <span className="text-sm font-medium">SPCR Status</span>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="text-2xl font-bold">{overviewAnalytics.approvedSpcrs}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {overviewAnalytics.pendingSpcrs} pending review
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      {/* HBI Insights */}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <AlertTriangle className="h-5 w-5 text-blue-600" />
-                          HBI Staffing Insights
-                        </h3>
-                        <EnhancedHBIInsights config={staffingInsights} cardId="staffing-executive" />
-                      </div>
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            </div>
-          )}
-
-          {/* Assignments & SPCR Management Content */}
-          {activeTab === "assignments" && (
-            <div className="space-y-6">
-              {/* Staff Assignment Management */}
-              <InteractiveStaffingGantt userRole="executive" />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Export Modal */}
-      <ExportModal
-        open={isExportModalOpen}
-        onOpenChange={setIsExportModalOpen}
-        onExport={handleExportSubmit}
-        defaultFileName="staffing-export"
-      />
-
-      {/* SPCR Assignment Modal */}
-      <Dialog
-        open={assignmentModal.isOpen}
-        onOpenChange={(open) => setAssignmentModal((prev) => ({ ...prev, isOpen: open }))}
-      >
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[99999]">
-          <DialogHeader>
-            <DialogTitle>
-              {assignmentModal.step === "staff" ? "Assign Staff to SPCR" : "Assignment Details"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-6">
-            {/* SPCR Information */}
-            {assignmentModal.spcr && (
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">SPCR ID:</span> {assignmentModal.spcr.id}
-                  </div>
-                  <div>
-                    <span className="font-medium">Project:</span> {getProjectName(assignmentModal.spcr.project_id)}
-                  </div>
-                  <div>
-                    <span className="font-medium">Position:</span> {assignmentModal.spcr.position}
-                  </div>
-                  <div>
-                    <span className="font-medium">Type:</span>
-                    <span
-                      className={`ml-1 ${
-                        assignmentModal.spcr.type === "increase" ? "text-green-600" : "text-orange-600"
-                      }`}
-                    >
-                      {assignmentModal.spcr.type === "increase" ? "Add Staff" : "Remove Staff"}
-                    </span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="font-medium">Explanation:</span> {assignmentModal.spcr.explanation}
-                  </div>
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
 
-            {/* Step 1: Staff Selection */}
-            {assignmentModal.step === "staff" && (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Select Staff Member</label>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Choose a staff member who matches the position requirements for this SPCR.
-                  </p>
-
-                  {(() => {
-                    const availableStaff = getStaffByPosition(assignmentModal.selectedPosition)
-
-                    if (availableStaff.length === 0) {
-                      return (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          <div className="text-sm">
-                            No staff members found for position: {assignmentModal.selectedPosition}
-                          </div>
-                          <div className="text-xs">Consider broadening the search or recruiting new staff.</div>
-                        </div>
-                      )
-                    }
-
-                    return (
-                      <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
-                        {availableStaff.map((staff) => (
-                          <div
-                            key={staff.id}
-                            className="p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                            onClick={() => handleStaffMemberSelect(staff.id)}
-                          >
-                            <div className="flex justify-between items-start">
+            {/* Approved SPCRs for Executive Action */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  Approved SPCRs ({approvedSpcrs.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="h-64 overflow-auto">
+                  {approvedSpcrs.length > 0 ? (
+                    <div className="space-y-3">
+                      {approvedSpcrs.map((spcr) => (
+                        <div
+                          key={spcr.id}
+                          className="p-3 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="space-y-2">
+                            {/* Header */}
+                            <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <div className="font-medium">{staff.name}</div>
-                                <div className="text-sm text-muted-foreground">{staff.position}</div>
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {staff.experience} years experience • ${staff.laborRate}/hr
+                                <div className="font-medium text-xs">{spcr.position}</div>
+                                <div className="text-[10px] text-muted-foreground">
+                                  {getProjectName(spcr.project_id)}
                                 </div>
                               </div>
-                              <Button size="sm" className="ml-2">
-                                Select
+                              <div className="text-right">
+                                <div
+                                  className={`text-xs font-medium ${
+                                    spcr.type === "increase" ? "text-green-600" : "text-orange-600"
+                                  }`}
+                                >
+                                  {spcr.type === "increase" ? "+" : "-"}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground">
+                                  ${(spcr.budget / 1000).toFixed(0)}K
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Details */}
+                            <div className="text-[10px] text-muted-foreground">
+                              <div>Activity: {spcr.schedule_activity}</div>
+                              <div className="truncate" title={spcr.explanation}>
+                                {spcr.explanation.length > 40
+                                  ? `${spcr.explanation.substring(0, 40)}...`
+                                  : spcr.explanation}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-1 pt-1">
+                              <Button
+                                size="sm"
+                                className="h-6 px-2 text-[10px] bg-green-600 hover:bg-green-700"
+                                onClick={() => handleSpcrAssignment(spcr)}
+                              >
+                                <UserCheck className="h-3 w-3 mr-1" />
+                                Assign Staff
+                              </Button>
+                              <Button size="sm" variant="outline" className="h-6 px-2 text-[10px]">
+                                <Eye className="h-3 w-3 mr-1" />
+                                Details
                               </Button>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )
-                  })()}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground p-4 text-center">
+                      <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <div>No approved SPCRs pending assignment</div>
+                    </div>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content - Executive Management */}
+          <div className="xl:col-span-9">
+            {/* Overview Content */}
+            {activeTab === "overview" && (
+              <div className="space-y-6">
+                {/* Overview Collapsible Section */}
+                <Collapsible open={isOverviewExpanded} onOpenChange={setIsOverviewExpanded}>
+                  <Card>
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5" />
+                            Staffing Overview
+                          </CardTitle>
+                          <div className="flex items-center">
+                            {isOverviewExpanded ? (
+                              <ChevronUp className="h-5 w-5" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5" />
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <CardContent className="space-y-6">
+                        {/* Key Metrics */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Users className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium">Staff Utilization</span>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="text-2xl font-bold">
+                                  {overviewAnalytics.utilizationRate.toFixed(1)}%
+                                </div>
+                                <Progress value={overviewAnalytics.utilizationRate} className="h-2" />
+                                <div className="text-xs text-muted-foreground">
+                                  {overviewAnalytics.assignedStaff} of {overviewAnalytics.totalStaff} assigned
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <DollarSign className="h-4 w-4 text-green-600" />
+                                <span className="text-sm font-medium">Monthly Labor Cost</span>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-2xl font-bold">${(2032000 / 1000000).toFixed(2)}M</div>
+                                <div className="text-xs text-muted-foreground">
+                                  +${(overviewAnalytics.burden / 1000).toFixed(0)}K burden
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <TrendingUp className="h-4 w-4 text-purple-600" />
+                                <span className="text-sm font-medium">Cash Inflow on Labor</span>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-2xl font-bold">${(2819400).toLocaleString()}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Last: ${(overviewAnalytics.lastInflow / 1000).toFixed(0)}K
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4 text-orange-600" />
+                                <span className="text-sm font-medium">SPCR Status</span>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-2xl font-bold">{overviewAnalytics.approvedSpcrs}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {overviewAnalytics.pendingSpcrs} pending review
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* HBI Insights */}
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-blue-600" />
+                            HBI Staffing Insights
+                          </h3>
+                          <EnhancedHBIInsights config={staffingInsights} cardId="staffing-executive" />
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
               </div>
             )}
 
-            {/* Step 2: Assignment Details */}
-            {assignmentModal.step === "assignments" &&
-              assignmentModal.staffMember &&
-              assignmentModal.assignments.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Button variant="outline" size="sm" onClick={goBackToStaffSelection}>
-                      ← Back to Staff Selection
-                    </Button>
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm">
-                        <span className="font-medium">{assignmentModal.staffMember.name}</span>
-                        <span className="text-muted-foreground"> • {assignmentModal.staffMember.position}</span>
-                      </div>
+            {/* Assignments & SPCR Management Content */}
+            {activeTab === "assignments" && (
+              <div className="space-y-6">
+                {/* Staff Assignment Management */}
+                <InteractiveStaffingGantt userRole="executive" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Export Modal */}
+        <ExportModal
+          open={isExportModalOpen}
+          onOpenChange={setIsExportModalOpen}
+          onExport={handleExportSubmit}
+          defaultFileName="staffing-export"
+        />
+
+        {/* SPCR Assignment Modal */}
+        <Dialog
+          open={assignmentModal.isOpen}
+          onOpenChange={(open) => setAssignmentModal((prev) => ({ ...prev, isOpen: open }))}
+        >
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[99999]">
+            <DialogHeader>
+              <DialogTitle>
+                {assignmentModal.step === "staff" ? "Assign Staff to SPCR" : "Assignment Details"}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {/* SPCR Information */}
+              {assignmentModal.spcr && (
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">SPCR ID:</span> {assignmentModal.spcr.id}
                     </div>
-                  </div>
-
-                  {/* Assignment Form */}
-                  {assignmentModal.assignments.map((assignment, index) => (
-                    <div key={assignment.id} className="border rounded-lg p-4 space-y-4">
-                      <h5 className="font-medium">Assignment Details</h5>
-
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Project</label>
-                        <Select
-                          value={assignment.project_id.toString()}
-                          onValueChange={(value) => updateAssignment(assignment.id, { project_id: Number(value) })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {projects
-                              .filter((p) => p.active)
-                              .map((project) => (
-                                <SelectItem key={project.project_id} value={project.project_id.toString()}>
-                                  {project.name}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">Start Date</label>
-                          <Input
-                            type="date"
-                            value={assignment.startDate}
-                            onChange={(e) => updateAssignment(assignment.id, { startDate: e.target.value })}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">End Date</label>
-                          <Input
-                            type="date"
-                            value={assignment.endDate}
-                            onChange={(e) => updateAssignment(assignment.id, { endDate: e.target.value })}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Comments</label>
-                        <Textarea
-                          placeholder="Add any notes about this assignment..."
-                          value={assignment.comments}
-                          onChange={(e) => updateAssignment(assignment.id, { comments: e.target.value })}
-                          rows={3}
-                        />
-                      </div>
+                    <div>
+                      <span className="font-medium">Project:</span> {getProjectName(assignmentModal.spcr.project_id)}
                     </div>
-                  ))}
-
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setAssignmentModal((prev) => ({ ...prev, isOpen: false }))}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={handleCompleteAssignment} className="bg-green-600 hover:bg-green-700">
-                      <UserCheck className="h-4 w-4 mr-1" />
-                      Complete Assignment
-                    </Button>
+                    <div>
+                      <span className="font-medium">Position:</span> {assignmentModal.spcr.position}
+                    </div>
+                    <div>
+                      <span className="font-medium">Type:</span>
+                      <span
+                        className={`ml-1 ${
+                          assignmentModal.spcr.type === "increase" ? "text-green-600" : "text-orange-600"
+                        }`}
+                      >
+                        {assignmentModal.spcr.type === "increase" ? "Add Staff" : "Remove Staff"}
+                      </span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="font-medium">Explanation:</span> {assignmentModal.spcr.explanation}
+                    </div>
                   </div>
                 </div>
               )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+
+              {/* Step 1: Staff Selection */}
+              {assignmentModal.step === "staff" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Select Staff Member</label>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Choose a staff member who matches the position requirements for this SPCR.
+                    </p>
+
+                    {(() => {
+                      const availableStaff = getStaffByPosition(assignmentModal.selectedPosition)
+
+                      if (availableStaff.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <div className="text-sm">
+                              No staff members found for position: {assignmentModal.selectedPosition}
+                            </div>
+                            <div className="text-xs">Consider broadening the search or recruiting new staff.</div>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
+                          {availableStaff.map((staff) => (
+                            <div
+                              key={staff.id}
+                              className="p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                              onClick={() => handleStaffMemberSelect(staff.id)}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="font-medium">{staff.name}</div>
+                                  <div className="text-sm text-muted-foreground">{staff.position}</div>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {staff.experience} years experience • ${staff.laborRate}/hr
+                                  </div>
+                                </div>
+                                <Button size="sm" className="ml-2">
+                                  Select
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Assignment Details */}
+              {assignmentModal.step === "assignments" &&
+                assignmentModal.staffMember &&
+                assignmentModal.assignments.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Button variant="outline" size="sm" onClick={goBackToStaffSelection}>
+                        ← Back to Staff Selection
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm">
+                          <span className="font-medium">{assignmentModal.staffMember.name}</span>
+                          <span className="text-muted-foreground"> • {assignmentModal.staffMember.position}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Assignment Form */}
+                    {assignmentModal.assignments.map((assignment, index) => (
+                      <div key={assignment.id} className="border rounded-lg p-4 space-y-4">
+                        <h5 className="font-medium">Assignment Details</h5>
+
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Project</label>
+                          <Select
+                            value={assignment.project_id.toString()}
+                            onValueChange={(value) => updateAssignment(assignment.id, { project_id: Number(value) })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {projects
+                                .filter((p) => p.active)
+                                .map((project) => (
+                                  <SelectItem key={project.project_id} value={project.project_id.toString()}>
+                                    {project.name}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Start Date</label>
+                            <Input
+                              type="date"
+                              value={assignment.startDate}
+                              onChange={(e) => updateAssignment(assignment.id, { startDate: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">End Date</label>
+                            <Input
+                              type="date"
+                              value={assignment.endDate}
+                              onChange={(e) => updateAssignment(assignment.id, { endDate: e.target.value })}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Comments</label>
+                          <Textarea
+                            placeholder="Add any notes about this assignment..."
+                            value={assignment.comments}
+                            onChange={(e) => updateAssignment(assignment.id, { comments: e.target.value })}
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setAssignmentModal((prev) => ({ ...prev, isOpen: false }))}
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCompleteAssignment} className="bg-green-600 hover:bg-green-700">
+                        <UserCheck className="h-4 w-4 mr-1" />
+                        Complete Assignment
+                      </Button>
+                    </div>
+                  </div>
+                )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Presentation Carousel - Rendered outside main container for full-screen coverage */}
+      {showTour && (
+        <>
+          {(() => {
+            console.log("🎬 Executive Staffing Tour: Rendering PresentationCarousel")
+            return null
+          })()}
+          {createPortal(
+            <PresentationCarousel
+              slides={executiveStaffingSlides}
+              onComplete={handleTourComplete}
+              ctaText="Return to Executive Staffing"
+              ctaIcon={UserCheck}
+            />,
+            document.body
+          )}
+        </>
+      )}
+    </>
   )
 }

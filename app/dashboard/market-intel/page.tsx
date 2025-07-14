@@ -17,6 +17,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
+import { useHBIAnalysis } from "@/hooks/use-hbi-analysis"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -80,6 +81,25 @@ function MarketIntelDashboardContent({ user }: { user: User }) {
   const [isLoading, setIsLoading] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [isFocusMode, setIsFocusMode] = useState(false)
+  const { hasMarketIntelPreload, hasAutoInsightsMode } = useAuth()
+
+  // Preload HBI analysis for demo users
+  const { runAnalysis, loading: hbiLoading } = useHBIAnalysis()
+
+  // Auto-preload insights for demo users
+  useEffect(() => {
+    if (hasMarketIntelPreload && user?.role) {
+      // Preload relevant market intelligence based on user role
+      const analysisTypes =
+        user.role === "estimator"
+          ? ["market-forecast", "cost-analysis"]
+          : ["market-forecast", "competitive-analysis", "risk-assessment"]
+
+      analysisTypes.forEach((type) => {
+        runAnalysis(type, { timeframe: "3-months", region: "Florida" })
+      })
+    }
+  }, [hasMarketIntelPreload, user?.role, runAnalysis])
 
   // Determine user role
   const userRole = useMemo((): UserRole => {

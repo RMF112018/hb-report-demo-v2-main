@@ -126,20 +126,20 @@ export default function HBIInteractiveDemo() {
   return (
     <div className="space-y-6">
       {/* HBI Status and Controls */}
-      <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+      <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-blue-50">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-orange-600 to-blue-600 rounded-lg">
                 <Brain className="h-6 w-6 text-white" />
               </div>
               <div>
-                <CardTitle className="text-xl font-bold text-purple-900">HBI Market Intelligence</CardTitle>
-                <p className="text-sm text-purple-700">Interactive demonstration of Hedrick Brothers Intelligence</p>
+                <CardTitle className="text-xl font-bold text-orange-900">HBI Market Intelligence</CardTitle>
+                <p className="text-sm text-orange-700">Interactive demonstration of Hedrick Brothers Intelligence</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50">
+              <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
                 Model: HBI-3.2.1
               </Badge>
               {hbiStatus && (
@@ -160,7 +160,7 @@ export default function HBIInteractiveDemo() {
 
         <CardContent className="space-y-4">
           {/* HBI Mode Toggle */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-purple-200">
+          <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-orange-200">
             <div className="flex items-center gap-3">
               <Zap className={`h-5 w-5 ${isHBIEnabled ? "text-green-600" : "text-gray-400"}`} />
               <div>
@@ -178,7 +178,7 @@ export default function HBIInteractiveDemo() {
               className={
                 isHBIEnabled
                   ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "border-purple-200 text-purple-600 hover:bg-purple-50"
+                  : "border-orange-200 text-orange-600 hover:bg-orange-50"
               }
               onMouseEnter={() => setShowTooltip("hbi-toggle")}
               onMouseLeave={() => setShowTooltip(null)}
@@ -215,7 +215,7 @@ export default function HBIInteractiveDemo() {
                         key={prompt.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-all ${
                           selectedPrompt.id === prompt.id
-                            ? "border-purple-300 bg-purple-50"
+                            ? "border-orange-300 bg-orange-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() => setSelectedPrompt(prompt)}
@@ -237,7 +237,7 @@ export default function HBIInteractiveDemo() {
                 <Button
                   onClick={handleRunAnalysis}
                   disabled={!isHBIEnabled || hbiLoading}
-                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                  className="w-full h-12 bg-gradient-to-r from-orange-600 to-blue-600 hover:from-orange-700 hover:to-blue-700 text-white"
                   onMouseEnter={() => setShowTooltip("run-analysis")}
                   onMouseLeave={() => setShowTooltip(null)}
                 >
@@ -273,13 +273,13 @@ export default function HBIInteractiveDemo() {
             <TabsContent value="results" className="space-y-4">
               {hbiData ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-white rounded-lg border border-purple-200">
+                  <div className="p-4 bg-white rounded-lg border border-orange-200">
                     <div className="flex items-start gap-3 mb-3">
-                      <Brain className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                      <Brain className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-purple-900">HBI Insight</h3>
-                          <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50">
+                          <h3 className="font-semibold text-orange-900">HBI Insight</h3>
+                          <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
                             {hbiData.confidence}% confidence
                           </Badge>
                           {hbiData.dataQuality && (
@@ -288,17 +288,17 @@ export default function HBIInteractiveDemo() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-purple-800 mb-3">{hbiData.insight}</p>
+                        <p className="text-sm text-orange-800 mb-3">{hbiData.insight}</p>
 
                         {hbiData.keyFactors && hbiData.keyFactors.length > 0 && (
                           <div className="mb-3">
-                            <h4 className="text-xs font-medium text-purple-700 mb-1">Key Factors:</h4>
+                            <h4 className="text-xs font-medium text-orange-700 mb-1">Key Factors:</h4>
                             <div className="flex flex-wrap gap-1">
                               {hbiData.keyFactors.map((factor, index) => (
                                 <Badge
                                   key={index}
                                   variant="outline"
-                                  className="text-xs text-purple-600 border-purple-200 bg-purple-50"
+                                  className="text-xs text-orange-600 border-orange-200 bg-orange-50"
                                 >
                                   {factor}
                                 </Badge>
@@ -314,12 +314,12 @@ export default function HBIInteractiveDemo() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-purple-100">
-                          <div className="flex items-center gap-2 text-xs text-purple-600">
+                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-orange-100">
+                          <div className="flex items-center gap-2 text-xs text-orange-600">
                             <Clock className="h-3 w-3" />
                             Processing: {hbiData.processingTime}ms
                           </div>
-                          <div className="text-xs text-purple-600 opacity-75">Powered by HBI</div>
+                          <div className="text-xs text-orange-600 opacity-75">Powered by HBI</div>
                         </div>
                       </div>
                     </div>
@@ -370,7 +370,7 @@ export default function HBIInteractiveDemo() {
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium text-gray-900">{analysis.promptLabel}</h4>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50">
+                          <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
                             {analysis.confidence}%
                           </Badge>
                           <span className="text-xs text-gray-500">

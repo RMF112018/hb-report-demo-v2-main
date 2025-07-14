@@ -165,7 +165,7 @@ interface ResponsibilityTask {
 #### **Enhanced Search & Filtering**
 
 - **Semantic Search**: Search across document content, tags, and metadata
-- **Advanced Filters**: Filter by status, type, risk level, AI analysis status
+- **Advanced Filters**: Filter by status, type, risk level, HBI Analysis status
 - **Tag-Based Navigation**: Quick filtering by tag categories
 - **Real-time Results**: Instant search results as you type
 
@@ -206,7 +206,7 @@ interface ResponsibilityTask {
 
 #### **Comprehensive Analytics**
 
-- **Cost Savings**: $485K identified through AI analysis
+- **Cost Savings**: $485K identified through HBI Analysis
 - **Risk Resolution**: 89 risk items successfully resolved
 - **Compliance Rate**: 94% overall compliance across all documents
 

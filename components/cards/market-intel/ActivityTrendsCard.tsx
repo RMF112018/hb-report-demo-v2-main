@@ -333,13 +333,13 @@ export default function ActivityTrendsCard({
 
         {/* HBI Analysis */}
         {showHBISummary && hbiSummary && (
-          <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+          <div className="mt-3 p-3 bg-gradient-to-r from-orange-50 to-blue-50 dark:from-orange-950/20 dark:to-blue-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+              <Brain className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-purple-900 dark:text-purple-100">HBI Insight</span>
-                  <Badge variant="outline" className="text-xs text-purple-600 border-purple-200 bg-purple-50">
+                  <span className="text-sm font-semibold text-orange-900 dark:text-orange-100">HBI Insight</span>
+                  <Badge variant="outline" className="text-xs text-orange-600 border-orange-200 bg-orange-50">
                     {hbiSummary.confidence}% confidence
                   </Badge>
                   {hbiSummary.dataQuality && (
@@ -348,14 +348,14 @@ export default function ActivityTrendsCard({
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-purple-800 dark:text-purple-200 mb-2">{hbiSummary.insight}</p>
+                <p className="text-sm text-orange-800 dark:text-orange-200 mb-2">{hbiSummary.insight}</p>
                 {hbiSummary.keyFactors && hbiSummary.keyFactors.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">
                     {hbiSummary.keyFactors.map((factor, index) => (
                       <Badge
                         key={index}
                         variant="outline"
-                        className="text-xs text-purple-600 border-purple-200 bg-purple-50"
+                        className="text-xs text-orange-600 border-orange-200 bg-orange-50"
                       >
                         {factor}
                       </Badge>
@@ -365,10 +365,10 @@ export default function ActivityTrendsCard({
                 {hbiSummary.recommendation && (
                   <div className="flex items-start gap-1 mt-2">
                     <Lightbulb className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-purple-700 dark:text-purple-300">{hbiSummary.recommendation}</p>
+                    <p className="text-xs text-orange-700 dark:text-orange-300">{hbiSummary.recommendation}</p>
                   </div>
                 )}
-                <div className="mt-2 text-xs text-purple-600 dark:text-purple-400 opacity-75">Powered by HBI</div>
+                <div className="mt-2 text-xs text-orange-600 dark:text-orange-400 opacity-75">Powered by HBI</div>
               </div>
             </div>
           </div>

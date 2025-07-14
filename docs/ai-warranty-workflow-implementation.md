@@ -83,7 +83,7 @@ The AI-Supported Warranty Workflow has been successfully implemented to enhance 
 A comprehensive standalone component that provides:
 
 - **Four Main Tabs**:
-  - AI Analysis (trade/vendor matching, risk assessment)
+  - HBI Analysis (trade/vendor matching, risk assessment)
   - Warranty Data (manufacturer/contractor warranties, submittals)
   - Historical (similar issues, cost trends, recommendations)
   - AI Documents (generated letters, claim forms)
@@ -92,7 +92,7 @@ A comprehensive standalone component that provides:
 
 Extended with AI capabilities:
 
-- **Enhanced Data Structures**: New interfaces for AI analysis, historical data, warranty information
+- **Enhanced Data Structures**: New interfaces for HBI Analysis, historical data, warranty information
 - **AI Confidence Indicators**: Visual confidence scores in grid columns
 - **Integration Points**: Hooks for lessons learned generation
 
@@ -155,7 +155,7 @@ interface AIGeneratedDocument {
 
 ## User Interface Features
 
-### AI Analysis Display ✅
+### HBI Analysis Display ✅
 
 - **Trade Match Confidence**: Visual progress bars showing AI confidence levels
 - **Vendor Suggestions**: Complete vendor information with Compass API integration
@@ -185,7 +185,7 @@ interface AIGeneratedDocument {
 
 ## Mock Data Examples
 
-### Comprehensive AI Analysis Example ✅
+### Comprehensive HBI Analysis Example ✅
 
 **HVAC Chiller Issue (WR-2025-001)**:
 

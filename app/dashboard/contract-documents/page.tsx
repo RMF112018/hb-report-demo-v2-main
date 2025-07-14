@@ -468,7 +468,7 @@ export default function ContractDocumentsPage() {
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
-                <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
+                <TabsTrigger value="analysis">HBI Analysis</TabsTrigger>
                 <TabsTrigger value="compliance">Compliance</TabsTrigger>
               </TabsList>
 
@@ -675,7 +675,7 @@ export default function ContractDocumentsPage() {
                 </Card>
               </TabsContent>
 
-              {/* AI Analysis Tab */}
+              {/* HBI Analysis Tab */}
               <TabsContent value="analysis" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="border-l-4 border-l-orange-600 dark:border-l-orange-400">
@@ -883,7 +883,7 @@ export default function ContractDocumentsPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold mb-3 text-foreground">AI Analysis</h4>
+                <h4 className="font-semibold mb-3 text-foreground">HBI Analysis</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
@@ -1014,7 +1014,7 @@ export default function ContractDocumentsPage() {
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center gap-2">
                     <Brain className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                    HBI AI Analysis
+                    HBI HBI Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

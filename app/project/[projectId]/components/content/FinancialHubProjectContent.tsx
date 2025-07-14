@@ -1,16 +1,16 @@
 /**
  * @fileoverview Financial Hub Project Content Component
  * @module FinancialHubProjectContent
- * @version 3.0.0
+ * @version 3.0.0 (Container Structure Fix)
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Financial Hub implementation for project page following Core Project Tools pattern:
+ * Financial Hub implementation for project page following FieldManagementContent pattern:
+ * - Simplified container structure to prevent overflow issues
  * - Tab-based navigation (Overview, Budget Analysis, JCHR, AR Aging, Cash Flow, Forecasting, Change Management, Pay Authorization, Pay Applications, Retention)
  * - Role-based access control
  * - Responsive layout integration
- * - Focus mode support
- * - Responsive tabs that convert to dropdown on mobile
+ * - Removed focus mode to simplify container structure
  */
 
 "use client"
@@ -115,20 +115,9 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   })
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
-  const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-  }, [])
-
-  // Mobile detection
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
-    return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
   // Extract project name from project data
@@ -186,83 +175,83 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
     switch (navigation.financialTab) {
       case "overview":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <FinancialOverview userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "budget-analysis":
         return (
-          <div className="space-y-6 w-full max-w-full" style={{ maxWidth: "100%", width: "100%" }}>
+          <div className="space-y-6 w-full min-w-0">
             <BudgetAnalysisProjectContent
               projectId={projectId}
               projectData={projectScope}
               userRole={userRole}
               user={user}
-              className="w-full"
+              className="w-full min-w-0"
             />
           </div>
         )
 
       case "jchr":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <JCHRCard userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "ar-aging":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <ARAgingCard userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "cash-flow":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <CashFlowAnalysis userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "forecasting":
         return (
-          <div className="space-y-6 w-full max-w-full" style={{ maxWidth: "100%", width: "100%" }}>
+          <div className="space-y-6 w-full min-w-0">
             <Forecasting userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "change-management":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <ChangeManagement userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "pay-authorization":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <PayAuthorizations userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "pay-application":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <PayApplication userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "retention":
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <RetentionManagement userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       default:
         return (
-          <div className="space-y-6 w-full max-w-full">
+          <div className="space-y-6 w-full min-w-0">
             <FinancialOverview userRole={userRole} projectData={projectScope} />
           </div>
         )
@@ -282,90 +271,86 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
     setIsFocusMode(!isFocusMode)
   }
 
-  // Financial Hub content
-  const financialHubContent = (
-    <div className="h-full w-full">
-      {/* Financial Tabs - Mobile dropdown, Desktop horizontal */}
-      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold">Financial Hub</h1>
-            <p className="text-muted-foreground">Comprehensive financial management and analysis for {projectName}</p>
-          </div>
-          <div className="flex items-center gap-2">
+  // Header with focus mode toggle
+  const renderHeader = () => (
+    <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-bold">Financial Hub</h1>
+          <p className="text-muted-foreground">Comprehensive financial management and analysis for {projectName}</p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleFocusToggle}
+            className={`${
+              isFocusMode
+                ? "bg-[#FA4616] text-white border-[#FA4616] hover:bg-[#FA4616]/90"
+                : "text-[#FA4616] border-[#FA4616] hover:bg-[#FA4616]/10"
+            }`}
+          >
+            {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            {isFocusMode ? "Exit Focus" : "Focus Mode"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Financial Tabs Navigation */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 min-w-0">
+        {availableTabs.map((tab) => {
+          const IconComponent = tab.icon
+          const isActive = navigation.financialTab === tab.id
+          return (
             <Button
-              variant="outline"
+              key={tab.id}
+              variant={isActive ? "default" : "ghost"}
               size="sm"
-              onClick={handleFocusToggle}
-              className={`${
-                isFocusMode
-                  ? "bg-[#FA4616] text-white border-[#FA4616] hover:bg-[#FA4616]/90"
-                  : "text-[#FA4616] border-[#FA4616] hover:bg-[#FA4616]/10"
-              }`}
+              onClick={() => handleFinancialTabChange(tab.id)}
+              className={`
+                flex items-center gap-2 whitespace-nowrap transition-all duration-200 flex-shrink-0
+                ${
+                  isActive
+                    ? "bg-[#FA4616] text-white hover:bg-[#FA4616]/90 border-[#FA4616]"
+                    : "hover:bg-[#FA4616]/10 hover:text-[#FA4616] hover:border-[#FA4616]/30"
+                }
+              `}
             >
-              {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              {isFocusMode ? "Exit Focus" : "Focus Mode"}
+              <IconComponent className="h-4 w-4" />
+              {tab.label}
+              {tab.id === "change-management" && (
+                <Badge variant="secondary" className="bg-[#0021A5] text-white text-xs ml-1 border-[#0021A5]">
+                  New
+                </Badge>
+              )}
             </Button>
-          </div>
-        </div>
-
-        {/* Financial Tabs Navigation */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
-          {availableTabs.map((tab) => {
-            const IconComponent = tab.icon
-            const isActive = navigation.financialTab === tab.id
-            return (
-              <Button
-                key={tab.id}
-                variant={isActive ? "default" : "ghost"}
-                size="sm"
-                onClick={() => handleFinancialTabChange(tab.id)}
-                className={`
-                  flex items-center gap-2 whitespace-nowrap transition-all duration-200
-                  ${
-                    isActive
-                      ? "bg-[#FA4616] text-white hover:bg-[#FA4616]/90 border-[#FA4616]"
-                      : "hover:bg-[#FA4616]/10 hover:text-[#FA4616] hover:border-[#FA4616]/30"
-                  }
-                `}
-              >
-                <IconComponent className="h-4 w-4" />
-                {tab.label}
-                {tab.id === "change-management" && (
-                  <Badge variant="secondary" className="bg-[#0021A5] text-white text-xs ml-1 border-[#0021A5]">
-                    New
-                  </Badge>
-                )}
-              </Button>
-            )
-          })}
-        </div>
+          )
+        })}
       </div>
+    </div>
+  )
 
-      {/* Content Area */}
-      <div className="min-h-96 w-full max-w-full overflow-hidden" style={{ maxWidth: "100%", width: "100%" }}>
-        {renderFinancialTabContent()}
-      </div>
+  // Main content container
+  const mainContent = (
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
+      {renderHeader()}
+      <div className="w-full max-w-full overflow-hidden">{renderFinancialTabContent()}</div>
     </div>
   )
 
   // Return focus mode if active
   if (isFocusMode) {
     return (
-      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-[150]">
         <div className="flex-1 overflow-auto">
-          <div className="p-6 h-full w-full max-w-full">{financialHubContent}</div>
+          <div className="p-6 h-full">{mainContent}</div>
         </div>
       </div>
     )
   }
 
-  // Return the main content
-  return (
-    <div className="flex-1 p-6 overflow-auto" style={{ maxWidth: "100%", width: "100%" }}>
-      <div style={{ maxWidth: "100%", width: "100%" }}>{financialHubContent}</div>
-    </div>
-  )
+  // Return normal mode
+  return mainContent
 }
 
 export default FinancialHubProjectContent

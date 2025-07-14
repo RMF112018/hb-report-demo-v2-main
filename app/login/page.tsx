@@ -270,6 +270,9 @@ export default function LoginPage() {
       if (loggedInUser?.role === "presentation") {
         // Set a flag to trigger Intel tour with 5-second delay
         localStorage.setItem("triggerIntelTour", Date.now().toString())
+        // Clear any previous completion flag to allow tour to auto-launch
+        localStorage.removeItem("intelTourCompleted")
+        console.log("🎬 Login: Intel Tour flags set for presentation user")
       }
 
       toast({
@@ -319,7 +322,10 @@ export default function LoginPage() {
         localStorage.setItem("presentationMode", "true")
         // Set flag to trigger Intel tour with 5-second delay
         localStorage.setItem("triggerIntelTour", Date.now().toString())
+        // Clear any previous completion flag to allow tour to auto-launch
+        localStorage.removeItem("intelTourCompleted")
         setPresentationMode(true)
+        console.log("🎬 Demo Login: Intel Tour flags set for presentation account")
         toast({
           title: `Welcome to HB Intel`,
           description: `Starting executive presentation...`,
@@ -346,7 +352,10 @@ export default function LoginPage() {
     localStorage.removeItem("presentationMode")
     // Set flag to trigger Intel tour with 5-second delay
     localStorage.setItem("triggerIntelTour", Date.now().toString())
+    // Clear any previous completion flag to allow tour to auto-launch
+    localStorage.removeItem("intelTourCompleted")
     setPresentationMode(false)
+    console.log("🎬 Presentation Complete: Intel Tour flags set for transition to main app")
     router.push("/main-app")
   }
 

@@ -782,8 +782,8 @@ export const StageAdaptiveContent = ({ project, currentStage, userRole }: StageA
             <Alert className="border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/30">
               <Brain className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               <AlertDescription className="text-purple-800 dark:text-purple-200">
-                AI analysis suggests accelerating electrical work to optimize critical path. Estimated 5-day improvement
-                possible.
+                HBI Analysis suggests accelerating electrical work to optimize critical path. Estimated 5-day
+                improvement possible.
               </AlertDescription>
             </Alert>
           </div>

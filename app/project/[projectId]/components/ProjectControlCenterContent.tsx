@@ -107,6 +107,11 @@ import SafetyProjectContent from "./content/SafetyProjectContent"
 // Lazy load ProjectTabsShell for better performance
 const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
 
+// Lazy load ConstructabilityReviewCenter for better performance
+const ConstructabilityReviewCenter = React.lazy(
+  () => import("@/components/constructability/ConstructabilityReviewCenter")
+)
+
 interface ProjectControlCenterContentProps {
   projectId: string
   projectData: any
@@ -202,6 +207,7 @@ const PreConstructionContent: React.FC<{
   user: any
 }> = ({ projectId, projectData, userRole, user }) => {
   const [activePreconTab, setActivePreconTab] = useState<string>("estimating")
+  const [showConstructabilityReviews, setShowConstructabilityReviews] = useState<boolean>(false)
 
   const getBidPackageName = (packageId: string) => {
     const packages: { [key: string]: string } = {
@@ -304,7 +310,7 @@ const PreConstructionContent: React.FC<{
         return (
           <div className="space-y-6">
             {/* Pre-Construction Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -387,6 +393,45 @@ const PreConstructionContent: React.FC<{
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Constructability Reviews Card - Role-based access */}
+              {["project-manager", "estimator", "project-executive", "executive"].includes(userRole) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Constructability Reviews
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">8.2</div>
+                        <p className="text-sm text-muted-foreground">Average Score</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Button
+                          size="sm"
+                          className="w-full justify-start"
+                          onClick={() => setShowConstructabilityReviews(true)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          View Reviews
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => setShowConstructabilityReviews(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Review
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Pre-Construction Activities */}
@@ -636,7 +681,30 @@ const PreConstructionContent: React.FC<{
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">{renderPreconTabContent()}</div>
+      <div className="mt-6">
+        {showConstructabilityReviews ? (
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading constructability reviews...</p>
+                </div>
+              </div>
+            }
+          >
+            <ConstructabilityReviewCenter
+              projectId={projectId}
+              projectData={projectData}
+              userRole={userRole}
+              user={user}
+              onNavigateBack={() => setShowConstructabilityReviews(false)}
+            />
+          </Suspense>
+        ) : (
+          renderPreconTabContent()
+        )}
+      </div>
     </div>
   )
 }

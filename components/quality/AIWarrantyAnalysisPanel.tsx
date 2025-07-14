@@ -56,7 +56,7 @@ import {
   Mail,
 } from "lucide-react"
 
-// AI Analysis Interfaces
+// HBI Analysis Interfaces
 interface AIWarrantyAnalysis {
   tradeMatchConfidence: number
   vendorMatchConfidence: number
@@ -199,7 +199,7 @@ export const AIWarrantyAnalysisPanel: React.FC<AIWarrantyAnalysisPanelProps> = (
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          AI analysis is not available for this warranty issue. AI features require additional data processing.
+          HBI Analysis is not available for this warranty issue. AI features require additional data processing.
         </AlertDescription>
       </Alert>
     )
@@ -211,7 +211,7 @@ export const AIWarrantyAnalysisPanel: React.FC<AIWarrantyAnalysisPanelProps> = (
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="ai-analysis" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
-            AI Analysis
+            HBI Analysis
           </TabsTrigger>
           <TabsTrigger value="warranty-data" className="flex items-center gap-2">
             <Database className="h-4 w-4" />

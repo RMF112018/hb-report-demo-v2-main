@@ -31,7 +31,7 @@ AI-powered insights and recommendations for permit management, providing intelli
 - **Opportunities**: Cost savings, efficiency gains
 - **Forecasts**: Predictive analysis and trends
 
-## AI Analysis
+## HBI Analysis
 - **Pattern Recognition**: Identifies trends and anomalies
 - **Predictive Modeling**: Forecasts potential issues
 - **Benchmarking**: Compares against industry standards

@@ -666,7 +666,7 @@ export const EnhancedContractDocuments: React.FC<EnhancedContractDocumentsProps>
                     <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Risk Level</TableHead>
-                    <TableHead>AI Analysis</TableHead>
+                    <TableHead>HBI Analysis</TableHead>
                     <TableHead>Tags</TableHead>
                     <TableHead>Tasks</TableHead>
                     <TableHead>Actions</TableHead>
@@ -1135,7 +1135,7 @@ export const EnhancedContractDocuments: React.FC<EnhancedContractDocumentsProps>
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">AI Analysis</p>
+                  <p className="text-sm text-muted-foreground">HBI Analysis</p>
                   <Badge variant="outline" className="border-green-500 text-green-700">
                     {selectedDocument.aiAnalysisStatus}
                   </Badge>

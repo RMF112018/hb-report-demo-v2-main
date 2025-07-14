@@ -168,6 +168,15 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       })
     }
 
+    // Executive Staffing Tour - available for presentation users, shown third
+    if (isPresentationMode) {
+      carousels.push({
+        id: "executive-staffing-tour",
+        label: "Executive Staffing Tour",
+        description: "6-slide workforce management transformation from spreadsheets to strategic intelligence",
+      })
+    }
+
     return carousels
   }
 

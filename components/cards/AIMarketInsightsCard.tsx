@@ -125,7 +125,7 @@ const generateAIInsights = (userRole: string) => {
       id: 4,
       category: "Market Trend",
       title: "Sustainable Construction Demand",
-      insight: "AI analysis shows 35% increase in green building requirements across all sectors",
+      insight: "HBI Analysis shows 35% increase in green building requirements across all sectors",
       confidence: 91,
       impact: "High",
       priority: "Medium",

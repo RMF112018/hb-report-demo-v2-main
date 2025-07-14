@@ -1,0 +1,186 @@
+[
+  {
+    "id": "rev-001",
+    "project_id": "123456",
+    "project_name": "Palm Beach Luxury Estate",
+    "stage": "100% DD",
+    "date": "2024-12-15",
+    "reviewer": "Jane Smith",
+    "reviewer_role": "Senior Project Manager",
+    "status": "completed",
+    "scores": {
+      "Design Feasibility": 8.5,
+      "Coordination and Completeness": 7.8,
+      "Compliance and Regulatory": 9.2,
+      "Cost and Schedule": 7.5,
+      "Constructability and Safety": 8.0,
+      "BIM Team Review": 8.8
+    },
+    "overall_score": 8.3,
+    "weighted_score": 8.15,
+    "comments": {
+      "Design Feasibility": "Structural systems well-coordinated with architectural intent",
+      "Coordination and Completeness": "Minor gaps in MEP coordination require attention",
+      "Compliance and Regulatory": "Excellent compliance with local building codes",
+      "Cost and Schedule": "Some value engineering opportunities identified",
+      "Constructability and Safety": "Good constructability with standard methods",
+      "BIM Team Review": "BIM model accurate and clash-free"
+    },
+    "report_url": "/reports/constructability/rev-001.pdf",
+    "created_at": "2024-12-15T10:30:00Z",
+    "updated_at": "2024-12-15T14:45:00Z"
+  },
+  {
+    "id": "rev-002",
+    "project_id": "123456",
+    "project_name": "Palm Beach Luxury Estate",
+    "stage": "80% CD",
+    "date": "2024-11-28",
+    "reviewer": "Michael Chen",
+    "reviewer_role": "Chief Estimator",
+    "status": "completed",
+    "scores": {
+      "Design Feasibility": 7.2,
+      "Coordination and Completeness": 8.5,
+      "Compliance and Regulatory": 8.8,
+      "Cost and Schedule": 8.0,
+      "Constructability and Safety": 7.8,
+      "BIM Team Review": 9.0
+    },
+    "overall_score": 8.2,
+    "weighted_score": 8.35,
+    "comments": {
+      "Design Feasibility": "Design intent clear but some constructability concerns",
+      "Coordination and Completeness": "Well-coordinated drawings across disciplines",
+      "Compliance and Regulatory": "Code compliance verified",
+      "Cost and Schedule": "Cost estimates align with budget",
+      "Constructability and Safety": "Safety considerations well-documented",
+      "BIM Team Review": "Excellent BIM coordination and clash detection"
+    },
+    "report_url": "/reports/constructability/rev-002.pdf",
+    "created_at": "2024-11-28T09:15:00Z",
+    "updated_at": "2024-11-28T16:20:00Z"
+  },
+  {
+    "id": "rev-003",
+    "project_id": "789012",
+    "project_name": "Downtown Mixed-Use Complex",
+    "stage": "50% DD",
+    "date": "2024-12-10",
+    "reviewer": "Sarah Johnson",
+    "reviewer_role": "Project Executive",
+    "status": "completed",
+    "scores": {
+      "Design Feasibility": 8.8,
+      "Coordination and Completeness": 7.5,
+      "Compliance and Regulatory": 8.2,
+      "Cost and Schedule": 7.0,
+      "Constructability and Safety": 8.5,
+      "BIM Team Review": 7.8
+    },
+    "overall_score": 7.97,
+    "weighted_score": 7.92,
+    "comments": {
+      "Design Feasibility": "Strong architectural and structural design",
+      "Coordination and Completeness": "Coordination improving but needs refinement",
+      "Compliance and Regulatory": "Good compliance framework established",
+      "Cost and Schedule": "Budget pressures require value engineering",
+      "Constructability and Safety": "Excellent safety planning and constructability",
+      "BIM Team Review": "BIM coordination progressing well"
+    },
+    "report_url": "/reports/constructability/rev-003.pdf",
+    "created_at": "2024-12-10T11:00:00Z",
+    "updated_at": "2024-12-10T15:30:00Z"
+  },
+  {
+    "id": "rev-004",
+    "project_id": "345678",
+    "project_name": "Coastal Resort Development",
+    "stage": "Schematic Design",
+    "date": "2024-12-05",
+    "reviewer": "David Rodriguez",
+    "reviewer_role": "Senior Estimator",
+    "status": "completed",
+    "scores": {
+      "Design Feasibility": 9.0,
+      "Coordination and Completeness": 6.5,
+      "Compliance and Regulatory": 7.8,
+      "Cost and Schedule": 8.5,
+      "Constructability and Safety": 7.2
+    },
+    "overall_score": 7.8,
+    "weighted_score": 8.12,
+    "comments": {
+      "Design Feasibility": "Excellent conceptual design and feasibility",
+      "Coordination and Completeness": "Early stage - basic coordination in place",
+      "Compliance and Regulatory": "Environmental constraints well-addressed",
+      "Cost and Schedule": "Budget and schedule realistic for scope",
+      "Constructability and Safety": "Good preliminary constructability review"
+    },
+    "report_url": "/reports/constructability/rev-004.pdf",
+    "created_at": "2024-12-05T13:45:00Z",
+    "updated_at": "2024-12-05T17:15:00Z"
+  },
+  {
+    "id": "rev-005",
+    "project_id": "123456",
+    "project_name": "Palm Beach Luxury Estate",
+    "stage": "100% CD",
+    "date": "2024-12-20",
+    "reviewer": "Jane Smith",
+    "reviewer_role": "Senior Project Manager",
+    "status": "in-progress",
+    "scores": {
+      "Design Feasibility": 7.8,
+      "Coordination and Completeness": 8.9,
+      "Compliance and Regulatory": 9.5,
+      "Cost and Schedule": 8.2,
+      "Constructability and Safety": 8.5,
+      "BIM Team Review": 9.2
+    },
+    "overall_score": 8.68,
+    "weighted_score": 8.72,
+    "comments": {
+      "Design Feasibility": "Final design well-resolved",
+      "Coordination and Completeness": "Excellent coordination across all disciplines",
+      "Compliance and Regulatory": "Full code compliance achieved",
+      "Cost and Schedule": "Final costs within budget parameters",
+      "Constructability and Safety": "Ready for construction with clear methods",
+      "BIM Team Review": "Construction-ready BIM model with full detail"
+    },
+    "report_url": null,
+    "created_at": "2024-12-20T08:30:00Z",
+    "updated_at": "2024-12-20T12:00:00Z"
+  },
+  {
+    "id": "rev-006",
+    "project_id": "567890",
+    "project_name": "Tech Campus Phase II",
+    "stage": "50% DD",
+    "date": "2024-12-18",
+    "reviewer": "Emily Park",
+    "reviewer_role": "BIM Coordinator",
+    "status": "draft",
+    "scores": {
+      "Design Feasibility": 8.0,
+      "Coordination and Completeness": 6.8,
+      "Compliance and Regulatory": 7.5,
+      "Cost and Schedule": 7.2,
+      "Constructability and Safety": 7.8,
+      "BIM Team Review": 8.5
+    },
+    "overall_score": 7.63,
+    "weighted_score": 7.54,
+    "comments": {
+      "Design Feasibility": "Design progressing well with good feasibility",
+      "Coordination and Completeness": "Coordination gaps identified and being addressed",
+      "Compliance and Regulatory": "Compliance review in progress",
+      "Cost and Schedule": "Early cost estimates look reasonable",
+      "Constructability and Safety": "Good constructability considerations",
+      "BIM Team Review": "Strong BIM coordination and modeling"
+    },
+    "report_url": null,
+    "created_at": "2024-12-18T14:20:00Z",
+    "updated_at": "2024-12-18T16:45:00Z"
+  }
+]
