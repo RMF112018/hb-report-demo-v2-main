@@ -1084,144 +1084,67 @@ export default function FieldReportsCard({ card, config, span, isCompact, userRo
               </div>
             </div>
 
-            {/* Project-Specific or Portfolio View */}
-            {userRole === "project-manager" ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project: {data.projectName}
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Superintendent:</span>
-                    <span className="font-medium">{data.superintendent}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Avg Crew Size:</span>
-                    <span className="font-medium">{data.keyMetrics?.avgCrewSize || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Delays:</span>
-                    <span className="font-medium">{data.keyMetrics?.totalDelays || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Safety Incidents:</span>
-                    <span className="font-medium">{data.keyMetrics?.safetyIncidents || 0}</span>
-                  </div>
-                  <div className="pt-2 border-t border-green-700">
-                    <div className="text-green-200 mb-1">Recent Reports Quality:</div>
-                    {data.recentReports?.slice(0, 3).map((report: any, index: number) => (
-                      <div key={index} className="text-green-300 text-xs">
-                        • {report.date}: {report.workCompleted.slice(0, 30)}...
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : userRole === "project-executive" ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project Performance (6 Projects)
-                </h4>
-                <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                  {data.projectReports?.map((project: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center border-b border-green-800 pb-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-green-200">{project.project}</div>
-                        <div className="text-green-300">
-                          {project.submitted}/{project.reports} • {formatPercentage(project.completion)}
-                        </div>
-                        <div className="text-green-400">Supt: {project.superintendent.split(" ")[0]}</div>
-                      </div>
-                      <div className="text-right">
-                        <Badge
-                          className={`text-xs ${
-                            project.completion >= 90
-                              ? "bg-green-200 text-green-800"
-                              : project.completion >= 80
-                              ? "bg-yellow-200 text-yellow-800"
-                              : "bg-red-200 text-red-800"
-                          }`}
-                        >
-                          {formatPercentage(project.completion)}
-                        </Badge>
-                        {project.issues > 0 && <div className="text-red-300 text-xs">⚠ {project.issues} issues</div>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Portfolio Metrics
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Projects:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.totalProjects || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Avg Crew Size:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.avgCrewSize || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Delays:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.totalDelays || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Safety Incidents:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.safetyIncidents || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Missed Reports:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.missedReports || 0}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Field Reports Tables */}
+            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
+              <Tabs defaultValue="daily-logs" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-3">
+                  <TabsTrigger value="daily-logs" className="flex items-center gap-1 text-xs">
+                    <FileText className="w-3 h-3" />
+                    Daily Logs
+                  </TabsTrigger>
+                  <TabsTrigger value="safety-audits" className="flex items-center gap-1 text-xs">
+                    <Shield className="w-3 h-3" />
+                    Safety Audits
+                  </TabsTrigger>
+                  <TabsTrigger value="quality-control" className="flex items-center gap-1 text-xs">
+                    <Clipboard className="w-3 h-3" />
+                    Quality Control
+                  </TabsTrigger>
+                </TabsList>
 
-            {/* Performance Insights */}
-            {userRole !== "project-manager" && (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Award className="w-4 h-4 mr-2" />
-                  Performance Insights
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {userRole === "project-executive" ? (
-                    <>
-                      <div className="text-green-200 mb-1">Top Performers:</div>
-                      {data.projectReports
-                        ?.slice(0, 3)
-                        .sort((a: any, b: any) => b.completion - a.completion)
-                        .map((project: any, index: number) => (
-                          <div key={index} className="text-green-300">
-                            • {project.project}: {formatPercentage(project.completion)}
-                          </div>
-                        ))}
-                    </>
-                  ) : (
-                    <>
-                      <div className="text-green-200 mb-1">Top Performers:</div>
-                      {data.topPerformers?.map((project: any, index: number) => (
-                        <div key={index} className="text-green-300">
-                          • {project.project}: {formatPercentage(project.completion)}
-                        </div>
-                      ))}
-                      <div className="text-green-200 mb-1 mt-2">Needs Attention:</div>
-                      {data.underPerformers?.map((project: any, index: number) => (
-                        <div key={index} className="text-red-300">
-                          • {project.project}: {formatPercentage(project.completion)}
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
+                <TabsContent value="daily-logs" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={dailyLogsColumns}
+                      rowData={dailyLogsData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="safety-audits" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={safetyAuditsColumns}
+                      rowData={safetyAuditsData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="quality-control" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={qualityControlColumns}
+                      rowData={qualityControlData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
 
             {/* Key Insights */}
             <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">

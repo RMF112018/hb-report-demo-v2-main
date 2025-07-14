@@ -27,6 +27,7 @@ import { TeamsSlideOutPanel } from "../../../components/productivity/TeamsSlideO
 import { QualityWarrantyCarousel } from "../../../components/quality/QualityWarrantyCarousel"
 import { ProjectPageCarousel } from "../../../components/presentation/ProjectPageCarousel"
 import { CoreTabCarousel } from "../../../components/presentation/CoreTabCarousel"
+import { HBIntelPitchCarousel } from "../../../components/presentation/HBIntelPitchCarousel"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,6 +64,7 @@ import {
   Gavel,
   Server,
   Drill,
+  GitCompareArrows,
   MessageSquare,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
@@ -410,6 +412,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const [projectPageCarouselTimeout, setProjectPageCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
   const [showCoreTabCarousel, setShowCoreTabCarousel] = useState(false)
   const [coreTabCarouselTimeout, setCoreTabCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showHBIntelPitchCarousel, setShowHBIntelPitchCarousel] = useState(false)
 
   // New state for fluid navigation
   const [activeCategory, setActiveCategory] = useState<SidebarCategory | null>(null)
@@ -782,6 +785,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
       clearTimeout(coreTabCarouselTimeout)
       setCoreTabCarouselTimeout(null)
     }
+  }
+
+  // Handle HB Intel Pitch carousel completion
+  const handleHBIntelPitchCarouselComplete = () => {
+    setShowHBIntelPitchCarousel(false)
   }
 
   // Helper function to handle project selection with carousel logic
@@ -1368,7 +1376,27 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
             </div>
 
             {/* Productivity Quick Access */}
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Launch HB Intel Pitch carousel for executives
+                        setShowHBIntelPitchCarousel(true)
+                      }}
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[120]"
+                    >
+                      <GitCompareArrows className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="z-[130]">
+                    <p>HB Intel Executive Pitch Presentation</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1793,6 +1821,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
         {/* Core Tab Carousel */}
         {showCoreTabCarousel && <CoreTabCarousel onComplete={handleCoreTabCarouselComplete} />}
+
+        {/* HB Intel Pitch Carousel */}
+        {showHBIntelPitchCarousel && <HBIntelPitchCarousel onComplete={handleHBIntelPitchCarouselComplete} />}
       </div>
     )
   }
