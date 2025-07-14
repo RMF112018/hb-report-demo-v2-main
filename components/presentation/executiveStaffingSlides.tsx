@@ -6,8 +6,8 @@
  * @since 2025-01-15
  *
  * Complete sequence of slides for the Executive Staffing presentation.
- * Focuses on ExecutiveStaffingView.tsx layout, drag-and-drop Gantt chart scheduling,
- * real-time assignment visibility, predictive staffing gaps, and role-based filtering.
+ * Based on ExecutiveStaffingView.tsx component features including SPCR management,
+ * drag-and-drop Gantt chart scheduling, Needing Assignment panel, and executive insights.
  */
 
 "use client"
@@ -25,6 +25,10 @@ import {
   Clock,
   CheckCircle,
   ArrowRight,
+  FileText,
+  Eye,
+  Settings,
+  Building2,
 } from "lucide-react"
 
 export const executiveStaffingSlides: PresentationSlide[] = [
@@ -35,47 +39,47 @@ export const executiveStaffingSlides: PresentationSlide[] = [
       <div className="space-y-8">
         <div className="space-y-6">
           <p className="text-3xl md:text-5xl font-bold leading-tight">
-            Transform your workforce planning from <span className="text-orange-500">reactive chaos</span> to{" "}
-            <span className="text-blue-600">strategic advantage</span>.
+            Replace the <span className="text-red-500">legacy Excel workflow</span> with{" "}
+            <span className="text-blue-600">centralized intelligence</span>.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-red-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-red-100 p-3 rounded-full">
-                  <AlertTriangle className="h-8 w-8 text-red-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-red-600">Old Way</h3>
+                <AlertTriangle className="h-8 w-8 text-red-600" />
+                <h3 className="text-xl font-bold text-red-600">Pain Points</h3>
               </div>
-              <ul className="space-y-3 text-lg">
-                <li>• Manual spreadsheet tracking</li>
-                <li>• Last-minute scrambling</li>
-                <li>• Disconnected project data</li>
-                <li>• Reactive decision making</li>
+              <ul className="space-y-2 text-base">
+                <li>• Manual spreadsheet updates</li>
+                <li>• Misaligned handoffs</li>
+                <li>• Stale, disconnected data</li>
+                <li>• Version control chaos</li>
               </ul>
             </div>
 
-            <div className="space-y-4">
+            <div className="bg-blue-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-3 rounded-full">
-                  <Target className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-green-600">HB Intel Way</h3>
+                <Zap className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Optimization</h3>
               </div>
-              <ul className="space-y-3 text-lg">
-                <li>
-                  • <strong>Intelligent forecasting</strong>
-                </li>
-                <li>
-                  • <strong>Proactive gap detection</strong>
-                </li>
-                <li>
-                  • <strong>Unified project visibility</strong>
-                </li>
-                <li>
-                  • <strong>Strategic workforce planning</strong>
-                </li>
-              </ul>
+              <p className="text-base">
+                <strong>Centralized project/staffing database</strong> pulls real-time data across all systems
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Results</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Eliminates 5-10 hours/week of manual coordination
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Executives make decisions—not format spreadsheets
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -89,110 +93,51 @@ export const executiveStaffingSlides: PresentationSlide[] = [
       <div className="space-y-8">
         <div className="space-y-6">
           <p className="text-3xl md:text-5xl font-bold leading-tight">
-            See your entire workforce at a glance with our{" "}
-            <span className="text-blue-600">interactive Gantt visualization</span>.
+            See your workforce with <span className="text-purple-600">executive-level staffing matrix</span> grouped by
+            PE → Project → Role.
           </p>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center space-y-4">
-                <div className="bg-blue-100 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto">
-                  <Users className="h-10 w-10 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold">Drag & Drop Assignments</h3>
-                <p className="text-lg">Intuitive scheduling with visual feedback and conflict detection</p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="bg-green-100 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto">
-                  <Calendar className="h-10 w-10 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold">Multi-Project Timeline</h3>
-                <p className="text-lg">See all projects and assignments across your entire portfolio</p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="bg-purple-100 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto">
-                  <Zap className="h-10 w-10 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-bold">Real-Time Updates</h3>
-                <p className="text-lg">Instant visibility into capacity, availability, and utilization</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <p className="text-xl text-center">
-              <strong>No more guesswork.</strong> Make informed decisions with complete workforce visibility.
-            </p>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: "real-time-assignment-visibility",
-    title: "Real-Time Assignment Visibility",
-    content: (
-      <div className="space-y-8">
-        <div className="space-y-6">
-          <p className="text-3xl md:text-5xl font-bold leading-tight">
-            Track every assignment, every role, every project in <span className="text-green-600">real-time</span>.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-purple-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="text-2xl font-bold">Live Dashboard</h3>
+                <Eye className="h-8 w-8 text-purple-600" />
+                <h3 className="text-xl font-bold text-purple-600">Description</h3>
               </div>
-              <ul className="space-y-4 text-lg">
-                <li>
-                  • <strong>Current assignments</strong> across all projects
-                </li>
-                <li>
-                  • <strong>Utilization rates</strong> by role and individual
-                </li>
-                <li>
-                  • <strong>Availability windows</strong> for quick scheduling
-                </li>
-                <li>
-                  • <strong>Skill matching</strong> for optimal placement
-                </li>
-              </ul>
+              <p className="text-base">
+                Executive-level staffing matrix shows hierarchical view:{" "}
+                <strong>Project Executive → Project → Role assignments</strong>
+              </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="bg-blue-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-3 rounded-full">
-                  <Clock className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-bold">Instant Alerts</h3>
+                <Settings className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Optimization</h3>
               </div>
-              <ul className="space-y-4 text-lg">
-                <li>
-                  • <strong>Overallocation warnings</strong> before they happen
-                </li>
-                <li>
-                  • <strong>Schedule conflicts</strong> with resolution suggestions
-                </li>
-                <li>
-                  • <strong>Resource gaps</strong> identified weeks in advance
-                </li>
-                <li>
-                  • <strong>Project milestones</strong> at risk due to staffing
-                </li>
-              </ul>
+              <p className="text-base">
+                <strong>Drag-and-drop Gantt chart</strong> replaces static timelines with interactive scheduling
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <TrendingUp className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Impact</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Instant visibility into who's staffed where and for how long
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Improved load balancing, faster planning cycles
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl mt-8">
-            <p className="text-xl text-center font-semibold">
-              <CheckCircle className="inline h-6 w-6 text-green-600 mr-2" />
-              Stay ahead of staffing challenges with <strong>predictive insights</strong> and{" "}
-              <strong>automated alerts</strong>.
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-xl text-white text-center mt-8">
+            <p className="text-xl font-bold">
+              Visual workforce planning at executive scale—see the big picture, drill down to details.
             </p>
           </div>
         </div>
@@ -206,70 +151,63 @@ export const executiveStaffingSlides: PresentationSlide[] = [
       <div className="space-y-8">
         <div className="space-y-6">
           <p className="text-3xl md:text-5xl font-bold leading-tight">
-            Our <span className="text-purple-600">AI-powered analytics</span> identify staffing gaps weeks before they
-            impact your projects.
+            The <span className="text-orange-600">"Needing Assignment" panel</span> detects at-risk personnel based on
+            upcoming assignment end dates.
           </p>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-purple-600">Predictive Intelligence</h3>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded-full mt-1">
-                      <TrendingUp className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold">Demand Forecasting</p>
-                      <p className="text-base opacity-90">
-                        Analyze historical patterns and project pipelines to predict future staffing needs
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded-full mt-1">
-                      <AlertTriangle className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold">Risk Assessment</p>
-                      <p className="text-base opacity-90">
-                        Identify potential bottlenecks and critical path dependencies
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded-full mt-1">
-                      <Target className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold">Skill Gap Analysis</p>
-                      <p className="text-base opacity-90">
-                        Match required expertise with available talent across your organization
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-orange-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <Clock className="h-8 w-8 text-orange-600" />
+                <h3 className="text-xl font-bold text-orange-600">Description</h3>
               </div>
+              <p className="text-base">
+                Smart panel automatically flags personnel whose assignments end within <strong>14-62 days</strong>,
+                color-coded by urgency
+              </p>
+            </div>
 
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-orange-600">Proactive Solutions</h3>
-                <div className="space-y-4 text-lg">
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <p className="font-semibold text-orange-800">3-Week Warning System</p>
-                    <p className="text-orange-700">Get advance notice when gaps are detected</p>
-                  </div>
+            <div className="bg-blue-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <Target className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Optimization</h3>
+              </div>
+              <p className="text-base">
+                <strong>Auto-flagging based on date logic</strong> with filterable views by role and criticality
+              </p>
+            </div>
 
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <p className="font-semibold text-green-800">Automated Recommendations</p>
-                    <p className="text-green-700">Suggested solutions with impact analysis</p>
-                  </div>
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Results</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Staffing gaps filled weeks earlier
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Prevents idle time, protects margins
+                </p>
+              </div>
+            </div>
+          </div>
 
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="font-semibold text-blue-800">Resource Optimization</p>
-                    <p className="text-blue-700">Maximize efficiency across all projects</p>
-                  </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mt-8">
+            <div className="text-center space-y-4">
+              <h3 className="text-2xl font-bold">Color-Coded Early Warning System</h3>
+              <div className="flex justify-center space-x-8">
+                <div className="text-center">
+                  <div className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-bold">≤14 days</div>
+                  <p className="text-sm mt-2">Critical</p>
+                </div>
+                <div className="text-center">
+                  <div className="bg-yellow-100 text-yellow-600 px-4 py-2 rounded-full font-bold">15-30 days</div>
+                  <p className="text-sm mt-2">Warning</p>
+                </div>
+                <div className="text-center">
+                  <div className="bg-green-100 text-green-600 px-4 py-2 rounded-full font-bold">31+ days</div>
+                  <p className="text-sm mt-2">Planning</p>
                 </div>
               </div>
             </div>
@@ -279,68 +217,151 @@ export const executiveStaffingSlides: PresentationSlide[] = [
     ),
   },
   {
-    id: "role-based-filtering-analytics",
-    title: "Role-Based Intelligence",
+    id: "assignment-flow-refined",
+    title: "The Assignment Flow, Refined",
     content: (
       <div className="space-y-8">
         <div className="space-y-6">
           <p className="text-3xl md:text-5xl font-bold leading-tight">
-            Tailored insights for every level of your organization, from{" "}
-            <span className="text-blue-600">field operations</span> to{" "}
-            <span className="text-purple-600">executive strategy</span>.
+            Smart <span className="text-blue-600">"Create Assignment" modal</span> with position-grouped selectors and
+            dual search modes.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             <div className="bg-blue-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-600 p-3 rounded-full">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-blue-600">Project Managers</h3>
+                <FileText className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Description</h3>
               </div>
-              <ul className="space-y-2 text-base">
-                <li>• Team capacity planning</li>
-                <li>• Schedule optimization</li>
-                <li>• Resource allocation</li>
-                <li>• Performance tracking</li>
-              </ul>
-            </div>
-
-            <div className="bg-green-50 p-6 rounded-xl space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-600 p-3 rounded-full">
-                  <BarChart3 className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-green-600">Project Executives</h3>
-              </div>
-              <ul className="space-y-2 text-base">
-                <li>• Portfolio overview</li>
-                <li>• Cross-project analytics</li>
-                <li>• Strategic planning</li>
-                <li>• Risk management</li>
-              </ul>
+              <p className="text-base">
+                Intelligent modal with <strong>position-grouped staff selectors</strong>, start date filters, and dual
+                search modes (by name or role)
+              </p>
             </div>
 
             <div className="bg-purple-50 p-6 rounded-xl space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-purple-600 p-3 rounded-full">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-purple-600">Executives</h3>
+                <Zap className="h-8 w-8 text-purple-600" />
+                <h3 className="text-xl font-bold text-purple-600">Optimization</h3>
               </div>
-              <ul className="space-y-2 text-base">
-                <li>• Company-wide metrics</li>
-                <li>• Growth planning</li>
-                <li>• Market analysis</li>
-                <li>• Strategic insights</li>
-              </ul>
+              <p className="text-base">
+                <strong>No more scrolling through endless names</strong>—smart filtering and categorization
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Results</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Create an assignment in under 30 seconds
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Faster workflows with fewer errors
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-xl text-white">
-            <p className="text-xl font-bold text-center">
-              <strong>Smart Filters:</strong> See exactly what matters to your role, when it matters most.
-            </p>
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-xl text-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Smart Features</h3>
+                <ul className="space-y-2 text-base">
+                  <li>• Position-based staff grouping</li>
+                  <li>• Available date filtering</li>
+                  <li>• Conflict detection</li>
+                  <li>• Rate/budget validation</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-4">Workflow Steps</h3>
+                <ol className="space-y-2 text-base">
+                  <li>1. Select SPCR requirement</li>
+                  <li>2. Choose qualified staff</li>
+                  <li>3. Set assignment dates</li>
+                  <li>4. Confirm and deploy</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "insights-in-context",
+    title: "Insights in Context",
+    content: (
+      <div className="space-y-8">
+        <div className="space-y-6">
+          <p className="text-3xl md:text-5xl font-bold leading-tight">
+            Executive-level trends and <span className="text-red-500">system alerts</span> for overallocations and
+            assignment collisions.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-red-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <BarChart3 className="h-8 w-8 text-red-600" />
+                <h3 className="text-xl font-bold text-red-600">Description</h3>
+              </div>
+              <p className="text-base">
+                Real-time dashboard displays <strong>executive-level trends</strong> and system alerts for
+                overallocations, assignment collisions, and resource conflicts
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <TrendingUp className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Optimization</h3>
+              </div>
+              <p className="text-base">
+                <strong>Live, contextual insights</strong> replace anecdotal planning with data-driven intelligence
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <Target className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Results</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Execs can triage issues directly
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Moves decisions closer to the data
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mt-8">
+            <h3 className="text-2xl font-bold text-center mb-6">Executive Alert System</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="text-xl font-semibold text-red-500">Critical Alerts</h4>
+                <ul className="space-y-2 text-base">
+                  <li>• Staff overallocation warnings</li>
+                  <li>• Schedule conflict detection</li>
+                  <li>• Budget variance alerts</li>
+                  <li>• Resource shortage notices</li>
+                </ul>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-xl font-semibold text-blue-500">Trend Analysis</h4>
+                <ul className="space-y-2 text-base">
+                  <li>• Utilization rate trends</li>
+                  <li>• Project timeline health</li>
+                  <li>• Cost performance metrics</li>
+                  <li>• Resource optimization opportunities</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -353,78 +374,75 @@ export const executiveStaffingSlides: PresentationSlide[] = [
       <div className="space-y-8">
         <div className="space-y-6">
           <p className="text-3xl md:text-5xl font-bold leading-tight">
-            Experience the future of workforce management with{" "}
-            <span className="text-blue-600">HB Intel's Executive Staffing Platform</span>.
+            Integrated into <span className="text-blue-600">HB Intel's unified platform</span>—supporting 4x growth
+            without 4x staffing effort.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-green-600">Immediate Benefits</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                  <p className="text-lg">
-                    <strong>75% reduction</strong> in scheduling conflicts
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                  <p className="text-lg">
-                    <strong>3-week advance</strong> staffing gap detection
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                  <p className="text-lg">
-                    <strong>Real-time visibility</strong> across all projects
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                  <p className="text-lg">
-                    <strong>Automated reporting</strong> and analytics
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="bg-blue-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <Building2 className="h-8 w-8 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-600">Description</h3>
               </div>
+              <p className="text-base">
+                Seamlessly fits into <strong>HB Intel's broader ecosystem</strong> of continuity and cross-functional
+                planning
+              </p>
             </div>
 
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-purple-600">Strategic Impact</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                  <p className="text-lg">
-                    <strong>Improved project delivery</strong> timelines
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                  <p className="text-lg">
-                    <strong>Enhanced team utilization</strong> rates
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                  <p className="text-lg">
-                    <strong>Data-driven decisions</strong> for growth
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                  <p className="text-lg">
-                    <strong>Competitive advantage</strong> in market
-                  </p>
-                </div>
+            <div className="bg-purple-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <Settings className="h-8 w-8 text-purple-600" />
+                <h3 className="text-xl font-bold text-purple-600">Optimization</h3>
+              </div>
+              <p className="text-base">
+                <strong>Integrated across dashboards, projects, and scheduling tools</strong> for unified operations
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-xl space-y-4">
+              <div className="flex items-center space-x-3">
+                <TrendingUp className="h-8 w-8 text-green-600" />
+                <h3 className="text-xl font-bold text-green-600">Results</h3>
+              </div>
+              <div className="space-y-2 text-base">
+                <p>
+                  <strong>Productivity:</strong> Unifies data sources into one pane of glass
+                </p>
+                <p>
+                  <strong>Benefit:</strong> Supports 4x scale growth without 4x staffing effort
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-xl text-white text-center">
-            <p className="text-2xl font-bold mb-4">Ready to Transform Your Staffing Strategy?</p>
-            <p className="text-lg mb-6">Join the next generation of construction workforce management with HB Intel.</p>
-            <div className="flex items-center justify-center space-x-2">
-              <span className="text-xl font-semibold">Experience the Platform</span>
-              <ArrowRight className="h-6 w-6" />
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-xl text-white">
+            <div className="text-center space-y-6">
+              <h3 className="text-2xl font-bold">Transform Your Workforce Strategy Today</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold">Strategic Impact</h4>
+                  <ul className="space-y-2 text-base">
+                    <li>• 85% reduction in planning cycles</li>
+                    <li>• 60% improvement in resource utilization</li>
+                    <li>• 95% accuracy in gap prediction</li>
+                    <li>• Real-time executive visibility</li>
+                  </ul>
+                </div>
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold">Platform Integration</h4>
+                  <ul className="space-y-2 text-base">
+                    <li>• Unified with project dashboards</li>
+                    <li>• Connected to scheduling tools</li>
+                    <li>• Integrated financial tracking</li>
+                    <li>• Seamless HB Intel ecosystem</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="flex items-center justify-center space-x-2 mt-6">
+                <span className="text-xl font-bold">Ready to Scale Smart?</span>
+                <ArrowRight className="h-6 w-6" />
+              </div>
             </div>
           </div>
         </div>
