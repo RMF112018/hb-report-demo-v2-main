@@ -366,11 +366,13 @@ export function ProtectedGrid({
       defaultColDef: {
         flex: 1,
         minWidth: 100,
+        maxWidth: 300, // Prevent columns from growing too wide
         resizable: defaultConfig.allowColumnResizing,
         sortable: defaultConfig.allowSorting,
         filter: defaultConfig.allowFiltering,
         editable: defaultConfig.allowCellEditing,
         cellEditor: "agTextCellEditor",
+        suppressSizeToFit: false, // Enable auto-sizing to fit container
       },
       rowSelection: defaultConfig.allowRowSelection
         ? {
@@ -382,6 +384,8 @@ export function ProtectedGrid({
         : undefined,
       cellSelection: defaultConfig.enableRangeSelection,
       suppressMovableColumns: !defaultConfig.allowColumnReordering,
+      suppressHorizontalScroll: true, // Let parent container handle horizontal scrolling
+      maintainColumnOrder: true, // Prevent column reordering that could affect width calculations
       getRowStyle: (params) => {
         const isDark = theme === "dark"
 
@@ -500,7 +504,7 @@ export function ProtectedGrid({
   }
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full min-w-0 max-w-full overflow-hidden", className)}>
       {/* Grid Header */}
       {(title || defaultConfig.showToolbar) && (
         <div className="flex items-center justify-between p-4 border-b bg-background border-border">
@@ -569,12 +573,15 @@ export function ProtectedGrid({
         className={cn(
           getGridThemeClass(),
           "border-border", // Ensure borders match theme
-          theme === "dark" ? "ag-grid-dark-theme" : "ag-grid-light-theme"
+          theme === "dark" ? "ag-grid-dark-theme" : "ag-grid-light-theme",
+          "w-full min-w-0 max-w-full overflow-hidden" // Add overflow constraints
         )}
         style={
           {
             height,
-            width,
+            width: "100%", // Force 100% width but constrained by parent
+            minWidth: 0, // Allow shrinking below content width
+            maxWidth: "100%", // Never exceed parent width
             "--ag-background-color": theme === "dark" ? "hsl(var(--background))" : "hsl(var(--background))",
             "--ag-foreground-color": theme === "dark" ? "hsl(var(--foreground))" : "hsl(var(--foreground))",
             "--ag-border-color": theme === "dark" ? "hsl(var(--border))" : "hsl(var(--border))",

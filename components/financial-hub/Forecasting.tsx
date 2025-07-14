@@ -54,8 +54,6 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import {
   ProtectedGrid,
   ProtectedColDef,
@@ -558,7 +556,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
 
   // UI state
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [useBetaGrid, setUseBetaGrid] = useState(false)
 
   // Initialize data
   useEffect(() => {
@@ -694,18 +691,26 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Cost Code",
         { level: "none" },
         {
-          minWidth: 200,
           pinned: "left",
           cellStyle: (params: any) => {
             const style: any = {}
             if (params.data?.rowType === "actual") {
               style.fontWeight = "600"
-              style.color = "#1f2937" // Darker text for main rows
+              style.color = "#0f172a" // Darker text for light mode
             } else {
               style.paddingLeft = "20px"
               style.fontStyle = "italic"
-              style.color = "#6b7280" // Lighter text for sub-rows
+              style.color = "#64748b" // Better contrast for sub-rows
               style.fontSize = "13px"
+            }
+
+            // Dark mode support
+            if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+              if (params.data?.rowType === "actual") {
+                style.color = "#f8fafc" // Light text for dark mode
+              } else {
+                style.color = "#94a3b8" // Better contrast for dark mode sub-rows
+              }
             }
 
             // Add subtle left border for visual grouping
@@ -720,21 +725,29 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         }
       ),
       createReadOnlyColumn("description", "Type", {
-        minWidth: 150,
         cellStyle: (params: any) => {
           const style: any = { fontSize: "11px" }
 
           // Enhanced styling based on row type
           if (params.data?.rowType === "actual") {
             style.fontWeight = "600"
-            style.color = "#1f2937"
+            style.color = "#0f172a"
             style.fontSize = "12px"
           } else if (params.data?.rowType === "previous") {
-            style.color = "#6b7280"
+            style.color = "#64748b"
             style.fontStyle = "italic"
           } else if (params.data?.rowType === "variance") {
             style.color = params.data.variance >= 0 ? "#059669" : "#dc2626" // Green for positive, red for negative
             style.fontWeight = "500"
+          }
+
+          // Dark mode support
+          if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            if (params.data?.rowType === "actual") {
+              style.color = "#f8fafc"
+            } else if (params.data?.rowType === "previous") {
+              style.color = "#94a3b8"
+            }
           }
 
           return style
@@ -745,7 +758,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Budget",
         { level: "none" },
         {
-          minWidth: 120,
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
@@ -763,7 +775,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Cost to Complete",
         { level: "none" },
         {
-          minWidth: 120,
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
@@ -781,7 +792,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Est. at Completion",
         { level: "none" },
         {
-          minWidth: 120,
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
@@ -799,7 +809,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Variance",
         { level: "none" },
         {
-          minWidth: 120,
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
@@ -817,7 +826,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Start Date",
         { level: "none" },
         {
-          minWidth: 100,
           cellStyle: { textAlign: "right" },
         }
       ),
@@ -826,7 +834,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "End Date",
         { level: "none" },
         {
-          minWidth: 100,
           cellStyle: { textAlign: "right" },
         }
       ),
@@ -841,7 +848,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
           month.label,
           { level: "none" },
           {
-            minWidth: 100,
             type: "numericColumn",
             valueFormatter: (params: any) => formatCurrency(params.value || 0),
             cellStyle: (params: any) => {
@@ -869,9 +875,9 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     allowImport: false,
     allowRowSelection: false,
     allowMultiSelection: false,
-    allowColumnReordering: true,
-    allowColumnResizing: true,
-    allowSorting: false, // Disable to maintain grouping
+    allowColumnReordering: true, // Allow column reordering
+    allowColumnResizing: true, // Enable column resizing for auto-sizing
+    allowSorting: true, // Allow sorting
     allowFiltering: true,
     allowCellEditing: true,
     showToolbar: true,
@@ -881,7 +887,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     userRole: userRole,
     theme: "quartz", // Use quartz theme for better dark mode support
     enableTotalsRow: true,
-    stickyColumnsCount: 6,
+    stickyColumnsCount: 3, // Keep first 3 columns sticky for auto-sizing
   }
 
   const protectedGridEvents: GridEvents = {
@@ -916,8 +922,8 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       setHasUnsavedChanges(true)
     },
     onGridReady: (event) => {
-      // Auto-size columns to fit
-      event.api.sizeColumnsToFit()
+      // Auto-size all columns to fit their content
+      event.api.autoSizeAllColumns()
 
       // Apply custom row styling for grouped rows
       const gridOptions = event.api.getGridOption("getRowStyle")
@@ -993,14 +999,14 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     }
   }
 
-  // Memoized grid data and columns for beta grid
+  // Memoized grid data and columns
   const protectedGridData = useMemo(() => {
-    return useBetaGrid ? createProtectedGridData(filteredData) : []
-  }, [useBetaGrid, filteredData, monthlyColumns])
+    return createProtectedGridData(filteredData)
+  }, [filteredData, monthlyColumns])
 
   const protectedGridColumns = useMemo(() => {
-    return useBetaGrid ? createProtectedGridColumns() : []
-  }, [useBetaGrid, monthlyColumns])
+    return createProtectedGridColumns()
+  }, [monthlyColumns])
 
   // Calculate totals
   const calculateTotals = useMemo(() => {
@@ -1711,7 +1717,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
   }
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden" style={{ maxWidth: "100%", width: "100%" }}>
+    <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden" style={{ width: "100%", maxWidth: "100%" }}>
       {/* Table Selection with Controls */}
       <div className="flex items-center justify-between">
         <div className="flex-1">
@@ -1730,28 +1736,6 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Beta Grid Toggle */}
-          <div className="flex items-center gap-2 p-2 border rounded-lg bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800">
-            <TestTube className="h-4 w-4 text-orange-600" />
-            <Label htmlFor="beta-grid" className="text-sm font-medium text-orange-800 dark:text-orange-200">
-              Beta Grid
-            </Label>
-            <Switch
-              id="beta-grid"
-              checked={useBetaGrid}
-              onCheckedChange={setUseBetaGrid}
-              className="data-[state=checked]:bg-orange-600"
-            />
-            {useBetaGrid && (
-              <Badge
-                variant="secondary"
-                className="text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-              >
-                Active
-              </Badge>
-            )}
-          </div>
-
           <Button
             onClick={startHBIReview}
             className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white"
@@ -1763,186 +1747,42 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       </div>
 
       {/* Interactive Forecast Table with Fixed Layout */}
-      <div className="w-full max-w-full">
-        {useBetaGrid ? (
-          /* Beta Protected Grid */
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
-                <TestTube className="h-5 w-5 text-orange-600" />
-                <span className="font-medium text-orange-800 dark:text-orange-200">Beta Grid Mode Active</span>
-                <Badge
-                  variant="outline"
-                  className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-                >
-                  Protected Grid v1.0
-                </Badge>
-              </div>
-              <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  🚀 <strong>New Experience:</strong> This is the same forecast data displayed using our new Protected
-                  Grid component, featuring Excel-like functionality, enhanced cell protection, advanced filtering,
-                  improved data export capabilities, <strong>sticky columns</strong> (first 6 columns remain visible
-                  when scrolling), a <strong>totals row</strong> at the bottom showing calculated summaries, and
-                  <strong>visual row grouping</strong> with subtle shading to clearly distinguish each forecast record's
-                  3-row structure (actual/previous/variance).
-                </p>
+      <div className="w-full min-w-0 max-w-full overflow-hidden">
+        <div className="space-y-4">
+          <div className="w-full min-w-0 max-w-full overflow-hidden">
+            <div className="w-full min-w-0 max-w-full overflow-x-auto overflow-y-visible">
+              <div style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
+                <ProtectedGrid
+                  title={`${activeTable === "gcgr" ? "GC & GR" : "Draw"} Forecast`}
+                  columnDefs={protectedGridColumns}
+                  rowData={protectedGridData}
+                  config={protectedGridConfig}
+                  events={protectedGridEvents}
+                  height="700px"
+                  width="100%"
+                  enableSearch={true}
+                  className="border rounded-lg"
+                  totalsCalculator={forecastTotalsCalculator}
+                />
               </div>
             </div>
-
-            <ProtectedGrid
-              title={`${activeTable === "gcgr" ? "GC & GR" : "Draw"} Forecast - Beta Grid`}
-              columnDefs={protectedGridColumns}
-              rowData={protectedGridData}
-              config={protectedGridConfig}
-              events={protectedGridEvents}
-              height="700px"
-              enableSearch={true}
-              className="border rounded-lg"
-              totalsCalculator={forecastTotalsCalculator}
-            />
-
-            {hasUnsavedChanges && (
-              <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    You have unsaved changes
-                  </span>
-                </div>
-                <Button onClick={saveChanges} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
-                  <Save className="h-4 w-4 mr-1" />
-                  Save Changes
-                </Button>
-              </div>
-            )}
           </div>
-        ) : (
-          /* Original Table */
-          <Card className="w-full overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-lg">Interactive Forecast Table</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="w-full overflow-x-auto">
-                <table className="w-full text-xs border-collapse" style={{ minWidth: "1000px" }}>
-                  <thead>
-                    <tr className="border-b-2 bg-muted/50">
-                      <th className="text-left p-3 min-w-[180px] sticky left-0 bg-muted/50 z-10">Cost Code</th>
-                      <th className="text-left p-3 min-w-[120px]">Forecast / Actual</th>
-                      <th className="text-right p-3 min-w-[80px]">Budget</th>
-                      <th className="text-right p-3 min-w-[80px]">Cost to Complete</th>
-                      <th className="text-right p-3 min-w-[80px]">Est. at Completion</th>
-                      <th className="text-right p-3 min-w-[80px]">Variance</th>
-                      <th className="text-right p-3 min-w-[80px]">Start Date</th>
-                      <th className="text-right p-3 min-w-[80px]">End Date</th>
-                      {monthlyColumns.map((month) => (
-                        <th key={month.key} className="text-right p-3 min-w-[70px]">
-                          {month.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.map((record) => renderRecordRows(record))}
 
-                    {/* Total Rows */}
-                    <tr className="border-t-2 bg-blue-50 dark:bg-blue-950 font-medium">
-                      <td className="p-2 font-bold sticky left-0 bg-blue-50 dark:bg-blue-950 z-10">
-                        Previous Forecast Total
-                      </td>
-                      <td className="p-2"></td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.budget * 0.95)}</td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.cost_to_complete * 1.05)}</td>
-                      <td className="p-2 text-right">
-                        {formatCurrency(calculateTotals.estimated_at_completion * 0.98)}
-                      </td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.variance * 0.85)}</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      {monthlyColumns.map((month) => (
-                        <td key={`total-prev-${month.key}`} className="p-2 text-right">
-                          {formatCurrency(calculateTotals.monthly_previous[month.key] || 0)}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="bg-green-50 dark:bg-green-950 font-medium">
-                      <td className="p-2 font-bold sticky left-0 bg-green-50 dark:bg-green-950 z-10">
-                        Actual / Remaining Forecast Total
-                      </td>
-                      <td className="p-2"></td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.budget)}</td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.cost_to_complete)}</td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.estimated_at_completion)}</td>
-                      <td className="p-2 text-right">{formatCurrency(calculateTotals.variance)}</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      {monthlyColumns.map((month) => (
-                        <td key={`total-actual-${month.key}`} className="p-2 text-right font-medium">
-                          {formatCurrency(calculateTotals.monthly_actual[month.key] || 0)}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="bg-yellow-50 dark:bg-yellow-950 font-medium">
-                      <td className="p-2 font-bold sticky left-0 bg-yellow-50 dark:bg-yellow-950 z-10">
-                        Variance Total
-                      </td>
-                      <td className="p-2"></td>
-                      <td
-                        className={`p-2 text-right ${
-                          calculateTotals.budget * 0.05 >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {formatCurrency(calculateTotals.budget * 0.05)}
-                      </td>
-                      <td
-                        className={`p-2 text-right ${
-                          -calculateTotals.cost_to_complete * 0.05 >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {formatCurrency(-calculateTotals.cost_to_complete * 0.05)}
-                      </td>
-                      <td
-                        className={`p-2 text-right ${
-                          calculateTotals.estimated_at_completion * 0.02 >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {formatCurrency(calculateTotals.estimated_at_completion * 0.02)}
-                      </td>
-                      <td
-                        className={`p-2 text-right ${
-                          calculateTotals.variance * 0.15 >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {formatCurrency(calculateTotals.variance * 0.15)}
-                      </td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      <td className="p-2 text-right">-</td>
-                      {monthlyColumns.map((month) => (
-                        <td
-                          key={`total-variance-${month.key}`}
-                          className={`p-2 text-right font-medium ${
-                            (calculateTotals.monthly_variance[month.key] || 0) >= 0 ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
-                          {formatCurrency(calculateTotals.monthly_variance[month.key] || 0)}
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
+          {hasUnsavedChanges && (
+            <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  You have unsaved changes
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <Button onClick={saveChanges} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+                <Save className="h-4 w-4 mr-1" />
+                Save Changes
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* HBI AI Chat Interface - Interactive */}
@@ -1965,9 +1805,9 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                 </DialogTitle>
                 <DialogDescription className="text-base">
                   Interactive HBI Analysis for{" "}
-                  {chatRecord.forecast_type === "gcgr"
-                    ? `${chatRecord.cost_code} - ${chatRecord.cost_code_description}`
-                    : `${chatRecord.csi_code} - ${chatRecord.csi_description}`}
+                  {chatRecord?.forecast_type === "gcgr"
+                    ? `${chatRecord?.cost_code} - ${chatRecord?.cost_code_description}`
+                    : `${chatRecord?.csi_code} - ${chatRecord?.csi_description}`}
                 </DialogDescription>
               </DialogHeader>
 
@@ -2107,7 +1947,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                             style: "currency",
                             currency: "USD",
                             minimumFractionDigits: 0,
-                          }).format(chatRecord.budget)}
+                          }).format(chatRecord?.budget || 0)}
                         </div>
                       </div>
 
@@ -2119,7 +1959,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                             style: "currency",
                             currency: "USD",
                             minimumFractionDigits: 0,
-                          }).format(chatRecord.estimated_at_completion)}
+                          }).format(chatRecord?.estimated_at_completion || 0)}
                         </div>
                       </div>
 
@@ -2128,14 +1968,14 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                         <div className="text-xs font-medium text-muted-foreground mb-1">Variance</div>
                         <div
                           className={`text-sm font-bold ${
-                            chatRecord.variance >= 0 ? "text-green-600" : "text-red-600"
+                            (chatRecord?.variance || 0) >= 0 ? "text-green-600" : "text-red-600"
                           }`}
                         >
                           {new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "USD",
                             minimumFractionDigits: 0,
-                          }).format(chatRecord.variance)}
+                          }).format(chatRecord?.variance || 0)}
                         </div>
                       </div>
 
@@ -2143,7 +1983,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                       <div className="p-2 bg-white dark:bg-gray-800 rounded-md border">
                         <div className="text-xs font-medium text-muted-foreground mb-2">Acknowledgment Status</div>
                         {(() => {
-                          const ack = acknowledgments.find((a) => a.recordId === chatRecord.id && a.acknowledged)
+                          const ack = acknowledgments.find((a) => a.recordId === chatRecord?.id && a.acknowledged)
                           if (ack) {
                             return (
                               <div className="space-y-1">
@@ -2157,7 +1997,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                                   </Badge>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {new Date(ack.timestamp).toLocaleString()}
+                                  {ack?.timestamp ? new Date(ack.timestamp).toLocaleString() : ""}
                                 </div>
                               </div>
                             )
@@ -2251,13 +2091,13 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="h-4 w-4 text-violet-600" />
                   <span className="font-medium text-violet-800 dark:text-violet-200">
-                    {chatRecord.forecast_type === "gcgr"
-                      ? `${chatRecord.cost_code} - ${chatRecord.cost_code_description}`
-                      : `${chatRecord.csi_code} - ${chatRecord.csi_description}`}
+                    {chatRecord?.forecast_type === "gcgr"
+                      ? `${chatRecord?.cost_code} - ${chatRecord?.cost_code_description}`
+                      : `${chatRecord?.csi_code} - ${chatRecord?.csi_description}`}
                   </span>
                 </div>
                 <p className="text-sm text-violet-700 dark:text-violet-300">
-                  {getHBIForecastExplanation(chatRecord).reasoning}
+                  {chatRecord ? getHBIForecastExplanation(chatRecord).reasoning : ""}
                 </p>
               </div>
             )}
@@ -2517,10 +2357,10 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                 <div className="max-w-2xl mx-auto text-center">
                   <h3 className="text-xl font-semibold mb-4">Ready to Analyze</h3>
                   <div className="bg-violet-50 dark:bg-violet-950 rounded-lg p-6 mb-6">
-                    <h4 className="font-medium text-lg mb-2">{hbiAnalysisMode.label}</h4>
+                    <h4 className="font-medium text-lg mb-2">{hbiAnalysisMode?.label}</h4>
                     <p className="text-muted-foreground">
                       The AI will analyze{" "}
-                      {hbiAnalysisMode.type === "full_forecast" ? "all forecast records" : "the selected forecast"}{" "}
+                      {hbiAnalysisMode?.type === "full_forecast" ? "all forecast records" : "the selected forecast"}{" "}
                       using:
                     </p>
                     <ul className="mt-3 text-sm space-y-1">
@@ -2772,7 +2612,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                         <h5 className="font-medium mb-2">Analysis Summary</h5>
                         <div className="text-sm space-y-1">
                           <p>
-                            <span className="font-medium">Type:</span> {hbiAnalysisMode.label}
+                            <span className="font-medium">Type:</span> {hbiAnalysisMode?.label}
                           </p>
                           <p>
                             <span className="font-medium">Confidence:</span> 94.2%

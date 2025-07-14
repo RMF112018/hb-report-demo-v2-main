@@ -175,14 +175,14 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
     switch (navigation.financialTab) {
       case "overview":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <FinancialOverview userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "budget-analysis":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <BudgetAnalysisProjectContent
               projectId={projectId}
               projectData={projectScope}
@@ -195,56 +195,56 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
       case "jchr":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <JCHRCard userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "ar-aging":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <ARAgingCard userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "cash-flow":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <CashFlowAnalysis userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "forecasting":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <Forecasting userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "change-management":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <ChangeManagement userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "pay-authorization":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <PayAuthorizations userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "pay-application":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <PayApplication userRole={userRole} projectData={projectScope} />
           </div>
         )
 
       case "retention":
         return (
-          <div className="space-y-6 w-full min-w-0">
+          <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
             <RetentionManagement userRole={userRole} projectData={projectScope} />
           </div>
         )
@@ -332,9 +332,9 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
   // Main content container
   const mainContent = (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden">
       {renderHeader()}
-      <div className="w-full max-w-full overflow-hidden">{renderFinancialTabContent()}</div>
+      <div className="w-full min-w-0 max-w-full overflow-hidden">{renderFinancialTabContent()}</div>
     </div>
   )
 

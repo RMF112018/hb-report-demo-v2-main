@@ -96,9 +96,8 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
         tool: null,
         subTool: null,
         coreTab: "dashboard", // Default to dashboard within core
-        staffingSubTab: null,
-        reportsSubTab: null,
-        selectedBidPackage,
+        staffingSubTab: undefined,
+        reportsSubTab: undefined,
       }
     }
 
@@ -115,9 +114,8 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
       tool: activeTab === "field-management" ? "Field Management" : null,
       subTool: null,
       coreTab: null,
-      staffingSubTab: null,
-      reportsSubTab: null,
-      selectedBidPackage,
+      staffingSubTab: undefined,
+      reportsSubTab: undefined,
     }
   }, [activeTab, selectedBidPackage])
 
@@ -165,7 +163,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
       return dynamicSidebarContent
     }
 
-    return getProjectSidebarContent(projectData, navigationState, projectMetrics, activeTab, handleBidPackageSelect)
+    return getProjectSidebarContent(projectData, navigationState, projectMetrics, activeTab)
   }, [projectData, navigationState, projectMetrics, activeTab, dynamicSidebarContent, handleBidPackageSelect])
 
   // Set up the global callback for sidebar updates

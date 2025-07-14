@@ -23,15 +23,7 @@ import {
   FileText,
   Zap,
   TableIcon,
-  Search,
-  Filter,
   Download,
-  SortAsc,
-  SortDesc,
-  ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
-  TestTube,
 } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -50,7 +42,7 @@ import {
   createLockedColumn,
 } from "@/components/ui/protected-grid"
 import type { ProtectedColDef, GridRow } from "@/components/ui/protected-grid"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -250,9 +242,6 @@ const monthlyPerformance = [
 
 type ViewMode = "overview" | "categories" | "variance" | "budget"
 
-type SortField = keyof BudgetItem
-type SortDirection = "asc" | "desc"
-
 export default function BudgetAnalysis({
   userRole,
   projectData,
@@ -263,16 +252,13 @@ export default function BudgetAnalysis({
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode as ViewMode)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [useBetaGrid, setUseBetaGrid] = useState(false)
+  const [useBetaGrid, setUseBetaGrid] = useState(true)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   // Update view mode when initialViewMode changes
   useEffect(() => {
     setViewMode(initialViewMode as ViewMode)
   }, [initialViewMode])
-  const [sortField, setSortField] = useState<SortField>("Budget Code")
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [isBudgetTableFullscreen, setIsBudgetTableFullscreen] = useState(false)
 
   // Filter budget data to single project (2525840 - Palm Beach Luxury Estate)
@@ -302,41 +288,8 @@ export default function BudgetAnalysis({
   const riskLevel =
     summaryData.costPerformanceIndex < 0.95 ? "high" : summaryData.costPerformanceIndex < 1.05 ? "medium" : "low"
 
-  // Budget table search and sort functionality
-  const processedBudgetData = useMemo(() => {
-    let data = [...filteredBudgetData]
-
-    // Apply search filter
-    if (searchTerm) {
-      data = data.filter(
-        (item) =>
-          item["Cost Code Tier 3"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item["Cost Type"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item["Budget Code Description"].toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    // Apply sorting
-    data.sort((a, b) => {
-      const aValue = a[sortField]
-      const bValue = b[sortField]
-
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue
-      }
-
-      const aStr = String(aValue).toLowerCase()
-      const bStr = String(bValue).toLowerCase()
-
-      if (sortDirection === "asc") {
-        return aStr.localeCompare(bStr)
-      } else {
-        return bStr.localeCompare(aStr)
-      }
-    })
-
-    return data
-  }, [filteredBudgetData, searchTerm, sortField, sortDirection])
+  // Use filtered data directly for grid
+  const processedBudgetData = filteredBudgetData
 
   // Transform budget data for ProtectedGrid
   const createProtectedBudgetData = useMemo(() => {
@@ -368,7 +321,6 @@ export default function BudgetAnalysis({
     return [
       createReadOnlyColumn("costCode", "Cost Code", {
         pinned: "left",
-        width: 200,
         cellRenderer: (params: any) => {
           const data = params.data
           return `
@@ -382,7 +334,6 @@ export default function BudgetAnalysis({
       createLockedColumn("originalBudget", "Original Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createProtectedColumn(
@@ -395,7 +346,6 @@ export default function BudgetAnalysis({
             const value = params.value
             return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
           },
-          width: 140,
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
@@ -412,7 +362,6 @@ export default function BudgetAnalysis({
             const value = params.value
             return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
           },
-          width: 140,
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
@@ -422,7 +371,6 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("revisedBudget", "Revised Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace", fontWeight: "600" },
       }),
       createProtectedColumn(
@@ -435,7 +383,6 @@ export default function BudgetAnalysis({
             const value = params.value
             return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
           },
-          width: 160,
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
@@ -445,25 +392,21 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("projectedBudget", "Projected Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("committedCosts", "Committed Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("directCosts", "Direct Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("jtdCosts", "JTD Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createProtectedColumn(
@@ -476,7 +419,6 @@ export default function BudgetAnalysis({
             const value = params.value
             return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
           },
-          width: 160,
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
@@ -486,19 +428,16 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("projectedCosts", "Projected Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 140,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("forecastToComplete", "Forecast to Complete", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 160,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("estimatedAtCompletion", "Est. at Completion", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        width: 160,
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("projectedOverUnder", "Projected Over/Under", {
@@ -507,7 +446,6 @@ export default function BudgetAnalysis({
           const value = params.value
           return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
         },
-        width: 160,
         cellStyle: (params: any) => ({
           fontFamily: "monospace",
           color: params.value >= 0 ? "#16a34a" : "#dc2626",
@@ -584,15 +522,6 @@ export default function BudgetAnalysis({
       }
     )
   }, [processedBudgetData])
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortField(field)
-      setSortDirection("asc")
-    }
-  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -1042,15 +971,6 @@ export default function BudgetAnalysis({
                       <Download className="h-4 w-4 mr-2" />
                       Export CSV
                     </Button>
-                    <Button
-                      onClick={() => setUseBetaGrid(!useBetaGrid)}
-                      variant={useBetaGrid ? "default" : "outline"}
-                      size="sm"
-                      className={useBetaGrid ? "bg-orange-500 hover:bg-orange-600" : ""}
-                    >
-                      <TestTube className="h-4 w-4 mr-2" />
-                      Beta Grid
-                    </Button>
                     <FullscreenToggle
                       isFullscreen={isBudgetTableFullscreen}
                       onToggle={() => setIsBudgetTableFullscreen(!isBudgetTableFullscreen)}
@@ -1059,498 +979,53 @@ export default function BudgetAnalysis({
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Beta Grid Information Banner */}
-                {useBetaGrid && (
-                  <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <TestTube className="h-5 w-5 text-orange-600 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-orange-800">Beta Grid Mode Active</h4>
-                        <p className="text-sm text-orange-700 mt-1">
-                          Experience our enhanced budget grid with Excel-like functionality, including inline editing,
-                          advanced sorting, totals row, and sticky columns. This new interface provides improved
-                          performance and user experience.
-                        </p>
-                        {hasUnsavedChanges && (
-                          <div className="mt-3 flex items-center gap-2">
-                            <Badge variant="destructive">Unsaved Changes</Badge>
-                            <Button onClick={handleSaveChanges} size="sm" variant="outline">
-                              Save Changes
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                {/* Budget Grid Content */}
+                <div className="space-y-4">
+                  <ProtectedGrid
+                    columnDefs={createProtectedBudgetColumns}
+                    rowData={createProtectedBudgetData}
+                    config={{
+                      allowExport: true,
+                      allowImport: false,
+                      allowRowSelection: false,
+                      allowMultiSelection: false,
+                      allowColumnReordering: true,
+                      allowColumnResizing: true,
+                      allowSorting: true,
+                      allowFiltering: true,
+                      allowCellEditing: true,
+                      showToolbar: true,
+                      showStatusBar: true,
+                      enableRangeSelection: false, // Disabled - requires enterprise license
+                      protectionEnabled: true,
+                      userRole: userRole,
+                      theme: "quartz", // Use quartz theme for better dark mode support
+                      enableTotalsRow: true,
+                      stickyColumnsCount: 3,
+                    }}
+                    events={{
+                      onCellValueChanged: handleGridChange,
+                      onCellEditingStopped: handleGridChange,
+                      onGridReady: (event) => {
+                        // Auto-size all columns to fit their content
+                        event.api.autoSizeAllColumns()
+                      },
+                    }}
+                    height={isBudgetTableFullscreen ? "calc(100vh - 200px)" : "600px"}
+                    title="Budget Analysis Grid"
+                    enableSearch={true}
+                    totalsCalculator={budgetTotalsCalculator}
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    <Badge variant="secondary" className="mr-2">
+                      Total Items: {createProtectedBudgetData.length}
+                    </Badge>
+                    <Badge variant="secondary" className="mr-2">
+                      Totals Row: Enabled
+                    </Badge>
+                    <Badge variant="secondary">Sticky Columns: 1</Badge>
                   </div>
-                )}
-
-                {/* Beta Grid Content */}
-                {useBetaGrid ? (
-                  <div className="space-y-4">
-                    <ProtectedGrid
-                      columnDefs={createProtectedBudgetColumns}
-                      rowData={createProtectedBudgetData}
-                      config={{
-                        allowExport: true,
-                        allowCellEditing: true,
-                        allowSorting: true,
-                        allowFiltering: true,
-                        showToolbar: true,
-                        showStatusBar: true,
-                        enableRangeSelection: false, // Disabled - requires enterprise license
-                        theme: "quartz", // Use quartz theme for better dark mode support
-                        enableTotalsRow: true,
-                        stickyColumnsCount: 1,
-                        userRole: userRole,
-                      }}
-                      events={{
-                        onCellValueChanged: handleGridChange,
-                        onCellEditingStopped: handleGridChange,
-                      }}
-                      height={isBudgetTableFullscreen ? "calc(100vh - 200px)" : "600px"}
-                      title="Budget Analysis Grid"
-                      enableSearch={true}
-                      totalsCalculator={budgetTotalsCalculator}
-                    />
-                    <div className="text-sm text-muted-foreground">
-                      <Badge variant="secondary" className="mr-2">
-                        Total Items: {createProtectedBudgetData.length}
-                      </Badge>
-                      <Badge variant="secondary" className="mr-2">
-                        Totals Row: Enabled
-                      </Badge>
-                      <Badge variant="secondary">Sticky Columns: 1</Badge>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    {/* Search and Filter Controls */}
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input
-                          placeholder="Search cost codes, types, descriptions..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                      <Badge variant="secondary" className="whitespace-nowrap">
-                        {processedBudgetData.length} items
-                      </Badge>
-                    </div>
-
-                    {/* Budget Data Table */}
-                    <div className="rounded-md border overflow-hidden">
-                      <div
-                        className={`overflow-x-auto w-full ${
-                          isBudgetTableFullscreen ? "max-h-[calc(100vh-200px)]" : "max-h-[calc(100vh-300px)]"
-                        }`}
-                        style={{ maxWidth: "100%", width: "100%" }}
-                      >
-                        <Table className="min-w-[1200px]">
-                          <TableHeader className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b-2 border-border/50 shadow-lg">
-                            <TableRow className="bg-background/95 backdrop-blur-md">
-                              <TableHead className="min-w-[200px] sticky left-0 bg-background/95 backdrop-blur-md z-40">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Cost Code Tier 3")}
-                                >
-                                  Cost Code
-                                  {sortField === "Cost Code Tier 3" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Original Budget Amount")}
-                                >
-                                  Original Budget
-                                  {sortField === "Original Budget Amount" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Budget Modifications")}
-                                >
-                                  Modifications
-                                  {sortField === "Budget Modifications" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Approved COs")}
-                                >
-                                  Approved COs
-                                  {sortField === "Approved COs" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Revised Budget")}
-                                >
-                                  Revised Budget
-                                  {sortField === "Revised Budget" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Pending Budget Changes")}
-                                >
-                                  Pending Budget Changes
-                                  {sortField === "Pending Budget Changes" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Projected Budget")}
-                                >
-                                  Projected Budget
-                                  {sortField === "Projected Budget" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Committed Costs")}
-                                >
-                                  Committed Costs
-                                  {sortField === "Committed Costs" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Direct Costs")}
-                                >
-                                  Direct Costs
-                                  {sortField === "Direct Costs" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Job to Date Costs")}
-                                >
-                                  JTD Costs
-                                  {sortField === "Job to Date Costs" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Pending Cost Changes")}
-                                >
-                                  Pending Cost Changes
-                                  {sortField === "Pending Cost Changes" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Projected Costs")}
-                                >
-                                  Projected Costs
-                                  {sortField === "Projected Costs" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Forecast To Complete")}
-                                >
-                                  Forecast to Complete
-                                  {sortField === "Forecast To Complete" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Estimated Cost at Completion")}
-                                >
-                                  Est. at Completion
-                                  {sortField === "Estimated Cost at Completion" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                              <TableHead className="text-right w-[120px]">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 font-semibold"
-                                  onClick={() => handleSort("Projected over Under")}
-                                >
-                                  Projected Over Under
-                                  {sortField === "Projected over Under" &&
-                                    (sortDirection === "asc" ? (
-                                      <SortAsc className="ml-2 h-4 w-4" />
-                                    ) : (
-                                      <SortDesc className="ml-2 h-4 w-4" />
-                                    ))}
-                                </Button>
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {processedBudgetData.slice(0, 50).map((item, index) => (
-                              <TableRow key={index} className="hover:bg-muted/50">
-                                <TableCell className="max-w-[200px] sticky left-0 bg-background z-30">
-                                  <div className="space-y-1">
-                                    <div className="font-medium text-sm">{item["Cost Code Tier 3"]}</div>
-                                    <div className="text-xs text-muted-foreground truncate">{item["Cost Type"]}</div>
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Original Budget Amount"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  <span
-                                    className={item["Budget Modifications"] >= 0 ? "text-green-600" : "text-red-600"}
-                                  >
-                                    {item["Budget Modifications"] >= 0 ? "+" : ""}
-                                    {formatCurrency(item["Budget Modifications"])}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  <span className={item["Approved COs"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                    {item["Approved COs"] >= 0 ? "+" : ""}
-                                    {formatCurrency(item["Approved COs"])}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm font-medium">
-                                  {formatCurrency(item["Revised Budget"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  <span
-                                    className={item["Pending Budget Changes"] >= 0 ? "text-green-600" : "text-red-600"}
-                                  >
-                                    {item["Pending Budget Changes"] >= 0 ? "+" : ""}
-                                    {formatCurrency(item["Pending Budget Changes"])}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Projected Budget"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Committed Costs"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Direct Costs"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Job to Date Costs"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  <span
-                                    className={item["Pending Cost Changes"] >= 0 ? "text-green-600" : "text-red-600"}
-                                  >
-                                    {item["Pending Cost Changes"] >= 0 ? "+" : ""}
-                                    {formatCurrency(item["Pending Cost Changes"])}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Projected Costs"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Forecast To Complete"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  {formatCurrency(item["Estimated Cost at Completion"])}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  <span
-                                    className={item["Projected over Under"] >= 0 ? "text-green-600" : "text-red-600"}
-                                  >
-                                    {item["Projected over Under"] >= 0 ? "+" : ""}
-                                    {formatCurrency(item["Projected over Under"])}
-                                  </span>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                          <TableFooter>
-                            <TableRow className="bg-muted/50 font-semibold">
-                              <TableCell className="font-bold sticky left-0 bg-muted/50 z-30">Total</TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.originalBudget)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                <span
-                                  className={columnTotals.budgetModifications >= 0 ? "text-green-600" : "text-red-600"}
-                                >
-                                  {columnTotals.budgetModifications >= 0 ? "+" : ""}
-                                  {formatCurrency(columnTotals.budgetModifications)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                <span className={columnTotals.approvedCOs >= 0 ? "text-green-600" : "text-red-600"}>
-                                  {columnTotals.approvedCOs >= 0 ? "+" : ""}
-                                  {formatCurrency(columnTotals.approvedCOs)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.revisedBudget)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                <span
-                                  className={columnTotals.pendingBudgetChanges >= 0 ? "text-green-600" : "text-red-600"}
-                                >
-                                  {columnTotals.pendingBudgetChanges >= 0 ? "+" : ""}
-                                  {formatCurrency(columnTotals.pendingBudgetChanges)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.projectedBudget)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.committedCosts)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.directCosts)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.jtdCosts)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                <span
-                                  className={columnTotals.pendingCostChanges >= 0 ? "text-green-600" : "text-red-600"}
-                                >
-                                  {columnTotals.pendingCostChanges >= 0 ? "+" : ""}
-                                  {formatCurrency(columnTotals.pendingCostChanges)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.projectedCosts)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.forecastToComplete)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                {formatCurrency(columnTotals.estimatedAtCompletion)}
-                              </TableCell>
-                              <TableCell className="text-right font-mono text-sm font-bold">
-                                <span
-                                  className={columnTotals.projectedOverUnder >= 0 ? "text-green-600" : "text-red-600"}
-                                >
-                                  {columnTotals.projectedOverUnder >= 0 ? "+" : ""}
-                                  {formatCurrency(columnTotals.projectedOverUnder)}
-                                </span>
-                              </TableCell>
-                            </TableRow>
-                          </TableFooter>
-                        </Table>
-                      </div>
-                    </div>
-
-                    {processedBudgetData.length > 50 && (
-                      <div className="mt-4 text-center">
-                        <Badge variant="secondary">Showing first 50 of {processedBudgetData.length} items</Badge>
-                      </div>
-                    )}
-                  </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -463,8 +463,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               </Popover>
             )}
 
-            {/* Row 3: Tour Carousel Badge */}
-            {isPresentationMode && availableCarousels.length > 0 && (
+            {/* Row 3: Tour Carousel Badge - Hidden */}
+            {/* Tour Carousel Badge and Menu functionality commented out */}
+            {false && isPresentationMode && availableCarousels.length > 0 && (
               <Popover open={carouselPopoverOpen} onOpenChange={setCarouselPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button

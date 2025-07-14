@@ -9,7 +9,10 @@
  * Introduces users to the unified project workspace and its capabilities.
  */
 
+"use client"
+
 import React from "react"
+import { motion } from "framer-motion"
 import { PresentationSlide } from "./PresentationCarousel"
 import { Building, Layers, Users, Target, Zap, Eye, ArrowRight, CheckCircle, Sparkles } from "lucide-react"
 
@@ -18,91 +21,58 @@ export const projectPageSlides: PresentationSlide[] = [
     id: "project-page-overview",
     title: "Project Page Overview",
     content: (
-      <div className="space-y-3 py-1">
-        <div className="flex justify-center mb-2">
-          <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm shadow-lg">
-            <Building className="h-8 w-8 text-blue-300" />
-          </div>
-        </div>
+      <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
+        {/* Background Icon Overlay */}
+        <Building className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
-        <div className="text-center">
-          <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">One Workspace for Everything</h2>
-          <p className="text-base lg:text-lg text-white/90 leading-relaxed">
-            This central hub organizes every project activity—from preconstruction to closeout—into an elegant, modular
-            workspace.
-          </p>
-        </div>
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-full">
+          <motion.p
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <strong>Project Page</strong> transforms scattered project management by providing{" "}
+            <strong>one unified workspace that connects every team, tool, and workflow</strong> from preconstruction
+            through closeout with role-based customization.
+          </motion.p>
 
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-          <p className="text-sm lg:text-base text-white/90 leading-relaxed">
-            The Project Page is designed to offer total visibility, with structured views for financials, procurement,
-            staffing, and field performance—all customized per role.
-          </p>
-        </div>
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Instead of juggling multiple systems, SharePoint sites, and disconnected tools,{" "}
+            <strong>everything is consolidated into one intelligent interface</strong> that adapts to your role and
+            provides the exact information you need when you need it.
+          </motion.p>
 
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-          <p className="text-sm lg:text-base text-white/90 leading-relaxed">
-            Whether you're a Project Manager, Executive, Estimator, or Coordinator, this page connects every team and
-            tool.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-2">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 border border-white/20">
-            <div className="flex items-start space-x-2">
-              <Layers className="h-4 w-4 text-blue-300 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-white text-xs">Unifies all project tools and insights</h3>
-                <p className="text-xs text-white/80">into one location</p>
-              </div>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">🏗️</div>
+              <div className="font-medium text-white">Unified Workspace</div>
+              <div className="text-xs text-blue-200">Complete project lifecycle in one location</div>
             </div>
-          </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 border border-white/20">
-            <div className="flex items-start space-x-2">
-              <ArrowRight className="h-4 w-4 text-green-300 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-white text-xs">Enables seamless transitions</h3>
-                <p className="text-xs text-white/80">between phases of work</p>
-              </div>
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">🎯</div>
+              <div className="font-medium text-white">Role-Based Views</div>
+              <div className="text-xs text-blue-200">Customized features for each team member</div>
             </div>
-          </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 border border-white/20">
-            <div className="flex items-start space-x-2">
-              <Users className="h-4 w-4 text-purple-300 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-white text-xs">Context-aware tabs</h3>
-                <p className="text-xs text-white/80">provide the right features to the right people</p>
-              </div>
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">⚡</div>
+              <div className="font-medium text-white">Smart Navigation</div>
+              <div className="text-xs text-blue-200">Seamless transitions between project phases</div>
             </div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 border border-white/20">
-            <div className="flex items-start space-x-2">
-              <Zap className="h-4 w-4 text-yellow-300 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-white text-xs">
-                  Optimized for speed, visibility, and decision-making
-                </h3>
-                <p className="text-xs text-white/80">with HBI</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 max-w-xl mx-auto mt-2 w-full">
-          <div className="flex items-center justify-center mb-2">
-            <Building className="h-6 w-6 text-blue-300 mr-2" />
-            <h3 className="text-lg font-bold text-blue-300">Your Project Command Center</h3>
-          </div>
-          <p className="text-base text-white/90 mb-2">
-            <strong>Unified workspace. Intelligent insights. Built for project excellence.</strong>
-          </p>
-          <div className="flex items-center justify-center">
-            <Sparkles className="h-4 w-4 text-yellow-300 mr-2" />
-            <span className="text-sm font-bold text-yellow-300">Ready to explore your project's complete story</span>
-          </div>
+          </motion.div>
         </div>
       </div>
     ),
