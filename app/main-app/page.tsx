@@ -32,6 +32,7 @@ import { PresentationCarousel } from "../../components/presentation/Presentation
 import { PreconCarousel } from "../../components/presentation/PreconCarousel"
 import { FinancialCarousel } from "../../components/presentation/FinancialCarousel"
 import { FieldManagementCarousel } from "../../components/presentation/FieldManagementCarousel"
+import { ComplianceCarousel } from "../../components/presentation/ComplianceCarousel"
 import intelTourSlides from "../../components/presentation/intelTourSlides"
 import { useRouter } from "next/navigation"
 import {
@@ -222,6 +223,7 @@ export default function MainApplicationPage() {
   const [showPreconCarousel, setShowPreconCarousel] = useState(false)
   const [showFinancialCarousel, setShowFinancialCarousel] = useState(false)
   const [showFieldManagementCarousel, setShowFieldManagementCarousel] = useState(false)
+  const [showComplianceCarousel, setShowComplianceCarousel] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -518,6 +520,14 @@ export default function MainApplicationPage() {
         setShowFieldManagementCarousel(true)
       }, 2000)
     }
+
+    // Check if user is in presentation mode and selected "compliance" tab
+    if (isPresentationMode && tabId === "compliance") {
+      // Trigger Compliance carousel with 2-second delay
+      setTimeout(() => {
+        setShowComplianceCarousel(true)
+      }, 2000)
+    }
   }
 
   const handleIntelTourComplete = () => {
@@ -554,6 +564,15 @@ export default function MainApplicationPage() {
     console.log("🏁 Field Management Carousel: Tour completed")
     // Hide the Field Management carousel
     setShowFieldManagementCarousel(false)
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleComplianceCarouselComplete = () => {
+    console.log("🏁 Compliance Carousel: Tour completed")
+    // Hide the Compliance carousel
+    setShowComplianceCarousel(false)
 
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -1382,6 +1401,18 @@ export default function MainApplicationPage() {
             return null
           })()}
           <FieldManagementCarousel onComplete={handleFieldManagementCarouselComplete} />
+        </>
+      )}
+
+      {/* Compliance Carousel - Overlays entire dashboard for presentation users */}
+      {/* Uses standard ComplianceCarousel with Compliance slides for consistency */}
+      {showComplianceCarousel && (
+        <>
+          {(() => {
+            console.log("🎬 Compliance Carousel: Rendering ComplianceCarousel")
+            return null
+          })()}
+          <ComplianceCarousel onComplete={handleComplianceCarouselComplete} />
         </>
       )}
     </div>
