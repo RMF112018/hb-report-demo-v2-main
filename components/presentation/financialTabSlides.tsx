@@ -421,9 +421,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>HBI AI-Powered Forecasting</strong> revolutionizes financial planning by leveraging{" "}
+            <strong>HBI AI-Powered Forecasting</strong> assists users in reviewing and grading forecasts by leveraging{" "}
             <strong>proprietary machine learning algorithms, historical project data, and market intelligence</strong>
-            to provide unprecedented accuracy in project financial predictions and risk assessment.
+            to provide intelligent insights that help users make better financial decisions and risk assessments.
           </motion.p>
 
           <motion.p
@@ -433,8 +433,10 @@ export const financialTabSlides: PresentationSlide[] = [
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Instead of relying on static financial projections and manual analysis,{" "}
-            <strong>HBI's intelligent system continuously learns from project outcomes</strong> and adapts forecasts in
-            real-time, providing construction-specific insights that generic financial tools cannot match.
+            <strong>
+              HBI's intelligent system analyzes all available data to help users evaluate forecast accuracy
+            </strong>
+            , providing construction-specific insights and recommendations that generic financial tools cannot match.
           </motion.p>
 
           <motion.div
@@ -446,19 +448,21 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🤖</div>
               <div className="font-medium text-white">HBI Intelligence</div>
-              <div className="text-xs text-indigo-200">Proprietary AI trained on construction project data</div>
+              <div className="text-xs text-indigo-200">AI-powered analysis to help users evaluate forecast quality</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
-              <div className="font-medium text-white">Predictive Analytics</div>
-              <div className="text-xs text-indigo-200">Advanced forecasting with seasonal and market adjustments</div>
+              <div className="font-medium text-white">Data-Driven Insights</div>
+              <div className="text-xs text-indigo-200">Comprehensive analytics to support user decision-making</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
-              <div className="font-medium text-white">Risk Assessment</div>
-              <div className="text-xs text-indigo-200">Intelligent risk scoring and mitigation recommendations</div>
+              <div className="font-medium text-white">Review Assistance</div>
+              <div className="text-xs text-indigo-200">
+                Intelligent tools to help users grade and validate forecasts
+              </div>
             </div>
           </motion.div>
         </div>

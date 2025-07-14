@@ -49,7 +49,7 @@ import {
 } from "lucide-react"
 
 // Import Quality Control Components
-import QualityProjectContent from "../QualityProjectContent"
+import QualityProjectContent from "./QualityProjectContent"
 import { QCProgramGenerator } from "@/components/quality/QCProgramGenerator"
 import { QCMilestoneLinker } from "@/components/quality/QCMilestoneLinker"
 import { QCReviewWorkflow } from "@/components/quality/QCReviewWorkflow"

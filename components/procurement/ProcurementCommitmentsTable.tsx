@@ -1,15 +1,15 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
+import { ProtectedGrid, ProtectedColDef, GridRow, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
 import {
   Building2,
   Search,
@@ -397,6 +397,235 @@ export function ProcurementCommitmentsTable({
     filteredCommitments.reduce((sum, commitment) => sum + commitment.completionPercent, 0) /
       filteredCommitments.length || 0
 
+  // Transform commitments data for the grid
+  const transformedCommitments = useMemo(() => {
+    return filteredCommitments.map((commitment) => ({
+      id: commitment.id,
+      commitment_info: commitment.title,
+      vendor_name: commitment.vendor.name,
+      commitment_number: commitment.number,
+      trade: commitment.trade,
+      status: commitment.status,
+      contract_amount: commitment.contractAmount,
+      original_amount: commitment.originalAmount,
+      variance: commitment.variance,
+      variance_percent: commitment.variancePercent,
+      completion_percent: commitment.completionPercent,
+      sync_status: commitment.procoreSyncStatus,
+      procore_id: commitment.procoreId,
+      start_date: commitment.startDate,
+      end_date: commitment.endDate,
+      vendor_contact: commitment.vendor.contact,
+      vendor_phone: commitment.vendor.phone,
+      change_orders: commitment.changeOrders,
+      current_balance: commitment.currentBalance,
+      bond_required: commitment.bondRequired,
+      insurance_verified: commitment.insuranceVerified,
+      last_sync_date: commitment.lastSyncDate,
+      _originalData: commitment, // Keep reference to original data
+    }))
+  }, [filteredCommitments])
+
+  // Define column definitions for the grid
+  const columnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "commitment_info",
+        headerName: "Commitment / Vendor",
+        width: 280,
+        cellRenderer: (params: any) => {
+          const commitment = params.data._originalData
+          return (
+            <div className="cursor-pointer py-1" onClick={() => handleCommitmentClick(commitment)}>
+              <div className="font-medium text-sm leading-tight">{commitment.title}</div>
+              <div className="text-xs text-gray-500 mt-1">{commitment.vendor.name}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{commitment.number}</div>
+            </div>
+          )
+        },
+        pinned: "left",
+      },
+      {
+        field: "trade",
+        headerName: "Trade",
+        width: 120,
+        cellRenderer: (params: any) => (
+          <Badge variant="outline" className="text-xs">
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const statusConfig: { [key: string]: { color: string; label: string } } = {
+            draft: { color: "bg-gray-100 text-gray-800 border-gray-200", label: "Draft" },
+            pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending" },
+            approved: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "Approved" },
+            executed: { color: "bg-green-100 text-green-800 border-green-200", label: "Executed" },
+            complete: { color: "bg-purple-100 text-purple-800 border-purple-200", label: "Complete" },
+            cancelled: { color: "bg-red-100 text-red-800 border-red-200", label: "Cancelled" },
+          }
+          const config = statusConfig[params.value] || statusConfig.draft
+          return (
+            <Badge variant="outline" className={`${config.color} text-xs`}>
+              {config.label}
+            </Badge>
+          )
+        },
+      },
+      {
+        field: "contract_amount",
+        headerName: "Contract Amount",
+        width: 140,
+        type: "numericColumn",
+        cellRenderer: (params: any) => {
+          const commitment = params.data._originalData
+          return (
+            <div className="text-right">
+              <div className="font-medium text-sm">{formatCurrency(commitment.contractAmount)}</div>
+              {commitment.originalAmount !== commitment.contractAmount && (
+                <div className="text-xs text-gray-500">Original: {formatCurrency(commitment.originalAmount)}</div>
+              )}
+            </div>
+          )
+        },
+      },
+      {
+        field: "variance",
+        headerName: "Variance",
+        width: 120,
+        type: "numericColumn",
+        cellRenderer: (params: any) => {
+          const commitment = params.data._originalData
+          const varianceColor =
+            commitment.variance === 0 ? "text-gray-600" : commitment.variance > 0 ? "text-red-600" : "text-green-600"
+          const varianceIcon =
+            commitment.variance === 0 ? null : commitment.variance > 0 ? (
+              <TrendingUp className="h-3 w-3" />
+            ) : (
+              <TrendingDown className="h-3 w-3" />
+            )
+
+          return (
+            <div className="text-right">
+              <div className={`flex items-center justify-end gap-1 ${varianceColor}`}>
+                {varianceIcon}
+                <span className="font-medium text-sm">
+                  {commitment.variance > 0 ? "+" : ""}
+                  {formatCurrency(commitment.variance)}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                {commitment.variancePercent > 0 ? "+" : ""}
+                {commitment.variancePercent.toFixed(1)}%
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        field: "completion_percent",
+        headerName: "Completion",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const commitment = params.data._originalData
+          return (
+            <div className="px-2">
+              <Progress value={commitment.completionPercent} className="h-2 mb-1" />
+              <div className="text-xs text-center">{commitment.completionPercent}%</div>
+            </div>
+          )
+        },
+      },
+      {
+        field: "sync_status",
+        headerName: "Sync Status",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const syncConfig: { [key: string]: { color: string; label: string; icon: React.ReactNode } } = {
+            synced: {
+              color: "bg-green-100 text-green-800 border-green-200",
+              label: "Synced",
+              icon: <CheckCircle className="h-3 w-3" />,
+            },
+            pending: {
+              color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+              label: "Pending",
+              icon: <Clock className="h-3 w-3" />,
+            },
+            error: {
+              color: "bg-red-100 text-red-800 border-red-200",
+              label: "Error",
+              icon: <AlertTriangle className="h-3 w-3" />,
+            },
+          }
+          const config = syncConfig[params.value] || syncConfig.pending
+          return (
+            <Badge variant="outline" className={`${config.color} text-xs`}>
+              {config.icon}
+              <span className="ml-1">{config.label}</span>
+            </Badge>
+          )
+        },
+      },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const commitment = params.data._originalData
+          return (
+            <div className="flex items-center gap-1">
+              <Button size="sm" variant="outline" onClick={() => handleCommitmentClick(commitment)}>
+                <Eye className="h-3 w-3" />
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => onCommitmentEdit && onCommitmentEdit(commitment)}>
+                <Edit className="h-3 w-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => window.open(`https://app.procore.com/commitments/${commitment.procoreId}`, "_blank")}
+              >
+                <ArrowUpRight className="h-3 w-3" />
+              </Button>
+            </div>
+          )
+        },
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    [handleCommitmentClick, onCommitmentEdit]
+  )
+
+  // Grid configuration
+  const gridConfig = createGridWithTotalsAndSticky(2, false, {
+    allowExport: true,
+    allowRowSelection: true,
+    allowMultiSelection: true,
+    allowColumnReordering: false,
+    allowColumnResizing: true,
+    allowSorting: true,
+    allowFiltering: true,
+    allowCellEditing: false,
+    showToolbar: true,
+    showStatusBar: true,
+    userRole,
+    theme: "quartz",
+  })
+
+  // Handle row selection
+  const handleRowSelection = (event: any) => {
+    const selectedNodes = event.api.getSelectedNodes()
+    const selectedIds = selectedNodes.map((node: any) => node.data.id)
+    setSelectedCommitments(selectedIds)
+  }
+
   if (loading) {
     return (
       <Card>
@@ -469,7 +698,7 @@ export function ProcurementCommitmentsTable({
         </div>
       )}
 
-      {/* Commitments Table */}
+      {/* Commitments Grid */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -558,119 +787,23 @@ export function ProcurementCommitmentsTable({
             </Button>
           </div>
 
-          {/* Table */}
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={selectedCommitments.length === filteredCommitments.length}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedCommitments(filteredCommitments.map((c) => c.id))
-                        } else {
-                          setSelectedCommitments([])
-                        }
-                      }}
-                    />
-                  </TableHead>
-                  <TableHead>Commitment / Vendor</TableHead>
-                  <TableHead>Trade</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Contract Amount</TableHead>
-                  <TableHead className="text-right">Variance</TableHead>
-                  <TableHead className="text-center">Completion</TableHead>
-                  <TableHead className="text-center">Sync Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCommitments.map((commitment) => (
-                  <TableRow key={commitment.id} className="hover:bg-gray-50">
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedCommitments.includes(commitment.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedCommitments([...selectedCommitments, commitment.id])
-                          } else {
-                            setSelectedCommitments(selectedCommitments.filter((id) => id !== commitment.id))
-                          }
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="cursor-pointer" onClick={() => handleCommitmentClick(commitment)}>
-                        <div className="font-medium">{commitment.title}</div>
-                        <div className="text-sm text-gray-500">{commitment.vendor.name}</div>
-                        <div className="text-xs text-gray-400">{commitment.number}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{commitment.trade}</Badge>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(commitment.status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="font-medium">{formatCurrency(commitment.contractAmount)}</div>
-                      {commitment.originalAmount !== commitment.contractAmount && (
-                        <div className="text-xs text-gray-500">
-                          Original: {formatCurrency(commitment.originalAmount)}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div
-                        className={`flex items-center justify-end gap-1 ${getVarianceColor(
-                          commitment.variance,
-                          commitment.variancePercent
-                        )}`}
-                      >
-                        {getVarianceIcon(commitment.variance)}
-                        <span className="font-medium">
-                          {commitment.variance > 0 ? "+" : ""}
-                          {formatCurrency(commitment.variance)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {commitment.variancePercent > 0 ? "+" : ""}
-                        {commitment.variancePercent.toFixed(1)}%
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="w-full space-y-1">
-                        <Progress value={commitment.completionPercent} className="h-2" />
-                        <span className="text-sm">{commitment.completionPercent}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">{getSyncStatusBadge(commitment.procoreSyncStatus)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleCommitmentClick(commitment)}>
-                          <Eye className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onCommitmentEdit && onCommitmentEdit(commitment)}
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            window.open(`https://app.procore.com/commitments/${commitment.procoreId}`, "_blank")
-                          }
-                        >
-                          <ArrowUpRight className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          {/* Protected Grid */}
+          <div className="min-w-0 max-w-full overflow-hidden">
+            <ProtectedGrid
+              columnDefs={columnDefs}
+              rowData={transformedCommitments}
+              config={gridConfig}
+              events={{
+                onRowSelected: handleRowSelection,
+                onGridReady: (event) => {
+                  // Grid ready event
+                },
+              }}
+              height="600px"
+              loading={loading}
+              enableSearch={false} // We handle search externally
+              title=""
+            />
           </div>
 
           {filteredCommitments.length === 0 && (
