@@ -366,7 +366,7 @@ export function ProtectedGrid({
       defaultColDef: {
         flex: 1,
         minWidth: 100,
-        maxWidth: 300, // Prevent columns from growing too wide
+        // Remove maxWidth to allow columns to grow as needed for horizontal scrolling
         resizable: defaultConfig.allowColumnResizing,
         sortable: defaultConfig.allowSorting,
         filter: defaultConfig.allowFiltering,
@@ -384,7 +384,7 @@ export function ProtectedGrid({
         : undefined,
       cellSelection: defaultConfig.enableRangeSelection,
       suppressMovableColumns: !defaultConfig.allowColumnReordering,
-      suppressHorizontalScroll: true, // Let parent container handle horizontal scrolling
+      suppressHorizontalScroll: false, // Enable horizontal scrolling within the grid
       maintainColumnOrder: true, // Prevent column reordering that could affect width calculations
       getRowStyle: (params) => {
         const isDark = theme === "dark"
@@ -574,7 +574,7 @@ export function ProtectedGrid({
           getGridThemeClass(),
           "border-border", // Ensure borders match theme
           theme === "dark" ? "ag-grid-dark-theme" : "ag-grid-light-theme",
-          "w-full min-w-0 max-w-full overflow-hidden" // Add overflow constraints
+          "w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden" // Enable horizontal scrolling
         )}
         style={
           {

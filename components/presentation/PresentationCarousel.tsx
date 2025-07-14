@@ -309,7 +309,6 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
             </div>
             <div>
               <h1 className="text-xl lg:text-2xl font-bold text-white">Hedrick Brothers Construction</h1>
-              <p className="text-blue-200 text-sm lg:text-base">HB Report Presentation</p>
             </div>
           </div>
 
@@ -478,7 +477,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
-            <p className="text-lg font-medium">Launching HB Report...</p>
+            <p className="text-lg font-medium">Launching HB Intel...</p>
           </div>
         </motion.div>
       )}

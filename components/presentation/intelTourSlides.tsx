@@ -32,7 +32,7 @@ import {
 export const intelTourSlides: PresentationSlide[] = [
   {
     id: "welcome",
-    title: "Welcome to HB Intel v3.0",
+    title: "Welcome to HB Intel",
     content: (
       <div className="space-y-6">
         {/* Icon integrated into content */}

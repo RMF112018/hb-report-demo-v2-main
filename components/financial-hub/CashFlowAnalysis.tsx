@@ -19,7 +19,6 @@ import {
   ArrowDownRight,
   Banknote,
   Building2,
-  Users,
   HandCoins,
   Timer,
   Zap,
@@ -40,6 +39,7 @@ import { FullscreenToggle } from "@/components/ui/fullscreen-toggle"
 import { CollapseWrapper } from "@/components/ui/collapse-wrapper"
 import { useFinancialHubStore } from "@/hooks/use-financial-hub-store"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ProtectedGrid, createReadOnlyColumn, GridRow, ProtectedColDef } from "@/components/ui/protected-grid"
 import {
   AreaChart,
   Area,
@@ -104,6 +104,190 @@ const outflowBreakdown = [
   { name: "Overhead", value: 265293.62, color: "#84cc16", percentage: 5.9 },
 ]
 
+// Mock data for pay applications grid
+const payApplicationsData = [
+  {
+    id: "001",
+    payAppNumber: "001",
+    month: "Jan 24",
+    submitted: "01/05/2024",
+    approved: "01/12/2024",
+    approvedTotal: 425000,
+    paid: "01/20/2024",
+    receivable: 382500, // 90% of approved total
+    payableSub: 191250, // ~50% of receivable
+    payableGCGR: 61200, // ~16% of receivable
+    fee: 17993, // 4.7% of receivable
+    other: 15300, // contingency/retention release
+    netDelta: 96757, // receivable - (payableSub + payableGCGR + fee + other)
+  },
+  {
+    id: "002",
+    payAppNumber: "002",
+    month: "Feb 24",
+    submitted: "02/05/2024",
+    approved: "02/13/2024",
+    approvedTotal: 398000,
+    paid: "02/22/2024",
+    receivable: 358200,
+    payableSub: 179100,
+    payableGCGR: 57312,
+    fee: 16836,
+    other: 12500,
+    netDelta: 92452,
+  },
+  {
+    id: "003",
+    payAppNumber: "003",
+    month: "Mar 24",
+    submitted: "03/05/2024",
+    approved: "03/14/2024",
+    approvedTotal: 467000,
+    paid: "03/25/2024",
+    receivable: 420300,
+    payableSub: 210150,
+    payableGCGR: 67248,
+    fee: 24634,
+    other: 18750,
+    netDelta: 99518,
+  },
+  {
+    id: "004",
+    payAppNumber: "004",
+    month: "Apr 24",
+    submitted: "04/05/2024",
+    approved: "04/15/2024",
+    approvedTotal: 523000,
+    paid: "04/24/2024",
+    receivable: 470700,
+    payableSub: 235350,
+    payableGCGR: 75312,
+    fee: 29071,
+    other: 22100,
+    netDelta: 108867,
+  },
+  {
+    id: "005",
+    payAppNumber: "005",
+    month: "May 24",
+    submitted: "05/05/2024",
+    approved: "05/16/2024",
+    approvedTotal: 612000,
+    paid: "05/26/2024",
+    receivable: 550800,
+    payableSub: 275400,
+    payableGCGR: 88128,
+    fee: 34999,
+    other: 27500,
+    netDelta: 124773,
+  },
+  {
+    id: "006",
+    payAppNumber: "006",
+    month: "Jun 24",
+    submitted: "06/05/2024",
+    approved: "06/17/2024",
+    approvedTotal: 578000,
+    paid: "06/27/2024",
+    receivable: 520200,
+    payableSub: 260100,
+    payableGCGR: 83232,
+    fee: 35889,
+    other: 24750,
+    netDelta: 116229,
+  },
+  {
+    id: "007",
+    payAppNumber: "007",
+    month: "Jul 24",
+    submitted: "07/05/2024",
+    approved: "07/18/2024",
+    approvedTotal: 634000,
+    paid: "07/28/2024",
+    receivable: 570600,
+    payableSub: 285300,
+    payableGCGR: 91296,
+    fee: 28530,
+    other: 31200,
+    netDelta: 134274,
+  },
+  {
+    id: "008",
+    payAppNumber: "008",
+    month: "Aug 24",
+    submitted: "08/05/2024",
+    approved: "08/19/2024",
+    approvedTotal: 689000,
+    paid: "08/29/2024",
+    receivable: 620100,
+    payableSub: 310050,
+    payableGCGR: 99216,
+    fee: 38246,
+    other: 28900,
+    netDelta: 143688,
+  },
+  {
+    id: "009",
+    payAppNumber: "009",
+    month: "Sep 24",
+    submitted: "09/05/2024",
+    approved: "09/20/2024",
+    approvedTotal: 742000,
+    paid: "09/30/2024",
+    receivable: 667800,
+    payableSub: 333900,
+    payableGCGR: 106848,
+    fee: 39268,
+    other: 35100,
+    netDelta: 152684,
+  },
+  {
+    id: "010",
+    payAppNumber: "010",
+    month: "Oct 24",
+    submitted: "10/05/2024",
+    approved: "10/21/2024",
+    approvedTotal: 798000,
+    paid: "10/31/2024",
+    receivable: 718200,
+    payableSub: 359100,
+    payableGCGR: 114912,
+    fee: 49555,
+    other: 38750,
+    netDelta: 155883,
+  },
+  {
+    id: "011",
+    payAppNumber: "011",
+    month: "Nov 24",
+    submitted: "11/05/2024",
+    approved: "11/22/2024",
+    approvedTotal: 856000,
+    paid: "12/02/2024",
+    receivable: 770400,
+    payableSub: 385200,
+    payableGCGR: 123264,
+    fee: 53158,
+    other: 42500,
+    netDelta: 166278,
+  },
+  {
+    id: "012",
+    payAppNumber: "012",
+    month: "Dec 24",
+    submitted: "12/05/2024",
+    approved: "12/23/2024",
+    approvedTotal: 923000,
+    paid: "01/03/2025",
+    receivable: 830700,
+    payableSub: 415350,
+    payableGCGR: 132912,
+    fee: 57318,
+    other: 46250,
+    netDelta: 178870,
+  },
+]
+
 type ViewMode = "overview" | "inflow" | "outflow" | "forecast"
 
 export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnalysisProps) {
@@ -157,6 +341,139 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
     cumulative: month.cumulativeCashFlow,
     workingCapital: month.workingCapital,
   }))
+
+  // Convert pay applications data to GridRow format
+  const payApplicationsGridData: GridRow[] = useMemo(() => {
+    return payApplicationsData.map((item) => ({
+      id: item.id,
+      payAppNumber: item.payAppNumber,
+      month: item.month,
+      submitted: item.submitted,
+      approved: item.approved,
+      approvedTotal: item.approvedTotal,
+      paid: item.paid,
+      receivable: item.receivable,
+      payableSub: item.payableSub,
+      payableGCGR: item.payableGCGR,
+      fee: item.fee,
+      other: item.other,
+      netDelta: item.netDelta,
+    }))
+  }, [])
+
+  // Create column definitions for pay applications grid
+  const payApplicationsColumnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      createReadOnlyColumn("payAppNumber", "Pay App #", {
+        width: 100,
+        pinned: "left",
+        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+      }),
+      createReadOnlyColumn("month", "Month", {
+        width: 100,
+        pinned: "left",
+      }),
+      createReadOnlyColumn("submitted", "Submitted", {
+        width: 120,
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("approved", "Approved", {
+        width: 120,
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("approvedTotal", "Approved Total", {
+        width: 140,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+      }),
+      createReadOnlyColumn("paid", "Paid", {
+        width: 120,
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("receivable", "Receivable", {
+        width: 130,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", color: "#16a34a", fontWeight: "500" },
+      }),
+      createReadOnlyColumn("payableSub", "Payable - Sub", {
+        width: 140,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", color: "#dc2626" },
+      }),
+      createReadOnlyColumn("payableGCGR", "Payable - GC GR", {
+        width: 150,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", color: "#dc2626" },
+      }),
+      createReadOnlyColumn("fee", "Fee", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", color: "#7c3aed" },
+      }),
+      createReadOnlyColumn("other", "Other", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", color: "#ea580c" },
+      }),
+      createReadOnlyColumn("netDelta", "Net Delta", {
+        width: 130,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const style: any = { fontFamily: "monospace", fontWeight: "bold" }
+          if (typeof value === "number") {
+            style.color = value >= 0 ? "#16a34a" : "#dc2626"
+          }
+          return style
+        },
+      }),
+    ],
+    []
+  )
+
+  // Custom totals calculator for pay applications
+  const payApplicationsTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+    if (columnField === "payAppNumber") return "Totals"
+    if (["month", "submitted", "approved", "paid"].includes(columnField)) return ""
+
+    const values = data
+      .map((row) => {
+        const value = row[columnField]
+        return typeof value === "number" && !isNaN(value) ? value : 0
+      })
+      .filter((val) => typeof val === "number" && !isNaN(val))
+
+    if (values.length === 0) return 0
+    return values.reduce((sum, val) => sum + val, 0)
+  }
 
   const ViewToggle = () => (
     <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
@@ -307,97 +624,50 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
               </Card>
             </div>
 
-            {/* 4. Monthly Owner vs Vendor Payments Table */}
+            {/* 4. Pay Applications Grid */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-600" />
-                  Monthly Owner vs Vendor Payments
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  Payment Applications
                 </CardTitle>
-                <CardDescription>
-                  Comparison of owner payments received vs vendor/subcontractor payments made
-                </CardDescription>
+                <CardDescription>Detailed breakdown of payment applications, receivables, and payables</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left p-3 font-medium">Month</th>
-                        <th className="text-right p-3 font-medium">Owner Payments</th>
-                        <th className="text-right p-3 font-medium">Vendor/Sub Payments</th>
-                        <th className="text-right p-3 font-medium">Net Delta</th>
-                        <th className="text-right p-3 font-medium">% Variance</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ownerVendorComparison.map((row, index) => (
-                        <tr
-                          key={index}
-                          className={`border-b border-border/50 ${
-                            row.isSignificantSpread ? "bg-amber-50 dark:bg-amber-950/20" : ""
-                          }`}
-                        >
-                          <td className="p-3 font-medium">{row.month}</td>
-                          <td className="p-3 text-right text-green-600 dark:text-green-400">
-                            {formatCurrency(row.ownerPayments)}
-                          </td>
-                          <td className="p-3 text-right text-red-600 dark:text-red-400">
-                            {formatCurrency(row.vendorSubPayments)}
-                          </td>
-                          <td
-                            className={`p-3 text-right font-medium ${
-                              row.netDelta >= 0
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-red-600 dark:text-red-400"
-                            }`}
-                          >
-                            {row.netDelta >= 0 ? "+" : ""}
-                            {formatCurrency(row.netDelta)}
-                          </td>
-                          <td
-                            className={`p-3 text-right font-medium ${
-                              row.percentVariance >= 0
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-red-600 dark:text-red-400"
-                            }`}
-                          >
-                            {row.percentVariance >= 0 ? "+" : ""}
-                            {row.percentVariance.toFixed(1)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.ownerPayments, 0))}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Total Owner Payments</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.vendorSubPayments, 0))}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Total Vendor/Sub Payments</p>
-                  </div>
-                  <div className="text-center">
-                    <div
-                      className={`text-2xl font-bold ${
-                        ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0) >= 0
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {formatCurrency(ownerVendorComparison.reduce((sum, row) => sum + row.netDelta, 0))}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Net Delta</p>
-                  </div>
-                </div>
+                <ProtectedGrid
+                  title="Payment Applications Analysis"
+                  columnDefs={payApplicationsColumnDefs}
+                  rowData={payApplicationsGridData}
+                  height="600px"
+                  config={{
+                    allowExport: true,
+                    allowImport: false,
+                    allowRowSelection: false,
+                    allowMultiSelection: false,
+                    allowColumnReordering: false,
+                    allowColumnResizing: true,
+                    allowSorting: true,
+                    allowFiltering: true,
+                    allowCellEditing: false,
+                    showToolbar: true,
+                    showStatusBar: true,
+                    enableRangeSelection: false,
+                    protectionEnabled: true,
+                    userRole: userRole,
+                    theme: "quartz",
+                    enableTotalsRow: true,
+                    stickyColumnsCount: 2, // Pin first two columns (Pay App # and Month)
+                  }}
+                  events={{
+                    onGridReady: (event) => {
+                      // Auto-size columns to fit content
+                      event.api.autoSizeAllColumns()
+                    },
+                  }}
+                  enableSearch={true}
+                  totalsCalculator={payApplicationsTotalsCalculator}
+                  className="border rounded-lg"
+                />
               </CardContent>
             </Card>
 

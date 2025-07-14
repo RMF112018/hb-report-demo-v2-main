@@ -1,10 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   ProtectedGrid,
@@ -13,7 +10,7 @@ import {
   GridRow,
   ProtectedColDef,
 } from "@/components/ui/protected-grid"
-import { Filter, Download, DollarSign, TrendingUp, Calculator, Percent, Building2, Activity } from "lucide-react"
+// Icons removed as they are not used in this component
 
 // Import mock data
 import jchrData from "@/data/mock/financial/jchr.json"
@@ -110,8 +107,8 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
     }
   }, [currentProject])
 
-  // Create tree data structure for ProtectedGrid
-  const treeData = useMemo(() => {
+  // Create flattened data structure for ProtectedGrid
+  const gridData = useMemo(() => {
     if (!currentProject) return []
 
     const filteredItems = currentProject.jobCostItems.filter((item) => {
@@ -133,16 +130,16 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
       divisions[division].push(item)
     })
 
-    // Create tree structure
-    const treeRows: GridRow[] = []
+    // Create flattened structure with division totals and items
+    const flatRows: GridRow[] = []
 
     Object.entries(divisions).forEach(([divisionKey, items]) => {
       // Calculate division totals
       const divisionTotals = {
-        budget: items.reduce((sum, item) => sum + item.budgetAmount, 0),
-        actual: items.reduce((sum, item) => sum + item.actualCost, 0),
-        commitments: items.reduce((sum, item) => sum + item.commitments, 0),
-        variance: items.reduce((sum, item) => sum + item.variance, 0),
+        budget: items.reduce((sum, item) => sum + (item.budgetAmount || 0), 0),
+        actual: items.reduce((sum, item) => sum + (item.actualCost || 0), 0),
+        commitments: items.reduce((sum, item) => sum + (item.commitments || 0), 0),
+        variance: items.reduce((sum, item) => sum + (item.variance || 0), 0),
       }
 
       // Division parent row
@@ -151,16 +148,15 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
         costCode: `Division ${divisionKey}`,
         description: `Division ${divisionKey} Total`,
         category: "",
-        budgetAmount: divisionTotals.budget,
-        actualCost: divisionTotals.actual,
-        commitments: divisionTotals.commitments,
-        variance: divisionTotals.variance,
+        budgetAmount: divisionTotals.budget || 0,
+        actualCost: divisionTotals.actual || 0,
+        commitments: divisionTotals.commitments || 0,
+        variance: divisionTotals.variance || 0,
         percentComplete: divisionTotals.budget > 0 ? (divisionTotals.actual / divisionTotals.budget) * 100 : 0,
         lastUpdated: "",
-        orgHierarchy: [divisionKey],
         _isDivisionRow: true,
       }
-      treeRows.push(divisionRow)
+      flatRows.push(divisionRow)
 
       // Add child items
       items.forEach((item) => {
@@ -170,20 +166,19 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
           costCode: item.costCode,
           description: item.description,
           category,
-          budgetAmount: item.budgetAmount,
-          actualCost: item.actualCost,
-          commitments: item.commitments,
-          variance: item.variance,
-          percentComplete: item.percentComplete,
-          lastUpdated: item.lastUpdated,
-          orgHierarchy: [divisionKey, item.costCode],
+          budgetAmount: item.budgetAmount || 0,
+          actualCost: item.actualCost || 0,
+          commitments: item.commitments || 0,
+          variance: item.variance || 0,
+          percentComplete: item.percentComplete || 0,
+          lastUpdated: item.lastUpdated || "",
           _isChildRow: true,
         }
-        treeRows.push(childRow)
+        flatRows.push(childRow)
       })
     })
 
-    return treeRows
+    return flatRows
   }, [currentProject, filterCategory, searchTerm])
 
   // Create column definitions for ProtectedGrid
@@ -191,93 +186,131 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
     () => [
       createReadOnlyColumn("costCode", "Cost Code", {
         width: 150,
+        pinned: "left",
         cellRenderer: (params: any) => {
           const isParent = params.data._isDivisionRow
           const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
 
-          if (isParent) {
-            return `
-            <div style="font-weight: 600; color: ${isDark ? "#f8fafc" : "#0f172a"};">
-              ${params.value}
+          return (
+            <div
+              style={{
+                fontWeight: isParent ? "600" : "400",
+                color: !isParent ? (isDark ? "#e2e8f0" : "#334155") : isDark ? "#f8fafc" : "#0f172a",
+                fontFamily: !isParent ? "monospace" : undefined,
+                fontSize: !isParent ? "12px" : undefined,
+              }}
+            >
+              {params.value}
             </div>
-          `
-          }
-
-          return `
-          <div style="font-family: monospace; font-size: 12px; color: ${isDark ? "#e2e8f0" : "#334155"};">
-            ${params.value}
-          </div>
-        `
+          )
         },
       }),
       createReadOnlyColumn("description", "Description", {
         flex: 1,
+        pinned: "left",
         cellRenderer: (params: any) => {
           const isParent = params.data._isDivisionRow
           const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
 
-          return `
-          <div style="font-weight: ${isParent ? "600" : "400"}; color: ${isDark ? "#f1f5f9" : "#1e293b"};">
-            ${params.value}
-          </div>
-        `
+          return (
+            <div
+              style={{
+                fontWeight: isParent ? "600" : "400",
+                color: isDark ? "#f1f5f9" : "#1e293b",
+              }}
+            >
+              {params.value}
+            </div>
+          )
         },
       }),
       createReadOnlyColumn("category", "Category", {
         width: 120,
+        pinned: "left",
         cellRenderer: (params: any) => {
           if (params.data._isDivisionRow) return ""
 
           const category = params.value
           const colors = {
-            Material: "border-blue-200 text-blue-700 bg-blue-50",
-            Labor: "border-green-200 text-green-700 bg-green-50",
-            "Labor Burden": "border-yellow-200 text-yellow-700 bg-yellow-50",
-            Subcontract: "border-purple-200 text-purple-700 bg-purple-50",
-            Other: "border-gray-200 text-gray-700 bg-gray-50",
+            Material: { border: "#dbeafe", text: "#1d4ed8", bg: "#eff6ff" },
+            Labor: { border: "#dcfce7", text: "#16a34a", bg: "#f0fdf4" },
+            "Labor Burden": { border: "#fef3c7", text: "#d97706", bg: "#fffbeb" },
+            Subcontract: { border: "#e9d5ff", text: "#9333ea", bg: "#faf5ff" },
+            Other: { border: "#e5e7eb", text: "#374151", bg: "#f9fafb" },
           }
 
-          const colorClass = colors[category as keyof typeof colors] || colors.Other
+          const colorConfig = colors[category as keyof typeof colors] || colors.Other
 
-          return `
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}">
-            ${category}
-          </span>
-        `
+          return (
+            <span
+              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+              style={{
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: colorConfig.border,
+                color: colorConfig.text,
+                backgroundColor: colorConfig.bg,
+              }}
+            >
+              {category}
+            </span>
+          )
         },
       }),
       createReadOnlyColumn("budgetAmount", "Budget", {
         type: "numericColumn",
         width: 130,
-        valueFormatter: (params: any) => formatCurrency(params.value),
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("actualCost", "Actual Cost", {
         type: "numericColumn",
         width: 130,
-        valueFormatter: (params: any) => formatCurrency(params.value),
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("commitments", "Commitments", {
         type: "numericColumn",
         width: 130,
-        valueFormatter: (params: any) => formatCurrency(params.value),
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
         cellStyle: { fontFamily: "monospace" },
       }),
       createReadOnlyColumn("variance", "Variance", {
         type: "numericColumn",
         width: 130,
-        valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: (params: any) => ({
-          fontFamily: "monospace",
-          color: params.value >= 0 ? "#dc2626" : "#16a34a",
-          fontWeight: "500",
-        }),
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const numericValue = typeof value === "number" ? value : 0
+          return {
+            fontFamily: "monospace",
+            color: numericValue >= 0 ? "#dc2626" : "#16a34a",
+            fontWeight: "500",
+          }
+        },
       }),
       createReadOnlyColumn("percentComplete", "% Complete", {
         type: "numericColumn",
         width: 110,
-        valueFormatter: (params: any) => `${params.value.toFixed(1)}%`,
+        valueFormatter: (params: any) => {
+          const value = params.value
+          if (typeof value === "number" && !isNaN(value)) {
+            return `${value.toFixed(1)}%`
+          }
+          return "0.0%"
+        },
         cellStyle: { fontFamily: "monospace" },
       }),
     ],
@@ -294,15 +327,25 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
     const values = parentRows
       .map((row) => {
         const value = row[columnField]
-        return typeof value === "number" ? value : parseFloat(value)
+        if (typeof value === "number" && !isNaN(value)) {
+          return value
+        }
+        const parsed = parseFloat(value)
+        return !isNaN(parsed) ? parsed : 0
       })
-      .filter((val) => !isNaN(val))
+      .filter((val) => typeof val === "number" && !isNaN(val))
 
     if (values.length === 0) return ""
 
     if (columnField === "percentComplete") {
-      const totalBudget = parentRows.reduce((sum, row) => sum + (row.budgetAmount || 0), 0)
-      const totalActual = parentRows.reduce((sum, row) => sum + (row.actualCost || 0), 0)
+      const totalBudget = parentRows.reduce((sum, row) => {
+        const budget = row.budgetAmount
+        return sum + (typeof budget === "number" && !isNaN(budget) ? budget : 0)
+      }, 0)
+      const totalActual = parentRows.reduce((sum, row) => {
+        const actual = row.actualCost
+        return sum + (typeof actual === "number" && !isNaN(actual) ? actual : 0)
+      }, 0)
       return totalBudget > 0 ? ((totalActual / totalBudget) * 100).toFixed(1) + "%" : "0.0%"
     }
 
@@ -315,82 +358,66 @@ export default function JCHRCard({ userRole, projectData }: JCHRCardProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters and Controls */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
-              <span>Job Cost History Report</span>
-              <Badge variant="outline">{currentProject.project_name}</Badge>
-            </CardTitle>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="flex-1 min-w-[200px]">
-              <Input
-                placeholder="Search by description or cost code..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="material">Material</SelectItem>
-                <SelectItem value="labor">Labor</SelectItem>
-                <SelectItem value="labor burden">Labor Burden</SelectItem>
-                <SelectItem value="subcontract">Subcontract</SelectItem>
-                <SelectItem value="overhead">Overhead</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
+        <CardContent className="p-6">
           {/* Job Cost Protected Grid */}
-          <ProtectedGrid
-            title="Job Cost History Report"
-            columnDefs={columnDefs}
-            rowData={treeData}
-            height="600px"
-            config={{
-              allowExport: true,
-              allowImport: false,
-              allowRowSelection: false,
-              allowMultiSelection: false,
-              allowColumnReordering: false,
-              allowColumnResizing: true,
-              allowSorting: true,
-              allowFiltering: true,
-              allowCellEditing: false,
-              showToolbar: true,
-              showStatusBar: true,
-              enableRangeSelection: false,
-              protectionEnabled: true,
-              userRole: userRole,
-              theme: "quartz",
-              enableTotalsRow: true,
-              stickyColumnsCount: 2,
-            }}
-            events={{
-              onGridReady: (event) => {
-                // Auto-size all columns to fit their content
-                event.api.autoSizeAllColumns()
-              },
-            }}
-            enableSearch={true}
-            defaultSearch={searchTerm}
-            totalsCalculator={totalsCalculator}
-            className="border rounded-lg"
-          />
+          <div className="space-y-4">
+            {/* Category Filter inline with grid */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Filter:</span>
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger className="w-[180px] h-8">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="material">Material</SelectItem>
+                    <SelectItem value="labor">Labor</SelectItem>
+                    <SelectItem value="labor burden">Labor Burden</SelectItem>
+                    <SelectItem value="subcontract">Subcontract</SelectItem>
+                    <SelectItem value="overhead">Overhead</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <ProtectedGrid
+              title="Job Cost History Report"
+              columnDefs={columnDefs}
+              rowData={gridData}
+              height="600px"
+              config={{
+                allowExport: true,
+                allowImport: false,
+                allowRowSelection: false,
+                allowMultiSelection: false,
+                allowColumnReordering: false,
+                allowColumnResizing: true,
+                allowSorting: true,
+                allowFiltering: true,
+                allowCellEditing: false,
+                showToolbar: true,
+                showStatusBar: true,
+                enableRangeSelection: false,
+                protectionEnabled: true,
+                userRole: userRole,
+                theme: "quartz",
+                enableTotalsRow: true,
+                stickyColumnsCount: 0, // Using manual pinning instead
+              }}
+              events={{
+                onGridReady: (event) => {
+                  // Auto-size all columns to fit their content
+                  event.api.autoSizeAllColumns()
+                },
+              }}
+              enableSearch={true}
+              defaultSearch={searchTerm}
+              totalsCalculator={totalsCalculator}
+              className="border rounded-lg"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

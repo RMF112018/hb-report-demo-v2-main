@@ -22,12 +22,12 @@ import {
   Target,
 } from "lucide-react"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ProtectedGrid, createReadOnlyColumn, GridRow, ProtectedColDef } from "@/components/ui/protected-grid"
 
 // Import AR aging data
 import arAgingData from "@/data/mock/financial/ar-aging.json"
@@ -77,30 +77,6 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
     return data
   }, [filteredARData, searchTerm])
 
-  // Calculate totals for each aging category
-  const totals = useMemo(() => {
-    return processedARData.reduce(
-      (acc, item) => ({
-        balance_to_finish: acc.balance_to_finish + item.balance_to_finish,
-        retainage: acc.retainage + item.retainage,
-        total_ar: acc.total_ar + item.total_ar,
-        current: acc.current + item.current,
-        days_1_30: acc.days_1_30 + item.days_1_30,
-        days_31_60: acc.days_31_60 + item.days_31_60,
-        days_60_plus: acc.days_60_plus + item.days_60_plus,
-      }),
-      {
-        balance_to_finish: 0,
-        retainage: 0,
-        total_ar: 0,
-        current: 0,
-        days_1_30: 0,
-        days_31_60: 0,
-        days_60_plus: 0,
-      }
-    )
-  }, [processedARData])
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -110,8 +86,174 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
     }).format(amount)
   }
 
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`
+  const formatPercentage = (value: number | null | undefined) => {
+    if (typeof value === "number" && !isNaN(value)) {
+      return `${value.toFixed(1)}%`
+    }
+    return "0.0%"
+  }
+
+  // Convert AR aging data to GridRow format
+  const gridData: GridRow[] = useMemo(() => {
+    return processedARData.map((item) => ({
+      id: item.project_id.toString(),
+      projectName: item.project_name || "",
+      projectManager: item.project_manager || "",
+      percentComplete: typeof item.percent_complete === "number" ? item.percent_complete : 0,
+      balanceToFinish: typeof item.balance_to_finish === "number" ? item.balance_to_finish : 0,
+      retainage: typeof item.retainage === "number" ? item.retainage : 0,
+      totalAR: typeof item.total_ar === "number" ? item.total_ar : 0,
+      current: typeof item.current === "number" ? item.current : 0,
+      days1To30: typeof item.days_1_30 === "number" ? item.days_1_30 : 0,
+      days31To60: typeof item.days_31_60 === "number" ? item.days_31_60 : 0,
+      days60Plus: typeof item.days_60_plus === "number" ? item.days_60_plus : 0,
+      comments: item.comments || "",
+      // Add custom properties for styling
+      _hasOverdue: (typeof item.days_60_plus === "number" ? item.days_60_plus : 0) > 0,
+      _hasAging:
+        (typeof item.days_1_30 === "number" ? item.days_1_30 : 0) > 0 ||
+        (typeof item.days_31_60 === "number" ? item.days_31_60 : 0) > 0,
+    }))
+  }, [processedARData])
+
+  // Create column definitions for ProtectedGrid
+  const columnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      createReadOnlyColumn("projectName", "Project Details", {
+        width: 200,
+        pinned: "left",
+        cellRenderer: (params: any) => {
+          return (
+            <div className="space-y-1">
+              <div className="font-medium text-sm">{params.data.projectName}</div>
+              <div className="text-xs text-muted-foreground">PM: {params.data.projectManager}</div>
+            </div>
+          )
+        },
+      }),
+      createReadOnlyColumn("percentComplete", "% Complete", {
+        width: 120,
+        type: "numericColumn",
+        cellRenderer: (params: any) => {
+          const value = params.value
+          return (
+            <Badge variant="outline" className="text-xs">
+              {formatPercentage(value)}
+            </Badge>
+          )
+        },
+      }),
+      createReadOnlyColumn("balanceToFinish", "Balance to Finish", {
+        width: 140,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("retainage", "Retainage", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("totalAR", "Total AR", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+      }),
+      createReadOnlyColumn("current", "Current", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: { fontFamily: "monospace" },
+      }),
+      createReadOnlyColumn("days1To30", "1-30 Days", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const style: any = { fontFamily: "monospace" }
+          if (typeof value === "number" && value > 0) {
+            style.color = "#d97706"
+            style.fontWeight = "500"
+          }
+          return style
+        },
+      }),
+      createReadOnlyColumn("days31To60", "31-60 Days", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const style: any = { fontFamily: "monospace" }
+          if (typeof value === "number" && value > 0) {
+            style.color = "#d97706"
+            style.fontWeight = "500"
+          }
+          return style
+        },
+      }),
+      createReadOnlyColumn("days60Plus", "60+ Days", {
+        width: 120,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const style: any = { fontFamily: "monospace" }
+          if (typeof value === "number" && value > 0) {
+            style.color = "#dc2626"
+            style.fontWeight = "bold"
+          }
+          return style
+        },
+      }),
+      createReadOnlyColumn("comments", "Comments", {
+        width: 150,
+        cellRenderer: (params: any) => {
+          return <div className="text-sm max-w-[150px] truncate">{params.value || "-"}</div>
+        },
+      }),
+    ],
+    []
+  )
+
+  // Custom totals calculator
+  const totalsCalculator = (data: GridRow[], columnField: string): number | string => {
+    if (columnField === "projectName") return "Totals"
+    if (columnField === "percentComplete" || columnField === "comments") return ""
+
+    const values = data
+      .map((row) => {
+        const value = row[columnField]
+        return typeof value === "number" && !isNaN(value) ? value : 0
+      })
+      .filter((val) => typeof val === "number" && !isNaN(val))
+
+    if (values.length === 0) return 0
+    return values.reduce((sum, val) => sum + val, 0)
   }
 
   const exportToCSV = () => {
@@ -159,17 +301,6 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
     document.body.removeChild(link)
   }
 
-  // Get row styling based on aging status
-  const getRowStyling = (item: ARAgingItem) => {
-    if (item.days_60_plus > 0) {
-      return "bg-red-50 dark:bg-red-950/20 border-l-4 border-l-red-500 dark:border-l-red-400" // Red highlight for 60+ days
-    }
-    if (item.days_1_30 > 0 || item.days_31_60 > 0) {
-      return "bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-l-yellow-500 dark:border-l-yellow-400" // Yellow highlight for 1-60 days
-    }
-    return "" // Default styling
-  }
-
   return (
     <div className="space-y-6">
       {/* Controls and Export */}
@@ -202,104 +333,44 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         </Button>
       </div>
 
-      {/* AR Aging Table */}
+      {/* AR Aging Grid */}
       <Card>
         <CardContent className="p-6">
-          <div className="rounded-md border">
-            <div className="overflow-auto max-h-[600px]">
-              <Table>
-                <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b-2 border-border/50 shadow-lg">
-                  <TableRow className="bg-background/95 backdrop-blur-md">
-                    <TableHead className="min-w-[200px]">Project Details</TableHead>
-                    <TableHead className="text-right w-[120px]">% Complete</TableHead>
-                    <TableHead className="text-right w-[120px]">Balance to Finish</TableHead>
-                    <TableHead className="text-right w-[120px]">Retainage</TableHead>
-                    <TableHead className="text-right w-[120px]">Total AR</TableHead>
-                    <TableHead className="text-right w-[120px]">Current</TableHead>
-                    <TableHead className="text-right w-[120px]">1-30 Days</TableHead>
-                    <TableHead className="text-right w-[120px]">31-60 Days</TableHead>
-                    <TableHead className="text-right w-[120px]">60+ Days</TableHead>
-                    <TableHead className="min-w-[150px]">Comments</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {processedARData.map((item, index) => (
-                    <TableRow key={index} className={`hover:bg-muted/50 ${getRowStyling(item)}`}>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium text-sm">{item.project_name}</div>
-                          <div className="text-xs text-muted-foreground">PM: {item.project_manager}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        <Badge variant="outline" className="text-xs">
-                          {formatPercentage(item.percent_complete)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        {formatCurrency(item.balance_to_finish)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">{formatCurrency(item.retainage)}</TableCell>
-                      <TableCell className="text-right font-mono text-sm font-medium">
-                        {formatCurrency(item.total_ar)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">{formatCurrency(item.current)}</TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_1_30 > 0 ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""}>
-                          {formatCurrency(item.days_1_30)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_31_60 > 0 ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""}>
-                          {formatCurrency(item.days_31_60)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        <span className={item.days_60_plus > 0 ? "text-red-600 dark:text-red-400 font-bold" : ""}>
-                          {formatCurrency(item.days_60_plus)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm max-w-[150px] truncate">{item.comments || "-"}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-                <TableFooter>
-                  <TableRow className="bg-muted/50 font-semibold">
-                    <TableCell className="font-bold">Totals</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      {formatCurrency(totals.balance_to_finish)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      {formatCurrency(totals.retainage)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      {formatCurrency(totals.total_ar)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      {formatCurrency(totals.current)}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_1_30 > 0 ? "text-yellow-600 dark:text-yellow-400" : ""}>
-                        {formatCurrency(totals.days_1_30)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_31_60 > 0 ? "text-yellow-600 dark:text-yellow-400" : ""}>
-                        {formatCurrency(totals.days_31_60)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-bold">
-                      <span className={totals.days_60_plus > 0 ? "text-red-600 dark:text-red-400" : ""}>
-                        {formatCurrency(totals.days_60_plus)}
-                      </span>
-                    </TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
-            </div>
-          </div>
+          <ProtectedGrid
+            title="AR Aging Analysis"
+            columnDefs={columnDefs}
+            rowData={gridData}
+            height="600px"
+            config={{
+              allowExport: true,
+              allowImport: false,
+              allowRowSelection: false,
+              allowMultiSelection: false,
+              allowColumnReordering: false,
+              allowColumnResizing: true,
+              allowSorting: true,
+              allowFiltering: true,
+              allowCellEditing: false,
+              showToolbar: true,
+              showStatusBar: true,
+              enableRangeSelection: false,
+              protectionEnabled: true,
+              userRole: userRole,
+              theme: "quartz",
+              enableTotalsRow: true,
+              stickyColumnsCount: 1, // Pin first column (Project Details)
+            }}
+            events={{
+              onGridReady: (event) => {
+                // Auto-size all columns to fit their content
+                event.api.autoSizeAllColumns()
+              },
+            }}
+            enableSearch={true}
+            defaultSearch={searchTerm}
+            totalsCalculator={totalsCalculator}
+            className="border rounded-lg"
+          />
 
           {/* Data Quality Notice */}
           {processedARData.length === 0 && (
