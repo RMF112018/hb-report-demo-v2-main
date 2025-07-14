@@ -28,7 +28,8 @@ import { ToolContent } from "./components/ToolContent"
 import ProjectContent from "./components/ProjectContent"
 import { PageHeader } from "./components/PageHeader"
 import type { PageHeaderTab } from "./components/PageHeader"
-import { HbiIntelTourCarousel } from "../../components/presentation/HbiIntelTourCarousel"
+import { PresentationCarousel } from "../../components/presentation/PresentationCarousel"
+import intelTourSlides from "../../components/presentation/intelTourSlides"
 import { useRouter } from "next/navigation"
 import {
   Calendar,
@@ -466,7 +467,14 @@ export default function MainApplicationPage() {
   }
 
   const handleIntelTourComplete = () => {
+    // Mark tour as completed
+    localStorage.setItem("intelTourCompleted", "true")
+
+    // Hide the tour carousel
     setShowIntelTour(false)
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   // Handle manual carousel launch from PageHeader badge
@@ -1210,7 +1218,8 @@ export default function MainApplicationPage() {
       </footer>
 
       {/* Intel Tour Carousel - Overlays entire dashboard for presentation users */}
-      {showIntelTour && <HbiIntelTourCarousel onComplete={handleIntelTourComplete} forceShow={true} />}
+      {/* Uses standard PresentationCarousel with Intel Tour slides for consistency */}
+      {showIntelTour && <PresentationCarousel slides={intelTourSlides} onComplete={handleIntelTourComplete} />}
     </div>
   )
 }
