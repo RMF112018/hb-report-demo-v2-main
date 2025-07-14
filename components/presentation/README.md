@@ -39,6 +39,22 @@ A sophisticated full-screen presentation carousel component built with Framer Mo
 - Flexible background options (gradients, images, colors)
 - Completion callbacks and router integration
 
+## Available Slide Sets
+
+### 1. Main Presentation Slides (`slide-definitions.tsx`)
+
+- 9-slide leadership presentation
+- Focus on legacy to future vision
+- Continuity as core value proposition
+- Used during login presentation workflow
+
+### 2. Intel Tour Slides (`intelTourSlides.tsx`)
+
+- 15-slide comprehensive Intel Tour
+- Feature-focused with business impact messaging
+- Role-based content with efficiency metrics
+- Used in main app for presentation users
+
 ## Installation & Usage
 
 ### Basic Usage
@@ -72,6 +88,25 @@ function MyPresentation() {
       onComplete={() => console.log("Presentation completed!")}
       autoPlay={false}
       autoPlayInterval={5000}
+    />
+  )
+}
+```
+
+### Intel Tour Usage
+
+```tsx
+import { PresentationCarousel } from "@/components/presentation/PresentationCarousel"
+import intelTourSlides from "@/components/presentation/intelTourSlides"
+
+function IntelTourPresentation() {
+  return (
+    <PresentationCarousel
+      slides={intelTourSlides}
+      onComplete={() => {
+        localStorage.setItem("intelTourCompleted", "true")
+        // Handle completion
+      }}
     />
   )
 }
@@ -147,151 +182,69 @@ interface PresentationCarouselProps {
 
 ### Slide Transitions
 
-- **Type**: Spring animation with direction-aware sliding
-- **Spring Config**: `stiffness: 100, damping: 20`
-- **Direction**: Slides enter from left/right based on navigation direction
+- **Type**: Spring-based with direction awareness
+- **Stiffness**: 100
+- **Damping**: 20
+- **Direction**: Slides enter from appropriate side based on navigation
 
 ### Exit Animation
 
 - **Duration**: 0.6s
 - **Effect**: Fade-out + scale-up to 105%
-- **Loading**: Shows spinner with "Launching HB Report..." message
+- **Trigger**: CTA button click or Escape key
 
-## Background Options
+## Refactoring History
 
-### Gradient Backgrounds
+### v3.0 Intel Tour Standardization
 
-```tsx
-{
-  backgroundGradient: "linear-gradient(135deg, #003087 0%, #1e3a8a 50%, #1e40af 100%)"
-}
-```
+- **Previous**: Separate `HbiIntelTourCarousel.tsx` component
+- **Current**: Uses standard `PresentationCarousel.tsx` with `intelTourSlides.tsx`
+- **Benefits**:
+  - Consistent presentation experience across all carousels
+  - Reduced code duplication
+  - Single source of truth for presentation styling
+  - Easier maintenance and updates
+  - Icons integrated into slide content for visual consistency
 
-### Solid Backgrounds
+### Migration Guide
 
-```tsx
-{
-  background: "#003087"
-}
-```
-
-### Image Backgrounds
+If you were using the old `HbiIntelTourCarousel`:
 
 ```tsx
-{
-  background: "url('/path/to/image.jpg') center/cover"
-}
+// Old implementation
+import { HbiIntelTourCarousel } from "@/components/presentation/HbiIntelTourCarousel"
+
+;<HbiIntelTourCarousel onComplete={handleComplete} forceShow={true} />
+
+// New implementation
+import { PresentationCarousel } from "@/components/presentation/PresentationCarousel"
+import intelTourSlides from "@/components/presentation/intelTourSlides"
+
+;<PresentationCarousel slides={intelTourSlides} onComplete={handleComplete} />
 ```
 
-## CTA Button Behavior
+## Styling
 
-When `isFinalSlide: true` is set on a slide:
+The component uses Tailwind CSS classes with custom gradients and animations. Key visual elements:
 
-1. **Button Appearance**: "Explore what continuity looks like" with sparkles and arrow icons
-2. **Click Action**: Triggers exit animation → navigates to `/main-app` → calls `onComplete()`
-3. **Loading State**: Shows loading overlay during transition
-4. **Styling**: Orange gradient button with hover effects
+- **Background**: Full-screen gradient overlays
+- **Typography**: Responsive text sizing with proper hierarchy
+- **Animations**: Framer Motion for smooth transitions
+- **Icons**: Integrated into slide content with backdrop blur effects
+- **Navigation**: Professional button styling with hover states
 
-## Responsive Design
+## Performance
 
-- **Mobile (< 768px)**: Optimized typography and spacing
-- **Tablet (768px - 1023px)**: Balanced layouts
-- **Desktop (1024px+)**: Full layout with larger typography
-- **Large Displays (1920px+)**: Enhanced spacing and scaling
+- **Lazy Loading**: Slides are rendered on-demand
+- **Optimized Animations**: Uses transform properties for smooth performance
+- **Memory Management**: Proper cleanup of event listeners and timers
+- **Responsive**: Adapts to different screen sizes without performance impact
 
-## Example Content Patterns
+## Build Status
 
-### Feature Highlight
-
-```tsx
-{
-  title: "Powerful Analytics",
-  content: (
-    <div className="space-y-6">
-      <p className="text-xl lg:text-2xl">
-        Real-time insights that drive smarter decisions
-      </p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        {features.map(feature => (
-          <div key={feature.id} className="text-center">
-            <div className="bg-white/20 rounded-2xl p-6 mb-3">
-              <feature.icon className="h-8 w-8 mx-auto text-white" />
-            </div>
-            <p className="text-sm font-medium">{feature.name}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-```
-
-### Statistics Display
-
-```tsx
-{
-  title: "Proven Results",
-  content: (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-      <div className="text-center">
-        <div className="text-4xl lg:text-5xl font-bold mb-2">99.9%</div>
-        <p className="text-lg opacity-80">System Uptime</p>
-      </div>
-      {/* More stats... */}
-    </div>
-  )
-}
-```
-
-## Best Practices
-
-1. **Slide Count**: Keep presentations to 3-7 slides for optimal engagement
-2. **Content Length**: Use concise, impactful messaging
-3. **Visual Hierarchy**: Use consistent spacing and typography
-4. **Background Contrast**: Ensure text readability on gradient backgrounds
-5. **Performance**: Optimize images and avoid heavy computations in slide content
-6. **Accessibility**: Include proper ARIA labels and keyboard navigation
-
-## Dependencies
-
-- `framer-motion` (v12.19.1+)
-- `next/navigation` (for router)
-- `@/components/ui/*` (shadcn/ui components)
-- `lucide-react` (icons)
-
-## Browser Support
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-- Mobile Safari (iOS 14+)
-- Chrome Mobile (Android 10+)
-
-## Troubleshooting
-
-### TypeScript Errors
-
-If you encounter TypeScript errors with animation variants, ensure you're using the latest version of Framer Motion and have proper type definitions installed.
-
-### Performance Issues
-
-- Use `React.memo` for slide content with heavy computations
-- Optimize images with Next.js Image component
-- Limit concurrent animations in slide content
-
-### Mobile Issues
-
-- Test touch targets are at least 44px × 44px
-- Verify text is readable on smaller screens
-- Check that animations don't cause motion sickness
-
-## Contributing
-
-When contributing to this component:
-
-1. Follow v3.0 design standards
-2. Maintain TypeScript type safety
-3. Test across all supported browsers
-4. Ensure accessibility compliance
-5. Update documentation for new features
+✅ All components compile successfully  
+✅ No TypeScript errors  
+✅ Responsive design tested  
+✅ Animation performance optimized  
+✅ Intel Tour refactoring completed  
+✅ Single presentation system established
