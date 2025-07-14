@@ -274,6 +274,13 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     category: "Financial Management",
     description: "Subcontractor buyout and material procurement management",
   },
+  {
+    name: "Market Intelligence",
+    href: "/dashboard/market-intel",
+    category: "Financial Management",
+    description: "AI-powered market analysis, competitive positioning, and predictive insights",
+    visibleRoles: ["executive", "project-executive", "project-manager", "estimator"],
+  },
 
   // Field Management
   {

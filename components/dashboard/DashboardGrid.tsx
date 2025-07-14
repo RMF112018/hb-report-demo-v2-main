@@ -95,6 +95,18 @@ import SimpleRFIStatusCard from "@/components/cards/SimpleRFIStatusCard"
 import SimpleMarketInsightsCard from "@/components/cards/SimpleMarketInsightsCard"
 import SimpleEstimatingProgressCard from "@/components/cards/SimpleEstimatingProgressCard"
 
+// Market Intelligence Dashboard cards
+import SimpleMarketIntelCard from "@/components/cards/SimpleMarketIntelCard"
+import MarketAnalyticsCard from "@/components/cards/MarketAnalyticsCard"
+import AIMarketInsightsCard from "@/components/cards/AIMarketInsightsCard"
+import { FloridaMarketGrowthCard } from "@/components/cards/FloridaMarketGrowthCard"
+import { RegionalHotspotsCard } from "@/components/cards/RegionalHotspotsCard"
+import { DeveloperSentimentCard } from "@/components/cards/DeveloperSentimentCard"
+import { ThreatTrackerCard } from "@/components/cards/ThreatTrackerCard"
+import { AIOpportunitiesCard } from "@/components/cards/AIOpportunitiesCard"
+import { CompetitorBenchmarkCard } from "@/components/cards/CompetitorBenchmarkCard"
+import { RiskRewardRadarCard } from "@/components/cards/RiskRewardRadarCard"
+
 // Beta card components
 import BetaPortfolioOverview from "@/components/cards/beta/BetaPortfolioOverview"
 import BetaEnhancedHBIInsights from "@/components/cards/beta/BetaEnhancedHBIInsights"
@@ -1087,6 +1099,27 @@ function CardContent({
       return <SimpleMarketInsightsCard {...commonProps} />
     case "simple-estimating-progress":
       return <SimpleEstimatingProgressCard {...commonProps} />
+    // Market Intelligence Dashboard cards
+    case "simple-market-intel":
+      return <SimpleMarketIntelCard {...commonProps} />
+    case "market-analytics":
+      return <MarketAnalyticsCard {...commonProps} />
+    case "ai-market-insights":
+      return <AIMarketInsightsCard {...commonProps} />
+    case "florida-market-growth":
+      return <FloridaMarketGrowthCard {...commonProps} />
+    case "regional-hotspots":
+      return <RegionalHotspotsCard {...commonProps} />
+    case "developer-sentiment":
+      return <DeveloperSentimentCard {...commonProps} />
+    case "threat-tracker":
+      return <ThreatTrackerCard {...commonProps} />
+    case "ai-opportunities":
+      return <AIOpportunitiesCard {...commonProps} />
+    case "competitor-benchmark":
+      return <CompetitorBenchmarkCard {...commonProps} />
+    case "risk-reward-radar":
+      return <RiskRewardRadarCard {...commonProps} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -1134,6 +1167,27 @@ const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
       return { cols: 8, rows: 4 }
     case "bd-opportunities":
       return { cols: 6, rows: 4 }
+    // Market Intelligence Dashboard cards
+    case "simple-market-intel":
+      return { cols: 16, rows: 6 }
+    case "market-analytics":
+      return { cols: 10, rows: 8 }
+    case "ai-market-insights":
+      return { cols: 6, rows: 8 }
+    case "florida-market-growth":
+      return { cols: 8, rows: 8 }
+    case "regional-hotspots":
+      return { cols: 8, rows: 8 }
+    case "developer-sentiment":
+      return { cols: 8, rows: 8 }
+    case "threat-tracker":
+      return { cols: 8, rows: 8 }
+    case "ai-opportunities":
+      return { cols: 8, rows: 8 }
+    case "competitor-benchmark":
+      return { cols: 16, rows: 8 }
+    case "risk-reward-radar":
+      return { cols: 8, rows: 8 }
     default:
       return { cols: 6, rows: 4 }
   }

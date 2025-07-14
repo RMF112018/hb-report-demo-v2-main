@@ -302,7 +302,7 @@ export default function MainApplicationPage() {
 
   // Intel Tour logic triggered by successful login
   useEffect(() => {
-    if (mounted && isPresentationMode) {
+    if (mounted) {
       // Check if Intel tour should be triggered (set at login)
       const triggerTimestamp = localStorage.getItem("triggerIntelTour")
       const intelTourCompleted = localStorage.getItem("intelTourCompleted")
@@ -325,7 +325,7 @@ export default function MainApplicationPage() {
         return () => clearTimeout(tourTimer)
       }
     }
-  }, [isPresentationMode, mounted])
+  }, [mounted])
 
   // Handle sidebar panel state changes - updates layout to account for sidebar width
   const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
