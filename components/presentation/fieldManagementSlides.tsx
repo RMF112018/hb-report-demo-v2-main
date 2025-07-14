@@ -1,17 +1,24 @@
 /**
- * @fileoverview Field Management Slides Component
+ * @fileoverview Field Management Tab Presentation Slide Definitions
  * @module fieldManagementSlides
  * @version 3.0.0
  * @author HB Development Team
  * @since 2024-01-15
  *
- * Comprehensive slides for field management tools and operations
+ * Complete sequence of slides for the Field Management tab presentation covering:
+ * - Field Management Overview
+ * - Procurement Management with Procore integration
+ * - Project Scheduler with look-ahead planning
+ * - Constraints Log Management
+ * - Permit Log & Inspection Management
+ * - Field Reports & Documentation
  */
 
 "use client"
 
 import React from "react"
 import { motion } from "framer-motion"
+import { PresentationSlide } from "./PresentationCarousel"
 import {
   Building2,
   Calendar,
@@ -37,13 +44,7 @@ import {
   Wrench,
 } from "lucide-react"
 
-export interface FieldManagementSlide {
-  id: string
-  title: string
-  content: React.ReactNode
-}
-
-export const fieldManagementSlides: FieldManagementSlide[] = [
+export const fieldManagementSlides: PresentationSlide[] = [
   {
     id: "overview",
     title: "Field Management Overview",
@@ -403,5 +404,8 @@ export const fieldManagementSlides: FieldManagementSlide[] = [
         </div>
       </div>
     ),
+    isFinalSlide: true,
   },
 ]
+
+export default fieldManagementSlides

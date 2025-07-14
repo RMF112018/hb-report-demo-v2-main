@@ -1381,11 +1381,7 @@ export default function MainApplicationPage() {
             console.log("🎬 Field Management Carousel: Rendering FieldManagementCarousel")
             return null
           })()}
-          <FieldManagementCarousel
-            isOpen={showFieldManagementCarousel}
-            onClose={() => setShowFieldManagementCarousel(false)}
-            onComplete={handleFieldManagementCarouselComplete}
-          />
+          <FieldManagementCarousel onComplete={handleFieldManagementCarouselComplete} />
         </>
       )}
     </div>
