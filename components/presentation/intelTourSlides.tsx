@@ -65,7 +65,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%)",
   },
   {
     id: "role-dashboards",
@@ -91,7 +90,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
   },
   {
     id: "executive-staffing",
@@ -121,7 +119,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%)",
   },
   {
     id: "scheduler-planning",
@@ -147,7 +144,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%)",
   },
   {
     id: "field-reporting",
@@ -176,7 +172,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%)",
   },
   {
     id: "financial-intelligence",
@@ -202,7 +197,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #4ade80 100%)",
   },
   {
     id: "bid-management",
@@ -228,7 +222,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #be123c 0%, #e11d48 50%, #f43f5e 100%)",
   },
   {
     id: "standardized-reports",
@@ -254,7 +247,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #4338ca 0%, #6366f1 50%, #8b5cf6 100%)",
   },
   {
     id: "market-intelligence",
@@ -280,7 +272,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%)",
   },
   {
     id: "ai-copilot",
@@ -306,7 +297,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%)",
   },
   {
     id: "project-control",
@@ -332,7 +322,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #475569 0%, #64748b 50%, #94a3b8 100%)",
   },
   {
     id: "power-bi-analytics",
@@ -358,7 +347,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%)",
   },
   {
     id: "it-command-center",
@@ -384,7 +372,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%)",
   },
   {
     id: "quality-safety",
@@ -410,7 +397,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #365314 0%, #65a30d 50%, #a3e635 100%)",
   },
   {
     id: "outlook-integration",
@@ -436,7 +422,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%)",
   },
   {
     id: "ready-to-explore",
@@ -461,7 +446,6 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
-    backgroundGradient: "linear-gradient(135deg, #1e3a8a 0%, #7c3aed 25%, #ea580c 50%, #059669 75%, #0891b2 100%)",
     isFinalSlide: true,
   },
 ]
