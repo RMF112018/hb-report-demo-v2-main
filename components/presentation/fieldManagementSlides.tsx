@@ -181,9 +181,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Project Scheduler</strong> revolutionizes project timeline management by providing{" "}
-            <strong>integrated scheduling, look-ahead planning, and real-time updates</strong>
-            that keep projects on track and stakeholders informed across all project phases.
+            <strong>HBI-Integrated Project Scheduler</strong> provides advanced critical path analysis with{" "}
+            <strong>schedule health monitoring, AI-powered insights, and real-time variance tracking</strong>
+            that dissects every aspect of your project timeline for optimal performance.
           </motion.p>
 
           <motion.p
@@ -192,9 +192,12 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing schedules through static documents and manual updates,{" "}
-            <strong>HB's dynamic scheduling system</strong> provides real-time Gantt charts, automated look-ahead
-            planning, and comprehensive schedule analysis that drives proactive project management.
+            HBI Intelligence continuously analyzes{" "}
+            <strong>
+              schedule health (87%), critical path duration, schedule variance (-8 days), and activity dependencies
+            </strong>{" "}
+            across 1,247 activities to provide an AI Score of 8.7/10 with predictive recommendations and proactive risk
+            identification.
           </motion.p>
 
           <motion.div
@@ -204,21 +207,21 @@ export const fieldManagementSlides: PresentationSlide[] = [
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📅</div>
-              <div className="font-medium text-white">Dynamic Scheduling</div>
-              <div className="text-xs text-purple-200">Real-time Gantt charts and timeline management</div>
+              <div className="text-3xl">🧠</div>
+              <div className="font-medium text-white">HBI Critical Analysis</div>
+              <div className="text-xs text-purple-200">AI-powered health metrics and critical path intelligence</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔮</div>
-              <div className="font-medium text-white">Look-Ahead Planning</div>
-              <div className="text-xs text-purple-200">Automated multi-week planning and forecasting</div>
+              <div className="text-3xl">📊</div>
+              <div className="font-medium text-white">Schedule Health Monitoring</div>
+              <div className="text-xs text-purple-200">Real-time variance tracking and performance analytics</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📈</div>
-              <div className="font-medium text-white">Schedule Analysis</div>
-              <div className="text-xs text-purple-200">Comprehensive progress tracking and variance analysis</div>
+              <div className="text-3xl">⚡</div>
+              <div className="font-medium text-white">Predictive Insights</div>
+              <div className="text-xs text-purple-200">AI Score (8.7/10) with proactive risk identification</div>
             </div>
           </motion.div>
         </div>
