@@ -31,6 +31,7 @@ import type { PageHeaderTab } from "./components/PageHeader"
 import { PresentationCarousel } from "../../components/presentation/PresentationCarousel"
 import { PreconCarousel } from "../../components/presentation/PreconCarousel"
 import { FinancialCarousel } from "../../components/presentation/FinancialCarousel"
+import { FieldManagementCarousel } from "../../components/presentation/FieldManagementCarousel"
 import intelTourSlides from "../../components/presentation/intelTourSlides"
 import { useRouter } from "next/navigation"
 import {
@@ -220,6 +221,7 @@ export default function MainApplicationPage() {
   const [showIntelTour, setShowIntelTour] = useState(false)
   const [showPreconCarousel, setShowPreconCarousel] = useState(false)
   const [showFinancialCarousel, setShowFinancialCarousel] = useState(false)
+  const [showFieldManagementCarousel, setShowFieldManagementCarousel] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -508,6 +510,14 @@ export default function MainApplicationPage() {
         setShowFinancialCarousel(true)
       }, 2000)
     }
+
+    // Check if user is in presentation mode and selected "field-management" tab
+    if (isPresentationMode && tabId === "field-management") {
+      // Trigger Field Management carousel with 2-second delay
+      setTimeout(() => {
+        setShowFieldManagementCarousel(true)
+      }, 2000)
+    }
   }
 
   const handleIntelTourComplete = () => {
@@ -535,6 +545,15 @@ export default function MainApplicationPage() {
     console.log("🏁 Financial Management Carousel: Tour completed")
     // Hide the Financial Management carousel
     setShowFinancialCarousel(false)
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleFieldManagementCarouselComplete = () => {
+    console.log("🏁 Field Management Carousel: Tour completed")
+    // Hide the Field Management carousel
+    setShowFieldManagementCarousel(false)
 
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -1351,6 +1370,22 @@ export default function MainApplicationPage() {
             return null
           })()}
           <FinancialCarousel onComplete={handleFinancialCarouselComplete} />
+        </>
+      )}
+
+      {/* Field Management Carousel - Overlays entire dashboard for presentation users */}
+      {/* Uses standard FieldManagementCarousel with Field Management slides for consistency */}
+      {showFieldManagementCarousel && (
+        <>
+          {(() => {
+            console.log("🎬 Field Management Carousel: Rendering FieldManagementCarousel")
+            return null
+          })()}
+          <FieldManagementCarousel
+            isOpen={showFieldManagementCarousel}
+            onClose={() => setShowFieldManagementCarousel(false)}
+            onComplete={handleFieldManagementCarouselComplete}
+          />
         </>
       )}
     </div>
