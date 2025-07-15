@@ -1,8 +1,8 @@
-# HB Report Platform - Storybook Documentation
+# HB Intel Platform - Storybook Documentation
 
 ## Overview
 
-This directory contains Storybook stories and documentation for the HB Report Platform's Subcontract Buyout and Material Procurement feature. The stories demonstrate component usage across different user roles and scenarios with comprehensive AIA compliance support.
+This directory contains Storybook stories and documentation for the HB Intel Platform's Subcontract Buyout and Material Procurement feature. The stories demonstrate component usage across different user roles and scenarios with comprehensive AIA compliance support.
 
 ## Quick Start
 
@@ -529,4 +529,4 @@ export const WithAPIIntegration: Story = {
 }
 \`\`\`
 
-This comprehensive Storybook setup provides thorough testing and documentation for the HB Report Platform's Buyout & Procurement features, ensuring proper functionality across all user roles and AIA compliance scenarios.
+This comprehensive Storybook setup provides thorough testing and documentation for the HB Intel Platform's Buyout & Procurement features, ensuring proper functionality across all user roles and AIA compliance scenarios.
