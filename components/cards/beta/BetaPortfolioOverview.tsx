@@ -248,6 +248,20 @@ const CHART_COLORS = [
 ]
 
 export default function BetaPortfolioOverview({ className, isCompact, userRole, config }: BetaPortfolioOverviewProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-2" : "pb-3",
+    gap: isCompact ? "gap-1" : "gap-2",
+    gapLarge: isCompact ? "gap-2" : "gap-3",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    buttonHeight: isCompact ? "h-6" : "h-8",
+    buttonHeightLarge: isCompact ? "h-8" : "h-10",
+  }
   const [activeTab, setActiveTab] = useState("overview")
   const [realTimeEnabled, setRealTimeEnabled] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -338,36 +352,57 @@ export default function BetaPortfolioOverview({ className, isCompact, userRole, 
     <Card
       className={`${className} bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50 shadow-lg`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-md">
-              <Building2 className="h-5 w-5 text-white" />
+          <div className={`flex items-center ${compactScale.gapLarge}`}>
+            <div
+              className={`${compactScale.padding} bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-md`}
+            >
+              <Building2 className={`${compactScale.iconSize} text-white`} />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+              <CardTitle className={`${compactScale.textTitle} font-semibold text-blue-900 dark:text-blue-100`}>
                 Portfolio Executive Dashboard
               </CardTitle>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className={`flex items-center ${compactScale.gap}`}>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
-              className="h-8 px-3"
+              className={`${compactScale.buttonHeight} ${isCompact ? "px-2" : "px-3"}`}
             >
-              <BarChart3 className="h-4 w-4 mr-1" />
+              <BarChart3 className={`${isCompact ? "h-3 w-3" : "h-4 w-4"} ${isCompact ? "mr-0.5" : "mr-1"}`} />
               Advanced
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDataStreamToggle} className="h-8 px-3">
-              {dataStreamActive ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDataStreamToggle}
+              className={`${compactScale.buttonHeight} ${isCompact ? "px-2" : "px-3"}`}
+            >
+              {dataStreamActive ? (
+                <Pause className={`${isCompact ? "h-3 w-3" : "h-4 w-4"}`} />
+              ) : (
+                <Play className={`${isCompact ? "h-3 w-3" : "h-4 w-4"}`} />
+              )}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-10 w-10 p-0">
-              <RefreshCw className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className={`${compactScale.buttonHeightLarge} ${compactScale.buttonHeightLarge} p-0`}
+            >
+              <RefreshCw className={`${compactScale.iconSize} ${isLoading ? "animate-spin" : ""}`} />
             </Button>
-            <Button variant="outline" size="sm" className="h-10 w-10 p-0">
-              <Share2 className="h-5 w-5" />
+            <Button
+              variant="outline"
+              size="sm"
+              className={`${compactScale.buttonHeightLarge} ${compactScale.buttonHeightLarge} p-0`}
+            >
+              <Share2 className={compactScale.iconSize} />
             </Button>
           </div>
         </div>
@@ -395,74 +430,82 @@ export default function BetaPortfolioOverview({ className, isCompact, userRole, 
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className={isCompact ? "space-y-2 p-2" : "space-y-4"}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="overview" className="text-xs font-medium">
-              <Building2 className="h-3 w-3 mr-1" />
+          <TabsList className={`grid w-full grid-cols-4 ${isCompact ? "mb-2" : "mb-4"}`}>
+            <TabsTrigger value="overview" className={compactScale.textSmall}>
+              <Building2 className={`${compactScale.iconSizeSmall} ${isCompact ? "mr-0.5" : "mr-1"}`} />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="performance" className="text-xs font-medium">
-              <TrendingUp className="h-3 w-3 mr-1" />
+            <TabsTrigger value="performance" className={compactScale.textSmall}>
+              <TrendingUp className={`${compactScale.iconSizeSmall} ${isCompact ? "mr-0.5" : "mr-1"}`} />
               Performance
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-xs font-medium">
-              <BarChart3 className="h-3 w-3 mr-1" />
+            <TabsTrigger value="analytics" className={compactScale.textSmall}>
+              <BarChart3 className={`${compactScale.iconSizeSmall} ${isCompact ? "mr-0.5" : "mr-1"}`} />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="insights" className="text-xs font-medium">
-              <Zap className="h-3 w-3 mr-1" />
+            <TabsTrigger value="insights" className={compactScale.textSmall}>
+              <Zap className={`${compactScale.iconSizeSmall} ${isCompact ? "mr-0.5" : "mr-1"}`} />
               AI Insights
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Executive KPI Dashboard */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800 shadow-sm">
+            <div className={`grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 ${isCompact ? "gap-2" : "gap-3"}`}>
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${compactScale.padding} border border-blue-200 dark:border-blue-800 shadow-sm`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Total Projects</p>
-                    <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    <p className={`${compactScale.textSmall} text-gray-600 dark:text-gray-400`}>Total Projects</p>
+                    <p className={`${isCompact ? "text-lg" : "text-xl"} font-bold text-blue-600 dark:text-blue-400`}>
                       {portfolioData.kpis.totalProjects}
                     </p>
                   </div>
-                  <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <Building2 className={`${compactScale.iconSize} text-blue-600 dark:text-blue-400`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+15% YoY</span>
+                <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
+                  <TrendingUp className={`${compactScale.iconSizeSmall} text-green-500`} />
+                  <span className={`${compactScale.textSmall} text-green-600 dark:text-green-400`}>+15% YoY</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800 shadow-sm">
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${compactScale.padding} border border-green-200 dark:border-green-800 shadow-sm`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Portfolio Value</p>
-                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                    <p className={`${compactScale.textSmall} text-gray-600 dark:text-gray-400`}>Portfolio Value</p>
+                    <p className={`${isCompact ? "text-lg" : "text-xl"} font-bold text-green-600 dark:text-green-400`}>
                       ${portfolioData.kpis.totalValue.toFixed(1)}M
                     </p>
                   </div>
-                  <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <DollarSign className={`${compactScale.iconSize} text-green-600 dark:text-green-400`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+12.3% QoQ</span>
+                <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
+                  <TrendingUp className={`${compactScale.iconSizeSmall} text-green-500`} />
+                  <span className={`${compactScale.textSmall} text-green-600 dark:text-green-400`}>+12.3% QoQ</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800 shadow-sm">
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${compactScale.padding} border border-purple-200 dark:border-purple-800 shadow-sm`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Avg Margin</p>
-                    <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                    <p className={`${compactScale.textSmall} text-gray-600 dark:text-gray-400`}>Avg Margin</p>
+                    <p
+                      className={`${isCompact ? "text-lg" : "text-xl"} font-bold text-purple-600 dark:text-purple-400`}
+                    >
                       {portfolioData.kpis.avgMargin.toFixed(1)}%
                     </p>
                   </div>
-                  <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <Target className={`${compactScale.iconSize} text-purple-600 dark:text-purple-400`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
+                <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
+                  <TrendingUp className={`${compactScale.iconSizeSmall} text-green-500`} />
                   <span className="text-xs text-green-600 dark:text-green-400">+2.1% vs target</span>
                 </div>
               </div>

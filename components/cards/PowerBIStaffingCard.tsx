@@ -49,6 +49,7 @@ import spcrData from "../../data/mock/staffing/spcr.json"
 interface PowerBIStaffingCardProps {
   className?: string
   userRole?: string
+  isCompact?: boolean
   config?: {
     userRole?: string
     showRealTime?: boolean
@@ -56,7 +57,21 @@ interface PowerBIStaffingCardProps {
   }
 }
 
-export default function PowerBIStaffingCard({ className, userRole, config }: PowerBIStaffingCardProps) {
+export default function PowerBIStaffingCard({ className, userRole, isCompact, config }: PowerBIStaffingCardProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(config?.showRealTime ?? true)
   const [isLoading, setIsLoading] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
@@ -178,88 +193,129 @@ export default function PowerBIStaffingCard({ className, userRole, config }: Pow
     <Card
       className={`${className} bg-gradient-to-br from-purple-50/50 to-indigo-50/50 dark:from-purple-950/20 dark:to-indigo-950/20 border-purple-200/50 dark:border-purple-800/50 h-full`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg">
-              <Users className="h-5 w-5 text-white" />
+          <div className={`flex items-center ${compactScale.gap}`}>
+            <div
+              className={`${compactScale.padding} bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg shadow-sm`}
+            >
+              <Users className={`${compactScale.iconSize} text-white`} />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-purple-900 dark:text-purple-100">
+              <CardTitle className={`${compactScale.textTitle} font-semibold text-purple-900 dark:text-purple-100`}>
                 Staffing Distribution
               </CardTitle>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50 dark:bg-purple-950/50">
+          <div className={`flex items-center ${compactScale.gap}`}>
+            <Badge
+              variant="outline"
+              className={`${compactScale.textSmall} text-purple-600 border-purple-200 bg-purple-50 dark:bg-purple-950/50`}
+            >
               Power BI
             </Badge>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsRealTimeEnabled(!isRealTimeEnabled)}
-              className="h-8 px-3"
+              className={isCompact ? "h-6 px-2" : "h-8 px-3"}
             >
-              {isRealTimeEnabled ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isRealTimeEnabled ? (
+                <Pause className={compactScale.iconSizeSmall} />
+              ) : (
+                <Play className={compactScale.iconSizeSmall} />
+              )}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-8 px-3">
-              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className={isCompact ? "h-6 px-2" : "h-8 px-3"}
+            >
+              <RefreshCw className={`${compactScale.iconSizeSmall} ${isLoading ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>
 
         {/* Real-time Status */}
         {isRealTimeEnabled && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className={`flex items-center ${compactScale.gap} ${compactScale.textSmall} text-muted-foreground`}>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>Live data • Last updated: {lastUpdated.toLocaleTimeString()}</span>
           </div>
         )}
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>
         {/* Key Metrics */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className={`grid grid-cols-4 ${isCompact ? "gap-2 mb-3" : "gap-4 mb-6"}`}>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{staffingData.length}</div>
-            <div className="text-xs text-muted-foreground">Total Staff</div>
+            <div className={`${isCompact ? "text-lg" : "text-2xl"} font-bold text-purple-600 dark:text-purple-400`}>
+              {staffingData.length}
+            </div>
+            <div className={`${compactScale.textSmall} text-muted-foreground`}>Total Staff</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{utilizationRate}%</div>
-            <div className="text-xs text-muted-foreground">Utilization</div>
+            <div className={`${isCompact ? "text-lg" : "text-2xl"} font-bold text-green-600 dark:text-green-400`}>
+              {utilizationRate}%
+            </div>
+            <div className={`${compactScale.textSmall} text-muted-foreground`}>Utilization</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{spcrStats.total}</div>
-            <div className="text-xs text-muted-foreground">Total SPCRs</div>
+            <div className={`${isCompact ? "text-lg" : "text-2xl"} font-bold text-blue-600 dark:text-blue-400`}>
+              {spcrStats.total}
+            </div>
+            <div className={`${compactScale.textSmall} text-muted-foreground`}>Total SPCRs</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{spcrStats.approved || 0}</div>
-            <div className="text-xs text-muted-foreground">SPCR Approved</div>
+            <div className={`${isCompact ? "text-lg" : "text-2xl"} font-bold text-emerald-600 dark:text-emerald-400`}>
+              {spcrStats.approved || 0}
+            </div>
+            <div className={`${compactScale.textSmall} text-muted-foreground`}>SPCR Approved</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className={`grid grid-cols-2 ${isCompact ? "gap-2" : "gap-4"}`}>
           {/* Role Distribution Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
-              <UserCheck className="h-4 w-4 mr-2 text-purple-600" />
+          <div
+            className={`bg-white dark:bg-gray-800 rounded-lg ${compactScale.padding} border border-gray-200 dark:border-gray-700`}
+          >
+            <h4
+              className={`${compactScale.textSmall} font-semibold text-foreground ${
+                isCompact ? "mb-2" : "mb-3"
+              } flex items-center`}
+            >
+              <UserCheck className={`${compactScale.iconSizeSmall} mr-1 text-purple-600`} />
               Staff by Role ({roleChartData.length} roles)
             </h4>
             {roleChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={isCompact ? 120 : 200}>
                 <BarChart data={roleChartData} layout="horizontal" margin={{ left: 5, right: 5, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis type="number" tick={{ fontSize: 10 }} domain={[0, "dataMax"]} tickCount={5} />
-                  <YAxis dataKey="role" type="category" tick={{ fontSize: 9 }} width={90} interval={0} />
+                  <XAxis type="number" tick={{ fontSize: isCompact ? 8 : 10 }} domain={[0, "dataMax"]} tickCount={5} />
+                  <YAxis
+                    dataKey="role"
+                    type="category"
+                    tick={{ fontSize: isCompact ? 7 : 9 }}
+                    width={90}
+                    interval={0}
+                  />
                   <Tooltip formatter={(value, name) => [value, "Count"]} labelFormatter={(label) => `Role: ${label}`} />
                   <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]} minPointSize={2} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+              <div
+                className={`${isCompact ? "h-[120px]" : "h-[200px]"} flex items-center justify-center ${
+                  compactScale.textSmall
+                } text-muted-foreground`}
+              >
                 <div className="text-center">
-                  <div className="text-xs">No role data available</div>
-                  <div className="text-xs mt-1">Total staff: {staffingData?.length || 0}</div>
+                  <div className={compactScale.textSmall}>No role data available</div>
+                  <div className={`${compactScale.textSmall} ${compactScale.marginTop}`}>
+                    Total staff: {staffingData?.length || 0}
+                  </div>
                 </div>
               </div>
             )}

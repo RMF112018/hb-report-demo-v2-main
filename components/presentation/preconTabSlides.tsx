@@ -110,7 +110,7 @@ import {
 export const preconTabSlides: PresentationSlide[] = [
   {
     id: "precon-overview",
-    title: "Pre-Construction Command Center",
+    title: "Pre-Construction: From Bid to Build, Connected by Continuity",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -124,9 +124,10 @@ export const preconTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Pre-Construction Command Center</strong> transforms disconnected estimating and planning processes
-            by <strong>integrating BuildingConnected, scheduling, staffing, and BIM coordination</strong> into one
-            unified platform that follows projects through their entire lifecycle.
+            The Pre-Construction Command Center unifies the earliest phases of project planning by integrating
+            estimating, staffing, scheduling, and BIM coordination into one intelligent workspace. By centralizing every
+            preconstruction tool, team, and timeline, HB Intel brings true lifecycle continuity from initial bid through
+            final closeout.
           </motion.p>
 
           <motion.p
@@ -149,25 +150,31 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Unified Estimating</div>
-              <div className="text-xs text-blue-200">BuildingConnected integration with Excel workbook management</div>
+              <div className="text-xs text-blue-200">
+                Connected workflows from bid solicitation to workbook creation.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👥</div>
               <div className="font-medium text-white">Staffing Plans</div>
-              <div className="text-xs text-blue-200">Pre-construction team allocation and resource planning</div>
+              <div className="text-xs text-blue-200">Plan and allocate precon teams with lifecycle alignment.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Schedule Analysis</div>
-              <div className="text-xs text-blue-200">Bid package scheduling with HBI risk assessment</div>
+              <div className="text-xs text-blue-200">
+                Build logic-tied preconstruction schedules with risk insights.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🏗️</div>
               <div className="font-medium text-white">BIM Coordination</div>
-              <div className="text-xs text-blue-200">Clash detection, model viewing, and IDS integration</div>
+              <div className="text-xs text-blue-200">
+                Integrated model management with clash detection and IDS support.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -176,7 +183,7 @@ export const preconTabSlides: PresentationSlide[] = [
   },
   {
     id: "unified-estimating",
-    title: "Unified Estimating Platform",
+    title: "Estimating Without Gaps, From BuildingConnected to Closeout",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -190,10 +197,9 @@ export const preconTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Unified Estimating Platform</strong> eliminates the disconnect between BuildingConnected
-            subcontractor bids and Excel workbook development by{" "}
-            <strong>overlaying BuildingConnected with integrated estimating tools</strong> that maintain project
-            continuity from bid to warranty closeout.
+            The Unified Estimating Platform bridges the gap between subcontractor bid management and estimating
+            workbooks. By integrating BuildingConnected directly into HB Intel's estimating environment, continuity is
+            preserved throughout the entire project lifecycle—from the first bid to final closeout.
           </motion.p>
 
           <motion.p
@@ -216,19 +222,19 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔗</div>
               <div className="font-medium text-white">BuildingConnected Integration</div>
-              <div className="text-xs text-green-200">Native subcontractor bid management with enhanced workflows</div>
+              <div className="text-xs text-green-200">Real-time subcontractor bid management, fully embedded.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Estimating Workbooks</div>
-              <div className="text-xs text-green-200">Excel-powered estimating with project lifecycle tracking</div>
+              <div className="text-xs text-green-200">Excel-powered estimates with centralized project alignment.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Lifecycle Continuity</div>
-              <div className="text-xs text-green-200">Seamless data flow from bid through warranty closeout</div>
+              <div className="text-xs text-green-200">No handoffs lost—estimates evolve with the project.</div>
             </div>
           </motion.div>
         </div>
@@ -237,7 +243,7 @@ export const preconTabSlides: PresentationSlide[] = [
   },
   {
     id: "precon-planning",
-    title: "Pre-Construction Planning & Risk Analysis",
+    title: "Strategic Preconstruction Planning with HBI Foresight",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -251,10 +257,9 @@ export const preconTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Pre-Construction Planning</strong> transforms project preparation by{" "}
-            <strong>creating integrated staffing plans, schedule analysis, and HBI-powered risk assessment</strong> that
-            combines estimating coverage, schedule constraints, and industry data for comprehensive project
-            intelligence.
+            Pre-Construction Planning connects the dots between estimating, staffing, schedule logic, and early-stage
+            risk identification. With support from HBI, your preconstruction team gains AI-driven intelligence to align
+            resources and mitigate risks before construction begins.
           </motion.p>
 
           <motion.p
@@ -278,22 +283,20 @@ export const preconTabSlides: PresentationSlide[] = [
               <div className="text-3xl">👥</div>
               <div className="font-medium text-white">Staffing Plans</div>
               <div className="text-xs text-purple-200">
-                Pre-construction team allocation supporting estimating process
+                Precon staffing aligned with estimating and future execution.
               </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Schedule Generation</div>
-              <div className="text-xs text-purple-200">
-                Bid package and pre-construction schedule creation and analysis
-              </div>
+              <div className="text-xs text-purple-200">Smart bid-phase schedules with embedded phase logic.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🤖</div>
               <div className="font-medium text-white">HBI Risk Analysis</div>
-              <div className="text-xs text-purple-200">AI-powered risk assessment with industry data aggregation</div>
+              <div className="text-xs text-purple-200">AI-powered insights guide better decisions, earlier.</div>
             </div>
           </motion.div>
         </div>
@@ -302,7 +305,7 @@ export const preconTabSlides: PresentationSlide[] = [
   },
   {
     id: "bim-coordination",
-    title: "IDS & BIM Coordination",
+    title: "BIM & Model Coordination—Seamless, Visual, Intelligent",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -316,9 +319,9 @@ export const preconTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>IDS & BIM Coordination</strong> streamlines model management and clash resolution by{" "}
-            <strong>aggregating clash detection data through Autodesk and Procore APIs</strong> while providing model
-            viewing, presentation media, and integrated IDS services pricing.
+            IDS & BIM Coordination simplifies model aggregation, clash detection, and presentation management. Through
+            Autodesk and Procore APIs, HBI centralizes BIM workflows and makes it easy to identify issues, communicate
+            visually, and integrate IDS pricing into estimates—maintaining continuity from coordination to contract.
           </motion.p>
 
           <motion.p
@@ -341,21 +344,21 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚡</div>
               <div className="font-medium text-white">Clash Detection</div>
-              <div className="text-xs text-orange-200">Automated clash aggregation via Autodesk and Procore APIs</div>
+              <div className="text-xs text-orange-200">
+                Aggregated and visualized clashes from Autodesk and Procore.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👁️</div>
               <div className="font-medium text-white">Model Viewing</div>
-              <div className="text-xs text-orange-200">Integrated model viewing with presentation media rendering</div>
+              <div className="text-xs text-orange-200">Presentation-ready model viewers built into each phase.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💼</div>
               <div className="font-medium text-white">IDS Services</div>
-              <div className="text-xs text-orange-200">
-                Menu of IDS services with pricing integrated into estimating
-              </div>
+              <div className="text-xs text-orange-200">Track IDS offerings and costs—directly within estimating.</div>
             </div>
           </motion.div>
         </div>

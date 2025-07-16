@@ -66,31 +66,50 @@ const recentActivity = [
   { user: "Tom Davis", action: "Failed Login", time: "3 hours ago", status: "warning" },
 ]
 
-function CardShell({ title, children }: { title: string; children: React.ReactNode }) {
+interface BetaUserAccessSummaryProps {
+  className?: string
+  isCompact?: boolean
+}
+
+function CardShell({ title, children, isCompact }: { title: string; children: React.ReactNode; isCompact?: boolean }) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   return (
     <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <Users className="h-5 w-5" style={{ color: "#FA4616" }} />
+      <CardHeader className={compactScale.paddingCard}>
+        <CardTitle className={`flex items-center ${compactScale.gap} ${compactScale.textTitle} font-semibold`}>
+          <Users className={compactScale.iconSize} style={{ color: "#FA4616" }} />
           {title}
-          <Badge variant="outline" className="ml-auto text-xs">
-            <Activity className="h-3 w-3 mr-1" />
-            Power BI
+          <Badge variant="outline" className={`ml-auto ${compactScale.textSmall}`}>
+            <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
+            Real-time
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>{children}</CardContent>
     </Card>
   )
 }
 
-export default function BetaUserAccessSummary() {
+export default function BetaUserAccessSummary({ isCompact }: BetaUserAccessSummaryProps) {
   const totalUsers = userRoleDistribution.reduce((acc, role) => acc + role.value, 0)
   const pendingUsers = 12
   const activeUsers = totalUsers - pendingUsers
 
   return (
-    <CardShell title="User Access Summary">
+    <CardShell title="User Access Summary" isCompact={isCompact}>
       <div className="h-full space-y-4">
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">

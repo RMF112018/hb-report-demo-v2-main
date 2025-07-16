@@ -4854,8 +4854,12 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     )
   }
 
-  // Return the main content with proper JSX structure
-  return mainContent
+  // Return the main content with proper JSX structure and overflow constraints
+  return (
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden">
+      <div className="h-full w-full min-w-0 max-w-full overflow-hidden">{mainContent}</div>
+    </div>
+  )
 }
 
 // Export the left sidebar content as a separate function
@@ -6529,14 +6533,14 @@ export const getFieldManagementRightPanelContent = (
   onSidebarContentChange?: (content: React.ReactNode) => void
 ) => {
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="h-full w-full min-w-0 max-w-full overflow-visible">
       <FieldManagementContent
         selectedSubTool={selectedSubTool}
         projectData={projectData}
         userRole={userRole}
         projectId={projectId}
         onSidebarContentChange={onSidebarContentChange}
-        className="w-full h-full"
+        className="w-full h-full min-w-0 max-w-full"
       />
     </div>
   )

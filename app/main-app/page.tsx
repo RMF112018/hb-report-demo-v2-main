@@ -1319,10 +1319,10 @@ export default function MainApplicationPage() {
           <div
             className={`${
               contentConfig.hasLeftContent ? "w-4/5" : "w-full"
-            } overflow-y-scroll overflow-x-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col scrollbar-hide`}
+            } overflow-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col scrollbar-hide`}
           >
-            <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-x-hidden flex flex-col">
-              <div className="flex-1 min-w-0 w-full max-w-full overflow-x-hidden">{contentConfig.rightContent}</div>
+            <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-y-auto overflow-x-hidden flex flex-col">
+              <div className="flex-1 min-w-0 w-full max-w-full overflow-hidden">{contentConfig.rightContent}</div>
             </div>
           </div>
         </div>

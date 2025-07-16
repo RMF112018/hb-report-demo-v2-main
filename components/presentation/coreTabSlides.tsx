@@ -76,7 +76,7 @@ import {
 export const coreTabSlides: PresentationSlide[] = [
   {
     id: "core-overview",
-    title: "Core Project Tools Overview",
+    title: "The Core Tab: Foundation of Project Continuity",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -90,9 +90,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Core Project Tools</strong> provide a unified workspace where{" "}
-            <strong>project managers get instant access to all critical project information</strong> — eliminating the
-            need to juggle multiple SharePoint tabs, Excel trackers, and scattered documents.
+            The Core Tab is the command center for project execution—unifying dashboards, checklists, collaboration
+            tools, staffing logic, and accountability frameworks in a single pane of glass.
           </motion.p>
 
           <motion.p
@@ -101,10 +100,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of switching between separate systems for dashboards, checklists, team communications, staffing
-            plans, responsibility tracking, and reports,{" "}
-            <strong>everything is consolidated into one intelligent interface</strong> that adapts to your role and
-            project needs.
+            No more switching between SharePoint, Excel trackers, or siloed apps. With HB Intel, all essential functions
+            are accessible, centralized, and tailored to each role across the project lifecycle.
           </motion.p>
 
           <motion.div
@@ -116,37 +113,49 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Live Dashboard</div>
-              <div className="text-xs text-blue-200">Real-time KPIs and project health metrics</div>
+              <div className="text-xs text-blue-200">
+                Real-time KPIs track health across budget, schedule, and performance.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">✅</div>
               <div className="font-medium text-white">Smart Checklists</div>
-              <div className="text-xs text-blue-200">Automated progress tracking and compliance</div>
+              <div className="text-xs text-blue-200">
+                Track milestone completion and compliance with intelligent automation.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💬</div>
               <div className="font-medium text-white">Team Collaboration</div>
-              <div className="text-xs text-blue-200">Microsoft Teams integration and task management</div>
+              <div className="text-xs text-blue-200">
+                Microsoft 365 integration drives team productivity and clarity.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👥</div>
               <div className="font-medium text-white">Staffing Plans</div>
-              <div className="text-xs text-blue-200">Resource allocation and workforce planning</div>
+              <div className="text-xs text-blue-200">
+                Centralized workforce planning aligned with active and upcoming work.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Responsibility Matrix</div>
-              <div className="text-xs text-blue-200">Clear ownership and accountability tracking</div>
+              <div className="text-xs text-blue-200">
+                Accountability, ownership, and coverage defined and validated.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
               <div className="font-medium text-white">Comprehensive Reports</div>
-              <div className="text-xs text-blue-200">Automated reporting and analytics</div>
+              <div className="text-xs text-blue-200">
+                Actionable insights with automated reporting across every phase.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -155,7 +164,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "dashboard-kpis",
-    title: "Live Dashboard & KPIs",
+    title: "Live Dashboards That Keep You Ahead",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -169,9 +178,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Live Dashboard</strong> replaces weekly email briefings and static reports with{" "}
-            <strong>real-time project status and performance metrics</strong> that update automatically as work
-            progresses across all project areas.
+            Static reports and weekly updates are replaced by live, interactive dashboards that show the current state
+            of your projects across all key metrics.
           </motion.p>
 
           <motion.p
@@ -180,9 +188,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of waiting for status meetings or chasing down updates from multiple team members,{" "}
-            <strong>HBI AI intelligence provides role-tailored insights</strong> that surface critical issues and
-            opportunities before they become problems.
+            HBI enhances visibility by surfacing predictive insights and role-specific alerts—giving you a clear view of
+            what matters, before it becomes an issue.
           </motion.p>
 
           <motion.div
@@ -194,19 +201,23 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">At-a-Glance Insights</div>
-              <div className="text-xs text-green-200">Budget, schedule, and quality metrics in one view</div>
+              <div className="text-xs text-green-200">
+                Track progress on budget, schedule, quality, and risk in real time.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🤖</div>
               <div className="font-medium text-white">HBI Intelligence</div>
-              <div className="text-xs text-green-200">AI-powered alerts and predictive recommendations</div>
+              <div className="text-xs text-green-200">
+                AI-driven alerts for performance gaps and early interventions.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Critical Path Analysis</div>
-              <div className="text-xs text-green-200">Automated risk detection and schedule optimization</div>
+              <div className="text-xs text-green-200">Forecast delays and optimize sequencing before impact.</div>
             </div>
           </motion.div>
         </div>
@@ -215,7 +226,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "project-checklists",
-    title: "Project Checklists",
+    title: "Smart Checklists Across the Entire Project Lifecycle",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -229,9 +240,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Project Checklists</strong> eliminate the chaos of scattered task lists and manual tracking by{" "}
-            <strong>providing automated progress monitoring across StartUp, PreCO, and Closeout phases</strong> with
-            real-time completion status.
+            StartUp, PreCO, and Closeout checklists are unified in one smart interface—enabling automated progress
+            tracking, live status updates, and role-based task views.
           </motion.p>
 
           <motion.p
@@ -240,9 +250,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of juggling multiple Excel spreadsheets, printed checklists, and email reminders,{" "}
-            <strong>all project milestones are centrally managed</strong> with automatic progress calculation and
-            compliance validation.
+            HB Intel brings structure to every phase, ensuring accountability and momentum from the first mobilization
+            meeting to final turnover.
           </motion.p>
 
           <motion.div
@@ -254,19 +263,25 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🚀</div>
               <div className="font-medium text-white">StartUp Checklist</div>
-              <div className="text-xs text-purple-200">Essential startup tasks and documentation tracking</div>
+              <div className="text-xs text-purple-200">
+                Ensure your project starts strong—with permits, plans, and safety.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🏗️</div>
               <div className="font-medium text-white">PreCO Checklist</div>
-              <div className="text-xs text-purple-200">Pre-construction activities and preparations</div>
+              <div className="text-xs text-purple-200">
+                Proactively prep for inspections, operations, and CO readiness.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">✅</div>
               <div className="font-medium text-white">Closeout Checklist</div>
-              <div className="text-xs text-purple-200">Project completion and closure activities</div>
+              <div className="text-xs text-purple-200">
+                Close confidently with docs, punch lists, and warranty initiation.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -275,7 +290,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "team-productivity",
-    title: "Team Productivity & Collaboration",
+    title: "Streamlined Communication Meets Intelligent Tasking",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -289,9 +304,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Team Productivity</strong> transforms scattered communications and task management by{" "}
-            <strong>integrating Microsoft Teams directly into project workflows</strong> with unified messaging, task
-            tracking, and activity feeds.
+            The Core Tab brings Microsoft Teams, Planner, and project data together—enabling smarter task assignments,
+            conversations in context, and visibility into what's happening now.
           </motion.p>
 
           <motion.p
@@ -300,9 +314,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of switching between email, Teams, Planner, and multiple project platforms,{" "}
-            <strong>everything is integrated into one collaborative workspace</strong> with enterprise-grade Microsoft
-            365 connectivity.
+            No more bouncing between tabs—HBI keeps your team aligned, accountable, and informed within a single
+            workspace.
           </motion.p>
 
           <motion.div
@@ -314,19 +327,23 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💬</div>
               <div className="font-medium text-white">Teams Integration</div>
-              <div className="text-xs text-blue-200">Native Microsoft Teams messaging and channels</div>
+              <div className="text-xs text-blue-200">
+                Native messaging and channels connected to real project workflows.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📋</div>
               <div className="font-medium text-white">Task Management</div>
-              <div className="text-xs text-blue-200">Microsoft Planner integration with project context</div>
+              <div className="text-xs text-blue-200">
+                Assign, track, and resolve tasks with Microsoft Planner context.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Activity Feed</div>
-              <div className="text-xs text-blue-200">Real-time project updates and progress tracking</div>
+              <div className="text-xs text-blue-200">Real-time view of what's happening—what's late, what's next.</div>
             </div>
           </motion.div>
         </div>
@@ -335,7 +352,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "staffing-management",
-    title: "Staffing & Resource Management",
+    title: "Workforce Clarity, From Planning to Execution",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -349,9 +366,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Staffing & Resource Management</strong> eliminates complex workforce planning spreadsheets by{" "}
-            <strong>providing visual staff allocation and resource optimization</strong> with real-time availability
-            tracking and skill matching.
+            Resource planning shifts from manual spreadsheets to dynamic workforce optimization. Visual tools help you
+            allocate, adjust, and align staffing with project demands and continuity.
           </motion.p>
 
           <motion.p
@@ -360,9 +376,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing multiple Excel files for crew assignments, availability tracking, and skill inventories,{" "}
-            <strong>all workforce planning is centralized</strong> with automated conflict detection and optimization
-            recommendations.
+            HBI cross-references schedules, skills, and availability—reducing downtime and double-bookings before they
+            happen.
           </motion.p>
 
           <motion.div
@@ -374,19 +389,21 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Resource Allocation</div>
-              <div className="text-xs text-orange-200">Visual workforce planning with Gantt charts</div>
+              <div className="text-xs text-orange-200">Gantt-based visual planning tailored to project needs.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Skill Matching</div>
-              <div className="text-xs text-orange-200">Automated crew assignment based on expertise</div>
+              <div className="text-xs text-orange-200">
+                Auto-suggested assignments based on availability and experience.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚡</div>
               <div className="font-medium text-white">Availability Tracking</div>
-              <div className="text-xs text-orange-200">Real-time crew availability and conflict detection</div>
+              <div className="text-xs text-orange-200">Conflict alerts and capacity insights in real time.</div>
             </div>
           </motion.div>
         </div>
@@ -395,7 +412,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "responsibility-matrix",
-    title: "Responsibility Matrix",
+    title: "Define Responsibility. Prevent Gaps.",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -409,9 +426,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Responsibility Matrix</strong> eliminates "who owns this?" delays in meetings by{" "}
-            <strong>providing centralized visibility into role assignments and accountability</strong> across all
-            project phases and cost codes.
+            The Responsibility Matrix makes accountability clear, centralizing ownership data across cost codes,
+            schedule tasks, and project phases.
           </motion.p>
 
           <motion.p
@@ -420,9 +436,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of scattered assignment documents and unclear ownership boundaries,{" "}
-            <strong>all responsibilities are clearly defined and validated</strong> with real-time updates tied directly
-            to staffing and scheduling tools.
+            With integrated validation logic, the platform flags unclear handoffs and duplicate assignments—eliminating
+            ambiguity before it stalls progress.
           </motion.p>
 
           <motion.div
@@ -434,21 +449,19 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👁️</div>
               <div className="font-medium text-white">Centralized Visibility</div>
-              <div className="text-xs text-red-200">Clear view of who's assigned to what across all phases</div>
+              <div className="text-xs text-red-200">See ownership across trades, scopes, and teams in one view.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔍</div>
               <div className="font-medium text-white">Assignment Validation</div>
-              <div className="text-xs text-red-200">Cross-validates clarity and flags gaps automatically</div>
+              <div className="text-xs text-red-200">Spot gaps, overlaps, and conflicts in real time.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚠️</div>
               <div className="font-medium text-white">Conflict Detection</div>
-              <div className="text-xs text-red-200">
-                Identifies overlapping responsibilities before they impact work
-              </div>
+              <div className="text-xs text-red-200">Proactive issue detection—before confusion leads to delay.</div>
             </div>
           </motion.div>
         </div>
@@ -457,7 +470,7 @@ export const coreTabSlides: PresentationSlide[] = [
   },
   {
     id: "comprehensive-reports",
-    title: "Comprehensive Reports & Analytics",
+    title: "Insights that Write Themselves",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -471,9 +484,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Comprehensive Reports</strong> eliminate manual report compilation and data hunting by{" "}
-            <strong>providing automated analytics and insights</strong> with real-time data integration across all
-            project modules.
+            Reporting is no longer a burden. HB Intel aggregates real-time data across all Core modules—generating
+            meaningful, role-based insights without the need for manual compilation.
           </motion.p>
 
           <motion.p
@@ -482,9 +494,8 @@ export const coreTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of spending hours gathering data from multiple systems and creating reports manually,{" "}
-            <strong>all project metrics are automatically aggregated</strong> with customizable dashboards and scheduled
-            reporting.
+            Dashboards and reports are customizable, automated, and always available—supporting proactive leadership
+            through every project phase.
           </motion.p>
 
           <motion.div
@@ -496,19 +507,21 @@ export const coreTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Automated Analytics</div>
-              <div className="text-xs text-indigo-200">Real-time data integration across all project modules</div>
+              <div className="text-xs text-indigo-200">Real-time metrics, synced across all platform tools.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
               <div className="font-medium text-white">Performance Insights</div>
-              <div className="text-xs text-indigo-200">Trend analysis and predictive reporting</div>
+              <div className="text-xs text-indigo-200">Track progress trends and generate predictive overviews.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📋</div>
               <div className="font-medium text-white">Custom Dashboards</div>
-              <div className="text-xs text-indigo-200">Role-based reporting with scheduled delivery</div>
+              <div className="text-xs text-indigo-200">
+                Tailored reporting with scheduled delivery to decision-makers.
+              </div>
             </div>
           </motion.div>
         </div>

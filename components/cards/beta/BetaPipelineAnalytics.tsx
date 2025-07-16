@@ -85,12 +85,22 @@ const RISK_COLORS = {
   High: COLORS.danger,
 }
 
-export default function BetaPipelineAnalytics({
-  className,
-  config,
-  isCompact = false,
-  userRole,
-}: BetaPipelineAnalyticsProps) {
+export default function BetaPipelineAnalytics({ className, config, isCompact, userRole }: BetaPipelineAnalyticsProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
+  const [isRealTime, setIsRealTime] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
@@ -256,28 +266,32 @@ export default function BetaPipelineAnalytics({
         </div>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent className={isCompact ? "p-2" : "p-4"}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="overview" className="text-xs">
+          <TabsList className={`grid w-full grid-cols-3 ${isCompact ? "mb-2" : "mb-4"}`}>
+            <TabsTrigger value="overview" className={compactScale.textSmall}>
               Overview
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-xs">
+            <TabsTrigger value="analytics" className={compactScale.textSmall}>
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="pipeline" className="text-xs">
+            <TabsTrigger value="pipeline" className={compactScale.textSmall}>
               Pipeline
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+            <div className={`grid grid-cols-2 lg:grid-cols-4 ${isCompact ? "gap-2" : "gap-3"}`}>
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${compactScale.padding} border border-blue-200 dark:border-blue-800`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Total Pipeline</p>
-                    <p className="text-lg font-bold text-blue-600">{formatMillions(analytics.totalValue)}</p>
+                    <p className={`${compactScale.textSmall} text-muted-foreground`}>Total Pipeline</p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-blue-600`}>
+                      {formatMillions(analytics.totalValue)}
+                    </p>
                   </div>
                   <DollarSign className="h-4 w-4 text-blue-600" />
                 </div>

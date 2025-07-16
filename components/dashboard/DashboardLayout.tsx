@@ -80,7 +80,7 @@ export function DashboardLayout({
         <div data-tour="kpi-widgets" className="mb-4">
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
             <div className="mx-auto max-w-[1920px]">
-              <KPIRow userRole={userRole} />
+              <KPIRow userRole={userRole} isCompact={isCompact} />
             </div>
           </div>
         </div>

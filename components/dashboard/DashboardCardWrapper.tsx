@@ -201,7 +201,7 @@ const SMART_PRESETS = [
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 16, rows: 6 }
+      return { cols: 8, rows: 5 }
     case "enhanced-hbi-insights":
       return { cols: 8, rows: 5 }
     case "portfolio-overview":

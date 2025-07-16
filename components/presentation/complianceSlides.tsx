@@ -37,8 +37,9 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Unified compliance management</strong> across safety, quality, contract, and trade partner domains
-            with <strong>integrated platform overlays</strong> for comprehensive project oversight.
+            <strong>Comprehensive compliance oversight</strong> spanning safety, quality, contract execution, and trade
+            partner management—delivered through a <strong>unified platform overlay</strong> for full project visibility
+            and control.
           </motion.p>
 
           <motion.div
@@ -86,8 +87,19 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>SiteMate platform overlay</strong> providing real-time safety inspection data and field monitoring
-            capabilities with <strong>live aggregation</strong> of completed safety tasks.
+            <strong>SiteMate Safety</strong> overlays provide{" "}
+            <strong>real-time jobsite inspection data, task verification, and incident tracking</strong>—empowering
+            field teams to proactively manage safety compliance from mobile devices.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Live task aggregation and automated tracking <strong>streamline verification and response</strong>,
+            eliminating delays and improving accountability across sites.
           </motion.p>
 
           <motion.div
@@ -135,8 +147,19 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>SiteMate quality control platform</strong> overlay aggregating field inspection data and providing{" "}
-            <strong>real-time monitoring</strong> of quality tasks and inspections.
+            <strong>SiteMate Quality Control</strong> consolidates inspection workflows with{" "}
+            <strong>mobile data capture, real-time dashboards, and automated issue resolution</strong>—ensuring
+            consistent quality standards across all field activities.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Field data feeds directly into HBI analytics for{" "}
+            <strong>actionable insights and system-driven corrective actions</strong>.
           </motion.p>
 
           <motion.div
@@ -184,8 +207,19 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>AI-powered contract analysis</strong> and document management with{" "}
-            <strong>intelligent risk assessment</strong> and automated compliance tracking.
+            <strong>HBI Contract Management</strong> leverages AI to provide{" "}
+            <strong>intelligent risk detection, document tagging, and compliance automation</strong>—ensuring contracts
+            are reviewed with precision and managed with confidence.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Streamline legal oversight and{" "}
+            <strong>maintain a living audit trail of contract obligations and risk status</strong>.
           </motion.p>
 
           <motion.div
@@ -233,8 +267,19 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Compass compliance platform overlay</strong> providing ratings and pre-qualification assistance for{" "}
-            <strong>informed procurement decision making</strong> during the bidding process.
+            <strong>Compass Trade Partner Compliance</strong> offers{" "}
+            <strong>real-time risk scoring, prequalification support, and performance intelligence</strong>—enabling
+            smarter procurement decisions at the bidding stage.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Centralize partner ratings and{" "}
+            <strong>ensure ongoing alignment with project standards and insurance/licensing requirements</strong>.
           </motion.p>
 
           <motion.div
@@ -282,8 +327,19 @@ export const complianceSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Executive dashboard</strong> providing unified compliance insights across all platforms with{" "}
-            <strong>proactive monitoring</strong> and regulatory readiness.
+            <strong>HBI's Executive Compliance Dashboard</strong> delivers a unified view across platforms with{" "}
+            <strong>real-time alerts, seamless integrations, and audit readiness tools</strong> for proactive compliance
+            leadership.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Replace reactive tracking with <strong>live oversight and built-in regulatory intelligence</strong> that
+            prepares your team for any review.
           </motion.p>
 
           <motion.div

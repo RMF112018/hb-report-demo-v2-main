@@ -205,48 +205,61 @@ export default function BetaEnhancedHBIInsights({
     }
   }
 
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-2" : "pb-3",
+    gap: isCompact ? "gap-1" : "gap-2",
+    gapLarge: isCompact ? "gap-2" : "gap-3",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+  }
+
   return (
     <Card
       className={`${className} bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border-[#FA4616]/20 dark:border-[#FA4616]/40 shadow-lg`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#FA4616] rounded-lg">
-              <Brain className="h-5 w-5 text-white" />
+          <div className={`flex items-center ${compactScale.gapLarge}`}>
+            <div className={`${compactScale.padding} bg-[#FA4616] rounded-lg`}>
+              <Brain className={`${compactScale.iconSize} text-white`} />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-[#FA4616] dark:text-[#FF8A67]">
+              <CardTitle className={`${compactScale.textTitle} font-semibold text-[#FA4616] dark:text-[#FF8A67]`}>
                 HBI AI Insights
               </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
+              <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
                 <Badge
                   variant="outline"
-                  className="text-xs bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
+                  className={`${compactScale.textSmall} bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]`}
                 >
-                  <Bot className="h-3 w-3 mr-1" />
+                  <Bot className={`${compactScale.iconSizeSmall} mr-0.5`} />
                   AI-Powered
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-xs bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                  className={`${compactScale.textSmall} bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]`}
                 >
-                  <Database className="h-3 w-3 mr-1" />
+                  <Database className={`${compactScale.iconSizeSmall} mr-0.5`} />
                   Power BI
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-xs bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                  className={`${compactScale.textSmall} bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]`}
                 >
-                  <Activity className="h-3 w-3 mr-1" />
+                  <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
                   {isProcessing ? "Processing..." : "Live"}
                 </Badge>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="ai-toggle" className="text-xs">
+          <div className={`flex items-center ${compactScale.gap}`}>
+            <div className={`flex items-center ${compactScale.gap}`}>
+              <Label htmlFor="ai-toggle" className={compactScale.textSmall}>
                 AI Processing
               </Label>
               <Switch id="ai-toggle" checked={aiEnabled} onCheckedChange={setAiEnabled} />
@@ -256,13 +269,13 @@ export default function BetaEnhancedHBIInsights({
               size="sm"
               onClick={handleReprocess}
               disabled={isProcessing}
-              className="h-8 w-8 p-0"
+              className={isCompact ? "h-6 w-6 p-0" : "h-8 w-8 p-0"}
             >
-              <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`${compactScale.iconSizeSmall} ${isProcessing ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className={`flex items-center justify-between ${compactScale.textSmall} text-muted-foreground`}>
           <span>Last processed: {lastProcessed.toLocaleTimeString()}</span>
           <span>Confidence: {data.confidence}%</span>
         </div>
@@ -279,108 +292,141 @@ export default function BetaEnhancedHBIInsights({
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="insights" className="text-xs">
+          <TabsList className={`grid w-full grid-cols-3 ${isCompact ? "mb-2" : "mb-4"}`}>
+            <TabsTrigger value="insights" className={compactScale.textSmall}>
               AI Insights
             </TabsTrigger>
-            <TabsTrigger value="predictions" className="text-xs">
+            <TabsTrigger value="predictions" className={compactScale.textSmall}>
               Predictions
             </TabsTrigger>
-            <TabsTrigger value="models" className="text-xs">
+            <TabsTrigger value="models" className={compactScale.textSmall}>
               AI Models
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="insights" className="space-y-4">
+          <TabsContent value="insights" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+            <div className={`grid grid-cols-2 lg:grid-cols-4 ${isCompact ? "gap-2" : "gap-3"}`}>
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${
+                  isCompact ? "p-2" : "p-3"
+                } border border-purple-200 dark:border-purple-800`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Active Insights</p>
-                    <p className="text-lg font-bold text-purple-600">{data.analytics.activeInsights}</p>
+                    <p className={`${compactScale.textSmall} text-muted-foreground`}>Active Insights</p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-purple-600`}>
+                      {data.analytics.activeInsights}
+                    </p>
                   </div>
-                  <Eye className="h-4 w-4 text-purple-600" />
+                  <Eye className={`${isCompact ? "h-3 w-3" : "h-4 w-4"} text-purple-600`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600">+3 this week</span>
+                <div className={`flex items-center gap-1 ${isCompact ? "mt-0.5" : "mt-1"}`}>
+                  <TrendingUp className={`${compactScale.iconSizeSmall} text-green-500`} />
+                  <span className={`${compactScale.textSmall} text-green-600`}>+3 this week</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800">
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${
+                  isCompact ? "p-2" : "p-3"
+                } border border-green-200 dark:border-green-800`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Accuracy Rate</p>
-                    <p className="text-lg font-bold text-green-600">{data.analytics.accuracyRate}%</p>
+                    <p className={`${compactScale.textSmall} text-muted-foreground`}>Accuracy Rate</p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-green-600`}>
+                      {data.analytics.accuracyRate}%
+                    </p>
                   </div>
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <CheckCircle className={`${isCompact ? "h-3 w-3" : "h-4 w-4"} text-green-600`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600">+2.1% vs last month</span>
+                <div className={`flex items-center gap-1 ${isCompact ? "mt-0.5" : "mt-1"}`}>
+                  <TrendingUp className={`${compactScale.iconSizeSmall} text-green-500`} />
+                  <span className={`${compactScale.textSmall} text-green-600`}>+2.1% vs last month</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${
+                  isCompact ? "p-2" : "p-3"
+                } border border-blue-200 dark:border-blue-800`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Data Points</p>
-                    <p className="text-lg font-bold text-blue-600">{data.analytics.dataPoints.toLocaleString()}</p>
+                    <p className={`${compactScale.textSmall} text-muted-foreground`}>Data Points</p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-blue-600`}>
+                      {data.analytics.dataPoints.toLocaleString()}
+                    </p>
                   </div>
-                  <Database className="h-4 w-4 text-blue-600" />
+                  <Database className={`${isCompact ? "h-3 w-3" : "h-4 w-4"} text-blue-600`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <Clock className="h-3 w-3 text-blue-500" />
-                  <span className="text-xs text-blue-600">{data.analytics.processingTime}</span>
+                <div className={`flex items-center gap-1 ${isCompact ? "mt-0.5" : "mt-1"}`}>
+                  <Clock className={`${compactScale.iconSizeSmall} text-blue-500`} />
+                  <span className={`${compactScale.textSmall} text-blue-600`}>{data.analytics.processingTime}</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-orange-200 dark:border-orange-800">
+              <div
+                className={`bg-white dark:bg-gray-800 rounded-lg ${
+                  isCompact ? "p-2" : "p-3"
+                } border border-orange-200 dark:border-orange-800`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Risk Score</p>
-                    <p className="text-lg font-bold text-orange-600">{data.riskScore}%</p>
+                    <p className={`${compactScale.textSmall} text-muted-foreground`}>Risk Score</p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-orange-600`}>
+                      {data.riskScore}%
+                    </p>
                   </div>
-                  <Shield className="h-4 w-4 text-orange-600" />
+                  <Shield className={`${isCompact ? "h-3 w-3" : "h-4 w-4"} text-orange-600`} />
                 </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <CheckCircle className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600">Low Risk</span>
+                <div className={`flex items-center gap-1 ${isCompact ? "mt-0.5" : "mt-1"}`}>
+                  <CheckCircle className={`${compactScale.iconSizeSmall} text-green-500`} />
+                  <span className={`${compactScale.textSmall} text-green-600`}>Low Risk</span>
                 </div>
               </div>
             </div>
 
             {/* AI Insights List */}
-            <div className="space-y-3">
+            <div className={isCompact ? "space-y-2" : "space-y-3"}>
               {data.insights.map((insight) => (
-                <div key={insight.id} className={`rounded-lg p-4 border ${getInsightColor(insight.type)}`}>
+                <div
+                  key={insight.id}
+                  className={`rounded-lg ${isCompact ? "p-2" : "p-4"} border ${getInsightColor(insight.type)}`}
+                >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
+                    <div className={`flex items-start ${isCompact ? "gap-2" : "gap-3"}`}>
                       {getInsightIcon(insight.type)}
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-sm">{insight.title}</h4>
+                        <div
+                          className={`flex items-center ${isCompact ? "gap-1" : "gap-2"} ${
+                            isCompact ? "mb-0.5" : "mb-1"
+                          }`}
+                        >
+                          <h4 className={`font-semibold ${isCompact ? "text-xs" : "text-sm"}`}>{insight.title}</h4>
                           {getPriorityBadge(insight.priority)}
                         </div>
-                        <p className="text-xs text-muted-foreground mb-2">{insight.description}</p>
-                        <div className="flex items-center gap-4 text-xs">
+                        <p className={`${compactScale.textSmall} text-muted-foreground ${isCompact ? "mb-1" : "mb-2"}`}>
+                          {insight.description}
+                        </p>
+                        <div className={`flex items-center ${isCompact ? "gap-2" : "gap-4"} ${compactScale.textSmall}`}>
                           <span className="flex items-center gap-1">
-                            <Target className="h-3 w-3" />
+                            <Target className={compactScale.iconSizeSmall} />
                             {insight.action}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
+                            <Clock className={compactScale.iconSizeSmall} />
                             {insight.timeline}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Brain className="h-3 w-3" />
+                            <Brain className={compactScale.iconSizeSmall} />
                             {insight.confidence}% confidence
                           </span>
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="h-6 text-xs">
+                    <Button variant="outline" size="sm" className={`${isCompact ? "h-5 text-[10px]" : "h-6 text-xs"}`}>
                       View Details
                     </Button>
                   </div>

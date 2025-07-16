@@ -215,15 +215,15 @@ const GRID_CONFIG = {
     xl: 16, // Large desktop - optimized for executive dashboard
     "2xl": 16, // Extra large desktop - consistent 16 columns
   },
-  // Base row height (in pixels)
+  // Base row height (in pixels) - reduced by 50% for compact view
   rowHeight: {
-    compact: 55,
-    normal: 70,
+    compact: 28,
+    normal: 35,
   },
-  // Grid gaps
+  // Grid gaps - reduced by 50% for compact view
   gap: {
-    compact: 12,
-    normal: 16,
+    compact: 6,
+    normal: 8,
   },
 }
 
@@ -267,20 +267,20 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
     return card.span.rows * rowHeight
   }
 
-  // Content-aware heights for different card types
+  // Content-aware heights for different card types - reduced by 50% for compact view
   switch (card.type) {
     case "financial-review-panel":
-      return isCompact ? 400 : 500
+      return isCompact ? 200 : 250
     case "enhanced-hbi-insights":
-      return isCompact ? 350 : 400
+      return isCompact ? 175 : 200
     case "portfolio-overview":
-      return isCompact ? 300 : 350
+      return isCompact ? 150 : 175
     case "market-intelligence":
-      return isCompact ? 450 : 500
+      return isCompact ? 225 : 250
     case "staffing-distribution":
-      return isCompact ? 400 : 450
+      return isCompact ? 200 : 225
     default:
-      return isCompact ? 300 : 350
+      return isCompact ? 150 : 175
   }
 }
 
@@ -1132,63 +1132,64 @@ function CardContent({
   }
 }
 
-// Get optimal size for cards (optimized for 16-column executive layout)
+// Get optimal size for cards (optimized for 16-column executive layout) - reduced by ~50% for compact view
+// Maximum 5 columns per card to ensure minimum 3 cards per row (16÷5 = 3.2 cards minimum)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 16, rows: 5 }
-    case "financial-dashboard":
-      return { cols: 16, rows: 18 }
-    case "enhanced-hbi-insights":
-      return { cols: 8, rows: 4 }
-    case "portfolio-overview":
-      return { cols: 8, rows: 4 }
-    case "pipeline-analytics":
-      return { cols: 10, rows: 4 }
-    case "market-intelligence":
-      return { cols: 6, rows: 4 }
-    case "staffing-distribution":
-      return { cols: 8, rows: 4 }
-    case "quality-control":
-      return { cols: 4, rows: 4 }
-    case "safety":
-      return { cols: 4, rows: 4 }
-    case "cash-flow":
-      return { cols: 8, rows: 4 }
-    case "power-bi-dashboard":
       return { cols: 8, rows: 5 }
+    case "financial-dashboard":
+      return { cols: 5, rows: 9 }
+    case "enhanced-hbi-insights":
+      return { cols: 4, rows: 2 }
+    case "portfolio-overview":
+      return { cols: 4, rows: 2 }
+    case "pipeline-analytics":
+      return { cols: 5, rows: 2 }
+    case "market-intelligence":
+      return { cols: 3, rows: 2 }
+    case "staffing-distribution":
+      return { cols: 4, rows: 2 }
+    case "quality-control":
+      return { cols: 2, rows: 2 }
+    case "safety":
+      return { cols: 2, rows: 2 }
+    case "cash-flow":
+      return { cols: 4, rows: 2 }
+    case "power-bi-dashboard":
+      return { cols: 4, rows: 3 }
     case "critical-dates":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 2 }
     case "schedule-monitor":
-      return { cols: 8, rows: 4 }
+      return { cols: 4, rows: 2 }
     case "health":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 2 }
     case "change-order-analysis":
-      return { cols: 8, rows: 4 }
+      return { cols: 4, rows: 2 }
     case "bd-opportunities":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 2 }
     // Market Intelligence Dashboard cards
     case "simple-market-intel":
-      return { cols: 16, rows: 6 }
+      return { cols: 5, rows: 3 }
     case "market-analytics":
-      return { cols: 10, rows: 8 }
+      return { cols: 5, rows: 4 }
     case "ai-market-insights":
-      return { cols: 6, rows: 8 }
+      return { cols: 3, rows: 4 }
     case "florida-market-growth":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     case "regional-hotspots":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     case "developer-sentiment":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     case "threat-tracker":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     case "ai-opportunities":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     case "competitor-benchmark":
-      return { cols: 16, rows: 8 }
+      return { cols: 5, rows: 4 }
     case "risk-reward-radar":
-      return { cols: 8, rows: 8 }
+      return { cols: 4, rows: 4 }
     default:
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 2 }
   }
 }

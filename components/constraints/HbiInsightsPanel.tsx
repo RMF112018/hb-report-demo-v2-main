@@ -4,30 +4,44 @@ import React, { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { 
-  Brain, 
-  AlertTriangle, 
-  CheckCircle, 
-  Lightbulb, 
-  Info, 
+import {
+  Brain,
+  AlertTriangle,
+  CheckCircle,
+  Lightbulb,
+  Info,
   TrendingUp,
   Target,
   Clock,
   Users,
   BarChart3,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react"
 import type { Constraint, HbiInsight } from "@/types/constraint"
 
 interface HbiInsightsPanelProps {
   constraints: Constraint[]
+  isCompact?: boolean
 }
 
-export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
+export function HbiInsightsPanel({ constraints, isCompact }: HbiInsightsPanelProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+  }
+
   // Generate AI-driven insights based on constraint data
   const insights = useMemo((): HbiInsight[] => {
-    const openConstraints = constraints.filter(c => c.completionStatus !== "Closed")
-    const overdueConstraints = constraints.filter(c => {
+    const openConstraints = constraints.filter((c) => c.completionStatus !== "Closed")
+    const overdueConstraints = constraints.filter((c) => {
       if (c.completionStatus === "Closed") return false
       if (!c.dueDate) return false
       return new Date(c.dueDate) < new Date()
@@ -57,27 +71,32 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
         priority: "high",
         confidence: 0.95,
         actionable: true,
-        relatedConstraints: overdueConstraints.slice(0, 5).map(c => c.id)
+        relatedConstraints: overdueConstraints.slice(0, 5).map((c) => c.id),
       })
     }
 
     // Category concentration insight
-    const topCategory = Object.entries(categoryDistribution).sort(([,a], [,b]) => b - a)[0]
+    const topCategory = Object.entries(categoryDistribution).sort(([, a], [, b]) => b - a)[0]
     if (topCategory && topCategory[1] > constraints.length * 0.3) {
       generatedInsights.push({
         id: "category-concentration",
         type: "recommendation",
         title: `High Concentration in ${topCategory[0]}`,
-        description: `${topCategory[1]} constraints (${((topCategory[1] / constraints.length) * 100).toFixed(1)}%) are in ${topCategory[0]}. Consider dedicated resources or process improvements for this category.`,
+        description: `${topCategory[1]} constraints (${((topCategory[1] / constraints.length) * 100).toFixed(
+          1
+        )}%) are in ${topCategory[0]}. Consider dedicated resources or process improvements for this category.`,
         priority: "medium",
         confidence: 0.88,
         actionable: true,
-        relatedConstraints: constraints.filter(c => c.category === topCategory[0]).slice(0, 3).map(c => c.id)
+        relatedConstraints: constraints
+          .filter((c) => c.category === topCategory[0])
+          .slice(0, 3)
+          .map((c) => c.id),
       })
     }
 
     // Workload distribution insight
-    const overloadedAssignees = Object.entries(assigneeWorkload).filter(([,count]) => count > 5)
+    const overloadedAssignees = Object.entries(assigneeWorkload).filter(([, count]) => count > 5)
     if (overloadedAssignees.length > 0) {
       const assignee = overloadedAssignees[0]
       generatedInsights.push({
@@ -88,27 +107,35 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
         priority: "medium",
         confidence: 0.82,
         actionable: true,
-        relatedConstraints: constraints.filter(c => c.assigned === assignee[0] && c.completionStatus !== "Closed").slice(0, 3).map(c => c.id)
+        relatedConstraints: constraints
+          .filter((c) => c.assigned === assignee[0] && c.completionStatus !== "Closed")
+          .slice(0, 3)
+          .map((c) => c.id),
       })
     }
 
     // Positive trend insight
-    const completionRate = constraints.length > 0 ? (constraints.filter(c => c.completionStatus === "Closed").length / constraints.length) * 100 : 0
+    const completionRate =
+      constraints.length > 0
+        ? (constraints.filter((c) => c.completionStatus === "Closed").length / constraints.length) * 100
+        : 0
     if (completionRate > 70) {
       generatedInsights.push({
         id: "positive-trend",
         type: "success",
         title: "Strong Resolution Performance",
-        description: `${completionRate.toFixed(1)}% constraint resolution rate indicates effective project management. Continue current practices.`,
+        description: `${completionRate.toFixed(
+          1
+        )}% constraint resolution rate indicates effective project management. Continue current practices.`,
         priority: "low",
         confidence: 0.91,
         actionable: false,
-        relatedConstraints: []
+        relatedConstraints: [],
       })
     }
 
     // Aging constraints insight
-    const longRunningConstraints = openConstraints.filter(c => c.daysElapsed > 30)
+    const longRunningConstraints = openConstraints.filter((c) => c.daysElapsed > 30)
     if (longRunningConstraints.length > 0) {
       generatedInsights.push({
         id: "aging-constraints",
@@ -118,7 +145,7 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
         priority: "medium",
         confidence: 0.78,
         actionable: true,
-        relatedConstraints: longRunningConstraints.slice(0, 3).map(c => c.id)
+        relatedConstraints: longRunningConstraints.slice(0, 3).map((c) => c.id),
       })
     }
 
@@ -128,11 +155,12 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
         id: "process-improvement",
         type: "info",
         title: "Process Optimization Opportunity",
-        description: "With growing constraint volume, consider implementing automated escalation rules and constraint categorization workflows.",
+        description:
+          "With growing constraint volume, consider implementing automated escalation rules and constraint categorization workflows.",
         priority: "low",
         confidence: 0.75,
         actionable: true,
-        relatedConstraints: []
+        relatedConstraints: [],
       })
     }
 
@@ -195,12 +223,20 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-indigo-900 dark:text-indigo-100 mb-2">
+          <div className={`text-center ${isCompact ? "py-4" : "py-8"}`}>
+            <CheckCircle
+              className={`${isCompact ? "h-8 w-8" : "h-12 w-12"} text-green-600 dark:text-green-400 mx-auto ${
+                isCompact ? "mb-2" : "mb-4"
+              }`}
+            />
+            <h3
+              className={`${compactScale.textTitle} font-medium text-indigo-900 dark:text-indigo-100 ${
+                isCompact ? "mb-1" : "mb-2"
+              }`}
+            >
               All Systems Operating Optimally
             </h3>
-            <p className="text-indigo-700 dark:text-indigo-300">
+            <p className={`${compactScale.textMedium} text-indigo-700 dark:text-indigo-300`}>
               No critical insights or recommendations at this time. Your constraint management is performing well.
             </p>
           </div>
@@ -212,50 +248,55 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
   return (
     <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950/30 dark:to-indigo-900/30 border-indigo-200 dark:border-indigo-800">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
-          <Brain className="h-5 w-5" />
+        <CardTitle className={`flex items-center ${compactScale.gap} text-indigo-800 dark:text-indigo-200`}>
+          <Brain className={compactScale.iconSize} />
           HBI Intelligence Insights
-          <Badge variant="outline" className="ml-auto bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300">
+          <Badge
+            variant="outline"
+            className={`ml-auto bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 ${compactScale.textSmall}`}
+          >
             {insights.length} insights
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className={isCompact ? "space-y-2" : "space-y-4"}>
           {insights.map((insight) => (
             <div
               key={insight.id}
-              className={`p-4 rounded-lg border ${getInsightColor(insight.type)}`}
+              className={`${compactScale.padding} rounded-lg border ${getInsightColor(insight.type)}`}
             >
-              <div className="flex items-start gap-3">
+              <div className={`flex items-start ${compactScale.gap}`}>
                 {getInsightIcon(insight.type)}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h4 className="text-sm font-semibold text-foreground">
-                      {insight.title}
-                    </h4>
-                    <Badge className={`text-xs ${getPriorityColor(insight.priority)}`}>
+                  <div className={`flex items-center ${compactScale.gap} ${isCompact ? "mb-1" : "mb-2"}`}>
+                    <h4 className={`${compactScale.textMedium} font-semibold text-foreground`}>{insight.title}</h4>
+                    <Badge className={`${compactScale.textSmall} ${getPriorityColor(insight.priority)}`}>
                       {insight.priority.toUpperCase()}
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className={compactScale.textSmall}>
                       {(insight.confidence * 100).toFixed(0)}% confidence
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <p className={`${compactScale.textSmall} text-muted-foreground ${isCompact ? "mb-2" : "mb-3"}`}>
                     {insight.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center ${compactScale.gap}`}>
                       {insight.relatedConstraints.length > 0 && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className={compactScale.textSmall}>
                           {insight.relatedConstraints.length} related
                         </Badge>
                       )}
                     </div>
                     {insight.actionable && (
-                      <Button size="sm" variant="outline" className="text-xs h-7">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className={`${compactScale.textSmall} ${isCompact ? "h-6" : "h-7"}`}
+                      >
                         Take Action
-                        <ArrowRight className="h-3 w-3 ml-1" />
+                        <ArrowRight className={`${compactScale.iconSizeSmall} ml-1`} />
                       </Button>
                     )}
                   </div>
@@ -266,26 +307,32 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
         </div>
 
         {/* Quick Action Summary */}
-        <div className="mt-6 p-4 bg-white/50 dark:bg-black/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-          <h5 className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-2">
+        <div
+          className={`${compactScale.marginTop} ${compactScale.padding} bg-white/50 dark:bg-black/20 rounded-lg border border-indigo-200 dark:border-indigo-800`}
+        >
+          <h5
+            className={`${compactScale.textMedium} font-semibold text-indigo-800 dark:text-indigo-200 ${
+              isCompact ? "mb-1" : "mb-2"
+            }`}
+          >
             Recommended Actions
           </h5>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-xs text-indigo-700 dark:text-indigo-300">
-                Address {insights.filter(i => i.priority === "high").length} high-priority items
+          <div className={`grid grid-cols-1 md:grid-cols-3 ${isCompact ? "gap-2" : "gap-3"}`}>
+            <div className={`flex items-center ${compactScale.gap}`}>
+              <Target className={`${compactScale.iconSizeSmall} text-indigo-600 dark:text-indigo-400`} />
+              <span className={`${compactScale.textSmall} text-indigo-700 dark:text-indigo-300`}>
+                Address {insights.filter((i) => i.priority === "high").length} high-priority items
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-xs text-indigo-700 dark:text-indigo-300">
+            <div className={`flex items-center ${compactScale.gap}`}>
+              <Clock className={`${compactScale.iconSizeSmall} text-indigo-600 dark:text-indigo-400`} />
+              <span className={`${compactScale.textSmall} text-indigo-700 dark:text-indigo-300`}>
                 Review aging constraints (30+ days)
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-xs text-indigo-700 dark:text-indigo-300">
+            <div className={`flex items-center ${compactScale.gap}`}>
+              <Users className={`${compactScale.iconSizeSmall} text-indigo-600 dark:text-indigo-400`} />
+              <span className={`${compactScale.textSmall} text-indigo-700 dark:text-indigo-300`}>
                 Balance workload distribution
               </span>
             </div>
@@ -294,4 +341,4 @@ export function HbiInsightsPanel({ constraints }: HbiInsightsPanelProps) {
       </CardContent>
     </Card>
   )
-} 
+}

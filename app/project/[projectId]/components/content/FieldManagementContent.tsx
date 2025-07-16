@@ -1064,7 +1064,7 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
                 />
               </TabsContent>
 
-              <TabsContent value="commitments" className="w-full max-w-full overflow-hidden">
+              <TabsContent value="commitments" className="w-full max-w-80% overflow-hidden">
                 <ProcurementCommitmentsTable
                   projectId={projectId}
                   userRole={userRole}
@@ -1277,7 +1277,7 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
     // Handle scheduler sub-tab
     if (activeTab === "scheduler") {
       return (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full min-w-0 max-w-full overflow-visible">
           <SchedulerContent
             selectedSubTool={schedulerSubTab}
             projectData={projectData}
@@ -1295,7 +1295,7 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
       return (
         <div className="space-y-6">
           {/* Permit Log Sub-tabs */}
-          <div className="space-y-4 w-full max-w-full overflow-hidden">
+          <div className="space-y-4 w-full max-w-80% overflow-hidden">
             <Tabs value={permitSubTab} onValueChange={setPermitSubTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -1633,8 +1633,8 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
 
   return (
     <div
-      className={`space-y-6 w-full max-w-full overflow-hidden ${
-        isFocusMode ? "fixed inset-0 z-50 bg-background pt-16 p-6 overflow-y-auto" : ""
+      className={`space-y-6 w-full max-w-full overflow-hidden h-full flex flex-col min-h-0 ${
+        isFocusMode ? "fixed inset-0 z-[200] bg-background pt-16 p-6 overflow-y-auto" : ""
       }`}
     >
       {/* Header */}
@@ -1702,7 +1702,13 @@ export const FieldManagementContent: React.FC<FieldManagementContentProps> = ({
       </div>
 
       {/* Content */}
-      <div className="w-full max-w-full overflow-hidden">{renderContent()}</div>
+      <div className="w-full min-w-0 max-w-full overflow-visible flex-1 min-h-0">
+        <div className="w-full min-w-0 max-w-full overflow-visible h-full flex flex-col min-h-0">
+          <div className="w-full min-w-0 max-w-full overflow-x-auto overflow-y-visible h-full">
+            <div style={{ width: "100%", minWidth: 0, maxWidth: "100%", height: "100%" }}>{renderContent()}</div>
+          </div>
+        </div>
+      </div>
 
       {/* Permit Form Modal */}
       <PermitForm

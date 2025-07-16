@@ -364,7 +364,8 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
                 onReset={onReset}
                 isEditing={isEditing}
                 onToggleEdit={onToggleEdit}
-                layoutDensity={layoutDensity}
+                // Force compact layout density for executives to show 50% smaller cards
+                layoutDensity="compact"
                 userRole={userRole}
                 dashboards={dashboards}
                 currentDashboardId={currentDashboardId ?? undefined}

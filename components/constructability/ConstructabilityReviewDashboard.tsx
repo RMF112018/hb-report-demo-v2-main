@@ -98,40 +98,15 @@ import {
   Area,
 } from "recharts"
 
-interface ReviewData {
-  id: string
-  reviewType: string
-  projectStage: string
-  reviewDate: string
-  reviewerName: string
-  reviewerRole: string
-  overallScore: number
-  status: "completed" | "in-progress" | "pending"
-  scoring: {
-    designFeasibility: number
-    coordinationClarity: number
-    codeCompliance: number
-    costScheduleImpact: number
-    constructabilityRisk: number
-    bimReviewQuality: number
-  }
-  comments: string
-  recommendations: string[]
-  attachments: string[]
-}
-
-interface ConstructabilityReviewDashboardProps {
-  projectId: string
-  projectData: any
-  userRole: string
-  user: any
-}
+import type { ReviewData, ConstructabilityReviewDashboardProps } from "@/types/constructability"
 
 const ConstructabilityReviewDashboard: React.FC<ConstructabilityReviewDashboardProps> = ({
   projectId,
   projectData,
   userRole,
   user,
+  reviews: externalReviews,
+  onEditReview,
 }) => {
   const [reviews, setReviews] = useState<ReviewData[]>([])
   const [loading, setLoading] = useState(true)

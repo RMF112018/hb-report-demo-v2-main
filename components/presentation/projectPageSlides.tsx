@@ -19,7 +19,7 @@ import { Building, Layers, Users, Target, Zap, Eye, ArrowRight, CheckCircle, Spa
 export const projectPageSlides: PresentationSlide[] = [
   {
     id: "project-page-overview",
-    title: "Project Page Overview",
+    title: "The Central Hub for Project Continuity",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -33,9 +33,10 @@ export const projectPageSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Project Page</strong> transforms scattered project management by providing{" "}
-            <strong>one unified workspace that connects every team, tool, and workflow</strong> from preconstruction
-            through closeout with role-based customization.
+            The Project Page replaces fragmented tools and siloed systems with a unified interface—providing continuous
+            visibility, team alignment, and decision-making clarity from preconstruction to closeout. HB Intel ensures
+            that every project stakeholder sees the right information at the right time, tailored to their role and
+            responsibilities.
           </motion.p>
 
           <motion.p
@@ -44,9 +45,9 @@ export const projectPageSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of juggling multiple systems, SharePoint sites, and disconnected tools,{" "}
-            <strong>everything is consolidated into one intelligent interface</strong> that adapts to your role and
-            provides the exact information you need when you need it.
+            No more jumping between SharePoint folders, spreadsheets, and legacy software. This intelligent workspace
+            brings everything together into one secure, role-aware environment—designed to evolve with your project's
+            lifecycle and your team's needs.
           </motion.p>
 
           <motion.div
@@ -58,19 +59,25 @@ export const projectPageSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🏗️</div>
               <div className="font-medium text-white">Unified Workspace</div>
-              <div className="text-xs text-blue-200">Complete project lifecycle in one location</div>
+              <div className="text-xs text-blue-200">
+                Manage the full project lifecycle—precon to closeout—in one centralized location.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Role-Based Views</div>
-              <div className="text-xs text-blue-200">Customized features for each team member</div>
+              <div className="text-xs text-blue-200">
+                Every user sees what matters most to them, based on their responsibilities.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚡</div>
               <div className="font-medium text-white">Smart Navigation</div>
-              <div className="text-xs text-blue-200">Seamless transitions between project phases</div>
+              <div className="text-xs text-blue-200">
+                Move effortlessly across phases with workflows that stay connected and context-aware.
+              </div>
             </div>
           </motion.div>
         </div>

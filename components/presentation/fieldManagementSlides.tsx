@@ -61,9 +61,8 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Field Management</strong> transforms construction operations by providing{" "}
-            <strong>unified tools for scheduling, constraints, permits, and reporting</strong> that eliminate scattered
-            spreadsheets and manual processes across your project sites.
+            <strong>Field Management</strong> unifies scheduling, constraints, inspections, and reporting into one
+            platform—<strong>eliminating fragmented systems and manual workflows</strong> across the jobsite.
           </motion.p>
 
           <motion.p
@@ -72,9 +71,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of juggling multiple disconnected tools and paper forms,{" "}
-            <strong>HB's integrated field management system</strong> streamlines every aspect of field operations from
-            procurement to daily reporting in one centralized platform.
+            Rather than switching between siloed tools and paper-based processes,{" "}
+            <strong>HB's integrated field suite</strong> centralizes critical operations from procurement through daily
+            reporting for streamlined execution and full project oversight.
           </motion.p>
 
           <motion.div
@@ -121,9 +120,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Procurement Management</strong> centralizes all procurement activities by providing{" "}
-            <strong>commitment tracking, vendor management, and Procore integration</strong> that eliminates manual
-            procurement processes and ensures complete visibility into project spending.
+            <strong>Procurement Management</strong> centralizes commitment tracking, vendor coordination, and{" "}
+            <strong>seamless Procore integration</strong>—delivering full visibility into procurement workflows and
+            eliminating manual entry.
           </motion.p>
 
           <motion.p
@@ -132,9 +131,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing procurement through separate systems and spreadsheets,{" "}
-            <strong>HB's procurement system integrates seamlessly with Procore</strong>, providing real-time commitment
-            tracking and intelligent procurement insights that drive better decision-making.
+            With real-time commitment monitoring and intelligent insights,{" "}
+            <strong>procurement decisions are faster, clearer, and aligned with project budgets</strong>, all within a
+            unified system.
           </motion.p>
 
           <motion.div
@@ -181,9 +180,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>HBI-Integrated Project Scheduler</strong> provides advanced critical path analysis with{" "}
-            <strong>schedule health monitoring, AI-powered insights, and real-time variance tracking</strong> that
-            dissects every aspect of your project timeline for optimal performance.
+            <strong>HBI-Integrated Project Scheduler</strong> enhances scheduling with{" "}
+            <strong>real-time variance analysis, critical path monitoring, and predictive insights</strong>—delivering
+            actionable schedule intelligence in one view.
           </motion.p>
 
           <motion.p
@@ -192,12 +191,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            HBI Intelligence continuously analyzes{" "}
-            <strong>
-              schedule health (87%), critical path duration, schedule variance (-8 days), and activity dependencies
-            </strong>{" "}
-            across 1,247 activities to provide an AI Score of 8.7/10 with predictive recommendations and proactive risk
-            identification.
+            With continuous evaluation of health metrics across 1,247 activities, HBI provides{" "}
+            <strong>AI-powered forecasts, variance flags, and an AI Score (8.7/10)</strong> that highlight risks and
+            optimization opportunities before delays occur.
           </motion.p>
 
           <motion.div
@@ -244,9 +240,8 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Constraints Log Management</strong> transforms issue tracking by providing{" "}
-            <strong>centralized constraint logging, resolution tracking, and timeline visualization</strong> that
-            ensures no project obstacles slip through the cracks or delay completion.
+            <strong>Constraints Log Management</strong> brings visibility and control to project obstacles through{" "}
+            <strong>centralized issue tracking, automated escalation, and visual impact timelines</strong>.
           </motion.p>
 
           <motion.p
@@ -255,9 +250,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of tracking constraints through scattered emails and informal notes,{" "}
-            <strong>HB's constraint management system</strong> provides comprehensive logging, automated escalation, and
-            visual timeline tracking that drives faster resolution and better project outcomes.
+            No more chasing emails or buried notes—
+            <strong>all constraints are logged, categorized, and monitored</strong> to ensure timely resolution and
+            uninterrupted progress.
           </motion.p>
 
           <motion.div
@@ -304,9 +299,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Permit Log & Inspection Management</strong> streamlines regulatory compliance by providing{" "}
-            <strong>permit tracking, inspection scheduling, and calendar integration</strong> that ensures all
-            regulatory requirements are met on time and within compliance standards.
+            <strong>Permit & Inspection Management</strong> simplifies compliance by automating{" "}
+            <strong>permit tracking, inspection scheduling, and calendar integration</strong>—reducing delays and risk
+            of non-compliance.
           </motion.p>
 
           <motion.p
@@ -315,9 +310,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing permits through paper files and manual tracking,{" "}
-            <strong>HB's permit management system</strong> provides automated tracking, inspection scheduling, and
-            regulatory compliance monitoring that prevents costly delays and violations.
+            Say goodbye to paper files.{" "}
+            <strong>Every permit and inspection is tracked, scheduled, and monitored in real-time</strong>, keeping your
+            project aligned with regulatory deadlines.
           </motion.p>
 
           <motion.div
@@ -364,9 +359,9 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Field Reports & Documentation</strong> revolutionizes field documentation by providing{" "}
-            <strong>digital daily logs, safety audits, and quality control tracking</strong> that eliminates paper forms
-            and ensures complete project documentation and compliance.
+            <strong>Field Reports & Documentation</strong> digitizes jobsite records with{" "}
+            <strong>real-time daily logs, safety tracking, and quality audits</strong>—replacing paper-based reporting
+            with smart, searchable documentation.
           </motion.p>
 
           <motion.p
@@ -375,9 +370,8 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing field reports through paper forms and manual data entry,{" "}
-            <strong>HB's digital reporting system</strong> provides real-time data capture, automated compliance
-            tracking, and comprehensive analytics that drive better field management decisions.
+            With <strong>automated compliance tracking and field analytics</strong>, HB's system empowers teams to make
+            faster, data-informed decisions and maintain full field transparency.
           </motion.p>
 
           <motion.div

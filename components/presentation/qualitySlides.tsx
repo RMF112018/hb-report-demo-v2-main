@@ -31,8 +31,52 @@ import {
 
 export const qualitySlides: PresentationSlide[] = [
   {
+    id: "digital-headquarters-intro",
+    title: "Your Digital Headquarters for Quality & Warranty Excellence",
+    content: (
+      <div className="space-y-6">
+        <div className="flex justify-center mb-8">
+          <div className="p-6 rounded-full bg-white/20 backdrop-blur-sm shadow-lg">
+            <Users className="h-16 w-16 text-blue-300" />
+          </div>
+        </div>
+
+        <p className="text-xl lg:text-2xl">
+          <strong>
+            HB Intel serves as the digital headquarters for your Quality Control and Warranty teams—connecting insights,
+            actions, and accountability across the entire project lifecycle.
+          </strong>
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          From preconstruction standards to post-completion claims, this module delivers true operational
+          continuity—unifying field inputs, document generation, and team workflows under one platform.
+        </p>
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+            <h4 className="text-lg font-semibold mb-2">🏢 Digital Headquarters</h4>
+            <p className="text-sm opacity-80">
+              Centralized command center for all quality and warranty operations across projects
+            </p>
+          </div>
+          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+            <h4 className="text-lg font-semibold mb-2">🔄 Operational Continuity</h4>
+            <p className="text-sm opacity-80">
+              Seamless lifecycle management from preconstruction standards to post-completion claims
+            </p>
+          </div>
+          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+            <h4 className="text-lg font-semibold mb-2">🤝 Unified Workflows</h4>
+            <p className="text-sm opacity-80">
+              Connect field inputs, document generation, and team coordination under one platform
+            </p>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
     id: "ai-powered-qc-generation",
-    title: "AI-Powered QC Program Generation",
+    title: "Intelligent, Continuous QC Program Generation",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -43,13 +87,13 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            HBI AI generates comprehensive, project-specific Quality Control programs by analyzing specifications,
-            approved submittals, manufacturer guidelines, and building codes with 91% confidence.
+            Harness HBI to auto-generate project-specific Quality Control programs, continuously aligned with evolving
+            specifications, submittals, and compliance requirements.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Automated QC program generation reduces manual effort while ensuring compliance with industry standards and
-          project-specific requirements.
+          Reduces manual workload and ensures programs stay current with regulatory and project changes—supporting
+          lifecycle continuity from preconstruction to closeout.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -70,7 +114,7 @@ export const qualitySlides: PresentationSlide[] = [
   },
   {
     id: "welcome-to-quality-warranty",
-    title: "Welcome to Quality & Warranty Oversight",
+    title: "A Unified Hub for Continuous Quality & Warranty Oversight",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -81,13 +125,13 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            Your central hub for QC operations, with SiteMate overlay turning fragmented data into actionable
-            intelligence.
+            The central command center for all QC operations, integrating SiteMate and transforming field data into
+            structured, continuous insights.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Unified quality management dashboard provides real-time visibility across all projects while maintaining
-          existing field workflows.
+          Maintain your familiar field workflows while achieving real-time oversight and program continuity across
+          projects.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -114,7 +158,7 @@ export const qualitySlides: PresentationSlide[] = [
   },
   {
     id: "overlaying-sitemate",
-    title: "Overlaying SiteMate for Total Field Visibility",
+    title: "Preserving Field Workflow While Ensuring Continuous Oversight",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -125,13 +169,13 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            SiteMate remains your primary field app, while our tool synchronizes inputs and replaces email chains with
-            live aggregation.
+            SiteMate remains the frontline tool—HB Intel enhances it by continuously aggregating data and eliminating
+            fragmented communication.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Seamless integration preserves field team workflows while providing office teams with centralized quality
-          intelligence and automated reporting.
+          Field continuity is preserved while office and executive teams gain seamless visibility into quality
+          performance and emerging risks.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -158,7 +202,7 @@ export const qualitySlides: PresentationSlide[] = [
   },
   {
     id: "smart-documents-generation",
-    title: "Generate Smart Documents & Distributions with HBI",
+    title: "Smart QC Documentation and Seamless Distribution",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -169,13 +213,12 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            HBI analyzes field data to auto-generate reports, allows staff to flag issues, and handles automated
-            formatting for compliance.
+            Convert field data into structured, compliant documents with automated formatting, issue flagging, and
+            stakeholder routing—all powered by HBI.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Transform raw field data into structured compliance reports with automated formatting and intelligent
-          distribution to stakeholders.
+          Ensure continuity of documentation standards and reduce compliance gaps through proactive AI assistance.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -202,7 +245,7 @@ export const qualitySlides: PresentationSlide[] = [
   },
   {
     id: "warranty-integration",
-    title: "Warranty Integration Built In",
+    title: "Built-In Warranty Management with Continuous Accountability",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -213,13 +256,12 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            Post-closeout warranty tracking with responsibilities clearly assigned to subs/vendors and complete
-            transparency throughout.
+            Warranty tracking doesn't end at closeout—HB Intel ensures ongoing visibility, responsibility assignments,
+            and issue closure.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Seamless warranty management continues beyond project completion with automated tracking, notifications, and
-          clear responsibility assignments.
+          Create a continuous feedback loop between construction, operations, and post-completion support.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -246,7 +288,7 @@ export const qualitySlides: PresentationSlide[] = [
   },
   {
     id: "start-managing-what-matters",
-    title: "Start Managing What Matters",
+    title: "End-to-End Continuity in Quality & Warranty",
     content: (
       <div className="space-y-6">
         <div className="flex justify-center mb-8">
@@ -257,13 +299,13 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            Integrated into HB Intel's unified platform—comprehensive quality and warranty management built for
-            construction excellence.
+            Fully integrated into HB Intel—our Quality & Warranty module ensures uninterrupted visibility,
+            accountability, and improvement across the project lifecycle.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Transform your quality management with AI-powered intelligence, seamless integrations, and proactive warranty
-          tracking within secure, enterprise-grade protocols.
+          Proactively manage quality with AI insight, seamless data flow, and governance-aligned tracking—because
+          quality is not a phase, it's a continuum.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">

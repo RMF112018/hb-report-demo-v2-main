@@ -43,13 +43,15 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>
-            A purpose-built, role-based operational intelligence platform for large construction and development firms.
-          </strong>
+          <strong>Welcome to HB Intel: Your Platform for Operational Continuity.</strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Designed to unify visibility and cross-functional coordination across the full project lifecycle—from early
-          business development to closeout and turnover.
+          HB Intel is a role-based operational intelligence platform tailored for sophisticated construction and
+          development teams.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          It connects every function—from business development to project closeout—ensuring continuous visibility,
+          seamless collaboration, and institutional memory at every step.
         </p>
         <div className="mt-8 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
           <p className="text-base lg:text-lg font-medium">
@@ -72,7 +74,14 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>Critical industry issue: Lack of unified visibility due to disconnected systems.</strong>
+          <strong>The Hidden Cost of Disconnection: Breaking the Chain of Continuity</strong>
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          Disconnected tools create information silos, delay decisions, and force teams to spend hours tracking down
+          what should be instantly accessible.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          Without continuity, every handoff becomes a risk—and growth compounds the problem.
         </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
           <div className="space-y-4">
@@ -113,22 +122,23 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>
-            HB Intel acts as an overlay platform—a layer of intelligence that unifies your existing systems.
-          </strong>
+          <strong>HB Intel: A Continuity Layer Across Your Enterprise</strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Rather than replacing core systems, HB Intel draws from them, organizes their data, and delivers it in a
-          meaningful, context-specific way.
+          Rather than replacing your core systems, HB Intel overlays them—connecting and contextualizing data to
+          eliminate gaps and ensure nothing falls through the cracks.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          Your people stay in sync. Your insights compound. Your growth stays grounded in what already works.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+          <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
             <h4 className="text-lg font-semibold mb-2">🔗 Unified Data Aggregation</h4>
             <p className="text-sm opacity-80">
               Integrates with Procore, Sage, SharePoint via APIs to create consolidated project views
             </p>
           </div>
-          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+          <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
             <h4 className="text-lg font-semibold mb-2">🎯 Role-Based Intelligence</h4>
             <p className="text-sm opacity-80">Personalized interfaces for each role, reducing information overload</p>
           </div>
@@ -148,49 +158,56 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>Comprehensive tools for every construction role and workflow.</strong>
+          <strong>One Platform. Every Role. End-to-End Continuity.</strong>
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          HB Intel provides tailored tools across all phases—estimating, scheduling, finance, field reporting, staffing,
+          and analytics—working together in one unified system.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          Every module reinforces the others, turning individual efforts into coordinated excellence.
         </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <Target className="h-5 w-5 mr-2 text-orange-300" />
-              <h4 className="text-base font-semibold">Estimating & Bid Management</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <Target className="h-5 w-5 text-orange-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">Estimating & Bid Management</h4>
             <p className="text-sm opacity-80">BuildingConnected integration, CSI templates, pricing analysis</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <Calendar className="h-5 w-5 mr-2 text-blue-300" />
-              <h4 className="text-base font-semibold">Scheduling Oversight</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <Calendar className="h-5 w-5 text-blue-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">Scheduling Oversight</h4>
             <p className="text-sm opacity-80">Schedule drift tracking, milestone overlays, look-ahead planning</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <DollarSign className="h-5 w-5 mr-2 text-green-300" />
-              <h4 className="text-base font-semibold">Financial Forecasting</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <DollarSign className="h-5 w-5 text-green-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">Financial Forecasting</h4>
             <p className="text-sm opacity-80">GCGR workflows, draw forecasts, cost code tracking</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 mr-2 text-indigo-300" />
-              <h4 className="text-base font-semibold">Field Reporting & QC</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <FileText className="h-5 w-5 text-indigo-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">Field Reporting & QC</h4>
             <p className="text-sm opacity-80">Standardized daily reports, safety logs, compliance docs</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <Users className="h-5 w-5 mr-2 text-cyan-300" />
-              <h4 className="text-base font-semibold">Staffing & Responsibility</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <Users className="h-5 w-5 text-cyan-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">Staffing & Responsibility</h4>
             <p className="text-sm opacity-80">Assignment forecasting, gap analysis, accountability tracking</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <BarChart3 className="h-5 w-5 mr-2 text-purple-300" />
-              <h4 className="text-base font-semibold">AI-Powered Analytics</h4>
+          <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <BarChart3 className="h-5 w-5 text-purple-300" />
             </div>
+            <h4 className="text-base font-semibold mb-2">AI-Powered Analytics</h4>
             <p className="text-sm opacity-80">Natural language queries, predictive forecasting, automated insights</p>
           </div>
         </div>
@@ -209,7 +226,14 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>Documented benefits based on market benchmarks and deployment results.</strong>
+          <strong>Results That Reinforce Your Momentum</strong>
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          HB Intel delivers measurable returns—from faster decisions to fewer delays and reduced rework.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          By ensuring continuity of information and accountability, your teams can act faster, with greater confidence
+          and alignment.
         </p>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
           <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -229,18 +253,18 @@ export const intelTourSlides: PresentationSlide[] = [
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <CheckCircle className="h-5 w-5 mr-2 text-green-300" />
-              <span className="text-lg font-semibold">10 hours/week saved</span>
+          <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <CheckCircle className="h-5 w-5 text-green-300" />
             </div>
+            <span className="text-lg font-semibold block mb-2">10 hours/week saved</span>
             <p className="text-sm opacity-80">Per manager by eliminating manual reporting</p>
           </div>
-          <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-            <div className="flex items-center mb-2">
-              <CheckCircle className="h-5 w-5 mr-2 text-green-300" />
-              <span className="text-lg font-semibold">&lt;1 hour decisions</span>
+          <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="flex justify-center mb-2">
+              <CheckCircle className="h-5 w-5 text-green-300" />
             </div>
+            <span className="text-lg font-semibold block mb-2">&lt;1 hour decisions</span>
             <p className="text-sm opacity-80">Executive decision cycle vs. 2-3 day delays</p>
           </div>
         </div>
@@ -259,11 +283,14 @@ export const intelTourSlides: PresentationSlide[] = [
         </div>
 
         <p className="text-xl lg:text-2xl">
-          <strong>HB Intel v3.0: Your connective tissue for modern construction operations.</strong>
+          <strong>HB Intel v3.0: The Continuity Engine for Modern Construction</strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Break down operational silos, accelerate decision-making, and build a foundation for AI-assisted
-          intelligence—all within secure, governance-aligned enterprise protocols.
+          By unifying people, systems, and decisions, HB Intel enables transformational change without disruption.
+        </p>
+        <p className="text-lg lg:text-xl opacity-90">
+          It preserves your strengths, accelerates your operations, and prepares your business for what's next—with
+          continuity as the core advantage.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="text-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">

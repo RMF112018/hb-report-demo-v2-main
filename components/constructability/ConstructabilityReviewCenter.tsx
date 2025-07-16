@@ -38,10 +38,11 @@ import {
 import reviewLogData from "@/data/mock/precon/reviewLog.json"
 import reviewTemplatesData from "@/data/mock/precon/reviewTemplates.json"
 
-// Import modular components (to be created)
-import { ConstructabilityReviewDashboard } from "./ConstructabilityReviewDashboard"
-import { ConstructabilityReviewLog } from "./ConstructabilityReviewLog"
+// Import modular components
+import ConstructabilityReviewDashboard from "./ConstructabilityReviewDashboard"
+import ConstructabilityReviewLog from "./ConstructabilityReviewLog"
 import { ConstructabilityReviewCreator } from "./ConstructabilityReviewCreator"
+import type { ReviewData } from "@/types/constructability"
 
 interface ConstructabilityReviewCenterProps {
   projectId: string
@@ -53,22 +54,41 @@ interface ConstructabilityReviewCenterProps {
 
 type ViewMode = "overview" | "dashboard" | "log" | "create" | "edit"
 
-interface ReviewData {
-  id: string
-  project_id: string
-  project_name: string
-  stage: string
-  date: string
-  reviewer: string
-  reviewer_role: string
-  status: "completed" | "in-progress" | "draft"
-  scores: Record<string, number>
-  overall_score: number
-  weighted_score: number
-  comments: Record<string, string>
-  report_url: string | null
-  created_at: string
-  updated_at: string
+// Transform legacy data format to new interface
+const transformReviewData = (legacyData: any): ReviewData => {
+  return {
+    id: legacyData.id,
+    reviewType: legacyData.stage || "Design Review",
+    projectStage: legacyData.stage || "Unknown",
+    reviewDate: legacyData.date || legacyData.created_at,
+    reviewerName: legacyData.reviewer || "Unknown",
+    reviewerRole: legacyData.reviewer_role || "Unknown",
+    overallScore: legacyData.overall_score || legacyData.weighted_score || 0,
+    status: legacyData.status === "draft" ? "pending" : legacyData.status,
+    scoring: {
+      designFeasibility: legacyData.scores?.["Design Feasibility"] || 0,
+      coordinationClarity: legacyData.scores?.["Coordination and Completeness"] || 0,
+      codeCompliance: legacyData.scores?.["Compliance and Regulatory"] || 0,
+      costScheduleImpact: legacyData.scores?.["Cost and Schedule"] || 0,
+      constructabilityRisk: legacyData.scores?.["Constructability and Safety"] || 0,
+      bimReviewQuality: legacyData.scores?.["BIM Model Quality"] || 0,
+    },
+    comments: Object.values(legacyData.comments || {}).join("; "),
+    recommendations: Object.values(legacyData.comments || {}).filter(Boolean) as string[],
+    attachments: [],
+    // Legacy properties for backward compatibility
+    project_id: legacyData.project_id,
+    project_name: legacyData.project_name,
+    stage: legacyData.stage,
+    date: legacyData.date,
+    reviewer: legacyData.reviewer,
+    scores: legacyData.scores,
+    overall_score: legacyData.overall_score,
+    weighted_score: legacyData.weighted_score,
+    report_url: legacyData.report_url,
+    created_at: legacyData.created_at,
+    updated_at: legacyData.updated_at,
+  }
 }
 
 export const ConstructabilityReviewCenter: React.FC<ConstructabilityReviewCenterProps> = ({
@@ -88,8 +108,10 @@ export const ConstructabilityReviewCenter: React.FC<ConstructabilityReviewCenter
     const loadReviews = async () => {
       try {
         setIsLoading(true)
-        // Filter reviews for current project
-        const projectReviews = reviewLogData.filter((review: any) => review.project_id === projectId) as ReviewData[]
+        // Filter and transform reviews for current project
+        const projectReviews = reviewLogData
+          .filter((review: any) => review.project_id === projectId)
+          .map((review: any) => transformReviewData(review))
         setReviews(projectReviews)
       } catch (error) {
         console.error("Error loading reviews:", error)

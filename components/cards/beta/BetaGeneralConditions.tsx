@@ -44,9 +44,24 @@ import projectsData from "@/data/mock/projects.json"
 interface BetaGeneralConditionsProps {
   className?: string
   config?: any
+  isCompact?: boolean
 }
 
-export default function BetaGeneralConditions({ className, config }: BetaGeneralConditionsProps) {
+export default function BetaGeneralConditions({ className, config, isCompact }: BetaGeneralConditionsProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const [isRealTime, setIsRealTime] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const [activeTab, setActiveTab] = useState("overview")

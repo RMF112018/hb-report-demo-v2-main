@@ -73,7 +73,7 @@ import {
 export const safetySlides: PresentationSlide[] = [
   {
     id: "from-paper-to-platform",
-    title: "From Paper to Platform",
+    title: "Unified Safety. Company-Wide Clarity.",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -87,9 +87,9 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            SiteMate safety management platform overlay aggregates report and inspection data for quick access and
-            review. HBI (proprietary AI models) generate safety content and procedures, creating a centralized platform
-            for Safety Committee collaboration.
+            The SiteMate safety platform now feeds directly into HB Intel, giving our Safety team real-time access to
+            inspection reports, incident logs, and field metrics. HBI, our intelligent assistant, auto-generates safety
+            procedures and content—establishing a single source of truth for safety leadership across the company.
           </motion.p>
 
           <motion.div
@@ -102,20 +102,22 @@ export const safetySlides: PresentationSlide[] = [
               <Activity className="h-8 w-8 text-blue-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-blue-300 mb-2">SiteMate Integration</h3>
               <p className="text-blue-100 text-sm">
-                Live safety metrics, incident tracking, and inspection aggregation
+                Live dashboards, incident reporting, and inspection tracking—direct from the field.
               </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Brain className="h-8 w-8 text-yellow-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-yellow-300 mb-2">HBI AI Content</h3>
-              <p className="text-blue-100 text-sm">AI-generated safety procedures and automated content creation</p>
+              <p className="text-blue-100 text-sm">
+                Proprietary AI models craft custom safety procedures and hazard briefings.
+              </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Users className="h-8 w-8 text-green-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-green-300 mb-2">Safety Committee</h3>
-              <p className="text-blue-100 text-sm">Centralized collaboration platform for safety leadership</p>
+              <p className="text-blue-100 text-sm">Central hub for collaboration and strategic safety oversight.</p>
             </div>
           </motion.div>
         </div>
@@ -138,8 +140,8 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The Certifications Tracker monitors every employee's safety credentials (e.g., OSHA 30, First Aid, CPR),
-            with visual expiration warnings and automated renewal reminders.
+            The Certifications Tracker monitors every employee's safety credentials with automated alerts and renewal
+            workflows—keeping teams compliant and projects uninterrupted.
           </motion.p>
 
           <motion.div
@@ -152,20 +154,24 @@ export const safetySlides: PresentationSlide[] = [
               <Settings className="h-8 w-8 text-purple-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-purple-300 mb-2">Optimization</h3>
               <p className="text-blue-100 text-sm">
-                Auto-sync with workforce directory and color-coded status tracking
+                Auto-syncs with employee directories; real-time status indicators.
               </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Bell className="h-8 w-8 text-yellow-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-yellow-300 mb-2">Productivity</h3>
-              <p className="text-blue-100 text-sm">Automated reminders reduce site exposure due to expired certs</p>
+              <p className="text-blue-100 text-sm">
+                Prevent lapses with automated renewal reminders and team-wide visibility.
+              </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Shield className="h-8 w-8 text-green-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-green-300 mb-2">Benefit</h3>
-              <p className="text-blue-100 text-sm">Safer jobsites, fewer violations, no last-minute scramble</p>
+              <p className="text-blue-100 text-sm">
+                Fewer delays, safer sites, and audit-ready compliance at all times.
+              </p>
             </div>
           </motion.div>
         </div>
@@ -188,8 +194,8 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The Safety Forms Panel offers real-time, structured entry of safety incidents with timestamps, media upload,
-            and comprehensive follow-up tracking integrated with project workflows.
+            Every incident, every inspection—logged in real-time with photos, videos, and follow-up actions. No more
+            disconnected PDFs or forgotten details. Everything is tracked, searchable, and actionable.
           </motion.p>
 
           <motion.div
@@ -201,19 +207,21 @@ export const safetySlides: PresentationSlide[] = [
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <FileText className="h-8 w-8 text-blue-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-blue-300 mb-2">Optimization</h3>
-              <p className="text-blue-100 text-sm">No more unfiled PDFs or follow-up falling through cracks</p>
+              <p className="text-blue-100 text-sm">Structured digital forms eliminate data loss and inconsistency.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <BarChart3 className="h-8 w-8 text-yellow-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-yellow-300 mb-2">Productivity</h3>
-              <p className="text-blue-100 text-sm">Supports trend analysis by trade, project, or root cause</p>
+              <p className="text-blue-100 text-sm">Trend analysis by trade, project, or root cause—fully integrated.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Brain className="h-8 w-8 text-green-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-green-300 mb-2">Benefit</h3>
-              <p className="text-blue-100 text-sm">Turns safety logs into strategic insight and preventive action</p>
+              <p className="text-blue-100 text-sm">
+                Actionable insights help prevent repeat incidents and drive safety culture.
+              </p>
             </div>
           </motion.div>
         </div>
@@ -236,9 +244,9 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            HBI generates Tool Box Talks aligning with project schedules, automatically distributed to project teams
-            prior to scheduled activities. Following failed safety inspections, HBI generates notices with lessons
-            learned and refreshers on appropriate standards and regulations.
+            HB Intel generates project-specific Tool Box Talks based on the upcoming schedule, delivering safety
+            briefings before high-risk activities. Failed inspections trigger automatic follow-up content tailored to
+            lessons learned and regulatory standards.
           </motion.p>
 
           <motion.div
@@ -250,22 +258,20 @@ export const safetySlides: PresentationSlide[] = [
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Calendar className="h-8 w-8 text-purple-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-purple-300 mb-2">Schedule Integration</h3>
-              <p className="text-blue-100 text-sm">
-                AI analyzes upcoming activities and generates relevant safety content
-              </p>
+              <p className="text-blue-100 text-sm">Tool Box Talks tailored to the project's evolving timeline.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Send className="h-8 w-8 text-yellow-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-yellow-300 mb-2">Auto-Distribution</h3>
-              <p className="text-blue-100 text-sm">Talks automatically distributed prior to scheduled activities</p>
+              <p className="text-blue-100 text-sm">Briefings auto-delivered to each project team, ahead of time.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Lightbulb className="h-8 w-8 text-green-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-green-300 mb-2">Lessons Learned</h3>
               <p className="text-blue-100 text-sm">
-                HBI generates notices following failed inspections with regulatory refreshers
+                Dynamic content responds to inspection failures and recurring issues.
               </p>
             </div>
           </motion.div>
@@ -289,8 +295,9 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Live safety dashboards surface missed inspections, upcoming certification expirations, open incident
-            follow-ups, and risk hotspots with Emergency Locator integration for immediate response.
+            Safety dashboards offer real-time insight into compliance status across all jobsites. Certification
+            expirations, missed inspections, and incident follow-ups are surfaced immediately—empowering field leaders
+            to act before risks escalate.
           </motion.p>
 
           <motion.div
@@ -302,21 +309,21 @@ export const safetySlides: PresentationSlide[] = [
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Monitor className="h-8 w-8 text-blue-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-blue-300 mb-2">Real-Time Dashboards</h3>
-              <p className="text-blue-100 text-sm">
-                Live compliance tracking with instant visibility into safety metrics
-              </p>
+              <p className="text-blue-100 text-sm">Always-current compliance data across all job locations.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <Users className="h-8 w-8 text-yellow-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-yellow-300 mb-2">Proactive Management</h3>
-              <p className="text-blue-100 text-sm">Enables proactive mitigation by superintendents and executives</p>
+              <p className="text-blue-100 text-sm">Field leaders spot issues early and prevent downstream risk.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <MapPin className="h-8 w-8 text-green-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-green-300 mb-2">Emergency Response</h3>
-              <p className="text-blue-100 text-sm">Integrated Emergency Locator for immediate incident response</p>
+              <p className="text-blue-100 text-sm">
+                Emergency Locator integration ensures rapid response when it counts.
+              </p>
             </div>
           </motion.div>
         </div>
@@ -339,8 +346,9 @@ export const safetySlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The Safety Control Center integrates CertificationTracker, SafetyAnnouncements, SafetyPrograms, and
-            EmergencyLocator into a unified safety management ecosystem powered by HBI intelligence.
+            The Safety Control Center unifies safety tracking, certification oversight, and emergency response in one
+            intelligent ecosystem. With HBI guidance, we can move from reactive reporting to proactive safety
+            leadership—powered by data.
           </motion.p>
 
           <motion.div
@@ -378,7 +386,7 @@ export const safetySlides: PresentationSlide[] = [
             <div className="flex items-center justify-center">
               <Sparkles className="h-6 w-6 text-yellow-300 mr-2" />
               <span className="text-lg font-bold text-yellow-300">
-                Creating a culture of proactive safety management
+                Creating a culture of proactive safety management.
               </span>
             </div>
           </motion.div>

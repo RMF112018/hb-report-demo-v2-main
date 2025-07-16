@@ -258,6 +258,12 @@ const DocumentSiloVisualization: React.FC<{ toolName: string; onClose: () => voi
 export const TangledToolsVisualization: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null)
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Set loaded immediately to prevent layout shifts
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
 
   // Generate connection lines between tools
   const generateConnections = () => {
@@ -307,8 +313,25 @@ export const TangledToolsVisualization: React.FC = () => {
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden">
+      {/* Skeleton loader for immediate space reservation */}
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900/10 to-gray-800/10">
+          <div className="text-white/60 text-center">
+            <div className="animate-pulse">
+              <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-4"></div>
+              <div className="text-sm">Loading visualization...</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Background visualization container */}
-      <div className="absolute inset-0 opacity-40">
+      <motion.div
+        className="absolute inset-0 opacity-40"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.95 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         <div className="relative w-full h-full bg-gradient-to-br from-gray-50/10 to-gray-100/10 dark:from-gray-900/20 dark:to-gray-800/20">
           {/* Background pattern */}
           <div className="absolute inset-0 opacity-30">
@@ -394,7 +417,7 @@ export const TangledToolsVisualization: React.FC = () => {
             )
           })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Compact legend in bottom corner */}
       <div className="absolute bottom-6 left-6 bg-black/70 backdrop-blur-sm rounded-lg p-3 border border-white/20 z-10">

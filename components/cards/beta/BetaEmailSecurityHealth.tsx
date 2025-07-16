@@ -57,32 +57,51 @@ const complianceStatus = [
   { standard: "PCI DSS", status: "Compliant", score: 94.8 },
 ]
 
-function CardShell({ title, children }: { title: string; children: React.ReactNode }) {
+interface BetaEmailSecurityHealthProps {
+  className?: string
+  isCompact?: boolean
+}
+
+function CardShell({ title, children, isCompact }: { title: string; children: React.ReactNode; isCompact?: boolean }) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   return (
     <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <Mail className="h-5 w-5" style={{ color: "#FA4616" }} />
+      <CardHeader className={compactScale.paddingCard}>
+        <CardTitle className={`flex items-center ${compactScale.gap} ${compactScale.textTitle} font-semibold`}>
+          <Shield className={compactScale.iconSize} style={{ color: "#FA4616" }} />
           {title}
-          <Badge variant="outline" className="ml-auto text-xs">
-            <Activity className="h-3 w-3 mr-1" />
+          <Badge variant="outline" className={`ml-auto ${compactScale.textSmall}`}>
+            <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
             Real-time
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>{children}</CardContent>
     </Card>
   )
 }
 
-export default function BetaEmailSecurityHealth() {
+export default function BetaEmailSecurityHealth({ isCompact }: BetaEmailSecurityHealthProps) {
   const totalEmails = emailMetrics.reduce((acc, day) => acc + day.clean + day.spam + day.malware + day.phishing, 0)
   const cleanEmails = emailMetrics.reduce((acc, day) => acc + day.clean, 0)
   const blockedEmails = totalEmails - cleanEmails
   const cleanRate = (cleanEmails / totalEmails) * 100
 
   return (
-    <CardShell title="Email Security Health">
+    <CardShell title="Email Security Health" isCompact={isCompact}>
       <div className="h-full space-y-4">
         {/* Key Metrics */}
         <div className="grid grid-cols-4 gap-3">

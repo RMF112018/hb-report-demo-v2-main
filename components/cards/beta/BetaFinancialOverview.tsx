@@ -44,9 +44,23 @@ import projectsData from "@/data/mock/projects.json"
 interface BetaFinancialOverviewProps {
   className?: string
   config?: any
+  isCompact?: boolean
 }
 
-export default function BetaFinancialOverview({ className, config }: BetaFinancialOverviewProps) {
+export default function BetaFinancialOverview({ className, config, isCompact }: BetaFinancialOverviewProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
   const [isRealTime, setIsRealTime] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const [activeTab, setActiveTab] = useState("overview")
@@ -167,72 +181,83 @@ export default function BetaFinancialOverview({ className, config }: BetaFinanci
     <Card
       className={`h-full bg-gradient-to-br from-[#0021A5]/5 to-[#0021A5]/10 dark:from-[#0021A5]/20 dark:to-[#0021A5]/30 border-[#0021A5]/20 dark:border-[#0021A5]/40 ${className}`}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#0021A5] dark:text-[#4A7FD6]">
+            <CardTitle className={`${compactScale.textTitle} font-semibold text-[#0021A5] dark:text-[#4A7FD6]`}>
               Financial Overview
             </CardTitle>
-            <p className="text-sm text-[#0021A5]/70 dark:text-[#4A7FD6]/80">
+            <p className={`${compactScale.textMedium} text-[#0021A5]/70 dark:text-[#4A7FD6]/80`}>
               {constructionProjects.length} Construction Projects •{" "}
               {formatCurrency(financialMetrics.currentApprovedValue)} Total Value
             </p>
-            <div className="flex items-center gap-2 mt-1">
+            <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
               <Badge
                 variant="outline"
-                className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                className={`${compactScale.textSmall} bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]`}
               >
-                <BarChart3 className="h-3 w-3 mr-1" />
+                <BarChart3 className={`${compactScale.iconSizeSmall} mr-0.5`} />
                 Power BI Enhanced
               </Badge>
               {isRealTime && (
                 <Badge
                   variant="outline"
-                  className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
+                  className={`${compactScale.textSmall} bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]`}
                 >
-                  <RefreshCw className="h-3 w-3 mr-1" />
+                  <RefreshCw className={`${compactScale.iconSizeSmall} mr-0.5`} />
                   Live Updates
                 </Badge>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${compactScale.gap}`}>
+            <div className={`flex items-center space-x-${isCompact ? "1" : "2"}`}>
               <Switch id="real-time" checked={isRealTime} onCheckedChange={setIsRealTime} />
-              <Label htmlFor="real-time" className="text-sm text-[#0021A5]/70 dark:text-[#4A7FD6]/80">
+              <Label
+                htmlFor="real-time"
+                className={`${compactScale.textMedium} text-[#0021A5]/70 dark:text-[#4A7FD6]/80`}
+              >
                 Real-time
               </Label>
             </div>
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <RefreshCw className="h-4 w-4" />
+            <Button size="sm" variant="outline" className={isCompact ? "h-6 w-6 p-0" : "h-8 w-8 p-0"}>
+              <RefreshCw className={compactScale.iconSizeSmall} />
             </Button>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-3">
+      <CardContent className={isCompact ? "p-2" : "p-3"}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-3 ${isCompact ? "mb-2" : "mb-4"}`}>
+            <TabsTrigger value="overview" className={compactScale.textSmall}>
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="breakdown" className={compactScale.textSmall}>
+              Breakdown
+            </TabsTrigger>
+            <TabsTrigger value="trends" className={compactScale.textSmall}>
+              Trends
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid grid-cols-2 ${isCompact ? "gap-2" : "gap-3"}`}>
               {keyMetrics.map((metric, index) => {
                 const Icon = metric.icon
                 return (
                   <div
                     key={index}
-                    className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700"
+                    className={`bg-white dark:bg-gray-800 ${
+                      isCompact ? "p-2" : "p-3"
+                    } rounded-lg border border-blue-200 dark:border-gray-700`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <Icon className={`h-5 w-5 ${metric.color}`} />
+                    <div className={`flex items-center justify-between ${isCompact ? "mb-1" : "mb-2"}`}>
+                      <Icon className={`${isCompact ? "h-3 w-3" : "h-5 w-5"} ${metric.color}`} />
                       <Badge
                         variant="outline"
-                        className={`text-xs ${
+                        className={`${compactScale.textSmall} ${
                           metric.trend === "up"
                             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                             : metric.trend === "down"
@@ -243,17 +268,31 @@ export default function BetaFinancialOverview({ className, config }: BetaFinanci
                         {metric.change}
                       </Badge>
                     </div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{metric.title}</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{metric.value}</p>
+                    <p className={`${compactScale.textSmall} font-medium text-gray-700 dark:text-gray-300`}>
+                      {metric.title}
+                    </p>
+                    <p className={`${isCompact ? "text-sm" : "text-lg"} font-bold text-gray-900 dark:text-gray-100`}>
+                      {metric.value}
+                    </p>
                   </div>
                 )
               })}
             </div>
 
             {/* Summary Statistics */}
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Portfolio Summary</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div
+              className={`bg-white dark:bg-gray-800 ${
+                isCompact ? "p-2" : "p-3"
+              } rounded-lg border border-blue-200 dark:border-gray-700`}
+            >
+              <h4
+                className={`${compactScale.textSmall} font-medium text-gray-700 dark:text-gray-300 ${
+                  isCompact ? "mb-1" : "mb-2"
+                }`}
+              >
+                Portfolio Summary
+              </h4>
+              <div className={`grid grid-cols-2 ${isCompact ? "gap-2" : "gap-4"} ${compactScale.textSmall}`}>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Active Projects</span>
                   <span className="font-medium">{constructionProjects.length}</span>

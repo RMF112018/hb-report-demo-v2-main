@@ -54,41 +54,76 @@ const jobTypes = [
   { type: "Schedule Optimization", count: 298, avgTime: 890, successRate: 88.7 },
 ]
 
-function CardShell({ title, children }: { title: string; children: React.ReactNode }) {
+interface BetaAiPipelineStatusProps {
+  className?: string
+  isCompact?: boolean
+}
+
+function CardShell({ title, children, isCompact }: { title: string; children: React.ReactNode; isCompact?: boolean }) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   return (
     <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <Brain className="h-5 w-5" style={{ color: "#FA4616" }} />
+      <CardHeader className={compactScale.paddingCard}>
+        <CardTitle className={`flex items-center ${compactScale.gap} ${compactScale.textTitle} font-semibold`}>
+          <Brain className={compactScale.iconSize} style={{ color: "#FA4616" }} />
           {title}
-          <Badge variant="outline" className="ml-auto text-xs">
-            <Activity className="h-3 w-3 mr-1" />
+          <Badge variant="outline" className={`ml-auto ${compactScale.textSmall}`}>
+            <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
             Power BI
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>{children}</CardContent>
     </Card>
   )
 }
 
-export default function BetaAiPipelineStatus() {
+export default function BetaAiPipelineStatus({ isCompact }: BetaAiPipelineStatusProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const totalJobs = pipelinePerformance.reduce((acc, item) => acc + item.jobs, 0)
   const totalSuccess = pipelinePerformance.reduce((acc, item) => acc + item.success, 0)
   const successRate = ((totalSuccess / totalJobs) * 100).toFixed(1)
 
   return (
-    <CardShell title="AI Pipeline Status">
-      <div className="h-full space-y-4">
+    <CardShell title="AI Pipeline Status" isCompact={isCompact}>
+      <div className={`h-full ${isCompact ? "space-y-2" : "space-y-4"}`}>
         {/* Key Metrics */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
-            <div className="flex items-center gap-2 mb-1">
-              <Zap className="h-4 w-4 text-blue-600" />
-              <span className="text-xs font-medium">Active Jobs</span>
+        <div className={`grid grid-cols-4 ${isCompact ? "gap-2" : "gap-3"}`}>
+          <div
+            className={`bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 rounded-lg ${compactScale.padding} border border-blue-200 dark:border-blue-800`}
+          >
+            <div className={`flex items-center ${compactScale.gap} ${isCompact ? "mb-0.5" : "mb-1"}`}>
+              <Zap className={`${compactScale.iconSizeSmall} text-blue-600`} />
+              <span className={`${compactScale.textSmall} font-medium`}>Active Jobs</span>
             </div>
-            <div className="text-xl font-bold text-blue-700 dark:text-blue-300">47</div>
-            <div className="text-xs text-blue-600 dark:text-blue-400">Running now</div>
+            <div className={`${isCompact ? "text-lg" : "text-xl"} font-bold text-blue-700 dark:text-blue-300`}>47</div>
+            <div className={`${compactScale.textSmall} text-blue-600 dark:text-blue-400`}>Running now</div>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
             <div className="flex items-center gap-2 mb-1">
@@ -117,7 +152,7 @@ export default function BetaAiPipelineStatus() {
         </div>
 
         {/* Pipeline Performance Chart */}
-        <div className="h-48">
+        <div className={`${compactScale.chartHeight}`}>
           <div className="text-sm font-medium mb-2">Pipeline Performance (24h)</div>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={pipelinePerformance}>

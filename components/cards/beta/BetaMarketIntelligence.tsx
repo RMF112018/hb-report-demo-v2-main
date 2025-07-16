@@ -46,9 +46,24 @@ import {
 interface BetaMarketIntelligenceProps {
   className?: string
   config?: any
+  isCompact?: boolean
 }
 
-export default function BetaMarketIntelligence({ className, config }: BetaMarketIntelligenceProps) {
+export default function BetaMarketIntelligence({ className, config, isCompact }: BetaMarketIntelligenceProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const [isRealTime, setIsRealTime] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const [activeTab, setActiveTab] = useState("overview")
@@ -169,67 +184,80 @@ export default function BetaMarketIntelligence({ className, config }: BetaMarket
     <Card
       className={`h-full bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border-[#FA4616]/20 dark:border-[#FA4616]/40 ${className}`}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#FA4616] dark:text-[#FF8A67]">
+            <CardTitle className={`${compactScale.textTitle} font-semibold text-[#FA4616] dark:text-[#FF8A67]`}>
               Market Intelligence
             </CardTitle>
-            <p className="text-sm text-[#FA4616]/70 dark:text-[#FF8A67]/80">
+            <p className={`${compactScale.textMedium} text-[#FA4616]/70 dark:text-[#FF8A67]/80`}>
               Florida Construction & Real Estate • Live Data Sources
             </p>
-            <div className="flex items-center gap-2 mt-1">
+            <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
               <Badge
                 variant="outline"
-                className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
+                className={`${compactScale.textSmall} bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]`}
               >
-                <Activity className="h-3 w-3 mr-1" />
+                <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
                 Power BI Enhanced
               </Badge>
               {isRealTime && (
                 <Badge
                   variant="outline"
-                  className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
+                  className={`${compactScale.textSmall} bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]`}
                 >
-                  <Clock className="h-3 w-3 mr-1" />
+                  <Clock className={`${compactScale.iconSizeSmall} mr-0.5`} />
                   Live Data
                 </Badge>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className={`flex items-center ${compactScale.gap}`}>
             <div className="flex items-center space-x-2">
               <Switch id="real-time" checked={isRealTime} onCheckedChange={setIsRealTime} />
-              <Label htmlFor="real-time" className="text-sm text-[#FA4616]/70 dark:text-[#FF8A67]/80">
+              <Label
+                htmlFor="real-time"
+                className={`${compactScale.textSmall} text-[#FA4616]/70 dark:text-[#FF8A67]/80`}
+              >
                 Real-time
               </Label>
             </div>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={compactScale.iconSize} />
             </Button>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-3">
+      <CardContent className={isCompact ? "p-2" : "p-3"}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="materials">Materials</TabsTrigger>
-            <TabsTrigger value="labor">Labor</TabsTrigger>
-            <TabsTrigger value="regional">Regional</TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-4 ${isCompact ? "mb-2" : "mb-3"}`}>
+            <TabsTrigger value="overview" className={compactScale.textSmall}>
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="materials" className={compactScale.textSmall}>
+              Materials
+            </TabsTrigger>
+            <TabsTrigger value="labor" className={compactScale.textSmall}>
+              Labor
+            </TabsTrigger>
+            <TabsTrigger value="regional" className={compactScale.textSmall}>
+              Regional
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Key Economic Indicators */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid grid-cols-2 ${isCompact ? "gap-2" : "gap-3"}`}>
               {marketData.economicIndicators.map((indicator, index) => (
                 <div
                   key={index}
-                  className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-purple-200 dark:border-gray-700"
+                  className={`bg-white dark:bg-gray-800 ${compactScale.padding} rounded-lg border border-purple-200 dark:border-gray-700`}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{indicator.name}</span>
+                  <div className={`flex items-center justify-between ${isCompact ? "mb-1" : "mb-2"}`}>
+                    <span className={`${compactScale.textMedium} font-medium text-gray-700 dark:text-gray-300`}>
+                      {indicator.name}
+                    </span>
                     {getTrendIcon(indicator.change)}
                   </div>
                   <div className="flex items-center justify-between">

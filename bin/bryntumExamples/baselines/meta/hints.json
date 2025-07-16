@@ -1,0 +1,11 @@
+{
+  ".b-task-baseline": {
+    "title": "",
+    "content": "Shows customized messages in the baselines tooltip",
+    "align": "l-r"
+  },
+  ".b-baseline-toggle": {
+    "title": "Enable baseline renderer",
+    "content": "Baselines are painted red when behind schedule, green when ahead and blue when on time"
+  }
+}

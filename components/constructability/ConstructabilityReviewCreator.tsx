@@ -129,6 +129,9 @@ interface ConstructabilityReviewCreatorProps {
   userRole: string
   user: any
   onClose?: () => void
+  reviewId?: string | null
+  onSave?: (reviewData: any) => void
+  onCancel?: () => void
 }
 
 const ConstructabilityReviewCreator: React.FC<ConstructabilityReviewCreatorProps> = ({
@@ -137,6 +140,9 @@ const ConstructabilityReviewCreator: React.FC<ConstructabilityReviewCreatorProps
   userRole,
   user,
   onClose,
+  reviewId,
+  onSave,
+  onCancel,
 }) => {
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<FormData>({

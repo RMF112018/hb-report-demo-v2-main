@@ -1,0 +1,14 @@
+{
+  "title": "Advanced demo",
+  "description": "Shows a Gantt chart with many advanced options enabled.",
+  "source": [
+    "app.js",
+    "index.html",
+    "lib/ComplexityColumn.js",
+    "lib/ComplexityCombo.js",
+    "lib/GanttToolbar.js",
+    "lib/StatusColumn.js",
+    "lib/Task.js",
+    "resources/app.scss"
+  ]
+}

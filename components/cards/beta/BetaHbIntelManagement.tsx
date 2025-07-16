@@ -66,27 +66,46 @@ const systemHealth = [
   { component: "File Storage", status: 99.9, trend: "up" },
 ]
 
-function CardShell({ title, children }: { title: string; children: React.ReactNode }) {
+interface BetaHbIntelManagementProps {
+  className?: string
+  isCompact?: boolean
+}
+
+function CardShell({ title, children, isCompact }: { title: string; children: React.ReactNode; isCompact?: boolean }) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   return (
     <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <Settings className="h-5 w-5" style={{ color: "#FA4616" }} />
+      <CardHeader className={compactScale.paddingCard}>
+        <CardTitle className={`flex items-center ${compactScale.gap} ${compactScale.textTitle} font-semibold`}>
+          <Database className={compactScale.iconSize} style={{ color: "#FA4616" }} />
           {title}
-          <Badge variant="outline" className="ml-auto text-xs">
-            <Activity className="h-3 w-3 mr-1" />
-            Power BI
+          <Badge variant="outline" className={`ml-auto ${compactScale.textSmall}`}>
+            <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
+            Live
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>{children}</CardContent>
     </Card>
   )
 }
 
-export default function BetaHbIntelManagement() {
+export default function BetaHbIntelManagement({ isCompact }: BetaHbIntelManagementProps) {
   return (
-    <CardShell title="HB Intel Management">
+    <CardShell title="HB Intel Management" isCompact={isCompact}>
       <div className="h-full">
         <Tabs defaultValue="analytics" className="w-full h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-5">

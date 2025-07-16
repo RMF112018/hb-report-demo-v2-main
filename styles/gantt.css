@@ -1,0 +1,576 @@
+/* HB Gantt Chart Styles - Aligned with Bryntum Portfolio Planning Example */
+
+/* Bryntum Gantt Sizing - Following Official Documentation */
+.b-gantt {
+  flex: 1 !important; /* Drives height for parent flex column layout */
+  width: 100% !important; /* Fill parent width */
+  display: flex !important; /* Required by Bryntum */
+  min-height: 400px; /* Minimum height fallback */
+  --task-border-radius: 0.3em; /* Custom property from portfolio example */
+}
+
+/* Timeline/Scheduler area styling */
+.b-timeline-scroller {
+  background: var(--background) !important;
+}
+
+.b-sch-timeaxis-cell {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.b-grid-row {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+}
+
+.b-grid-row:nth-child(even) {
+  background: var(--muted/20) !important;
+}
+
+.b-grid-row.b-selected {
+  background: hsl(var(--accent)) !important;
+}
+
+/* Ensure proper task visibility in timeline */
+.b-sch-event-wrap {
+  z-index: 10 !important;
+}
+
+.b-gantt-task-wrap {
+  z-index: 10 !important;
+}
+
+/* Task styling - from portfolio-planning example */
+.b-gantt-task {
+  border-radius: var(--task-border-radius);
+}
+
+.b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
+  border-radius: var(--task-border-radius) var(--task-border-radius) 0 0;
+  max-height: 1.6em;
+}
+
+.b-gantt-task-wrap .b-sch-label {
+  display: flex;
+  gap: 1.5em;
+  font-weight: 400;
+}
+
+/* Ensure all Bryntum Gantt instances use flex sizing */
+.b-gantt,
+[class*="b-gantt"] {
+  flex: 1 !important;
+  height: auto !important;
+  min-height: 400px !important;
+}
+
+/* Grid and column styling */
+.b-grid-headers {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+}
+
+.b-grid-header {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+  font-weight: 600 !important;
+}
+
+.b-grid-cell {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.b-grid-subgrid {
+  background: var(--background) !important;
+}
+
+/* Parent container must use flexbox */
+.hb-gantt-parent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Grid splitter styling - from portfolio example */
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled) {
+  flex: 0 0 1px;
+}
+
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-inner {
+  width: 1px;
+}
+
+/* Rollup styling - from portfolio example */
+.b-task-rollup-wrap {
+  position: absolute;
+  margin-top: 0;
+  grid-area: none;
+  z-index: 10;
+}
+
+.b-task-rollup.b-milestone {
+  background-color: var(--event-primary-color);
+  top: 0.29em;
+  width: 0.4em;
+  height: 0.4em;
+  filter: brightness(1.75);
+}
+
+.b-rollups .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
+  min-height: 1.3em;
+}
+
+/* Tooltip styling - from portfolio example */
+.b-gantt-task-tooltip {
+  max-width: none;
+}
+
+.b-gantt-task-tooltip,
+.b-gantt-task-tooltip > .b-panel-body-wrap > .b-panel-content {
+  border-radius: 0.5em !important;
+}
+
+.b-gantt-task-tooltip .b-panel-content {
+  display: grid;
+  grid-template-columns: 15em auto;
+  grid-column-gap: 2em;
+  grid-row-gap: 2em;
+  padding: 2em !important;
+  margin: 0 !important;
+}
+
+.b-gantt-task-tooltip .field {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+
+.b-gantt-task-tooltip .field label {
+  margin-bottom: 0.5em;
+  color: #888;
+}
+
+.b-gantt-task-tooltip.b-popup {
+  max-width: 30em;
+}
+
+/* Base container styles */
+.hb-gantt-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* SVAR Gantt container overrides - Light Theme (Willow) */
+.hb-gantt-container .gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+}
+
+/* Grid styling - Light Theme */
+.hb-gantt-container .gantt_grid {
+  background: var(--card);
+  border-right: 1px solid var(--border);
+}
+
+.hb-gantt-container .gantt_grid_scale {
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.hb-gantt-container .gantt_grid_head_cell {
+  background: var(--muted);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-weight: 600;
+  padding: 8px;
+}
+
+.hb-gantt-container .gantt_cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Task area styling - Light Theme */
+.hb-gantt-container .gantt_task_bg {
+  background: var(--card);
+}
+
+.hb-gantt-container .gantt_scale_cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.hb-gantt-container .gantt_task_line {
+  border-bottom: 1px solid var(--border);
+}
+
+.hb-gantt-container .gantt_task_line:nth-child(even) {
+  background: var(--muted/20);
+}
+
+/* Task bar styling - Light Theme (Bryntum Classes) */
+.b-gantt-task {
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary)) !important;
+  border-radius: var(--task-border-radius) !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.b-gantt-task.b-gantt-task-parent {
+  background: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+}
+
+.b-gantt-task.b-milestone {
+  background: hsl(var(--chart-3)) !important;
+  border-color: hsl(var(--chart-3)) !important;
+}
+
+/* Task content styling */
+.b-gantt-task .b-gantt-task-content {
+  color: white !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Alternative SVAR styling if present */
+.hb-gantt-container .gantt_task_bar {
+  background: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary));
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+}
+
+.hb-gantt-container .gantt_task_bar.gantt_project {
+  background: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
+}
+
+.hb-gantt-container .gantt_task_bar.gantt_milestone {
+  background: hsl(var(--chart-3));
+  border-color: hsl(var(--chart-3));
+}
+
+/* Links/Dependencies - Light Theme */
+.hb-gantt-container .gantt_link_line {
+  stroke: hsl(var(--muted-foreground));
+  stroke-width: 2px;
+}
+
+.hb-gantt-container .gantt_link_arrow {
+  fill: hsl(var(--muted-foreground));
+}
+
+/* Scrollbars - Light Theme */
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Dark theme overrides */
+.dark .hb-gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_grid {
+  background: var(--card);
+  border-right-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt_grid_scale {
+  background: var(--muted);
+  border-bottom-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_grid_head_cell {
+  background: var(--muted);
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_cell {
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_task_bg {
+  background: var(--card);
+}
+
+.dark .hb-gantt-container .gantt_scale_cell {
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.dark .hb-gantt-container .gantt_task_line {
+  border-bottom-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt_task_line:nth-child(even) {
+  background: var(--muted/10);
+}
+
+/* Dark theme task bar styling */
+.dark .b-gantt-task {
+  background: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+  color: white !important;
+}
+
+.dark .b-gantt-task.b-gantt-task-parent {
+  background: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+}
+
+.dark .b-gantt-task.b-milestone {
+  background: hsl(var(--chart-3)) !important;
+  border-color: hsl(var(--chart-3)) !important;
+}
+
+.dark .b-gantt-task .b-gantt-task-content {
+  color: white !important;
+}
+
+/* Dark theme scrollbars */
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+}
+
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Custom HB enhancements */
+.hb-gantt-container .gantt_grid_head_cell,
+.hb-gantt-container .gantt_cell {
+  font-family: inherit;
+}
+
+.hb-gantt-container .gantt_task_content {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hb-gantt-container .gantt_grid_head_cell,
+  .hb-gantt-container .gantt_cell {
+    padding: 4px;
+    font-size: 0.875rem;
+  }
+
+  .hb-gantt-container .gantt_task_content {
+    font-size: 0.75rem;
+  }
+}
+
+/* Focus and selection states */
+.hb-gantt-container .gantt_task_bar.gantt_selected {
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+.hb-gantt-container .gantt_cell.gantt_selected {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* Loading state */
+.hb-gantt-container.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hb-gantt-container.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 3px solid hsl(var(--muted));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ensures proper container sizing for Next.js layouts */
+.gantt-layout-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Baseline styling aligned with baselines example */
+.b-task-baseline[data-index="0"] {
+  background-color: #ddd;
+}
+
+.b-task-baseline[data-index="1"] {
+  background-color: #d4d4d4;
+}
+
+.b-task-baseline[data-index="2"] {
+  background-color: #c9c9c9;
+}
+
+.b-task-baseline.b-baseline-ahead {
+  background-color: lightgreen;
+}
+
+.b-task-baseline.b-baseline-behind {
+  background-color: indianred;
+}
+
+.b-task-baseline.b-baseline-on-time {
+  background-color: lightblue;
+}
+
+.b-hide-baseline-1 .b-task-baseline[data-index="0"] {
+  display: none;
+}
+
+.b-hide-baseline-2 .b-task-baseline[data-index="1"] {
+  display: none;
+}
+
+.b-hide-baseline-3 .b-task-baseline[data-index="2"] {
+  display: none;
+}
+
+/* Baseline status message styling */
+h4.statusmessage {
+  margin: 1em 0 0 0;
+}
+
+.b-fa.statusicon {
+  margin-inline-end: 0.5em;
+}
+
+.b-toolbar > .b-content-element .b-button {
+  margin-inline-end: 1em;
+}
+
+/* Force visibility and proper rendering of task bars */
+.b-gantt-task,
+.b-gantt-task-content,
+.b-sch-event,
+.b-sch-event-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+/* Ensure timeline background is visible */
+.b-sch-timeline-scroller,
+.b-timeline-subgrid {
+  background: var(--background) !important;
+}
+
+/* Fix any potential layout issues */
+.b-gantt .b-grid-body-container,
+.b-gantt .b-timeline-body {
+  background: var(--background) !important;
+}
+
+/* Ensure proper task bar visibility and styling */
+.b-gantt-task {
+  min-height: 20px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 2px 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Progress bar styling if present */
+.b-gantt-task .b-gantt-task-progress {
+  background: rgba(255, 255, 255, 0.3) !important;
+  height: 100% !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  border-radius: inherit !important;
+}
+
+/* Task text styling */
+.b-gantt-task .b-gantt-task-content,
+.b-gantt-task .b-gantt-task-text {
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  z-index: 2 !important;
+  position: relative !important;
+}

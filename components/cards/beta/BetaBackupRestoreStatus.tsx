@@ -70,32 +70,51 @@ const recentActivities = [
   { activity: "Archive to Cloud", time: "3:00 PM", status: "running", duration: "2h 05m" },
 ]
 
-function CardShell({ title, children }: { title: string; children: React.ReactNode }) {
+interface BetaBackupRestoreStatusProps {
+  className?: string
+  isCompact?: boolean
+}
+
+function CardShell({ title, children, isCompact }: { title: string; children: React.ReactNode; isCompact?: boolean }) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   return (
     <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <HardDrive className="h-5 w-5" style={{ color: "#FA4616" }} />
+      <CardHeader className={compactScale.paddingCard}>
+        <CardTitle className={`flex items-center ${compactScale.gap} ${compactScale.textTitle} font-semibold`}>
+          <HardDrive className={compactScale.iconSize} style={{ color: "#FA4616" }} />
           {title}
-          <Badge variant="outline" className="ml-auto text-xs">
-            <Activity className="h-3 w-3 mr-1" />
+          <Badge variant="outline" className={`ml-auto ${compactScale.textSmall}`}>
+            <Activity className={`${compactScale.iconSizeSmall} mr-0.5`} />
             Real-time
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className={isCompact ? "pt-0 p-2" : "pt-0"}>{children}</CardContent>
     </Card>
   )
 }
 
-export default function BetaBackupRestoreStatus() {
+export default function BetaBackupRestoreStatus({ isCompact }: BetaBackupRestoreStatusProps) {
   const totalBackups = backupSchedule.reduce((acc, day) => acc + day.success + day.failed, 0)
   const successfulBackups = backupSchedule.reduce((acc, day) => acc + day.success, 0)
   const successRate = (successfulBackups / totalBackups) * 100
   const totalSize = backupSources.reduce((acc, source) => acc + source.size, 0)
 
   return (
-    <CardShell title="Backup & DR Status">
+    <CardShell title="Backup & DR Status" isCompact={isCompact}>
       <div className="h-full space-y-4">
         {/* Key Metrics */}
         <div className="grid grid-cols-4 gap-3">
@@ -134,7 +153,7 @@ export default function BetaBackupRestoreStatus() {
         </div>
 
         {/* Backup Success Trend */}
-        <div className="h-32">
+        <div className={isCompact ? "h-32" : "h-48"}>
           <div className="text-sm font-medium mb-2">Backup Success Rate (7 days)</div>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={backupSchedule}>

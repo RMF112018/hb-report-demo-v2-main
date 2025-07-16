@@ -99,7 +99,7 @@ import {
 export const financialTabSlides: PresentationSlide[] = [
   {
     id: "financial-overview",
-    title: "Financial Management Overview",
+    title: "Financial Continuity Across Every Project Phase",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -113,9 +113,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Financial Management</strong> transforms scattered financial processes by providing{" "}
-            <strong>unified budget tracking, cash flow analysis, and AI-powered forecasting</strong> that eliminates the
-            need for multiple Excel spreadsheets and disconnected financial systems.
+            <strong>Financial Management</strong> ensures unbroken financial continuity by unifying{" "}
+            <strong>budget tracking, cash flow visibility, and intelligent forecasting</strong> across the entire
+            project lifecycle, replacing fragmented workflows that create gaps in financial oversight.
           </motion.p>
 
           <motion.p
@@ -124,9 +124,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of juggling separate systems for budget analysis, payment tracking, and financial reporting,{" "}
-            <strong>all financial operations are centralized</strong> with real-time integration and intelligent
-            automation that follows projects from estimate to final payment.
+            From initial estimate through final payment and warranty closeout,{" "}
+            <strong>financial continuity is preserved</strong> with real-time data and automated intelligence that
+            maintains visibility and control throughout every project phase.
           </motion.p>
 
           <motion.div
@@ -165,7 +165,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "budget-analysis",
-    title: "Budget Analysis & Variance Tracking",
+    title: "Continuous Budget Monitoring & Real-Time Variance Control",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -179,9 +179,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Budget Analysis</strong> eliminates manual budget tracking by providing{" "}
-            <strong>real-time variance analysis, cost code breakdowns, and automated alerts</strong> that identify
-            budget overruns before they impact project profitability.
+            <strong>Budget Analysis</strong> maintains continuous financial oversight with{" "}
+            <strong>real-time variance insights, cost breakdowns, and automated threshold alerts</strong>, ensuring
+            budget continuity and early identification of issues before they disrupt project flow.
           </motion.p>
 
           <motion.p
@@ -190,9 +190,8 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of waiting for monthly budget reports and manual variance calculations,{" "}
-            <strong>budget performance is monitored continuously</strong> with intelligent insights that help project
-            managers make informed decisions quickly.
+            Continuous budget monitoring replaces static reports with <strong>live financial continuity</strong> that
+            empowers proactive control and faster response to cost deviations throughout the project lifecycle.
           </motion.p>
 
           <motion.div
@@ -225,7 +224,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "jchr-analysis",
-    title: "Job Cost History Report (JCHR)",
+    title: "Continuous Cost Intelligence & Historical Learning",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -239,9 +238,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Job Cost History Report</strong> transforms cost tracking by providing{" "}
-            <strong>comprehensive cost breakdowns, labor productivity analysis, and historical cost comparisons</strong>
-            that eliminate the need for manual cost report compilation.
+            <strong>Job Cost History Report</strong> creates continuous cost intelligence through{" "}
+            <strong>detailed cost breakdowns, productivity metrics, and historical comparisons</strong>—maintaining
+            institutional knowledge continuity that informs future bids and optimizes resource allocation.
           </motion.p>
 
           <motion.p
@@ -250,9 +249,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of spending hours gathering cost data from multiple systems and creating manual reports,{" "}
-            <strong>all job costs are automatically tracked and analyzed</strong> with intelligent insights that help
-            optimize future project estimates and resource allocation.
+            Through centralized tracking, <strong>every labor hour and dollar creates continuous learning</strong>,
+            building cost intelligence that bridges past experience with future project planning for sustained
+            improvement.
           </motion.p>
 
           <motion.div
@@ -285,7 +284,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "ar-aging",
-    title: "Accounts Receivable Aging",
+    title: "Continuous Receivables Management & Cash Flow Protection",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -299,9 +298,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>AR Aging Analysis</strong> streamlines accounts receivable management by providing{" "}
-            <strong>automated aging reports, collection priority ranking, and cash flow impact analysis</strong>
-            that eliminates manual AR tracking and improves collection efficiency.
+            <strong>AR Aging Analysis</strong> ensures continuous receivables oversight with{" "}
+            <strong>live aging buckets, smart collection prioritization, and cash impact metrics</strong>—maintaining
+            cash flow continuity and preventing payment gaps that disrupt operations.
           </motion.p>
 
           <motion.p
@@ -310,9 +309,8 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing AR spreadsheets and manual follow-up schedules,{" "}
-            <strong>all receivables are automatically tracked and prioritized</strong> with intelligent alerts that help
-            maintain healthy cash flow and reduce collection delays.
+            Continuous AR management replaces fragmented tracking with <strong>intelligent continuity</strong> that
+            helps teams maintain consistent collection focus and preserve liquidity throughout project lifecycles.
           </motion.p>
 
           <motion.div
@@ -345,7 +343,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "cash-flow",
-    title: "Cash Flow Management",
+    title: "Continuous Cash Flow Visibility & Proactive Capital Management",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -359,9 +357,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Cash Flow Management</strong> transforms financial planning by providing{" "}
-            <strong>real-time cash position tracking, automated forecasting, and liquidity analysis</strong>
-            that eliminates manual cash flow projections and improves financial decision-making.
+            <strong>Cash Flow Management</strong> maintains continuous financial visibility through{" "}
+            <strong>real-time monitoring, predictive forecasting, and liquidity analysis</strong>—ensuring cash flow
+            continuity across all projects and eliminating funding surprises.
           </motion.p>
 
           <motion.p
@@ -370,9 +368,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of creating weekly cash flow reports and manual projections,{" "}
-            <strong>cash flow is monitored continuously</strong> with intelligent insights that help optimize payment
-            timing and maintain healthy working capital levels.
+            Continuous monitoring replaces reactive planning with <strong>proactive capital continuity</strong>,
+            enabling teams to maintain optimal payment timing and capital availability throughout every phase of
+            construction.
           </motion.p>
 
           <motion.div
@@ -407,7 +405,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "ai-forecasting",
-    title: "HBI AI-Powered Forecasting",
+    title: "Continuous Intelligence & Evolving Financial Foresight",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -421,9 +419,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>HBI AI-Powered Forecasting</strong> assists users in reviewing and grading forecasts by leveraging{" "}
-            <strong>proprietary machine learning algorithms, historical project data, and market intelligence</strong>
-            to provide intelligent insights that help users make better financial decisions and risk assessments.
+            <strong>HBI Forecasting</strong> creates continuous intelligence by empowering users with{" "}
+            <strong>AI-driven analysis, market data, and historical benchmarks</strong> that evolve with every project,
+            maintaining forecasting continuity that improves accuracy over time.
           </motion.p>
 
           <motion.p
@@ -432,11 +430,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of relying on static financial projections and manual analysis,{" "}
-            <strong>
-              HBI's intelligent system analyzes all available data to help users evaluate forecast accuracy
-            </strong>
-            , providing construction-specific insights and recommendations that generic financial tools cannot match.
+            Through continuous learning, <strong>HBI delivers construction-specific continuity</strong> that assesses
+            forecast quality and provides actionable financial guidance that bridges experience with intelligent
+            prediction.
           </motion.p>
 
           <motion.div
@@ -471,7 +467,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "change-management",
-    title: "Change Management & Tracking",
+    title: "Change Management with Continuous Budget Integrity",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -485,9 +481,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Change Management</strong> streamlines change order processes by providing{" "}
-            <strong>automated change tracking, approval workflows, and budget impact analysis</strong>
-            that eliminates manual change order management and improves approval efficiency.
+            <strong>Change Management</strong> preserves project continuity through{" "}
+            <strong>automated tracking, smart approvals, and real-time impact analysis</strong>—ensuring changes enhance
+            rather than disrupt financial continuity and project flow.
           </motion.p>
 
           <motion.p
@@ -496,9 +492,8 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing change orders through email chains and manual tracking,{" "}
-            <strong>all changes are centrally managed</strong> with intelligent routing and automatic budget impact
-            calculations that keep projects on track and stakeholders informed.
+            With continuous budget integration, <strong>all change orders maintain financial continuity</strong>,
+            enabling faster approvals and clearer stakeholder communication without breaking project momentum.
           </motion.p>
 
           <motion.div
@@ -531,7 +526,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "pay-authorization",
-    title: "Payment Authorization Workflows",
+    title: "Continuous Payment Workflows & Vendor Relationship Continuity",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -545,9 +540,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Payment Authorization</strong> transforms payment processing by providing{" "}
-            <strong>automated approval workflows, compliance validation, and integrated payment tracking</strong>
-            that eliminates manual payment approvals and reduces processing delays.
+            <strong>Payment Authorization</strong> ensures continuous payment flow through{" "}
+            <strong>automated routing, compliance checks, and live tracking</strong>—maintaining vendor relationship
+            continuity and project momentum.
           </motion.p>
 
           <motion.p
@@ -556,9 +551,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing payment approvals through email and manual sign-offs,{" "}
-            <strong>all payments are routed intelligently</strong> with automated compliance checks and real-time
-            tracking that ensures timely payments and maintains vendor relationships.
+            Continuous workflow automation replaces fragmented approval chains with{" "}
+            <strong>transparent payment continuity</strong> that ensures timely vendor payments and sustained project
+            relationships.
           </motion.p>
 
           <motion.div
@@ -591,7 +586,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "pay-applications",
-    title: "Pay Applications (AIA G702/G703)",
+    title: "Continuous Billing Cycles & Integrated Revenue Flow",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -605,9 +600,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Pay Applications</strong> streamlines billing processes by providing{" "}
-            <strong>automated AIA G702/G703 generation, progress tracking, and retention calculations</strong>
-            that eliminates manual pay application preparation and reduces billing cycle times.
+            <strong>Pay Applications</strong> maintain continuous billing flow by automating G702/G703 generation,
+            aligning billing with progress, and <strong>managing retention within unified workflows</strong> that
+            preserve revenue continuity.
           </motion.p>
 
           <motion.p
@@ -616,9 +611,8 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of manually creating pay applications and tracking billing progress,{" "}
-            <strong>all billing is automated and integrated</strong> with project progress data to ensure accurate,
-            timely payment requests that improve cash flow and reduce administrative overhead.
+            Through continuous project data integration, <strong>billing continuity is preserved</strong> with faster,
+            more accurate, and less administrative processes that improve cash flow reliability throughout construction.
           </motion.p>
 
           <motion.div
@@ -651,7 +645,7 @@ export const financialTabSlides: PresentationSlide[] = [
   },
   {
     id: "retention-management",
-    title: "Retention Management",
+    title: "Retention Continuity Through Project Closeout & Warranty",
     content: (
       <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
         {/* Background Icon Overlay */}
@@ -665,9 +659,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Retention Management</strong> transforms retention tracking by providing{" "}
-            <strong>automated retention calculations, release scheduling, and warranty period monitoring</strong>
-            that eliminates manual retention spreadsheets and ensures timely retention releases.
+            <strong>Retention Management</strong> ensures continuous financial oversight through{" "}
+            <strong>automated calculations, release schedules, and warranty period tracking</strong>—maintaining
+            retention continuity from construction completion through final warranty closeout.
           </motion.p>
 
           <motion.p
@@ -676,9 +670,9 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Instead of managing retention through manual calculations and tracking systems,{" "}
-            <strong>all retention is automatically monitored</strong> with intelligent alerts for release opportunities
-            and warranty period expiration to optimize cash flow and maintain vendor relationships.
+            Continuous retention monitoring with <strong>intelligent alerts and lifecycle visibility</strong> ensures
+            seamless retention continuity, enabling timely releases and stronger vendor trust throughout the entire
+            project lifecycle.
           </motion.p>
 
           <motion.div

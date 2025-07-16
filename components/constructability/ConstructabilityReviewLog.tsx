@@ -71,45 +71,16 @@ import {
   Bookmark,
 } from "lucide-react"
 
-interface ReviewData {
-  id: string
-  reviewType: string
-  projectStage: string
-  reviewDate: string
-  reviewerName: string
-  reviewerRole: string
-  overallScore: number
-  status: "completed" | "in-progress" | "pending"
-  scoring: {
-    designFeasibility: number
-    coordinationClarity: number
-    codeCompliance: number
-    costScheduleImpact: number
-    constructabilityRisk: number
-    bimReviewQuality: number
-  }
-  comments: string
-  recommendations: string[]
-  attachments: string[]
-  reviewDuration: number // in hours
-  issuesIdentified: number
-  issuesResolved: number
-  priority: "high" | "medium" | "low"
-  tags: string[]
-}
-
-interface ConstructabilityReviewLogProps {
-  projectId: string
-  projectData: any
-  userRole: string
-  user: any
-}
+import type { ReviewData, ConstructabilityReviewLogProps } from "@/types/constructability"
 
 const ConstructabilityReviewLog: React.FC<ConstructabilityReviewLogProps> = ({
   projectId,
   projectData,
   userRole,
   user,
+  reviews: externalReviews,
+  onEditReview,
+  onCreateReview,
 }) => {
   const [reviews, setReviews] = useState<ReviewData[]>([])
   const [filteredReviews, setFilteredReviews] = useState<ReviewData[]>([])

@@ -11,11 +11,12 @@
 
 "use client"
 
-import React, { useState, useMemo, useCallback } from "react"
+import React, { useState, useMemo, useCallback, Suspense, lazy } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -41,7 +42,13 @@ import {
   ChevronDown,
   MoreVertical,
 } from "lucide-react"
-import { format } from "date-fns"
+
+// Lazy imports for panel components with performance optimization
+const OverviewPanel = lazy(() => import("@/components/scheduler/panels/OverviewPanel"))
+const PerformancePanel = lazy(() => import("@/components/scheduler/panels/PerformancePanel"))
+const QualityPanel = lazy(() => import("@/components/scheduler/panels/QualityPanel"))
+const RiskPanel = lazy(() => import("@/components/scheduler/panels/RiskPanel"))
+const OptimizationPanel = lazy(() => import("@/components/scheduler/panels/OptimizationPanel"))
 
 // Types
 interface SchedulerOverviewProps {
@@ -404,6 +411,46 @@ const ScheduleMonitor: React.FC = () => {
   )
 }
 
+// Loading Skeleton for Panels
+const PanelSkeleton: React.FC = () => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
+        <Card key={i}>
+          <CardHeader>
+            <Skeleton className="h-4 w-24" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-3 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-32" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-32" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+)
+
 // Main Component
 const SchedulerOverview: React.FC<SchedulerOverviewProps> = ({ userRole, projectData }) => {
   const [activeCategory, setActiveCategory] = useState("overview")
@@ -423,6 +470,43 @@ const SchedulerOverview: React.FC<SchedulerOverviewProps> = ({ userRole, project
       prev.includes(kpiLabel) ? prev.filter((label) => label !== kpiLabel) : [...prev, kpiLabel]
     )
   }, [])
+
+  const renderActivePanel = () => {
+    const commonProps = {
+      currentKPIs,
+      pinnedKPIs,
+      onPinKPI: handlePinKPI,
+    }
+
+    switch (activeCategory) {
+      case "overview":
+        return (
+          <OverviewPanel
+            {...commonProps}
+            showAIInsights={showAIInsights}
+            onToggleAIInsights={setShowAIInsights}
+            filteredInsights={filteredInsights}
+          />
+        )
+      case "performance":
+        return <PerformancePanel {...commonProps} />
+      case "quality":
+        return <QualityPanel {...commonProps} />
+      case "risk":
+        return <RiskPanel {...commonProps} />
+      case "optimization":
+        return <OptimizationPanel {...commonProps} />
+      default:
+        return (
+          <OverviewPanel
+            {...commonProps}
+            showAIInsights={showAIInsights}
+            onToggleAIInsights={setShowAIInsights}
+            filteredInsights={filteredInsights}
+          />
+        )
+    }
+  }
 
   const categories = [
     { id: "overview", label: "Overview", icon: BarChart3 },
@@ -545,112 +629,7 @@ const SchedulerOverview: React.FC<SchedulerOverviewProps> = ({ userRole, project
 
       {/* Dynamic Content Based on Selected Category */}
       <div className="space-y-6">
-        {activeCategory === "overview" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <ScheduleMonitor />
-
-              {/* KPI Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {currentKPIs.map((kpi) => (
-                  <KPICard
-                    key={kpi.label}
-                    metric={kpi}
-                    isPinned={pinnedKPIs.includes(kpi.label)}
-                    onPin={() => handlePinKPI(kpi.label)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* AI Insights Sidebar */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">HBI Insights</h3>
-                <div className="flex items-center gap-2">
-                  <Switch checked={showAIInsights} onCheckedChange={setShowAIInsights} />
-                  <Brain className="h-4 w-4" />
-                </div>
-              </div>
-
-              {showAIInsights && (
-                <div className="space-y-4">
-                  {filteredInsights.map((insight) => (
-                    <AIInsightCard key={insight.id} insight={insight} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeCategory === "performance" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {currentKPIs.map((kpi) => (
-                <KPICard
-                  key={kpi.label}
-                  metric={kpi}
-                  isPinned={pinnedKPIs.includes(kpi.label)}
-                  onPin={() => handlePinKPI(kpi.label)}
-                />
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>SPI/CPI Trends</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center">
-                    <p className="text-muted-foreground">SPI/CPI Chart Visualization</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Progress Velocity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center">
-                    <p className="text-muted-foreground">Velocity Chart Visualization</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Other categories would render similar content structures */}
-        {activeCategory !== "overview" && activeCategory !== "performance" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {currentKPIs.map((kpi) => (
-                <KPICard
-                  key={kpi.label}
-                  metric={kpi}
-                  isPinned={pinnedKPIs.includes(kpi.label)}
-                  onPin={() => handlePinKPI(kpi.label)}
-                />
-              ))}
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>{categories.find((c) => c.id === activeCategory)?.label} Dashboard</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    {categories.find((c) => c.id === activeCategory)?.label} content coming soon
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <Suspense fallback={<PanelSkeleton />}>{renderActivePanel()}</Suspense>
       </div>
     </div>
   )

@@ -10,7 +10,7 @@
       "title": "Financial Review Panel",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
-      "span": { "cols": 16, "rows": 5 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "panelProps": {
@@ -18,6 +18,20 @@
           "scope": "company-wide",
           "layout": "executive-optimized"
         }
+      }
+    },
+    {
+      "id": "placeholder-card",
+      "type": "portfolio-overview",
+      "title": "Placeholder Card",
+      "size": "optimal",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showCharts": true,
+        "compactMetrics": true
       }
     },
     {
