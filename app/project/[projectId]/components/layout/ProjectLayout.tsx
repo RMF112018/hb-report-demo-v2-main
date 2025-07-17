@@ -75,6 +75,7 @@ export function ProjectLayout({
     "transition-all",
     "duration-300",
     "ease-in-out",
+    "overflow-hidden", // CRITICAL: Prevent overflow
     animation.isAnimating && "overflow-hidden",
     animation.isAnimating && animation.animationType === "view-mode-change" && "animate-pulse",
     className
@@ -86,6 +87,8 @@ export function ProjectLayout({
     "flex-1",
     "relative",
     "overflow-hidden",
+    "min-w-0", // CRITICAL: Allow flex items to shrink
+    "max-w-full", // CRITICAL: Prevent overflow
     !animation.isAnimating && "transition-all duration-300 ease-in-out"
   )
 
@@ -97,6 +100,7 @@ export function ProjectLayout({
     "w-full",
     "max-w-full",
     "overflow-hidden",
+    "min-w-0", // CRITICAL: Allow flex items to shrink
     "transition-all",
     "duration-300",
     "ease-in-out",
@@ -153,95 +157,21 @@ export function ProjectLayout({
           "--sidebar-width": `${config.sidebar.width}px`,
           "--content-padding": `${config.content.padding}px`,
           "--footer-height": `${config.footer.height}px`,
+          width: "100%", // CRITICAL: Constrain width
+          maxWidth: "100%", // CRITICAL: Prevent overflow
         } as React.CSSProperties
       }
     >
-      {/* Header removed - using main app header instead */}
-      {/* <ProjectHeader
-        config={config.header}
-        navigation={navigation}
-        user={
-          userRole
-            ? {
-                name: "Current User",
-                role: userRole,
-                avatar: undefined,
-              }
-            : undefined
-        }
-        project={
-          projectData
-            ? {
-                name: projectData.name || "Project Name",
-                id: String(projectData.id || "unknown"),
-                stage: projectData.stage || "in-progress",
-              }
-            : undefined
-        }
-        onAction={(actionId) => {
-          console.log("Header action:", actionId)
-        }}
-        onSearch={(query) => {
-          console.log("Search query:", query)
-        }}
-        className="z-30"
-      /> */}
-
       {/* Content area with sidebar */}
       <div className={contentAreaClasses}>
-        {/* Sidebar removed - using main app sidebar instead */}
-        {/* <ProjectSidebar
-          config={config.sidebar}
-          navigation={navigation}
-          userRole={userRole}
-          onStateChange={(newState) => {
-            actions.setSidebarState(newState)
-          }}
-          onQuickAction={(actionId) => {
-            console.log("Quick action:", actionId)
-          }}
-          className={cn(
-            "z-20",
-            config.sidebar.state === "overlay" && "fixed",
-            config.sidebar.state !== "overlay" && "relative"
-          )}
-        /> */}
-
-        {/* Mobile overlay */}
-        {/* <div className={overlayClasses} onClick={handleOverlayClick} aria-hidden="true" /> */}
-
-        {/* Main content */}
-        <div className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
-          <ProjectContent
-            config={config.content}
-            navigation={navigation}
-            userRole={userRole}
-            projectData={projectData}
-            loading={animation.isAnimating}
-            className="flex-1"
-          >
-            {children}
-          </ProjectContent>
-
-          {/* Footer */}
-          {config.footer.visible && <ProjectFooter config={config.footer} className="z-10" />}
+        {/* Main content area */}
+        <div className={mainContentClasses}>
+          {/* Project content */}
+          <div className="flex-1 overflow-hidden min-w-0 max-w-full">{children}</div>
         </div>
-      </div>
 
-      {/* Skip links for accessibility */}
-      <div className="sr-only">
-        <a
-          href="#main-content"
-          className="fixed top-4 left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md focus:not-sr-only focus:absolute"
-        >
-          Skip to main content
-        </a>
-        <a
-          href="#sidebar-navigation"
-          className="fixed top-4 left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md focus:not-sr-only focus:absolute"
-        >
-          Skip to navigation
-        </a>
+        {/* Overlay for mobile sidebar */}
+        <div className={overlayClasses} onClick={handleOverlayClick} />
       </div>
     </div>
   )

@@ -9,11 +9,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Calculator, 
-  TrendingUp, 
-  DollarSign, 
-  FileText, 
+import {
+  Calculator,
+  TrendingUp,
+  DollarSign,
+  FileText,
   Clock,
   CheckCircle,
   AlertTriangle,
@@ -48,7 +48,7 @@ import {
   UserCheck,
   Package,
   Gavel,
-  Scale
+  Scale,
 } from "lucide-react"
 import {
   Breadcrumb,
@@ -68,13 +68,13 @@ import { EstimatingIntelligence } from "@/components/estimating/EstimatingIntell
 import { ProjectEstimateOverview } from "@/components/estimating/ProjectEstimateOverview"
 import ClarificationsAssumptions from "@/components/estimating/ClarificationsAssumptions"
 import DocumentLog from "@/components/estimating/DocumentLog"
-import TradePartnerLog from '@/components/estimating/TradePartnerLog'
-import AllowancesLog from '@/components/estimating/AllowancesLog'
-import GCGRLog from '@/components/estimating/GCGRLog'
-import { BidLeveling } from '@/components/estimating/BidLeveling'
-import BidTabManagement from '@/components/estimating/BidTabManagement'
-import { CostSummaryModule } from '@/components/estimating/CostSummaryModule'
-import { AreaCalculationsModule } from '@/components/estimating/AreaCalculationsModule'
+import TradePartnerLog from "@/components/estimating/TradePartnerLog"
+import AllowancesLog from "@/components/estimating/AllowancesLog"
+import GCGRLog from "@/components/estimating/GCGRLog"
+import { BidLeveling } from "@/components/estimating/BidLeveling"
+import BidTabManagement from "@/components/estimating/BidTabManagement"
+import { CostSummaryModule } from "@/components/estimating/CostSummaryModule"
+import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
 
 // Import mock data
 import projectsData from "@/data/mock/projects.json"
@@ -90,17 +90,31 @@ export default function ProjectEstimatePage() {
 
   // Find the specific project
   const project = useMemo(() => {
-    return projectsData.find(p => p.project_id?.toString() === projectId)
+    return projectsData.find((p) => p.project_id?.toString() === projectId)
   }, [projectId])
 
   // Handle URL hash navigation
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '')
-    if (hash && [
-      'overview', 'takeoff', 'bidding', 'cost-summary', 'area-calc', 'analytics', 
-      'intelligence', 'clarifications', 'documents', 'trade-partners', 'allowances', 
-      'gc-gr', 'bid-leveling', 'bid-tabs'
-    ].includes(hash)) {
+    const hash = window.location.hash.replace("#", "")
+    if (
+      hash &&
+      [
+        "overview",
+        "takeoff",
+        "bidding",
+        "cost-summary",
+        "area-calc",
+        "analytics",
+        "intelligence",
+        "clarifications",
+        "documents",
+        "trade-partners",
+        "allowances",
+        "gc-gr",
+        "bid-leveling",
+        "bid-tabs",
+      ].includes(hash)
+    ) {
       setActiveTab(hash)
     }
   }, [])
@@ -108,12 +122,24 @@ export default function ProjectEstimatePage() {
   // Update URL when tab changes
   const handleTabChange = (tabValue: string) => {
     setActiveTab(tabValue)
-    window.history.replaceState(null, '', `#${tabValue}`)
+    window.history.replaceState(null, "", `#${tabValue}`)
+
+    // If switching to cost-summary, redirect to main app with sidebar
+    if (tabValue === "cost-summary") {
+      // Store the project selection and navigate to main app
+      localStorage.setItem("selectedProject", projectId)
+      localStorage.setItem("selectedTool", "estimating")
+      localStorage.setItem("activeTab", "cost-summary")
+
+      // Navigate to main app with the project selected
+      router.push("/main-app")
+      return
+    }
   }
 
   // Handle back navigation
   const handleBackToProjects = () => {
-    router.push('/projects')
+    router.push("/projects")
   }
 
   // Handle refresh
@@ -132,9 +158,7 @@ export default function ProjectEstimatePage() {
               <div className="text-center">
                 <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
                 <h2 className="text-xl font-semibold mb-2">Project Not Found</h2>
-                <p className="text-muted-foreground mb-4">
-                  The project with ID "{projectId}" could not be found.
-                </p>
+                <p className="text-muted-foreground mb-4">The project with ID "{projectId}" could not be found.</p>
                 <Button onClick={handleBackToProjects}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Projects
@@ -151,30 +175,30 @@ export default function ProjectEstimatePage() {
   const projectProgress = useMemo(() => {
     const stage = project.project_stage_name
     let progress = 0
-    let status = 'In Progress'
-    
+    let status = "In Progress"
+
     switch (stage) {
-      case 'Pre-Construction':
+      case "Pre-Construction":
         progress = 25
-        status = 'Planning'
+        status = "Planning"
         break
-      case 'Bidding':
+      case "Bidding":
         progress = 60
-        status = 'Bidding'
+        status = "Bidding"
         break
-      case 'BIM Coordination':
+      case "BIM Coordination":
         progress = 80
-        status = 'Coordination'
+        status = "Coordination"
         break
-      case 'Construction':
+      case "Construction":
         progress = 100
-        status = 'Awarded'
+        status = "Awarded"
         break
       default:
         progress = 10
-        status = 'Initial'
+        status = "Initial"
     }
-    
+
     return { progress, status }
   }, [project])
 
@@ -182,23 +206,20 @@ export default function ProjectEstimatePage() {
     <EstimatingProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
         <AppHeader />
-        
+
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb Navigation */}
           <Breadcrumb className="mb-6">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink 
-                  onClick={handleBackToProjects}
-                  className="cursor-pointer hover:text-primary"
-                >
+                <BreadcrumbLink onClick={handleBackToProjects} className="cursor-pointer hover:text-primary">
                   Projects
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Project Estimate</BreadcrumbPage>
+                <BreadcrumbPage>{project.name || project.display_name || "Untitled Project"}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -212,34 +233,34 @@ export default function ProjectEstimatePage() {
                     <div className="flex items-center gap-3 mb-2">
                       <Building2 className="h-6 w-6 text-primary" />
                       <h1 className="text-2xl font-bold text-foreground">
-                        {project.name || project.display_name || 'Untitled Project'}
+                        {project.name || project.display_name || "Untitled Project"}
                       </h1>
                       <Badge variant="secondary" className="ml-2">
                         {project.project_stage_name}
                       </Badge>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                       <div className="text-sm">
                         <span className="text-muted-foreground">Type:</span>
-                        <p className="font-medium">{project.project_type_name || project.work_scope || 'N/A'}</p>
+                        <p className="font-medium">{project.project_type_name || project.work_scope || "N/A"}</p>
                       </div>
                       <div className="text-sm">
                         <span className="text-muted-foreground">Value:</span>
                         <p className="font-medium">
-                          {project.contract_value ? `$${project.contract_value.toLocaleString()}` : 'TBD'}
+                          {project.contract_value ? `$${project.contract_value.toLocaleString()}` : "TBD"}
                         </p>
                       </div>
                       <div className="text-sm">
                         <span className="text-muted-foreground">Location:</span>
                         <p className="font-medium">
-                          {`${project.city || ''} ${project.state_code || ''}`.trim() || 'N/A'}
+                          {`${project.city || ""} ${project.state_code || ""}`.trim() || "N/A"}
                         </p>
                       </div>
                       <div className="text-sm">
                         <span className="text-muted-foreground">Square Footage:</span>
                         <p className="font-medium">
-                          {project.square_feet ? `${project.square_feet.toLocaleString()} SF` : 'N/A'}
+                          {project.square_feet ? `${project.square_feet.toLocaleString()} SF` : "N/A"}
                         </p>
                       </div>
                     </div>
@@ -255,12 +276,8 @@ export default function ProjectEstimatePage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleRefresh}
-                      disabled={isLoading}
-                    >
-                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
                       Refresh
                     </Button>
                     <Button onClick={handleBackToProjects} variant="outline">
@@ -342,27 +359,46 @@ export default function ProjectEstimatePage() {
                 </TabsContent>
 
                 <TabsContent value="takeoff" className="space-y-6">
-                  <QuantityTakeoffDashboard />
+                  <QuantityTakeoffDashboard
+                    estimatingProjects={[
+                      {
+                        id: project.project_id?.toString() || projectId,
+                        project_name: project.name || project.display_name || "Untitled Project",
+                        project_stage_name: project.project_stage_name || "Unknown",
+                        active: project.active || false,
+                        project_value: project.contract_value || undefined,
+                        start_date: project.start_date || undefined,
+                        completion_date: project.completion_date || undefined,
+                      },
+                    ]}
+                    userRole={(user?.role as any) || "estimator"}
+                  />
                 </TabsContent>
 
                 <TabsContent value="bidding" className="space-y-6">
-                  <BidManagementCenter />
+                  <BidManagementCenter userRole={(user?.role as any) || "estimator"} />
                 </TabsContent>
 
                 <TabsContent value="cost-summary" className="space-y-6">
-                  <CostSummaryModule />
+                  <CostSummaryModule
+                    projectId={projectId}
+                    projectName={project.name || project.display_name || "Untitled Project"}
+                  />
                 </TabsContent>
 
                 <TabsContent value="area-calc" className="space-y-6">
-                  <AreaCalculationsModule />
+                  <AreaCalculationsModule
+                    projectId={projectId}
+                    projectName={project.name || project.display_name || "Untitled Project"}
+                  />
                 </TabsContent>
 
                 <TabsContent value="analytics" className="space-y-6">
-                  <CostAnalyticsDashboard />
+                  <CostAnalyticsDashboard userRole={(user?.role as any) || "estimator"} />
                 </TabsContent>
 
                 <TabsContent value="intelligence" className="space-y-6">
-                  <EstimatingIntelligence />
+                  <EstimatingIntelligence userRole={(user?.role as any) || "estimator"} />
                 </TabsContent>
 
                 <TabsContent value="clarifications" className="space-y-6">
@@ -399,4 +435,4 @@ export default function ProjectEstimatePage() {
       </div>
     </EstimatingProvider>
   )
-} 
+}

@@ -5,6 +5,7 @@ import ProjectOverviewPanel from "./ProjectOverviewPanel"
 import InsightsPanel from "./InsightsPanel"
 import QuickActionsPanel from "./QuickActionsPanel"
 import KeyMetricsPanel from "./KeyMetricsPanel"
+import { EstimateSummaryPanel } from "./EstimateSummaryPanel"
 
 interface SidebarPanelRendererProps {
   activePanel?: string
@@ -102,6 +103,28 @@ export default function SidebarPanelRenderer({
   const currentInsightsTitle = isContractDocumentsTab ? getContractDocumentsInsightsTitle() : getHBIInsightsTitle()
   const currentInsights = isContractDocumentsTab ? getContractDocumentsInsights() : getHBIInsights()
 
+  // Detect if CostSummaryModule is active
+  // The CostSummaryModule is active when:
+  // 1. We're in the estimating page (navigation.coreTab === "estimating" or we're in the estimate route)
+  // 2. The activeTab is "cost-summary"
+  // 3. We're in the estimating page route and the cost-summary tab is active
+  const isCostSummaryActive =
+    activeTab === "cost-summary" ||
+    (navigation?.coreTab === "estimating" && activeTab === "cost-summary") ||
+    (typeof window !== "undefined" &&
+      window.location.pathname.includes("/estimate") &&
+      window.location.hash.includes("cost-summary"))
+
+  // Mock data for CostSummaryModule totals - replace with real data from context or props
+  const costSummaryData = {
+    totalEstimate: 12345678,
+    costCategoriesTotal: 9876543,
+    generalConditionsTotal: 750000, // Sum of all GC sections
+    generalRequirementsTotal: 160000, // Sum of all GR sections
+    costPerMonth: 1266223.38, // totalEstimate / 9.75
+    projectDuration: 9.75,
+  }
+
   // Render all panels by default (current behavior)
   if (activePanel === "all") {
     return (
@@ -113,6 +136,18 @@ export default function SidebarPanelRenderer({
           userRole={userRole}
           projectMetrics={projectMetrics}
         />
+
+        {/* Show EstimateSummaryPanel when CostSummaryModule is active */}
+        {isCostSummaryActive && (
+          <EstimateSummaryPanel
+            totalEstimate={costSummaryData.totalEstimate}
+            costCategoriesTotal={costSummaryData.costCategoriesTotal}
+            generalConditionsTotal={costSummaryData.generalConditionsTotal}
+            generalRequirementsTotal={costSummaryData.generalRequirementsTotal}
+            costPerMonth={costSummaryData.costPerMonth}
+            projectDuration={costSummaryData.projectDuration}
+          />
+        )}
 
         {/* Hide Insights Panel when Contract Documents tab is active */}
         {!isContractDocumentsTab && (
@@ -158,6 +193,21 @@ export default function SidebarPanelRenderer({
           user={user}
           userRole={userRole}
           projectMetrics={projectMetrics}
+        />
+      )
+
+    case "estimate-summary":
+      if (!isCostSummaryActive) {
+        return null
+      }
+      return (
+        <EstimateSummaryPanel
+          totalEstimate={costSummaryData.totalEstimate}
+          costCategoriesTotal={costSummaryData.costCategoriesTotal}
+          generalConditionsTotal={costSummaryData.generalConditionsTotal}
+          generalRequirementsTotal={costSummaryData.generalRequirementsTotal}
+          costPerMonth={costSummaryData.costPerMonth}
+          projectDuration={costSummaryData.projectDuration}
         />
       )
 

@@ -25,7 +25,7 @@
 
 "use client"
 
-import React, { useState, useCallback, useEffect, useMemo } from "react"
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -58,6 +58,9 @@ import {
   Clock,
   Award,
   RefreshCw,
+  Zap,
+  Shield,
+  TestTube,
 } from "lucide-react"
 import {
   ProtectedGrid,
@@ -78,6 +81,16 @@ import {
   gcTemporaryUtilities,
   type GeneralConditionsRow,
 } from "./general-conditions-data"
+import {
+  grTemporaryUtilities,
+  grCleaning,
+  grServices,
+  grDrawings,
+  grTesting,
+  grPermits,
+  grTravel,
+  grOther,
+} from "./general-requirements-data"
 
 // Types for Cost Summary
 export interface CostCategory {
@@ -427,364 +440,7 @@ const temporaryUtilitiesColumns: ProtectedColDef[] = [
   ),
 ]
 
-// Data generation functions
-const generateFieldLaborConstructionData = (): GCLineItem[] => {
-  const items: GCLineItem[] = [
-    {
-      id: "section-header",
-      description: "Field Labor - Construction",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: null,
-      generalReq: null,
-      total: null,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "section",
-    },
-    {
-      id: "pe",
-      description: "Project Executive",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 2554,
-      constCost: 2554 * 39,
-      generalReq: null,
-      total: 2554 * 39,
-      percentTime: 100,
-      remarks: "Full time project executive",
-      customizedLaborRates: 2554,
-      laborFY2025: 2554,
-      rowType: "item",
-    },
-    {
-      id: "spm",
-      description: "Senior Project Manager",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 2154,
-      constCost: 2154 * 39,
-      generalReq: null,
-      total: 2154 * 39,
-      percentTime: 100,
-      remarks: "Full time senior PM",
-      customizedLaborRates: 2154,
-      laborFY2025: 2154,
-      rowType: "item",
-    },
-    {
-      id: "pm",
-      description: "Project Manager",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 1854,
-      constCost: 1854 * 39,
-      generalReq: null,
-      total: 1854 * 39,
-      percentTime: 100,
-      remarks: "Full time project manager",
-      customizedLaborRates: 1854,
-      laborFY2025: 1854,
-      rowType: "item",
-    },
-    {
-      id: "subtotal",
-      description: "Subtotal - Field Labor Construction",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: 2554 * 39 + 2154 * 39 + 1854 * 39,
-      generalReq: null,
-      total: 2554 * 39 + 2154 * 39 + 1854 * 39,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "subtotal",
-    },
-  ]
-  return items
-}
-
-const generateFieldLaborCloseOutData = (): GCLineItem[] => {
-  const items: GCLineItem[] = [
-    {
-      id: "section-header",
-      description: "Field Labor - Close Out",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: null,
-      generalReq: null,
-      total: null,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "section",
-    },
-    {
-      id: "closeout-pm",
-      description: "Close Out Project Manager",
-      quantity: 12,
-      unit: "wks",
-      unitCost: 1854,
-      constCost: 1854 * 12,
-      generalReq: null,
-      total: 1854 * 12,
-      percentTime: 50,
-      remarks: "Part time close out PM",
-      customizedLaborRates: 1854,
-      laborFY2025: 1854,
-      rowType: "item",
-    },
-    {
-      id: "closeout-admin",
-      description: "Close Out Administrator",
-      quantity: 12,
-      unit: "wks",
-      unitCost: 1254,
-      constCost: 1254 * 12,
-      generalReq: null,
-      total: 1254 * 12,
-      percentTime: 75,
-      remarks: "Part time close out admin",
-      customizedLaborRates: 1254,
-      laborFY2025: 1254,
-      rowType: "item",
-    },
-    {
-      id: "subtotal",
-      description: "Subtotal - Field Labor Close Out",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: 1854 * 12 + 1254 * 12,
-      generalReq: null,
-      total: 1854 * 12 + 1254 * 12,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "subtotal",
-    },
-  ]
-  return items
-}
-
-const generateFieldOfficeContractorData = (): GCLineItem[] => {
-  const items: GCLineItem[] = [
-    {
-      id: "section-header",
-      description: "Field Office - Contractor",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: null,
-      generalReq: null,
-      total: null,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "section",
-    },
-    {
-      id: "field-office",
-      description: "Field Office Setup",
-      quantity: 1,
-      unit: "ls",
-      unitCost: 25000,
-      constCost: 25000,
-      generalReq: null,
-      total: 25000,
-      percentTime: null,
-      remarks: "Initial field office setup",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "item",
-    },
-    {
-      id: "office-equipment",
-      description: "Office Equipment",
-      quantity: 1,
-      unit: "ls",
-      unitCost: 15000,
-      constCost: 15000,
-      generalReq: null,
-      total: 15000,
-      percentTime: null,
-      remarks: "Computers, furniture, etc.",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "item",
-    },
-    {
-      id: "subtotal",
-      description: "Subtotal - Field Office Contractor",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: 25000 + 15000,
-      generalReq: null,
-      total: 25000 + 15000,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "subtotal",
-    },
-  ]
-  return items
-}
-
-const generateTemporaryUtilitiesData = (): GCLineItem[] => {
-  const items: GCLineItem[] = [
-    {
-      id: "section-header",
-      description: "Temporary Utilities",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: null,
-      generalReq: null,
-      total: null,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "section",
-    },
-    {
-      id: "temp-power",
-      description: "Temporary Power",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 500,
-      constCost: 500 * 39,
-      generalReq: null,
-      total: 500 * 39,
-      percentTime: null,
-      remarks: "Weekly temporary power cost",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "item",
-    },
-    {
-      id: "temp-water",
-      description: "Temporary Water",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 200,
-      constCost: 200 * 39,
-      generalReq: null,
-      total: 200 * 39,
-      percentTime: null,
-      remarks: "Weekly temporary water cost",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "item",
-    },
-    {
-      id: "temp-phone",
-      description: "Temporary Phone/Internet",
-      quantity: 39,
-      unit: "wks",
-      unitCost: 150,
-      constCost: 150 * 39,
-      generalReq: null,
-      total: 150 * 39,
-      percentTime: null,
-      remarks: "Weekly temporary communications",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "item",
-    },
-    {
-      id: "subtotal",
-      description: "Subtotal - Temporary Utilities",
-      quantity: "",
-      unit: "",
-      unitCost: null,
-      constCost: 500 * 39 + 200 * 39 + 150 * 39,
-      generalReq: null,
-      total: 500 * 39 + 200 * 39 + 150 * 39,
-      percentTime: null,
-      remarks: "",
-      customizedLaborRates: null,
-      laborFY2025: null,
-      rowType: "subtotal",
-    },
-  ]
-  return items
-}
-
-// Grid configurations
-const fieldLaborConstructionConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
-const fieldLaborCloseOutConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
-const fieldOfficeContractorConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
-const temporaryUtilitiesConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
-
-// Event handlers
-const fieldLaborConstructionEvents: GridEvents = {
-  onCellValueChanged: (event) => {
-    // Handle cell value changes for field labor construction
-    console.log("Field Labor Construction cell changed:", event)
-  },
-}
-
-const fieldLaborCloseOutEvents: GridEvents = {
-  onCellValueChanged: (event) => {
-    // Handle cell value changes for field labor close out
-    console.log("Field Labor Close Out cell changed:", event)
-  },
-}
-
-const fieldOfficeContractorEvents: GridEvents = {
-  onCellValueChanged: (event) => {
-    // Handle cell value changes for field office contractor
-    console.log("Field Office Contractor cell changed:", event)
-  },
-}
-
-const temporaryUtilitiesEvents: GridEvents = {
-  onCellValueChanged: (event) => {
-    // Handle cell value changes for temporary utilities
-    console.log("Temporary Utilities cell changed:", event)
-  },
-}
-
-// Totals calculators
-const fieldLaborTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
-  if (columnField === "constCost" || columnField === "total") {
-    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
-  }
-  return ""
-}
-
-const fieldOfficeTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
-  if (columnField === "constCost" || columnField === "total") {
-    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
-  }
-  return ""
-}
-
-const utilitiesTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
-  if (columnField === "constCost" || columnField === "total") {
-    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
-  }
-  return ""
-}
-
 export function CostSummaryModule({ projectId, projectName, onSave, onExport, onSubmit }: CostSummaryModuleProps) {
-  // Generate data for each section
-  const fieldLaborConstructionData = useMemo(() => gcFieldLaborConstruction, [])
-  const fieldLaborCloseOutData = useMemo(() => gcFieldLaborCloseOut, [])
-  const fieldOfficeContractorData = useMemo(() => gcFieldOfficeContractor, [])
-  const temporaryUtilitiesData = useMemo(() => gcTemporaryUtilities, [])
   const { toast } = useToast()
 
   // State management
@@ -816,6 +472,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingField, setEditingField] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSticky, setIsSticky] = useState(false)
+  const [pageHeaderHeight, setPageHeaderHeight] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // Initialize data
   useEffect(() => {
@@ -1043,6 +702,42 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
       demobilization: 90000,
       other: 35000,
     })
+  }, [])
+
+  // Sticky scroll handling
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return
+
+      // Find the PageHeader element
+      const pageHeader =
+        document.querySelector("[data-radix-popper-content-wrapper]") ||
+        document.querySelector('[role="banner"]') ||
+        document.querySelector("header")
+
+      if (!pageHeader) return
+
+      const pageHeaderRect = pageHeader.getBoundingClientRect()
+      const containerRect = containerRef.current.getBoundingClientRect()
+
+      // Check if the container top has reached the bottom of the page header
+      const shouldBeSticky = containerRect.top <= pageHeaderRect.bottom
+
+      setIsSticky(shouldBeSticky)
+      setPageHeaderHeight(pageHeaderRect.height)
+    }
+
+    // Initial measurement
+    handleScroll()
+
+    // Add scroll listener
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("resize", handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleScroll)
+    }
   }, [])
 
   // Calculate totals
@@ -1421,8 +1116,8 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(value)
   }
 
@@ -2187,6 +1882,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         { level: "none" },
         {
           width: 120,
+          valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
             "subtotal-row": (params) => params.data.rowType === "subtotal",
@@ -3216,20 +2912,24 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     ]
   }, [])
 
-  function GridSection({ title, data }: { title: string; data: GeneralConditionsRow[] }) {
+  function GridSection({ title, data }: { title: string; data: any[] }) {
+    // Calculate dynamic height based on number of data rows
+    // Each row is approximately 40px, plus header (60px) and padding (40px)
+    const rowHeight = 40
+    const headerHeight = 60
+    const padding = 40
+    const dynamicHeight = Math.max(200, data.length * rowHeight + headerHeight + padding)
+
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
         <CardContent>
           <ProtectedGrid
-            columnDefs={generalConditionsColumns}
+            columnDefs={generalRequirementsColumns}
             rowData={data}
-            config={generalConditionsGridConfig}
-            events={generalConditionsGridEvents}
+            config={generalRequirementsGridConfig}
+            events={generalRequirementsGridEvents}
             totalsCalculator={defaultTotalsCalculator}
-            height="500px"
+            height={`${dynamicHeight}px`}
             enableSearch
             title={title}
           />
@@ -4309,8 +4009,311 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     ]
   }, [])
 
+  // Conditional KPI cards based on active tab
+  const renderKPICards = () => {
+    const projectMonths = 9.75 // Demo project duration in months
+
+    switch (activeTab) {
+      case "categories":
+        return (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Estimate</CardTitle>
+                <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {formatCurrency(calculations.total)}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {formatCurrency(calculations.total / projectMonths)} per month
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {calculations.markupPercentage.toFixed(1)}% markup
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Buyout Savings</CardTitle>
+                <TrendingDown className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(calculations.totalBuyoutSavings)}
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  {formatCurrency(calculations.totalBuyoutSavings / projectMonths)} per month
+                </p>
+                <p className="text-xs text-green-600 dark:text-green-400">Negotiated savings</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Categories</CardTitle>
+                <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{costCategories.length}</div>
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  {(costCategories.length / projectMonths).toFixed(1)} per month
+                </p>
+                <p className="text-xs text-orange-600 dark:text-orange-400">Cost categories</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
+                <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {calculations.approvalProgress.toFixed(0)}%
+                </div>
+                <p className="text-xs text-purple-600 dark:text-purple-400">
+                  {(calculations.approvalProgress / projectMonths).toFixed(1)}% per month
+                </p>
+                <p className="text-xs text-purple-600 dark:text-purple-400">Complete</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "conditions":
+        return (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">GC Total</CardTitle>
+                <Calculator className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {formatCurrency(calculations.gcTotal)}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {formatCurrency(calculations.gcTotal / projectMonths)} per month
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">General Conditions</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Field Labor</CardTitle>
+                <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(calculations.gcTotal * 0.6)}
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  {formatCurrency((calculations.gcTotal * 0.6) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-green-600 dark:text-green-400">Construction & Close Out</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Field Office</CardTitle>
+                <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  {formatCurrency(calculations.gcTotal * 0.25)}
+                </div>
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  {formatCurrency((calculations.gcTotal * 0.25) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-orange-600 dark:text-orange-400">Setup & Equipment</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Utilities</CardTitle>
+                <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {formatCurrency(calculations.gcTotal * 0.15)}
+                </div>
+                <p className="text-xs text-purple-600 dark:text-purple-400">
+                  {formatCurrency((calculations.gcTotal * 0.15) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-purple-600 dark:text-purple-400">Temporary Services</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "requirements":
+        return (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">GR Total</CardTitle>
+                <Calculator className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {formatCurrency(calculations.grTotal)}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {formatCurrency(calculations.grTotal / projectMonths)} per month
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">General Requirements</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Project Mgmt</CardTitle>
+                <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(calculations.grTotal * 0.4)}
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  {formatCurrency((calculations.grTotal * 0.4) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-green-600 dark:text-green-400">Management & Admin</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                  Quality & Safety
+                </CardTitle>
+                <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  {formatCurrency(calculations.grTotal * 0.3)}
+                </div>
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  {formatCurrency((calculations.grTotal * 0.3) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-orange-600 dark:text-orange-400">QC & Safety Programs</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                  Testing & Cleanup
+                </CardTitle>
+                <TestTube className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {formatCurrency(calculations.grTotal * 0.3)}
+                </div>
+                <p className="text-xs text-purple-600 dark:text-purple-400">
+                  {formatCurrency((calculations.grTotal * 0.3) / projectMonths)} per month
+                </p>
+                <p className="text-xs text-purple-600 dark:text-purple-400">Testing & Demobilization</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "summary":
+        return (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Bid</CardTitle>
+                <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {formatCurrency(calculations.total)}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  {formatCurrency(calculations.total / projectMonths)} per month
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">Final estimate</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Base Cost</CardTitle>
+                <Calculator className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(calculations.baseTotal)}
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  {formatCurrency(calculations.baseTotal / projectMonths)} per month
+                </p>
+                <p className="text-xs text-green-600 dark:text-green-400">Before markup</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Markup</CardTitle>
+                <TrendingUp className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  {formatCurrency(calculations.overhead + calculations.profit + calculations.contingency)}
+                </div>
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  {formatCurrency(
+                    (calculations.overhead + calculations.profit + calculations.contingency) / projectMonths
+                  )}{" "}
+                  per month
+                </p>
+                <p className="text-xs text-orange-600 dark:text-orange-400">OH + Profit + Contingency</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
+                <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {calculations.approvalProgress.toFixed(0)}%
+                </div>
+                <p className="text-xs text-purple-600 dark:text-purple-400">
+                  {(calculations.approvalProgress / projectMonths).toFixed(1)}% per month
+                </p>
+                <p className="text-xs text-purple-600 dark:text-purple-400">Complete</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div
+      ref={containerRef}
+      className={`space-y-6 transition-all duration-200 ${
+        isSticky
+          ? `sticky top-0 z-20 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-lg`
+          : ""
+      }`}
+      style={{
+        top: isSticky ? `${pageHeaderHeight}px` : "auto",
+      }}
+    >
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -4346,60 +4349,8 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Estimate</CardTitle>
-            <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {formatCurrency(calculations.total)}
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              {calculations.markupPercentage.toFixed(1)}% markup
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Buyout Savings</CardTitle>
-            <TrendingDown className="h-4 w-4 text-green-600 dark:text-green-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
-              {formatCurrency(calculations.totalBuyoutSavings)}
-            </div>
-            <p className="text-xs text-green-600 dark:text-green-400">Negotiated savings</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Categories</CardTitle>
-            <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{costCategories.length}</div>
-            <p className="text-xs text-orange-600 dark:text-orange-400">Cost categories</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
-            <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-              {calculations.approvalProgress.toFixed(0)}%
-            </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">Complete</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* KPI Cards */}
+      <div className="py-4 -mx-6 px-6">{renderKPICards()}</div>
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -4451,28 +4402,14 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-orange-600" />
-                General Requirements
-              </CardTitle>
-              <CardDescription>Administrative and operational requirements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProtectedGrid
-                columnDefs={generalRequirementsColumns}
-                rowData={generalRequirementsData}
-                config={generalRequirementsGridConfig}
-                events={generalRequirementsGridEvents}
-                title="General Requirements Cost Breakdown"
-                height="600px"
-                enableSearch={true}
-                totalsCalculator={defaultTotalsCalculator}
-                className="w-full"
-              />
-            </CardContent>
-          </Card>
+          <GridSection title="Temporary Utilities" data={grTemporaryUtilities} />
+          <GridSection title="Cleaning" data={grCleaning} />
+          <GridSection title="Services" data={grServices} />
+          <GridSection title="Drawings" data={grDrawings} />
+          <GridSection title="Testing" data={grTesting} />
+          <GridSection title="Permits" data={grPermits} />
+          <GridSection title="Travel" data={grTravel} />
+          <GridSection title="Other" data={grOther} />
         </TabsContent>
 
         <TabsContent value="summary" className="space-y-6">

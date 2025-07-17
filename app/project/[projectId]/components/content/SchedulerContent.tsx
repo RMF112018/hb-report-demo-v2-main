@@ -430,17 +430,17 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
   const activeTab = selectedSubTool || "overview"
 
   return (
-    <div className="space-y-6 h-full flex flex-col min-h-0">
+    <div className="space-y-6 h-full flex flex-col min-h-0 overflow-hidden">
       <Tabs
         value={activeTab || "overview"}
         onValueChange={(value) => onSubToolChange?.(value)}
-        className="w-full h-full flex flex-col min-h-0"
+        className="w-full h-full flex flex-col min-h-0 overflow-hidden"
       >
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 min-w-0 max-w-full overflow-hidden">
           {availableTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm">
-              <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
+            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm min-w-0">
+              <tab.icon className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline truncate">{tab.label}</span>
             </TabsTrigger>
           ))}
         </TabsList>

@@ -33,6 +33,7 @@ import { PreconCarousel } from "../../components/presentation/PreconCarousel"
 import { FinancialCarousel } from "../../components/presentation/FinancialCarousel"
 import { FieldManagementCarousel } from "../../components/presentation/FieldManagementCarousel"
 import { ComplianceCarousel } from "../../components/presentation/ComplianceCarousel"
+import { ITCommandCenterCarousel } from "../../components/presentation/ITCommandCenterCarousel"
 import intelTourSlides from "../../components/presentation/intelTourSlides"
 import { useRouter } from "next/navigation"
 import {
@@ -224,6 +225,7 @@ export default function MainApplicationPage() {
   const [showFinancialCarousel, setShowFinancialCarousel] = useState(false)
   const [showFieldManagementCarousel, setShowFieldManagementCarousel] = useState(false)
   const [showComplianceCarousel, setShowComplianceCarousel] = useState(false)
+  const [showITCommandCenterCarousel, setShowITCommandCenterCarousel] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -578,6 +580,15 @@ export default function MainApplicationPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handleITCommandCenterCarouselComplete = () => {
+    console.log("🏁 IT Command Center Carousel: Tour completed")
+    // Hide the IT Command Center carousel
+    setShowITCommandCenterCarousel(false)
+
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   // Handle manual carousel launch from PageHeader badge
   const handleCarouselLaunch = (carouselType: string) => {
     console.log(`🎠 Launching carousel: "${carouselType}" (length: ${carouselType.length})`)
@@ -613,6 +624,10 @@ export default function MainApplicationPage() {
             timestamp: localStorage.getItem("execStaffingTourTimestamp"),
           })
         }, 100)
+        break
+      case "it-command-center":
+        console.log("✅ IT Command Center case matched!")
+        setShowITCommandCenterCarousel(true)
         break
       default:
         console.log(`❌ Unknown carousel type: "${carouselType}" (length: ${carouselType.length})`)
@@ -860,6 +875,9 @@ export default function MainApplicationPage() {
         } else {
           setActiveTab("overview")
         }
+      } else if (selectedTool === "estimating") {
+        // Set default tab for estimating tool
+        setActiveTab("cost-summary")
       } else {
         setActiveTab("overview")
       }
@@ -873,9 +891,14 @@ export default function MainApplicationPage() {
       const savedTool = localStorage.getItem("selectedTool")
       const savedProject = localStorage.getItem("selectedProject")
       const savedModule = localStorage.getItem("selectedModule")
+      const savedActiveTab = localStorage.getItem("activeTab")
 
       if (savedTool) {
         setSelectedTool(savedTool)
+        // Restore activeTab if it was saved
+        if (savedActiveTab) {
+          setActiveTab(savedActiveTab)
+        }
       } else if (savedProject && !isITAdministrator) {
         setSelectedProject(savedProject)
       } else if (savedModule && isITAdministrator) {
@@ -1140,7 +1163,7 @@ export default function MainApplicationPage() {
             onTabChange={handleTabChange}
           />
         ),
-        hasLeftContent: false, // Tools don't provide left content by default
+        hasLeftContent: selectedTool === "estimating" && activeTab === "cost-summary", // Show sidebar for estimating cost-summary
       }
     }
 
@@ -1254,7 +1277,7 @@ export default function MainApplicationPage() {
   const contentConfig = getContentConfig()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col overflow-hidden">
       {/* Enhanced Project Sidebar with fluid navigation */}
       <ProjectSidebar
         projects={projects}
@@ -1304,14 +1327,16 @@ export default function MainApplicationPage() {
         style={{
           marginLeft: isMobile ? "0px" : `${sidebarWidth}px`,
           paddingTop: `${headerHeight}px`, // Account for header height
+          width: isMobile ? "100vw" : `calc(100vw - ${sidebarWidth}px)`, // CRITICAL: Constrain width
+          maxWidth: isMobile ? "100vw" : `calc(100vw - ${sidebarWidth}px)`, // CRITICAL: Prevent overflow
         }}
       >
         {/* Main Content Container - 2 Column Layout */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-w-0 max-w-full">
           {/* Left Column - 20% width (hidden if no content) */}
           {contentConfig.hasLeftContent && (
-            <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-scroll overflow-x-hidden bg-gray-50/20 dark:bg-gray-900/20 scrollbar-hide">
-              <div className="p-4 space-y-1">{contentConfig.leftContent}</div>
+            <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-scroll overflow-x-hidden bg-gray-50/20 dark:bg-gray-900/20 scrollbar-hide min-w-0 max-w-full">
+              <div className="p-4 space-y-1 min-w-0 max-w-full overflow-hidden">{contentConfig.leftContent}</div>
             </div>
           )}
 
@@ -1326,35 +1351,41 @@ export default function MainApplicationPage() {
             </div>
           </div>
         </div>
-      </main>
 
-      {/* Footer Container - Full width of window */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-              <span>© 2025 Hedrick Brothers Construction</span>
-              <span className="text-gray-400">•</span>
-              <span className="text-[#0021A5] font-medium">HB Report Demo v3.0</span>
-              <span className="text-gray-400">•</span>
-              <span className="flex items-center gap-1">
-                <Activity className="h-3 w-3 text-[#FA4616]" />
-                System Status: <span className="text-[#FA4616] font-medium">Operational</span>
-              </span>
-            </div>
-            <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
-              <span className="flex items-center gap-1">
-                <Users className="h-3 w-3 text-[#0021A5]" />
-                {projects.length} Projects
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3 text-[#0021A5]" />
-                Last Updated: {new Date().toLocaleDateString()}
-              </span>
+        {/* Footer Container - Positioned within main content area to respect sidebar width */}
+        <footer
+          className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 overflow-hidden min-w-0 max-w-full"
+          style={{
+            width: "100%", // Use full width of main content area
+            maxWidth: "100%", // Prevent overflow
+          }}
+        >
+          <div className="px-6 py-4 min-w-0 max-w-full overflow-hidden">
+            <div className="flex items-center justify-between min-w-0">
+              <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 min-w-0 flex-shrink">
+                <span className="truncate">© 2025 Hedrick Brothers Construction</span>
+                <span className="text-gray-400 flex-shrink-0">•</span>
+                <span className="text-[#0021A5] font-medium flex-shrink-0">HB Report Demo v3.0</span>
+                <span className="text-gray-400 flex-shrink-0">•</span>
+                <span className="flex items-center gap-1 flex-shrink-0">
+                  <Activity className="h-3 w-3 text-[#FA4616]" />
+                  System Status: <span className="text-[#FA4616] font-medium">Operational</span>
+                </span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400 flex-shrink-0">
+                <span className="flex items-center gap-1">
+                  <Users className="h-3 w-3 text-[#0021A5]" />
+                  {projects.length} Projects
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3 text-[#0021A5]" />
+                  Last Updated: {new Date().toLocaleDateString()}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </main>
 
       {/* Intel Tour Carousel - Overlays entire dashboard for presentation users */}
       {/* Uses standard PresentationCarousel with Intel Tour slides for consistency */}
@@ -1413,6 +1444,18 @@ export default function MainApplicationPage() {
             return null
           })()}
           <ComplianceCarousel onComplete={handleComplianceCarouselComplete} />
+        </>
+      )}
+
+      {/* IT Command Center Carousel - Overlays entire dashboard for presentation users */}
+      {/* Uses standard ITCommandCenterCarousel with IT Command Center slides for consistency */}
+      {showITCommandCenterCarousel && (
+        <>
+          {(() => {
+            console.log("🎬 IT Command Center Carousel: Rendering ITCommandCenterCarousel")
+            return null
+          })()}
+          <ITCommandCenterCarousel onComplete={handleITCommandCenterCarouselComplete} />
         </>
       )}
     </div>

@@ -38,3 +38,42 @@ export interface ProjectPursuit {
   leadEstimator?: string
   px?: string
 }
+
+// --- Takeoff Manager Types ---
+export type TakeoffType = "area" | "linear" | "count" | "volume" | "assembly"
+
+export interface TakeoffMeasurement {
+  length?: number
+  width?: number
+  height?: number
+  depth?: number
+  area?: number
+  volume?: number
+  count?: number
+  weight?: number
+}
+
+export interface TakeoffItem {
+  id: string
+  csiCode: string
+  csiDivision: string
+  description: string
+  takeoffType: TakeoffType
+  measurements: TakeoffMeasurement
+  unitOfMeasure: string
+  unitCost: number
+  totalCost: number
+  laborHours: number
+  laborRate: number
+  materialCost: number
+  equipmentCost: number
+  subcontractorCost: number
+  markup: number
+  location: string
+  floor: string
+  phase: string
+  status: "draft" | "reviewed" | "approved" | "locked"
+  notes?: string
+  attachments?: string[]
+  lastModified: string
+}

@@ -49,7 +49,7 @@ import {
 
 // Import existing estimating components
 import { CostSummaryModule } from "@/components/estimating/CostSummaryModule"
-import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
+import TakeoffManager from "@/components/estimating/TakeoffManager"
 import AllowancesLog from "@/components/estimating/AllowancesLog"
 import GCGRLog from "@/components/estimating/GCGRLog"
 import { BidLeveling } from "@/components/estimating/BidLeveling"
@@ -100,14 +100,11 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
       <TabsTrigger value="cost-summary" className="text-xs px-2 py-1">
         Cost Summary
       </TabsTrigger>
-      <TabsTrigger value="gc-gr" className="text-xs px-2 py-1">
-        GC GR
-      </TabsTrigger>
       <TabsTrigger value="bidding" className="text-xs px-2 py-1">
         Bidding
       </TabsTrigger>
       <TabsTrigger value="area-calculation" className="text-xs px-2 py-1">
-        Area Calc
+        Takeoff Manager
       </TabsTrigger>
       <TabsTrigger value="allowances" className="text-xs px-2 py-1">
         Allowances
@@ -299,10 +296,6 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
           <CostSummaryModule projectId={projectId} projectName={projectData?.name || "Project"} />
         </TabsContent>
 
-        <TabsContent value="gc-gr" className="mt-6">
-          <GCGRLog />
-        </TabsContent>
-
         <TabsContent value="bidding" className="mt-6">
           <BiddingSubTab
             projectId={projectId}
@@ -314,7 +307,7 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
         </TabsContent>
 
         <TabsContent value="area-calculation" className="mt-6">
-          <AreaCalculationsModule projectId={projectId} projectName={projectData?.name || "Project"} />
+          <TakeoffManager projectId={projectId} projectName={projectData?.name || "Project"} />
         </TabsContent>
 
         <TabsContent value="allowances" className="mt-6">

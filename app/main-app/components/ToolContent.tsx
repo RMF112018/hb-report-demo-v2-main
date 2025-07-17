@@ -75,6 +75,8 @@ import {
   Import,
   ArrowRight,
   Home,
+  Ruler,
+  Gavel,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import type { ProcurementLogRecord, ProcoreCommitment, BidTabLink } from "../../../types/procurement"
@@ -165,6 +167,10 @@ import permitsData from "../../../data/mock/logs/permits.json"
 // Import Safety components
 import { SafetyDashboard } from "../../../components/safety/SafetyDashboard"
 import { QualityDashboard } from "../../../components/quality/QualityDashboard"
+
+// Import estimating components
+import { CostSummaryModule } from "../../../components/estimating/CostSummaryModule"
+import { EstimatingProvider } from "../../../components/estimating/EstimatingProvider"
 
 interface User {
   firstName: string
@@ -4128,6 +4134,94 @@ const QualityControlContent: React.FC<{ userRole: UserRole; user: User; onNaviga
   )
 }
 
+const EstimatingContent: React.FC<{
+  userRole: UserRole
+  user: User
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, activeTab = "cost-summary", onTabChange }) => {
+  // Get the selected project from localStorage
+  const selectedProject = typeof window !== "undefined" ? localStorage.getItem("selectedProject") : null
+  const projectName = selectedProject ? `Project ${selectedProject}` : "Untitled Project"
+
+  return (
+    <EstimatingProvider>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Estimating Center</h1>
+            <p className="text-gray-600 dark:text-gray-400">Cost analysis and project estimation tools</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-sm">
+              {userRole}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Estimating Tabs */}
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="cost-summary" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Cost Summary
+            </TabsTrigger>
+            <TabsTrigger value="takeoff" className="flex items-center gap-2">
+              <Ruler className="h-4 w-4" />
+              Takeoff
+            </TabsTrigger>
+            <TabsTrigger value="bidding" className="flex items-center gap-2">
+              <Gavel className="h-4 w-4" />
+              Bidding
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="cost-summary" className="space-y-6">
+            <CostSummaryModule projectId={selectedProject || "demo"} projectName={projectName} />
+          </TabsContent>
+
+          <TabsContent value="takeoff" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Quantity Takeoff</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Takeoff functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="bidding" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bid Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Bid management functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Estimating Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Analytics functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </EstimatingProvider>
+  )
+}
+
 export const ToolContent: React.FC<ToolContentProps> = ({
   toolName,
   userRole,
@@ -4192,6 +4286,11 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   // Use Quality Control layout for Quality Control & Warranty tool
   if (toolName === "Quality Control & Warranty") {
     return <QualityControlContent userRole={userRole} user={user} onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Estimating layout for Estimating tool
+  if (toolName === "estimating") {
+    return <EstimatingContent userRole={userRole} user={user} activeTab={activeTab} onTabChange={onTabChange} />
   }
 
   // For other tools, use a simple layout without app-header

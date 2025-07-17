@@ -15,7 +15,7 @@
 
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { ChevronRight, Home, ChevronDown, Play } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
@@ -111,6 +111,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   const [roleSwitchPopoverOpen, setRoleSwitchPopoverOpen] = useState(false)
   const [carouselPopoverOpen, setCarouselPopoverOpen] = useState(false)
+  const [hasTriggeredITCarousel, setHasTriggeredITCarousel] = useState(false)
 
   // Capitalize first letter of each word
   const capitalizeTitle = (title: string) => {
@@ -129,6 +130,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   const handleRoleSelection = (role: string) => {
     onRoleSwitch?.(role as "executive" | "project-executive" | "project-manager" | "estimator" | "admin")
     setRoleSwitchPopoverOpen(false)
+
+    // Trigger IT Command Center carousel for admin role with 2-second delay
+    if (role === "admin" && isPresentationMode && !hasTriggeredITCarousel) {
+      setHasTriggeredITCarousel(true)
+      setTimeout(() => {
+        onLaunchCarousel?.("it-command-center")
+      }, 2000)
+    }
   }
 
   // Handle carousel selection
@@ -174,6 +183,15 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         id: "executive-staffing-tour",
         label: "Executive Staffing Tour",
         description: "6-slide workforce management transformation from spreadsheets to strategic intelligence",
+      })
+    }
+
+    // IT Command Center Tour - available for presentation users, shown fourth
+    if (isPresentationMode) {
+      carousels.push({
+        id: "it-command-center",
+        label: "IT Command Center Tour",
+        description: "Comprehensive tour of centralized IT management and operations",
       })
     }
 
