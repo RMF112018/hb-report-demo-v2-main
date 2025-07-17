@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { PageHeader } from "@/components/layout/PageHeader"
+import { PageHeader } from "../main-app/components/PageHeader"
 import {
   Shield,
   Monitor,
@@ -284,7 +284,7 @@ export default function ITCommandCenterPage() {
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                     </div>
                     <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      {module.name}
+                      {module.label}
                     </h3>
                     <p className="text-sm text-muted-foreground">{module.description}</p>
                   </Link>
