@@ -6533,7 +6533,7 @@ export const getFieldManagementRightPanelContent = (
   onSidebarContentChange?: (content: React.ReactNode) => void
 ) => {
   return (
-    <div className="h-full w-full min-w-0 max-w-full overflow-visible">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden">
       <FieldManagementContent
         selectedSubTool={selectedSubTool}
         projectData={projectData}

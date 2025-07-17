@@ -256,6 +256,7 @@ export default function BetaProcurementStatsPanel({
 
   // Generate comprehensive Power BI procurement data
   const procurementData = useMemo(() => generatePowerBIProcurementData(userRole), [userRole])
+  const { stats } = procurementData
 
   // Simulate real-time data streaming
   useEffect(() => {
@@ -350,39 +351,14 @@ export default function BetaProcurementStatsPanel({
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg shadow-md">
-              <Package className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-orange-900 dark:text-orange-100">
-                Procurement Metrics
-              </CardTitle>
-              <div className="text-sm text-orange-700 dark:text-orange-300 mt-1">
-                {getRoleDisplayName()} • {procurementData.projectCount} Project
-                {procurementData.projectCount !== 1 ? "s" : ""}
-              </div>
+              <CardTitle className="text-lg font-semibold">Procurement Metrics</CardTitle>
+              <p className="text-sm text-muted-foreground">Executive Portfolio View • 20 Projects</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
-              className="h-8 px-3"
-            >
-              <BarChart3 className="h-4 w-4 mr-1" />
-              Advanced
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDataStreamToggle} className="h-8 px-3">
-              {dataStreamActive ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-10 w-10 p-0">
-              <RefreshCw className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
-            </Button>
-            <Button variant="outline" size="sm" className="h-10 w-10 p-0">
-              <Share2 className="h-5 w-5" />
-            </Button>
           </div>
         </div>
 
@@ -409,554 +385,129 @@ export default function BetaProcurementStatsPanel({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="overview" className="text-xs font-medium">
-              <Activity className="h-3 w-3 mr-1" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="performance" className="text-xs font-medium">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              Performance
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-xs font-medium">
-              <BarChart3 className="h-3 w-3 mr-1" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="text-xs font-medium">
-              <Zap className="h-3 w-3 mr-1" />
-              AI Insights
-            </TabsTrigger>
-          </TabsList>
+      <CardContent className="p-3">
+        {/* Row 1: Procurement Metrics */}
+        <div className="grid grid-cols-12 gap-3 mb-3">
+          {/* Total Value & Cycle Time - 5 columns */}
+          <div className="col-span-5 bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Package className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">Value & Time</span>
+            </div>
+            <div className="space-y-3">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Total Value</p>
+                <p className="text-lg font-bold text-blue-600">{formatCurrency(stats.totalValue, true)}</p>
+                <p className="text-xs text-green-600">+8.5% QoQ</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Cycle Time</p>
+                <p className="text-lg font-bold text-green-600">{stats.avgCycleTime}d</p>
+                <p className="text-xs text-red-600">-5.2d</p>
+              </div>
+            </div>
+            {/* Bar chart for value trends */}
+            <div className="mt-2 flex items-end gap-1 h-8">
+              <div className="bg-blue-300 rounded-sm flex-1" style={{ height: "60%" }}></div>
+              <div className="bg-blue-400 rounded-sm flex-1" style={{ height: "75%" }}></div>
+              <div className="bg-blue-500 rounded-sm flex-1" style={{ height: "85%" }}></div>
+              <div className="bg-blue-600 rounded-sm flex-1" style={{ height: "70%" }}></div>
+              <div className="bg-blue-700 rounded-sm flex-1" style={{ height: "90%" }}></div>
+            </div>
+          </div>
 
-          <TabsContent value="overview" className="space-y-4">
-            {/* Executive KPI Dashboard */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-orange-200 dark:border-orange-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Total Value</p>
-                    <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                      {formatCurrency(procurementData.stats.totalValue)}
-                    </p>
-                  </div>
-                  <DollarSign className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+8.5% QoQ</span>
+          {/* Compliance & Savings - 7 columns */}
+          <div className="col-span-7 bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium">Performance</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Compliance</p>
+                <p className="text-lg font-bold text-purple-600">{stats.complianceRate}%</p>
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: `${stats.complianceRate}%` }} />
                 </div>
               </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Total Records</p>
-                    <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                      {procurementData.stats.totalRecords}
-                    </p>
-                  </div>
-                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+12% vs target</span>
-                </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Savings</p>
+                <p className="text-lg font-bold text-orange-600">{formatCurrency(stats.costSavings, true)}</p>
+                <p className="text-xs text-green-600">+15.7%</p>
               </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Avg Cycle Time</p>
-                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                      {procurementData.stats.avgCycleTime}d
-                    </p>
-                  </div>
-                  <Clock className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingDown className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">-5.2d improved</span>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Compliance Rate</p>
-                    <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
-                      {formatPercent(procurementData.stats.complianceRate)}
-                    </p>
-                  </div>
-                  <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+2.3% improved</span>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-teal-200 dark:border-teal-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Cost Savings</p>
-                    <p className="text-xl font-bold text-teal-600 dark:text-teal-400">
-                      {formatCurrency(procurementData.stats.costSavings)}
-                    </p>
-                  </div>
-                  <Target className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">+15.7% YTD</span>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200 dark:border-red-800 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Risk Score</p>
-                    <p className="text-xl font-bold text-red-600 dark:text-red-400">
-                      {procurementData.stats.riskScore.toFixed(1)}
-                    </p>
-                  </div>
-                  <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingDown className="h-3 w-3 text-green-500" />
-                  <span className="text-xs text-green-600 dark:text-green-400">-2.8 (improving)</span>
+            </div>
+            {/* Donut chart for compliance */}
+            <div className="mt-2 flex items-center justify-center">
+              <div className="relative w-12 h-12">
+                <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#8b5cf6"
+                    strokeWidth="3"
+                    strokeDasharray={`${stats.complianceRate}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">{stats.complianceRate}%</span>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Advanced KPIs (shown when toggle is on) */}
-            {showAdvancedMetrics && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">On-Time Delivery</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.stats.onTimeDelivery)}
-                      </p>
-                    </div>
-                    <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Supplier Performance</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.stats.supplierPerformance)}
-                      </p>
-                    </div>
-                    <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Quality Score</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.stats.qualityScore)}
-                      </p>
-                    </div>
-                    <Award className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Digital Adoption</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.advancedKPIs.digitalAdoption)}
-                      </p>
-                    </div>
-                    <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Sustainability</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.advancedKPIs.sustainabilityScore)}
-                      </p>
-                    </div>
-                    <CheckCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Innovation Index</p>
-                      <p className="text-lg font-bold text-gray-700 dark:text-gray-300">
-                        {formatPercent(procurementData.advancedKPIs.innovationIndex)}
-                      </p>
-                    </div>
-                    <Zap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Procurement Status Overview */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Procurement Status</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm">Completed</span>
-                    </div>
-                    <div className="text-sm font-medium">{procurementData.stats.completedProcurements}</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span className="text-sm">Active</span>
-                    </div>
-                    <div className="text-sm font-medium">{procurementData.stats.activeProcurements}</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                      <span className="text-sm">Pending Approval</span>
-                    </div>
-                    <div className="text-sm font-medium">{procurementData.stats.pendingApprovals}</div>
-                  </div>
-
-                  <div className="pt-2">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Completion Rate</span>
-                      <span>{formatPercent(getCompletionRate())}</span>
-                    </div>
-                    <Progress value={getCompletionRate()} className="h-2" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Bid Tab Integration</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Linked to Bid Tabs</span>
-                    </div>
-                    <div className="text-sm font-medium">{procurementData.stats.linkedToBidTabs}</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm">Not Linked</span>
-                    </div>
-                    <div className="text-sm font-medium">
-                      {procurementData.stats.totalRecords - procurementData.stats.linkedToBidTabs}
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Linkage Rate</span>
-                      <span>{formatPercent(getLinkageRate())}</span>
-                    </div>
-                    <Progress value={getLinkageRate()} className="h-2" />
-                  </div>
-
-                  <div className="pt-2">
-                    <Badge variant={getLinkageRate() >= 80 ? "default" : "secondary"} className="text-xs">
-                      {getLinkageRate() >= 80 ? "Good Integration" : "Needs Attention"}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+        {/* Row 2: Risk Assessment */}
+        <div className="grid grid-cols-12 gap-3">
+          {/* Risk Score - 12 columns */}
+          <div className="col-span-12 bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200 dark:border-red-800">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <span className="text-sm font-medium">Risk Assessment</span>
             </div>
-          </TabsContent>
-
-          <TabsContent value="performance" className="space-y-4">
-            {/* Performance Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">
-                  Procurement Volume & Value
-                </h4>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={procurementData.performanceData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                      <YAxis tick={{ fontSize: 12 }} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend />
-                      <Bar dataKey="procurements" fill={POWER_BI_COLORS.primary} name="Procurements" />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke={POWER_BI_COLORS.secondary}
-                        strokeWidth={2}
-                        name="Value ($M)"
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Risk Score</p>
+                <p className="text-2xl font-bold text-red-600">{stats.riskScore}/10</p>
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                  <div className="bg-red-500 h-3 rounded-full" style={{ width: `${(stats.riskScore / 10) * 100}%` }} />
+                </div>
+                <p className="text-xs text-red-600 mt-1">-2.8 from last month</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Risk Level</p>
+                <p className="text-lg font-bold text-orange-600">Medium</p>
+                <p className="text-xs text-muted-foreground">Based on 5 factors</p>
+              </div>
+              <div className="text-center">
+                {/* Radar chart visualization */}
+                <div className="flex items-center justify-center">
+                  <div className="relative w-12 h-12">
+                    <svg className="w-12 h-12" viewBox="0 0 32 32">
+                      <polygon
+                        points="16,2 20,8 26,10 22,16 26,22 20,24 16,30 12,24 6,22 10,16 6,10 12,8"
+                        fill="none"
+                        stroke="#ef4444"
+                        strokeWidth="1"
+                        opacity="0.3"
                       />
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Category Breakdown</h4>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={procurementData.categoryData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : "0"}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {procurementData.categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                      <polygon
+                        points="16,4 18,8 22,9 20,12 22,15 18,16 16,20 14,16 10,15 12,12 10,9 14,8"
+                        fill="#ef4444"
+                        opacity="0.7"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Performance Indicators */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-              <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Performance Indicators</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Compliance Rate</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatPercent(procurementData.stats.complianceRate)}
-                    </span>
-                  </div>
-                  <Progress value={procurementData.stats.complianceRate} className="h-2" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">On-Time Delivery</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatPercent(procurementData.stats.onTimeDelivery)}
-                    </span>
-                  </div>
-                  <Progress value={procurementData.stats.onTimeDelivery} className="h-2" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Supplier Performance</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatPercent(procurementData.stats.supplierPerformance)}
-                    </span>
-                  </div>
-                  <Progress value={procurementData.stats.supplierPerformance} className="h-2" />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4">
-            {/* Advanced Analytics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Risk Analysis</h4>
-                <div className="space-y-3">
-                  {procurementData.riskAnalysis.map((risk, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{risk.category}</span>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                risk.trend === "improving"
-                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                  : risk.trend === "declining"
-                                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                              }`}
-                            >
-                              {risk.trend}
-                            </span>
-                            <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{risk.score}</span>
-                          </div>
-                        </div>
-                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                          {risk.impact} impact • {risk.mitigation}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">Supplier Performance</h4>
-                <div className="space-y-3">
-                  {procurementData.supplierData.map((supplier, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{supplier.name}</span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{supplier.count}</span>
-                        </div>
-                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                          Performance: {supplier.performance.toFixed(1)}% • On-Time: {supplier.onTime.toFixed(1)}% •
-                          Quality: {supplier.quality.toFixed(1)}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="insights" className="space-y-4">
-            {/* AI-Powered Insights */}
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-purple-600 rounded-lg">
-                  <Zap className="h-4 w-4 text-white" />
-                </div>
-                <h4 className="font-semibold text-sm text-purple-900 dark:text-purple-100">
-                  AI-Powered Procurement Insights
-                </h4>
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                >
-                  Machine Learning
-                </Badge>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                      Cost Optimization Opportunity
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    Consolidating MEP suppliers could reduce procurement cycle time by 18% and generate additional cost
-                    savings of {formatCurrency(procurementData.stats.costSavings * 0.15)}.
-                  </p>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Supply Chain Alert</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    Specialty finishes category shows 85% probability of delivery delays based on current market
-                    conditions. Recommend early procurement initiation.
-                  </p>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Performance Prediction</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    Q4 procurement performance forecasted to exceed targets by 12.5% based on current velocity and
-                    supplier capacity analysis.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Power BI Embedded Features */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-              <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-3">
-                Power BI Enterprise Features
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Row-Level Security</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                    >
-                      Active
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                    Role-based data filtering ensures users only see relevant procurement data.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Real-Time Sync</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    >
-                      15 min
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                    Automatic synchronization with ERP and procurement systems.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Premium Capacity</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                    >
-                      P1
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                    Dedicated capacity for high-performance analytics and reporting.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Usage Analytics</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-                    >
-                      Tracking
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                    Monitor dashboard usage, performance, and procurement insights engagement.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

@@ -19,6 +19,7 @@ import {
   PieChart,
   Calculator,
   DollarSign,
+  Wallet,
 } from "lucide-react"
 import {
   PieChart as RechartsPieChart,
@@ -139,216 +140,139 @@ export default function BetaContingencyAnalysis({ className, config, isCompact }
     <Card
       className={`h-full bg-gradient-to-br from-[#FA4616]/5 to-[#FA4616]/10 dark:from-[#FA4616]/20 dark:to-[#FA4616]/30 border-[#FA4616]/20 dark:border-[#FA4616]/40 ${className}`}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold text-[#FA4616] dark:text-[#FF8A67]">
-              Contingency Analysis
-            </CardTitle>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge
-                variant="outline"
-                className="bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]"
-              >
-                <Shield className="h-3 w-3 mr-1" />
-                Power BI Enhanced
-              </Badge>
-              {isRealTime && (
-                <Badge
-                  variant="outline"
-                  className="bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]"
-                >
-                  <Clock className="h-3 w-3 mr-1" />
-                  Live
-                </Badge>
-              )}
-            </div>
-          </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center space-x-2">
-              <Switch id="real-time" checked={isRealTime} onCheckedChange={setIsRealTime} />
-              <Label htmlFor="real-time" className="text-sm text-[#FA4616]/70 dark:text-[#FF8A67]/80">
-                Real-time
-              </Label>
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <Shield className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+            <div>
+              <CardTitle className="text-lg font-semibold">Contingency Analysis</CardTitle>
+            </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
-            <TabsTrigger value="risks">Risk Analysis</TabsTrigger>
-          </TabsList>
+      <CardContent className="p-3">
+        {/* Row 1: Contingency Metrics */}
+        <div className="grid grid-cols-12 gap-3 mb-3">
+          {/* Total & Used Contingency - 5 columns */}
+          <div className="col-span-5 bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium">Contingency</span>
+            </div>
+            <div className="space-y-3">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-lg font-bold text-green-600">$2.4M</p>
+                <p className="text-xs text-green-600">+1.2%</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Used</p>
+                <p className="text-lg font-bold text-orange-600">$850K</p>
+                <p className="text-xs text-orange-600">+5.3%</p>
+              </div>
+            </div>
+            {/* Stacked bar chart for contingency breakdown */}
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground w-8">Used</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: "35.4%" }} />
+                </div>
+                <span className="text-xs font-bold text-orange-600">35.4%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground w-8">Remaining</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: "64.6%" }} />
+                </div>
+                <span className="text-xs font-bold text-green-600">64.6%</span>
+              </div>
+            </div>
+          </div>
 
-          <TabsContent value="overview" className="space-y-4">
+          {/* Remaining Budget - 7 columns */}
+          <div className="col-span-7 bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">Remaining Budget</span>
+            </div>
             <div className="grid grid-cols-2 gap-3">
-              {contingencyMetrics.map((metric, index) => (
-                <div
-                  key={index}
-                  className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <metric.icon className={`h-4 w-4 ${metric.color}`} />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{metric.title}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {metric.trend === "up" ? (
-                        <TrendingUp className="h-3 w-3 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 text-red-500" />
-                      )}
-                      <span className={`text-xs ${metric.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-                        {metric.change}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">{metric.value}</div>
-                  </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-600">$1.55M</p>
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                  <div className="bg-blue-500 h-3 rounded-full" style={{ width: "64.6%" }} />
                 </div>
-              ))}
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contingency Utilization</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Used</span>
-                  <span className="font-medium">35.4%</span>
+                <p className="text-xs text-muted-foreground mt-1">64.6% remaining</p>
+                <p className="text-xs text-blue-600">-4.1% from last month</p>
+              </div>
+              <div className="text-center">
+                {/* Line chart for budget trends */}
+                <div className="flex items-end gap-1 h-12 justify-center">
+                  <div className="bg-blue-300 rounded-sm w-1" style={{ height: "70%" }}></div>
+                  <div className="bg-blue-400 rounded-sm w-1" style={{ height: "75%" }}></div>
+                  <div className="bg-blue-500 rounded-sm w-1" style={{ height: "80%" }}></div>
+                  <div className="bg-blue-600 rounded-sm w-1" style={{ height: "85%" }}></div>
+                  <div className="bg-blue-700 rounded-sm w-1" style={{ height: "90%" }}></div>
+                  <div className="bg-blue-800 rounded-sm w-1" style={{ height: "65%" }}></div>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div className="bg-amber-600 h-2 rounded-full" style={{ width: "35.4%" }}></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>$850K used</span>
-                  <span>$1.55M remaining</span>
-                </div>
+                <p className="text-xs text-muted-foreground mt-1">Trend</p>
               </div>
             </div>
-          </TabsContent>
+          </div>
+        </div>
 
-          <TabsContent value="breakdown" className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Contingency by Category</h4>
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <ResponsiveContainer width="100%" height={120}>
-                    <RechartsPieChart>
-                      <Pie
-                        data={contingencyByCategory}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={25}
-                        outerRadius={50}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {contingencyByCategory.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
+        {/* Row 2: Risk Assessment */}
+        <div className="grid grid-cols-12 gap-3">
+          {/* Risk Score - 12 columns */}
+          <div className="col-span-12 bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium">Risk Assessment</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Risk Score</p>
+                <p className="text-2xl font-bold text-green-600">7.2/10</p>
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                  <div className="bg-green-500 h-3 rounded-full" style={{ width: "72%" }} />
                 </div>
-                <div className="flex-1 ml-4">
-                  <div className="space-y-2">
-                    {contingencyByCategory.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                          <span className="text-gray-600 dark:text-gray-400">{item.name}</span>
-                        </div>
-                        <span className="font-medium">${(item.amount / 1000).toFixed(0)}K</span>
-                      </div>
-                    ))}
+                <p className="text-xs text-green-600 mt-1">+0.3 from last month</p>
+                <p className="text-xs text-muted-foreground">Low Risk</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Risk Level</p>
+                <p className="text-lg font-bold text-green-600">Low</p>
+                <p className="text-xs text-muted-foreground">Based on 5 factors</p>
+                <p className="text-xs text-green-600">Good standing</p>
+              </div>
+              <div className="text-center">
+                {/* Gauge chart visualization */}
+                <div className="flex items-center justify-center">
+                  <div className="relative w-12 h-12">
+                    <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="3"
+                      />
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="3"
+                        strokeDasharray="72, 100"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold">7.2</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Contingency Usage Trend</h4>
-              <ResponsiveContainer width="100%" height={120}>
-                <LineChart data={contingencyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="used" stroke="#F59E0B" strokeWidth={2} />
-                  <Line type="monotone" dataKey="remaining" stroke="#10B981" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="risks" className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Risk Factors</h4>
-              <div className="space-y-3">
-                {riskFactors.map((risk, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded"
-                  >
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{risk.factor}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Impact: {risk.impact} | Probability: {risk.probability}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm font-bold text-gray-900 dark:text-white">{risk.score}</div>
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          risk.score >= 8 ? "bg-red-500" : risk.score >= 6 ? "bg-yellow-500" : "bg-green-500"
-                        }`}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-amber-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Risk Summary</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Overall Risk Score</span>
-                  <span className="font-medium text-orange-600">7.2/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">High Risk Items</span>
-                  <span className="font-medium text-red-600">2</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Recommended Action</span>
-                  <Badge
-                    variant="outline"
-                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
-                  >
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    Monitor Closely
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="mt-4 pt-3 border-t border-amber-200 dark:border-gray-700">
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
-            <Button variant="link" size="sm" className="h-auto p-0 text-xs text-amber-600 dark:text-amber-400">
-              <ExternalLink className="h-3 w-3 mr-1" />
-              Powered by Power BI
-            </Button>
           </div>
         </div>
       </CardContent>

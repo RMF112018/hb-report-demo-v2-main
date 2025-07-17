@@ -449,10 +449,10 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
           <TabsContent
             key={tab.id}
             value={tab.id}
-            className="mt-6 w-full min-w-0 max-w-full overflow-visible flex-1 min-h-0"
+            className="mt-6 w-full min-w-0 max-w-full overflow-hidden flex-1 min-h-0"
           >
-            <div className="space-y-4 w-full min-w-0 max-w-full overflow-visible h-full flex flex-col min-h-0">
-              <div className="w-full min-w-0 max-w-full overflow-visible flex-1 min-h-0">
+            <div className="space-y-4 w-full min-w-0 max-w-full overflow-hidden h-full flex flex-col min-h-0">
+              <div className="w-full min-w-0 max-w-full overflow-hidden flex-1 min-h-0">
                 <div className="w-full min-w-0 max-w-full overflow-x-auto overflow-y-visible h-full">
                   <div style={{ width: "100%", minWidth: 0, maxWidth: "100%", height: "100%" }}>
                     {/* Tab Content */}

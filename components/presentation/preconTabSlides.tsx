@@ -364,6 +364,73 @@ export const preconTabSlides: PresentationSlide[] = [
         </div>
       </div>
     ),
+  },
+  {
+    id: "cost-savings",
+    title: "Eliminating Destini—$120,500 Saved, Zero Frustration",
+    content: (
+      <div className="h-full w-full max-w-full flex flex-col justify-center items-center px-6 text-center relative overflow-hidden">
+        {/* Background Icon Overlay */}
+        <DollarSign className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
+
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-full">
+          <motion.p
+            className="text-base md:text-xl text-emerald-100 max-w-4xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            HB Intel eliminates the need for Destini Estimator Software entirely. Our unified estimating platform
+            provides everything Destini offers—and significantly more—while delivering a familiar yet modernized
+            workflow that reduces training time and eliminates software frustration.
+          </motion.p>
+
+          <motion.p
+            className="text-sm md:text-base text-emerald-200 max-w-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Instead of investing in separate estimating software with steep learning curves,{" "}
+            <strong>HB Intel delivers superior functionality</strong> with intuitive workflows that your team already
+            understands—saving $120,500 annually in software costs (which only increases as usage grows) and countless
+            hours of training and frustration.
+          </motion.p>
+
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">💰</div>
+              <div className="font-medium text-white">$120,500+ Annually</div>
+              <div className="text-xs text-emerald-200">
+                Annual license savings that increase as usage grows over time.
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">⏰</div>
+              <div className="font-medium text-white">Zero Training Time</div>
+              <div className="text-xs text-emerald-200">
+                Familiar workflows eliminate steep learning curves and frustration.
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-3xl">🚀</div>
+              <div className="font-medium text-white">Enhanced Capabilities</div>
+              <div className="text-xs text-emerald-200">
+                Everything Destini offers plus advanced integration and intelligence.
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    ),
     isFinalSlide: true,
   },
 ]

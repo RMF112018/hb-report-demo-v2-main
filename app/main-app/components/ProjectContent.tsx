@@ -212,7 +212,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
 
   // Render main content (rightContent mode)
   return (
-    <div className="h-full w-full min-w-0 max-w-full overflow-visible flex flex-col">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden flex flex-col">
       <ProjectPageWrapper projectId={actualProjectId} projectData={projectData} userRole={userRole}>
         <ProjectPageContent
           projectId={actualProjectId}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
 import {
   MessageSquare,
   Clock,
@@ -211,260 +212,163 @@ export default function BetaRFI({ className, config, isCompact = false, userRole
 
   return (
     <Card className={`h-full flex flex-col overflow-hidden ${className}`}>
-      <CardHeader className="flex-shrink-0 space-y-0 pb-3 px-4 pt-3">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-              <MessageSquare className="w-3.5 h-3.5" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <CardTitle className="text-sm font-medium leading-none">RFI Monitor</CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Request for Information</p>
+              <CardTitle className="text-lg font-semibold">RFI Monitor</CardTitle>
+              <p className="text-sm text-muted-foreground">Request for Information</p>
+              <p className="text-xs text-muted-foreground">Updated 4:07:48 PM</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className={`text-xs px-1.5 py-0.5 ${getGradeColor(data.performanceScore)} border-current`}
-            >
-              Grade {performanceGrade}
-            </Badge>
-            <Button variant="ghost" size="sm" onClick={() => setAutoRefresh(!autoRefresh)} className="h-6 w-6 p-0">
-              <RefreshCw className={`h-3 w-3 ${autoRefresh ? "animate-spin" : ""}`} />
-            </Button>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>Updated {lastUpdated.toLocaleTimeString()}</span>
-          <span>•</span>
-          <span>{data.overdue} overdue</span>
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden px-4 pb-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="categories">Categories</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
-          </TabsList>
+      <CardContent className="p-3">
+        {/* Row 1: RFI Metrics */}
+        <div className="grid grid-cols-12 gap-3 mb-3">
+          {/* Closure Rate - 5 columns */}
+          <div className="col-span-5 bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">Closure Rate</span>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-blue-600">{closureRate.toFixed(1)}%</p>
+              <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
+                <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${closureRate}%` }} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {data.resolvedRFIs} of {data.totalRFIs}
+              </p>
+            </div>
+            {/* Pie chart visualization */}
+            <div className="mt-2 flex items-center justify-center">
+              <div className="relative w-12 h-12">
+                <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="3"
+                    strokeDasharray={`${closureRate}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">{closureRate.toFixed(0)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <TabsContent value="overview" className="flex-1 space-y-4 overflow-y-auto">
-            {/* Key Metrics */}
+          {/* Resolution Time - 7 columns */}
+          <div className="col-span-7 bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium">Resolution Time</span>
+            </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/50 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
-                <div className="flex items-center gap-2 mb-1">
-                  <Target className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  <span className="text-sm font-medium">Closure Rate</span>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-600">{data.avgResolutionDays}d</p>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">Target:</span>
+                  <span className="text-xs font-medium text-green-600">{data.targetResolutionDays}d</span>
                 </div>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{closureRate.toFixed(1)}%</div>
-                <div className="text-xs text-orange-700 dark:text-orange-300">
-                  {data.resolvedRFIs} of {data.totalRFIs} RFIs
-                </div>
-              </div>
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/50 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  <span className="text-sm font-medium">Avg Resolution</span>
-                </div>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                  {data.avgResolutionDays} <span className="text-sm">days</span>
-                </div>
-                <div className="text-xs text-orange-700 dark:text-orange-300">
-                  Target: {data.targetResolutionDays} days
-                </div>
-              </div>
-            </div>
-
-            {/* Status Overview */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</div>
-                <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{data.pendingRFIs}</div>
-              </div>
-              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Resolved</div>
-                <div className="text-lg font-bold text-green-600 dark:text-green-400">{data.resolvedRFIs}</div>
-              </div>
-              <div className="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Overdue</div>
-                <div className="text-lg font-bold text-red-600 dark:text-red-400">{data.overdue}</div>
-              </div>
-            </div>
-
-            {/* Impact Metrics */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-medium">Cost Impact</span>
-                </div>
-                <div className="text-xl font-bold text-green-600 dark:text-green-400">
-                  {formatCurrency(data.costImpact)}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Potential cost impact</div>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Timer className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium">Schedule Impact</span>
-                </div>
-                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                  {data.scheduleImpact} <span className="text-sm">days</span>
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Potential delay</div>
-              </div>
-            </div>
-
-            {/* Performance Score */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-3">Performance Score</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Overall Performance</span>
-                  <span className="font-medium">{data.performanceScore.toFixed(1)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${data.performanceScore}%` }}
+                    className={`h-2 rounded-full ${
+                      data.avgResolutionDays <= data.targetResolutionDays ? "bg-green-500" : "bg-orange-500"
+                    }`}
+                    style={{ width: `${Math.min((data.avgResolutionDays / data.targetResolutionDays) * 100, 100)}%` }}
                   />
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Grade {performanceGrade} - {data.performanceScore >= 75 ? "Good" : "Needs Improvement"}
+              </div>
+              <div className="text-center">
+                {/* Line chart for resolution trends */}
+                <div className="flex items-end gap-1 h-12 justify-center">
+                  <div className="bg-green-300 rounded-sm w-1" style={{ height: "80%" }}></div>
+                  <div className="bg-green-400 rounded-sm w-1" style={{ height: "65%" }}></div>
+                  <div className="bg-green-500 rounded-sm w-1" style={{ height: "90%" }}></div>
+                  <div className="bg-green-600 rounded-sm w-1" style={{ height: "75%" }}></div>
+                  <div className="bg-green-700 rounded-sm w-1" style={{ height: "85%" }}></div>
+                  <div className="bg-green-800 rounded-sm w-1" style={{ height: "70%" }}></div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Trend</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2: Status Breakdown */}
+        <div className="grid grid-cols-12 gap-3">
+          {/* Status Breakdown - 12 columns */}
+          <div className="col-span-12 bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart3 className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium">Status Breakdown</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Pending</p>
+                <p className="text-xl font-bold text-yellow-600">{data.pendingRFIs}</p>
+                <p className="text-xs text-muted-foreground">
+                  {((data.pendingRFIs / data.totalRFIs) * 100).toFixed(1)}%
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Resolved</p>
+                <p className="text-xl font-bold text-green-600">{data.resolvedRFIs}</p>
+                <p className="text-xs text-muted-foreground">
+                  {((data.resolvedRFIs / data.totalRFIs) * 100).toFixed(1)}%
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Overdue</p>
+                <p className="text-xl font-bold text-red-600">{data.overdue}</p>
+                <p className="text-xs text-muted-foreground">{((data.overdue / data.totalRFIs) * 100).toFixed(1)}%</p>
+              </div>
+            </div>
+            {/* Bar chart for status breakdown */}
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-yellow-500 h-2 rounded-full"
+                    style={{ width: `${(data.pendingRFIs / data.totalRFIs) * 100}%` }}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-500 h-2 rounded-full"
+                    style={{ width: `${(data.resolvedRFIs / data.totalRFIs) * 100}%` }}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-red-500 h-2 rounded-full"
+                    style={{ width: `${(data.overdue / data.totalRFIs) * 100}%` }}
+                  />
                 </div>
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="categories" className="flex-1 space-y-4 overflow-y-auto">
-            {/* Category Breakdown */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-sm">Category Breakdown</h4>
-              {data.categoryBreakdown.map((category, index) => (
-                <div key={index} className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">{category.category}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">{category.count} RFIs</span>
-                      <span className="text-sm font-medium">{category.avgResolution.toFixed(1)} days</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400">
-                    <span>Avg Resolution: {category.avgResolution.toFixed(1)} days</span>
-                    <span>Impact: {formatCurrency(category.costImpact)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Category Distribution Chart */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-3">RFI Distribution by Category</h4>
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie
-                    data={data.categoryBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={60}
-                    fill="#8884d8"
-                    dataKey="count"
-                    label={({ category, percent }) => `${category} ${percent ? (percent * 100).toFixed(0) : "0"}%`}
-                  >
-                    {data.categoryBreakdown.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
-                      fontSize: "12px",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="trends" className="flex-1 space-y-4 overflow-y-auto">
-            {/* Resolution Trend */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-3">Resolution Trend</h4>
-              <ResponsiveContainer width="100%" height={160}>
-                <LineChart data={historicalData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
-                      fontSize: "12px",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgDays"
-                    stroke={chartColors.primary}
-                    strokeWidth={2}
-                    dot={{ fill: chartColors.primary, strokeWidth: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Volume Trend */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-              <h4 className="font-medium text-sm mb-3">Volume Trend</h4>
-              <ResponsiveContainer width="100%" height={140}>
-                <BarChart data={historicalData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
-                      fontSize: "12px",
-                    }}
-                  />
-                  <Bar dataKey="submitted" fill={chartColors.primary} />
-                  <Bar dataKey="resolved" fill={chartColors.secondary} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Real-time Controls */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Real-time Updates</span>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="auto-refresh"
-                    checked={autoRefresh}
-                    onCheckedChange={setAutoRefresh}
-                    className="data-[state=checked]:bg-orange-600"
-                  />
-                  <Label htmlFor="auto-refresh" className="text-xs">
-                    Auto-refresh
-                  </Label>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                <Activity className="h-3 w-3" />
-                <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

@@ -106,7 +106,7 @@ export function ProjectPageContent({
   }, [projectData])
 
   return (
-    <div className="h-full w-full min-w-0 max-w-full overflow-visible flex flex-col">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden flex flex-col">
       <ProjectControlCenterContent
         projectId={actualProjectId.toString()}
         projectData={originalProjectData}

@@ -4,14 +4,53 @@
 .b-gantt {
   flex: 1 !important; /* Drives height for parent flex column layout */
   width: 100% !important; /* Fill parent width */
+  height: 100% !important; /* Explicit height to prevent sizing issues */
   display: flex !important; /* Required by Bryntum */
   min-height: 400px; /* Minimum height fallback */
   --task-border-radius: 0.3em; /* Custom property from portfolio example */
+  overflow-x: auto !important; /* Allow horizontal scrolling */
+  overflow-y: hidden !important; /* Prevent vertical overflow */
+}
+
+/* Ensure Gantt container handles overflow properly */
+.b-gantt .b-grid-container,
+.b-gantt .b-timeline-container {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  height: 100% !important;
+}
+
+/* Remove vertical interior cell borders */
+.b-grid-cell {
+  border-right: none !important; /* Remove right border from cells */
+}
+
+.b-grid-header {
+  border-right: none !important; /* Remove right border from headers */
+}
+
+.b-grid-subgrid .b-grid-cell {
+  border-right: none !important; /* Remove right border from subgrid cells */
+}
+
+.b-grid-subgrid .b-grid-header {
+  border-right: none !important; /* Remove right border from subgrid headers */
+}
+
+/* Remove column lines completely */
+.b-grid-columnlines {
+  display: none !important;
+}
+
+.b-grid-columnline {
+  display: none !important;
 }
 
 /* Timeline/Scheduler area styling */
 .b-timeline-scroller {
   background: var(--background) !important;
+  overflow-x: auto !important; /* Allow horizontal scrolling in timeline */
+  height: 100% !important;
 }
 
 .b-sch-timeaxis-cell {
@@ -49,7 +88,7 @@
 
 .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
   border-radius: var(--task-border-radius) var(--task-border-radius) 0 0;
-  max-height: 1.6em;
+  max-height: 18px !important; /* Override the 1.6em to ensure consistency */
 }
 
 .b-gantt-task-wrap .b-sch-label {
@@ -62,8 +101,9 @@
 .b-gantt,
 [class*="b-gantt"] {
   flex: 1 !important;
-  height: auto !important;
+  height: 100% !important; /* Explicit height */
   min-height: 400px !important;
+  overflow-x: auto !important; /* Allow horizontal scrolling */
 }
 
 /* Grid and column styling */
@@ -96,6 +136,15 @@
   height: 100%;
   min-height: 0;
   flex: 1;
+  overflow: hidden; /* Prevent container overflow */
+}
+
+/* Ensure Gantt chart can scroll horizontally when needed */
+.hb-gantt-parent .b-gantt {
+  min-width: 0; /* Allow shrinking */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  height: 100% !important; /* Explicit height */
 }
 
 /* Grid splitter styling - from portfolio example */
@@ -124,7 +173,8 @@
 }
 
 .b-rollups .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
-  min-height: 1.3em;
+  min-height: 18px !important; /* Override 1.3em to ensure consistency */
+  max-height: 18px !important;
 }
 
 /* Tooltip styling - from portfolio example */
@@ -469,6 +519,38 @@
   flex-direction: column;
 }
 
+/* Gantt Chart Container Sizing */
+.hb-gantt-parent {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt .b-grid-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt .b-timeline-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+/* Ensure grid columns don't exceed container width */
+.hb-gantt-parent .b-grid-container .b-grid-column {
+  max-width: 200px !important;
+  min-width: 60px !important;
+}
+
 /* Baseline styling aligned with baselines example */
 .b-task-baseline[data-index="0"] {
   background-color: #ddd;
@@ -506,7 +588,7 @@
   display: none;
 }
 
-/* Baseline status message styling */
+/* Baseline status message styling exactly as in example */
 h4.statusmessage {
   margin: 1em 0 0 0;
 }
@@ -550,6 +632,211 @@ h4.statusmessage {
   justify-content: flex-start !important;
   padding: 2px 8px !important;
   box-sizing: border-box !important;
+}
+
+/* Ensure Gantt bars are not oversized and are vertically centered */
+.b-gantt-task {
+  height: 18px !important;
+  min-height: 0 !important;
+  max-height: 18px !important;
+  margin-top: 9px !important; /* (36 - 18) / 2 */
+  margin-bottom: 9px !important;
+  box-sizing: border-box;
+}
+
+/* Ensure all summary bars (parent tasks) have consistent height */
+.b-gantt-task-parent,
+.b-gantt-task.b-gantt-task-parent,
+.b-sch-event.b-sch-event-parent {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure summary bars have consistent styling */
+.b-gantt-task-parent .b-gantt-task,
+.b-sch-event-parent .b-sch-event {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Additional Bryntum summary bar classes for consistency */
+.b-gantt-task-summary,
+.b-sch-event-summary,
+.b-gantt-task.b-gantt-task-summary,
+.b-sch-event.b-sch-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure all task types have consistent height */
+.b-gantt-task,
+.b-sch-event,
+.b-gantt-task-parent,
+.b-sch-event-parent,
+.b-gantt-task-summary,
+.b-sch-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Target ALL possible Bryntum summary and rollup classes */
+.b-gantt-task-summary,
+.b-sch-event-summary,
+.b-gantt-task.b-gantt-task-summary,
+.b-sch-event.b-sch-event-summary,
+.b-task-summary,
+.b-sch-summary,
+.b-gantt-summary,
+.b-sch-event.b-summary,
+.b-gantt-task.b-summary,
+.b-rollup,
+.b-task-rollup,
+.b-gantt-rollup,
+.b-sch-rollup,
+.b-gantt-task.b-rollup,
+.b-sch-event.b-rollup,
+.b-summary-task,
+.b-summary-event,
+.b-gantt-task.b-summary-task,
+.b-sch-event.b-summary-event,
+.b-gantt-task.b-gantt-summary,
+.b-sch-event.b-sch-summary,
+.b-gantt-task.b-task-summary,
+.b-sch-event.b-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+
+/* Force all timeline elements to respect row height */
+.b-timeline-body .b-gantt-task,
+.b-timeline-body .b-sch-event,
+.b-timeline-body .b-gantt-task-parent,
+.b-timeline-body .b-sch-event-parent,
+.b-timeline-body .b-gantt-task-summary,
+.b-timeline-body .b-sch-event-summary,
+.b-timeline-body .b-task-summary,
+.b-timeline-body .b-sch-summary,
+.b-timeline-body .b-gantt-summary,
+.b-timeline-body .b-rollup,
+.b-timeline-body .b-task-rollup,
+.b-timeline-body .b-gantt-rollup,
+.b-timeline-body .b-sch-rollup {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+
+/* Override any absolute positioning that might cause full-height spans */
+.b-timeline-container .b-gantt-task,
+.b-timeline-container .b-sch-event,
+.b-timeline-container .b-gantt-task-parent,
+.b-timeline-container .b-sch-event-parent,
+.b-timeline-container .b-gantt-task-summary,
+.b-timeline-container .b-sch-event-summary,
+.b-timeline-container .b-task-summary,
+.b-timeline-container .b-sch-summary,
+.b-timeline-container .b-gantt-summary,
+.b-timeline-container .b-rollup,
+.b-timeline-container .b-task-rollup,
+.b-timeline-container .b-gantt-rollup,
+.b-timeline-container .b-sch-rollup {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element that might be a summary bar by color */
+.b-timeline-container [style*="background-color: yellow"],
+.b-timeline-container [style*="background-color: #ffff00"],
+.b-timeline-container [style*="background-color: #ffeb3b"],
+.b-timeline-container [style*="background-color: #ffc107"],
+.b-timeline-container [style*="background-color: #ffd700"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element with yellow background in the timeline */
+.b-timeline-container div[style*="background-color: yellow"],
+.b-timeline-container div[style*="background-color: #ffff00"],
+.b-timeline-container div[style*="background-color: #ffeb3b"],
+.b-timeline-container div[style*="background-color: #ffc107"],
+.b-timeline-container div[style*="background-color: #ffd700"],
+.b-timeline-container span[style*="background-color: yellow"],
+.b-timeline-container span[style*="background-color: #ffff00"],
+.b-timeline-container span[style*="background-color: #ffeb3b"],
+.b-timeline-container span[style*="background-color: #ffc107"],
+.b-timeline-container span[style*="background-color: #ffd700"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element that spans the full height of the timeline */
+.b-timeline-container div[style*="height: 100%"],
+.b-timeline-container div[style*="height: 100vh"],
+.b-timeline-container div[style*="top: 0"],
+.b-timeline-container div[style*="bottom: 0"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
 }
 
 /* Progress bar styling if present */

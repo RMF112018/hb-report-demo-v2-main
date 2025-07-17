@@ -60,6 +60,10 @@ import TradePartnerLog from "@/components/estimating/TradePartnerLog"
 import { ProjectEstimateOverview } from "@/components/estimating/ProjectEstimateOverview"
 import { EstimatingIntelligence } from "@/components/estimating/EstimatingIntelligence"
 import BiddingSubTab from "@/components/estimating/bid-management/components/BiddingSubTab"
+import SimpleEstimatingProgressCard from "@/components/cards/SimpleEstimatingProgressCard"
+import BetaProcurementStatsPanel from "@/components/cards/beta/BetaProcurementStatsPanel"
+import BetaRFI from "@/components/cards/beta/BetaRFI"
+import BetaContingencyAnalysis from "@/components/cards/beta/BetaContingencyAnalysis"
 
 interface EstimatingSuiteProps {
   projectId: string
@@ -279,7 +283,12 @@ export default function EstimatingSuite({ projectId, projectData, user, userRole
 
         {/* Tab Content */}
         <TabsContent value="overview" className="mt-6">
-          <EstimatingDashboardOverview />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <SimpleEstimatingProgressCard userRole={userRole} />
+            <BetaProcurementStatsPanel userRole={userRole} />
+            <BetaRFI userRole={userRole} />
+            <BetaContingencyAnalysis />
+          </div>
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">
