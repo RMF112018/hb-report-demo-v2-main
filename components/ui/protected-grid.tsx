@@ -266,8 +266,6 @@ export function ProtectedGrid({
             if (rowType === "section") {
               result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)"
               result.fontWeight = "bold"
-              // Make entire row non-editable for section headers
-              params.node.setRowSelectable(false)
             }
 
             // Subtotal row styling
@@ -313,8 +311,6 @@ export function ProtectedGrid({
           if (rowType === "section") {
             result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)"
             result.fontWeight = "bold"
-            // Make entire row non-editable for section headers
-            params.node.setRowSelectable(false)
           }
 
           // Subtotal row styling
