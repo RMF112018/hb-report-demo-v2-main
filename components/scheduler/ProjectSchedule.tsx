@@ -10,6 +10,25 @@ const ProjectSchedule: React.FC = () => {
   const [tasks, setTasks] = useState<HBTask[]>([])
   const [links, setLinks] = useState<HBLink[]>([])
 
+  const toolbar = useMemo(
+    () => [
+      "undo",
+      "redo",
+      "zoomIn",
+      "zoomOut",
+      "zoomToFit",
+      "addTask",
+      "deleteTask",
+      "expandAll",
+      "collapseAll",
+      "fullscreen",
+      "exportPdf",
+      "exportPng",
+      "exportExcel",
+    ],
+    []
+  )
+
   useEffect(() => {
     const loadedTasks: HBTask[] = scheduleData.map((item: any) => {
       const type = item.activity_type?.toLowerCase()
@@ -39,7 +58,7 @@ const ProjectSchedule: React.FC = () => {
 
   return (
     <div className="w-full h-full">
-      <HBGanttChart tasks={tasks} links={links} height="80vh" />
+      <HBGanttChart tasks={tasks} links={links} height="80vh" toolbar={toolbar} />
     </div>
   )
 }

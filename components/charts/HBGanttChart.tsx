@@ -28,10 +28,54 @@ export interface HBGanttChartProps {
   height?: string | number
   width?: string | number
   theme?: "light" | "dark"
+  toolbar?: string[]
+  columns?: any[]
+  scales?: any[]
+  start?: Date
+  end?: Date
+  zoom?: number
+  autoTypes?: boolean
+  roundDates?: boolean
+  editable?: boolean
+  resizable?: boolean
+  movable?: boolean
+  progressEditable?: boolean
+  linkEditable?: boolean
+  lazy?: boolean
+  scrollToNow?: boolean
+  readonly?: boolean
 }
 
 const HBGanttChart = forwardRef<HTMLDivElement, HBGanttChartProps>(
-  ({ tasks, links = [], height = "100%", width = "100%", theme = "light" }, ref) => {
+  (
+    {
+      tasks,
+      links = [],
+      height = "100%",
+      width = "100%",
+      theme = "light",
+      toolbar = [],
+      columns,
+      scales = [
+        { unit: "month", step: 1, format: "MMM yyyy" },
+        { unit: "day", step: 1, format: "d" },
+      ],
+      start,
+      end,
+      zoom,
+      autoTypes = true,
+      roundDates = false,
+      editable = true,
+      resizable = true,
+      movable = true,
+      progressEditable = true,
+      linkEditable = true,
+      lazy = false,
+      scrollToNow = false,
+      readonly = false,
+    },
+    ref
+  ) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const [ready, setReady] = useState(false)
 
@@ -61,10 +105,22 @@ const HBGanttChart = forwardRef<HTMLDivElement, HBGanttChartProps>(
                 type: task.type === "milestone" ? "milestone" : "task",
               }))}
               links={links}
-              scales={[
-                { unit: "month", step: 1, format: "MMM yyyy" },
-                { unit: "day", step: 1, format: "d" },
-              ]}
+              toolbar={toolbar}
+              columns={columns}
+              scales={scales}
+              start={start}
+              end={end}
+              zoom={zoom}
+              autoTypes={autoTypes}
+              roundDates={roundDates}
+              editable={editable}
+              resizable={resizable}
+              movable={movable}
+              progressEditable={progressEditable}
+              linkEditable={linkEditable}
+              lazy={lazy}
+              scrollToNow={scrollToNow}
+              readonly={readonly}
             />
           </ThemeWrapper>
         ) : (

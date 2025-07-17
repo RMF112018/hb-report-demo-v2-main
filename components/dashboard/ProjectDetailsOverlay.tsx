@@ -276,19 +276,21 @@ export const ProjectDetailsOverlay: React.FC<ProjectDetailsOverlayProps> = ({
   // Calculate dynamic header offset
   useEffect(() => {
     const calculateHeaderOffset = () => {
-      // Look for the sticky page header element
-      const stickyHeader = document.querySelector('[data-tour="dashboard-page-header"]') as HTMLElement
-      if (stickyHeader) {
-        const rect = stickyHeader.getBoundingClientRect()
-        const offset = rect.bottom + window.scrollY
-        setHeaderOffset(offset)
-      } else {
-        // Fallback: look for any sticky header in the dashboard
-        const fallbackHeader = document.querySelector(".sticky") as HTMLElement
-        if (fallbackHeader) {
-          const rect = fallbackHeader.getBoundingClientRect()
+      if (typeof window !== "undefined") {
+        // Look for the sticky page header element
+        const stickyHeader = document.querySelector('[data-tour="dashboard-page-header"]') as HTMLElement
+        if (stickyHeader) {
+          const rect = stickyHeader.getBoundingClientRect()
           const offset = rect.bottom + window.scrollY
           setHeaderOffset(offset)
+        } else {
+          // Fallback: look for any sticky header in the dashboard
+          const fallbackHeader = document.querySelector(".sticky") as HTMLElement
+          if (fallbackHeader) {
+            const rect = fallbackHeader.getBoundingClientRect()
+            const offset = rect.bottom + window.scrollY
+            setHeaderOffset(offset)
+          }
         }
       }
     }
@@ -298,16 +300,19 @@ export const ProjectDetailsOverlay: React.FC<ProjectDetailsOverlayProps> = ({
 
     // Recalculate on scroll (for sticky behavior)
     const handleScroll = () => calculateHeaderOffset()
-    window.addEventListener("scroll", handleScroll)
-
-    return () => window.removeEventListener("scroll", handleScroll)
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", handleScroll)
+      return () => window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
   // Prevent body scroll when overlay is open
   useEffect(() => {
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = "unset"
+    if (typeof window !== "undefined") {
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.body.style.overflow = "unset"
+      }
     }
   }, [])
 

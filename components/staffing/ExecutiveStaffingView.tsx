@@ -1134,7 +1134,7 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
       </div>
 
       {/* Presentation Carousel - Rendered outside main container for full-screen coverage */}
-      {showTour && (
+      {showTour && typeof window !== "undefined" && (
         <>
           {(() => {
             console.log("🎬 Executive Staffing Tour: Rendering PresentationCarousel")
