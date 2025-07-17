@@ -15,8 +15,6 @@
   },
   "dependencies": {
     "@apollo/client": "latest",
-    "@bryntum/gantt": "npm:@bryntum/gantt-trial@^6.2.5",
-    "@bryntum/gantt-react": "^6.2.5",
     "@dnd-kit/core": "latest",
     "@dnd-kit/sortable": "latest",
     "@dnd-kit/utilities": "latest",

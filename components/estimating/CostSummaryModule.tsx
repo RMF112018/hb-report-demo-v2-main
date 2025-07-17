@@ -1,3 +1,28 @@
+/**
+ * @prompt
+ * Refactor this component to replicate the layout and grouping behavior of the Cost Summary Excel worksheet.
+ *
+ * Key goals:
+ * 1. Restructure the grid to support **grouped cost categories by CSI division** (e.g., "03 - Concrete", "04 - Masonry").
+ * 2. Insert **pseudo subtotal rows** before each CSI group using a new `rowType: "subtotal"` flag.
+ * 3. In the grid column definitions:
+ *    - Add custom `cellRenderer` logic to visually style subtotal rows (bold text, muted background, no edit icons).
+ *    - Hide `Actions` column for subtotal rows.
+ *    - Use `cellClassRules` to apply custom styling.
+ * 4. In the grid config:
+ *    - Prevent editing for subtotal rows via `isCellEditable`.
+ *    - Optionally gray out rows or apply icons for locked categories.
+ * 5. Use `useMemo` to generate the full grouped dataset with injected subtotal rows.
+ *    - Aggregate values like `Original Bid`, `Selected Bid`, `Buyout Savings`, `Final Amount` in each subtotal row.
+ *    - Group by the first two digits of `CSI Code` to determine the division.
+ * 6. Ensure that export (PDF/CSV) and save logic ignores subtotal rows unless explicitly needed.
+ * 7. Retain all existing `ProtectedGrid` configurations and hooks, but wrap new logic in helper functions if necessary.
+ *
+ * Summary:
+ * This module should mimic the visual groupings and subtotal formatting of the Excel worksheet,
+ * while retaining interactivity and protection rules defined in protected-grid.tsx.
+ */
+
 "use client"
 
 import React, { useState, useCallback, useEffect, useMemo } from "react"
@@ -53,11 +78,16 @@ export interface CostCategory {
   category: string
   description: string
   csiCode?: string
+  csiDivision?: string // Add CSI division (e.g., "03 - Concrete")
+  rowType?: "category" | "subtotal" | "total" // New field for row type
   selectedBidAmount: number
   originalBidAmount: number
   buyoutSavings: number
   adjustments: number
   finalAmount: number
+  numberOfBids?: number // Number of bids received for this CSI code
+  adjustment?: "None" | "$" | "%" // Adjustment type for the row
+  adjValue?: number // Adjustment value (dollar amount or percentage)
   status: "pending" | "selected" | "committed" | "approved"
   bidder?: string
   notes?: string
@@ -120,6 +150,110 @@ interface CostSummaryModuleProps {
   onSave?: (data: CostSummaryData) => void
   onExport?: (format: "pdf" | "csv") => void
   onSubmit?: (data: CostSummaryData) => void
+}
+
+// CSI Division mapping for grouping
+const CSI_DIVISION_MAP: Record<string, string> = {
+  "01": "01 - General Requirements",
+  "02": "02 - Existing Conditions",
+  "03": "03 - Concrete",
+  "04": "04 - Masonry",
+  "05": "05 - Metals",
+  "06": "06 - Wood, Plastics, and Composites",
+  "07": "07 - Thermal and Moisture Protection",
+  "08": "08 - Openings",
+  "09": "09 - Finishes",
+  "10": "10 - Specialties",
+  "11": "11 - Equipment",
+  "12": "12 - Furnishings",
+  "13": "13 - Special Construction",
+  "14": "14 - Conveying Equipment",
+  "21": "21 - Fire Suppression",
+  "22": "22 - Plumbing",
+  "23": "23 - HVAC",
+  "25": "25 - Integrated Automation",
+  "26": "26 - Electrical",
+  "27": "27 - Communications",
+  "28": "28 - Electronic Safety and Security",
+  "31": "31 - Earthwork",
+  "32": "32 - Exterior Improvements",
+  "33": "33 - Utilities",
+  "34": "34 - Transportation",
+  "35": "35 - Waterway and Marine Construction",
+}
+
+// 1. Create proper cell editors that extend ag-Grid's ICellEditorComp interface
+const AdjustmentSelectEditor = (props: any) => {
+  const [value, setValue] = useState(props.value || "None")
+
+  const getValue = () => value
+
+  const isPopup = () => true
+
+  const onValueChange = (newValue: string) => {
+    setValue(newValue)
+    // Don't stop editing immediately - let ag-Grid handle it
+  }
+
+  // Handle Enter key to stop editing
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      props.api.stopEditing()
+    }
+    if (e.key === "Escape") {
+      props.api.stopEditing()
+    }
+  }
+
+  return (
+    <div onKeyDown={handleKeyDown}>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger className="w-full h-8 text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="None">None</SelectItem>
+          <SelectItem value="$">$</SelectItem>
+          <SelectItem value="%">%</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
+const AdjValueEditor = (props: any) => {
+  const [value, setValue] = useState(props.value || 0)
+  const adjustmentType = props.data?.adjustment || "None"
+
+  const getValue = () => value
+
+  const isPopup = () => true
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      props.api.stopEditing()
+    }
+    if (e.key === "Escape") {
+      props.api.stopEditing()
+    }
+  }
+
+  if (adjustmentType === "None") {
+    return <div className="text-muted-foreground italic p-2">No adjustment</div>
+  }
+
+  return (
+    <div className="flex items-center gap-1 p-1" onKeyDown={handleKeyDown}>
+      <Input
+        type="number"
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
+        className="w-20 h-6 text-xs"
+        autoFocus
+      />
+      <span className="text-xs">{adjustmentType === "$" ? "$" : "%"}</span>
+    </div>
+  )
 }
 
 export function CostSummaryModule({ projectId, projectName, onSave, onExport, onSubmit }: CostSummaryModuleProps) {
@@ -234,6 +368,97 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         notes: "Upgraded tile selection",
         lastModified: new Date().toISOString(),
       },
+      {
+        id: "6",
+        category: "Masonry",
+        description: "Brick, block, stone work",
+        csiCode: "04000",
+        selectedBidAmount: 950000,
+        originalBidAmount: 1000000,
+        buyoutSavings: 50000,
+        adjustments: 0,
+        finalAmount: 950000,
+        status: "committed",
+        bidder: "Masonry Masters",
+        notes: "Premium brick selection",
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: "7",
+        category: "Electrical",
+        description: "Power, lighting, systems",
+        csiCode: "26000",
+        selectedBidAmount: 2200000,
+        originalBidAmount: 2300000,
+        buyoutSavings: 100000,
+        adjustments: 0,
+        finalAmount: 2200000,
+        status: "selected",
+        bidder: "Power Systems Inc",
+        notes: "LED lighting upgrade",
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: "8",
+        category: "Plumbing",
+        description: "Water, waste, gas systems",
+        csiCode: "22000",
+        selectedBidAmount: 1600000,
+        originalBidAmount: 1650000,
+        buyoutSavings: 50000,
+        adjustments: 0,
+        finalAmount: 1600000,
+        status: "approved",
+        bidder: "Plumbing Pros",
+        notes: "High-efficiency fixtures",
+        lastModified: new Date().toISOString(),
+      },
+      // Category 2 - Contingency rows
+      {
+        id: "9",
+        category: "GC Contingency",
+        description: "GC Contingency",
+        csiCode: " ", // Blank CSI code
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        status: "pending",
+        bidder: "",
+        notes: "",
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: "10",
+        category: "Owner Contingency",
+        description: "Owner Contingency",
+        csiCode: " ", // Blank CSI code
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        status: "pending",
+        bidder: "",
+        notes: "",
+        lastModified: new Date().toISOString(),
+      },
+      {
+        id: "11",
+        category: "Escalation Contingency",
+        description: "Escalation Contingency",
+        csiCode: " ", // Blank CSI code
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        status: "pending",
+        bidder: "",
+        notes: "",
+        lastModified: new Date().toISOString(),
+      },
     ]
 
     const mockApprovalSteps: ApprovalStep[] = [
@@ -323,6 +548,346 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     }
   }, [costCategories, generalConditions, generalRequirements, approvalSteps])
 
+  // Generate grouped cost data with subtotal rows (remove the Total row)
+  const generateGroupedCostData = useMemo(() => {
+    // Filter categories that have CSI codes (not null/blank/empty) - Category 1
+    const categoriesWithCSI = costCategories.filter((category) => category.csiCode && category.csiCode.trim() !== "")
+
+    // Filter categories with blank CSI codes - Category 2 (contingency items)
+    const categoriesWithoutCSI = costCategories.filter(
+      (category) => !category.csiCode || category.csiCode.trim() === ""
+    )
+
+    // Generate rows with three subtotals plus Category 4 (no Total row)
+    const rows: GridRow[] = []
+
+    // Add Category 1 rows first
+    categoriesWithCSI.forEach((category) => {
+      rows.push({
+        ...category,
+        rowType: "category",
+        numberOfBids: Math.floor(Math.random() * 5) + 1, // Mock data for number of bids
+        // Ensure adjustment and adjValue are preserved
+        adjustment: category.adjustment || "None",
+        adjValue: category.adjValue || 0,
+      })
+    })
+
+    // Add Category 1 subtotal row
+    if (categoriesWithCSI.length > 0) {
+      const category1Subtotal = categoriesWithCSI.reduce((sum, c) => sum + c.selectedBidAmount, 0)
+      const subtotalRow1: GridRow = {
+        id: "subtotal-category1",
+        csiCode: "Subtotal",
+        description: "Category 1 - Cost of Work",
+        selectedBidAmount: category1Subtotal,
+        originalBidAmount: categoriesWithCSI.reduce((sum, c) => sum + c.originalBidAmount, 0),
+        buyoutSavings: categoriesWithCSI.reduce((sum, c) => sum + c.buyoutSavings, 0),
+        adjustments: categoriesWithCSI.reduce((sum, c) => sum + c.adjustments, 0),
+        finalAmount: categoriesWithCSI.reduce((sum, c) => sum + c.finalAmount, 0),
+        numberOfBids: categoriesWithCSI.reduce((sum, c) => sum + (c.numberOfBids || 0), 0),
+        status: " ",
+        bidder: " ",
+        rowType: "subtotal",
+        adjustment: "None",
+        adjValue: 0,
+      }
+      rows.push(subtotalRow1)
+    }
+
+    // Add Category 2 rows
+    categoriesWithoutCSI.forEach((category) => {
+      rows.push({
+        ...category,
+        rowType: "category",
+        numberOfBids: 0, // No bids for contingency items
+        // Ensure adjustment and adjValue are preserved
+        adjustment: category.adjustment || "None",
+        adjValue: category.adjValue || 0,
+      })
+    })
+
+    // Add Category 2 subtotal row with conditional calculation
+    if (categoriesWithoutCSI.length > 0) {
+      // Find the adjustment settings for Category 2
+      // Use the first Category 2 row that has adjustment settings, or default to first row
+      const category2Row =
+        categoriesWithoutCSI.find((c) => c.adjustment && c.adjustment !== "None") || categoriesWithoutCSI[0]
+      const category2Adjustment = category2Row?.adjustment || "None"
+      const category2AdjValue = category2Row?.adjValue || 0
+
+      // Calculate Category 2 subtotal based on adjustment type
+      let category2Subtotal = 0
+      if (category2Adjustment === "%") {
+        // Calculate from Category 1 subtotal
+        const category1Subtotal = categoriesWithCSI.reduce((sum, c) => sum + c.selectedBidAmount, 0)
+        category2Subtotal = category1Subtotal * (category2AdjValue / 100)
+      } else if (category2Adjustment === "$") {
+        category2Subtotal = category2AdjValue
+      }
+      // Default is $0.00 if adjustment is "None"
+
+      const subtotalRow2: GridRow = {
+        id: "subtotal-category2",
+        csiCode: "Subtotal",
+        description: "Category 2 - Contingency",
+        selectedBidAmount: category2Subtotal,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: category2Subtotal,
+        numberOfBids: 0,
+        status: " ",
+        bidder: " ",
+        rowType: "subtotal",
+        adjustment: "None",
+        adjValue: 0,
+      }
+      rows.push(subtotalRow2)
+    }
+
+    // Add Category 3 rows (Bonds, Insurance, & GCs)
+    const category3Rows: GridRow[] = [
+      {
+        id: "gc-general-conditions",
+        csiCode: " ",
+        description: "General Conditions",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-general-requirements",
+        csiCode: " ",
+        description: "General Requirements",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-impact-concurrency",
+        csiCode: " ",
+        description: "Impact & Concurrency Fee Allowance",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-permits-co",
+        csiCode: " ",
+        description: "Permits & C/O Fee Allowance",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-builder-risk",
+        csiCode: " ",
+        description: "Builder Risk Insurance & Deductibles",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-ccip-insurance",
+        csiCode: " ",
+        description: "CCIP Insurance Program",
+        selectedBidAmount: 0,
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0,
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-subcontractor-default",
+        csiCode: " ",
+        description: "Subcontractor Default Insurance",
+        selectedBidAmount: 0, // Will be calculated below
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0, // Will be calculated below
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-warranty",
+        csiCode: " ",
+        description: "Warranty",
+        selectedBidAmount: 0, // Will be calculated below
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0, // Will be calculated below
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-procore",
+        csiCode: " ",
+        description: "Procore",
+        selectedBidAmount: 0, // Will be calculated below
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0, // Will be calculated below
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+      {
+        id: "gc-general-liability",
+        csiCode: " ",
+        description: "General Liability Insurance",
+        selectedBidAmount: 0, // Will be calculated below
+        originalBidAmount: 0,
+        buyoutSavings: 0,
+        adjustments: 0,
+        finalAmount: 0, // Will be calculated below
+        numberOfBids: 0,
+        status: "pending",
+        bidder: " ",
+        rowType: "category",
+        adjustment: "None",
+        adjValue: 0,
+      },
+    ]
+
+    // Calculate Category 1 and Category 2 subtotals for Category 3 calculations
+    const category1Subtotal = categoriesWithCSI.reduce((sum, c) => sum + c.selectedBidAmount, 0)
+    const category2Subtotal =
+      categoriesWithoutCSI.length > 0
+        ? (() => {
+            const category2Row =
+              categoriesWithoutCSI.find((c) => c.adjustment && c.adjustment !== "None") || categoriesWithoutCSI[0]
+            const category2Adjustment = category2Row?.adjustment || "None"
+            const category2AdjValue = category2Row?.adjValue || 0
+
+            if (category2Adjustment === "%") {
+              return category1Subtotal * (category2AdjValue / 100)
+            } else if (category2Adjustment === "$") {
+              return category2AdjValue
+            }
+            return 0
+          })()
+        : 0
+
+    const combinedSubtotal = category1Subtotal + category2Subtotal
+
+    // Update Category 3 rows with calculated values
+    category3Rows[6].selectedBidAmount = combinedSubtotal * 0.018 // Subcontractor Default Insurance
+    category3Rows[6].finalAmount = combinedSubtotal * 0.018
+    category3Rows[7].selectedBidAmount = combinedSubtotal * 0.0065 // Warranty
+    category3Rows[7].finalAmount = combinedSubtotal * 0.0065
+    category3Rows[8].selectedBidAmount = combinedSubtotal * 0.0025 // Procore
+    category3Rows[8].finalAmount = combinedSubtotal * 0.0025
+    category3Rows[9].selectedBidAmount = combinedSubtotal * 0.015 // General Liability Insurance
+    category3Rows[9].finalAmount = combinedSubtotal * 0.015
+
+    // Add Category 3 rows to the main rows array
+    rows.push(...category3Rows)
+
+    // Add Category 3 subtotal row
+    const category3Subtotal = category3Rows.reduce((sum, row) => sum + row.selectedBidAmount, 0)
+    const subtotalRow3: GridRow = {
+      id: "subtotal-category3",
+      csiCode: "Subtotal",
+      description: "Category 3 - Bonds, Ins., & GCs",
+      selectedBidAmount: category3Subtotal,
+      originalBidAmount: 0,
+      buyoutSavings: 0,
+      adjustments: 0,
+      finalAmount: category3Subtotal,
+      numberOfBids: 0,
+      status: " ",
+      bidder: " ",
+      rowType: "subtotal",
+      adjustment: "None",
+      adjValue: 0,
+    }
+    rows.push(subtotalRow3)
+
+    // Add Category 4 row (Contracting Fee - OH & P)
+    const category4Amount = (category1Subtotal + category2Subtotal + category3Subtotal) * 0.1
+    const category4Row: GridRow = {
+      id: "category4-contracting-fee",
+      csiCode: " ",
+      description: "Contracting Fee (OH & P)",
+      selectedBidAmount: category4Amount,
+      originalBidAmount: 0,
+      buyoutSavings: 0,
+      adjustments: 0,
+      finalAmount: category4Amount,
+      numberOfBids: 0,
+      status: "pending",
+      bidder: " ",
+      rowType: "category",
+      adjustment: "None",
+      adjValue: 0,
+    }
+    rows.push(category4Row)
+
+    // Remove the Total row - it will be handled by the built-in totals row
+    return rows
+  }, [costCategories])
+
   // Format currency
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -333,19 +898,19 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     }).format(value)
   }
 
-  // Get status color
-  const getStatusColor = (status: string) => {
+  // Fix the getStatusColor function to return Badge variant types
+  const getStatusColor = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+        return "secondary"
       case "selected":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+        return "default"
       case "committed":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+        return "outline"
       case "approved":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+        return "default"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "secondary"
     }
   }
 
@@ -407,7 +972,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         className={`flex items-center gap-1 cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group ${className}`}
         onClick={() => setEditingField(fieldKey)}
       >
-        <span className="text-sm font-medium">{formatCurrency(value)}</span>
+        <span className={`text-sm font-medium ${className}`}>{formatCurrency(value)}</span>
         <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
       </div>
     )
@@ -423,6 +988,13 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
           // Recalculate final amount when relevant fields change
           if (field === "selectedBidAmount" || field === "adjustments") {
             updated.finalAmount = updated.selectedBidAmount + (updated.adjustments || 0)
+          }
+
+          // If this is a Category 2 row (blank CSI code) and adjValue or adjustment changed,
+          // we need to trigger a recalculation of Category 2 subtotal
+          if ((field === "adjValue" || field === "adjustment") && (!updated.csiCode || updated.csiCode.trim() === "")) {
+            // The generateGroupedCostData will automatically recalculate due to dependency on costCategories
+            setHasUnsavedChanges(true)
           }
 
           return updated
@@ -444,6 +1016,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
       buyoutSavings: 0,
       adjustments: 0,
       finalAmount: 0,
+      numberOfBids: 0,
+      adjustment: "None",
+      adjValue: 0,
       status: "pending",
       lastModified: new Date().toISOString(),
     }
@@ -530,6 +1105,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     async (format: "pdf" | "csv") => {
       setIsExporting(true)
       try {
+        // Filter out subtotal rows for export unless explicitly requested
+        const exportData = costCategories.filter((category) => category.rowType !== "subtotal")
+
         await new Promise((resolve) => setTimeout(resolve, 2000))
         if (onExport) {
           onExport(format)
@@ -548,188 +1126,357 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         setIsExporting(false)
       }
     },
-    [onExport, toast]
+    [onExport, toast, costCategories]
   )
 
   // Create column definitions for the ProtectedGrid
   const costCategoryColumns: ProtectedColDef[] = useMemo(
     () => [
       createProtectedColumn(
-        "category",
-        "Category",
+        "csiCode",
+        "CSI",
         { level: "none" },
         {
-          width: 150,
+          width: 100,
           cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             return (
               <div
-                className="font-medium cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
-                onClick={() => {
-                  const newValue = prompt("Enter category name:", params.value)
-                  if (newValue) updateCostCategory(params.data.id, "category", newValue)
-                }}
+                className={`${
+                  isSubtotal || isTotal
+                    ? "text-muted-foreground"
+                    : "cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
+                }`}
               >
-                {params.value}
-                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
+                {isSubtotal ? "Subtotal" : isTotal ? "Total" : params.value || "N/A"}
+                {!isSubtotal && !isTotal && (
+                  <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
+                )}
               </div>
             )
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
           },
         }
       ),
       createProtectedColumn(
         "description",
-        "Description",
+        "CSI DESCRIPTION",
         { level: "none" },
         {
           width: 200,
           cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             return (
               <div
-                className="cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
-                onClick={() => {
-                  const newValue = prompt("Enter description:", params.value || "")
-                  if (newValue !== null) updateCostCategory(params.data.id, "description", newValue)
-                }}
+                className={`${
+                  isSubtotal || isTotal
+                    ? "text-muted-foreground italic"
+                    : "cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
+                }`}
               >
-                {params.value || "Click to add description"}
-                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
+                {isTotal ? "" : params.value || "Click to add description"}
+                {!isSubtotal && !isTotal && (
+                  <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
+                )}
               </div>
             )
           },
-        }
-      ),
-      createProtectedColumn(
-        "csiCode",
-        "CSI Code",
-        { level: "none" },
-        {
-          width: 100,
-          cellRenderer: (params: any) => {
-            return (
-              <div
-                className="cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
-                onClick={() => {
-                  const newValue = prompt("Enter CSI code:", params.value || "")
-                  if (newValue !== null) updateCostCategory(params.data.id, "csiCode", newValue)
-                }}
-              >
-                {params.value || "N/A"}
-                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
-              </div>
-            )
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
           },
-        }
-      ),
-      createProtectedColumn(
-        "originalBidAmount",
-        "Original Bid",
-        { level: "none" },
-        {
-          width: 130,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellRenderer: (params: any) => (
-            <InlineEdit
-              value={params.value}
-              onSave={(value) => updateCostCategory(params.data.id, "originalBidAmount", value)}
-            />
-          ),
         }
       ),
       createProtectedColumn(
         "selectedBidAmount",
-        "Selected Bid",
-        { level: "none" },
+        "TOTAL PROJECT",
+        { level: "read-only" },
         {
           width: 130,
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value),
-          cellRenderer: (params: any) => (
-            <InlineEdit
-              value={params.value}
-              onSave={(value) => updateCostCategory(params.data.id, "selectedBidAmount", value)}
-            />
-          ),
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return (
+                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                  {formatCurrency(params.value)}
+                </div>
+              )
+            }
+            return <div className="text-right">{formatCurrency(params.value)}</div>
+          },
+          cellStyle: { textAlign: "right" },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
         }
       ),
       createProtectedColumn(
-        "buyoutSavings",
-        "Buyout Savings",
+        "dollarPerGSF",
+        "$ /GSF",
         { level: "none" },
         {
-          width: 130,
+          width: 100,
           type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellRenderer: (params: any) => (
-            <InlineEdit
-              value={params.value}
-              onSave={(value) => updateCostCategory(params.data.id, "buyoutSavings", value)}
-              className="text-green-600"
-            />
-          ),
+          valueFormatter: (params: any) => {
+            const totalProject = params.data.selectedBidAmount || 0
+            const gsf = 6794 // Mock data as specified
+            const dollarPerGSF = totalProject / gsf
+            return formatCurrency(dollarPerGSF)
+          },
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            const totalProject = params.data.selectedBidAmount || 0
+            const gsf = 6794 // Mock data as specified
+            const dollarPerGSF = totalProject / gsf
+
+            if (isSubtotal || isTotal) {
+              return (
+                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                  {formatCurrency(dollarPerGSF)}
+                </div>
+              )
+            }
+            return <div className="text-right">{formatCurrency(dollarPerGSF)}</div>
+          },
+          cellStyle: { textAlign: "right" },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
         }
       ),
       createProtectedColumn(
-        "adjustments",
-        "Adjustments",
+        "dollarPerLSF",
+        "$ /LSF",
         { level: "none" },
         {
-          width: 130,
+          width: 100,
           type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellRenderer: (params: any) => (
-            <InlineEdit
-              value={params.value}
-              onSave={(value) => updateCostCategory(params.data.id, "adjustments", value)}
-            />
-          ),
+          valueFormatter: (params: any) => {
+            const totalProject = params.data.selectedBidAmount || 0
+            const lsf = 5827 // Mock data as specified
+            const dollarPerLSF = totalProject / lsf
+            return formatCurrency(dollarPerLSF)
+          },
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            const totalProject = params.data.selectedBidAmount || 0
+            const lsf = 5827 // Mock data as specified
+            const dollarPerLSF = totalProject / lsf
+
+            if (isSubtotal || isTotal) {
+              return (
+                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                  {formatCurrency(dollarPerLSF)}
+                </div>
+              )
+            }
+            return <div className="text-right">{formatCurrency(dollarPerLSF)}</div>
+          },
+          cellStyle: { textAlign: "right" },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
         }
       ),
-      createReadOnlyColumn("finalAmount", "Final Amount", {
-        width: 130,
-        type: "numericColumn",
-        valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontWeight: "bold", color: "var(--blue-900)" },
-      }),
+      createProtectedColumn(
+        "numberOfBids",
+        "# OF BIDS",
+        { level: "none" },
+        {
+          width: 100,
+          type: "numericColumn",
+          valueFormatter: (params: any) => params.value || 0,
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            return (
+              <div className={`${isSubtotal || isTotal ? "font-bold" : ""}`}>
+                {isSubtotal ? "—" : isTotal ? "" : params.value || 0}
+              </div>
+            )
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
+        }
+      ),
+      createProtectedColumn(
+        "percentage",
+        "%",
+        { level: "none" },
+        {
+          width: 80,
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const totalProject = params.data.selectedBidAmount || 0
+            // Calculate grand total from all category rows (excluding subtotals and totals)
+            const grandTotal = generateGroupedCostData
+              .filter((row: any) => row.rowType !== "subtotal" && row.rowType !== "total")
+              .reduce((sum: number, row: any) => sum + (row.selectedBidAmount || 0), 0)
+            const percentage = grandTotal > 0 ? (totalProject / grandTotal) * 100 : 0
+            return `${percentage.toFixed(1)}%`
+          },
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            const totalProject = params.data.selectedBidAmount || 0
+            const grandTotal = generateGroupedCostData
+              .filter((row: any) => row.rowType !== "subtotal" && row.rowType !== "total")
+              .reduce((sum: number, row: any) => sum + (row.selectedBidAmount || 0), 0)
+            const percentage = grandTotal > 0 ? (totalProject / grandTotal) * 100 : 0
+
+            if (isSubtotal || isTotal) {
+              return (
+                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">{percentage.toFixed(1)}%</div>
+              )
+            }
+            return <div className="text-right">{percentage.toFixed(1)}%</div>
+          },
+          cellStyle: { textAlign: "right" },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
+        }
+      ),
+      createProtectedColumn(
+        "adjustment",
+        "Adjustment",
+        { level: "none" },
+        {
+          width: 120,
+          editable: (params) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            return !isSubtotal && !isTotal
+          },
+          cellEditor: AdjustmentSelectEditor,
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return <div className="text-muted-foreground italic"></div>
+            }
+            return <div className="text-sm">{params.value || "None"}</div>
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
+        }
+      ),
+      createProtectedColumn(
+        "adjValue",
+        "Adj. Value",
+        { level: "none" },
+        {
+          width: 120,
+          editable: (params) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            const adjustmentType = params.data.adjustment || "None"
+            return !isSubtotal && !isTotal && adjustmentType !== "None"
+          },
+          cellEditor: AdjValueEditor,
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return <div className="text-muted-foreground italic"></div>
+            }
+
+            const adjustmentType = params.data.adjustment || "None"
+            if (adjustmentType === "None") {
+              return <div className="text-muted-foreground italic">TBD</div>
+            }
+
+            const value = Number(params.data.adjValue) || 0
+            const formattedValue = adjustmentType === "$" ? formatCurrency(value) : `${value.toFixed(2)}%`
+
+            return <div className="text-right text-sm">{formattedValue}</div>
+          },
+          valueFormatter: (params: any) => {
+            const adjustmentType = params.data.adjustment || "None"
+            if (adjustmentType === "None") return "TBD"
+
+            const value = Number(params.data.adjValue) || 0
+            return adjustmentType === "$" ? formatCurrency(value) : `${value.toFixed(2)}%`
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
+        }
+      ),
       createProtectedColumn(
         "status",
         "Status",
         { level: "none" },
         {
           width: 120,
-          cellRenderer: (params: any) => (
-            <Select value={params.value} onValueChange={(value) => updateCostCategory(params.data.id, "status", value)}>
-              <SelectTrigger className="w-full h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="selected">Selected</SelectItem>
-                <SelectItem value="committed">Committed</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-              </SelectContent>
-            </Select>
-          ),
+          editable: (params) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            return !isSubtotal && !isTotal
+          },
+          cellEditor: "agSelectCellEditor",
+          cellEditorParams: {
+            values: ["pending", "selected", "committed", "approved"],
+          },
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return <div className="text-muted-foreground italic"></div>
+            }
+            return (
+              <Badge variant={getStatusColor(params.value)} className="text-xs">
+                {params.value}
+              </Badge>
+            )
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
         }
       ),
       createProtectedColumn(
         "bidder",
         "Bidder",
-        { level: "none" },
+        { level: "read-only" },
         {
           width: 150,
-          cellRenderer: (params: any) => (
-            <div
-              className="cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group text-xs"
-              onClick={() => {
-                const newValue = prompt("Enter bidder name:", params.value || "")
-                if (newValue !== null) updateCostCategory(params.data.id, "bidder", newValue)
-              }}
-            >
-              {params.value || "TBD"}
-              <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity inline ml-1" />
-            </div>
-          ),
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return <div className="text-muted-foreground italic"></div>
+            }
+            return (
+              <div className="flex items-center h-full text-xs">
+                <span>{params.value || "TBD"}</span>
+              </div>
+            )
+          },
+          cellClassRules: {
+            "subtotal-row": (params: any) => params.data.rowType === "subtotal",
+            "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
+          },
         }
       ),
       createProtectedColumn(
@@ -738,23 +1485,80 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         { level: "none" },
         {
           width: 80,
-          cellRenderer: (params: any) => (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeCostCategory(params.data.id)}
-              className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          ),
+          cellRenderer: (params: any) => {
+            const isSubtotal = params.data.rowType === "subtotal"
+            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
+            if (isSubtotal || isTotal) {
+              return <div></div>
+            }
+            return (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeCostCategory(params.data.id)}
+                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )
+          },
+          hide: false,
         }
       ),
     ],
-    [updateCostCategory, removeCostCategory]
+    [updateCostCategory, removeCostCategory, generateGroupedCostData]
   )
 
-  // Grid configuration
+  // Custom totals calculator that only sums category rows (not subtotals)
+  const customTotalsCalculator = useCallback((data: GridRow[], columnField: string): number | string => {
+    // Only sum rows that are not subtotals
+    const categoryRows = data.filter((row) => row.rowType !== "subtotal")
+
+    if (columnField === "csiCode") {
+      return "Total"
+    }
+
+    if (columnField === "description") {
+      return ""
+    }
+
+    if (columnField === "numberOfBids") {
+      return ""
+    }
+
+    if (columnField === "adjustment") {
+      return ""
+    }
+
+    if (columnField === "adjValue") {
+      return ""
+    }
+
+    if (columnField === "status") {
+      return ""
+    }
+
+    if (columnField === "bidder") {
+      return ""
+    }
+
+    if (columnField === "actions") {
+      return ""
+    }
+
+    // For numeric columns, sum the values
+    const values = categoryRows
+      .map((row) => {
+        const value = row[columnField]
+        return typeof value === "number" ? value : parseFloat(value)
+      })
+      .filter((val) => !isNaN(val))
+
+    if (values.length === 0) return ""
+    return values.reduce((sum, val) => sum + val, 0)
+  }, [])
+
+  // Update the grid configuration to enable totals row
   const gridConfig: GridConfig = useMemo(
     () =>
       createGridWithTotalsAndSticky(3, true, {
@@ -768,40 +1572,46 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         showStatusBar: true,
         protectionEnabled: true,
         theme: "quartz",
+        enableTotalsRow: true, // Enable the built-in totals row
       }),
     []
   )
 
-  // Grid events
+  // Fix the grid events with proper typing
   const gridEvents: GridEvents = useMemo(
     () => ({
-      onCellValueChanged: (event) => {
-        // Handle cell value changes if needed
+      onCellValueChanged: (event: any) => {
+        const { data, column, newValue, oldValue } = event
+
+        console.log("Cell value changed:", {
+          column: column.getColId(),
+          oldValue,
+          newValue,
+          dataId: data.id,
+        })
+
+        // Update the data through the proper callback
+        if (data.id) {
+          updateCostCategory(data.id, column.getColId() as keyof CostCategory, newValue)
+        }
       },
-      onGridReady: (event) => {
-        // Grid is ready
+      onCellEditingStarted: (event: any) => {
+        console.log("Cell editing started:", event.column.getColId())
+      },
+      onCellEditingStopped: (event: any) => {
+        console.log("Cell editing stopped:", event.column.getColId())
+      },
+      onGridReady: (event: any) => {
+        console.log("Grid ready")
       },
     }),
-    []
+    [updateCostCategory]
   )
 
-  // Convert cost categories to grid rows
+  // Convert cost categories to grid rows with grouped data
   const gridRowData: GridRow[] = useMemo(() => {
-    return costCategories.map((category) => ({
-      id: category.id,
-      category: category.category,
-      description: category.description,
-      csiCode: category.csiCode || "",
-      originalBidAmount: category.originalBidAmount,
-      selectedBidAmount: category.selectedBidAmount,
-      buyoutSavings: category.buyoutSavings,
-      adjustments: category.adjustments,
-      finalAmount: category.finalAmount,
-      status: category.status,
-      bidder: category.bidder || "",
-      actions: "",
-    }))
-  }, [costCategories])
+    return generateGroupedCostData
+  }, [generateGroupedCostData])
 
   // Create column definitions for the General Conditions ProtectedGrid
   const generalConditionsColumns: ProtectedColDef[] = useMemo(
@@ -939,14 +1749,14 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     []
   )
 
-  // Grid events for General Conditions
+  // Fix the general conditions grid events
   const generalConditionsGridEvents: GridEvents = useMemo(
     () => ({
-      onCellValueChanged: (event) => {
+      onCellValueChanged: (event: any) => {
         // Handle cell value changes if needed
         setHasUnsavedChanges(true)
       },
-      onGridReady: (event) => {
+      onGridReady: (event: any) => {
         // Grid is ready
       },
     }),
@@ -3060,7 +3870,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
                 title="Cost Categories"
                 height="600px"
                 enableSearch={true}
-                totalsCalculator={defaultTotalsCalculator}
+                totalsCalculator={customTotalsCalculator} // Use the custom totals calculator
                 className="w-full"
               />
             </CardContent>
