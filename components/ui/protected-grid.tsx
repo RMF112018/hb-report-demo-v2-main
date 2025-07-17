@@ -258,27 +258,39 @@ export function ProtectedGrid({
           cellStyle: (params: any) => {
             const baseStyle = typeof colDef.cellStyle === "function" ? colDef.cellStyle(params) : colDef.cellStyle || {}
             const isDark = theme === "dark"
+            const rowType = params.data?.rowType
 
-            return {
-              ...baseStyle,
-              backgroundColor:
-                protection.level === "locked"
-                  ? isDark
-                    ? "rgba(255, 255, 255, 0.05)"
-                    : "rgba(0, 0, 0, 0.05)"
-                  : isDark
-                  ? "rgba(255, 255, 255, 0.02)"
-                  : "rgba(0, 0, 0, 0.02)",
-              color:
-                protection.level === "locked"
-                  ? isDark
-                    ? "rgba(255, 255, 255, 0.5)"
-                    : "rgba(0, 0, 0, 0.5)"
-                  : isDark
-                  ? "rgba(255, 255, 255, 0.7)"
-                  : "rgba(0, 0, 0, 0.7)",
-              cursor: "not-allowed",
+            const result: any = { ...baseStyle }
+
+            // Section header styling
+            if (rowType === "section") {
+              result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)"
+              result.fontWeight = "bold"
+              // Make entire row non-editable for section headers
+              params.node.setRowSelectable(false)
             }
+
+            // Subtotal row styling
+            if (rowType === "subtotal") {
+              result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
+              result.fontWeight = "bold"
+              result.borderTop = isDark ? "1px solid #555" : "1px solid #ddd"
+            }
+
+            // Protection level styling
+            if (protection.level === "locked") {
+              result.backgroundColor =
+                result.backgroundColor || (isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)")
+              result.color = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)"
+            } else if (protection.level === "read-only") {
+              result.backgroundColor =
+                result.backgroundColor || (isDark ? "rgba(255, 255, 255, 0.02)" : "rgba(0, 0, 0, 0.02)")
+              result.color = isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)"
+            }
+
+            result.cursor = protection.level === "locked" || rowType === "section" ? "not-allowed" : "default"
+
+            return result
           },
           headerClass: `${colDef.headerClass || ""} ${
             protection.level === "locked" ? "locked-column" : "readonly-column"
@@ -286,21 +298,49 @@ export function ProtectedGrid({
         }
       }
 
-      // Handle editable columns with validation
-      if (protection?.validator && defaultConfig.allowCellEditing) {
-        return {
-          ...agGridColDef,
-          pinned: pinnedValue,
-          cellEditor: "agTextCellEditor",
-          cellEditorParams: {
-            validation: protection.validator,
-          },
-        }
-      }
-
+      // Handle editable columns with validation and rowType styling
       return {
         ...agGridColDef,
         pinned: pinnedValue,
+        cellStyle: (params: any) => {
+          const baseStyle = typeof colDef.cellStyle === "function" ? colDef.cellStyle(params) : colDef.cellStyle || {}
+          const isDark = theme === "dark"
+          const rowType = params.data?.rowType
+
+          const result: any = { ...baseStyle }
+
+          // Section header styling
+          if (rowType === "section") {
+            result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)"
+            result.fontWeight = "bold"
+            // Make entire row non-editable for section headers
+            params.node.setRowSelectable(false)
+          }
+
+          // Subtotal row styling
+          if (rowType === "subtotal") {
+            result.backgroundColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
+            result.fontWeight = "bold"
+            result.borderTop = isDark ? "1px solid #555" : "1px solid #ddd"
+          }
+
+          result.cursor = rowType === "section" ? "not-allowed" : "default"
+
+          return result
+        },
+        editable: (params: any): boolean => {
+          // Make section headers non-editable
+          if (params.data?.rowType === "section") {
+            return false
+          }
+          return defaultConfig.allowCellEditing || false
+        },
+        cellEditor: protection?.validator ? "agTextCellEditor" : "agTextCellEditor",
+        cellEditorParams: protection?.validator
+          ? {
+              validation: protection.validator,
+            }
+          : undefined,
       }
     })
   }, [
@@ -309,7 +349,7 @@ export function ProtectedGrid({
     showHiddenColumns,
     defaultConfig.allowCellEditing,
     defaultConfig.stickyColumnsCount,
-    events,
+    theme,
   ])
 
   // Calculate totals row data
