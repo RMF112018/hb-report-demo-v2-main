@@ -71,6 +71,13 @@ import {
   createGridWithTotalsAndSticky,
   defaultTotalsCalculator,
 } from "@/components/ui/protected-grid"
+import {
+  gcFieldLaborConstruction,
+  gcFieldLaborCloseOut,
+  gcFieldOfficeContractor,
+  gcTemporaryUtilities,
+  type GeneralConditionsRow,
+} from "./general-conditions-data"
 
 // Types for Cost Summary
 export interface CostCategory {
@@ -92,6 +99,38 @@ export interface CostCategory {
   bidder?: string
   notes?: string
   lastModified: string
+}
+
+// New interfaces for GC&GR Worksheet structure
+export interface GCLineItem {
+  id: string
+  description: string
+  quantity: number | string
+  unit: string
+  unitCost: number | null
+  constCost: number | null
+  generalReq: number | null
+  total: number | null
+  percentTime: number | null
+  remarks: string
+  customizedLaborRates: number | null
+  laborFY2025: number | null
+  rowType?: "section" | "item" | "subtotal"
+}
+
+export interface GRLineItem {
+  id: string
+  description: string
+  quantity: number | string
+  unit: string
+  unitCost: number | null
+  constCond: number | null
+  unitValue: number | null
+  generalReq: number | null
+  total: number | null
+  percentTime: number | null
+  remarks: string
+  rowType?: "section" | "item" | "subtotal"
 }
 
 export interface GeneralConditions {
@@ -256,7 +295,496 @@ const AdjValueEditor = (props: any) => {
   )
 }
 
+// Column definitions for Field Labor - Construction
+const fieldLaborConstructionColumns: ProtectedColDef[] = [
+  createProtectedColumn("description", "Description", { level: "none" }, { width: 200, pinned: "left" }),
+  createProtectedColumn(
+    "quantity",
+    "Qty.",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn("unit", "Unit", { level: "none" }, { width: 60 }),
+  createProtectedColumn(
+    "unitCost",
+    "Unit Cost",
+    { level: "none" },
+    { width: 120, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("constCost", "Const. Cost", { width: 130 }),
+  createLockedColumn("total", "Total", { width: 130 }),
+  createProtectedColumn(
+    "percentTime",
+    "% Time",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn(
+    "remarks",
+    "Remarks",
+    { level: "none" },
+    { width: 200, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("customizedLaborRates", "CUSTOMIZED LABOR RATES", { width: 180 }),
+  createLockedColumn("laborFY2025", "LABOR FY 2025", { width: 220 }),
+]
+
+// Column definitions for Field Labor - Close Out
+const fieldLaborCloseOutColumns: ProtectedColDef[] = [
+  createProtectedColumn("description", "Description", { level: "none" }, { width: 200, pinned: "left" }),
+  createProtectedColumn(
+    "quantity",
+    "Qty.",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn("unit", "Unit", { level: "none" }, { width: 60 }),
+  createProtectedColumn(
+    "unitCost",
+    "Unit Cost",
+    { level: "none" },
+    { width: 120, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("constCost", "Const. Cost", { width: 130 }),
+  createLockedColumn("total", "Total", { width: 130 }),
+  createProtectedColumn(
+    "percentTime",
+    "% Time",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn(
+    "remarks",
+    "Remarks",
+    { level: "none" },
+    { width: 200, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("customizedLaborRates", "CUSTOMIZED LABOR RATES", { width: 180 }),
+  createLockedColumn("laborFY2025", "LABOR FY 2025", { width: 220 }),
+]
+
+// Column definitions for Field Office - Contractor
+const fieldOfficeContractorColumns: ProtectedColDef[] = [
+  createProtectedColumn("description", "Description", { level: "none" }, { width: 200, pinned: "left" }),
+  createProtectedColumn(
+    "quantity",
+    "Qty.",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn("unit", "Unit", { level: "none" }, { width: 60 }),
+  createProtectedColumn(
+    "unitCost",
+    "Unit Cost",
+    { level: "none" },
+    { width: 120, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("constCost", "Const. Cost", { width: 130 }),
+  createLockedColumn("total", "Total", { width: 130 }),
+  createProtectedColumn(
+    "percentTime",
+    "% Time",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn(
+    "remarks",
+    "Remarks",
+    { level: "none" },
+    { width: 200, editable: (params) => params.data.rowType === "item" }
+  ),
+]
+
+// Column definitions for Temporary Utilities
+const temporaryUtilitiesColumns: ProtectedColDef[] = [
+  createProtectedColumn("description", "Description", { level: "none" }, { width: 200, pinned: "left" }),
+  createProtectedColumn(
+    "quantity",
+    "Qty.",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn("unit", "Unit", { level: "none" }, { width: 60 }),
+  createProtectedColumn(
+    "unitCost",
+    "Unit Cost",
+    { level: "none" },
+    { width: 120, editable: (params) => params.data.rowType === "item" }
+  ),
+  createLockedColumn("constCost", "Const. Cost", { width: 130 }),
+  createLockedColumn("total", "Total", { width: 130 }),
+  createProtectedColumn(
+    "percentTime",
+    "% Time",
+    { level: "none" },
+    { width: 80, editable: (params) => params.data.rowType === "item" }
+  ),
+  createProtectedColumn(
+    "remarks",
+    "Remarks",
+    { level: "none" },
+    { width: 200, editable: (params) => params.data.rowType === "item" }
+  ),
+]
+
+// Data generation functions
+const generateFieldLaborConstructionData = (): GCLineItem[] => {
+  const items: GCLineItem[] = [
+    {
+      id: "section-header",
+      description: "Field Labor - Construction",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: null,
+      generalReq: null,
+      total: null,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "section",
+    },
+    {
+      id: "pe",
+      description: "Project Executive",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 2554,
+      constCost: 2554 * 39,
+      generalReq: null,
+      total: 2554 * 39,
+      percentTime: 100,
+      remarks: "Full time project executive",
+      customizedLaborRates: 2554,
+      laborFY2025: 2554,
+      rowType: "item",
+    },
+    {
+      id: "spm",
+      description: "Senior Project Manager",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 2154,
+      constCost: 2154 * 39,
+      generalReq: null,
+      total: 2154 * 39,
+      percentTime: 100,
+      remarks: "Full time senior PM",
+      customizedLaborRates: 2154,
+      laborFY2025: 2154,
+      rowType: "item",
+    },
+    {
+      id: "pm",
+      description: "Project Manager",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 1854,
+      constCost: 1854 * 39,
+      generalReq: null,
+      total: 1854 * 39,
+      percentTime: 100,
+      remarks: "Full time project manager",
+      customizedLaborRates: 1854,
+      laborFY2025: 1854,
+      rowType: "item",
+    },
+    {
+      id: "subtotal",
+      description: "Subtotal - Field Labor Construction",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: 2554 * 39 + 2154 * 39 + 1854 * 39,
+      generalReq: null,
+      total: 2554 * 39 + 2154 * 39 + 1854 * 39,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "subtotal",
+    },
+  ]
+  return items
+}
+
+const generateFieldLaborCloseOutData = (): GCLineItem[] => {
+  const items: GCLineItem[] = [
+    {
+      id: "section-header",
+      description: "Field Labor - Close Out",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: null,
+      generalReq: null,
+      total: null,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "section",
+    },
+    {
+      id: "closeout-pm",
+      description: "Close Out Project Manager",
+      quantity: 12,
+      unit: "wks",
+      unitCost: 1854,
+      constCost: 1854 * 12,
+      generalReq: null,
+      total: 1854 * 12,
+      percentTime: 50,
+      remarks: "Part time close out PM",
+      customizedLaborRates: 1854,
+      laborFY2025: 1854,
+      rowType: "item",
+    },
+    {
+      id: "closeout-admin",
+      description: "Close Out Administrator",
+      quantity: 12,
+      unit: "wks",
+      unitCost: 1254,
+      constCost: 1254 * 12,
+      generalReq: null,
+      total: 1254 * 12,
+      percentTime: 75,
+      remarks: "Part time close out admin",
+      customizedLaborRates: 1254,
+      laborFY2025: 1254,
+      rowType: "item",
+    },
+    {
+      id: "subtotal",
+      description: "Subtotal - Field Labor Close Out",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: 1854 * 12 + 1254 * 12,
+      generalReq: null,
+      total: 1854 * 12 + 1254 * 12,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "subtotal",
+    },
+  ]
+  return items
+}
+
+const generateFieldOfficeContractorData = (): GCLineItem[] => {
+  const items: GCLineItem[] = [
+    {
+      id: "section-header",
+      description: "Field Office - Contractor",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: null,
+      generalReq: null,
+      total: null,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "section",
+    },
+    {
+      id: "field-office",
+      description: "Field Office Setup",
+      quantity: 1,
+      unit: "ls",
+      unitCost: 25000,
+      constCost: 25000,
+      generalReq: null,
+      total: 25000,
+      percentTime: null,
+      remarks: "Initial field office setup",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "item",
+    },
+    {
+      id: "office-equipment",
+      description: "Office Equipment",
+      quantity: 1,
+      unit: "ls",
+      unitCost: 15000,
+      constCost: 15000,
+      generalReq: null,
+      total: 15000,
+      percentTime: null,
+      remarks: "Computers, furniture, etc.",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "item",
+    },
+    {
+      id: "subtotal",
+      description: "Subtotal - Field Office Contractor",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: 25000 + 15000,
+      generalReq: null,
+      total: 25000 + 15000,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "subtotal",
+    },
+  ]
+  return items
+}
+
+const generateTemporaryUtilitiesData = (): GCLineItem[] => {
+  const items: GCLineItem[] = [
+    {
+      id: "section-header",
+      description: "Temporary Utilities",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: null,
+      generalReq: null,
+      total: null,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "section",
+    },
+    {
+      id: "temp-power",
+      description: "Temporary Power",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 500,
+      constCost: 500 * 39,
+      generalReq: null,
+      total: 500 * 39,
+      percentTime: null,
+      remarks: "Weekly temporary power cost",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "item",
+    },
+    {
+      id: "temp-water",
+      description: "Temporary Water",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 200,
+      constCost: 200 * 39,
+      generalReq: null,
+      total: 200 * 39,
+      percentTime: null,
+      remarks: "Weekly temporary water cost",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "item",
+    },
+    {
+      id: "temp-phone",
+      description: "Temporary Phone/Internet",
+      quantity: 39,
+      unit: "wks",
+      unitCost: 150,
+      constCost: 150 * 39,
+      generalReq: null,
+      total: 150 * 39,
+      percentTime: null,
+      remarks: "Weekly temporary communications",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "item",
+    },
+    {
+      id: "subtotal",
+      description: "Subtotal - Temporary Utilities",
+      quantity: "",
+      unit: "",
+      unitCost: null,
+      constCost: 500 * 39 + 200 * 39 + 150 * 39,
+      generalReq: null,
+      total: 500 * 39 + 200 * 39 + 150 * 39,
+      percentTime: null,
+      remarks: "",
+      customizedLaborRates: null,
+      laborFY2025: null,
+      rowType: "subtotal",
+    },
+  ]
+  return items
+}
+
+// Grid configurations
+const fieldLaborConstructionConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
+const fieldLaborCloseOutConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
+const fieldOfficeContractorConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
+const temporaryUtilitiesConfig = createGridWithTotalsAndSticky(1, false, { protectionEnabled: true })
+
+// Event handlers
+const fieldLaborConstructionEvents: GridEvents = {
+  onCellValueChanged: (event) => {
+    // Handle cell value changes for field labor construction
+    console.log("Field Labor Construction cell changed:", event)
+  },
+}
+
+const fieldLaborCloseOutEvents: GridEvents = {
+  onCellValueChanged: (event) => {
+    // Handle cell value changes for field labor close out
+    console.log("Field Labor Close Out cell changed:", event)
+  },
+}
+
+const fieldOfficeContractorEvents: GridEvents = {
+  onCellValueChanged: (event) => {
+    // Handle cell value changes for field office contractor
+    console.log("Field Office Contractor cell changed:", event)
+  },
+}
+
+const temporaryUtilitiesEvents: GridEvents = {
+  onCellValueChanged: (event) => {
+    // Handle cell value changes for temporary utilities
+    console.log("Temporary Utilities cell changed:", event)
+  },
+}
+
+// Totals calculators
+const fieldLaborTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+  if (columnField === "constCost" || columnField === "total") {
+    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
+  }
+  return ""
+}
+
+const fieldOfficeTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+  if (columnField === "constCost" || columnField === "total") {
+    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
+  }
+  return ""
+}
+
+const utilitiesTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+  if (columnField === "constCost" || columnField === "total") {
+    return data.filter((row) => row.rowType === "item").reduce((sum, row) => sum + (row[columnField] || 0), 0)
+  }
+  return ""
+}
+
 export function CostSummaryModule({ projectId, projectName, onSave, onExport, onSubmit }: CostSummaryModuleProps) {
+  // Generate data for each section
+  const fieldLaborConstructionData = useMemo(() => gcFieldLaborConstruction, [])
+  const fieldLaborCloseOutData = useMemo(() => gcFieldLaborCloseOut, [])
+  const fieldOfficeContractorData = useMemo(() => gcFieldOfficeContractor, [])
+  const temporaryUtilitiesData = useMemo(() => gcTemporaryUtilities, [])
   const { toast } = useToast()
 
   // State management
@@ -1621,9 +2149,12 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Description",
         { level: "none" },
         {
-          width: 200,
+          width: 250,
           pinned: "left",
-          cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
@@ -1632,8 +2163,10 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         { level: "none" },
         {
           width: 80,
-          type: "numericColumn",
-          valueFormatter: (params: any) => params.value,
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
@@ -1642,7 +2175,10 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         { level: "none" },
         {
           width: 60,
-          cellRenderer: (params: any) => <div className="text-center">{params.value}</div>,
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
@@ -1651,39 +2187,24 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         { level: "none" },
         {
           width: 120,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
         "constCost",
         "Const. Cost",
-        { level: "none" },
+        { level: "locked" },
         {
           width: 130,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-        }
-      ),
-      createProtectedColumn(
-        "generalReq",
-        "General Req.",
-        { level: "none" },
-        {
-          width: 120,
-          type: "numericColumn",
-          valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : ""),
-        }
-      ),
-      createProtectedColumn(
-        "total",
-        "Total",
-        { level: "none" },
-        {
-          width: 130,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellStyle: { fontWeight: "bold" },
+          valueGetter: (params) => params.data.quantity * params.data.unitCost,
+          valueFormatter: (params) => formatCurrency(params.value),
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
@@ -1691,9 +2212,11 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "% Time",
         { level: "none" },
         {
-          width: 80,
-          type: "numericColumn",
-          valueFormatter: (params: any) => (params.value ? `${params.value}%` : ""),
+          width: 100,
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
@@ -1701,30 +2224,51 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Remarks",
         { level: "none" },
         {
-          width: 200,
-          cellRenderer: (params: any) => <div className="text-sm text-muted-foreground">{params.value}</div>,
+          width: 180,
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
-        "customizedLaborRates",
+        "customizedRate",
         "CUSTOMIZED LABOR RATES",
-        { level: "none" },
+        { level: "read-only" },
         {
           width: 180,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellStyle: { backgroundColor: "var(--blue-50)", fontWeight: "bold" },
+          valueFormatter: (params) => formatCurrency(params.value),
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
       createProtectedColumn(
-        "laborFY2025",
-        "LABOR FY 2025 *Updated 09.26.24",
-        { level: "none" },
+        "laborRateFY2025",
+        "LABOR FY 2025",
+        { level: "read-only" },
         {
-          width: 220,
-          type: "numericColumn",
-          valueFormatter: (params: any) => formatCurrency(params.value),
-          cellStyle: { backgroundColor: "var(--blue-50)", fontWeight: "bold" },
+          width: 180,
+          valueFormatter: (params) => formatCurrency(params.value),
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
+        }
+      ),
+      createProtectedColumn(
+        "total",
+        "Total",
+        { level: "locked" },
+        {
+          width: 140,
+          valueGetter: (params) => params.data.constCost,
+          valueFormatter: (params) => formatCurrency(params.value),
+          cellClassRules: {
+            "section-header": (params) => params.data.rowType === "section",
+            "subtotal-row": (params) => params.data.rowType === "subtotal",
+          },
         }
       ),
     ],
@@ -2671,6 +3215,28 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
       },
     ]
   }, [])
+
+  function GridSection({ title, data }: { title: string; data: GeneralConditionsRow[] }) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProtectedGrid
+            columnDefs={generalConditionsColumns}
+            rowData={data}
+            config={generalConditionsGridConfig}
+            events={generalConditionsGridEvents}
+            totalsCalculator={defaultTotalsCalculator}
+            height="500px"
+            enableSearch
+            title={title}
+          />
+        </CardContent>
+      </Card>
+    )
+  }
 
   // Create column definitions for the General Requirements ProtectedGrid
   const generalRequirementsColumns: ProtectedColDef[] = useMemo(
@@ -3878,28 +4444,10 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         </TabsContent>
 
         <TabsContent value="conditions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-green-600" />
-                General Conditions
-              </CardTitle>
-              <CardDescription>Project management and site-related costs</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProtectedGrid
-                columnDefs={generalConditionsColumns}
-                rowData={generalConditionsData}
-                config={generalConditionsGridConfig}
-                events={generalConditionsGridEvents}
-                title="General Conditions Cost Breakdown"
-                height="600px"
-                enableSearch={true}
-                totalsCalculator={defaultTotalsCalculator}
-                className="w-full"
-              />
-            </CardContent>
-          </Card>
+          <GridSection title="Field Labor – Construction" data={gcFieldLaborConstruction} />
+          <GridSection title="Field Labor – Close Out" data={gcFieldLaborCloseOut} />
+          <GridSection title="Field Office – Contractor" data={gcFieldOfficeContractor} />
+          <GridSection title="Temporary Utilities" data={gcTemporaryUtilities} />
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-6">
