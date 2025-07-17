@@ -103,6 +103,7 @@ interface ProjectSidebarProps {
   onToolSelect?: (toolName: string | null) => void
   selectedModule?: string | null
   selectedTool?: string | null
+  onLaunchProjectPageCarousel?: () => void
 }
 
 // Define sidebar categories
@@ -395,6 +396,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onToolSelect,
   selectedModule,
   selectedTool,
+  onLaunchProjectPageCarousel,
 }) => {
   const { user, logout, isPresentationMode, viewingAs, switchRole, returnToPresentation } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -811,6 +813,13 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
     // Call the original project selection function
     onProjectSelect(projectId)
+  }
+
+  // Update the carousel trigger logic to use the callback
+  const triggerProjectPageCarousel = () => {
+    if (onLaunchProjectPageCarousel) {
+      onLaunchProjectPageCarousel()
+    }
   }
 
   // Mobile floating button
@@ -1302,7 +1311,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Desktop/Tablet Layout
   if (!isMobile) {
     return (
-      <div className="fixed top-0 left-0 z-[110] h-screen">
+      <div className="fixed top-0 left-0 z-[50] h-screen">
         {/* Sidebar Container - Dynamic width based on expanded state */}
         <div
           className={`
@@ -1323,7 +1332,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           {/* Collapsed Sidebar - Always visible */}
           <aside
             id="collapsed-sidebar"
-            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-[115]"
+            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-[55]"
           >
             {/* Logo */}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -1347,27 +1356,27 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                           size="sm"
                           onClick={() => handleCategorySelect(category.id)}
                           className={`
-                            w-full h-10 p-0 rounded-lg relative z-[120]
+                            w-full h-10 p-0 rounded-lg relative z-[60]
                             ${
                               activeCategory === category.id ||
                               (category.id === "dashboard" &&
                                 selectedProject === null &&
                                 selectedModule === null &&
                                 selectedTool === null)
-                                ? "bg-[#FA4616] text-white"
+                                ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-800"
                             }
                           `}
                         >
                           <IconComponent className="h-4 w-4" />
                           {category.id === "notifications" && productivityNotifications > 0 && (
-                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[125]">
+                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[65]">
                               <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                             </div>
                           )}
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="right" className="z-[130]">
+                      <TooltipContent side="right" className="z-[70]">
                         <p>{category.tooltip}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -1388,12 +1397,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         // Launch HB Intel Pitch carousel for executives
                         setShowHBIntelPitchCarousel(true)
                       }}
-                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[120]"
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
                     >
                       <GitCompareArrows className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="z-[130]">
+                  <TooltipContent side="right" className="z-[70]">
                     <p>HB Intel Executive Pitch Presentation</p>
                   </TooltipContent>
                 </Tooltip>
@@ -1408,17 +1417,17 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         // Show Microsoft Teams integration slide-out panel
                         setShowTeamsPanel(true)
                       }}
-                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[120]"
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
                     >
                       <MessageSquare className="h-4 w-4" />
                       {productivityNotifications > 0 && (
-                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[125]">
+                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[65]">
                           <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                         </div>
                       )}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="z-[130]">
+                  <TooltipContent side="right" className="z-[70]">
                     <p>Microsoft Teams & Productivity Tools</p>
                   </TooltipContent>
                 </Tooltip>
@@ -1435,7 +1444,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={handleUserAvatarClick}
-                        className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 z-[120]"
+                        className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 z-[60]"
                       >
                         <Avatar className="h-5 w-5">
                           <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
@@ -1445,7 +1454,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         </Avatar>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="z-[130]">
+                    <TooltipContent side="right" className="z-[70]">
                       <p>User Settings & Profile</p>
                     </TooltipContent>
                   </Tooltip>
@@ -1453,7 +1462,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                 {/* User Menu Dropdown */}
                 {showUserMenu && (
-                  <div className="absolute bottom-full left-16 mb-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[135]">
+                  <div className="absolute bottom-full left-16 mb-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[75]">
                     <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
@@ -1567,7 +1576,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 variant={selectedProject === project.id ? "default" : "ghost"}
                                 size="sm"
                                 onClick={() => handleProjectSelect(project.id)}
-                                className="w-full justify-start px-3 py-2 h-auto text-left"
+                                className={`w-full justify-start px-3 py-2 h-auto text-left ${
+                                  selectedProject === project.id
+                                    ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
+                                    : ""
+                                }`}
                               >
                                 <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
@@ -1626,7 +1639,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     variant={selectedProject === project.id ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleProjectSelect(project.id)}
-                                    className="w-full justify-start px-3 py-1.5 h-auto text-left"
+                                    className={`w-full justify-start px-3 py-1.5 h-auto text-left ${
+                                      selectedProject === project.id
+                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
+                                        : ""
+                                    }`}
                                   >
                                     <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">

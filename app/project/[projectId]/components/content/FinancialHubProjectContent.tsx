@@ -273,8 +273,8 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
 
   // Header with focus mode toggle
   const renderHeader = () => (
-    <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="border-b border-gray-200 dark:border-gray-700 mb-6 w-full">
+      <div className="flex items-center justify-between mb-4 w-full">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold">Financial Hub</h1>
           <p className="text-muted-foreground">Comprehensive financial management and analysis for {projectName}</p>
@@ -296,34 +296,48 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
         </div>
       </div>
 
-      {/* Financial Tabs Navigation */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 min-w-0">
+      {/* Financial Navigation Cards - Full width layout */}
+      <div className="grid grid-cols-10 gap-2 pb-4 w-full">
         {availableTabs.map((tab) => {
           const IconComponent = tab.icon
           const isActive = navigation.financialTab === tab.id
           return (
-            <Button
+            <Card
               key={tab.id}
-              variant={isActive ? "default" : "ghost"}
-              size="sm"
+              className={`cursor-pointer transition-all hover:shadow-md w-full ${
+                isActive
+                  ? "border-[#FA4616] bg-[#FA4616]/5 ring-1 ring-[#FA4616]/20"
+                  : "hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+              }`}
               onClick={() => handleFinancialTabChange(tab.id)}
-              className={`
-                flex items-center gap-2 whitespace-nowrap transition-all duration-200 flex-shrink-0
-                ${
-                  isActive
-                    ? "bg-[#FA4616] text-white hover:bg-[#FA4616]/90 border-[#FA4616]"
-                    : "hover:bg-[#FA4616]/10 hover:text-[#FA4616] hover:border-[#FA4616]/30"
-                }
-              `}
             >
-              <IconComponent className="h-4 w-4" />
-              {tab.label}
-              {tab.id === "change-management" && (
-                <Badge variant="secondary" className="bg-[#0021A5] text-white text-xs ml-1 border-[#0021A5]">
-                  New
-                </Badge>
-              )}
-            </Button>
+              <CardContent className="p-2">
+                <div className="flex flex-col items-center text-center space-y-1">
+                  <div className="relative">
+                    <IconComponent
+                      className={`h-4 w-4 ${isActive ? "text-[#FA4616]" : "text-gray-600 dark:text-gray-400"}`}
+                    />
+                    {tab.id === "change-management" && (
+                      <Badge
+                        variant="secondary"
+                        className="absolute -top-1 -right-1 bg-[#0021A5] text-white text-xs border-[#0021A5]"
+                      >
+                        New
+                      </Badge>
+                    )}
+                  </div>
+                  <div>
+                    <p
+                      className={`text-xs font-medium ${
+                        isActive ? "text-[#FA4616]" : "text-gray-900 dark:text-gray-100"
+                      }`}
+                    >
+                      {tab.label}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )
         })}
       </div>
@@ -341,7 +355,7 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
   // Return focus mode if active
   if (isFocusMode) {
     return (
-      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-[150]">
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-[200]">
         <div className="flex-1 overflow-auto">
           <div className="p-6 h-full">{mainContent}</div>
         </div>

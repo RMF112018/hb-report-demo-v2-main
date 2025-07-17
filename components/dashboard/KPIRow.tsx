@@ -398,7 +398,7 @@ export function KPIRow({ userRole, isCompact }: KPIRowProps) {
   const responsiveKpis = getResponsiveKPICount(kpis)
 
   return (
-    <div className="bg-card border-b border-gray-200 dark:border-gray-700">
+    <div className="bg-card">
       {/* Header with collapse toggle - always visible */}
       <div className="flex items-center justify-between px-0 sm:px-0 lg:px-0 py-0 sm:py-0">
         {/* Collapse toggle - visible on tablet and mobile */}

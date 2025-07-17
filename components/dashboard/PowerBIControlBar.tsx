@@ -481,57 +481,6 @@ export default function PowerBIControlBar({
             </div>
           </div>
         </div>
-
-        {/* Bottom Status Bar */}
-        <div className="px-4 py-2 bg-muted/50 border-t border-border">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-4">
-              <span>
-                {isMarketIntelligence
-                  ? "Market Intelligence Dashboard"
-                  : userRole === "admin"
-                  ? "IT Administrator Dashboard"
-                  : "Financial Review Dashboard"}{" "}
-                •{" "}
-                {userRole === "executive"
-                  ? "Executive"
-                  : userRole === "project-executive"
-                  ? "Project Executive"
-                  : userRole === "project-manager"
-                  ? "Project Manager"
-                  : userRole === "admin"
-                  ? "System Administrator"
-                  : "User"}{" "}
-                View
-              </span>
-              {isMarketIntelligence && (selectedSector !== "all" || selectedRegion !== "all") && (
-                <span>
-                  {selectedSector !== "all" && <>• {sectorOptions.find((s) => s.id === selectedSector)?.name}</>}
-                  {selectedRegion !== "all" && <>• {regionOptions.find((r) => r.id === selectedRegion)?.name}</>}
-                </span>
-              )}
-              {!isMarketIntelligence && userRole === "admin" && selectedITSystem !== "all" && (
-                <span>
-                  • {itSystems.find((s) => s.id === selectedITSystem)?.name} •{" "}
-                  {itSystems.find((s) => s.id === selectedITSystem)?.uptime}% uptime
-                </span>
-              )}
-              {!isMarketIntelligence && userRole !== "admin" && selectedProject !== "all" && (
-                <span>
-                  • {projects.find((p) => p.id === selectedProject)?.name} •{" "}
-                  {formatCurrency(projects.find((p) => p.id === selectedProject)?.value || 0)}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-4">
-              <span>Updated: {formatTime(lastRefresh)}</span>
-              <span>•</span>
-              <span>Region: US-East</span>
-              <span>•</span>
-              <span>Workspace: HB Construction</span>
-            </div>
-          </div>
-        </div>
       </Card>
     </TooltipProvider>
   )

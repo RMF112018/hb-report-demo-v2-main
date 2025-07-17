@@ -56,6 +56,7 @@ import { Button } from "../../components/ui/button"
 import projectsData from "../../data/mock/projects.json"
 import { filterProjectsByRole, getProjectStats } from "../../lib/project-access-utils"
 import type { UserRole } from "../project/[projectId]/types/project"
+import { ProjectPageCarousel } from "../../components/presentation/ProjectPageCarousel"
 
 /**
  * Content wrapper interface for modules that support sidebar content
@@ -226,6 +227,7 @@ export default function MainApplicationPage() {
   const [showFieldManagementCarousel, setShowFieldManagementCarousel] = useState(false)
   const [showComplianceCarousel, setShowComplianceCarousel] = useState(false)
   const [showITCommandCenterCarousel, setShowITCommandCenterCarousel] = useState(false)
+  const [showProjectPageCarousel, setShowProjectPageCarousel] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -587,6 +589,10 @@ export default function MainApplicationPage() {
 
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleProjectPageCarouselComplete = () => {
+    setShowProjectPageCarousel(false)
   }
 
   // Handle manual carousel launch from PageHeader badge
@@ -1291,11 +1297,12 @@ export default function MainApplicationPage() {
         onToolSelect={handleToolSelect}
         selectedModule={selectedModule}
         selectedTool={selectedTool}
+        onLaunchProjectPageCarousel={() => setShowProjectPageCarousel(true)}
       />
 
       {/* Sticky Page Header - Always visible at top */}
       <div
-        className="fixed top-0 right-0 z-50 transition-all duration-300 ease-in-out shadow-sm"
+        className="fixed top-0 right-0 z-40 transition-all duration-300 ease-in-out shadow-sm"
         style={{ left: isMobile ? "0px" : `${sidebarWidth}px` }}
         ref={headerRef}
       >
@@ -1456,6 +1463,18 @@ export default function MainApplicationPage() {
             return null
           })()}
           <ITCommandCenterCarousel onComplete={handleITCommandCenterCarouselComplete} />
+        </>
+      )}
+
+      {/* Project Page Carousel - Overlays entire dashboard for presentation users */}
+      {/* Uses standard ProjectPageCarousel with Project Page slides for consistency */}
+      {showProjectPageCarousel && (
+        <>
+          {(() => {
+            console.log("🎬 Project Page Carousel: Rendering ProjectPageCarousel")
+            return null
+          })()}
+          <ProjectPageCarousel onComplete={handleProjectPageCarouselComplete} />
         </>
       )}
     </div>

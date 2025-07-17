@@ -355,70 +355,7 @@ export default function GovernancePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
-
-      {/* Sticky Header - Following project page structure */}
-      <div className="sticky top-16 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
-        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
-          <div className="max-w-[1920px] mx-auto">
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb className="mb-3">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="flex items-center gap-1">
-                    <Home className="h-3 w-3" />
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/it-command-center" className="text-muted-foreground hover:text-foreground">
-                    IT Command Center
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Governance & Compliance</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Page Title and Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground">
-                  Governance & Compliance
-                </h1>
-                <Badge variant="outline" className="text-xs whitespace-nowrap">
-                  {governanceData.complianceScore}% Compliant
-                </Badge>
-              </div>
-
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Plus className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">New Policy</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <RefreshCw className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Refresh</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Settings className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Settings</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* IT Module Navigation */}
-            <div className="mt-3">
-              <ITModuleNavigation />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout - Following project page structure */}
+      {/* Removed AppHeader and all header elements */}
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         {/* Mobile Priority Cards */}
         <div className="block xl:hidden mb-4 sm:mb-6">
