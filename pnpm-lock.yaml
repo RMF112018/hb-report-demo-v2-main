@@ -11,12 +11,6 @@ importers:
       '@apollo/client':
         specifier: latest
         version: 3.13.8(@types/react@19.1.8)(graphql-ws@6.0.6(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
-      '@bryntum/gantt':
-        specifier: npm:@bryntum/gantt-trial@^6.2.5
-        version: '@bryntum/gantt-trial@6.2.5'
-      '@bryntum/gantt-react':
-        specifier: ^6.2.5
-        version: 6.2.5
       '@dnd-kit/core':
         specifier: latest
         version: 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -409,17 +403,6 @@ packages:
   '@babel/types@7.28.1':
     resolution: {integrity: sha512-x0LvFTekgSX+83TI28Y9wYPUfzrnl2aT5+5QLnO6v7mSJYtEEevuDRN0F0uSHRk1G1IWZC43o00Y0xDDrpBGPQ==}
     engines: {node: '>=6.9.0'}
-
-  '@bryntum/gantt-react@6.2.5':
-    resolution: {integrity: sha512-SEk8Og8Ls+zyKtRGEzLI+oQTKcO/XCwlc2SK8GjOwvW+5tiZsjtbCDpbEOAtZeU9vXCw5deO0ZUn0P6VHiiXrg==}
-    engines: {node: '>=0.10.0'}
-
-  '@bryntum/gantt-trial-lib@1.0.0':
-    resolution: {integrity: sha512-4HZ3VJuERIq6TK2p7/hidq5vv25OzoXWy06yCmWpw4mzD76A0Su/8dvewdB/rdw60NnTXhWfhKaP6fNvqhVDDg==}
-
-  '@bryntum/gantt-trial@6.2.5':
-    resolution: {integrity: sha512-iQpOXW3V/jv+ntP4D7lHU251h5CMTQLWfMNGJDkI9XfDS6ATThcPS/xsbzelG3IW/4lR3Y3uiTTFvCJ1YdYbww==}
-    engines: {node: '>=0.10.0'}
 
   '@date-fns/tz@1.2.0':
     resolution: {integrity: sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg==}
@@ -4768,14 +4751,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
-
-  '@bryntum/gantt-react@6.2.5': {}
-
-  '@bryntum/gantt-trial-lib@1.0.0': {}
-
-  '@bryntum/gantt-trial@6.2.5':
-    dependencies:
-      '@bryntum/gantt-trial-lib': 1.0.0
 
   '@date-fns/tz@1.2.0': {}
 
