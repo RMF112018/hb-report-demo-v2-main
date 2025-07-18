@@ -77,6 +77,9 @@ import {
   Home,
   Ruler,
   Gavel,
+  UserPlus,
+  Heart,
+  GraduationCap,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import type { ProcurementLogRecord, ProcoreCommitment, BidTabLink } from "../../../types/procurement"
@@ -103,7 +106,7 @@ const ProjectManagerStaffingView = React.lazy(() =>
 
 // Import staffing components
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
-import { InteractiveStaffingGantt } from "../../dashboard/staff-planning/components/InteractiveStaffingGantt"
+import { EnhancedInteractiveStaffingGantt } from "../../dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
 import { SPCRInboxPanel } from "../../dashboard/staff-planning/components/SPCRInboxPanel"
 import { LaborVsRevenuePanel } from "../../dashboard/staff-planning/components/LaborVsRevenuePanel"
 import { useStaffingStore } from "../../dashboard/staff-planning/store/useStaffingStore"
@@ -171,6 +174,53 @@ import { QualityDashboard } from "../../../components/quality/QualityDashboard"
 // Import estimating components
 import { CostSummaryModule } from "../../../components/estimating/CostSummaryModule"
 import { EstimatingProvider } from "../../../components/estimating/EstimatingProvider"
+
+// Lazy-load HR & Payroll components for production-ready loading
+const PersonnelPage = React.lazy(() =>
+  import("../../../components/hr-payroll/personnel/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const RecruitingPage = React.lazy(() =>
+  import("../../../components/hr-payroll/recruiting/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const TimesheetsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/timesheets/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const ExpensesPage = React.lazy(() =>
+  import("../../../components/hr-payroll/expenses/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const PayrollPage = React.lazy(() =>
+  import("../../../components/hr-payroll/payroll/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const BenefitsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/benefits/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const TrainingPage = React.lazy(() =>
+  import("../../../components/hr-payroll/training/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const CompliancePage = React.lazy(() =>
+  import("../../../components/hr-payroll/compliance/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const SettingsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/settings/page").then((module) => ({
+    default: module.default,
+  }))
+)
 
 interface User {
   firstName: string
@@ -328,6 +378,21 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { id: "notices", label: "Notices & Updates" },
     ],
   },
+  "HR & Payroll": {
+    title: "HR & Payroll",
+    description: "Comprehensive human resources and payroll management system",
+    tabs: [
+      { id: "personnel", label: "Personnel" },
+      { id: "recruiting", label: "Recruiting" },
+      { id: "timesheets", label: "Timesheets" },
+      { id: "expenses", label: "Expenses" },
+      { id: "payroll", label: "Payroll" },
+      { id: "benefits", label: "Benefits" },
+      { id: "training", label: "Training" },
+      { id: "compliance", label: "Compliance" },
+      { id: "settings", label: "Settings" },
+    ],
+  },
 }
 
 const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: string }> = ({
@@ -410,7 +475,9 @@ const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: str
         </div>
 
         {/* Interactive Gantt */}
-        <InteractiveStaffingGantt userRole={userRole as "executive" | "project-executive" | "project-manager"} />
+        <EnhancedInteractiveStaffingGantt
+          userRole={userRole as "executive" | "project-executive" | "project-manager"}
+        />
 
         {/* HBI Insights Integration */}
         <EnhancedHBIInsights
@@ -674,7 +741,9 @@ const StaffingLegacyContent: React.FC<{
         {activeTab === "management" && (
           <div className="space-y-6">
             {/* Staff Assignment Management */}
-            <InteractiveStaffingGantt userRole={userRole as "executive" | "project-executive" | "project-manager"} />
+            <EnhancedInteractiveStaffingGantt
+              userRole={userRole as "executive" | "project-executive" | "project-manager"}
+            />
 
             {/* SPCR Management - Only for project-executive and project-manager */}
             {(userRole === "project-executive" || userRole === "project-manager") && (
@@ -4222,6 +4291,184 @@ const EstimatingContent: React.FC<{
   )
 }
 
+const HRPayrollContent: React.FC<{
+  userRole: UserRole
+  user: User
+  onNavigateBack?: () => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, onNavigateBack, activeTab = "personnel", onTabChange }) => {
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "personnel":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Personnel...</div>}>
+            <PersonnelPage />
+          </React.Suspense>
+        )
+      case "recruiting":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Recruiting...</div>}>
+            <RecruitingPage />
+          </React.Suspense>
+        )
+      case "timesheets":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Timesheets...</div>}>
+            <TimesheetsPage />
+          </React.Suspense>
+        )
+      case "expenses":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Expenses...</div>}>
+            <ExpensesPage />
+          </React.Suspense>
+        )
+      case "payroll":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Payroll...</div>}>
+            <PayrollPage />
+          </React.Suspense>
+        )
+      case "benefits":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Benefits...</div>}>
+            <BenefitsPage />
+          </React.Suspense>
+        )
+      case "training":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Training...</div>}>
+            <TrainingPage />
+          </React.Suspense>
+        )
+      case "compliance":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Compliance...</div>}>
+            <CompliancePage />
+          </React.Suspense>
+        )
+      case "settings":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Settings...</div>}>
+            <SettingsPage />
+          </React.Suspense>
+        )
+      default:
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Personnel...</div>}>
+            <PersonnelPage />
+          </React.Suspense>
+        )
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb and Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {user.firstName} {user.lastName}
+          </span>
+          <ChevronRight className="h-4 w-4" />
+          <span>HR & Payroll Management</span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">HR & Payroll Management</h1>
+            <p className="text-muted-foreground">Comprehensive human resources and payroll management system</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onNavigateBack}>
+              Back to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* HR & Payroll Tabs */}
+      <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+        <TabsList className="grid w-full grid-cols-9">
+          <TabsTrigger value="personnel" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Personnel
+          </TabsTrigger>
+          <TabsTrigger value="recruiting" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            Recruiting
+          </TabsTrigger>
+          <TabsTrigger value="timesheets" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Timesheets
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="payroll" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Payroll
+          </TabsTrigger>
+          <TabsTrigger value="benefits" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Benefits
+          </TabsTrigger>
+          <TabsTrigger value="training" className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Training
+          </TabsTrigger>
+          <TabsTrigger value="compliance" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Compliance
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personnel" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="recruiting" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="timesheets" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="expenses" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="payroll" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="benefits" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="training" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="compliance" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
 export const ToolContent: React.FC<ToolContentProps> = ({
   toolName,
   userRole,
@@ -4291,6 +4538,13 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   // Use Estimating layout for Estimating tool
   if (toolName === "estimating") {
     return <EstimatingContent userRole={userRole} user={user} activeTab={activeTab} onTabChange={onTabChange} />
+  }
+
+  // Use HR & Payroll layout for HR & Payroll tool
+  if (toolName === "HR & Payroll") {
+    // Navigate to the dedicated HR & Payroll Suite page
+    window.location.href = "/hr-payroll"
+    return null
   }
 
   // For other tools, use a simple layout without app-header

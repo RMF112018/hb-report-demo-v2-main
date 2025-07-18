@@ -39,7 +39,13 @@ import { FullscreenToggle } from "@/components/ui/fullscreen-toggle"
 import { CollapseWrapper } from "@/components/ui/collapse-wrapper"
 import { useFinancialHubStore } from "@/hooks/use-financial-hub-store"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ProtectedGrid, createReadOnlyColumn, GridRow, ProtectedColDef } from "@/components/ui/protected-grid"
+import {
+  ProtectedGrid,
+  createReadOnlyColumn,
+  GridRow,
+  ProtectedColDef,
+  createProtectedColumn,
+} from "@/components/ui/protected-grid"
 import {
   AreaChart,
   Area,
@@ -103,6 +109,147 @@ const outflowBreakdown = [
   { name: "Equipment", value: 530587.25, color: "#f97316", percentage: 11.9 },
   { name: "Overhead", value: 265293.62, color: "#84cc16", percentage: 5.9 },
 ]
+
+// Generate monthly columns for forecast grid
+const generateMonthlyColumns = () => {
+  const columns = []
+  const currentDate = new Date()
+
+  for (let i = 0; i < 12; i++) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1)
+    const monthYear = date.toLocaleDateString("en-US", { month: "long", year: "2-digit" })
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    columns.push({ label: monthYear, key: monthKey })
+  }
+
+  return columns
+}
+
+// Mock forecast data for the grid
+const generateMockForecastData = () => {
+  const monthlyColumns = generateMonthlyColumns()
+  const mockData: any[] = []
+
+  // GC & GR Records
+  const gcgrRecords = [
+    {
+      cost_code: "01-00-000",
+      cost_code_description: "Presentation/Proposal/Rfq",
+      budget: 125000,
+    },
+    {
+      cost_code: "01-01-000",
+      cost_code_description: "General Conditions",
+      budget: 2500000,
+    },
+    {
+      cost_code: "01-01-022",
+      cost_code_description: "Contingency",
+      budget: 1800000,
+    },
+    {
+      cost_code: "15-02-227",
+      cost_code_description: "Waste Material Disposal",
+      budget: 450000,
+    },
+    {
+      cost_code: "10-01-571",
+      cost_code_description: "Erosion & Sediment Control",
+      budget: 320000,
+    },
+  ]
+
+  // Draw Records
+  const drawRecords = [
+    {
+      csi_code: "27 26 00",
+      csi_description: "Data Communications Programming and Integration",
+      budget: 850000,
+    },
+    {
+      csi_code: "23 05 00",
+      csi_description: "Common Work Results for HVAC",
+      budget: 1200000,
+    },
+    {
+      csi_code: "03 30 00",
+      csi_description: "Cast-in-Place Concrete",
+      budget: 2800000,
+    },
+    {
+      csi_code: "07 84 00",
+      csi_description: "Firestopping",
+      budget: 425000,
+    },
+    {
+      csi_code: "26 27 00",
+      csi_description: "Low-Voltage Distribution Equipment",
+      budget: 675000,
+    },
+  ]
+
+  // Generate GC & GR records
+  gcgrRecords.forEach((record, index) => {
+    const cost_to_complete = record.budget * (0.3 + Math.random() * 0.4)
+    const estimated_at_completion = record.budget + (Math.random() - 0.5) * record.budget * 0.1
+
+    // Generate monthly data
+    const actual_remaining_forecast: { [key: string]: number } = {}
+
+    monthlyColumns.forEach((month) => {
+      const baseAmount = record.budget / 12
+      const currentAmount = baseAmount * (0.8 + Math.random() * 0.4)
+      actual_remaining_forecast[month.key] = currentAmount
+    })
+
+    mockData.push({
+      id: `gcgr-${index}`,
+      project_id: 1001,
+      forecast_type: "gcgr",
+      cost_code: record.cost_code,
+      cost_code_description: record.cost_code_description,
+      budget: record.budget,
+      cost_to_complete,
+      estimated_at_completion,
+      variance: estimated_at_completion - record.budget,
+      start_date: "2024-01-15",
+      end_date: "2024-12-30",
+      actual_remaining_forecast,
+    })
+  })
+
+  // Generate Draw records
+  drawRecords.forEach((record, index) => {
+    const cost_to_complete = record.budget * (0.25 + Math.random() * 0.5)
+    const estimated_at_completion = record.budget + (Math.random() - 0.5) * record.budget * 0.15
+
+    // Generate monthly data
+    const actual_remaining_forecast: { [key: string]: number } = {}
+
+    monthlyColumns.forEach((month) => {
+      const baseAmount = record.budget / 12
+      const currentAmount = baseAmount * (0.7 + Math.random() * 0.6)
+      actual_remaining_forecast[month.key] = currentAmount
+    })
+
+    mockData.push({
+      id: `draw-${index}`,
+      project_id: 1001,
+      forecast_type: "draw",
+      csi_code: record.csi_code,
+      csi_description: record.csi_description,
+      budget: record.budget,
+      cost_to_complete,
+      estimated_at_completion,
+      variance: estimated_at_completion - record.budget,
+      start_date: "2024-02-01",
+      end_date: "2024-11-15",
+      actual_remaining_forecast,
+    })
+  })
+
+  return mockData
+}
 
 // Mock data for pay applications grid
 const payApplicationsData = [
@@ -288,7 +435,7 @@ const payApplicationsData = [
   },
 ]
 
-type ViewMode = "overview" | "inflow" | "outflow" | "forecast"
+type ViewMode = "overview" | "inflow" | "outflow" | "forecast" | "forecast-grid"
 
 export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnalysisProps) {
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
@@ -367,19 +514,20 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
       createReadOnlyColumn("payAppNumber", "Pay App #", {
         width: 100,
         pinned: "left",
-        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500", fontSize: "11px" },
       }),
       createReadOnlyColumn("month", "Month", {
         width: 100,
         pinned: "left",
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("submitted", "Submitted", {
         width: 120,
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("approved", "Approved", {
         width: 120,
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("approvedTotal", "Approved Total", {
         width: 140,
@@ -388,11 +536,11 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500", fontSize: "10px" },
       }),
       createReadOnlyColumn("paid", "Paid", {
         width: 120,
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("receivable", "Receivable", {
         width: 130,
@@ -401,7 +549,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", color: "#16a34a", fontWeight: "500" },
+        cellStyle: { fontFamily: "monospace", color: "#16a34a", fontWeight: "500", fontSize: "10px" },
       }),
       createReadOnlyColumn("payableSub", "Payable - Sub", {
         width: 140,
@@ -410,7 +558,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", color: "#dc2626" },
+        cellStyle: { fontFamily: "monospace", color: "#dc2626", fontSize: "10px" },
       }),
       createReadOnlyColumn("payableGCGR", "Payable - GC GR", {
         width: 150,
@@ -419,7 +567,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", color: "#dc2626" },
+        cellStyle: { fontFamily: "monospace", color: "#dc2626", fontSize: "10px" },
       }),
       createReadOnlyColumn("fee", "Fee", {
         width: 120,
@@ -428,7 +576,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", color: "#7c3aed" },
+        cellStyle: { fontFamily: "monospace", color: "#7c3aed", fontSize: "10px" },
       }),
       createReadOnlyColumn("other", "Other", {
         width: 120,
@@ -437,7 +585,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
         },
-        cellStyle: { fontFamily: "monospace", color: "#ea580c" },
+        cellStyle: { fontFamily: "monospace", color: "#ea580c", fontSize: "10px" },
       }),
       createReadOnlyColumn("netDelta", "Net Delta", {
         width: 130,
@@ -448,7 +596,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
         },
         cellStyle: (params: any) => {
           const value = params.value
-          const style: any = { fontFamily: "monospace", fontWeight: "bold" }
+          const style: any = { fontFamily: "monospace", fontWeight: "bold", fontSize: "10px" }
           if (typeof value === "number") {
             style.color = value >= 0 ? "#16a34a" : "#dc2626"
           }
@@ -475,6 +623,134 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
     return values.reduce((sum, val) => sum + val, 0)
   }
 
+  // Forecast grid data and columns
+  const forecastData = useMemo(() => generateMockForecastData(), [])
+  const monthlyColumns = useMemo(() => generateMonthlyColumns(), [])
+
+  // Convert forecast data to GridRow format for "Actual / Remaining Forecast" rows only
+  const forecastGridData: GridRow[] = useMemo(() => {
+    return forecastData.map((record) => {
+      const displayName =
+        record.forecast_type === "gcgr"
+          ? `${record.cost_code} - ${record.cost_code_description}`
+          : `${record.csi_code} - ${record.csi_description}`
+
+      return {
+        id: record.id,
+        displayName,
+        forecastType: record.forecast_type,
+        budget: record.budget,
+        costToComplete: record.cost_to_complete,
+        estimatedAtCompletion: record.estimated_at_completion,
+        variance: record.variance,
+        startDate: record.start_date,
+        endDate: record.end_date,
+        ...Object.fromEntries(
+          monthlyColumns.map((month) => [`month_${month.key}`, record.actual_remaining_forecast[month.key] || 0])
+        ),
+      }
+    })
+  }, [forecastData, monthlyColumns])
+
+  // Create column definitions for forecast grid
+  const forecastColumnDefs: ProtectedColDef[] = useMemo(() => {
+    const baseColumns: ProtectedColDef[] = [
+      createReadOnlyColumn("displayName", "Cost Code / CSI Division", {
+        width: 300,
+        pinned: "left",
+        cellStyle: { fontFamily: "monospace", fontWeight: "500", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("forecastType", "Type", {
+        width: 100,
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
+      }),
+      createReadOnlyColumn("budget", "Budget", {
+        width: 140,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500", fontSize: "10px" },
+      }),
+      createReadOnlyColumn("costToComplete", "Cost to Complete", {
+        width: 150,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
+      }),
+      createReadOnlyColumn("estimatedAtCompletion", "Est. at Completion", {
+        width: 160,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
+      }),
+      createReadOnlyColumn("variance", "Variance", {
+        width: 130,
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+        },
+        cellStyle: (params: any) => {
+          const value = params.value
+          const style: any = { fontFamily: "monospace", fontWeight: "bold", fontSize: "10px" }
+          if (typeof value === "number") {
+            style.color = value >= 0 ? "#16a34a" : "#dc2626"
+          }
+          return style
+        },
+      }),
+      createReadOnlyColumn("startDate", "Start Date", {
+        width: 120,
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
+      }),
+      createReadOnlyColumn("endDate", "End Date", {
+        width: 120,
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
+      }),
+    ]
+
+    // Add monthly columns
+    monthlyColumns.forEach((month) => {
+      baseColumns.push(
+        createReadOnlyColumn(`month_${month.key}`, month.label, {
+          width: 120,
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const value = params.value
+            return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+          },
+          cellStyle: { fontFamily: "monospace", fontSize: "9px" },
+        })
+      )
+    })
+
+    return baseColumns
+  }, [monthlyColumns])
+
+  // Custom totals calculator for forecast grid
+  const forecastTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+    if (columnField === "displayName") return "Totals"
+    if (["forecastType", "startDate", "endDate"].includes(columnField)) return ""
+
+    const values = data
+      .map((row) => {
+        const value = row[columnField]
+        return typeof value === "number" && !isNaN(value) ? value : 0
+      })
+      .filter((val) => typeof val === "number" && !isNaN(val))
+
+    if (values.length === 0) return 0
+    return values.reduce((sum, val) => sum + val, 0)
+  }
+
   const ViewToggle = () => (
     <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
       {[
@@ -482,6 +758,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
         { key: "inflow", label: "Inflows", icon: TrendingUp },
         { key: "outflow", label: "Outflows", icon: TrendingDown },
         { key: "forecast", label: "Forecast", icon: Calendar },
+        { key: "forecast-grid", label: "Forecast Grid", icon: FileText },
       ].map((item) => (
         <Button
           key={item.key}
@@ -657,6 +934,7 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                     theme: "quartz",
                     enableTotalsRow: true,
                     stickyColumnsCount: 2, // Pin first two columns (Pay App # and Month)
+                    rowHeight: 32, // Reduced row height for compact display
                   }}
                   events={{
                     onGridReady: (event) => {
@@ -1071,6 +1349,61 @@ export default function CashFlowAnalysis({ userRole, projectData }: CashFlowAnal
                 </CardContent>
               </Card>
             </div>
+          </div>
+        )
+
+      case "forecast-grid":
+        return (
+          <div className="space-y-6">
+            {/* Forecast Grid */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  Actual / Remaining Forecast Grid
+                </CardTitle>
+                <CardDescription>
+                  Read-only view of actual and remaining forecast values from GC & GR Forecast and Draw Forecast
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProtectedGrid
+                  title="Forecast Analysis Grid"
+                  columnDefs={forecastColumnDefs}
+                  rowData={forecastGridData}
+                  height="600px"
+                  config={{
+                    allowExport: true,
+                    allowImport: false,
+                    allowRowSelection: false,
+                    allowMultiSelection: false,
+                    allowColumnReordering: false,
+                    allowColumnResizing: true,
+                    allowSorting: true,
+                    allowFiltering: true,
+                    allowCellEditing: false,
+                    showToolbar: true,
+                    showStatusBar: true,
+                    enableRangeSelection: false,
+                    protectionEnabled: true,
+                    userRole: userRole,
+                    theme: "quartz",
+                    enableTotalsRow: true,
+                    stickyColumnsCount: 8, // Pin first 8 columns (Cost Code through End Date)
+                    rowHeight: 32, // Reduced row height for compact display
+                  }}
+                  events={{
+                    onGridReady: (event) => {
+                      // Auto-size columns to fit content
+                      event.api.autoSizeAllColumns()
+                    },
+                  }}
+                  enableSearch={true}
+                  totalsCalculator={forecastTotalsCalculator}
+                  className="border rounded-lg"
+                />
+              </CardContent>
+            </Card>
           </div>
         )
 

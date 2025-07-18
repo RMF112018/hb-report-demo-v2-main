@@ -21,7 +21,14 @@ HB Report Demo v3.0 features a sophisticated fluid navigation architecture desig
 The platform supports comprehensive role-based access control:
 
 ```typescript
-type UserRole = "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "presentation"
+type UserRole =
+  | "executive"
+  | "project-executive"
+  | "project-manager"
+  | "estimator"
+  | "admin"
+  | "presentation"
+  | "hr-payroll"
 ```
 
 Each role provides tailored dashboard experiences and access to specific tools and features.
@@ -88,6 +95,16 @@ Each role provides tailored dashboard experiences and access to specific tools a
 - **Help Desk Management**: Ticket tracking, priorities, and resolution metrics
 - **Security Operations**: SIEM integration, threat monitoring, and compliance
 - **Asset Management**: Hardware inventory, software licenses, and maintenance schedules
+
+#### HR & Payroll Manager Dashboard
+
+**Route**: `/main-app` (HR & Payroll Manager role)
+
+- **HR Overview**: Employee management, payroll status, and benefits tracking
+- **My Dashboard**: Personalized HR dashboard with key metrics and insights
+- **Activity Feed**: Recent HR activities and updates
+- **Employee Management**: Staff records, performance tracking, and compliance
+- **Payroll Processing**: Payroll status monitoring and processing workflows
 
 ## Core Features & Modules
 
@@ -207,7 +224,8 @@ Each role provides tailored dashboard experiences and access to specific tools a
 │   ├── Executive Dashboard (role: executive)
 │   ├── Project Executive Dashboard (role: project-executive)
 │   ├── Project Manager Dashboard (role: project-manager)
-│   └── Estimator Dashboard (role: estimator)
+│   ├── Estimator Dashboard (role: estimator)
+│   └── HR & Payroll Manager Dashboard (role: hr-payroll)
 ├── IT Command Center (/it-command-center)
 ├── Project Pages (/project/[projectId])
 │   ├── Core Project Tools

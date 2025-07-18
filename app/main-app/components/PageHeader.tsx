@@ -77,7 +77,9 @@ export interface PageHeaderProps {
   // Presentation mode
   isPresentationMode?: boolean
   viewingAs?: string | null
-  onRoleSwitch?: (role: "executive" | "project-executive" | "project-manager" | "estimator" | "admin") => void
+  onRoleSwitch?: (
+    role: "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "hr-payroll"
+  ) => void
   onReturnToPresentation?: () => void
 
   // Carousel controls
@@ -128,7 +130,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
   // Handle demo role selection
   const handleRoleSelection = (role: string) => {
-    onRoleSwitch?.(role as "executive" | "project-executive" | "project-manager" | "estimator" | "admin")
+    onRoleSwitch?.(role as "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "hr-payroll")
     setRoleSwitchPopoverOpen(false)
 
     // Trigger IT Command Center carousel for admin role with 2-second delay
@@ -153,6 +155,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     { id: "project-manager", label: "Project Manager" },
     { id: "estimator", label: "Estimator" },
     { id: "admin", label: "Admin" },
+    { id: "hr-payroll", label: "HR & Payroll Manager" },
   ]
 
   // Available carousels based on user role/presentation mode

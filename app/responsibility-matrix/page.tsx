@@ -265,46 +265,6 @@ export default function ResponsibilityMatrixPage() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Header Section - Made Sticky */}
-            <div className="sticky top-20 z-40 bg-white dark:bg-gray-950 border-b border-border/40 -mx-6 px-6 pb-4 backdrop-blur-sm">
-              <div className="flex flex-col gap-4 pt-3" data-tour="responsibility-matrix-page-header">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold text-foreground">Responsibility Matrix</h1>
-                    <p className="text-muted-foreground mt-1">
-                      Manage task assignments and accountability across project teams
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-                      Refresh
-                    </Button>
-                    <Button variant="outline" onClick={handleExport}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export
-                    </Button>
-                    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="bg-[#FF6B35] hover:bg-[#E55A2B]">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Task
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Add New Task</DialogTitle>
-                        </DialogHeader>
-                        <div className="p-4">
-                          <p className="text-muted-foreground">Task creation form would go here.</p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Main Content with Sidebar Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
               {/* Sidebar - Hidden on mobile, shown on xl+ */}

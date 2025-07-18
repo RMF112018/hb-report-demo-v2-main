@@ -32,6 +32,7 @@ import {
   Eye,
   Info,
 } from "lucide-react"
+import { FinalSummaryContent } from "@/components/estimating/FinalSummaryContent"
 import {
   ResponsiveContainer,
   FunnelChart as RechartsFunnelChart,
@@ -894,6 +895,64 @@ export function PipelineOverview({ pipelineData, summaryStats, userRole }: Pipel
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Final Summary Content */}
+        <div className={`space-y-${getSpacing()}`}>
+          <FinalSummaryContent
+            calculations={{
+              subtotal: 2500000,
+              gcTotal: 180000,
+              grTotal: 120000,
+              baseTotal: 2800000,
+              overhead: 224000,
+              profit: 280000,
+              contingency: 140000,
+              total: 3444000,
+              approvalProgress: 75,
+            }}
+            approvalSteps={[
+              {
+                id: "1",
+                title: "Estimator Review",
+                description: "Initial cost estimate validation",
+                status: "complete",
+                approver: "John Smith",
+                required: true,
+              },
+              {
+                id: "2",
+                title: "Project Manager Review",
+                description: "Scope and timeline validation",
+                status: "complete",
+                approver: "Sarah Johnson",
+                required: true,
+              },
+              {
+                id: "3",
+                title: "Senior Management Review",
+                description: "Final approval and sign-off",
+                status: "pending",
+                approver: "Mike Davis",
+                required: true,
+              },
+              {
+                id: "4",
+                title: "Client Submission",
+                description: "Submit to client for review",
+                status: "pending",
+                approver: "Client Team",
+                required: true,
+              },
+            ]}
+            isSubmitting={false}
+            onSubmit={() => {
+              console.log("Submit for client review")
+            }}
+            onApprovalStep={(stepId, action) => {
+              console.log(`Approval step ${stepId}: ${action}`)
+            }}
+          />
         </div>
       </div>
     </>

@@ -383,6 +383,11 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
     }
   }, [selectedSubTool, updatePackage, aiInsights, filteredActivities, onSidebarContentChange, projectData, projectId])
 
+  // Handle redirect to Bryntum Gantt baselines example
+  const handleProjectScheduleRedirect = () => {
+    window.open("https://bryntum.com/products/gantt/examples/baselines/", "_blank")
+  }
+
   const renderContent = () => {
     if (!selectedSubTool || selectedSubTool === "overview") {
       return <SchedulerOverview userRole={userRole} projectData={projectData} />
@@ -390,6 +395,8 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
 
     switch (selectedSubTool) {
       case "project-schedule":
+        // Redirect to Bryntum Gantt baselines example
+        handleProjectScheduleRedirect()
         return <ProjectSchedule userRole={userRole} projectData={projectData} projectId={projectId || ""} />
       case "update":
         return (

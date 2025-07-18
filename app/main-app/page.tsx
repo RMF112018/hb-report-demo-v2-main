@@ -47,6 +47,8 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
@@ -228,6 +230,9 @@ export default function MainApplicationPage() {
   const [showComplianceCarousel, setShowComplianceCarousel] = useState(false)
   const [showITCommandCenterCarousel, setShowITCommandCenterCarousel] = useState(false)
   const [showProjectPageCarousel, setShowProjectPageCarousel] = useState(false)
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false)
+  const [leftPanelWidth, setLeftPanelWidth] = useState(320) // Default width in pixels
+  const [isResizing, setIsResizing] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -354,6 +359,50 @@ export default function MainApplicationPage() {
     setSidebarWidth(totalWidth)
   }
 
+  // Handle left panel resize
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+    document.body.style.cursor = "col-resize"
+    document.body.style.userSelect = "none"
+  }
+
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!isResizing) return
+
+    const newWidth = e.clientX - (isMobile ? 0 : sidebarWidth)
+    const minWidth = 200
+    const maxWidth = 600
+
+    if (newWidth >= minWidth && newWidth <= maxWidth) {
+      setLeftPanelWidth(newWidth)
+    }
+  }
+
+  const handleResizeEnd = () => {
+    setIsResizing(false)
+    document.body.style.cursor = ""
+    document.body.style.userSelect = ""
+  }
+
+  // Add global mouse event listeners for resize
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener("mousemove", handleResizeMove)
+      document.addEventListener("mouseup", handleResizeEnd)
+
+      return () => {
+        document.removeEventListener("mousemove", handleResizeMove)
+        document.removeEventListener("mouseup", handleResizeEnd)
+      }
+    }
+  }, [isResizing])
+
+  // Toggle left panel collapse
+  const toggleLeftPanel = () => {
+    setIsLeftPanelCollapsed(!isLeftPanelCollapsed)
+  }
+
   // Determine user role
   const userRole = useMemo((): UserRole => {
     if (!user?.role) return "viewer"
@@ -372,6 +421,8 @@ export default function MainApplicationPage() {
         return "admin"
       case "presentation":
         return "presentation"
+      case "hr-payroll":
+        return "hr-payroll"
       default:
         return "team-member"
     }
@@ -732,6 +783,18 @@ export default function MainApplicationPage() {
             { id: "table", label: "Table" },
             { id: "analytics", label: "Analytics" },
           ]
+        case "HR & Payroll":
+          return [
+            { id: "personnel", label: "Personnel" },
+            { id: "recruiting", label: "Recruiting" },
+            { id: "timesheets", label: "Timesheets" },
+            { id: "expenses", label: "Expenses" },
+            { id: "payroll", label: "Payroll" },
+            { id: "benefits", label: "Benefits" },
+            { id: "training", label: "Training" },
+            { id: "compliance", label: "Compliance" },
+            { id: "settings", label: "Settings" },
+          ]
         default:
           return [
             { id: "overview", label: "Overview" },
@@ -816,6 +879,12 @@ export default function MainApplicationPage() {
         { id: "my-dashboard", label: "My Dashboard" },
         { id: "activity-feed", label: "Activity Feed" },
       ]
+    } else if (effectiveRole === "hr-payroll") {
+      return [
+        { id: "hr-overview", label: "HR Overview" },
+        { id: "my-dashboard", label: "My Dashboard" },
+        { id: "activity-feed", label: "Activity Feed" },
+      ]
     } else {
       // Default for other roles (estimator, etc.)
       return [
@@ -851,6 +920,8 @@ export default function MainApplicationPage() {
         setActiveTab("action-items")
       } else if (userRole === "estimator") {
         setActiveTab("bid-management")
+      } else if (userRole === "hr-payroll") {
+        setActiveTab("hr-overview")
       } else {
         setActiveTab("overview")
       }
@@ -884,6 +955,9 @@ export default function MainApplicationPage() {
       } else if (selectedTool === "estimating") {
         // Set default tab for estimating tool
         setActiveTab("cost-summary")
+      } else if (selectedTool === "HR & Payroll") {
+        // Set default tab for HR & Payroll tool
+        setActiveTab("personnel")
       } else {
         setActiveTab("overview")
       }
@@ -1019,7 +1093,13 @@ export default function MainApplicationPage() {
         setSelectedProject(null)
         setSelectedModule(null)
         setSelectedTool(toolName)
-        setActiveTab(toolName === "staffing" ? "portfolio" : "overview")
+        if (toolName === "Staffing") {
+          setActiveTab("portfolio")
+        } else if (toolName === "HR & Payroll") {
+          setActiveTab("personnel")
+        } else {
+          setActiveTab("overview")
+        }
         localStorage.removeItem("selectedProject")
         localStorage.removeItem("selectedModule")
         localStorage.setItem("selectedTool", toolName)
@@ -1118,11 +1198,13 @@ export default function MainApplicationPage() {
     const dashboardSubHead =
       userRole === "admin"
         ? "IT administration dashboard with system overview and module access"
+        : userRole === "hr-payroll"
+        ? "HR & Payroll Management Dashboard"
         : `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} dashboard with personalized insights`
 
     return {
       userName,
-      moduleTitle: dashboardTitle,
+      moduleTitle: userRole === "hr-payroll" ? "HR & Payroll Management Dashboard" : dashboardTitle,
       subHead: dashboardSubHead,
       tabs: getTabsForContent(),
       navigationState,
@@ -1140,6 +1222,11 @@ export default function MainApplicationPage() {
     // Project Manager: All dashboard views
     if (role === "project-manager") {
       return true
+    }
+
+    // HR & Payroll Manager: No left panel for any dashboard views
+    if (role === "hr-payroll") {
+      return false
     }
 
     // Estimator: Only Pre-Con Overview and Activity Feed views
@@ -1339,18 +1426,53 @@ export default function MainApplicationPage() {
         }}
       >
         {/* Main Content Container - 2 Column Layout */}
-        <div className="flex-1 flex overflow-hidden min-w-0 max-w-full">
+        <div className="flex-1 flex overflow-hidden min-w-0 max-w-full relative">
           {/* Left Column - 20% width (hidden if no content) */}
-          {contentConfig.hasLeftContent && (
-            <div className="w-1/5 border-r border-gray-200 dark:border-gray-800 overflow-y-scroll overflow-x-hidden bg-gray-50/20 dark:bg-gray-900/20 scrollbar-hide min-w-0 max-w-full">
+          {contentConfig.hasLeftContent && !isLeftPanelCollapsed && (
+            <div
+              className="relative border-r border-gray-200 dark:border-gray-800 overflow-y-scroll overflow-x-hidden bg-gray-50/20 dark:bg-gray-900/20 scrollbar-hide min-w-0 max-w-full"
+              style={{ width: `${leftPanelWidth}px` }}
+            >
               <div className="p-4 space-y-1 min-w-0 max-w-full overflow-hidden">{contentConfig.leftContent}</div>
+
+              {/* Resize Handle */}
+              <div
+                className="absolute top-0 right-0 w-1 h-full cursor-col-resize bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                onMouseDown={handleResizeStart}
+              />
+            </div>
+          )}
+
+          {/* Collapsed Left Panel Indicator */}
+          {contentConfig.hasLeftContent && isLeftPanelCollapsed && (
+            <div className="relative w-8 border-r border-gray-200 dark:border-gray-800 bg-gray-50/20 dark:bg-gray-900/20"></div>
+          )}
+
+          {/* Control Buttons - Positioned over main content area */}
+          {contentConfig.hasLeftContent && (
+            <div className="absolute left-0 top-4 z-20 flex flex-col gap-2">
+              {/* Collapse/Expand Toggle Button */}
+              <button
+                onClick={toggleLeftPanel}
+                className="w-6 h-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center"
+                title={isLeftPanelCollapsed ? "Expand left panel" : "Collapse left panel"}
+                style={{
+                  left: isLeftPanelCollapsed ? "8px" : `${leftPanelWidth - 12}px`,
+                }}
+              >
+                {isLeftPanelCollapsed ? (
+                  <ChevronRight className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                ) : (
+                  <ChevronLeft className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                )}
+              </button>
             </div>
           )}
 
           {/* Right Column - 80% width (100% if no left content) */}
           <div
             className={`${
-              contentConfig.hasLeftContent ? "w-4/5" : "w-full"
+              contentConfig.hasLeftContent && !isLeftPanelCollapsed ? "flex-1" : "w-full"
             } overflow-hidden min-w-0 max-w-full flex-shrink bg-white dark:bg-gray-950 flex flex-col scrollbar-hide`}
           >
             <div className="flex-1 p-4 min-w-0 w-full max-w-full overflow-y-auto overflow-x-hidden flex flex-col">

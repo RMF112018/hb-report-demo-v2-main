@@ -1,6 +1,87 @@
 "use client"
 
 import React, { useState, useEffect, useMemo } from "react"
+
+// Compact grid styling
+const compactGridStyles = `
+  .compact-grid .ag-root-wrapper {
+    font-size: 12px;
+  }
+  
+  .compact-grid .ag-header-cell {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 8px 12px;
+    height: 40px;
+  }
+  
+  .compact-grid .ag-cell {
+    font-size: 12px;
+    padding: 6px 12px;
+    height: 48px;
+    line-height: 1.4;
+  }
+  
+  .compact-grid .ag-row {
+    height: 48px;
+  }
+  
+  .compact-grid .ag-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  .compact-grid .ag-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .compact-grid .ag-header-cell-resize {
+    background-color: #dee2e6;
+  }
+  
+  .compact-grid .ag-cell-wrapper {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .compact-grid .ag-cell-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Dark mode specific styling */
+  .dark .compact-grid .ag-header {
+    background-color: #1f2937;
+    border-bottom: 1px solid #374151;
+  }
+  
+  .dark .compact-grid .ag-header-cell {
+    color: #f9fafb;
+    background-color: #1f2937;
+  }
+  
+  .dark .compact-grid .ag-header-cell-label {
+    color: #f9fafb;
+  }
+  
+  .dark .compact-grid .ag-header-cell-text {
+    color: #f9fafb;
+  }
+  
+  .dark .compact-grid .ag-header-cell-resize {
+    background-color: #4b5563;
+  }
+  
+  .dark .compact-grid .ag-row:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+  
+  .dark .compact-grid .ag-cell {
+    color: #f9fafb;
+  }
+`
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +90,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
-import { ProtectedGrid, ProtectedColDef, GridRow, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
+import {
+  ProtectedGrid,
+  ProtectedColDef,
+  GridRow,
+  createGridWithTotalsAndSticky,
+  createReadOnlyColumn,
+} from "@/components/ui/protected-grid"
 import {
   Building2,
   Search,
@@ -397,183 +484,138 @@ export function ProcurementCommitmentsTable({
     filteredCommitments.reduce((sum, commitment) => sum + commitment.completionPercent, 0) /
       filteredCommitments.length || 0
 
-  // Transform commitments data for the grid
+  // Transform commitments data for the grid - matching BuyoutV2.js structure
   const transformedCommitments = useMemo(() => {
     return filteredCommitments.map((commitment) => ({
-      id: commitment.id,
-      commitment_info: commitment.title,
-      vendor_name: commitment.vendor.name,
-      commitment_number: commitment.number,
-      trade: commitment.trade,
-      status: commitment.status,
-      contract_amount: commitment.contractAmount,
-      original_amount: commitment.originalAmount,
-      variance: commitment.variance,
-      variance_percent: commitment.variancePercent,
-      completion_percent: commitment.completionPercent,
-      sync_status: commitment.procoreSyncStatus,
+      id: commitment.id, // Required field for GridRow
       procore_id: commitment.procoreId,
-      start_date: commitment.startDate,
-      end_date: commitment.endDate,
-      vendor_contact: commitment.vendor.contact,
-      vendor_phone: commitment.vendor.phone,
-      change_orders: commitment.changeOrders,
-      current_balance: commitment.currentBalance,
-      bond_required: commitment.bondRequired,
-      insurance_verified: commitment.insuranceVerified,
-      last_sync_date: commitment.lastSyncDate,
+      division_description: commitment.trade,
+      title: commitment.title,
+      number: commitment.number,
+      vendor: commitment.vendor.name,
+      status: commitment.status,
+      bic: "N/A", // Default BIC value
+      contract_start_date: commitment.startDate,
+      grand_total: commitment.contractAmount,
+      budget: commitment.originalAmount,
+      allowances: 0, // Default allowances value
+      savings_loss: commitment.variance,
+      ownerApproval: commitment.status === "executed" ? "Approved" : "Pending",
+      signed_contract_received_date: commitment.status === "executed" ? commitment.endDate : null,
+      comments: "", // Default comments
       _originalData: commitment, // Keep reference to original data
     }))
   }, [filteredCommitments])
 
-  // Define column definitions for the grid
+  // Define column definitions for the grid - matching BuyoutV2.js structure
   const columnDefs: ProtectedColDef[] = useMemo(
     () => [
-      {
-        field: "commitment_info",
-        headerName: "Commitment / Vendor",
-        width: 280,
-        cellRenderer: (params: any) => {
-          const commitment = params.data._originalData
-          return (
-            <div className="cursor-pointer py-1" onClick={() => handleCommitmentClick(commitment)}>
-              <div className="font-medium text-sm leading-tight">{commitment.title}</div>
-              <div className="text-xs text-gray-500 mt-1">{commitment.vendor.name}</div>
-              <div className="text-xs text-gray-400 mt-0.5">{commitment.number}</div>
-            </div>
-          )
-        },
-        pinned: "left",
-      },
-      {
-        field: "trade",
-        headerName: "Trade",
-        width: 120,
-        cellRenderer: (params: any) => (
-          <Badge variant="outline" className="text-xs">
-            {params.value}
-          </Badge>
-        ),
-      },
-      {
-        field: "status",
-        headerName: "Status",
-        width: 120,
+      createReadOnlyColumn("division_description", "Division", {
+        width: 200,
+        cellStyle: { fontWeight: "bold" },
+      }),
+      createReadOnlyColumn("title", "Commitment", {
+        width: 200,
+        cellStyle: { fontWeight: "bold" },
+      }),
+      createReadOnlyColumn("number", "Commitment #", {
+        width: 150,
+      }),
+      createReadOnlyColumn("vendor", "Vendor", {
+        width: 200,
+      }),
+      createReadOnlyColumn("status", "Status", {
+        width: 180,
         cellRenderer: (params: any) => {
           const statusConfig: { [key: string]: { color: string; label: string } } = {
-            draft: { color: "bg-gray-100 text-gray-800 border-gray-200", label: "Draft" },
-            pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending" },
-            approved: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "Approved" },
-            executed: { color: "bg-green-100 text-green-800 border-green-200", label: "Executed" },
-            complete: { color: "bg-purple-100 text-purple-800 border-purple-200", label: "Complete" },
-            cancelled: { color: "bg-red-100 text-red-800 border-red-200", label: "Cancelled" },
+            Pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending" },
+            "In Progress": { color: "bg-blue-100 text-blue-800 border-blue-200", label: "In Progress" },
+            "LOI Sent": { color: "bg-orange-100 text-orange-800 border-orange-200", label: "LOI Sent" },
+            "Contract Sent": { color: "bg-purple-100 text-purple-800 border-purple-200", label: "Contract Sent" },
+            "Contract Executed": {
+              color: "bg-green-100 text-green-800 border-green-200",
+              label: "Contract Executed",
+            },
+            "On Hold": { color: "bg-red-100 text-red-800 border-red-200", label: "On Hold" },
           }
-          const config = statusConfig[params.value] || statusConfig.draft
+          const config = statusConfig[params.value] || statusConfig["Pending"]
           return (
             <Badge variant="outline" className={`${config.color} text-xs`}>
               {config.label}
             </Badge>
           )
         },
-      },
-      {
-        field: "contract_amount",
-        headerName: "Contract Amount",
-        width: 140,
-        type: "numericColumn",
-        cellRenderer: (params: any) => {
-          const commitment = params.data._originalData
-          return (
-            <div className="text-right">
-              <div className="font-medium text-sm">{formatCurrency(commitment.contractAmount)}</div>
-              {commitment.originalAmount !== commitment.contractAmount && (
-                <div className="text-xs text-gray-500">Original: {formatCurrency(commitment.originalAmount)}</div>
-              )}
-            </div>
-          )
-        },
-      },
-      {
-        field: "variance",
-        headerName: "Variance",
-        width: 120,
-        type: "numericColumn",
-        cellRenderer: (params: any) => {
-          const commitment = params.data._originalData
-          const varianceColor =
-            commitment.variance === 0 ? "text-gray-600" : commitment.variance > 0 ? "text-red-600" : "text-green-600"
-          const varianceIcon =
-            commitment.variance === 0 ? null : commitment.variance > 0 ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
-            )
-
-          return (
-            <div className="text-right">
-              <div className={`flex items-center justify-end gap-1 ${varianceColor}`}>
-                {varianceIcon}
-                <span className="font-medium text-sm">
-                  {commitment.variance > 0 ? "+" : ""}
-                  {formatCurrency(commitment.variance)}
-                </span>
-              </div>
-              <div className="text-xs text-gray-500">
-                {commitment.variancePercent > 0 ? "+" : ""}
-                {commitment.variancePercent.toFixed(1)}%
-              </div>
-            </div>
-          )
-        },
-      },
-      {
-        field: "completion_percent",
-        headerName: "Completion",
+      }),
+      createReadOnlyColumn("bic", "BIC", {
         width: 120,
         cellRenderer: (params: any) => {
-          const commitment = params.data._originalData
-          return (
-            <div className="px-2">
-              <Progress value={commitment.completionPercent} className="h-2 mb-1" />
-              <div className="text-xs text-center">{commitment.completionPercent}%</div>
-            </div>
-          )
-        },
-      },
-      {
-        field: "sync_status",
-        headerName: "Sync Status",
-        width: 120,
-        cellRenderer: (params: any) => {
-          const syncConfig: { [key: string]: { color: string; label: string; icon: React.ReactNode } } = {
-            synced: {
-              color: "bg-green-100 text-green-800 border-green-200",
-              label: "Synced",
-              icon: <CheckCircle className="h-3 w-3" />,
-            },
-            pending: {
-              color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-              label: "Pending",
-              icon: <Clock className="h-3 w-3" />,
-            },
-            error: {
-              color: "bg-red-100 text-red-800 border-red-200",
-              label: "Error",
-              icon: <AlertTriangle className="h-3 w-3" />,
-            },
+          const bicConfig: { [key: string]: { color: string; label: string } } = {
+            HB: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "HB" },
+            Vendor: { color: "bg-green-100 text-green-800 border-green-200", label: "Vendor" },
+            Owner: { color: "bg-purple-100 text-purple-800 border-purple-200", label: "Owner" },
+            "N/A": { color: "bg-gray-100 text-gray-800 border-gray-200", label: "N/A" },
           }
-          const config = syncConfig[params.value] || syncConfig.pending
+          const config = bicConfig[params.value] || bicConfig["N/A"]
           return (
             <Badge variant="outline" className={`${config.color} text-xs`}>
-              {config.icon}
-              <span className="ml-1">{config.label}</span>
+              {config.label}
             </Badge>
           )
         },
-      },
-      {
-        field: "actions",
-        headerName: "Actions",
+      }),
+      createReadOnlyColumn("contract_start_date", "Scope Start", {
+        width: 150,
+        cellRenderer: (params: any) => {
+          if (!params.value) return ""
+          const date = new Date(params.value)
+          return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
+        },
+      }),
+      createReadOnlyColumn("grand_total", "Contract Amount", {
+        width: 160,
+        cellRenderer: (params: any) => {
+          const value = parseFloat(params.value || 0)
+          return value.toLocaleString("en-US", { style: "currency", currency: "USD" })
+        },
+      }),
+      createReadOnlyColumn("budget", "Budget", {
+        width: 160,
+        cellRenderer: (params: any) => {
+          const value = parseFloat(params.value || 0)
+          return value.toLocaleString("en-US", { style: "currency", currency: "USD" })
+        },
+      }),
+      createReadOnlyColumn("allowances", "Allowances", {
+        width: 160,
+        cellRenderer: (params: any) => {
+          const value = parseFloat(params.value || 0)
+          return value.toLocaleString("en-US", { style: "currency", currency: "USD" })
+        },
+      }),
+      createReadOnlyColumn("savings_loss", "Savings / Loss", {
+        width: 160,
+        cellRenderer: (params: any) => {
+          const value = parseFloat(params.value || 0)
+          const formattedValue = value.toLocaleString("en-US", { style: "currency", currency: "USD" })
+          const color = value > 0 ? "text-green-600" : value < 0 ? "text-red-600" : "text-gray-600"
+          return <span className={color}>{formattedValue}</span>
+        },
+      }),
+      createReadOnlyColumn("ownerApproval", "Owner Approval", {
+        width: 150,
+      }),
+      createReadOnlyColumn("signed_contract_received_date", "Contract Executed", {
+        width: 150,
+        cellRenderer: (params: any) => {
+          if (!params.value) return ""
+          const date = new Date(params.value)
+          return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
+        },
+      }),
+      createReadOnlyColumn("comments", "Comments", {
+        width: 200,
+      }),
+      createReadOnlyColumn("actions", "Actions", {
         width: 120,
         cellRenderer: (params: any) => {
           const commitment = params.data._originalData
@@ -598,12 +640,12 @@ export function ProcurementCommitmentsTable({
         pinned: "right",
         sortable: false,
         filter: false,
-      },
+      }),
     ],
     [handleCommitmentClick, onCommitmentEdit]
   )
 
-  // Grid configuration
+  // Grid configuration with consistent styling
   const gridConfig = createGridWithTotalsAndSticky(2, false, {
     allowExport: true,
     allowRowSelection: true,
@@ -643,6 +685,9 @@ export function ProcurementCommitmentsTable({
 
   return (
     <div className="space-y-6">
+      {/* Inject compact grid styles */}
+      <style dangerouslySetInnerHTML={{ __html: compactGridStyles }} />
+
       {/* Summary Stats */}
       {!compactMode && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -700,93 +745,7 @@ export function ProcurementCommitmentsTable({
 
       {/* Commitments Grid */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle className="flex items-center gap-2">
-              <Link className="h-5 w-5 text-[#FF6B35]" />
-              Procore Commitments
-              <Badge variant="outline" className="ml-2">
-                <Zap className="h-3 w-3 mr-1" />
-                Live Sync
-              </Badge>
-            </CardTitle>
-
-            <div className="flex items-center gap-2">
-              {selectedCommitments.length > 0 && (
-                <Select onValueChange={handleBulkAction}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Bulk actions" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sync">Sync Selected</SelectItem>
-                    <SelectItem value="export">Export Selected</SelectItem>
-                    <SelectItem value="update">Update Status</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-
-              <Button variant="outline" size="sm" onClick={handleSync} disabled={syncStatus === "syncing"}>
-                {syncStatus === "syncing" ? (
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                )}
-                Sync Procore
-              </Button>
-
-              <Button size="sm" className="bg-[#FF6B35] hover:bg-[#E55A2B]">
-                <Plus className="h-4 w-4 mr-2" />
-                New Commitment
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
         <CardContent>
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search commitments, vendors, or trades..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="executed">Executed</SelectItem>
-                <SelectItem value="complete">Complete</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={tradeFilter} onValueChange={setTradeFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by trade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Trades</SelectItem>
-                {getUniqueValues("trade").map((trade) => (
-                  <SelectItem key={trade} value={trade}>
-                    {trade}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button variant="outline" size="icon">
-              <Download className="h-4 w-4" />
-            </Button>
-          </div>
-
           {/* Protected Grid */}
           <div className="min-w-0 max-w-full overflow-hidden">
             <ProtectedGrid
@@ -803,6 +762,7 @@ export function ProcurementCommitmentsTable({
               loading={loading}
               enableSearch={false} // We handle search externally
               title=""
+              className="compact-grid"
             />
           </div>
 

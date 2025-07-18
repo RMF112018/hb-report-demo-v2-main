@@ -255,7 +255,9 @@ export const TeamsProductivityContent: React.FC<TeamsProductivityContentProps> =
                     <Users className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-blue-900 dark:text-blue-100">{currentTeam.displayName}</h3>
+                    <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                      {projectData?.name || currentTeam.displayName}
+                    </h3>
                     <p className="text-sm text-blue-600 dark:text-blue-300">
                       {members.length} members • {channels.length} channels • {plans.length} plans
                     </p>

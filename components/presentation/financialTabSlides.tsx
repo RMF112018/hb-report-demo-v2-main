@@ -113,7 +113,7 @@ export const financialTabSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Financial Management</strong> ensures unbroken financial continuity by unifying{" "}
+            <strong>Our Financial Management</strong> ensures unbroken financial continuity by unifying{" "}
             <strong>budget tracking, cash flow visibility, and intelligent forecasting</strong> across the entire
             project lifecycle, replacing fragmented workflows that create gaps in financial oversight.
           </motion.p>
@@ -174,18 +174,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-green-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Budget Analysis</strong> maintains continuous financial oversight with{" "}
+            <strong>Our Budget Analysis</strong> maintains continuous financial oversight with{" "}
             <strong>real-time variance insights, cost breakdowns, and automated threshold alerts</strong>, ensuring
             budget continuity and early identification of issues before they disrupt project flow.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-green-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -203,19 +203,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
               <div className="font-medium text-white">Real-Time Variance</div>
-              <div className="text-xs text-green-200">Instant budget vs actual analysis with trend indicators</div>
+              <div className="text-xs text-blue-200">Instant budget vs actual analysis with trend indicators</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔍</div>
               <div className="font-medium text-white">Cost Code Breakdown</div>
-              <div className="text-xs text-green-200">Detailed cost analysis by trade and work category</div>
+              <div className="text-xs text-blue-200">Detailed cost analysis by trade and work category</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚠️</div>
               <div className="font-medium text-white">Proactive Alerts</div>
-              <div className="text-xs text-green-200">Automated notifications for budget threshold breaches</div>
+              <div className="text-xs text-blue-200">Automated notifications for budget threshold breaches</div>
             </div>
           </motion.div>
         </div>
@@ -233,18 +233,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-purple-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Job Cost History Report</strong> creates continuous cost intelligence through{" "}
+            <strong>Our Job Cost History Report</strong> creates continuous cost intelligence through{" "}
             <strong>detailed cost breakdowns, productivity metrics, and historical comparisons</strong>—maintaining
             institutional knowledge continuity that informs future bids and optimizes resource allocation.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-purple-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -263,19 +263,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💼</div>
               <div className="font-medium text-white">Complete Cost Breakdown</div>
-              <div className="text-xs text-purple-200">Detailed analysis of labor, materials, and overhead costs</div>
+              <div className="text-xs text-blue-200">Detailed analysis of labor, materials, and overhead costs</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Productivity Analysis</div>
-              <div className="text-xs text-purple-200">Labor efficiency tracking and performance metrics</div>
+              <div className="text-xs text-blue-200">Labor efficiency tracking and performance metrics</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔍</div>
               <div className="font-medium text-white">Historical Comparisons</div>
-              <div className="text-xs text-purple-200">Cost benchmarking against similar projects and phases</div>
+              <div className="text-xs text-blue-200">Cost benchmarking against similar projects and phases</div>
             </div>
           </motion.div>
         </div>
@@ -293,18 +293,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-red-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>AR Aging Analysis</strong> ensures continuous receivables oversight with{" "}
+            <strong>Our AR Aging Analysis</strong> ensures continuous receivables oversight with{" "}
             <strong>live aging buckets, smart collection prioritization, and cash impact metrics</strong>—maintaining
             cash flow continuity and preventing payment gaps that disrupt operations.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-red-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -322,19 +322,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🕐</div>
               <div className="font-medium text-white">Automated Aging</div>
-              <div className="text-xs text-red-200">Real-time aging buckets with automated categorization</div>
+              <div className="text-xs text-blue-200">Real-time aging buckets with automated categorization</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Collection Priority</div>
-              <div className="text-xs text-red-200">Intelligent ranking based on amount, age, and impact</div>
+              <div className="text-xs text-blue-200">Intelligent ranking based on amount, age, and impact</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💰</div>
               <div className="font-medium text-white">Cash Flow Impact</div>
-              <div className="text-xs text-red-200">Analysis of AR impact on project cash flow and liquidity</div>
+              <div className="text-xs text-blue-200">Analysis of AR impact on project cash flow and liquidity</div>
             </div>
           </motion.div>
         </div>
@@ -352,18 +352,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-orange-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Cash Flow Management</strong> maintains continuous financial visibility through{" "}
+            <strong>Our Cash Flow Management</strong> maintains continuous financial visibility through{" "}
             <strong>real-time monitoring, predictive forecasting, and liquidity analysis</strong>—ensuring cash flow
             continuity across all projects and eliminating funding surprises.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-orange-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -382,21 +382,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Real-Time Position</div>
-              <div className="text-xs text-orange-200">Live cash position with incoming and outgoing flows</div>
+              <div className="text-xs text-blue-200">Live cash position with incoming and outgoing flows</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔮</div>
               <div className="font-medium text-white">Automated Forecasting</div>
-              <div className="text-xs text-orange-200">
-                Intelligent cash flow predictions based on project schedules
-              </div>
+              <div className="text-xs text-blue-200">Intelligent cash flow predictions based on project schedules</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💧</div>
               <div className="font-medium text-white">Liquidity Analysis</div>
-              <div className="text-xs text-orange-200">Working capital optimization and cash availability tracking</div>
+              <div className="text-xs text-blue-200">Working capital optimization and cash availability tracking</div>
             </div>
           </motion.div>
         </div>
@@ -414,18 +412,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-indigo-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>HBI Forecasting</strong> creates continuous intelligence by empowering users with{" "}
+            <strong>Our HBI Forecasting</strong> creates continuous intelligence by empowering users with{" "}
             <strong>AI-driven analysis, market data, and historical benchmarks</strong> that evolve with every project,
             maintaining forecasting continuity that improves accuracy over time.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-indigo-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -444,21 +442,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🤖</div>
               <div className="font-medium text-white">HBI Intelligence</div>
-              <div className="text-xs text-indigo-200">AI-powered analysis to help users evaluate forecast quality</div>
+              <div className="text-xs text-blue-200">AI-powered analysis to help users evaluate forecast quality</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
               <div className="font-medium text-white">Data-Driven Insights</div>
-              <div className="text-xs text-indigo-200">Comprehensive analytics to support user decision-making</div>
+              <div className="text-xs text-blue-200">Comprehensive analytics to support user decision-making</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🎯</div>
               <div className="font-medium text-white">Review Assistance</div>
-              <div className="text-xs text-indigo-200">
-                Intelligent tools to help users grade and validate forecasts
-              </div>
+              <div className="text-xs text-blue-200">Intelligent tools to help users grade and validate forecasts</div>
             </div>
           </motion.div>
         </div>
@@ -476,18 +472,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-yellow-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Change Management</strong> preserves project continuity through{" "}
+            <strong>Our Change Management</strong> preserves project continuity through{" "}
             <strong>automated tracking, smart approvals, and real-time impact analysis</strong>—ensuring changes enhance
             rather than disrupt financial continuity and project flow.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-yellow-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -505,19 +501,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Automated Tracking</div>
-              <div className="text-xs text-yellow-200">Complete change order lifecycle management</div>
+              <div className="text-xs text-blue-200">Complete change order lifecycle management</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">✅</div>
               <div className="font-medium text-white">Approval Workflows</div>
-              <div className="text-xs text-yellow-200">Intelligent routing based on change value and type</div>
+              <div className="text-xs text-blue-200">Intelligent routing based on change value and type</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💰</div>
               <div className="font-medium text-white">Budget Impact</div>
-              <div className="text-xs text-yellow-200">Real-time analysis of change order financial impact</div>
+              <div className="text-xs text-blue-200">Real-time analysis of change order financial impact</div>
             </div>
           </motion.div>
         </div>
@@ -535,18 +531,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-teal-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Payment Authorization</strong> ensures continuous payment flow through{" "}
+            <strong>Our Payment Authorization</strong> ensures continuous payment flow through{" "}
             <strong>automated routing, compliance checks, and live tracking</strong>—maintaining vendor relationship
             continuity and project momentum.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-teal-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -565,19 +561,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Automated Workflows</div>
-              <div className="text-xs text-teal-200">Intelligent routing based on payment type and amount</div>
+              <div className="text-xs text-blue-200">Intelligent routing based on payment type and amount</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">✅</div>
               <div className="font-medium text-white">Compliance Validation</div>
-              <div className="text-xs text-teal-200">Automated checks for insurance, licensing, and documentation</div>
+              <div className="text-xs text-blue-200">Automated checks for insurance, licensing, and documentation</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Real-Time Tracking</div>
-              <div className="text-xs text-teal-200">Complete payment lifecycle visibility and status updates</div>
+              <div className="text-xs text-blue-200">Complete payment lifecycle visibility and status updates</div>
             </div>
           </motion.div>
         </div>
@@ -595,18 +591,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-pink-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Pay Applications</strong> maintain continuous billing flow by automating G702/G703 generation,
+            <strong>Our Pay Applications</strong> maintain continuous billing flow by automating G702/G703 generation,
             aligning billing with progress, and <strong>managing retention within unified workflows</strong> that
             preserve revenue continuity.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-pink-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -624,19 +620,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📋</div>
               <div className="font-medium text-white">AIA Form Generation</div>
-              <div className="text-xs text-pink-200">Automated G702/G703 creation with progress integration</div>
+              <div className="text-xs text-blue-200">Automated G702/G703 creation with progress integration</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📈</div>
               <div className="font-medium text-white">Progress Tracking</div>
-              <div className="text-xs text-pink-200">Real-time completion percentage and milestone tracking</div>
+              <div className="text-xs text-blue-200">Real-time completion percentage and milestone tracking</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💰</div>
               <div className="font-medium text-white">Retention Management</div>
-              <div className="text-xs text-pink-200">Automated retention calculations and release tracking</div>
+              <div className="text-xs text-blue-200">Automated retention calculations and release tracking</div>
             </div>
           </motion.div>
         </div>
@@ -654,18 +650,18 @@ export const financialTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-cyan-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Retention Management</strong> ensures continuous financial oversight through{" "}
+            <strong>Our Retention Management</strong> ensures continuous financial oversight through{" "}
             <strong>automated calculations, release schedules, and warranty period tracking</strong>—maintaining
             retention continuity from construction completion through final warranty closeout.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-cyan-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -684,19 +680,19 @@ export const financialTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔢</div>
               <div className="font-medium text-white">Automated Calculations</div>
-              <div className="text-xs text-cyan-200">Intelligent retention percentage and amount tracking</div>
+              <div className="text-xs text-blue-200">Intelligent retention percentage and amount tracking</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Release Scheduling</div>
-              <div className="text-xs text-cyan-200">Automated alerts for retention release opportunities</div>
+              <div className="text-xs text-blue-200">Automated alerts for retention release opportunities</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🛡️</div>
               <div className="font-medium text-white">Warranty Monitoring</div>
-              <div className="text-xs text-cyan-200">Warranty period tracking and expiration notifications</div>
+              <div className="text-xs text-blue-200">Warranty period tracking and expiration notifications</div>
             </div>
           </motion.div>
         </div>

@@ -300,21 +300,24 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
       </div>
 
       {/* Header with Logo, Progress, and Exit */}
-      <motion.header className="absolute top-0 left-0 right-0 z-20 p-6 lg:p-8" variants={contentVariants}>
+      <motion.header className="absolute top-0 left-0 right-0 z-20 p-4 sm:p-6 lg:p-8" variants={contentVariants}>
         <div className="flex items-center justify-between">
           {/* Logo Section */}
-          <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-xl shadow-2xl">
-              <Building2 className="h-8 w-8 text-[#003087]" />
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="bg-white p-2 sm:p-3 rounded-xl shadow-2xl">
+              <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-[#003087]" />
             </div>
             <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white">Hedrick Brothers Construction</h1>
+              <h1 className="text-sm sm:text-xl lg:text-2xl font-bold text-white">Hedrick Brothers Construction</h1>
             </div>
           </div>
 
           {/* Progress Indicator and Exit Button */}
-          <div className="flex items-center space-x-4">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm font-medium">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Badge
+              variant="secondary"
+              className="bg-white/20 text-white border-white/30 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium"
+            >
               {currentSlide + 1} of {slides.length}
             </Badge>
             <Button
@@ -322,7 +325,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
               size="sm"
               onClick={handleExit}
               disabled={isExiting}
-              className="text-white hover:bg-white/20 text-sm font-medium px-4 py-2 border border-white/30 hover:border-white/50 transition-all duration-200"
+              className="text-white hover:bg-white/20 text-xs sm:text-sm font-medium px-2 sm:px-4 py-1 sm:py-2 border border-white/30 hover:border-white/50 transition-all duration-200"
               aria-label="Exit presentation"
             >
               Exit
@@ -332,10 +335,10 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
       </motion.header>
 
       {/* Main Content Area */}
-      <div className="relative h-full flex items-center justify-center px-6 lg:px-12">
+      <div className="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-12 pt-16 sm:pt-20 lg:pt-24 pb-20 sm:pb-24 lg:pb-32">
         <div className="w-full max-w-7xl mx-auto">
           {/* Slide Container */}
-          <div className="relative h-[75vh] flex items-center justify-center">
+          <div className="relative min-h-[50vh] sm:min-h-[55vh] lg:min-h-[60vh] flex items-center justify-center">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentSlide}
@@ -346,16 +349,16 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
                 exit="exit"
                 className="absolute inset-0 flex items-center justify-center"
               >
-                <div className="w-full max-w-5xl mx-auto text-center">
+                <div className="w-full max-w-5xl mx-auto text-center px-4 sm:px-6 pb-4 sm:pb-6">
                   {/* Slide Image */}
                   {current?.image && (
                     <motion.div
-                      className="mb-8 lg:mb-12"
+                      className="mb-4 sm:mb-6 lg:mb-8"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.2, duration: 0.6 }}
                     >
-                      <div className="relative w-full h-64 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="relative w-full h-48 sm:h-64 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
                         <Image src={current.image} alt="" fill className="object-cover" priority />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                       </div>
@@ -364,7 +367,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
 
                   {/* Slide Title */}
                   <motion.h2
-                    className="text-4xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 lg:mb-8 leading-tight"
+                    className="text-xl sm:text-3xl lg:text-5xl xl:text-6xl font-bold text-white mb-3 sm:mb-4 lg:mb-6 leading-tight"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.6 }}
@@ -374,7 +377,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
 
                   {/* Slide Content */}
                   <motion.div
-                    className="text-lg lg:text-xl xl:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed"
+                    className="text-sm sm:text-base lg:text-lg xl:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.6 }}
@@ -385,7 +388,7 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
                   {/* CTA Button for Final Slide */}
                   {current?.isFinalSlide && (
                     <motion.div
-                      className="mt-6 lg:mt-8"
+                      className="mt-3 sm:mt-4 lg:mt-6"
                       initial={{ opacity: 0, y: 30, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ delay: 0.6, duration: 0.7, type: "spring" }}
@@ -393,12 +396,12 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
                       <Button
                         onClick={handleCTAClick}
                         size="lg"
-                        className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D14D20] text-white font-semibold px-8 lg:px-12 py-4 lg:py-6 text-lg lg:text-xl shadow-2xl transform transition-all duration-300 hover:scale-105 group"
+                        className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] hover:from-[#E55A2B] hover:to-[#D14D20] text-white font-semibold px-3 sm:px-6 lg:px-10 py-2 sm:py-3 lg:py-5 text-sm sm:text-base lg:text-lg shadow-2xl transform transition-all duration-300 hover:scale-105 group"
                         disabled={isExiting}
                       >
-                        <CTAIcon className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform" />
+                        <CTAIcon className="h-3 w-3 sm:h-5 sm:w-5 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform" />
                         {ctaText}
-                        <ArrowRight className="h-6 w-6 ml-3 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="h-3 w-3 sm:h-5 sm:w-5 ml-2 sm:ml-3 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </motion.div>
                   )}
@@ -410,8 +413,11 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
       </div>
 
       {/* Navigation Controls */}
-      <motion.div className="absolute bottom-8 inset-x-0 z-20 flex justify-center" variants={contentVariants}>
-        <div className="flex items-center justify-center space-x-6">
+      <motion.div
+        className="absolute bottom-6 sm:bottom-8 lg:bottom-12 inset-x-0 z-20 flex justify-center"
+        variants={contentVariants}
+      >
+        <div className="flex items-center justify-center space-x-4 sm:space-x-6">
           {/* Previous Button */}
           <Button
             variant="ghost"
@@ -421,17 +427,17 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
             className="text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6" />
           </Button>
 
           {/* Slide Dots */}
-          <div className="flex items-center justify-center space-x-3">
+          <div className="flex items-center justify-center space-x-2 sm:space-x-3">
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleSlideSelect(index)}
                 disabled={isExiting}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                   index === currentSlide ? "bg-white shadow-lg scale-125" : "bg-white/40 hover:bg-white/60"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -448,14 +454,17 @@ export const PresentationCarousel: React.FC<PresentationCarouselProps> = ({
             className="text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next slide"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
           </Button>
         </div>
       </motion.div>
 
       {/* Auto-play indicator */}
       {autoPlay && !isLastSlide && (
-        <motion.div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10" variants={contentVariants}>
+        <motion.div
+          className="absolute bottom-24 sm:bottom-28 left-1/2 transform -translate-x-1/2 z-10"
+          variants={contentVariants}
+        >
           <div className="flex items-center space-x-2 text-white/70 text-sm">
             <Play className="h-4 w-4" />
             <span>Auto-advancing...</span>

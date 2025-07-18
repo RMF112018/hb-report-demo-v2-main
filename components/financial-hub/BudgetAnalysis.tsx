@@ -306,12 +306,13 @@ export default function BudgetAnalysis({
       pendingBudgetChanges: item["Pending Budget Changes"],
       projectedBudget: item["Projected Budget"],
       committedCosts: item["Committed Costs"],
+      commitmentInvoices: item["Committed Costs"] * 0.95, // Mock data for commitment invoices
       directCosts: item["Direct Costs"],
       jtdCosts: item["Job to Date Costs"],
       pendingCostChanges: item["Pending Cost Changes"],
       projectedCosts: item["Projected Costs"],
-      forecastToComplete: item["Forecast To Complete"],
       estimatedAtCompletion: item["Estimated Cost at Completion"],
+      forecastToComplete: item["Forecast To Complete"],
       projectedOverUnder: item["Projected over Under"],
     })) as GridRow[]
   }, [processedBudgetData])
@@ -319,26 +320,30 @@ export default function BudgetAnalysis({
   // Create column definitions for ProtectedGrid
   const createProtectedBudgetColumns = useMemo(() => {
     return [
-      createReadOnlyColumn("costCode", "Cost Code", {
+      createReadOnlyColumn("costCode", "CSI", {
         pinned: "left",
         cellRenderer: (params: any) => {
           const data = params.data
-          return `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-              <div style="font-weight: 600; font-size: 14px;">${data.costCode}</div>
-              <div style="font-size: 12px; color: #6b7280;">${data.costType}</div>
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+              <div style={{ fontWeight: "600", fontSize: "11px" }}>{data.costCode}</div>
+              <div style={{ fontSize: "10px", color: "#6b7280" }}>{data.costType}</div>
             </div>
-          `
+          )
         },
+      }),
+      createReadOnlyColumn("description", "Description", {
+        pinned: "left",
+        cellRenderer: (params: any) => <div className="font-medium text-xs">{params.value}</div>,
       }),
       createLockedColumn("originalBudget", "Original Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
       createProtectedColumn(
         "budgetModifications",
-        "Modifications",
+        "Budget Modifications",
         { level: "none" },
         {
           type: "numericColumn",
@@ -348,6 +353,7 @@ export default function BudgetAnalysis({
           },
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
+            fontSize: "11px",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
           }),
         }
@@ -364,6 +370,7 @@ export default function BudgetAnalysis({
           },
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
+            fontSize: "11px",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
           }),
         }
@@ -371,7 +378,7 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("revisedBudget", "Revised Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace", fontWeight: "600" },
+        cellStyle: { fontFamily: "monospace", fontWeight: "600", fontSize: "11px" },
       }),
       createProtectedColumn(
         "pendingBudgetChanges",
@@ -385,6 +392,7 @@ export default function BudgetAnalysis({
           },
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
+            fontSize: "11px",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
           }),
         }
@@ -392,22 +400,27 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("projectedBudget", "Projected Budget", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
       createReadOnlyColumn("committedCosts", "Committed Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
-      createReadOnlyColumn("directCosts", "Direct Costs", {
+      createReadOnlyColumn("commitmentInvoices", "Commitment Invoices", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
-      createReadOnlyColumn("jtdCosts", "JTD Costs", {
+      createReadOnlyColumn("directCosts", "ERP Direct Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("jtdCosts", "ERP Job to Date Costs", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
       createProtectedColumn(
         "pendingCostChanges",
@@ -421,6 +434,7 @@ export default function BudgetAnalysis({
           },
           cellStyle: (params: any) => ({
             fontFamily: "monospace",
+            fontSize: "11px",
             color: params.value >= 0 ? "#16a34a" : "#dc2626",
           }),
         }
@@ -428,19 +442,19 @@ export default function BudgetAnalysis({
       createReadOnlyColumn("projectedCosts", "Projected Costs", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("estimatedAtCompletion", "Estimated Cost at Completion", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
       createReadOnlyColumn("forecastToComplete", "Forecast to Complete", {
         type: "numericColumn",
         valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
       }),
-      createReadOnlyColumn("estimatedAtCompletion", "Est. at Completion", {
-        type: "numericColumn",
-        valueFormatter: (params: any) => formatCurrency(params.value),
-        cellStyle: { fontFamily: "monospace" },
-      }),
-      createReadOnlyColumn("projectedOverUnder", "Projected Over/Under", {
+      createReadOnlyColumn("projectedOverUnder", "Projected Over Under", {
         type: "numericColumn",
         valueFormatter: (params: any) => {
           const value = params.value
@@ -448,6 +462,7 @@ export default function BudgetAnalysis({
         },
         cellStyle: (params: any) => ({
           fontFamily: "monospace",
+          fontSize: "11px",
           color: params.value >= 0 ? "#16a34a" : "#dc2626",
         }),
       }),
@@ -464,12 +479,13 @@ export default function BudgetAnalysis({
       "pendingBudgetChanges",
       "projectedBudget",
       "committedCosts",
+      "commitmentInvoices",
       "directCosts",
       "jtdCosts",
       "pendingCostChanges",
       "projectedCosts",
-      "forecastToComplete",
       "estimatedAtCompletion",
+      "forecastToComplete",
       "projectedOverUnder",
     ]
 
@@ -496,12 +512,13 @@ export default function BudgetAnalysis({
         pendingBudgetChanges: totals.pendingBudgetChanges + item["Pending Budget Changes"],
         projectedBudget: totals.projectedBudget + item["Projected Budget"],
         committedCosts: totals.committedCosts + item["Committed Costs"],
+        commitmentInvoices: totals.commitmentInvoices + item["Committed Costs"] * 0.95,
         directCosts: totals.directCosts + item["Direct Costs"],
         jtdCosts: totals.jtdCosts + item["Job to Date Costs"],
         pendingCostChanges: totals.pendingCostChanges + item["Pending Cost Changes"],
         projectedCosts: totals.projectedCosts + item["Projected Costs"],
-        forecastToComplete: totals.forecastToComplete + item["Forecast To Complete"],
         estimatedAtCompletion: totals.estimatedAtCompletion + item["Estimated Cost at Completion"],
+        forecastToComplete: totals.forecastToComplete + item["Forecast To Complete"],
         projectedOverUnder: totals.projectedOverUnder + item["Projected over Under"],
       }),
       {
@@ -512,12 +529,13 @@ export default function BudgetAnalysis({
         pendingBudgetChanges: 0,
         projectedBudget: 0,
         committedCosts: 0,
+        commitmentInvoices: 0,
         directCosts: 0,
         jtdCosts: 0,
         pendingCostChanges: 0,
         projectedCosts: 0,
-        forecastToComplete: 0,
         estimatedAtCompletion: 0,
+        forecastToComplete: 0,
         projectedOverUnder: 0,
       }
     )
@@ -534,39 +552,45 @@ export default function BudgetAnalysis({
 
   const exportToCSV = () => {
     const headers = [
-      "Budget Code",
+      "CSI",
       "Description",
-      "Cost Code Tier 1",
-      "Cost Code Tier 2",
-      "Cost Type",
       "Original Budget",
       "Budget Modifications",
       "Approved COs",
       "Revised Budget",
+      "Pending Budget Changes",
+      "Projected Budget",
       "Committed Costs",
-      "Job to Date Costs",
+      "Commitment Invoices",
+      "ERP Direct Costs",
+      "ERP Job to Date Costs",
+      "Pending Cost Changes",
+      "Projected Costs",
+      "Estimated Cost at Completion",
       "Forecast to Complete",
-      "Estimated at Completion",
-      "Projected Over/Under",
+      "Projected Over Under",
     ]
 
     const csvContent = [
       headers.join(","),
       ...processedBudgetData.map((item) =>
         [
-          `"${item["Budget Code"]}"`,
+          `"${item["Cost Code Tier 3"]}"`,
           `"${item["Budget Code Description"]}"`,
-          `"${item["Cost Code Tier 1"]}"`,
-          `"${item["Cost Code Tier 2"]}"`,
-          `"${item["Cost Type"]}"`,
           item["Original Budget Amount"],
           item["Budget Modifications"],
           item["Approved COs"],
           item["Revised Budget"],
+          item["Pending Budget Changes"],
+          item["Projected Budget"],
           item["Committed Costs"],
+          item["Committed Costs"] * 0.95,
+          item["Direct Costs"],
           item["Job to Date Costs"],
-          item["Forecast To Complete"],
+          item["Pending Cost Changes"],
+          item["Projected Costs"],
           item["Estimated Cost at Completion"],
+          item["Forecast To Complete"],
           item["Projected over Under"],
         ].join(",")
       ),
@@ -1002,7 +1026,9 @@ export default function BudgetAnalysis({
                       theme: "quartz", // Use quartz theme for better dark mode support
                       enableTotalsRow: true,
                       stickyColumnsCount: 3,
+                      rowHeight: 32, // Reduced row height
                     }}
+                    className="text-xs" // Smaller font size for the entire grid
                     events={{
                       onCellValueChanged: handleGridChange,
                       onCellEditingStopped: handleGridChange,

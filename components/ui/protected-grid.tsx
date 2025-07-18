@@ -92,6 +92,7 @@ export interface GridConfig {
   theme?: "alpine" | "balham" | "material" | "quartz"
   enableTotalsRow?: boolean
   stickyColumnsCount?: number
+  rowHeight?: number
 }
 
 /**
@@ -399,6 +400,7 @@ export function ProtectedGrid({
       rowData,
       pinnedBottomRowData: totalsRowData,
       theme: "legacy", // Use legacy theme to avoid v33+ theming conflicts
+      rowHeight: defaultConfig.rowHeight || 48, // Use custom row height or default to 48px
       defaultColDef: {
         flex: 1,
         minWidth: 100,
@@ -409,6 +411,7 @@ export function ProtectedGrid({
         editable: defaultConfig.allowCellEditing,
         cellEditor: "agTextCellEditor",
         suppressSizeToFit: false, // Enable auto-sizing to fit container
+        autoHeight: true, // Enable auto height for cells
       },
       rowSelection: defaultConfig.allowRowSelection
         ? {
@@ -445,6 +448,8 @@ export function ProtectedGrid({
       },
       onGridReady: (event: GridReadyEvent) => {
         setGridApi(event.api)
+        // Auto-size columns to fit content
+        event.api.sizeColumnsToFit()
         events.onGridReady?.(event)
       },
       onRowSelected: (event: RowSelectedEvent) => {

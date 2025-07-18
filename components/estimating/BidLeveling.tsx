@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import {
   Plus,
@@ -401,6 +402,47 @@ const BidLeveling: React.FC<BidLevelingProps> = ({ projectId, packageId, classNa
     }).format(amount)
   }
 
+  // Helper functions for prequal status and risk scoring
+  const getPrequalStatus = (bidder: BidderProposal) => {
+    const statuses: Record<string, { status: string; color: string }> = {
+      "bidder-001": { status: "approved", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+      "bidder-002": {
+        status: "pending",
+        color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      },
+      "bidder-003": { status: "expired", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
+    }
+    return (
+      statuses[bidder.bidderId] || {
+        status: "unknown",
+        color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+      }
+    )
+  }
+
+  const getRiskScore = (bidder: BidderProposal) => {
+    const riskScores: Record<string, { score: number; level: string; color: string }> = {
+      "bidder-001": {
+        score: 1.2,
+        level: "low",
+        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      },
+      "bidder-002": {
+        score: 3.1,
+        level: "medium",
+        color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      },
+      "bidder-003": { score: 4.7, level: "high", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
+    }
+    return (
+      riskScores[bidder.bidderId] || {
+        score: 2.5,
+        level: "unknown",
+        color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+      }
+    )
+  }
+
   const handleAddScopeItem = (newItem: Omit<ScopeLineItem, "id">) => {
     const scopeItem: ScopeLineItem = {
       ...newItem,
@@ -412,6 +454,33 @@ const BidLeveling: React.FC<BidLevelingProps> = ({ projectId, packageId, classNa
       title: "Scope Item Added",
       description: `${scopeItem.description} has been added to the scope.`,
     })
+  }
+
+  // Bidder action handlers
+  const handleBidderAction = (bidderId: string, action: string) => {
+    const bidder = bidderProposals.find((b) => b.bidderId === bidderId)
+    if (!bidder) return
+
+    switch (action) {
+      case "include":
+        toast({
+          title: "Bidder Included",
+          description: `${bidder.bidderName} has been included in the estimate.`,
+        })
+        break
+      case "bench":
+        toast({
+          title: "Bidder Benched",
+          description: `${bidder.bidderName} has been benched as backup.`,
+        })
+        break
+      case "disqualify":
+        toast({
+          title: "Bidder Disqualified",
+          description: `${bidder.bidderName} has been disqualified from consideration.`,
+        })
+        break
+    }
   }
 
   return (
@@ -450,10 +519,9 @@ const BidLeveling: React.FC<BidLevelingProps> = ({ projectId, packageId, classNa
 
       {/* Main Content Tabs */}
       <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="scope">Scope Management</TabsTrigger>
-          <TabsTrigger value="comparison">Bid Comparison</TabsTrigger>
-          <TabsTrigger value="analysis">Analysis & Results</TabsTrigger>
+          <TabsTrigger value="comparison">Bid Tab</TabsTrigger>
         </TabsList>
 
         {/* Scope Management Tab */}
@@ -582,8 +650,148 @@ const BidLeveling: React.FC<BidLevelingProps> = ({ projectId, packageId, classNa
           </Card>
         </TabsContent>
 
-        {/* Bid Comparison Tab */}
-        <TabsContent value="comparison" className="space-y-4">
+        {/* Bid Tab - Combined Comparison and Analysis */}
+        <TabsContent value="comparison" className="space-y-6">
+          {/* Analysis Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Lowest Bid</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {formatCurrency(analysisData.lowestBid?.includedTotal || 0)}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">{analysisData.lowestBid?.bidderName}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Highest Bid</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">
+                  {formatCurrency(analysisData.highestBid?.includedTotal || 0)}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">{analysisData.highestBid?.bidderName}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Average Bid</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">{formatCurrency(analysisData.avgBid || 0)}</div>
+                <p className="text-sm text-muted-foreground mt-1">3 bidders</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Plug Total</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-600">{formatCurrency(calculatePlugTotal())}</div>
+                <p className="text-sm text-muted-foreground mt-1">Selected values</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Bidder Analysis Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Bidder Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left p-3 font-semibold">Bidder</th>
+                      <th className="text-left p-3 font-semibold">Status</th>
+                      <th className="text-center p-3 font-semibold">Total Bid</th>
+                      <th className="text-center p-3 font-semibold">Included</th>
+                      <th className="text-center p-3 font-semibold">Excluded</th>
+                      <th className="text-center p-3 font-semibold">Clarifications</th>
+                      <th className="text-center p-3 font-semibold">Markup</th>
+                      <th className="text-center p-3 font-semibold">Prequal Status</th>
+                      <th className="text-center p-3 font-semibold">Risk</th>
+                      <th className="text-center p-3 font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysisData.bidders.map((bidder) => (
+                      <tr key={bidder.bidderId} className="border-b hover:bg-muted/20">
+                        <td className="p-3">
+                          <div className="font-medium">{bidder.bidderName}</div>
+                          <div className="text-sm text-muted-foreground">Submitted: {bidder.submitDate}</div>
+                        </td>
+                        <td className="p-3">
+                          <Badge variant="outline" className={getStatusColor(bidder.status)}>
+                            {bidder.status}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="font-medium">{formatCurrency(bidder.totalAmount)}</span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="text-green-700 font-medium">{formatCurrency(bidder.includedTotal)}</span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="text-red-700 font-medium">{formatCurrency(bidder.excludedTotal)}</span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="text-yellow-700 font-medium">
+                            {formatCurrency(bidder.clarificationTotal)}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="text-sm">{bidder.generalConditions?.markup || 0}%</span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <Badge variant="outline" className={getPrequalStatus(bidder).color}>
+                            {getPrequalStatus(bidder).status}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <Badge variant="outline" className={getRiskScore(bidder).color}>
+                            {getRiskScore(bidder).score.toFixed(1)}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleBidderAction(bidder.bidderId, "include")}>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Include in Estimate
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleBidderAction(bidder.bidderId, "bench")}>
+                                <Users className="h-4 w-4 mr-2" />
+                                Bench
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleBidderAction(bidder.bidderId, "disqualify")}>
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Disqualify
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bid Comparison Matrix */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -747,121 +955,6 @@ const BidLeveling: React.FC<BidLevelingProps> = ({ projectId, packageId, classNa
                       </td>
                     </tr>
                   </tfoot>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Analysis & Results Tab */}
-        <TabsContent value="analysis" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Lowest Bid</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {formatCurrency(analysisData.lowestBid?.includedTotal || 0)}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">{analysisData.lowestBid?.bidderName}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Highest Bid</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">
-                  {formatCurrency(analysisData.highestBid?.includedTotal || 0)}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">{analysisData.highestBid?.bidderName}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Average Bid</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{formatCurrency(analysisData.avgBid || 0)}</div>
-                <p className="text-sm text-muted-foreground mt-1">3 bidders</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Plug Total</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">{formatCurrency(calculatePlugTotal())}</div>
-                <p className="text-sm text-muted-foreground mt-1">Selected values</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Bidder Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left p-3 font-semibold">Bidder</th>
-                      <th className="text-left p-3 font-semibold">Status</th>
-                      <th className="text-center p-3 font-semibold">Total Bid</th>
-                      <th className="text-center p-3 font-semibold">Included</th>
-                      <th className="text-center p-3 font-semibold">Excluded</th>
-                      <th className="text-center p-3 font-semibold">Clarifications</th>
-                      <th className="text-center p-3 font-semibold">Markup</th>
-                      <th className="text-center p-3 font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analysisData.bidders.map((bidder) => (
-                      <tr key={bidder.bidderId} className="border-b hover:bg-muted/20">
-                        <td className="p-3">
-                          <div className="font-medium">{bidder.bidderName}</div>
-                          <div className="text-sm text-muted-foreground">Submitted: {bidder.submitDate}</div>
-                        </td>
-                        <td className="p-3">
-                          <Badge variant="outline" className={getStatusColor(bidder.status)}>
-                            {bidder.status}
-                          </Badge>
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="font-medium">{formatCurrency(bidder.totalAmount)}</span>
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="text-green-700 font-medium">{formatCurrency(bidder.includedTotal)}</span>
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="text-red-700 font-medium">{formatCurrency(bidder.excludedTotal)}</span>
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="text-yellow-700 font-medium">
-                            {formatCurrency(bidder.clarificationTotal)}
-                          </span>
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="text-sm">{bidder.generalConditions?.markup || 0}%</span>
-                        </td>
-                        <td className="p-3 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <Button variant="ghost" size="sm" title="View Details">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" title="More Actions">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
                 </table>
               </div>
             </CardContent>

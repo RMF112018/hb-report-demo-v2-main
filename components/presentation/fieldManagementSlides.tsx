@@ -61,8 +61,8 @@ export const fieldManagementSlides: PresentationSlide[] = [
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Field Management</strong> unifies scheduling, constraints, inspections, and reporting into one
-            platform—<strong>eliminating fragmented systems and manual workflows</strong> across the jobsite.
+            <strong>Our Field Management</strong> unifies scheduling, constraints, inspections, and reporting into one
+            platform—<strong>eliminating fragmented systems and manual workflows</strong> across our jobsite.
           </motion.p>
 
           <motion.p
@@ -72,7 +72,7 @@ export const fieldManagementSlides: PresentationSlide[] = [
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Rather than switching between siloed tools and paper-based processes,{" "}
-            <strong>HB's integrated field suite</strong> centralizes critical operations from procurement through daily
+            <strong>our integrated field suite</strong> centralizes critical operations from procurement through daily
             reporting for streamlined execution and full project oversight.
           </motion.p>
 
@@ -115,18 +115,18 @@ export const fieldManagementSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-green-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Procurement Management</strong> centralizes commitment tracking, vendor coordination, and{" "}
+            <strong>Our Procurement Management</strong> centralizes commitment tracking, vendor coordination, and{" "}
             <strong>seamless Procore integration</strong>—delivering full visibility into procurement workflows and
             eliminating manual entry.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-green-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -145,19 +145,19 @@ export const fieldManagementSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Commitment Tracking</div>
-              <div className="text-xs text-green-200">Real-time procurement commitments and spending</div>
+              <div className="text-xs text-blue-200">Real-time procurement commitments and spending</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Procore Integration</div>
-              <div className="text-xs text-green-200">Seamless synchronization with Procore systems</div>
+              <div className="text-xs text-blue-200">Seamless synchronization with Procore systems</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🧠</div>
               <div className="font-medium text-white">AI Insights</div>
-              <div className="text-xs text-green-200">Intelligent procurement analytics and recommendations</div>
+              <div className="text-xs text-blue-200">Intelligent procurement analytics and recommendations</div>
             </div>
           </motion.div>
         </div>
@@ -175,24 +175,24 @@ export const fieldManagementSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-purple-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>HBI-Integrated Project Scheduler</strong> enhances scheduling with{" "}
+            <strong>Our HBI-Integrated Project Scheduler</strong> enhances scheduling with{" "}
             <strong>real-time variance analysis, critical path monitoring, and predictive insights</strong>—delivering
             actionable schedule intelligence in one view.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-purple-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            With continuous evaluation of health metrics across 1,247 activities, HBI provides{" "}
-            <strong>AI-powered forecasts, variance flags, and an AI Score (8.7/10)</strong> that highlight risks and
+            With continuous evaluation of health metrics across all project activities, HBI provides{" "}
+            <strong>AI-powered forecasts, variance flags, and intelligent scoring</strong> that highlight risks and
             optimization opportunities before delays occur.
           </motion.p>
 
@@ -205,19 +205,19 @@ export const fieldManagementSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🧠</div>
               <div className="font-medium text-white">HBI Critical Analysis</div>
-              <div className="text-xs text-purple-200">AI-powered health metrics and critical path intelligence</div>
+              <div className="text-xs text-blue-200">AI-powered health metrics and critical path intelligence</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Schedule Health Monitoring</div>
-              <div className="text-xs text-purple-200">Real-time variance tracking and performance analytics</div>
+              <div className="text-xs text-blue-200">Real-time variance tracking and performance analytics</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚡</div>
               <div className="font-medium text-white">Predictive Insights</div>
-              <div className="text-xs text-purple-200">AI Score (8.7/10) with proactive risk identification</div>
+              <div className="text-xs text-blue-200">Intelligent scoring with proactive risk identification</div>
             </div>
           </motion.div>
         </div>
@@ -235,17 +235,17 @@ export const fieldManagementSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-red-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Constraints Log Management</strong> brings visibility and control to project obstacles through{" "}
+            <strong>Our Constraints Log Management</strong> brings visibility and control to project obstacles through{" "}
             <strong>centralized issue tracking, automated escalation, and visual impact timelines</strong>.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-red-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -264,19 +264,19 @@ export const fieldManagementSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🚨</div>
               <div className="font-medium text-white">Issue Tracking</div>
-              <div className="text-xs text-red-200">Centralized constraint logging and categorization</div>
+              <div className="text-xs text-blue-200">Centralized constraint logging and categorization</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Resolution Management</div>
-              <div className="text-xs text-red-200">Automated workflow and escalation processes</div>
+              <div className="text-xs text-blue-200">Automated workflow and escalation processes</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Timeline Visualization</div>
-              <div className="text-xs text-red-200">Visual constraint timeline and impact analysis</div>
+              <div className="text-xs text-blue-200">Visual constraint timeline and impact analysis</div>
             </div>
           </motion.div>
         </div>
@@ -294,24 +294,24 @@ export const fieldManagementSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-cyan-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Permit & Inspection Management</strong> simplifies compliance by automating{" "}
+            <strong>Our Permit & Inspection Management</strong> simplifies compliance by automating{" "}
             <strong>permit tracking, inspection scheduling, and calendar integration</strong>—reducing delays and risk
             of non-compliance.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-cyan-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Say goodbye to paper files.{" "}
-            <strong>Every permit and inspection is tracked, scheduled, and monitored in real-time</strong>, keeping your
+            <strong>Every permit and inspection is tracked, scheduled, and monitored in real-time</strong>, keeping our
             project aligned with regulatory deadlines.
           </motion.p>
 
@@ -324,19 +324,19 @@ export const fieldManagementSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📋</div>
               <div className="font-medium text-white">Permit Tracking</div>
-              <div className="text-xs text-cyan-200">Comprehensive permit status and deadline management</div>
+              <div className="text-xs text-blue-200">Comprehensive permit status and deadline management</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔍</div>
               <div className="font-medium text-white">Inspection Management</div>
-              <div className="text-xs text-cyan-200">Automated inspection scheduling and tracking</div>
+              <div className="text-xs text-blue-200">Automated inspection scheduling and tracking</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Calendar Integration</div>
-              <div className="text-xs text-cyan-200">Visual permit and inspection calendar management</div>
+              <div className="text-xs text-blue-200">Visual permit and inspection calendar management</div>
             </div>
           </motion.div>
         </div>
@@ -354,23 +354,23 @@ export const fieldManagementSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-orange-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Field Reports & Documentation</strong> digitizes jobsite records with{" "}
+            <strong>Our Field Reports & Documentation</strong> digitizes jobsite records with{" "}
             <strong>real-time daily logs, safety tracking, and quality audits</strong>—replacing paper-based reporting
             with smart, searchable documentation.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-orange-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            With <strong>automated compliance tracking and field analytics</strong>, HB's system empowers teams to make
+            With <strong>automated compliance tracking and field analytics</strong>, our system empowers teams to make
             faster, data-informed decisions and maintain full field transparency.
           </motion.p>
 
@@ -383,19 +383,19 @@ export const fieldManagementSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📝</div>
               <div className="font-medium text-white">Daily Logs</div>
-              <div className="text-xs text-orange-200">Digital daily reporting and manpower tracking</div>
+              <div className="text-xs text-blue-200">Digital daily reporting and manpower tracking</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🛡️</div>
               <div className="font-medium text-white">Safety Audits</div>
-              <div className="text-xs text-orange-200">Comprehensive safety compliance and audit tracking</div>
+              <div className="text-xs text-blue-200">Comprehensive safety compliance and audit tracking</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">✅</div>
               <div className="font-medium text-white">Quality Control</div>
-              <div className="text-xs text-orange-200">Automated quality inspections and defect tracking</div>
+              <div className="text-xs text-blue-200">Automated quality inspections and defect tracking</div>
             </div>
           </motion.div>
         </div>

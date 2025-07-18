@@ -173,6 +173,7 @@ import {
   LaborCostAnalysisCard,
   SPCRActivityCard,
   TeamExperienceCard,
+  TeamCompatibilityCard,
   ProjectStaffingOverviewCard,
   StaffingAlertsCard,
 } from "@/components/cards/staffing/StaffingAnalyticsCards"
@@ -233,7 +234,7 @@ const getGridClasses = (isCompact: boolean, spacingClass: string) => {
 
   return cn(
     "grid w-full",
-    "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-16 xl:grid-cols-16 2xl:grid-cols-16",
+    "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4",
     spacingClass || `gap-${gap / 4}`, // Convert px to Tailwind spacing
     "transition-all duration-300 ease-in-out"
   )
@@ -267,20 +268,20 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
     return card.span.rows * rowHeight
   }
 
-  // Content-aware heights for different card types - reduced by 50% for compact view
+  // Content-aware heights for different card types - reduced by 50% for all cards
   switch (card.type) {
     case "financial-review-panel":
-      return isCompact ? 200 : 250
+      return isCompact ? 100 : 125
     case "enhanced-hbi-insights":
-      return isCompact ? 175 : 200
+      return isCompact ? 87 : 100
     case "portfolio-overview":
-      return isCompact ? 150 : 175
+      return isCompact ? 75 : 87
     case "market-intelligence":
-      return isCompact ? 225 : 250
+      return isCompact ? 112 : 125
     case "staffing-distribution":
-      return isCompact ? 200 : 225
+      return isCompact ? 100 : 112
     default:
-      return isCompact ? 150 : 175
+      return isCompact ? 75 : 87
   }
 }
 
@@ -313,7 +314,7 @@ export function DashboardGrid({
 
   // Calculate grid position from mouse coordinates
   const getGridPosition = (x: number, y: number, containerRect: DOMRect, isCompact: boolean) => {
-    const gridColumns = 16 // Optimized grid columns for executive dashboard
+    const gridColumns = 12 // Updated to 12-column grid for 50% narrower cards
     const gridRows = 50 // Allow for tall layouts
 
     const relativeX = x - containerRect.left
@@ -341,13 +342,13 @@ export function DashboardGrid({
       if (card.position && card.span) {
         // Validate position is within grid bounds
         const validatedPosition = {
-          x: Math.max(0, Math.min(card.position.x, 15)), // Ensure x is within 0-15
+          x: Math.max(0, Math.min(card.position.x, 11)), // Ensure x is within 0-11 (12-column grid)
           y: Math.max(0, card.position.y),
         }
 
         // Validate span doesn't exceed grid bounds
         const validatedSpan = {
-          cols: Math.min(card.span.cols, 16 - validatedPosition.x), // Ensure span doesn't exceed grid width
+          cols: Math.min(card.span.cols, 12 - validatedPosition.x), // Ensure span doesn't exceed grid width
           rows: Math.max(1, card.span.rows),
         }
 
@@ -374,7 +375,7 @@ export function DashboardGrid({
 
       // Try to find an available position
       for (let y = 0; y <= maxY + 10 && !foundPosition; y++) {
-        for (let x = 0; x <= 16 - span.cols && !foundPosition; x++) {
+        for (let x = 0; x <= 12 - span.cols && !foundPosition; x++) {
           let canPlace = true
 
           // Check if this position is available
@@ -418,8 +419,8 @@ export function DashboardGrid({
     const endX = position.x + span.cols
     const endY = position.y + span.rows
 
-    // Check bounds - ensure position is within 16-column grid
-    if (position.x < 0 || position.y < 0 || position.x >= 16 || endX > 16) return false
+    // Check bounds - ensure position is within 12-column grid
+    if (position.x < 0 || position.y < 0 || position.x >= 12 || endX > 12) return false
 
     return !initializedCards.some((card) => {
       if (card.id === excludeCardId) return false
@@ -1076,6 +1077,8 @@ function CardContent({
       return <SPCRActivityCard {...commonProps} projectId={card.config?.projectId} />
     case "team-experience":
       return <TeamExperienceCard {...commonProps} projectId={card.config?.projectId} />
+    case "team-compatibility":
+      return <TeamCompatibilityCard {...commonProps} projectId={card.config?.projectId} />
     case "project-staffing-overview":
       return <ProjectStaffingOverviewCard {...commonProps} projectId={card.config?.projectId} />
     case "staffing-alerts":

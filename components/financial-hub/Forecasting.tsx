@@ -697,11 +697,12 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             if (params.data?.rowType === "actual") {
               style.fontWeight = "600"
               style.color = "#0f172a" // Darker text for light mode
+              style.fontSize = "11px" // Reduced font size
             } else {
               style.paddingLeft = "20px"
               style.fontStyle = "italic"
               style.color = "#64748b" // Better contrast for sub-rows
-              style.fontSize = "13px"
+              style.fontSize = "10px" // Reduced font size for sub-rows
             }
 
             // Dark mode support
@@ -726,19 +727,21 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
       ),
       createReadOnlyColumn("description", "Type", {
         cellStyle: (params: any) => {
-          const style: any = { fontSize: "11px" }
+          const style: any = { fontSize: "10px" } // Reduced base font size
 
           // Enhanced styling based on row type
           if (params.data?.rowType === "actual") {
             style.fontWeight = "600"
             style.color = "#0f172a"
-            style.fontSize = "12px"
+            style.fontSize = "11px" // Reduced font size
           } else if (params.data?.rowType === "previous") {
             style.color = "#64748b"
             style.fontStyle = "italic"
+            style.fontSize = "9px" // Reduced font size for previous rows
           } else if (params.data?.rowType === "variance") {
             style.color = params.data.variance >= 0 ? "#059669" : "#dc2626" // Green for positive, red for negative
             style.fontWeight = "500"
+            style.fontSize = "10px" // Reduced font size for variance rows
           }
 
           // Dark mode support
@@ -761,7 +764,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
-            const style: any = { textAlign: "right" }
+            const style: any = { textAlign: "right", fontSize: "10px" } // Reduced font size
             if (params.data?.rowType === "variance") {
               style.color = (params.value || 0) >= 0 ? "#16a34a" : "#dc2626"
               style.fontWeight = "600"
@@ -778,7 +781,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
-            const style: any = { textAlign: "right" }
+            const style: any = { textAlign: "right", fontSize: "10px" } // Reduced font size
             if (params.data?.rowType === "variance") {
               style.color = (params.value || 0) >= 0 ? "#16a34a" : "#dc2626"
               style.fontWeight = "600"
@@ -795,7 +798,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value || 0),
           cellStyle: (params: any) => {
-            const style: any = { textAlign: "right" }
+            const style: any = { textAlign: "right", fontSize: "10px" } // Reduced font size
             if (params.data?.rowType === "variance") {
               style.color = (params.value || 0) >= 0 ? "#16a34a" : "#dc2626"
               style.fontWeight = "600"
@@ -814,6 +817,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
           cellStyle: (params: any) => {
             const style: any = {
               textAlign: "right",
+              fontSize: "10px", // Reduced font size
               color: (params.value || 0) >= 0 ? "#16a34a" : "#dc2626",
               fontWeight: "600",
             }
@@ -826,7 +830,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "Start Date",
         { level: "none" },
         {
-          cellStyle: { textAlign: "right" },
+          cellStyle: { textAlign: "right", fontSize: "10px" }, // Reduced font size
         }
       ),
       createProtectedColumn(
@@ -834,7 +838,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         "End Date",
         { level: "none" },
         {
-          cellStyle: { textAlign: "right" },
+          cellStyle: { textAlign: "right", fontSize: "10px" }, // Reduced font size
         }
       ),
     ]
@@ -851,13 +855,13 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
             type: "numericColumn",
             valueFormatter: (params: any) => formatCurrency(params.value || 0),
             cellStyle: (params: any) => {
-              const style: any = { textAlign: "right" }
+              const style: any = { textAlign: "right", fontSize: "10px" } // Reduced font size
               if (params.data?.rowType === "variance") {
                 style.color = (params.value || 0) >= 0 ? "#16a34a" : "#dc2626"
                 style.fontWeight = "600"
               } else if (params.data?.rowType === "previous") {
                 style.color = "#666"
-                style.fontSize = "11px"
+                style.fontSize = "9px" // Reduced font size for previous rows
               }
               return style
             },
@@ -888,6 +892,7 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     theme: "quartz", // Use quartz theme for better dark mode support
     enableTotalsRow: true,
     stickyColumnsCount: 3, // Keep first 3 columns sticky for auto-sizing
+    rowHeight: 32, // Reduced row height from default
   }
 
   const protectedGridEvents: GridEvents = {

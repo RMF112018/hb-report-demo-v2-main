@@ -76,7 +76,7 @@ import {
 } from "lucide-react"
 
 // Enhanced TypeScript interfaces for v3.0 compliance
-type UserRole = "estimator" | "project-manager" | "executive" | "admin"
+type UserRole = "estimator" | "project-manager" | "executive" | "admin" | "hr-payroll"
 type TabId = "delivery" | "stage" | "estimates" | "bidders" | "forms" | "analytics"
 
 interface BidManagementCenterProps {

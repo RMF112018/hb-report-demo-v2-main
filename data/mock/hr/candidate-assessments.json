@@ -1,0 +1,315 @@
+{
+  "candidates": [
+    {
+      "candidateId": "CAND001",
+      "firstName": "Alex",
+      "lastName": "Rodriguez",
+      "email": "alex.rodriguez@email.com",
+      "jobId": "JOB001",
+      "jobTitle": "Senior Project Manager",
+      "discProfile": {
+        "type": "DC",
+        "primaryStyle": "Dominance",
+        "secondaryStyle": "Conscientiousness",
+        "summary": "Alex is a results-driven professional who combines assertiveness with attention to detail. He excels at setting clear goals and ensuring high-quality outcomes.",
+        "strengths": [
+          "Direct and decisive communication",
+          "Strong goal orientation",
+          "High standards for quality",
+          "Analytical problem-solving"
+        ],
+        "growthAreas": [
+          "Building rapport with team members",
+          "Showing more patience with process",
+          "Balancing task focus with relationship building"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Driver",
+        "color": "Red",
+        "profile": {
+          "type": "Driver",
+          "description": "Alex is a natural leader who thrives on challenges and drives results through direct action and clear direction.",
+          "leadershipStrengths": [
+            "Goal-oriented and results-driven",
+            "Decisive decision-making",
+            "Strong project management skills",
+            "Ability to motivate through achievement"
+          ],
+          "developmentAreas": [
+            "Building deeper team relationships",
+            "Developing coaching skills",
+            "Enhancing emotional intelligence"
+          ]
+        }
+      },
+      "culturalFitScore": 85,
+      "teamCompatibility": {
+        "overallScore": 82,
+        "compatibilityNotes": "Strong alignment with project management team dynamics",
+        "recommendations": [
+          "Excellent fit for leadership roles",
+          "May need support with relationship-focused team members",
+          "Ideal for high-pressure, results-driven environments"
+        ]
+      }
+    },
+    {
+      "candidateId": "CAND002",
+      "firstName": "Maria",
+      "lastName": "Garcia",
+      "email": "maria.garcia@email.com",
+      "jobId": "JOB002",
+      "jobTitle": "Estimator",
+      "discProfile": {
+        "type": "CS",
+        "primaryStyle": "Conscientiousness",
+        "secondaryStyle": "Steadiness",
+        "summary": "Maria is a methodical and reliable professional who values accuracy and consistency. She excels at detailed analysis and maintaining high standards.",
+        "strengths": [
+          "Attention to detail and accuracy",
+          "Reliable and consistent performance",
+          "Analytical thinking",
+          "Quality-focused approach"
+        ],
+        "growthAreas": [
+          "Taking more initiative in decision-making",
+          "Being more flexible with changes",
+          "Building confidence in presenting ideas"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Refiner",
+        "color": "Green",
+        "profile": {
+          "type": "Refiner",
+          "description": "Maria is a detail-oriented professional who excels at improving processes and ensuring quality through systematic approaches.",
+          "leadershipStrengths": [
+            "Process improvement and optimization",
+            "Quality control and standards",
+            "Analytical problem-solving",
+            "Reliable and consistent performance"
+          ],
+          "developmentAreas": [
+            "Taking more initiative in leadership",
+            "Building confidence in decision-making",
+            "Developing strategic thinking"
+          ]
+        }
+      },
+      "culturalFitScore": 92,
+      "teamCompatibility": {
+        "overallScore": 88,
+        "compatibilityNotes": "Excellent fit for estimating team, strong analytical skills",
+        "recommendations": [
+          "Perfect fit for detail-oriented roles",
+          "Strong alignment with quality-focused teams",
+          "Ideal for process-driven environments"
+        ]
+      }
+    },
+    {
+      "candidateId": "CAND003",
+      "firstName": "James",
+      "lastName": "Wilson",
+      "email": "james.wilson@email.com",
+      "jobId": "JOB003",
+      "jobTitle": "Field Engineer",
+      "discProfile": {
+        "type": "DI",
+        "primaryStyle": "Dominance",
+        "secondaryStyle": "Influence",
+        "summary": "James is a dynamic and energetic professional who combines assertiveness with people skills. He excels at motivating teams and driving results.",
+        "strengths": [
+          "Dynamic leadership and motivation",
+          "Building team enthusiasm",
+          "Quick decision-making",
+          "Inspiring team performance"
+        ],
+        "growthAreas": [
+          "Being more patient with process details",
+          "Following through on administrative tasks",
+          "Balancing enthusiasm with planning"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Creator",
+        "color": "Yellow",
+        "profile": {
+          "type": "Creator",
+          "description": "James is an innovative and energetic professional who excels at inspiring teams and driving creative solutions to challenges.",
+          "leadershipStrengths": [
+            "Inspiring and motivating teams",
+            "Creative problem-solving",
+            "Dynamic leadership style",
+            "Building team enthusiasm"
+          ],
+          "developmentAreas": [
+            "Following through on administrative details",
+            "Developing more systematic approaches",
+            "Enhancing planning and organization"
+          ]
+        }
+      },
+      "culturalFitScore": 78,
+      "teamCompatibility": {
+        "overallScore": 85,
+        "compatibilityNotes": "Good fit for field operations, may need support with detail-oriented tasks",
+        "recommendations": [
+          "Excellent for dynamic, fast-paced environments",
+          "May need pairing with detail-oriented team members",
+          "Ideal for leadership roles in field operations"
+        ]
+      }
+    },
+    {
+      "candidateId": "CAND004",
+      "firstName": "Lisa",
+      "lastName": "Thompson",
+      "email": "lisa.thompson@email.com",
+      "jobId": "JOB001",
+      "jobTitle": "Senior Project Manager",
+      "discProfile": {
+        "type": "IS",
+        "primaryStyle": "Influence",
+        "secondaryStyle": "Steadiness",
+        "summary": "Lisa is a people-oriented professional who builds strong relationships and creates positive work environments. She excels at collaboration and team support.",
+        "strengths": [
+          "Building relationships and rapport",
+          "Collaborative team approach",
+          "Positive and encouraging communication",
+          "Creating supportive work environments"
+        ],
+        "growthAreas": [
+          "Being more direct with difficult feedback",
+          "Setting firmer boundaries",
+          "Taking more initiative in decision-making"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Supporter",
+        "color": "Blue",
+        "profile": {
+          "type": "Supporter",
+          "description": "Lisa is a relationship-focused professional who excels at building strong teams and creating supportive work environments.",
+          "leadershipStrengths": [
+            "Building strong team relationships",
+            "Creating supportive work environments",
+            "Collaborative leadership style",
+            "Positive team motivation"
+          ],
+          "developmentAreas": [
+            "Being more direct with difficult decisions",
+            "Setting clearer boundaries",
+            "Developing strategic thinking"
+          ]
+        }
+      },
+      "culturalFitScore": 72,
+      "teamCompatibility": {
+        "overallScore": 80,
+        "compatibilityNotes": "Good team player but may need support with task-focused environments",
+        "recommendations": [
+          "Excellent for team-oriented roles",
+          "May need support with high-pressure environments",
+          "Ideal for roles requiring strong interpersonal skills"
+        ]
+      }
+    },
+    {
+      "candidateId": "CAND005",
+      "firstName": "David",
+      "lastName": "Chen",
+      "email": "david.chen@email.com",
+      "jobId": "JOB002",
+      "jobTitle": "Estimator",
+      "discProfile": {
+        "type": "SC",
+        "primaryStyle": "Steadiness",
+        "secondaryStyle": "Conscientiousness",
+        "summary": "David is a reliable and supportive professional who values stability and quality. He excels at providing consistent support and maintaining high standards.",
+        "strengths": [
+          "Reliable and consistent support",
+          "Attention to detail and quality",
+          "Patient and supportive approach",
+          "Building trust and relationships"
+        ],
+        "growthAreas": [
+          "Taking more initiative in leadership",
+          "Being more direct with difficult situations",
+          "Building confidence in decision-making"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Supporter",
+        "color": "Blue",
+        "profile": {
+          "type": "Supporter",
+          "description": "David is a supportive and reliable professional who excels at building trust and providing consistent support to teams.",
+          "leadershipStrengths": [
+            "Building trust and relationships",
+            "Providing consistent support",
+            "Reliable and dependable approach",
+            "Creating stable work environments"
+          ],
+          "developmentAreas": [
+            "Taking more initiative in leadership",
+            "Building confidence in decision-making",
+            "Developing strategic thinking"
+          ]
+        }
+      },
+      "culturalFitScore": 88,
+      "teamCompatibility": {
+        "overallScore": 85,
+        "compatibilityNotes": "Strong fit for supportive team environments",
+        "recommendations": [
+          "Excellent for roles requiring reliability and support",
+          "Strong alignment with quality-focused teams",
+          "Ideal for collaborative, team-oriented environments"
+        ]
+      }
+    }
+  ],
+  "jobCriteria": {
+    "JOB001": {
+      "title": "Senior Project Manager",
+      "targetDiscProfiles": ["DC", "DI", "D"],
+      "targetIntegrusTypes": ["Driver", "Creator"],
+      "culturalFitCriteria": {
+        "leadershipOriented": true,
+        "resultsDriven": true,
+        "teamCollaboration": true,
+        "detailOriented": false,
+        "processFocused": false
+      },
+      "priorityWeight": 0.8
+    },
+    "JOB002": {
+      "title": "Estimator",
+      "targetDiscProfiles": ["CS", "SC", "C"],
+      "targetIntegrusTypes": ["Refiner", "Supporter"],
+      "culturalFitCriteria": {
+        "leadershipOriented": false,
+        "resultsDriven": true,
+        "teamCollaboration": true,
+        "detailOriented": true,
+        "processFocused": true
+      },
+      "priorityWeight": 0.9
+    },
+    "JOB003": {
+      "title": "Field Engineer",
+      "targetDiscProfiles": ["DI", "IS", "I"],
+      "targetIntegrusTypes": ["Creator", "Supporter"],
+      "culturalFitCriteria": {
+        "leadershipOriented": true,
+        "resultsDriven": true,
+        "teamCollaboration": true,
+        "detailOriented": false,
+        "processFocused": false
+      },
+      "priorityWeight": 0.7
+    }
+  }
+}

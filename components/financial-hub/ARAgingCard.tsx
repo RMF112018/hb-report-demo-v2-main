@@ -125,8 +125,12 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         cellRenderer: (params: any) => {
           return (
             <div className="space-y-1">
-              <div className="font-medium text-sm">{params.data.projectName}</div>
-              <div className="text-xs text-muted-foreground">PM: {params.data.projectManager}</div>
+              <div className="font-medium text-sm" style={{ fontSize: "11px" }}>
+                {params.data.projectName}
+              </div>
+              <div className="text-xs text-muted-foreground" style={{ fontSize: "10px" }}>
+                PM: {params.data.projectManager}
+              </div>
             </div>
           )
         },
@@ -137,7 +141,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         cellRenderer: (params: any) => {
           const value = params.value
           return (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs" style={{ fontSize: "10px" }}>
               {formatPercentage(value)}
             </Badge>
           )
@@ -150,7 +154,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
         },
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("retainage", "Retainage", {
         width: 120,
@@ -159,7 +163,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
         },
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("totalAR", "Total AR", {
         width: 120,
@@ -168,7 +172,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
         },
-        cellStyle: { fontFamily: "monospace", fontWeight: "500" },
+        cellStyle: { fontFamily: "monospace", fontWeight: "500", fontSize: "10px" },
       }),
       createReadOnlyColumn("current", "Current", {
         width: 120,
@@ -177,7 +181,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
           const value = params.value
           return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0.00"
         },
-        cellStyle: { fontFamily: "monospace" },
+        cellStyle: { fontFamily: "monospace", fontSize: "10px" },
       }),
       createReadOnlyColumn("days1To30", "1-30 Days", {
         width: 120,
@@ -188,7 +192,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         },
         cellStyle: (params: any) => {
           const value = params.value
-          const style: any = { fontFamily: "monospace" }
+          const style: any = { fontFamily: "monospace", fontSize: "10px" }
           if (typeof value === "number" && value > 0) {
             style.color = "#d97706"
             style.fontWeight = "500"
@@ -205,7 +209,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         },
         cellStyle: (params: any) => {
           const value = params.value
-          const style: any = { fontFamily: "monospace" }
+          const style: any = { fontFamily: "monospace", fontSize: "10px" }
           if (typeof value === "number" && value > 0) {
             style.color = "#d97706"
             style.fontWeight = "500"
@@ -222,7 +226,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
         },
         cellStyle: (params: any) => {
           const value = params.value
-          const style: any = { fontFamily: "monospace" }
+          const style: any = { fontFamily: "monospace", fontSize: "10px" }
           if (typeof value === "number" && value > 0) {
             style.color = "#dc2626"
             style.fontWeight = "bold"
@@ -233,7 +237,11 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
       createReadOnlyColumn("comments", "Comments", {
         width: 150,
         cellRenderer: (params: any) => {
-          return <div className="text-sm max-w-[150px] truncate">{params.value || "-"}</div>
+          return (
+            <div className="text-sm max-w-[150px] truncate" style={{ fontSize: "10px" }}>
+              {params.value || "-"}
+            </div>
+          )
         },
       }),
     ],
@@ -359,6 +367,7 @@ export default function ARAgingCard({ userRole, projectData }: ARAgingProps) {
               theme: "quartz",
               enableTotalsRow: true,
               stickyColumnsCount: 1, // Pin first column (Project Details)
+              rowHeight: 32, // Reduced row height for compact display
             }}
             events={{
               onGridReady: (event) => {

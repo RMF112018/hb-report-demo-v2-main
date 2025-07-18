@@ -346,15 +346,6 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
     const renderTeamsContent = () => {
       return (
         <div className="space-y-4">
-          {/* Teams Mode Success Alert */}
-          <Alert className="border-green-200 bg-green-50 dark:bg-green-950/20">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-700 dark:text-green-300">
-              <strong>Enterprise Ready:</strong> Microsoft Teams integration active. Connected to Microsoft 365 for
-              enhanced collaboration.
-            </AlertDescription>
-          </Alert>
-
           {/* Teams Productivity Content */}
           <TeamsProductivityContent
             projectId={projectId}
@@ -370,45 +361,6 @@ const ProductivityModule: React.FC<ProductivityModuleProps> = React.memo(
     // Main content
     const mainContent = (
       <div ref={containerRef} className={cn("space-y-6", className)}>
-        {/* Header with Mode Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">Productivity Tools</h2>
-            <p className="text-sm text-muted-foreground">
-              {isTeamsMode
-                ? "Microsoft Teams integration for enterprise collaboration"
-                : "Legacy productivity system with basic messaging and tasks"}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Mode Toggle */}
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium">Legacy Mode</label>
-              <Switch
-                checked={isTeamsMode}
-                onCheckedChange={handleTeamsModeToggle}
-                className="data-[state=checked]:bg-blue-600"
-              />
-              <label className="text-sm font-medium">Teams Mode</label>
-            </div>
-
-            {/* Focus Mode Toggle */}
-            <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
-              {isFocusMode ? (
-                <>
-                  <Minimize2 className="h-3 w-3 mr-1" />
-                  Exit Focus
-                </>
-              ) : (
-                <>
-                  <Maximize2 className="h-3 w-3 mr-1" />
-                  Focus
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
         {/* Content Area */}
         <div className="w-full min-w-0 max-w-full">{isTeamsMode ? renderTeamsContent() : renderLegacyContent()}</div>
       </div>

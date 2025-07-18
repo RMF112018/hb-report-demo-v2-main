@@ -280,18 +280,18 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
           <p className="text-muted-foreground">Comprehensive financial management and analysis for {projectName}</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleFocusToggle}
-            className={`${
-              isFocusMode
-                ? "bg-[#FA4616] text-white border-[#FA4616] hover:bg-[#FA4616]/90"
-                : "text-[#FA4616] border-[#FA4616] hover:bg-[#FA4616]/10"
-            }`}
-          >
-            {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            {isFocusMode ? "Exit Focus" : "Focus Mode"}
+          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+            {isFocusMode ? (
+              <>
+                <Minimize2 className="h-3 w-3 mr-1" />
+                Exit Focus
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3 w-3 mr-1" />
+                Focus
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -317,14 +317,6 @@ const FinancialHubProjectContent: React.FC<FinancialHubProjectContentProps> = ({
                     <IconComponent
                       className={`h-4 w-4 ${isActive ? "text-[#FA4616]" : "text-gray-600 dark:text-gray-400"}`}
                     />
-                    {tab.id === "change-management" && (
-                      <Badge
-                        variant="secondary"
-                        className="absolute -top-1 -right-1 bg-[#0021A5] text-white text-xs border-[#0021A5]"
-                      >
-                        New
-                      </Badge>
-                    )}
                   </div>
                   <div>
                     <p

@@ -280,7 +280,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
     return steps[status as keyof typeof steps] || 1
   }
 
-  const ComplianceChecklistCard = ({
+  const ManualComplianceChecklistCard = ({
     authorization,
     onUpdate,
   }: {
@@ -312,25 +312,27 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
       onUpdate(updatedAuth)
     }
 
-    const allCompleted = Object.values(localCompliance)
-      .filter((v) => typeof v === "boolean")
-      .every(Boolean)
+    const manualItemsCompleted =
+      localCompliance.correctProjectNumbers &&
+      localCompliance.finalReleases &&
+      localCompliance.timberscanApproved &&
+      localCompliance.executedPayApplications
 
     return (
       <Card className="mt-4">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <CheckSquare className="h-5 w-5" />
-            TIMBERSCAN Compliance Verification
+            Manual Compliance Verification
           </CardTitle>
-          <CardDescription>Complete all items to avoid payment delays</CardDescription>
+          <CardDescription>Complete manual verification items to avoid payment delays</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {!allCompleted && (
+          {!manualItemsCompleted && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="font-medium text-red-600 dark:text-red-400">
-                *** NOT COMPLETING THE LAST 4 ITEMS WILL DELAY THE RELEASE OF PAYMENTS ***
+                *** NOT COMPLETING ALL MANUAL ITEMS WILL DELAY THE RELEASE OF PAYMENTS ***
               </AlertDescription>
             </Alert>
           )}
@@ -389,34 +391,6 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
             <div className="flex items-start space-x-3">
               <Checkbox
-                id="certificatesOnFile"
-                checked={localCompliance.certificatesOnFile}
-                onCheckedChange={(checked) => handleComplianceChange("certificatesOnFile", checked as boolean)}
-                disabled={!isEditing && userRole !== "project-manager"}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label htmlFor="certificatesOnFile" className="text-sm font-medium">
-                  Confirm CURRENT CERTIFICATES OF INSURANCE ON FILE for all payees
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="licensesOnFile"
-                checked={localCompliance.licensesOnFile}
-                onCheckedChange={(checked) => handleComplianceChange("licensesOnFile", checked as boolean)}
-                disabled={!isEditing && userRole !== "project-manager"}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label htmlFor="licensesOnFile" className="text-sm font-medium">
-                  Confirm CURRENT APPLICABLE LICENSES ON FILE for all payees
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <Checkbox
                 id="executedPayApplications"
                 checked={localCompliance.executedPayApplications}
                 onCheckedChange={(checked) => handleComplianceChange("executedPayApplications", checked as boolean)}
@@ -430,14 +404,155 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
             </div>
           </div>
 
-          {allCompleted && (
+          {manualItemsCompleted && (
             <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription className="text-green-600 dark:text-green-400">
-                All compliance items have been verified. Payment can proceed.
+                All manual compliance items have been verified.
               </AlertDescription>
             </Alert>
           )}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const AutomatedComplianceCard = ({ authorization }: { authorization: PaymentAuthorization }) => {
+    // Mock automated compliance data from Procore API
+    const automatedCompliance = {
+      certificatesOfInsurance: {
+        status: "verified",
+        lastChecked: "2025-01-27T10:30:00Z",
+        totalPayees: 12,
+        compliantPayees: 11,
+        nonCompliantPayees: 1,
+        nonCompliantDetails: [
+          {
+            payee: "ABC Contracting",
+            issue: "Certificate expires in 15 days",
+            action: "Renewal reminder sent",
+          },
+        ],
+      },
+      applicableLicenses: {
+        status: "verified",
+        lastChecked: "2025-01-27T10:30:00Z",
+        totalPayees: 12,
+        compliantPayees: 12,
+        nonCompliantPayees: 0,
+        nonCompliantDetails: [],
+      },
+    }
+
+    const getStatusIcon = (status: string) => {
+      switch (status) {
+        case "verified":
+          return <CheckCircle className="h-4 w-4 text-green-600" />
+        case "warning":
+          return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        case "error":
+          return <X className="h-4 w-4 text-red-600" />
+        default:
+          return <Info className="h-4 w-4 text-blue-600" />
+      }
+    }
+
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case "verified":
+          return "text-green-600 dark:text-green-400"
+        case "warning":
+          return "text-yellow-600 dark:text-yellow-400"
+        case "error":
+          return "text-red-600 dark:text-red-400"
+        default:
+          return "text-blue-600 dark:text-blue-400"
+      }
+    }
+
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Bot className="h-5 w-5 text-blue-600" />
+            Automated Compliance Tracking
+          </CardTitle>
+          <CardDescription>Real-time verification via Procore API integration</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Certificates of Insurance */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {getStatusIcon(automatedCompliance.certificatesOfInsurance.status)}
+                <Label className="text-sm font-medium">Certificates of Insurance</Label>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                {automatedCompliance.certificatesOfInsurance.compliantPayees}/
+                {automatedCompliance.certificatesOfInsurance.totalPayees} Compliant
+              </Badge>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Last checked: {new Date(automatedCompliance.certificatesOfInsurance.lastChecked).toLocaleString()}
+            </div>
+
+            {automatedCompliance.certificatesOfInsurance.nonCompliantDetails.length > 0 && (
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  <div className="font-medium mb-1">Non-compliant payees:</div>
+                  {automatedCompliance.certificatesOfInsurance.nonCompliantDetails.map((detail, index) => (
+                    <div key={index} className="text-xs">
+                      • {detail.payee}: {detail.issue} - {detail.action}
+                    </div>
+                  ))}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Applicable Licenses */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {getStatusIcon(automatedCompliance.applicableLicenses.status)}
+                <Label className="text-sm font-medium">Applicable Licenses</Label>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                {automatedCompliance.applicableLicenses.compliantPayees}/
+                {automatedCompliance.applicableLicenses.totalPayees} Compliant
+              </Badge>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Last checked: {new Date(automatedCompliance.applicableLicenses.lastChecked).toLocaleString()}
+            </div>
+
+            {automatedCompliance.applicableLicenses.nonCompliantDetails.length === 0 && (
+              <Alert>
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs text-green-600 dark:text-green-400">
+                  All payees have current applicable licenses on file.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <Separator />
+
+          <div className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 mb-1">
+              <Zap className="h-3 w-3" />
+              Automated checks performed every 4 hours via Procore API
+            </div>
+            <div className="flex items-center gap-1">
+              <Target className="h-3 w-3" />
+              Real-time compliance monitoring for payment authorization
+            </div>
+          </div>
         </CardContent>
       </Card>
     )
@@ -752,7 +867,7 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
           <div className="lg:col-span-2 space-y-4">
             <PaymentDetailsForm authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
 
-            <ComplianceChecklistCard authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
+            <ManualComplianceChecklistCard authorization={selectedAuthorization} onUpdate={handleUpdateAuthorization} />
 
             {userRole === "project-manager" && selectedAuthorization.status === "pending" && (
               <Card>
@@ -808,6 +923,8 @@ export default function PayAuthorizations({ userRole, projectData }: PayAuthoriz
 
           <div className="space-y-4">
             <WorkflowProgress authorization={selectedAuthorization} />
+
+            <AutomatedComplianceCard authorization={selectedAuthorization} />
 
             {showMessageThread && (
               <Card>

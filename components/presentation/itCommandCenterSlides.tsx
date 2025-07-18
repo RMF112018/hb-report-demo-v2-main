@@ -90,84 +90,84 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Server className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The IT Command Center unifies all technology operations under one intelligent dashboard—providing real-time
-            visibility, automated responses, and strategic oversight across every system that powers HB's digital
+            Our IT Command Center unifies all technology operations under one intelligent dashboard—providing real-time
+            visibility, automated responses, and strategic oversight across every system that powers our digital
             infrastructure.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            From AI-powered automation to comprehensive security monitoring, this centralized platform transforms IT
+            From AI-powered automation to comprehensive security monitoring, this centralized platform transforms our IT
             from reactive support to proactive strategic advantage—ensuring business continuity and operational
             excellence.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-7xl mx-auto w-full"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 max-w-7xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Brain className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">AI Pipelines</div>
-              <div className="text-blue-200 text-[10px]">Automated workflows</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Brain className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">AI Pipelines</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Automated workflows</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <HardDrive className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Assets</div>
-              <div className="text-blue-200 text-[10px]">Inventory tracking</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <HardDrive className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Assets</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Inventory tracking</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Cloud className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Backup</div>
-              <div className="text-blue-200 text-[10px]">Disaster recovery</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Cloud className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Backup</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Disaster recovery</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Mail className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Email Security</div>
-              <div className="text-blue-200 text-[10px]">Threat protection</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Email Security</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Threat protection</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Smartphone className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Endpoints</div>
-              <div className="text-blue-200 text-[10px]">Device management</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Endpoints</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Device management</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Shield className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Governance</div>
-              <div className="text-blue-200 text-[10px]">Compliance & policy</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Governance</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Compliance & policy</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Server className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Infrastructure</div>
-              <div className="text-blue-200 text-[10px]">System monitoring</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Server className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Infrastructure</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">System monitoring</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Settings className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Management</div>
-              <div className="text-blue-200 text-[10px]">Administrative tools</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Management</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Administrative tools</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Eye className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">SIEM</div>
-              <div className="text-blue-200 text-[10px]">Security monitoring</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">SIEM</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Security monitoring</div>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Users className="w-6 h-6 text-blue-200" />
-              <div className="font-medium text-white text-xs">Consultants</div>
-              <div className="text-blue-200 text-[10px]">Vendor management</div>
+            <div className="flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-200" />
+              <div className="font-medium text-white text-xs sm:text-sm text-center">Consultants</div>
+              <div className="text-blue-200 text-[10px] sm:text-xs text-center">Vendor management</div>
             </div>
           </motion.div>
         </div>
@@ -183,52 +183,54 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Brain className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-purple-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>AI Pipelines</strong> transform routine IT tasks into intelligent, automated workflows that learn
-            from patterns and optimize performance across all systems—reducing manual intervention by 85% while
+            <strong>AI Pipelines</strong> transform our routine IT tasks into intelligent, automated workflows that
+            learn from patterns and optimize performance across all systems—reducing manual intervention by 85% while
             improving response times and accuracy.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-purple-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             From automated system health checks to predictive maintenance alerts, AI-driven intelligence ensures{" "}
-            <strong>proactive problem resolution</strong> before users even notice issues.
+            <strong>proactive problem resolution</strong> before our users even notice issues.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🤖</div>
-              <div className="font-medium text-white">Intelligent Automation</div>
-              <div className="text-xs text-purple-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🤖</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Intelligent Automation</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Self-learning workflows that adapt to changing patterns and requirements.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔮</div>
-              <div className="font-medium text-white">Predictive Analytics</div>
-              <div className="text-xs text-purple-200">Anticipate issues before they impact business operations.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔮</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Predictive Analytics</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Anticipate issues before they impact business operations.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">⚡</div>
-              <div className="font-medium text-white">Performance Optimization</div>
-              <div className="text-xs text-purple-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">⚡</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Performance Optimization</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Continuous system tuning for maximum efficiency and reliability.
               </div>
             </div>
@@ -246,20 +248,20 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <HardDrive className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-green-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Asset Management</strong> provides complete visibility into every piece of technology across the
+            <strong>Asset Management</strong> provides complete visibility into every piece of technology across our
             organization—from laptops and mobile devices to servers and network equipment—with real-time tracking,
             lifecycle management, and cost optimization.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-green-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -269,29 +271,31 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📱</div>
-              <div className="font-medium text-white">Device Inventory</div>
-              <div className="text-xs text-green-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📱</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Device Inventory</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Complete tracking of all endpoints, servers, and network equipment.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📅</div>
-              <div className="font-medium text-white">Lifecycle Management</div>
-              <div className="text-xs text-green-200">Automated warranty tracking and replacement scheduling.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📅</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Lifecycle Management</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated warranty tracking and replacement scheduling.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">💰</div>
-              <div className="font-medium text-white">Cost Optimization</div>
-              <div className="text-xs text-green-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">💰</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Cost Optimization</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Depreciation tracking and budget forecasting for technology investments.
               </div>
             </div>
@@ -309,9 +313,9 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Cloud className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -322,41 +326,41 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With cloud-based redundancy and automated failover systems,{" "}
-            <strong>business operations continue seamlessly</strong> even during catastrophic events.
+            <strong>our business operations continue seamlessly</strong> even during catastrophic events.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">☁️</div>
-              <div className="font-medium text-white">Cloud Redundancy</div>
-              <div className="text-xs text-blue-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">☁️</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Cloud Redundancy</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Automated backup to multiple cloud locations for maximum protection.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">⚡</div>
-              <div className="font-medium text-white">Instant Recovery</div>
-              <div className="text-xs text-blue-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">⚡</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Instant Recovery</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Point-in-time restoration with minimal downtime and data loss.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔄</div>
-              <div className="font-medium text-white">Automated Testing</div>
-              <div className="text-xs text-blue-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔄</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Automated Testing</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Regular disaster recovery drills ensure systems work when needed.
               </div>
             </div>
@@ -374,54 +378,56 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Mail className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-red-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <strong>Email Security</strong> provides comprehensive protection against phishing, malware, and advanced
             persistent threats through AI-powered detection, real-time threat intelligence, and automated response
-            systems that keep business communications secure.
+            systems that keep our business communications secure.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-red-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With 99.9% threat detection accuracy and zero false positives,{" "}
-            <strong>critical business communications remain protected</strong> while maintaining productivity.
+            <strong>our critical business communications remain protected</strong> while maintaining productivity.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🛡️</div>
-              <div className="font-medium text-white">Threat Detection</div>
-              <div className="text-xs text-red-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🛡️</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Threat Detection</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 AI-powered identification of phishing, malware, and social engineering attacks.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔍</div>
-              <div className="font-medium text-white">Content Filtering</div>
-              <div className="text-xs text-red-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔍</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Content Filtering</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Advanced filtering for spam, inappropriate content, and policy violations.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📊</div>
-              <div className="font-medium text-white">Security Analytics</div>
-              <div className="text-xs text-red-200">Real-time threat intelligence and security posture reporting.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📊</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Security Analytics</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Real-time threat intelligence and security posture reporting.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -437,20 +443,20 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Smartphone className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-indigo-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Endpoint Management</strong> provides comprehensive control over all devices—laptops, desktops,
+            <strong>Endpoint Management</strong> provides comprehensive control over all our devices—laptops, desktops,
             tablets, and mobile phones—with automated software deployment, security policy enforcement, and remote
             troubleshooting capabilities.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-indigo-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -460,29 +466,31 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">💻</div>
-              <div className="font-medium text-white">Device Control</div>
-              <div className="text-xs text-indigo-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">💻</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Device Control</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Centralized management of all endpoints across the organization.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔧</div>
-              <div className="font-medium text-white">Software Deployment</div>
-              <div className="text-xs text-indigo-200">Automated installation and updates across all devices.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔧</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Software Deployment</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated installation and updates across all devices.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔒</div>
-              <div className="font-medium text-white">Security Policies</div>
-              <div className="text-xs text-indigo-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔒</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Security Policies</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Enforced security standards and compliance across all endpoints.
               </div>
             </div>
@@ -500,50 +508,56 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Shield className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-emerald-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <strong>Governance & Compliance</strong> establishes strategic IT policies, ensures regulatory adherence,
             and provides executive oversight through comprehensive reporting, audit trails, and risk management
-            frameworks that align technology with business objectives.
+            frameworks that align technology with our business objectives.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-emerald-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With automated compliance monitoring and strategic planning tools,{" "}
-            <strong>IT becomes a strategic business enabler</strong> rather than just a support function.
+            <strong>our IT becomes a strategic business enabler</strong> rather than just a support function.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📋</div>
-              <div className="font-medium text-white">Policy Management</div>
-              <div className="text-xs text-emerald-200">Centralized IT policies and standards across all systems.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📋</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Policy Management</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Centralized IT policies and standards across all systems.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📊</div>
-              <div className="font-medium text-white">Compliance Reporting</div>
-              <div className="text-xs text-emerald-200">Automated compliance monitoring and audit preparation.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📊</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Compliance Reporting</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated compliance monitoring and audit preparation.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🎯</div>
-              <div className="font-medium text-white">Strategic Planning</div>
-              <div className="text-xs text-emerald-200">Technology roadmaps aligned with business objectives.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🎯</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Strategic Planning</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Technology roadmaps aligned with business objectives.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -559,54 +573,54 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Server className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-orange-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Infrastructure Monitoring</strong> provides real-time visibility into all systems, networks, and
+            <strong>Infrastructure Monitoring</strong> provides real-time visibility into all our systems, networks, and
             applications with automated alerting, performance analytics, and predictive maintenance that ensures optimal
             system health and business continuity.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-orange-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With comprehensive monitoring and automated response capabilities,{" "}
-            <strong>system issues are resolved before they impact users</strong> and business operations.
+            <strong>system issues are resolved before they impact our users</strong> and business operations.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📈</div>
-              <div className="font-medium text-white">Performance Analytics</div>
-              <div className="text-xs text-orange-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📈</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Performance Analytics</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Real-time monitoring of system performance and resource utilization.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔔</div>
-              <div className="font-medium text-white">Automated Alerting</div>
-              <div className="text-xs text-orange-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔔</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Automated Alerting</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Intelligent alerts for critical issues and performance degradation.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔮</div>
-              <div className="font-medium text-white">Predictive Maintenance</div>
-              <div className="text-xs text-orange-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔮</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Predictive Maintenance</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Proactive identification of potential system issues before they occur.
               </div>
             </div>
@@ -624,20 +638,20 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Settings className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-cyan-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <strong>Management & Administration</strong> provides comprehensive administrative tools for user
             management, system configuration, access control, and operational oversight—all centralized in one powerful
-            interface that simplifies IT operations.
+            interface that simplifies our IT operations.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-cyan-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -647,29 +661,33 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">👥</div>
-              <div className="font-medium text-white">User Management</div>
-              <div className="text-xs text-cyan-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">👥</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">User Management</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Centralized user provisioning, access control, and role management.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">⚙️</div>
-              <div className="font-medium text-white">System Configuration</div>
-              <div className="text-xs text-cyan-200">Automated system setup and configuration management.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">⚙️</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">System Configuration</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated system setup and configuration management.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔐</div>
-              <div className="font-medium text-white">Access Control</div>
-              <div className="text-xs text-cyan-200">Granular permissions and security policy enforcement.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔐</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Access Control</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Granular permissions and security policy enforcement.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -685,9 +703,9 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Eye className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-rose-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -698,41 +716,44 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-rose-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With 24/7 monitoring and intelligent threat intelligence,{" "}
-            <strong>security incidents are detected and resolved</strong> before they can impact business operations.
+            <strong>security incidents are detected and resolved</strong> before they can impact our business
+            operations.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🔍</div>
-              <div className="font-medium text-white">Threat Detection</div>
-              <div className="text-xs text-rose-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🔍</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Threat Detection</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Advanced analytics for identifying security threats and anomalies.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📊</div>
-              <div className="font-medium text-white">Security Analytics</div>
-              <div className="text-xs text-rose-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📊</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Security Analytics</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Real-time correlation and analysis of security events across all systems.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🚨</div>
-              <div className="font-medium text-white">Incident Response</div>
-              <div className="text-xs text-rose-200">Automated response and escalation for security incidents.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🚨</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Incident Response</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated response and escalation for security incidents.
+              </div>
             </div>
           </motion.div>
         </div>
@@ -748,20 +769,20 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <Users className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-violet-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <strong>Consultant & Vendor Management</strong> centralizes oversight of all technology partnerships,
+            <strong>Consultant & Vendor Management</strong> centralizes oversight of all our technology partnerships,
             providing performance tracking, contract management, and strategic alignment tools that ensure optimal value
             from every technology investment and partnership.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-violet-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -771,29 +792,31 @@ export const itCommandCenterSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🤝</div>
-              <div className="font-medium text-white">Partnership Tracking</div>
-              <div className="text-xs text-violet-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🤝</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Partnership Tracking</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Performance monitoring and relationship management for all vendors.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📋</div>
-              <div className="font-medium text-white">Contract Management</div>
-              <div className="text-xs text-violet-200">Automated contract monitoring and renewal tracking.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📋</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Contract Management</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Automated contract monitoring and renewal tracking.
+              </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">📊</div>
-              <div className="font-medium text-white">Value Analytics</div>
-              <div className="text-xs text-violet-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">📊</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Value Analytics</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 ROI tracking and strategic alignment for technology investments.
               </div>
             </div>
@@ -811,54 +834,56 @@ export const itCommandCenterSlides: PresentationSlide[] = [
         <CircuitBoard className="absolute inset-0 w-96 h-96 m-auto text-white/5 z-0 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-full">
+        <div className="relative z-10 w-full max-w-full px-4 sm:px-6">
           <motion.p
-            className="text-base md:text-xl text-amber-100 max-w-4xl mb-8"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The IT Command Center represents the future of technology management—unifying all IT operations under one
+            Our IT Command Center represents the future of technology management—unifying all IT operations under one
             intelligent platform that transforms reactive support into proactive strategic advantage.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-amber-200 max-w-3xl mb-8"
+            className="text-xs sm:text-sm md:text-base text-blue-200 max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             With AI-powered automation, comprehensive security, and strategic oversight,{" "}
-            <strong>technology becomes a true business enabler</strong> that drives innovation, efficiency, and
+            <strong>our technology becomes a true business enabler</strong> that drives innovation, efficiency, and
             competitive advantage.
           </motion.p>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🚀</div>
-              <div className="font-medium text-white">Strategic Advantage</div>
-              <div className="text-xs text-amber-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🚀</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Strategic Advantage</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Technology that drives business innovation and competitive edge.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">⚡</div>
-              <div className="font-medium text-white">Operational Excellence</div>
-              <div className="text-xs text-amber-200">
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">⚡</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Operational Excellence</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
                 Automated processes that maximize efficiency and reliability.
               </div>
             </div>
 
-            <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="text-3xl">🛡️</div>
-              <div className="font-medium text-white">Comprehensive Security</div>
-              <div className="text-xs text-amber-200">Protection that enables business growth without compromise.</div>
+            <div className="flex flex-col items-center space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl">🛡️</div>
+              <div className="font-medium text-white text-sm sm:text-base text-center">Comprehensive Security</div>
+              <div className="text-xs sm:text-sm text-blue-200 text-center">
+                Protection that enables business growth without compromise.
+              </div>
             </div>
           </motion.div>
         </div>

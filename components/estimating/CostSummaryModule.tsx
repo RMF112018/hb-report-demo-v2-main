@@ -1360,13 +1360,15 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "CSI",
         { level: "none" },
         {
-          width: 100,
+          width: 80,
+          minWidth: 80,
+          headerClass: "text-xs font-semibold",
           cellRenderer: (params: any) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             return (
               <div
-                className={`${
+                className={`text-xs ${
                   isSubtotal || isTotal
                     ? "text-muted-foreground"
                     : "cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
@@ -1390,13 +1392,15 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "CSI DESCRIPTION",
         { level: "none" },
         {
-          width: 200,
+          width: 150,
+          minWidth: 120,
+          headerClass: "text-xs font-semibold",
           cellRenderer: (params: any) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             return (
               <div
-                className={`${
+                className={`text-xs ${
                   isSubtotal || isTotal
                     ? "text-muted-foreground italic"
                     : "cursor-pointer hover:bg-muted/50 rounded px-2 py-1 group"
@@ -1420,7 +1424,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "TOTAL PROJECT",
         { level: "read-only" },
         {
-          width: 130,
+          width: 100,
+          minWidth: 90,
+          headerClass: "text-xs font-semibold",
           type: "numericColumn",
           valueFormatter: (params: any) => formatCurrency(params.value),
           cellRenderer: (params: any) => {
@@ -1428,12 +1434,12 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             if (isSubtotal || isTotal) {
               return (
-                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                <div className="text-xs font-bold text-blue-900 dark:text-blue-100 text-right">
                   {formatCurrency(params.value)}
                 </div>
               )
             }
-            return <div className="text-right">{formatCurrency(params.value)}</div>
+            return <div className="text-xs text-right">{formatCurrency(params.value)}</div>
           },
           cellStyle: { textAlign: "right" },
           cellClassRules: {
@@ -1447,7 +1453,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "$ /GSF",
         { level: "none" },
         {
-          width: 100,
+          width: 80,
+          minWidth: 70,
+          headerClass: "text-xs font-semibold",
           type: "numericColumn",
           valueFormatter: (params: any) => {
             const totalProject = params.data.selectedBidAmount || 0
@@ -1464,12 +1472,12 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             if (isSubtotal || isTotal) {
               return (
-                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                <div className="text-xs font-bold text-blue-900 dark:text-blue-100 text-right">
                   {formatCurrency(dollarPerGSF)}
                 </div>
               )
             }
-            return <div className="text-right">{formatCurrency(dollarPerGSF)}</div>
+            return <div className="text-xs text-right">{formatCurrency(dollarPerGSF)}</div>
           },
           cellStyle: { textAlign: "right" },
           cellClassRules: {
@@ -1483,7 +1491,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "$ /LSF",
         { level: "none" },
         {
-          width: 100,
+          width: 80,
+          minWidth: 70,
+          headerClass: "text-xs font-semibold",
           type: "numericColumn",
           valueFormatter: (params: any) => {
             const totalProject = params.data.selectedBidAmount || 0
@@ -1500,12 +1510,12 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             if (isSubtotal || isTotal) {
               return (
-                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">
+                <div className="text-xs font-bold text-blue-900 dark:text-blue-100 text-right">
                   {formatCurrency(dollarPerLSF)}
                 </div>
               )
             }
-            return <div className="text-right">{formatCurrency(dollarPerLSF)}</div>
+            return <div className="text-xs text-right">{formatCurrency(dollarPerLSF)}</div>
           },
           cellStyle: { textAlign: "right" },
           cellClassRules: {
@@ -1519,14 +1529,16 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "# OF BIDS",
         { level: "none" },
         {
-          width: 100,
+          width: 80,
+          minWidth: 70,
+          headerClass: "text-xs font-semibold",
           type: "numericColumn",
           valueFormatter: (params: any) => params.value || 0,
           cellRenderer: (params: any) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
             return (
-              <div className={`${isSubtotal || isTotal ? "font-bold" : ""}`}>
+              <div className={`text-xs ${isSubtotal || isTotal ? "font-bold" : ""}`}>
                 {isSubtotal ? "—" : isTotal ? "" : params.value || 0}
               </div>
             )
@@ -1542,7 +1554,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "%",
         { level: "none" },
         {
-          width: 80,
+          width: 60,
+          minWidth: 50,
+          headerClass: "text-xs font-semibold",
           type: "numericColumn",
           valueFormatter: (params: any) => {
             const totalProject = params.data.selectedBidAmount || 0
@@ -1564,10 +1578,12 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             if (isSubtotal || isTotal) {
               return (
-                <div className="font-bold text-blue-900 dark:text-blue-100 text-right">{percentage.toFixed(1)}%</div>
+                <div className="text-xs font-bold text-blue-900 dark:text-blue-100 text-right">
+                  {percentage.toFixed(1)}%
+                </div>
               )
             }
-            return <div className="text-right">{percentage.toFixed(1)}%</div>
+            return <div className="text-xs text-right">{percentage.toFixed(1)}%</div>
           },
           cellStyle: { textAlign: "right" },
           cellClassRules: {
@@ -1581,7 +1597,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Adjustment",
         { level: "none" },
         {
-          width: 120,
+          width: 90,
+          minWidth: 80,
+          headerClass: "text-xs font-semibold",
           editable: (params) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
@@ -1594,7 +1612,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
             if (isSubtotal || isTotal) {
               return <div className="text-muted-foreground italic"></div>
             }
-            return <div className="text-sm">{params.value || "None"}</div>
+            return <div className="text-xs">{params.value || "None"}</div>
           },
           cellClassRules: {
             "subtotal-row": (params: any) => params.data.rowType === "subtotal",
@@ -1607,7 +1625,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Adj. Value",
         { level: "none" },
         {
-          width: 120,
+          width: 90,
+          minWidth: 80,
+          headerClass: "text-xs font-semibold",
           editable: (params) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
@@ -1630,7 +1650,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
             const value = Number(params.data.adjValue) || 0
             const formattedValue = adjustmentType === "$" ? formatCurrency(value) : `${value.toFixed(2)}%`
 
-            return <div className="text-right text-sm">{formattedValue}</div>
+            return <div className="text-xs text-right">{formattedValue}</div>
           },
           valueFormatter: (params: any) => {
             const adjustmentType = params.data.adjustment || "None"
@@ -1650,7 +1670,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Status",
         { level: "none" },
         {
-          width: 120,
+          width: 90,
+          minWidth: 80,
+          headerClass: "text-xs font-semibold",
           editable: (params) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
@@ -1666,11 +1688,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
             if (isSubtotal || isTotal) {
               return <div className="text-muted-foreground italic"></div>
             }
-            return (
-              <Badge variant={getStatusColor(params.value)} className="text-xs">
-                {params.value}
-              </Badge>
-            )
+            return <div className="text-xs">{params.value}</div>
           },
           cellClassRules: {
             "subtotal-row": (params: any) => params.data.rowType === "subtotal",
@@ -1683,7 +1701,9 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Bidder",
         { level: "read-only" },
         {
-          width: 150,
+          width: 100,
+          minWidth: 80,
+          headerClass: "text-xs font-semibold",
           cellRenderer: (params: any) => {
             const isSubtotal = params.data.rowType === "subtotal"
             const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
@@ -1700,32 +1720,6 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
             "subtotal-row": (params: any) => params.data.rowType === "subtotal",
             "total-row": (params: any) => params.data.rowType === "total" || params.data.csiCode === "Total",
           },
-        }
-      ),
-      createProtectedColumn(
-        "actions",
-        "Actions",
-        { level: "none" },
-        {
-          width: 80,
-          cellRenderer: (params: any) => {
-            const isSubtotal = params.data.rowType === "subtotal"
-            const isTotal = params.data.rowType === "total" || params.data.csiCode === "Total"
-            if (isSubtotal || isTotal) {
-              return <div></div>
-            }
-            return (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeCostCategory(params.data.id)}
-                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            )
-          },
-          hide: false,
         }
       ),
     ],
@@ -1765,10 +1759,6 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
       return ""
     }
 
-    if (columnField === "actions") {
-      return ""
-    }
-
     // For numeric columns, sum the values
     const values = categoryRows
       .map((row) => {
@@ -1781,7 +1771,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     return values.reduce((sum, val) => sum + val, 0)
   }, [])
 
-  // Update the grid configuration to enable totals row
+  // Update the grid configuration to enable totals row with auto-sizing and reduced row height
   const gridConfig: GridConfig = useMemo(
     () =>
       createGridWithTotalsAndSticky(3, true, {
@@ -1796,6 +1786,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         protectionEnabled: true,
         theme: "quartz",
         enableTotalsRow: true, // Enable the built-in totals row
+        rowHeight: 32, // Reduced row height for more compact display
       }),
     []
   )
@@ -1844,7 +1835,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Description",
         { level: "none" },
         {
-          width: 250,
+          width: 200,
           pinned: "left",
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
@@ -1857,7 +1848,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Qty.",
         { level: "none" },
         {
-          width: 80,
+          width: 60,
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
             "subtotal-row": (params) => params.data.rowType === "subtotal",
@@ -1869,7 +1860,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "U",
         { level: "none" },
         {
-          width: 60,
+          width: 50,
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
             "subtotal-row": (params) => params.data.rowType === "subtotal",
@@ -1881,7 +1872,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Unit Cost",
         { level: "none" },
         {
-          width: 120,
+          width: 100,
           valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
@@ -1894,7 +1885,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Const. Cost",
         { level: "locked" },
         {
-          width: 130,
+          width: 100,
           valueGetter: (params) => params.data.quantity * params.data.unitCost,
           valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
@@ -1908,7 +1899,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "% Time",
         { level: "none" },
         {
-          width: 100,
+          width: 80,
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
             "subtotal-row": (params) => params.data.rowType === "subtotal",
@@ -1920,7 +1911,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Remarks",
         { level: "none" },
         {
-          width: 180,
+          width: 150,
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
             "subtotal-row": (params) => params.data.rowType === "subtotal",
@@ -1932,7 +1923,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "CUSTOMIZED LABOR RATES",
         { level: "read-only" },
         {
-          width: 180,
+          width: 140,
           valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
@@ -1945,7 +1936,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "LABOR FY 2025",
         { level: "read-only" },
         {
-          width: 180,
+          width: 140,
           valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
             "section-header": (params) => params.data.rowType === "section",
@@ -1958,7 +1949,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Total",
         { level: "locked" },
         {
-          width: 140,
+          width: 100,
           valueGetter: (params) => params.data.constCost,
           valueFormatter: (params) => formatCurrency(params.value),
           cellClassRules: {
@@ -1985,6 +1976,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         showStatusBar: true,
         protectionEnabled: true,
         theme: "quartz",
+        rowHeight: 32,
       }),
     []
   )
@@ -2912,22 +2904,35 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
     ]
   }, [])
 
-  function GridSection({ title, data }: { title: string; data: any[] }) {
+  function GridSection({
+    title,
+    data,
+    type = "requirements",
+  }: {
+    title: string
+    data: any[]
+    type?: "conditions" | "requirements"
+  }) {
     // Calculate dynamic height based on number of data rows
-    // Each row is approximately 40px, plus header (60px) and padding (40px)
-    const rowHeight = 40
+    // Each row is approximately 32px, plus header (60px) and padding (40px)
+    const rowHeight = 32
     const headerHeight = 60
     const padding = 40
     const dynamicHeight = Math.max(200, data.length * rowHeight + headerHeight + padding)
+
+    // Use appropriate column definitions and config based on type
+    const columnDefs = type === "conditions" ? generalConditionsColumns : generalRequirementsColumns
+    const gridConfig = type === "conditions" ? generalConditionsGridConfig : generalRequirementsGridConfig
+    const gridEvents = type === "conditions" ? generalConditionsGridEvents : generalRequirementsGridEvents
 
     return (
       <Card>
         <CardContent>
           <ProtectedGrid
-            columnDefs={generalRequirementsColumns}
+            columnDefs={columnDefs}
             rowData={data}
-            config={generalRequirementsGridConfig}
-            events={generalRequirementsGridEvents}
+            config={gridConfig}
+            events={gridEvents}
             totalsCalculator={defaultTotalsCalculator}
             height={`${dynamicHeight}px`}
             enableSearch
@@ -2946,7 +2951,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Description",
         { level: "none" },
         {
-          width: 250,
+          width: 200,
           pinned: "left",
           cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
         }
@@ -2956,7 +2961,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Qty.",
         { level: "none" },
         {
-          width: 80,
+          width: 60,
           type: "numericColumn",
           valueFormatter: (params: any) => params.value || "",
         }
@@ -2966,7 +2971,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "U",
         { level: "none" },
         {
-          width: 60,
+          width: 50,
           cellRenderer: (params: any) => <div className="text-center">{params.value || ""}</div>,
         }
       ),
@@ -2975,7 +2980,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Unit Cost",
         { level: "none" },
         {
-          width: 120,
+          width: 100,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : "-"),
         }
@@ -2985,7 +2990,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Const. Cond.",
         { level: "none" },
         {
-          width: 120,
+          width: 100,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : "-"),
         }
@@ -2995,7 +3000,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Unit",
         { level: "none" },
         {
-          width: 120,
+          width: 100,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : "-"),
         }
@@ -3005,7 +3010,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "General Req",
         { level: "none" },
         {
-          width: 130,
+          width: 100,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : "-"),
         }
@@ -3015,7 +3020,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Total",
         { level: "none" },
         {
-          width: 130,
+          width: 100,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? formatCurrency(params.value) : "-"),
           cellStyle: { fontWeight: "bold" },
@@ -3026,7 +3031,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "% Time",
         { level: "none" },
         {
-          width: 80,
+          width: 70,
           type: "numericColumn",
           valueFormatter: (params: any) => (params.value ? `${params.value}%` : "-"),
         }
@@ -3036,7 +3041,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         "Remarks",
         { level: "none" },
         {
-          width: 300,
+          width: 150,
           cellRenderer: (params: any) => <div className="text-sm text-muted-foreground">{params.value || ""}</div>,
         }
       ),
@@ -3058,6 +3063,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         showStatusBar: true,
         protectionEnabled: true,
         theme: "quartz",
+        rowHeight: 32,
       }),
     []
   )
@@ -4019,7 +4025,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Estimate</CardTitle>
+                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">Total Estimate</CardTitle>
                 <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
@@ -4037,7 +4043,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Buyout Savings</CardTitle>
+                <CardTitle className="text-xs font-medium text-green-700 dark:text-green-300">Buyout Savings</CardTitle>
                 <TrendingDown className="h-4 w-4 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
@@ -4053,7 +4059,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Categories</CardTitle>
+                <CardTitle className="text-xs font-medium text-orange-700 dark:text-orange-300">Categories</CardTitle>
                 <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
@@ -4067,7 +4073,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
+                <CardTitle className="text-xs font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
                 <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               </CardHeader>
               <CardContent>
@@ -4088,7 +4094,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">GC Total</CardTitle>
+                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">GC Total</CardTitle>
                 <Calculator className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
@@ -4104,7 +4110,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Field Labor</CardTitle>
+                <CardTitle className="text-xs font-medium text-green-700 dark:text-green-300">Field Labor</CardTitle>
                 <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
@@ -4120,7 +4126,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Field Office</CardTitle>
+                <CardTitle className="text-xs font-medium text-orange-700 dark:text-orange-300">Field Office</CardTitle>
                 <Building2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
@@ -4136,7 +4142,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Utilities</CardTitle>
+                <CardTitle className="text-xs font-medium text-purple-700 dark:text-purple-300">Utilities</CardTitle>
                 <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               </CardHeader>
               <CardContent>
@@ -4157,7 +4163,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">GR Total</CardTitle>
+                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">GR Total</CardTitle>
                 <Calculator className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
@@ -4173,7 +4179,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Project Mgmt</CardTitle>
+                <CardTitle className="text-xs font-medium text-green-700 dark:text-green-300">Project Mgmt</CardTitle>
                 <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
@@ -4189,7 +4195,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                <CardTitle className="text-xs font-medium text-orange-700 dark:text-orange-300">
                   Quality & Safety
                 </CardTitle>
                 <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
@@ -4207,7 +4213,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                <CardTitle className="text-xs font-medium text-purple-700 dark:text-purple-300">
                   Testing & Cleanup
                 </CardTitle>
                 <TestTube className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -4230,7 +4236,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Bid</CardTitle>
+                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">Total Bid</CardTitle>
                 <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
@@ -4246,7 +4252,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Base Cost</CardTitle>
+                <CardTitle className="text-xs font-medium text-green-700 dark:text-green-300">Base Cost</CardTitle>
                 <Calculator className="h-4 w-4 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
@@ -4262,7 +4268,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Markup</CardTitle>
+                <CardTitle className="text-xs font-medium text-orange-700 dark:text-orange-300">Markup</CardTitle>
                 <TrendingUp className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
@@ -4281,7 +4287,7 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
+                <CardTitle className="text-xs font-medium text-purple-700 dark:text-purple-300">Approval</CardTitle>
                 <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               </CardHeader>
               <CardContent>
@@ -4354,11 +4360,10 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="categories">Cost Categories</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="categories">Cost Summary Detail</TabsTrigger>
           <TabsTrigger value="conditions">General Conditions</TabsTrigger>
           <TabsTrigger value="requirements">General Requirements</TabsTrigger>
-          <TabsTrigger value="summary">Final Summary</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories" className="space-y-6">
@@ -4372,7 +4377,11 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
                   </CardTitle>
                   <CardDescription>Editable cost categories with buyout savings and adjustments</CardDescription>
                 </div>
-                <Button onClick={addCostCategory} className="flex items-center gap-2">
+                <Button
+                  onClick={addCostCategory}
+                  className="flex items-center gap-2"
+                  style={{ backgroundColor: "rgb(250, 70, 22)", color: "#fff" }}
+                >
                   <Plus className="h-4 w-4" />
                   Add Category
                 </Button>
@@ -4395,172 +4404,21 @@ export function CostSummaryModule({ projectId, projectName, onSave, onExport, on
         </TabsContent>
 
         <TabsContent value="conditions" className="space-y-6">
-          <GridSection title="Field Labor – Construction" data={gcFieldLaborConstruction} />
-          <GridSection title="Field Labor – Close Out" data={gcFieldLaborCloseOut} />
-          <GridSection title="Field Office – Contractor" data={gcFieldOfficeContractor} />
-          <GridSection title="Temporary Utilities" data={gcTemporaryUtilities} />
+          <GridSection title="Field Labor – Construction" data={gcFieldLaborConstruction} type="conditions" />
+          <GridSection title="Field Labor – Close Out" data={gcFieldLaborCloseOut} type="conditions" />
+          <GridSection title="Field Office – Contractor" data={gcFieldOfficeContractor} type="conditions" />
+          <GridSection title="Temporary Utilities" data={gcTemporaryUtilities} type="conditions" />
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-6">
-          <GridSection title="Temporary Utilities" data={grTemporaryUtilities} />
-          <GridSection title="Cleaning" data={grCleaning} />
-          <GridSection title="Services" data={grServices} />
-          <GridSection title="Drawings" data={grDrawings} />
-          <GridSection title="Testing" data={grTesting} />
-          <GridSection title="Permits" data={grPermits} />
-          <GridSection title="Travel" data={grTravel} />
-          <GridSection title="Other" data={grOther} />
-        </TabsContent>
-
-        <TabsContent value="summary" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Final Cost Summary */}
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-                  <Calculator className="h-5 w-5" />
-                  Final Cost Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span>Direct Costs:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.subtotal)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>General Conditions:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.gcTotal)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>General Requirements:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.grTotal)}</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t pt-2">
-                    <span className="font-medium">Subtotal:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.baseTotal)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Overhead (8%):</span>
-                    <span className="font-semibold">{formatCurrency(calculations.overhead)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Profit (10%):</span>
-                    <span className="font-semibold">{formatCurrency(calculations.profit)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Contingency (5%):</span>
-                    <span className="font-semibold">{formatCurrency(calculations.contingency)}</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t-2 pt-3 text-lg">
-                    <span className="font-bold text-blue-800 dark:text-blue-200">Total Bid:</span>
-                    <span className="font-bold text-2xl text-blue-900 dark:text-blue-100">
-                      {formatCurrency(calculations.total)}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Approval Workflow */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Approval Workflow
-                </CardTitle>
-                <CardDescription>Review and approval status</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {approvalSteps.map((step) => (
-                    <div key={step.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{step.title}</div>
-                        <div className="text-sm text-muted-foreground">{step.description}</div>
-                        <div className="text-xs text-muted-foreground mt-1">Approver: {step.approver}</div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          className={
-                            step.status === "complete"
-                              ? "bg-green-100 text-green-800"
-                              : step.status === "skipped"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }
-                        >
-                          {step.status === "complete" ? "Approved" : step.status === "skipped" ? "Rejected" : "Pending"}
-                        </Badge>
-                        {step.status === "pending" && (
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              onClick={() => handleApprovalStep(step.id, "approve")}
-                              className="h-7 w-7 p-0 bg-green-600 hover:bg-green-700"
-                            >
-                              <CheckCircle className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleApprovalStep(step.id, "reject")}
-                              className="h-7 w-7 p-0"
-                            >
-                              ✕
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-3 border-t">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span>Approval Progress:</span>
-                    <span className="font-medium">{calculations.approvalProgress.toFixed(0)}%</span>
-                  </div>
-                  <Progress value={calculations.approvalProgress} className="h-2" />
-                </div>
-
-                {calculations.approvalProgress === 100 && (
-                  <Button
-                    className="w-full mt-4"
-                    onClick={() => {
-                      if (onSubmit) {
-                        const costSummaryData: CostSummaryData = {
-                          projectId,
-                          projectName,
-                          costCategories,
-                          generalConditions,
-                          generalRequirements,
-                          approvalSteps,
-                          subtotal: calculations.subtotal,
-                          overhead: calculations.overhead,
-                          profit: calculations.profit,
-                          contingency: calculations.contingency,
-                          total: calculations.total,
-                          approvalStatus: "approved",
-                          approvalProgress: calculations.approvalProgress,
-                          lastModified: new Date().toISOString(),
-                        }
-                        onSubmit(costSummaryData)
-                      }
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Send className="h-4 w-4 mr-2" />
-                    )}
-                    Submit for Client Review
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          <GridSection title="Temporary Utilities" data={grTemporaryUtilities} type="requirements" />
+          <GridSection title="Cleaning" data={grCleaning} type="requirements" />
+          <GridSection title="Services" data={grServices} type="requirements" />
+          <GridSection title="Drawings" data={grDrawings} type="requirements" />
+          <GridSection title="Testing" data={grTesting} type="requirements" />
+          <GridSection title="Permits" data={grPermits} type="requirements" />
+          <GridSection title="Travel" data={grTravel} type="requirements" />
+          <GridSection title="Other" data={grOther} type="requirements" />
         </TabsContent>
       </Tabs>
     </div>

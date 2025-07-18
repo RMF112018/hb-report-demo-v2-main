@@ -119,12 +119,12 @@ export const preconTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-blue-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-200 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The Pre-Construction Command Center unifies the earliest phases of project planning by integrating
+            Our Pre-Construction Command Center unifies the earliest phases of project planning by integrating
             estimating, staffing, scheduling, and BIM coordination into one intelligent workspace. By centralizing every
             preconstruction tool, team, and timeline, HB Intel brings true lifecycle continuity from initial bid through
             final closeout.
@@ -138,7 +138,8 @@ export const preconTabSlides: PresentationSlide[] = [
           >
             Instead of juggling separate Excel workbooks, BuildingConnected interfaces, and scattered planning
             documents, <strong>everything is centralized and connected</strong> from initial bid through final warranty
-            closeout.
+            closeout. Staffing plans and schedule durations automatically inform estimates by providing labor costs and
+            project timelines for general conditions and requirements.
           </motion.p>
 
           <motion.div
@@ -158,14 +159,17 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👥</div>
               <div className="font-medium text-white">Staffing Plans</div>
-              <div className="text-xs text-blue-200">Plan and allocate precon teams with lifecycle alignment.</div>
+              <div className="text-xs text-blue-200">
+                Plan field staffing with durations and labor costs that automatically populate general conditions
+                estimates.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Schedule Analysis</div>
               <div className="text-xs text-blue-200">
-                Build logic-tied preconstruction schedules with risk insights.
+                Define project durations to inform general conditions and requirements costs in estimates.
               </div>
             </div>
 
@@ -192,18 +196,18 @@ export const preconTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-green-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-200 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            The Unified Estimating Platform bridges the gap between subcontractor bid management and estimating
+            Our Unified Estimating Platform bridges the gap between subcontractor bid management and estimating
             workbooks. By integrating BuildingConnected directly into HB Intel's estimating environment, continuity is
             preserved throughout the entire project lifecycle—from the first bid to final closeout.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-green-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -222,19 +226,19 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔗</div>
               <div className="font-medium text-white">BuildingConnected Integration</div>
-              <div className="text-xs text-green-200">Real-time subcontractor bid management, fully embedded.</div>
+              <div className="text-xs text-blue-200">Real-time subcontractor bid management, fully embedded.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📊</div>
               <div className="font-medium text-white">Estimating Workbooks</div>
-              <div className="text-xs text-green-200">Excel-powered estimates with centralized project alignment.</div>
+              <div className="text-xs text-blue-200">Excel-powered estimates with centralized project alignment.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🔄</div>
               <div className="font-medium text-white">Lifecycle Continuity</div>
-              <div className="text-xs text-green-200">No handoffs lost—estimates evolve with the project.</div>
+              <div className="text-xs text-blue-200">No handoffs lost—estimates evolve with the project.</div>
             </div>
           </motion.div>
         </div>
@@ -252,25 +256,28 @@ export const preconTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-purple-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-200 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             Pre-Construction Planning connects the dots between estimating, staffing, schedule logic, and early-stage
-            risk identification. With support from HBI, your preconstruction team gains AI-driven intelligence to align
-            resources and mitigate risks before construction begins.
+            risk identification. With support from HBI, our preconstruction team gains AI-driven intelligence to align
+            resources and mitigate risks before construction begins. Staffing plans provide field labor durations and
+            costs that populate general conditions estimates, while schedule analysis defines project timelines that
+            inform general requirements costs.
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-purple-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Instead of separate staffing spreadsheets, disconnected schedules, and manual risk assessments,{" "}
             <strong>HBI AI aggregates trusted industry sources</strong> to provide comprehensive project intelligence
-            and constructibility analysis.
+            and constructibility analysis. The staffing and schedule data flows directly into estimating workbooks to
+            ensure accurate general conditions and requirements pricing.
           </motion.p>
 
           <motion.div
@@ -282,21 +289,24 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👥</div>
               <div className="font-medium text-white">Staffing Plans</div>
-              <div className="text-xs text-purple-200">
-                Precon staffing aligned with estimating and future execution.
+              <div className="text-xs text-blue-200">
+                Define field staffing with durations and labor costs that automatically populate general conditions
+                estimates.
               </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">📅</div>
               <div className="font-medium text-white">Schedule Generation</div>
-              <div className="text-xs text-purple-200">Smart bid-phase schedules with embedded phase logic.</div>
+              <div className="text-xs text-blue-200">
+                Create project durations that inform general conditions and requirements costs in estimates.
+              </div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🤖</div>
               <div className="font-medium text-white">HBI Risk Analysis</div>
-              <div className="text-xs text-purple-200">AI-powered insights guide better decisions, earlier.</div>
+              <div className="text-xs text-blue-200">AI-powered insights guide better decisions, earlier.</div>
             </div>
           </motion.div>
         </div>
@@ -314,7 +324,7 @@ export const preconTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-orange-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-200 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -325,7 +335,7 @@ export const preconTabSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-orange-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -344,21 +354,19 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⚡</div>
               <div className="font-medium text-white">Clash Detection</div>
-              <div className="text-xs text-orange-200">
-                Aggregated and visualized clashes from Autodesk and Procore.
-              </div>
+              <div className="text-xs text-blue-200">Aggregated and visualized clashes from Autodesk and Procore.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">👁️</div>
               <div className="font-medium text-white">Model Viewing</div>
-              <div className="text-xs text-orange-200">Presentation-ready model viewers built into each phase.</div>
+              <div className="text-xs text-blue-200">Presentation-ready model viewers built into each phase.</div>
             </div>
 
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💼</div>
               <div className="font-medium text-white">IDS Services</div>
-              <div className="text-xs text-orange-200">Track IDS offerings and costs—directly within estimating.</div>
+              <div className="text-xs text-blue-200">Track IDS offerings and costs—directly within estimating.</div>
             </div>
           </motion.div>
         </div>
@@ -376,7 +384,7 @@ export const preconTabSlides: PresentationSlide[] = [
         {/* Content */}
         <div className="relative z-10 w-full max-w-full">
           <motion.p
-            className="text-base md:text-xl text-emerald-100 max-w-4xl mb-8"
+            className="text-base md:text-xl text-blue-200 max-w-4xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -387,13 +395,13 @@ export const preconTabSlides: PresentationSlide[] = [
           </motion.p>
 
           <motion.p
-            className="text-sm md:text-base text-emerald-200 max-w-3xl mb-8"
+            className="text-sm md:text-base text-blue-200 max-w-3xl mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Instead of investing in separate estimating software with steep learning curves,{" "}
-            <strong>HB Intel delivers superior functionality</strong> with intuitive workflows that your team already
+            <strong>HB Intel delivers superior functionality</strong> with intuitive workflows that our team already
             understands—saving $120,500 annually in software costs (which only increases as usage grows) and countless
             hours of training and frustration.
           </motion.p>
@@ -407,7 +415,7 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">💰</div>
               <div className="font-medium text-white">$120,500+ Annually</div>
-              <div className="text-xs text-emerald-200">
+              <div className="text-xs text-blue-200">
                 Annual license savings that increase as usage grows over time.
               </div>
             </div>
@@ -415,7 +423,7 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">⏰</div>
               <div className="font-medium text-white">Zero Training Time</div>
-              <div className="text-xs text-emerald-200">
+              <div className="text-xs text-blue-200">
                 Familiar workflows eliminate steep learning curves and frustration.
               </div>
             </div>
@@ -423,7 +431,7 @@ export const preconTabSlides: PresentationSlide[] = [
             <div className="flex flex-col items-center space-y-3 p-4 bg-white/10 rounded-lg backdrop-blur-sm">
               <div className="text-3xl">🚀</div>
               <div className="font-medium text-white">Enhanced Capabilities</div>
-              <div className="text-xs text-emerald-200">
+              <div className="text-xs text-blue-200">
                 Everything Destini offers plus advanced integration and intelligence.
               </div>
             </div>

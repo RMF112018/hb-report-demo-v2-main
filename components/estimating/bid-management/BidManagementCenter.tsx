@@ -67,7 +67,7 @@ import ExportButton from "./ExportButton"
 import NewPursuitModal, { ProjectPursuitFormData } from "./NewPursuitModal"
 
 // Enhanced TypeScript interfaces
-type UserRole = "estimator" | "project-manager" | "executive" | "admin"
+type UserRole = "estimator" | "project-manager" | "executive" | "admin" | "hr-payroll"
 type TabId = "delivery" | "stage" | "estimates"
 
 interface BidManagementCenterProps {

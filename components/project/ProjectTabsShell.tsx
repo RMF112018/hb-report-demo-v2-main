@@ -250,25 +250,6 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
   const responsibilityMatrixContent = useMemo(
     () => (
       <div className="space-y-4 w-full max-w-full">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold">Responsibility Matrix</h3>
-            <p className="text-xs text-muted-foreground">
-              Manage task assignments and accountability across project teams
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-              <Download className="h-3 w-3 mr-1" />
-              Export
-            </Button>
-            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-              <Plus className="h-3 w-3 mr-1" />
-              Add Task
-            </Button>
-          </div>
-        </div>
-
         <ResponsibilityMatrixModule
           projectId={projectId}
           user={user}
@@ -376,50 +357,38 @@ const ProjectTabsShell: React.FC<ProjectTabsShellProps> = ({
       case "staffing":
         return (
           <div className="space-y-4 w-full max-w-full">
-            {/* Card-based Staffing Tab Navigation */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-              <div
+            {/* Tab-based Staffing Navigation */}
+            <div className="flex bg-muted rounded-lg p-1 mb-6">
+              <button
                 onClick={() => setStaffingSubTab("dashboard")}
-                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                   staffingSubTab === "dashboard"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <BarChart3 className="h-6 w-6" />
-                  <span className="text-sm font-medium">Dashboard</span>
-                  <span className="text-xs text-muted-foreground">Team overview and metrics</span>
-                </div>
-              </div>
-              <div
+                Dashboard
+              </button>
+              <button
                 onClick={() => setStaffingSubTab("timeline")}
-                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                   staffingSubTab === "timeline"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <Calendar className="h-6 w-6" />
-                  <span className="text-sm font-medium">Timeline</span>
-                  <span className="text-xs text-muted-foreground">Staffing timeline and scheduling</span>
-                </div>
-              </div>
-              <div
+                Timeline
+              </button>
+              <button
                 onClick={() => setStaffingSubTab("spcr")}
-                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                   staffingSubTab === "spcr"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
-                    : "border-border hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <FileText className="h-6 w-6" />
-                  <span className="text-sm font-medium">SPCR</span>
-                  <span className="text-xs text-muted-foreground">Staffing plan change requests</span>
-                </div>
-              </div>
+                SPCR
+              </button>
             </div>
             {/* Conditional Content Rendering */}
             {staffingSubTab === "timeline" && (

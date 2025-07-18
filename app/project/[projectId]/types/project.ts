@@ -105,6 +105,7 @@ export type UserRole =
   | "admin"
   | "viewer"
   | "presentation"
+  | "hr-payroll"
 
 /**
  * Project stage types

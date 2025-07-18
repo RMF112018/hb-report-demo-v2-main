@@ -43,7 +43,7 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            HB Intel serves as the digital headquarters for your Quality Control and Warranty teams—connecting insights,
+            HB Intel serves as the digital headquarters for our Quality Control and Warranty teams—connecting insights,
             actions, and accountability across the entire project lifecycle.
           </strong>
         </p>
@@ -87,8 +87,8 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            Harness HBI to auto-generate project-specific Quality Control programs, continuously aligned with evolving
-            specifications, submittals, and compliance requirements.
+            We harness HBI to auto-generate project-specific Quality Control programs, continuously aligned with
+            evolving specifications, submittals, and compliance requirements.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
@@ -130,7 +130,7 @@ export const qualitySlides: PresentationSlide[] = [
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Maintain your familiar field workflows while achieving real-time oversight and program continuity across
+          We maintain our familiar field workflows while achieving real-time oversight and program continuity across
           projects.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -174,7 +174,7 @@ export const qualitySlides: PresentationSlide[] = [
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Field continuity is preserved while office and executive teams gain seamless visibility into quality
+          Field continuity is preserved while our office and executive teams gain seamless visibility into quality
           performance and emerging risks.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -213,12 +213,12 @@ export const qualitySlides: PresentationSlide[] = [
 
         <p className="text-xl lg:text-2xl">
           <strong>
-            Convert field data into structured, compliant documents with automated formatting, issue flagging, and
+            We convert field data into structured, compliant documents with automated formatting, issue flagging, and
             stakeholder routing—all powered by HBI.
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Ensure continuity of documentation standards and reduce compliance gaps through proactive AI assistance.
+          We ensure continuity of documentation standards and reduce compliance gaps through proactive AI assistance.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -261,7 +261,7 @@ export const qualitySlides: PresentationSlide[] = [
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Create a continuous feedback loop between construction, operations, and post-completion support.
+          We create a continuous feedback loop between construction, operations, and post-completion support.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm">
@@ -304,7 +304,7 @@ export const qualitySlides: PresentationSlide[] = [
           </strong>
         </p>
         <p className="text-lg lg:text-xl opacity-90">
-          Proactively manage quality with AI insight, seamless data flow, and governance-aligned tracking—because
+          We proactively manage quality with AI insight, seamless data flow, and governance-aligned tracking—because
           quality is not a phase, it's a continuum.
         </p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">

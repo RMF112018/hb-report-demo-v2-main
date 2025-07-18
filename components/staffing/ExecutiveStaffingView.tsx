@@ -40,6 +40,10 @@ import {
   Download,
   Settings,
   History,
+  Brain,
+  Star,
+  Lightbulb,
+  User,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -50,9 +54,11 @@ import { PresentationCarousel } from "@/components/presentation/PresentationCaro
 import { executiveStaffingSlides } from "@/components/presentation/executiveStaffingSlides"
 
 // Import components
-import { InteractiveStaffingGantt } from "@/app/dashboard/staff-planning/components/InteractiveStaffingGantt"
+import { EnhancedInteractiveStaffingGantt } from "@/app/dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 import { ExportModal } from "@/components/constraints/ExportModal"
+import { BehavioralTeamCompatibility } from "@/components/staffing/BehavioralTeamCompatibility"
+import { TeamCompatibilityEngine } from "@/components/staffing/TeamCompatibilityEngine"
 import {
   ProtectedGrid,
   createProtectedColumn,
@@ -72,6 +78,41 @@ import spcrData from "@/data/mock/staffing/spcr.json"
 import cashFlowData from "@/data/mock/financial/cash-flow.json"
 
 // Types
+interface BehavioralProfile {
+  discProfile: {
+    type: string
+    primaryStyle: string
+    secondaryStyle: string
+    summary: string
+    strengths: string[]
+    growthAreas: string[]
+    communicationTips: string[]
+    stressResponse: string
+    motivators: string[]
+    deMotivators: string[]
+  }
+  integrus360: {
+    leadershipType: string
+    color: string
+    profile: {
+      type: string
+      description: string
+      leadershipStrengths: string[]
+      developmentAreas: string[]
+      communicationStyle: string
+      conflictResolution: string
+      teamMotivation: string
+      stressManagement: string
+    }
+  }
+  teamCompatibility: {
+    overallScore: number
+    compatibilityMatrix: Record<string, { score: number; notes: string }>
+    teamDynamics: string[]
+    recommendations: string[]
+  }
+}
+
 interface StaffMember {
   id: string
   name: string
@@ -81,6 +122,8 @@ interface StaffMember {
   experience: number
   strengths: string[]
   weaknesses: string[]
+  discProfile: string
+  behavioralProfile?: BehavioralProfile
   assignments: Array<{
     project_id: number
     role: string
@@ -133,7 +176,22 @@ interface AssignmentModal {
   assignments: AssignmentData[]
   selectedProject: number | null
   selectedPosition: string
-  step: "staff" | "assignments"
+  step: "overview" | "staff-selection" | "compatibility-analysis" | "assignment-config" | "confirmation"
+  selectedStaffMembers: StaffMember[]
+  compatibilityData: {
+    teamScore: number
+    diversityScore: number
+    leadershipBalance: number
+    communicationBalance: number
+    riskFactors: string[]
+    recommendations: string[]
+  } | null
+  assignmentDetails: {
+    startDate: string
+    endDate: string
+    comments: string
+    priority: "high" | "medium" | "low"
+  }
 }
 
 export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ activeTab = "overview" }) => {
@@ -161,7 +219,15 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     assignments: [],
     selectedProject: null,
     selectedPosition: "",
-    step: "staff",
+    step: "overview",
+    selectedStaffMembers: [],
+    compatibilityData: null,
+    assignmentDetails: {
+      startDate: "",
+      endDate: "",
+      comments: "",
+      priority: "medium",
+    },
   })
 
   // Initialize data
@@ -480,7 +546,15 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
       assignments: [],
       selectedProject: spcr.project_id,
       selectedPosition: spcr.position,
-      step: "staff",
+      step: "overview",
+      selectedStaffMembers: [],
+      compatibilityData: null,
+      assignmentDetails: {
+        startDate: "",
+        endDate: "",
+        comments: "",
+        priority: "medium",
+      },
     })
   }
 
@@ -494,33 +568,15 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     comments: "",
   })
 
-  // Handle staff member selection in assignment modal
-  const handleStaffMemberSelect = (staffMemberId: string) => {
-    const staff = staffMembers.find((s) => s.id === staffMemberId)
-    if (!staff || !assignmentModal.spcr) return
-
-    const initialAssignment = createNewAssignment(assignmentModal.spcr.position, assignmentModal.spcr.project_id)
-
-    // Set dates from SPCR
-    initialAssignment.startDate = assignmentModal.spcr.startDate.split("T")[0]
-    initialAssignment.endDate = assignmentModal.spcr.endDate.split("T")[0]
-    initialAssignment.comments = `Assigned to fulfill SPCR ${assignmentModal.spcr.id}: ${assignmentModal.spcr.explanation}`
-
-    setAssignmentModal((prev) => ({
-      ...prev,
-      staffMember: staff,
-      assignments: [initialAssignment],
-      step: "assignments",
-    }))
-  }
-
   // Handle assignment completion
   const handleCompleteAssignment = () => {
-    if (!assignmentModal.spcr || !assignmentModal.staffMember) return
+    if (!assignmentModal.spcr || assignmentModal.selectedStaffMembers.length === 0) return
+
+    const staffNames = assignmentModal.selectedStaffMembers.map((s) => s.name).join(", ")
 
     toast({
       title: "Assignment Completed",
-      description: `${assignmentModal.staffMember.name} assigned to ${assignmentModal.spcr.position}. SPCR ${assignmentModal.spcr.id} workflow closed.`,
+      description: `${staffNames} assigned to ${assignmentModal.spcr.position}. SPCR ${assignmentModal.spcr.id} workflow closed.`,
     })
 
     // Close modal
@@ -531,7 +587,15 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
       assignments: [],
       selectedProject: null,
       selectedPosition: "",
-      step: "staff",
+      step: "overview",
+      selectedStaffMembers: [],
+      compatibilityData: null,
+      assignmentDetails: {
+        startDate: "",
+        endDate: "",
+        comments: "",
+        priority: "medium",
+      },
     })
   }
 
@@ -547,9 +611,108 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
   const goBackToStaffSelection = () => {
     setAssignmentModal((prev) => ({
       ...prev,
-      step: "staff",
+      step: "staff-selection",
       staffMember: null,
       assignments: [],
+    }))
+  }
+
+  // Enhanced workflow functions
+  const handleNextStep = () => {
+    setAssignmentModal((prev) => {
+      switch (prev.step) {
+        case "overview":
+          return { ...prev, step: "staff-selection" }
+        case "staff-selection":
+          return { ...prev, step: "compatibility-analysis" }
+        case "compatibility-analysis":
+          return { ...prev, step: "assignment-config" }
+        case "assignment-config":
+          return { ...prev, step: "confirmation" }
+        default:
+          return prev
+      }
+    })
+  }
+
+  const handlePreviousStep = () => {
+    setAssignmentModal((prev) => {
+      switch (prev.step) {
+        case "staff-selection":
+          return { ...prev, step: "overview" }
+        case "compatibility-analysis":
+          return { ...prev, step: "staff-selection" }
+        case "assignment-config":
+          return { ...prev, step: "compatibility-analysis" }
+        case "confirmation":
+          return { ...prev, step: "assignment-config" }
+        default:
+          return prev
+      }
+    })
+  }
+
+  const handleStaffMemberSelect = (staffMemberId: string) => {
+    const staff = staffMembers.find((s) => s.id === staffMemberId)
+    if (!staff || !assignmentModal.spcr) return
+
+    setAssignmentModal((prev) => ({
+      ...prev,
+      selectedStaffMembers: [...prev.selectedStaffMembers, staff],
+      staffMember: staff,
+    }))
+  }
+
+  const handleRemoveStaffMember = (staffMemberId: string) => {
+    setAssignmentModal((prev) => ({
+      ...prev,
+      selectedStaffMembers: prev.selectedStaffMembers.filter((s) => s.id !== staffMemberId),
+    }))
+  }
+
+  const calculateTeamCompatibility = () => {
+    if (!assignmentModal.selectedStaffMembers.length || !assignmentModal.spcr) return
+
+    const existingTeam = staffMembers.filter((s) =>
+      s.assignments.some((a) => a.project_id === assignmentModal.spcr!.project_id)
+    )
+
+    const allTeamMembers = [...existingTeam, ...assignmentModal.selectedStaffMembers]
+
+    // Calculate compatibility metrics
+    const teamScore = Math.round(
+      allTeamMembers.reduce((sum, member) => {
+        return sum + (member.behavioralProfile?.teamCompatibility.overallScore || 70)
+      }, 0) / allTeamMembers.length
+    )
+
+    const diversityScore = Math.round(
+      (new Set(allTeamMembers.map((m) => m.behavioralProfile?.discProfile.type)).size / allTeamMembers.length) * 100
+    )
+
+    const leadershipTypes = allTeamMembers.map((m) => m.behavioralProfile?.integrus360.leadershipType).filter(Boolean)
+    const leadershipBalance = Math.round((new Set(leadershipTypes).size / leadershipTypes.length) * 100)
+
+    const riskFactors: string[] = []
+    if (teamScore < 70) riskFactors.push("Low team compatibility score")
+    if (diversityScore < 60) riskFactors.push("Limited behavioral diversity")
+    if (leadershipBalance < 50) riskFactors.push("Leadership style imbalance")
+
+    const recommendations: string[] = []
+    if (teamScore < 70) recommendations.push("Consider additional team building activities")
+    if (diversityScore < 60) recommendations.push("Look for candidates with different behavioral profiles")
+    if (leadershipBalance < 50) recommendations.push("Balance leadership styles for better team dynamics")
+
+    setAssignmentModal((prev) => ({
+      ...prev,
+      compatibilityData: {
+        teamScore,
+        diversityScore,
+        leadershipBalance,
+        communicationBalance: Math.round((teamScore + diversityScore) / 2),
+        riskFactors,
+        recommendations,
+      },
     }))
   }
 
@@ -919,6 +1082,82 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
                           </h3>
                           <EnhancedHBIInsights config={staffingInsights} cardId="staffing-executive" />
                         </div>
+
+                        {/* Behavioral Analytics */}
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                            Behavioral Analytics
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                  <span className="text-sm font-medium">Team Diversity</span>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="text-2xl font-bold">
+                                    {(() => {
+                                      const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                      const discTypes = staffWithProfiles.map(
+                                        (s) => s.behavioralProfile!.discProfile.type
+                                      )
+                                      const uniqueTypes = new Set(discTypes)
+                                      return Math.round((uniqueTypes.size / discTypes.length) * 100)
+                                    })()}
+                                    %
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Behavioral diversity across teams</div>
+                                </div>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Star className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                  <span className="text-sm font-medium">High Compatibility</span>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="text-2xl font-bold">
+                                    {(() => {
+                                      const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                      const highCompatibility = staffWithProfiles.filter(
+                                        (s) => s.behavioralProfile!.teamCompatibility.overallScore >= 80
+                                      )
+                                      return Math.round((highCompatibility.length / staffWithProfiles.length) * 100)
+                                    })()}
+                                    %
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Staff with excellent team fit</div>
+                                </div>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                  <span className="text-sm font-medium">Risk Assessment</span>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="text-2xl font-bold">
+                                    {(() => {
+                                      const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                      const lowCompatibility = staffWithProfiles.filter(
+                                        (s) => s.behavioralProfile!.teamCompatibility.overallScore < 60
+                                      )
+                                      return Math.round((lowCompatibility.length / staffWithProfiles.length) * 100)
+                                    })()}
+                                    %
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Staff needing placement review</div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </div>
                       </CardContent>
                     </CollapsibleContent>
                   </Card>
@@ -930,7 +1169,7 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
             {activeTab === "assignments" && (
               <div className="space-y-6">
                 {/* Staff Assignment Management */}
-                <InteractiveStaffingGantt userRole="executive" />
+                <EnhancedInteractiveStaffingGantt userRole="executive" />
               </div>
             )}
           </div>
@@ -952,11 +1191,78 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[99999]">
             <DialogHeader>
               <DialogTitle>
-                {assignmentModal.step === "staff" ? "Assign Staff to SPCR" : "Assignment Details"}
+                {assignmentModal.step === "overview"
+                  ? "Assignment Overview"
+                  : assignmentModal.step === "staff-selection"
+                  ? "Select Staff Members"
+                  : assignmentModal.step === "compatibility-analysis"
+                  ? "Team Compatibility Analysis"
+                  : assignmentModal.step === "assignment-config"
+                  ? "Configure Assignment"
+                  : "Confirm Assignment"}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-6">
+              {/* Progress Indicator */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  {["overview", "staff-selection", "compatibility-analysis", "assignment-config", "confirmation"].map(
+                    (step, index) => (
+                      <div key={step} className="flex items-center">
+                        <div
+                          className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
+                            assignmentModal.step === step
+                              ? "bg-primary text-primary-foreground"
+                              : index <
+                                [
+                                  "overview",
+                                  "staff-selection",
+                                  "compatibility-analysis",
+                                  "assignment-config",
+                                  "confirmation",
+                                ].indexOf(assignmentModal.step)
+                              ? "bg-green-500 text-white"
+                              : "bg-muted text-muted-foreground"
+                          )}
+                        >
+                          {index + 1}
+                        </div>
+                        {index < 4 && (
+                          <div
+                            className={cn(
+                              "w-8 h-1 mx-2",
+                              index <
+                                [
+                                  "overview",
+                                  "staff-selection",
+                                  "compatibility-analysis",
+                                  "assignment-config",
+                                  "confirmation",
+                                ].indexOf(assignmentModal.step)
+                                ? "bg-green-500"
+                                : "bg-muted"
+                            )}
+                          />
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Step{" "}
+                  {[
+                    "overview",
+                    "staff-selection",
+                    "compatibility-analysis",
+                    "assignment-config",
+                    "confirmation",
+                  ].indexOf(assignmentModal.step) + 1}{" "}
+                  of 5
+                </div>
+              </div>
+
               {/* SPCR Information */}
               {assignmentModal.spcr && (
                 <div className="bg-muted/50 p-4 rounded-lg">
@@ -987,147 +1293,573 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
                 </div>
               )}
 
-              {/* Step 1: Staff Selection */}
-              {assignmentModal.step === "staff" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Select Staff Member</label>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Choose a staff member who matches the position requirements for this SPCR.
-                    </p>
+              {/* Step 1: Overview & Context */}
+              {assignmentModal.step === "overview" && (
+                <div className="space-y-6">
+                  <div className="text-center py-8">
+                    <div className="mb-4">
+                      <Building2 className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Assignment Overview</h3>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        This guided workflow will help you make optimal staff assignments using behavioral data and team
+                        compatibility analysis.
+                      </p>
+                    </div>
 
-                    {(() => {
-                      const availableStaff = getStaffByPosition(assignmentModal.selectedPosition)
-
-                      if (availableStaff.length === 0) {
-                        return (
-                          <div className="text-center py-8 text-muted-foreground">
-                            <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                            <div className="text-sm">
-                              No staff members found for position: {assignmentModal.selectedPosition}
-                            </div>
-                            <div className="text-xs">Consider broadening the search or recruiting new staff.</div>
-                          </div>
-                        )
-                      }
-
-                      return (
-                        <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
-                          {availableStaff.map((staff) => (
-                            <div
-                              key={staff.id}
-                              className="p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                              onClick={() => handleStaffMemberSelect(staff.id)}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <div className="font-medium">{staff.name}</div>
-                                  <div className="text-sm text-muted-foreground">{staff.position}</div>
-                                  <div className="text-xs text-muted-foreground mt-1">
-                                    {staff.experience} years experience • ${staff.laborRate}/hr
-                                  </div>
-                                </div>
-                                <Button size="sm" className="ml-2">
-                                  Select
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )
-                    })()}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                      <div className="text-center p-4 border rounded-lg">
+                        <UserCheck className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                        <h4 className="font-medium text-sm">Smart Selection</h4>
+                        <p className="text-xs text-muted-foreground">
+                          AI-powered staff matching with behavioral insights
+                        </p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                        <h4 className="font-medium text-sm">Team Analysis</h4>
+                        <p className="text-xs text-muted-foreground">Comprehensive compatibility and risk assessment</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                        <h4 className="font-medium text-sm">Confident Assignment</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Data-driven decisions with clear recommendations
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 2: Assignment Details */}
-              {assignmentModal.step === "assignments" &&
-                assignmentModal.staffMember &&
-                assignmentModal.assignments.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Button variant="outline" size="sm" onClick={goBackToStaffSelection}>
-                        ← Back to Staff Selection
-                      </Button>
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm">
-                          <span className="font-medium">{assignmentModal.staffMember.name}</span>
-                          <span className="text-muted-foreground"> • {assignmentModal.staffMember.position}</span>
+              {/* Step 2: Smart Staff Selection */}
+              {assignmentModal.step === "staff-selection" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Select Staff Members</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Choose staff members who match the position requirements. Behavioral compatibility will be
+                      analyzed in the next step.
+                    </p>
+
+                    {/* Selected Staff Members */}
+                    {assignmentModal.selectedStaffMembers.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-medium mb-2">
+                          Selected Staff ({assignmentModal.selectedStaffMembers.length})
+                        </h4>
+                        <div className="space-y-2">
+                          {assignmentModal.selectedStaffMembers.map((staff) => (
+                            <div
+                              key={staff.id}
+                              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                            >
+                              <div>
+                                <div className="font-medium">{staff.name}</div>
+                                <div className="text-sm text-muted-foreground">{staff.position}</div>
+                              </div>
+                              <Button variant="outline" size="sm" onClick={() => handleRemoveStaffMember(staff.id)}>
+                                Remove
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       </div>
+                    )}
+
+                    {/* Available Staff */}
+                    <div>
+                      <h4 className="font-medium mb-2">Available Staff</h4>
+                      {(() => {
+                        const availableStaff = getStaffByPosition(assignmentModal.selectedPosition)
+
+                        if (availableStaff.length === 0) {
+                          return (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <div className="text-sm">
+                                No staff members found for position: {assignmentModal.selectedPosition}
+                              </div>
+                              <div className="text-xs">Consider broadening the search or recruiting new staff.</div>
+                            </div>
+                          )
+                        }
+
+                        return (
+                          <div className="space-y-3 max-h-64 overflow-y-auto">
+                            {availableStaff.map((staff) => (
+                              <div
+                                key={staff.id}
+                                className="p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                                onClick={() => handleStaffMemberSelect(staff.id)}
+                              >
+                                <div className="flex justify-between items-start mb-3">
+                                  <div className="flex-1">
+                                    <div className="font-medium">{staff.name}</div>
+                                    <div className="text-sm text-muted-foreground">{staff.position}</div>
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                      {staff.experience} years experience • ${staff.laborRate}/hr
+                                    </div>
+                                  </div>
+                                  <Button size="sm" className="ml-2">
+                                    Select
+                                  </Button>
+                                </div>
+
+                                {/* Behavioral Profile Summary */}
+                                {staff.behavioralProfile && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-xs">
+                                      <Brain className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                      <span className="font-medium">Behavioral Profile</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-muted-foreground">DiSC:</span>
+                                        <Badge variant="outline" className="text-xs">
+                                          {staff.behavioralProfile.discProfile.type}
+                                        </Badge>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-muted-foreground">Leadership:</span>
+                                        <Badge variant="outline" className="text-xs">
+                                          {staff.behavioralProfile.integrus360.leadershipType}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {staff.behavioralProfile.discProfile.summary.substring(0, 100)}...
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Team Compatibility Preview */}
+                                {staff.behavioralProfile && (
+                                  <div className="mt-2 pt-2 border-t">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-muted-foreground">Team Compatibility:</span>
+                                      <Badge
+                                        variant="outline"
+                                        className={cn(
+                                          "text-xs",
+                                          staff.behavioralProfile.teamCompatibility.overallScore >= 85
+                                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                            : staff.behavioralProfile.teamCompatibility.overallScore >= 70
+                                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+                                            : staff.behavioralProfile.teamCompatibility.overallScore >= 50
+                                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                            : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                        )}
+                                      >
+                                        {staff.behavioralProfile.teamCompatibility.overallScore}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      })()}
                     </div>
+                  </div>
+                </div>
+              )}
 
-                    {/* Assignment Form */}
-                    {assignmentModal.assignments.map((assignment, index) => (
-                      <div key={assignment.id} className="border rounded-lg p-4 space-y-4">
-                        <h5 className="font-medium">Assignment Details</h5>
+              {/* Step 3: Compatibility Analysis */}
+              {assignmentModal.step === "compatibility-analysis" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Team Compatibility Analysis</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Detailed analysis of how selected staff members will fit with the existing team.
+                    </p>
 
+                    {assignmentModal.selectedStaffMembers.length > 0 ? (
+                      <div className="space-y-6">
+                        {/* Compatibility Metrics */}
+                        {assignmentModal.compatibilityData && (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="text-2xl font-bold text-green-600">
+                                  {assignmentModal.compatibilityData.teamScore}%
+                                </div>
+                                <div className="text-xs text-muted-foreground">Team Score</div>
+                              </CardContent>
+                            </Card>
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="text-2xl font-bold text-blue-600">
+                                  {assignmentModal.compatibilityData.diversityScore}%
+                                </div>
+                                <div className="text-xs text-muted-foreground">Diversity</div>
+                              </CardContent>
+                            </Card>
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="text-2xl font-bold text-purple-600">
+                                  {assignmentModal.compatibilityData.leadershipBalance}%
+                                </div>
+                                <div className="text-xs text-muted-foreground">Leadership Balance</div>
+                              </CardContent>
+                            </Card>
+                            <Card>
+                              <CardContent className="p-4">
+                                <div className="text-2xl font-bold text-orange-600">
+                                  {assignmentModal.compatibilityData.communicationBalance}%
+                                </div>
+                                <div className="text-xs text-muted-foreground">Communication</div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        )}
+
+                        {/* Risk Assessment */}
+                        {assignmentModal.compatibilityData &&
+                          assignmentModal.compatibilityData.riskFactors.length > 0 && (
+                            <Card>
+                              <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-600" />
+                                  Risk Factors
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2">
+                                  {assignmentModal.compatibilityData.riskFactors.map((risk, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm">
+                                      <span className="text-orange-600 mt-1">•</span>
+                                      {risk}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                        {/* Recommendations */}
+                        {assignmentModal.compatibilityData &&
+                          assignmentModal.compatibilityData.recommendations.length > 0 && (
+                            <Card>
+                              <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                  <Lightbulb className="h-4 w-4 text-blue-600" />
+                                  Recommendations
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="space-y-2">
+                                  {assignmentModal.compatibilityData.recommendations.map((rec, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm">
+                                      <span className="text-blue-600 mt-1">•</span>
+                                      {rec}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                        {/* Behavioral Analysis for Each Selected Staff */}
+                        <div className="space-y-4">
+                          {assignmentModal.selectedStaffMembers.map((staff) => (
+                            <Card key={staff.id}>
+                              <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                  <User className="h-4 w-4" />
+                                  {staff.name} - Behavioral Analysis
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                {staff.behavioralProfile && (
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <BehavioralTeamCompatibility
+                                      staffMember={staff}
+                                      existingTeamMembers={staffMembers.filter((s) =>
+                                        s.assignments.some((a) => a.project_id === assignmentModal.selectedProject)
+                                      )}
+                                      projectId={assignmentModal.selectedProject || undefined}
+                                      showDetailedAnalysis={true}
+                                    />
+
+                                    <TeamCompatibilityEngine
+                                      candidate={staff}
+                                      existingTeam={staffMembers.filter((s) =>
+                                        s.assignments.some((a) => a.project_id === assignmentModal.selectedProject)
+                                      )}
+                                      projectId={assignmentModal.selectedProject || undefined}
+                                      onTeamAnalysis={(analysis) => {
+                                        console.log("Team analysis:", analysis)
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <div className="text-sm">No staff members selected</div>
+                        <div className="text-xs">Please go back and select staff members for analysis</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Assignment Configuration */}
+              {assignmentModal.step === "assignment-config" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Configure Assignment Details</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Set the final details for the staff assignment with behavioral context.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Assignment Details */}
+                      <div className="space-y-4">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">Project</label>
+                          <label className="text-sm font-medium">Start Date</label>
+                          <Input
+                            type="date"
+                            value={assignmentModal.assignmentDetails.startDate}
+                            onChange={(e) =>
+                              setAssignmentModal((prev) => ({
+                                ...prev,
+                                assignmentDetails: { ...prev.assignmentDetails, startDate: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">End Date</label>
+                          <Input
+                            type="date"
+                            value={assignmentModal.assignmentDetails.endDate}
+                            onChange={(e) =>
+                              setAssignmentModal((prev) => ({
+                                ...prev,
+                                assignmentDetails: { ...prev.assignmentDetails, endDate: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Priority</label>
                           <Select
-                            value={assignment.project_id.toString()}
-                            onValueChange={(value) => updateAssignment(assignment.id, { project_id: Number(value) })}
+                            value={assignmentModal.assignmentDetails.priority}
+                            onValueChange={(value: "high" | "medium" | "low") =>
+                              setAssignmentModal((prev) => ({
+                                ...prev,
+                                assignmentDetails: { ...prev.assignmentDetails, priority: value },
+                              }))
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {projects
-                                .filter((p) => p.active)
-                                .map((project) => (
-                                  <SelectItem key={project.project_id} value={project.project_id.toString()}>
-                                    {project.name}
-                                  </SelectItem>
-                                ))}
+                              <SelectItem value="high">High</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="low">Low</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">Start Date</label>
-                            <Input
-                              type="date"
-                              value={assignment.startDate}
-                              onChange={(e) => updateAssignment(assignment.id, { startDate: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">End Date</label>
-                            <Input
-                              type="date"
-                              value={assignment.endDate}
-                              onChange={(e) => updateAssignment(assignment.id, { endDate: e.target.value })}
-                            />
-                          </div>
-                        </div>
-
                         <div>
-                          <label className="text-sm font-medium mb-2 block">Comments</label>
+                          <label className="text-sm font-medium">Comments</label>
                           <Textarea
-                            placeholder="Add any notes about this assignment..."
-                            value={assignment.comments}
-                            onChange={(e) => updateAssignment(assignment.id, { comments: e.target.value })}
+                            value={assignmentModal.assignmentDetails.comments}
+                            onChange={(e) =>
+                              setAssignmentModal((prev) => ({
+                                ...prev,
+                                assignmentDetails: { ...prev.assignmentDetails, comments: e.target.value },
+                              }))
+                            }
+                            placeholder="Add any additional notes or context..."
                             rows={3}
                           />
                         </div>
                       </div>
-                    ))}
 
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => setAssignmentModal((prev) => ({ ...prev, isOpen: false }))}
-                      >
-                        Cancel
-                      </Button>
-                      <Button onClick={handleCompleteAssignment} className="bg-green-600 hover:bg-green-700">
-                        <UserCheck className="h-4 w-4 mr-1" />
-                        Complete Assignment
-                      </Button>
+                      {/* Behavioral Context */}
+                      <div className="space-y-4">
+                        <h4 className="font-medium">Behavioral Context</h4>
+                        {assignmentModal.selectedStaffMembers.map((staff) => (
+                          <Card key={staff.id} className="p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <User className="h-4 w-4" />
+                              <span className="font-medium">{staff.name}</span>
+                            </div>
+                            {staff.behavioralProfile && (
+                              <div className="space-y-2 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground">DiSC:</span>
+                                  <Badge variant="outline">{staff.behavioralProfile.discProfile.type}</Badge>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground">Leadership:</span>
+                                  <Badge variant="outline">{staff.behavioralProfile.integrus360.leadershipType}</Badge>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {staff.behavioralProfile.discProfile.summary.substring(0, 80)}...
+                                </div>
+                              </div>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Step 5: Confirmation */}
+              {assignmentModal.step === "confirmation" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Confirm Assignment</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Review the final assignment details and behavioral impact assessment.
+                    </p>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Assignment Summary */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Assignment Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <span className="text-sm font-medium">Project:</span>
+                            <div className="text-sm text-muted-foreground">
+                              {assignmentModal.spcr && getProjectName(assignmentModal.spcr.project_id)}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">Position:</span>
+                            <div className="text-sm text-muted-foreground">{assignmentModal.selectedPosition}</div>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">Staff Members:</span>
+                            <div className="text-sm text-muted-foreground">
+                              {assignmentModal.selectedStaffMembers.map((s) => s.name).join(", ")}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">Duration:</span>
+                            <div className="text-sm text-muted-foreground">
+                              {assignmentModal.assignmentDetails.startDate} to{" "}
+                              {assignmentModal.assignmentDetails.endDate}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">Priority:</span>
+                            <Badge
+                              variant={
+                                assignmentModal.assignmentDetails.priority === "high"
+                                  ? "destructive"
+                                  : assignmentModal.assignmentDetails.priority === "medium"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                            >
+                              {assignmentModal.assignmentDetails.priority}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Behavioral Impact */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Behavioral Impact Assessment</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {assignmentModal.compatibilityData ? (
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-green-600">
+                                    {assignmentModal.compatibilityData.teamScore}%
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Team Compatibility</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-blue-600">
+                                    {assignmentModal.compatibilityData.diversityScore}%
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Behavioral Diversity</div>
+                                </div>
+                              </div>
+                              {assignmentModal.compatibilityData.riskFactors.length > 0 && (
+                                <div>
+                                  <h5 className="font-medium text-sm mb-2">Risk Factors:</h5>
+                                  <ul className="text-xs space-y-1">
+                                    {assignmentModal.compatibilityData.riskFactors.map((risk, index) => (
+                                      <li key={index} className="text-orange-600">
+                                        • {risk}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-center text-muted-foreground">
+                              <Brain className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <div className="text-sm">No compatibility data available</div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6 border-t">
+                <div>
+                  {assignmentModal.step !== "overview" && (
+                    <Button variant="outline" onClick={handlePreviousStep}>
+                      ← Previous
+                    </Button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setAssignmentModal((prev) => ({ ...prev, isOpen: false }))}>
+                    Cancel
+                  </Button>
+                  {assignmentModal.step === "overview" && <Button onClick={handleNextStep}>Get Started →</Button>}
+                  {assignmentModal.step === "staff-selection" && (
+                    <Button
+                      onClick={() => {
+                        calculateTeamCompatibility()
+                        handleNextStep()
+                      }}
+                      disabled={assignmentModal.selectedStaffMembers.length === 0}
+                    >
+                      Analyze Compatibility →
+                    </Button>
+                  )}
+                  {assignmentModal.step === "compatibility-analysis" && (
+                    <Button onClick={handleNextStep}>Configure Assignment →</Button>
+                  )}
+                  {assignmentModal.step === "assignment-config" && (
+                    <Button onClick={handleNextStep}>Review & Confirm →</Button>
+                  )}
+                  {assignmentModal.step === "confirmation" && (
+                    <Button onClick={handleCompleteAssignment} className="bg-green-600 hover:bg-green-700">
+                      <UserCheck className="h-4 w-4 mr-1" />
+                      Complete Assignment
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

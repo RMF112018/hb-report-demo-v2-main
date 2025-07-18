@@ -3,7 +3,14 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { User } from "@/types"
 
-export type DemoRole = "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "presentation"
+export type DemoRole =
+  | "executive"
+  | "project-executive"
+  | "project-manager"
+  | "estimator"
+  | "admin"
+  | "presentation"
+  | "hr-payroll"
 export type DemoUser = User
 
 interface AuthContextType {
@@ -93,6 +100,18 @@ const demoUsers: DemoUser[] = [
     createdAt: new Date().toISOString(),
     isActive: true,
     avatar: "/avatars/demo-presenter.png",
+    permissions: { preConAccess: true },
+  },
+  {
+    id: "7",
+    firstName: "Lisa",
+    lastName: "Rodriguez",
+    email: "lisa.rodriguez@hedrickbrothers.com",
+    role: "hr-payroll",
+    company: "Hedrick Brothers",
+    createdAt: new Date().toISOString(),
+    isActive: true,
+    avatar: "/avatars/lisa-rodriguez.png",
     permissions: { preConAccess: true },
   },
 ]

@@ -30,8 +30,179 @@ import {
   ChevronUp,
   ChevronDown,
   Minus,
+  Eye,
 } from "lucide-react"
 import { useStaffingStore } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+
+// Power BI Visualization Component
+const PowerBIVisualization = ({
+  title,
+  type,
+  data,
+  className,
+}: {
+  title: string
+  type: "chart" | "gauge" | "radar" | "funnel"
+  data: any
+  className?: string
+}) => {
+  const getVisualizationContent = () => {
+    switch (type) {
+      case "chart":
+        return (
+          <div className="h-full w-full">
+            {/* DiSC Distribution Bar Chart */}
+            <div className="flex items-end justify-between h-24 gap-2 px-2">
+              {data.discProfiles?.map((profile: any, index: number) => (
+                <div key={index} className="flex flex-col items-center flex-1">
+                  <div
+                    className="w-full rounded-t-sm transition-all duration-300 hover:opacity-80 min-h-2"
+                    style={{
+                      height: `${Math.max((profile.count / 13) * 80, 8)}px`,
+                      backgroundColor: profile.color.replace("text-", ""),
+                    }}
+                  />
+                  <div className="text-xs font-medium mt-1 text-center">{profile.type}</div>
+                  <div className="text-xs text-muted-foreground">{profile.count}</div>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-xs font-medium text-blue-600">DiSC Distribution</div>
+              <div className="text-xs text-muted-foreground">13 Staff Members</div>
+            </div>
+          </div>
+        )
+      case "gauge":
+        return (
+          <div className="h-full w-full">
+            {/* Team Dynamics Gauge */}
+            <div className="relative h-24 w-24 mx-auto">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="8" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="8"
+                  strokeDasharray={`${(data.teamDynamics?.communication || 0) * 2.5} 250`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-blue-600">{data.teamDynamics?.communication || 0}%</div>
+                  <div className="text-xs text-muted-foreground">Communication</div>
+                </div>
+              </div>
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-xs font-medium text-green-600">Team Dynamics</div>
+              <div className="text-xs text-muted-foreground">Gauge Visualization</div>
+            </div>
+          </div>
+        )
+      case "radar":
+        return (
+          <div className="h-full w-full">
+            {/* Leadership Styles Radar Chart */}
+            <div className="relative h-24 w-24 mx-auto">
+              <svg className="w-full h-full" viewBox="0 0 100 100">
+                {/* Radar grid lines */}
+                <polygon points="50,5 75,25 75,75 50,95 25,75 25,25" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+                <polygon points="50,15 65,30 65,70 50,85 35,70 35,30" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+                <polygon points="50,25 55,35 55,65 50,75 45,65 45,35" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+                {/* Data polygon with more realistic values */}
+                <polygon
+                  points="50,20 70,35 72,65 50,80 30,65 28,35"
+                  fill="rgba(147, 51, 234, 0.3)"
+                  stroke="#9333ea"
+                  strokeWidth="2"
+                />
+                {/* Data points with labels */}
+                {[
+                  { x: 50, y: 20, label: "Analytical", value: "85%" },
+                  { x: 70, y: 35, label: "Directive", value: "78%" },
+                  { x: 72, y: 65, label: "Conceptual", value: "92%" },
+                  { x: 50, y: 80, label: "Behavioral", value: "81%" },
+                  { x: 30, y: 65, label: "Adaptive", value: "88%" },
+                  { x: 28, y: 35, label: "Strategic", value: "76%" },
+                ].map((point, index) => (
+                  <g key={index}>
+                    <circle cx={point.x} cy={point.y} r="3" fill="#9333ea" stroke="white" strokeWidth="1" />
+                    <text x={point.x} y={point.y - 5} fontSize="6" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      {point.value}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-xs font-medium text-purple-600">Leadership Styles</div>
+              <div className="text-xs text-muted-foreground">Radar Chart</div>
+            </div>
+          </div>
+        )
+      case "funnel":
+        return (
+          <div className="h-full w-full">
+            {/* Team Compatibility Funnel */}
+            <div className="flex flex-col items-center h-24 justify-center gap-2">
+              <div className="w-28 h-5 bg-blue-500 rounded-sm flex items-center justify-center">
+                <span className="text-xs text-white font-medium">13 Staff</span>
+              </div>
+              <div className="w-24 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
+                <span className="text-xs text-white font-medium">11 Compatible</span>
+              </div>
+              <div className="w-20 h-4 bg-blue-300 rounded-sm flex items-center justify-center">
+                <span className="text-xs text-white font-medium">9 Optimal</span>
+              </div>
+              <div className="w-16 h-4 bg-blue-200 rounded-sm flex items-center justify-center">
+                <span className="text-xs text-white font-medium">7 High</span>
+              </div>
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-xs font-medium text-orange-600">Compatibility Flow</div>
+              <div className="text-xs text-muted-foreground">Funnel Analysis</div>
+            </div>
+          </div>
+        )
+      default:
+        return (
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">Power BI</div>
+            <div className="text-xs text-muted-foreground">{title}</div>
+          </div>
+        )
+    }
+  }
+
+  const getGradientClass = () => {
+    switch (type) {
+      case "chart":
+        return "bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200"
+      case "gauge":
+        return "bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200"
+      case "radar":
+        return "bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200"
+      case "funnel":
+        return "bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200"
+      default:
+        return "bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200"
+    }
+  }
+
+  return (
+    <div className={cn("relative h-32 rounded-lg p-3", getGradientClass(), className)}>
+      <div className="absolute inset-0 flex items-center justify-center">{getVisualizationContent()}</div>
+      <div className="absolute top-2 right-2">
+        <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+  )
+}
 
 // Team Utilization Card
 export const TeamUtilizationCard = ({
@@ -66,12 +237,6 @@ export const TeamUtilizationCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <Users className="h-4 w-4 text-blue-600" />
-          Team Utilization
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-4", isCompact && "space-y-3")}>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -149,12 +314,6 @@ export const LaborCostAnalysisCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <DollarSign className="h-4 w-4 text-green-600" />
-          Labor Cost Analysis
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-4", isCompact && "space-y-3")}>
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -241,12 +400,6 @@ export const SPCRActivityCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <FileText className="h-4 w-4 text-purple-600" />
-          SPCR Activity
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-4", isCompact && "space-y-3")}>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="space-y-1">
@@ -328,12 +481,6 @@ export const TeamExperienceCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <Award className="h-4 w-4 text-yellow-600" />
-          Team Experience
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-4", isCompact && "space-y-3")}>
         <div className="text-center">
           <div className="text-2xl font-bold text-yellow-600">{experienceStats.avgExperience.toFixed(1)}</div>
@@ -422,12 +569,6 @@ export const ProjectStaffingOverviewCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <Building2 className="h-4 w-4 text-blue-600" />
-          Project Staffing
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-4", isCompact && "space-y-3")}>
         <div className="space-y-2">
           <div className="text-sm font-medium truncate">{projectStats.project.name}</div>
@@ -551,12 +692,6 @@ export const StaffingAlertsCard = ({
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardHeader className={cn("pb-3", isCompact && "pb-2")}>
-        <CardTitle className={cn("text-base flex items-center gap-2", isCompact && "text-sm")}>
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
-          Staffing Alerts
-        </CardTitle>
-      </CardHeader>
       <CardContent className={cn("space-y-3", isCompact && "space-y-2")}>
         {alerts.length === 0 ? (
           <div className="text-center py-4">
@@ -579,6 +714,300 @@ export const StaffingAlertsCard = ({
             </div>
           ))
         )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// Team Compatibility Card
+export const TeamCompatibilityCard = ({
+  className,
+  isCompact = false,
+  projectId,
+}: {
+  className?: string
+  isCompact?: boolean
+  projectId?: string
+}) => {
+  // Mock data for DiSC and Integrus 360 assessments
+  const compatibilityData = useMemo(() => {
+    const discProfiles = [
+      { type: "D", count: 2, description: "Dominance", color: "text-red-600", bgColor: "bg-red-100" },
+      { type: "i", count: 5, description: "Influence", color: "text-yellow-600", bgColor: "bg-yellow-100" },
+      { type: "S", count: 4, description: "Steadiness", color: "text-green-600", bgColor: "bg-green-100" },
+      { type: "C", count: 2, description: "Conscientiousness", color: "text-blue-600", bgColor: "bg-blue-100" },
+    ]
+
+    const integrusProfiles = [
+      { type: "Analytical", count: 3, description: "Data-driven decision makers", color: "text-blue-600" },
+      { type: "Directive", count: 2, description: "Results-oriented leaders", color: "text-red-600" },
+      { type: "Conceptual", count: 4, description: "Innovative problem solvers", color: "text-purple-600" },
+      { type: "Behavioral", count: 3, description: "Relationship-focused", color: "text-green-600" },
+      { type: "Adaptive", count: 1, description: "Flexible communicators", color: "text-orange-600" },
+    ]
+
+    const teamDynamics = {
+      communication: 87,
+      collaboration: 82,
+      conflict: 91,
+      innovation: 79,
+    }
+
+    const compatibilityScore = Math.round(
+      (teamDynamics.communication + teamDynamics.collaboration + teamDynamics.conflict + teamDynamics.innovation) / 4
+    )
+
+    return {
+      discProfiles,
+      integrusProfiles,
+      teamDynamics,
+      compatibilityScore,
+    }
+  }, [])
+
+  return (
+    <Card className={cn("h-full", className)}>
+      <CardContent className={cn("p-4 h-full", isCompact && "p-3")}>
+        {/* Quadrant Layout */}
+        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full">
+          {/* Top-Left: KPI Score */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+            <div className="text-center h-full flex flex-col justify-center">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                {compatibilityData.compatibilityScore}%
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">Team Compatibility</div>
+              <div className="text-xs text-muted-foreground mt-1">13 Staff Members</div>
+            </div>
+          </div>
+
+          {/* Top-Right: DiSC Distribution */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
+            <div className="h-full flex flex-col">
+              <div className="text-xs font-medium text-green-600 dark:text-green-400 mb-2">DiSC Distribution</div>
+              <div className="flex items-end justify-between flex-1 gap-2">
+                {compatibilityData.discProfiles.map((profile, index) => {
+                  // Map DiSC colors to actual CSS colors
+                  const getBarColor = (type: string) => {
+                    switch (type) {
+                      case "D":
+                        return "#dc2626" // red-600
+                      case "i":
+                        return "#ca8a04" // yellow-600
+                      case "S":
+                        return "#16a34a" // green-600
+                      case "C":
+                        return "#2563eb" // blue-600
+                      default:
+                        return "#6b7280" // gray-500
+                    }
+                  }
+
+                  return (
+                    <div key={index} className="flex flex-col items-center flex-1 group relative">
+                      <div
+                        className="w-full rounded-t-sm transition-all duration-300 hover:opacity-80 min-h-4 cursor-pointer hover:scale-105"
+                        style={{
+                          height: `${Math.max((profile.count / 5) * 60, 16)}px`,
+                          backgroundColor: getBarColor(profile.type),
+                        }}
+                        title={`${profile.type}: ${profile.count} staff members (${profile.description})`}
+                      />
+                      <div className="text-xs font-medium mt-1 text-center">{profile.type}</div>
+                      <div className="text-xs text-muted-foreground">{profile.count}</div>
+
+                      {/* Interactive Tooltip */}
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                        {profile.count} staff members
+                        <div className="text-xs text-gray-300">{profile.description}</div>
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom-Left: Leadership Radar */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+            <div className="h-full flex flex-col">
+              <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-2">Leadership Styles</div>
+              <div className="flex-1 flex items-center justify-center relative">
+                <div className="relative h-20 w-20">
+                  <svg className="w-full h-full" viewBox="0 0 100 100">
+                    {/* Radar grid lines */}
+                    <polygon
+                      points="50,5 75,25 75,75 50,95 25,75 25,25"
+                      fill="none"
+                      stroke="currentColor"
+                      className="text-gray-300 dark:text-gray-600"
+                      strokeWidth="1"
+                    />
+                    <polygon
+                      points="50,15 65,30 65,70 50,85 35,70 35,30"
+                      fill="none"
+                      stroke="currentColor"
+                      className="text-gray-300 dark:text-gray-600"
+                      strokeWidth="1"
+                    />
+                    <polygon
+                      points="50,25 55,35 55,65 50,75 45,65 45,35"
+                      fill="none"
+                      stroke="currentColor"
+                      className="text-gray-300 dark:text-gray-600"
+                      strokeWidth="1"
+                    />
+
+                    {/* Axis Labels */}
+                    <text x="50" y="3" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Analytical
+                    </text>
+                    <text x="78" y="25" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Directive
+                    </text>
+                    <text x="78" y="75" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Conceptual
+                    </text>
+                    <text x="50" y="98" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Behavioral
+                    </text>
+                    <text x="22" y="75" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Adaptive
+                    </text>
+                    <text x="22" y="25" fontSize="4" fill="#9333ea" textAnchor="middle" fontWeight="bold">
+                      Strategic
+                    </text>
+
+                    {/* Data polygon with realistic leadership style scores */}
+                    <polygon
+                      points="50,20 70,35 75,60 50,80 25,60 30,35"
+                      fill="rgba(147, 51, 234, 0.6)"
+                      stroke="#9333ea"
+                      strokeWidth="2"
+                      className="cursor-pointer hover:opacity-80 transition-opacity duration-200"
+                    />
+
+                    {/* Data points with better positioning and larger size */}
+                    {[
+                      { x: 50, y: 20, label: "Analytical", value: "85%", description: "Data-driven decision makers" },
+                      { x: 70, y: 35, label: "Directive", value: "78%", description: "Results-oriented leaders" },
+                      { x: 75, y: 60, label: "Conceptual", value: "92%", description: "Innovative problem solvers" },
+                      { x: 50, y: 80, label: "Behavioral", value: "81%", description: "Relationship-focused" },
+                      { x: 25, y: 60, label: "Adaptive", value: "88%", description: "Flexible communicators" },
+                      { x: 30, y: 35, label: "Strategic", value: "76%", description: "Long-term planners" },
+                    ].map((point, index) => (
+                      <g key={index} className="cursor-pointer">
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r="3"
+                          fill="#9333ea"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          className="hover:r-4 transition-all duration-200"
+                        />
+                        <text
+                          x={point.x}
+                          y={point.y - 6}
+                          fontSize="6"
+                          fill="#9333ea"
+                          textAnchor="middle"
+                          fontWeight="bold"
+                          className="pointer-events-none"
+                        >
+                          {point.value}
+                        </text>
+
+                        {/* Interactive tooltip for each data point */}
+                        <title>
+                          {point.label}: {point.value} - {point.description}
+                        </title>
+                      </g>
+                    ))}
+                  </svg>
+                </div>
+
+                {/* Legend */}
+                <div className="absolute bottom-0 left-0 right-0 text-center">
+                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                    Leadership Style Distribution
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Hover over points for details</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom-Right: Team Dynamics */}
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-lg p-3 border border-orange-200 dark:border-orange-800">
+            <div className="h-full flex flex-col">
+              <div className="text-xs font-medium text-orange-600 dark:text-orange-400 mb-2">Team Dynamics</div>
+              <div className="flex-1 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Communication</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className="bg-green-500 h-1.5 rounded-full"
+                        style={{ width: `${compatibilityData.teamDynamics.communication}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium">{compatibilityData.teamDynamics.communication}%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Collaboration</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className="bg-blue-500 h-1.5 rounded-full"
+                        style={{ width: `${compatibilityData.teamDynamics.collaboration}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium">{compatibilityData.teamDynamics.collaboration}%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Conflict Resolution</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className="bg-purple-500 h-1.5 rounded-full"
+                        style={{ width: `${compatibilityData.teamDynamics.conflict}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium">{compatibilityData.teamDynamics.conflict}%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Innovation</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className="bg-orange-500 h-1.5 rounded-full"
+                        style={{ width: `${compatibilityData.teamDynamics.innovation}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium">{compatibilityData.teamDynamics.innovation}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Status */}
+        <div className="flex items-center justify-between text-xs mt-3 pt-2 border-t border-border">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Eye className="h-3 w-3" />
+            <span>Anonymous assessment results</span>
+          </div>
+          <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+            <div className="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse"></div>
+            <span>Power BI Connected</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

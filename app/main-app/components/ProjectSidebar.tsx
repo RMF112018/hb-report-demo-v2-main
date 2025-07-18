@@ -67,8 +67,26 @@ import {
   GitCompareArrows,
   MessageSquare,
   BriefcaseBusiness,
+  UsersRound,
+  DollarSign,
+  Clock,
+  UserPlus,
+  GraduationCap,
+  FileText,
+  TrendingUp,
 } from "lucide-react"
-import type { UserRole } from "../../project/[projectId]/types/project"
+
+type UserRole =
+  | "executive"
+  | "project-executive"
+  | "project-manager"
+  | "superintendent"
+  | "estimator"
+  | "team-member"
+  | "admin"
+  | "viewer"
+  | "presentation"
+  | "hr-payroll"
 
 interface ProjectData {
   id: string
@@ -107,7 +125,7 @@ interface ProjectSidebarProps {
 }
 
 // Define sidebar categories
-type SidebarCategory = "dashboard" | "projects" | "tools-menu" | "notifications" | "it-modules"
+type SidebarCategory = "dashboard" | "projects" | "tools-menu" | "notifications" | "it-modules" | "hr-tools"
 
 interface SidebarCategoryConfig {
   id: SidebarCategory
@@ -116,6 +134,7 @@ interface SidebarCategoryConfig {
   tooltip: string
   adminOnly?: boolean
   executiveOnly?: boolean
+  hrOnly?: boolean
 }
 
 const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
@@ -135,6 +154,13 @@ const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
     tooltip: "Advanced Project Tools & Features",
     executiveOnly: true,
   },
+  {
+    id: "hr-tools",
+    label: "HR & Payroll Tools",
+    icon: UsersRound,
+    tooltip: "HR & Payroll Management Tools",
+    hrOnly: true,
+  },
   { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Messages, Tasks & System Alerts" },
 ]
 
@@ -147,6 +173,99 @@ interface ITModuleConfig {
   path: string
   status: "active" | "maintenance" | "planned"
 }
+
+// HR Tools configuration for HR & Payroll Manager
+interface HRToolConfig {
+  id: string
+  label: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  path: string
+  status: "active" | "maintenance" | "planned"
+}
+
+const HR_TOOLS: HRToolConfig[] = [
+  {
+    id: "personnel",
+    label: "Personnel Management",
+    description: "Employee records, org chart, and staff directory",
+    icon: UsersRound,
+    path: "/hr-payroll/personnel",
+    status: "active",
+  },
+  {
+    id: "recruiting",
+    label: "Recruiting",
+    description: "Job postings, candidate management, and hiring workflow",
+    icon: UserPlus,
+    path: "/hr-payroll/recruiting",
+    status: "active",
+  },
+  {
+    id: "timesheets",
+    label: "Timesheets",
+    description: "Time and attendance tracking, overtime management",
+    icon: Clock,
+    path: "/hr-payroll/timesheets",
+    status: "active",
+  },
+  {
+    id: "expenses",
+    label: "Expenses",
+    description: "Expense reports, reimbursements, and approvals",
+    icon: DollarSign,
+    path: "/hr-payroll/expenses",
+    status: "active",
+  },
+  {
+    id: "payroll",
+    label: "Payroll",
+    description: "Payroll processing, deductions, and payment tracking",
+    icon: BriefcaseBusiness,
+    path: "/hr-payroll/payroll",
+    status: "active",
+  },
+  {
+    id: "benefits",
+    label: "Benefits",
+    description: "Health plans, retirement, and enrollment management",
+    icon: Shield,
+    path: "/hr-payroll/benefits",
+    status: "active",
+  },
+  {
+    id: "training",
+    label: "Training",
+    description: "Certifications, training programs, and development",
+    icon: GraduationCap,
+    path: "/hr-payroll/training",
+    status: "active",
+  },
+  {
+    id: "compliance",
+    label: "Compliance",
+    description: "Regulatory requirements, audit trails, and monitoring",
+    icon: FileText,
+    path: "/hr-payroll/compliance",
+    status: "active",
+  },
+  {
+    id: "performance",
+    label: "Performance",
+    description: "Performance reviews, goal setting, and feedback",
+    icon: TrendingUp,
+    path: "/hr-payroll/performance",
+    status: "active",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    description: "System preferences and user permissions",
+    icon: Settings,
+    path: "/hr-payroll/settings",
+    status: "active",
+  },
+]
 
 const IT_MODULES: ITModuleConfig[] = [
   {
@@ -375,6 +494,15 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     description: "Warranty management and tracking tools",
   },
 
+  // HR & Payroll Management
+  {
+    name: "HR & Payroll",
+    href: "/hr-payroll",
+    category: "HR & Payroll Management",
+    description: "Comprehensive human resources and payroll management system",
+    visibleRoles: ["hr-payroll", "admin"],
+  },
+
   // Historical Projects
   {
     name: "Archive",
@@ -597,11 +725,19 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         return false
       }
 
+      // For HR & Payroll Manager, only show dashboard and HR tools
+      if (userRole === "hr-payroll") {
+        return category.id === "dashboard" || category.id === "hr-tools"
+      }
+
       if (category.adminOnly) {
         return userRole === "admin"
       }
       if (category.executiveOnly) {
         return userRole === "executive" || userRole === "project-executive"
+      }
+      if (category.hrOnly) {
+        return false // already handled above
       }
       return true
     })
@@ -743,6 +879,19 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Handle IT module navigation
   const handleITModuleClick = (moduleId: string) => {
     onModuleSelect?.(moduleId)
+
+    if (isMobile) {
+      setMobileMenuOpen(false)
+      setMobileSubMenuOpen(false)
+    } else {
+      setActiveCategory(null)
+    }
+  }
+
+  // Handle HR module navigation
+  const handleHRModuleClick = (moduleId: string) => {
+    // Navigate to HR & Payroll Suite page with module parameter
+    router.push(`/hr-payroll?module=${moduleId}`)
 
     if (isMobile) {
       setMobileMenuOpen(false)
@@ -1121,21 +1270,61 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         <Button
                           key={module.id}
                           variant="ghost"
-                          className="w-full justify-start h-12 px-3"
+                          className="w-full justify-start px-3 py-3 h-auto text-left group hover:bg-gray-100 dark:hover:bg-gray-800"
                           onClick={() => handleITModuleClick(module.id)}
                         >
-                          <ModuleIcon className="h-5 w-5 mr-3" />
-                          <div className="flex-1 text-left">
-                            <div className="font-medium text-sm">{module.label}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                              {module.description}
+                          <div className="flex items-center w-full">
+                            <div className="flex-shrink-0 mr-3">
+                              <ModuleIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-gray-900 dark:text-gray-100">{module.label}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                                {module.description}
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 ml-2">
+                              <Badge variant={module.status === "active" ? "default" : "secondary"} className="text-xs">
+                                {module.status}
+                              </Badge>
                             </div>
                           </div>
-                          <Badge
-                            variant={module.status === "active" ? "default" : "secondary"}
-                            className="ml-2 text-xs"
-                          >
-                            {module.status}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {activeSubCategory === "hr-tools" && (
+                  <div className="space-y-2">
+                    <div className="mb-4">
+                      <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                        HR & Payroll Tools
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Comprehensive HR and payroll management tools
+                      </p>
+                    </div>
+                    {HR_TOOLS.map((tool) => {
+                      const ToolIcon = tool.icon
+                      return (
+                        <Button
+                          key={tool.id}
+                          variant="ghost"
+                          className="w-full justify-start h-12 px-3"
+                          onClick={() => {
+                            handleHRModuleClick(tool.id)
+                            setMobileSubMenuOpen(false)
+                            setMobileMenuOpen(false)
+                          }}
+                        >
+                          <ToolIcon className="h-5 w-5 mr-3" />
+                          <div className="flex-1 text-left">
+                            <div className="font-medium text-sm">{tool.label}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{tool.description}</div>
+                          </div>
+                          <Badge variant={tool.status === "active" ? "default" : "secondary"} className="ml-2 text-xs">
+                            {tool.status}
                           </Badge>
                         </Button>
                       )
@@ -1739,6 +1928,58 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     </div>
                   )}
 
+                  {activeCategory === "hr-tools" && (
+                    <div className="p-4 space-y-4">
+                      <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          HR & Payroll Tools
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          Comprehensive HR and payroll management tools
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        {HR_TOOLS.map((tool) => {
+                          const ToolIcon = tool.icon
+                          return (
+                            <Button
+                              key={tool.id}
+                              variant="ghost"
+                              className="w-full justify-start px-3 py-3 h-auto text-left group hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => {
+                                handleHRModuleClick(tool.id)
+                                setActiveCategory(null)
+                              }}
+                            >
+                              <div className="flex items-center w-full">
+                                <div className="flex-shrink-0 mr-3">
+                                  <ToolIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                    {tool.label}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                                    {tool.description}
+                                  </div>
+                                </div>
+                                <div className="flex-shrink-0 ml-2">
+                                  <Badge
+                                    variant={tool.status === "active" ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {tool.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {activeCategory === "tools-menu" && (
                     <div className="p-4 space-y-4">
                       <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
@@ -1845,4 +2086,5 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
       </div>
     )
   }
+  return null
 }

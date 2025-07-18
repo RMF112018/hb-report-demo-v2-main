@@ -32,6 +32,7 @@ import {
 interface SimpleEstimatingProgressCardProps {
   className?: string
   userRole?: string
+  isCompact?: boolean
   config?: {
     userRole?: string
     showRealTime?: boolean
@@ -101,8 +102,23 @@ const generateEstimatingData = (userRole: string) => {
 export default function SimpleEstimatingProgressCard({
   className,
   userRole,
+  isCompact = false,
   config,
 }: SimpleEstimatingProgressCardProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(config?.showRealTime || false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [isLoading, setIsLoading] = useState(false)
@@ -142,14 +158,14 @@ export default function SimpleEstimatingProgressCard({
     <Card
       className={`${className} bg-gradient-to-br from-emerald-50/50 to-green-50/50 dark:from-emerald-950/20 dark:to-green-950/20 border-emerald-200/50 dark:border-emerald-800/50 h-full`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-r from-emerald-600 to-green-600 rounded-lg">
-              <Calculator className="h-5 w-5 text-white" />
+              <Calculator className={`${compactScale.iconSize} text-white`} />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+              <CardTitle className={`${compactScale.textTitle} font-semibold text-emerald-900 dark:text-emerald-100`}>
                 Estimating Progress
               </CardTitle>
             </div>
@@ -165,50 +181,54 @@ export default function SimpleEstimatingProgressCard({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Row 1: Estimating Status Cards */}
-        <div className="grid grid-cols-12 gap-3">
-          {/* Total & Active Estimates - 4 columns */}
-          <div className="col-span-4 bg-white dark:bg-gray-800 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator className="h-4 w-4 text-emerald-600" />
-              <span className="text-sm font-medium">Estimates</span>
+      <CardContent className={`space-y-${isCompact ? "1.5" : "3"}`}>
+        {/* Row 1: Estimating Status Cards - Made wider */}
+        <div className="grid grid-cols-12 gap-2">
+          {/* Total & Active Estimates - 3 columns (reduced from 4) */}
+          <div className="col-span-3 bg-white dark:bg-gray-800 rounded-lg p-2 border border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center gap-1 mb-1">
+              <Calculator className={`${compactScale.iconSizeSmall} text-emerald-600`} />
+              <span className={`${compactScale.textMedium} font-medium`}>Estimates</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex justify-between">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-sm font-bold text-emerald-600">{estimatingData.totalEstimates}</span>
+                <span className={`${compactScale.textSmall} text-muted-foreground`}>Total</span>
+                <span className={`${compactScale.textMedium} font-bold text-emerald-600`}>
+                  {estimatingData.totalEstimates}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-xs text-muted-foreground">Active</span>
-                <span className="text-sm font-bold text-yellow-600">{estimatingData.activeEstimates}</span>
+                <span className={`${compactScale.textSmall} text-muted-foreground`}>Active</span>
+                <span className={`${compactScale.textMedium} font-bold text-yellow-600`}>
+                  {estimatingData.activeEstimates}
+                </span>
               </div>
             </div>
             {/* Mini bar chart */}
-            <div className="mt-2 flex gap-1 h-6">
+            <div className="mt-1 flex gap-1 h-4">
               <div className="bg-emerald-500 rounded-sm flex-1" style={{ height: "60%" }}></div>
               <div className="bg-yellow-500 rounded-sm flex-1" style={{ height: "40%" }}></div>
               <div className="bg-green-500 rounded-sm flex-1" style={{ height: "80%" }}></div>
             </div>
           </div>
 
-          {/* Completion Progress - 5 columns */}
-          <div className="col-span-5 bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-800">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Completion</span>
+          {/* Completion Progress - 4 columns (reduced from 5) */}
+          <div className="col-span-4 bg-white dark:bg-gray-800 rounded-lg p-2 border border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-1 mb-1">
+              <CheckCircle className="h-3 w-3 text-green-600" />
+              <span className="text-xs font-medium">Completion</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex justify-between">
                 <span className="text-xs text-muted-foreground">Progress</span>
                 <span className="text-sm font-bold text-green-600">{completionPercentage}%</span>
               </div>
-              <Progress value={completionPercentage} className="h-2" />
+              <Progress value={completionPercentage} className="h-1.5" />
             </div>
             {/* Pie chart visualization */}
-            <div className="mt-2 flex items-center justify-center">
-              <div className="relative w-12 h-12">
-                <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="mt-1 flex items-center justify-center">
+              <div className="relative w-8 h-8">
+                <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
@@ -230,20 +250,20 @@ export default function SimpleEstimatingProgressCard({
             </div>
           </div>
 
-          {/* Accuracy Metric - 3 columns */}
-          <div className="col-span-3 bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium">Accuracy</span>
+          {/* Accuracy Metric - 2 columns (reduced from 3) */}
+          <div className="col-span-2 bg-white dark:bg-gray-800 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-1 mb-1">
+              <TrendingUp className="h-3 w-3 text-blue-600" />
+              <span className="text-xs font-medium">Accuracy</span>
             </div>
             <div className="text-center">
-              <span className="text-xl font-bold text-blue-600">{estimatingData.avgAccuracy}%</span>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${estimatingData.avgAccuracy}%` }} />
+              <span className="text-lg font-bold text-blue-600">{estimatingData.avgAccuracy}%</span>
+              <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${estimatingData.avgAccuracy}%` }} />
               </div>
             </div>
             {/* Mini line chart */}
-            <div className="mt-2 flex items-end gap-1 h-6">
+            <div className="mt-1 flex items-end gap-1 h-4">
               <div className="bg-blue-300 rounded-sm w-1" style={{ height: "40%" }}></div>
               <div className="bg-blue-400 rounded-sm w-1" style={{ height: "60%" }}></div>
               <div className="bg-blue-500 rounded-sm w-1" style={{ height: "80%" }}></div>
@@ -251,59 +271,59 @@ export default function SimpleEstimatingProgressCard({
               <div className="bg-blue-700 rounded-sm w-1" style={{ height: "90%" }}></div>
             </div>
           </div>
-        </div>
 
-        {/* Row 2: Performance Metrics */}
-        <div className="grid grid-cols-12 gap-3">
-          {/* Turnaround Time - 6 columns */}
-          <div className="col-span-6 bg-white dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium">Turnaround</span>
+          {/* Turnaround Time - 3 columns (new section in top row) */}
+          <div className="col-span-3 bg-white dark:bg-gray-800 rounded-lg p-2 border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-1 mb-1">
+              <Clock className="h-3 w-3 text-purple-600" />
+              <span className="text-xs font-medium">Turnaround</span>
             </div>
-            <div className="text-center mb-2">
-              <span className="text-xl font-bold text-purple-600">{estimatingData.avgTurnaroundTime}d</span>
+            <div className="text-center mb-1">
+              <span className="text-lg font-bold text-purple-600">{estimatingData.avgTurnaroundTime}d</span>
               <p className="text-xs text-muted-foreground">Average Time</p>
             </div>
             {/* Timeline chart */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-purple-500 h-2 rounded-full" style={{ width: "70%" }} />
+            <div className="flex items-center gap-1">
+              <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: "70%" }} />
               </div>
               <span className="text-xs text-muted-foreground">Target: 10d</span>
             </div>
           </div>
+        </div>
 
-          {/* Estimate Types - 6 columns */}
-          <div className="col-span-6 bg-white dark:bg-gray-800 rounded-lg p-3 border border-orange-200 dark:border-orange-800">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium">Estimate Types</span>
+        {/* Row 2: Estimate Types - Made wider to use more horizontal space */}
+        <div className="grid grid-cols-12 gap-2">
+          {/* Estimate Types - 12 columns (full width) */}
+          <div className="col-span-12 bg-white dark:bg-gray-800 rounded-lg p-2 border border-orange-200 dark:border-orange-800">
+            <div className="flex items-center gap-1 mb-1">
+              <BarChart3 className="h-3 w-3 text-orange-600" />
+              <span className="text-xs font-medium">Estimate Types</span>
             </div>
-            <div className="space-y-1">
+            <div className="grid grid-cols-3 gap-2">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Conceptual</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: "75%" }} />
+                <div className="flex items-center gap-1">
+                  <div className="w-8 bg-gray-200 rounded-full h-1">
+                    <div className="bg-orange-500 h-1 rounded-full" style={{ width: "75%" }} />
                   </div>
                   <span className="text-xs font-bold text-orange-600">75%</span>
                 </div>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Detailed</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: "45%" }} />
+                <div className="flex items-center gap-1">
+                  <div className="w-8 bg-gray-200 rounded-full h-1">
+                    <div className="bg-orange-500 h-1 rounded-full" style={{ width: "45%" }} />
                   </div>
                   <span className="text-xs font-bold text-orange-600">45%</span>
                 </div>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Final</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: "90%" }} />
+                <div className="flex items-center gap-1">
+                  <div className="w-8 bg-gray-200 rounded-full h-1">
+                    <div className="bg-orange-500 h-1 rounded-full" style={{ width: "90%" }} />
                   </div>
                   <span className="text-xs font-bold text-orange-600">90%</span>
                 </div>

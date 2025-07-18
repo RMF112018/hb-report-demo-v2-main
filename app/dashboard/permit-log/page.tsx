@@ -38,7 +38,21 @@ import {
   Home,
   Eye,
   Edit,
+  XCircle,
+  MoreHorizontal,
+  ExternalLink,
+  Calendar,
 } from "lucide-react"
+import { useTheme } from "next-themes"
+import { format } from "date-fns"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 // Import Permit Components
 import { PermitAnalytics } from "@/components/permit-log/PermitAnalytics"
@@ -47,6 +61,7 @@ import { PermitForm } from "@/components/permit-log/PermitForm"
 import { PermitExportModal } from "@/components/permit-log/PermitExportModal"
 import { PermitTable } from "@/components/permit-log/PermitTable"
 import { PermitCalendar } from "@/components/permit-log/PermitCalendar"
+import { ProtectedGrid, ProtectedColDef, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
 
 // Import new components aligned with constraints log
 import { PermitWidgets, type PermitStats } from "@/components/permit-log/PermitWidgets"
@@ -58,6 +73,589 @@ import type { Permit, PermitFilters as PermitFiltersType } from "@/types/permit-
 
 // Import mock data
 import permitsData from "@/data/mock/logs/permits.json"
+
+// Permits ProtectedGrid Component
+const PermitsProtectedGrid = ({
+  permits,
+  onEdit,
+  onView,
+  onExport,
+  userRole,
+}: {
+  permits: Permit[]
+  onEdit?: (permit: Permit) => void
+  onView?: (permit: Permit) => void
+  onExport?: (permit: Permit) => void
+  userRole?: string
+}) => {
+  const { theme } = useTheme()
+
+  // Transform permits data for the grid
+  const transformedPermits = useMemo(() => {
+    return permits.map((permit) => ({
+      id: permit.id,
+      number: permit.number,
+      type: permit.type,
+      status: permit.status,
+      authority: permit.authority,
+      applicationDate: permit.applicationDate,
+      approvalDate: permit.approvalDate,
+      expirationDate: permit.expirationDate,
+      cost: permit.cost,
+      priority: permit.priority,
+      description: permit.description,
+      _originalData: permit, // Keep reference to original data
+    }))
+  }, [permits])
+
+  // Helper functions
+  const getStatusIcon = useCallback((status: Permit["status"]) => {
+    switch (status) {
+      case "approved":
+      case "renewed":
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case "pending":
+        return <Clock className="h-4 w-4 text-yellow-600" />
+      case "expired":
+      case "rejected":
+        return <XCircle className="h-4 w-4 text-red-600" />
+      default:
+        return <FileText className="h-4 w-4 text-gray-600" />
+    }
+  }, [])
+
+  const getPriorityIcon = useCallback((priority?: Permit["priority"]) => {
+    if (!priority) return null
+
+    switch (priority) {
+      case "critical":
+      case "urgent":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
+      case "high":
+        return <AlertTriangle className="h-4 w-4 text-orange-600" />
+      case "medium":
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+      case "low":
+        return <AlertTriangle className="h-4 w-4 text-green-600" />
+      default:
+        return null
+    }
+  }, [])
+
+  const statusColors = {
+    approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    expired: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    renewed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  }
+
+  // Permission checks
+  const canEdit = useMemo(() => {
+    return ["admin", "project-manager", "project-executive"].includes(userRole || "user")
+  }, [userRole])
+
+  const canExport = useMemo(() => {
+    return ["admin", "executive", "project-executive", "project-manager"].includes(userRole || "user")
+  }, [userRole])
+
+  // Define column definitions
+  const columnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "number",
+        headerName: "Permit #",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const permit = params.data._originalData
+          return (
+            <div className="flex items-center gap-2">
+              {getStatusIcon(permit.status)}
+              <span className="font-medium">{permit.number}</span>
+              {permit.priority && getPriorityIcon(permit.priority)}
+            </div>
+          )
+        },
+        pinned: "left",
+      },
+      {
+        field: "type",
+        headerName: "Type",
+        width: 150,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            <Building className="h-4 w-4 text-muted-foreground" />
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        cellRenderer: (params: any) => (
+          <Badge variant="outline" className={statusColors[params.value as keyof typeof statusColors]}>
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "authority",
+        headerName: "Authority",
+        width: 150,
+      },
+      {
+        field: "applicationDate",
+        headerName: "Application Date",
+        width: 140,
+        cellRenderer: (params: any) => <span>{format(new Date(params.value), "MMM d, yyyy")}</span>,
+      },
+      {
+        field: "approvalDate",
+        headerName: "Approval Date",
+        width: 140,
+        cellRenderer: (params: any) => (
+          <span>{params.value ? format(new Date(params.value), "MMM d, yyyy") : "Pending"}</span>
+        ),
+      },
+      {
+        field: "expirationDate",
+        headerName: "Expiration Date",
+        width: 140,
+        cellRenderer: (params: any) => <span>{format(new Date(params.value), "MMM d, yyyy")}</span>,
+      },
+      {
+        field: "cost",
+        headerName: "Cost",
+        width: 120,
+        cellRenderer: (params: any) => <span>{params.value ? `$${params.value.toLocaleString()}` : "N/A"}</span>,
+      },
+      {
+        field: "priority",
+        headerName: "Priority",
+        width: 100,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            {getPriorityIcon(params.value)}
+            <span className="capitalize">{params.value}</span>
+          </div>
+        ),
+      },
+      {
+        field: "description",
+        headerName: "Description",
+        width: 200,
+        cellRenderer: (params: any) => (
+          <div className="truncate max-w-[180px]" title={params.value}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 80,
+        cellRenderer: (params: any) => {
+          const permit = params.data._originalData
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => onView?.(permit)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+                {canEdit && (
+                  <DropdownMenuItem onClick={() => onEdit?.(permit)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Permit
+                  </DropdownMenuItem>
+                )}
+                {canExport && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => onExport?.(permit)}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Export Permit
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {permit.authorityContact?.email && (
+                  <DropdownMenuItem asChild>
+                    <a href={`mailto:${permit.authorityContact.email}`}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Contact Authority
+                    </a>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    [getStatusIcon, getPriorityIcon, statusColors, canEdit, canExport, onView, onEdit, onExport]
+  )
+
+  // Grid configuration
+  const gridConfig = createGridWithTotalsAndSticky(1, false, {
+    allowExport: canExport,
+    allowRowSelection: false,
+    allowMultiSelection: false,
+    allowColumnReordering: true,
+    allowColumnResizing: true,
+    allowSorting: true,
+    allowFiltering: true,
+    allowCellEditing: false,
+    showToolbar: true,
+    showStatusBar: true,
+    theme: "quartz",
+  })
+
+  // Handle row click
+  const handleRowClick = (event: any) => {
+    const permit = event.data._originalData
+    if (onView) {
+      onView(permit)
+    }
+  }
+
+  if (permits.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-muted-foreground">No permits found</h3>
+          <p className="text-sm text-muted-foreground mt-2">No permits have been added yet.</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <ProtectedGrid
+      columnDefs={columnDefs}
+      rowData={transformedPermits}
+      config={gridConfig}
+      events={{
+        onRowSelected: handleRowClick,
+      }}
+      height="500px"
+      loading={false}
+      enableSearch={true}
+      title="Permits"
+    />
+  )
+}
+
+// Inspections ProtectedGrid Component
+const InspectionsProtectedGrid = ({
+  permits,
+  onEdit,
+  onView,
+  onExport,
+  userRole,
+}: {
+  permits: Permit[]
+  onEdit?: (permit: Permit) => void
+  onView?: (permit: Permit) => void
+  onExport?: (permit: Permit) => void
+  userRole?: string
+}) => {
+  const { theme } = useTheme()
+
+  // Transform permits data to show inspections
+  const transformedInspections = useMemo(() => {
+    const inspections: any[] = []
+
+    permits.forEach((permit) => {
+      if (permit.inspections && permit.inspections.length > 0) {
+        permit.inspections.forEach((inspection) => {
+          inspections.push({
+            id: `${permit.id}-${inspection.id}`,
+            permitNumber: permit.number,
+            permitType: permit.type,
+            inspectionId: inspection.id,
+            inspectionType: inspection.type,
+            scheduledDate: inspection.scheduledDate,
+            completedDate: inspection.completedDate,
+            result: inspection.result,
+            inspector: inspection.inspector,
+            notes: inspection.notes,
+            status: inspection.status,
+            score: inspection.score,
+            _originalData: { permit, inspection }, // Keep reference to original data
+          })
+        })
+      }
+    })
+
+    return inspections
+  }, [permits])
+
+  // Helper functions
+  const getResultIcon = useCallback((result: string) => {
+    switch (result) {
+      case "pass":
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case "fail":
+        return <XCircle className="h-4 w-4 text-red-600" />
+      case "pending":
+        return <Clock className="h-4 w-4 text-yellow-600" />
+      default:
+        return <FileText className="h-4 w-4 text-gray-600" />
+    }
+  }, [])
+
+  const getStatusIcon = useCallback((status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case "scheduled":
+        return <Calendar className="h-4 w-4 text-blue-600" />
+      case "overdue":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />
+    }
+  }, [])
+
+  const resultColors = {
+    pass: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    fail: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  }
+
+  const statusColors = {
+    completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    overdue: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  }
+
+  // Permission checks
+  const canEdit = useMemo(() => {
+    return ["admin", "project-manager", "project-executive"].includes(userRole || "user")
+  }, [userRole])
+
+  const canExport = useMemo(() => {
+    return ["admin", "executive", "project-executive", "project-manager"].includes(userRole || "user")
+  }, [userRole])
+
+  // Define column definitions
+  const columnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "permitNumber",
+        headerName: "Permit #",
+        width: 120,
+        cellRenderer: (params: any) => {
+          const { permit } = params.data._originalData
+          return (
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">{permit.number}</span>
+            </div>
+          )
+        },
+        pinned: "left",
+      },
+      {
+        field: "permitType",
+        headerName: "Permit Type",
+        width: 150,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            <Building className="h-4 w-4 text-muted-foreground" />
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "inspectionId",
+        headerName: "Inspection ID",
+        width: 120,
+        cellRenderer: (params: any) => <span className="font-mono text-sm">{params.value}</span>,
+      },
+      {
+        field: "inspectionType",
+        headerName: "Type",
+        width: 150,
+      },
+      {
+        field: "scheduledDate",
+        headerName: "Scheduled Date",
+        width: 140,
+        cellRenderer: (params: any) => (
+          <span>{params.value ? format(new Date(params.value), "MMM d, yyyy") : "Not scheduled"}</span>
+        ),
+      },
+      {
+        field: "completedDate",
+        headerName: "Completed Date",
+        width: 140,
+        cellRenderer: (params: any) => (
+          <span>{params.value ? format(new Date(params.value), "MMM d, yyyy") : "Not completed"}</span>
+        ),
+      },
+      {
+        field: "result",
+        headerName: "Result",
+        width: 120,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            {getResultIcon(params.value)}
+            <Badge variant="outline" className={resultColors[params.value as keyof typeof resultColors]}>
+              {params.value}
+            </Badge>
+          </div>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            {getStatusIcon(params.value)}
+            <Badge variant="outline" className={statusColors[params.value as keyof typeof statusColors]}>
+              {params.value}
+            </Badge>
+          </div>
+        ),
+      },
+      {
+        field: "inspector",
+        headerName: "Inspector",
+        width: 150,
+        cellRenderer: (params: any) => (
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "score",
+        headerName: "Score",
+        width: 100,
+        cellRenderer: (params: any) => <span>{params.value ? `${params.value}%` : "N/A"}</span>,
+      },
+      {
+        field: "notes",
+        headerName: "Notes",
+        width: 200,
+        cellRenderer: (params: any) => (
+          <div className="truncate max-w-[180px]" title={params.value}>
+            {params.value || "No notes"}
+          </div>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 80,
+        cellRenderer: (params: any) => {
+          const { permit, inspection } = params.data._originalData
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => onView?.(permit)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Permit
+                </DropdownMenuItem>
+                {canEdit && (
+                  <DropdownMenuItem onClick={() => onEdit?.(permit)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Inspection
+                  </DropdownMenuItem>
+                )}
+                {canExport && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => onExport?.(permit)}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Export Report
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    [getResultIcon, getStatusIcon, resultColors, statusColors, canEdit, canExport, onView, onEdit, onExport]
+  )
+
+  // Grid configuration
+  const gridConfig = createGridWithTotalsAndSticky(1, false, {
+    allowExport: canExport,
+    allowRowSelection: false,
+    allowMultiSelection: false,
+    allowColumnReordering: true,
+    allowColumnResizing: true,
+    allowSorting: true,
+    allowFiltering: true,
+    allowCellEditing: false,
+    showToolbar: true,
+    showStatusBar: true,
+    theme: "quartz",
+  })
+
+  // Handle row click
+  const handleRowClick = (event: any) => {
+    const { permit } = event.data._originalData
+    if (onView) {
+      onView(permit)
+    }
+  }
+
+  if (transformedInspections.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-muted-foreground">No inspections found</h3>
+          <p className="text-sm text-muted-foreground mt-2">No inspections have been scheduled yet.</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <ProtectedGrid
+      columnDefs={columnDefs}
+      rowData={transformedInspections}
+      config={gridConfig}
+      events={{
+        onRowSelected: handleRowClick,
+      }}
+      height="500px"
+      loading={false}
+      enableSearch={true}
+      title="Inspections"
+    />
+  )
+}
 
 export default function PermitLogPage() {
   const { user } = useAuth()
@@ -555,7 +1153,7 @@ export default function PermitLogPage() {
               </div>
             </div>
             <div data-tour="permits-table">
-              <PermitTable
+              <PermitsProtectedGrid
                 permits={filteredPermits}
                 onEdit={handleEditPermit}
                 onView={handleViewPermit}
@@ -591,13 +1189,12 @@ export default function PermitLogPage() {
               </div>
             </div>
             <div data-tour="inspections-scheduling">
-              <PermitTable
+              <InspectionsProtectedGrid
                 permits={filteredPermits}
                 onEdit={handleEditPermit}
                 onView={handleViewPermit}
                 onExport={handleExportPermit}
                 userRole={user?.role}
-                showInspections={true}
               />
             </div>
           </TabsContent>
