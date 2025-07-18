@@ -77,7 +77,7 @@ export function DashboardLayout({
 
       <div className="relative z-10">
         {/* KPI Row with enhanced styling */}
-        <div data-tour="kpi-widgets" className="mb-4">
+        <div data-tour="kpi-widgets" className="mb-8">
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
             <div className="mx-auto max-w-[1920px]">
               <KPIRow userRole={userRole} isCompact={isCompact} />

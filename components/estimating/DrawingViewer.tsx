@@ -48,6 +48,9 @@ import {
   ArrowLeft,
   ArrowUp,
   ArrowDown,
+  RefreshCw,
+  FileText,
+  Shield,
 } from "lucide-react"
 
 interface DrawingMarkup {
@@ -110,7 +113,7 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
 
   // State management
   const [currentDrawing, setCurrentDrawing] = useState<string | null>(
-    "/drawings/A-415_Interior Elev. - Primary Bedroom.pdf"
+    "/api/pdf/A-415_Interior%20Elev.%20-%20Primary%20Bedroom.pdf"
   )
   const [markups, setMarkups] = useState<DrawingMarkup[]>([])
   const [selectedTool, setSelectedTool] = useState<string | null>(null)
@@ -121,6 +124,22 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [showAiResults, setShowAiResults] = useState(true)
   const [selectedElement, setSelectedElement] = useState<string | null>(null)
+  const [pdfLoadError, setPdfLoadError] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [pdfViewerMode, setPdfViewerMode] = useState<"iframe" | "embed" | "object" | "fallback" | "direct">("iframe")
+  const [pdfLoadTimeout, setPdfLoadTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [debugMode, setDebugMode] = useState(false)
+  const [pdfLoadAttempts, setPdfLoadAttempts] = useState(0)
+  const [pdfLoading, setPdfLoading] = useState(true)
+  const [pdfLoadBlocked, setPdfLoadBlocked] = useState(false)
+
+  // Mobile detection for v-3-0 compliance
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   // Mock AI analysis results for demo
   const mockAiResults: AIAnalysisResult[] = [
@@ -286,6 +305,128 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
     URL.revokeObjectURL(url)
   }, [aiAnalysisResults])
 
+  // Enhanced PDF loading with multiple fallback mechanisms
+  const handlePdfLoadError = useCallback(() => {
+    setPdfLoadError(true)
+    setPdfLoading(false)
+    setPdfLoadAttempts((prev) => prev + 1)
+
+    // Try different PDF viewer modes
+    if (pdfViewerMode === "iframe") {
+      // Iframe failed, likely due to X-Frame-Options: DENY
+      console.log("Iframe failed due to X-Frame-Options, trying direct viewer...")
+      setPdfViewerMode("direct")
+      setPdfLoadError(false)
+      setPdfLoading(true)
+    } else if (pdfViewerMode === "embed") {
+      console.log("Embed failed, trying object element...")
+      setPdfViewerMode("object")
+      setPdfLoadError(false)
+      setPdfLoading(true)
+    } else if (pdfViewerMode === "object") {
+      console.log("Object failed, using direct viewer...")
+      setPdfViewerMode("direct")
+      setPdfLoadError(false)
+      setPdfLoading(true)
+    } else {
+      console.log("All PDF viewer modes failed, using fallback...")
+      setPdfViewerMode("fallback")
+      setPdfLoadError(false)
+      setPdfLoading(false)
+      setPdfLoadBlocked(true)
+    }
+  }, [pdfViewerMode])
+
+  // Enhanced success handler that checks for actual PDF content
+  const handlePdfLoadSuccess = useCallback(() => {
+    console.log(`PDF loaded successfully with ${pdfViewerMode} viewer`)
+
+    // For iframe mode, check if content is actually displayed
+    if (pdfViewerMode === "iframe") {
+      // Use a timeout to check if the iframe actually contains PDF content
+      setTimeout(() => {
+        const iframe = document.querySelector('iframe[title="PDF Drawing Viewer"]') as HTMLIFrameElement
+        if (iframe) {
+          try {
+            // Try to access iframe content - if it fails, PDF is not actually displayed
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+            if (
+              !iframeDoc ||
+              iframeDoc.body.innerHTML.includes("chrome-error") ||
+              iframeDoc.body.innerHTML.includes("denied")
+            ) {
+              console.log("Iframe loaded but PDF content is blocked, switching to direct viewer...")
+              setPdfViewerMode("direct")
+              setPdfLoadError(false)
+              setPdfLoading(true)
+              setPdfLoadBlocked(true)
+              return
+            }
+          } catch (error) {
+            // Cross-origin error means PDF is not accessible
+            console.log("Cross-origin error detected, switching to direct viewer...")
+            setPdfViewerMode("direct")
+            setPdfLoadError(false)
+            setPdfLoading(true)
+            setPdfLoadBlocked(true)
+            return
+          }
+        }
+
+        // If we get here, PDF is actually displayed
+        setPdfLoadError(false)
+        setPdfLoading(false)
+        setPdfLoadBlocked(false)
+        setPdfLoadAttempts(0)
+        if (pdfLoadTimeout) {
+          clearTimeout(pdfLoadTimeout)
+          setPdfLoadTimeout(null)
+        }
+      }, 1000) // Check after 1 second
+    } else {
+      // For other modes, assume success
+      setPdfLoadError(false)
+      setPdfLoading(false)
+      setPdfLoadBlocked(false)
+      setPdfLoadAttempts(0)
+      if (pdfLoadTimeout) {
+        clearTimeout(pdfLoadTimeout)
+        setPdfLoadTimeout(null)
+      }
+    }
+  }, [pdfLoadTimeout, pdfViewerMode])
+
+  // PDF loading timeout handler
+  const handlePdfLoadStart = useCallback(() => {
+    setPdfLoadError(false)
+
+    // Set a timeout to detect if PDF fails to load
+    const timeout = setTimeout(() => {
+      if (pdfViewerMode === "iframe") {
+        console.log("PDF load timeout, likely due to X-Frame-Options, switching to direct viewer...")
+        handlePdfLoadError()
+      }
+    }, 2000) // Reduced to 2 seconds for faster fallback
+
+    setPdfLoadTimeout(timeout)
+  }, [pdfViewerMode, handlePdfLoadError])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfLoadTimeout) {
+        clearTimeout(pdfLoadTimeout)
+      }
+    }
+  }, [pdfLoadTimeout])
+
+  // Reset PDF viewer mode when drawing changes
+  useEffect(() => {
+    setPdfViewerMode("iframe")
+    setPdfLoadError(false)
+    setPdfLoadAttempts(0)
+  }, [currentDrawing])
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -322,21 +463,266 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
     return "text-yellow-600 bg-yellow-50 border-yellow-200"
   }
 
+  // Enhanced PDF viewer component with multiple fallback mechanisms
+  const renderPdfViewer = () => {
+    if (!currentDrawing) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Drawing Loaded</h3>
+            <p className="text-sm text-gray-500 mb-4">Upload a PDF, DWG, or image file to begin</p>
+            <Button>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Drawing
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    // Show loading state
+    if (pdfLoading) {
+      return (
+        <div className="flex items-center justify-center h-full bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Loading PDF...</h3>
+            <p className="text-sm text-gray-500">Attempting to load drawing with {pdfViewerMode} viewer</p>
+            {pdfLoadAttempts > 0 && <p className="text-xs text-blue-600 mt-2">Attempt {pdfLoadAttempts + 1}</p>}
+          </div>
+        </div>
+      )
+    }
+
+    // Show blocked state
+    if (pdfLoadBlocked) {
+      return (
+        <div className="flex items-center justify-center h-full bg-white">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+              <Shield className="h-8 w-8 text-red-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">PDF Access Blocked</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              The PDF cannot be embedded due to security restrictions (X-Frame-Options: DENY).
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button size="sm" variant="outline" asChild>
+                <a href={currentDrawing} target="_blank" rel="noopener noreferrer">
+                  <Download className="h-4 w-4 mr-2" />
+                  Open PDF in New Tab
+                </a>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setPdfViewerMode("iframe")
+                  setPdfLoading(true)
+                  setPdfLoadBlocked(false)
+                  setPdfLoadError(false)
+                }}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Show error state
+    if (pdfLoadError) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">PDF Loading Error</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Unable to load the drawing file. The PDF may have security restrictions preventing embedding.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onClick={() => {
+                  setPdfLoadError(false)
+                  setPdfViewerMode("iframe")
+                  setPdfLoading(true)
+                }}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Retry Loading
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setPdfViewerMode("iframe")
+                  setPdfLoadError(false)
+                  setPdfLoading(true)
+                }}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Reset Viewer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    const pdfUrl = `${currentDrawing}#toolbar=1&navpanes=0&scrollbar=1&page=1&view=FitH`
+    const baseUrl = currentDrawing
+
+    switch (pdfViewerMode) {
+      case "iframe":
+        return (
+          <div className="w-full h-full flex items-center justify-center bg-white">
+            <iframe
+              src={pdfUrl}
+              width="100%"
+              height="100%"
+              style={{ border: "none", minHeight: "600px" }}
+              title="PDF Drawing Viewer"
+              onLoad={handlePdfLoadSuccess}
+              onError={handlePdfLoadError}
+              sandbox="allow-same-origin allow-scripts allow-forms"
+            />
+          </div>
+        )
+
+      case "embed":
+        return (
+          <div className="w-full h-full flex items-center justify-center bg-white">
+            <embed
+              src={baseUrl}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+              style={{ border: "none", minHeight: "600px" }}
+              onLoad={handlePdfLoadSuccess}
+              onError={handlePdfLoadError}
+            />
+          </div>
+        )
+
+      case "object":
+        return (
+          <div className="w-full h-full flex items-center justify-center bg-white">
+            <object
+              data={baseUrl}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+              style={{ border: "none", minHeight: "600px" }}
+              onLoad={handlePdfLoadSuccess}
+              onError={handlePdfLoadError}
+            >
+              <p>
+                PDF cannot be displayed.{" "}
+                <a href={baseUrl} target="_blank" rel="noopener noreferrer">
+                  Download PDF
+                </a>
+              </p>
+            </object>
+          </div>
+        )
+
+      case "direct":
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-white p-6">
+            <div className="text-center max-w-md">
+              <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <FileText className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Primary Bedroom Interior Elevation</h3>
+              <p className="text-sm text-gray-500 mb-4">A-415_Interior Elev. - Primary Bedroom.pdf</p>
+              <p className="text-xs text-gray-400 mb-4">
+                This drawing contains the interior elevation view of the primary bedroom
+              </p>
+              <p className="text-xs text-blue-600 mb-4">
+                AI has detected 8 construction elements with measurements and costs
+              </p>
+              <div className="flex gap-2 justify-center">
+                <Button size="sm" variant="outline" asChild>
+                  <a href={baseUrl} target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4 mr-2" />
+                    Open PDF
+                  </a>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setPdfViewerMode("iframe")}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          </div>
+        )
+
+      case "fallback":
+      default:
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-white p-6">
+            <div className="text-center max-w-md">
+              <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <FileText className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Primary Bedroom Interior Elevation</h3>
+              <p className="text-sm text-gray-500 mb-4">A-415_Interior Elev. - Primary Bedroom.pdf</p>
+              <p className="text-xs text-gray-400 mb-4">
+                This drawing contains the interior elevation view of the primary bedroom
+              </p>
+              <p className="text-xs text-blue-600 mb-4">
+                AI has detected 8 construction elements with measurements and costs
+              </p>
+              <div className="flex gap-2 justify-center">
+                <Button size="sm" variant="outline" asChild>
+                  <a href={baseUrl} target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4 mr-2" />
+                    Open PDF
+                  </a>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setPdfViewerMode("iframe")}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          </div>
+        )
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gray-50 dark:bg-gray-800">
+      {/* Header - v-3-0 compliant spacing */}
+      <div className="flex items-center justify-between p-3 border-b bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center gap-2">
           <Target className="h-5 w-5 text-blue-600" />
           <h2 className="text-lg font-semibold">Drawing Viewer - Primary Bedroom Interior Elevation</h2>
         </div>
-        <Button variant="outline" size="sm">
-          <Upload className="h-4 w-4 mr-2" />
-          Upload Drawing
-        </Button>
+        <div className="flex items-center gap-2">
+          {pdfLoadError && (
+            <Badge variant="destructive" className="text-xs">
+              PDF Error
+            </Badge>
+          )}
+          {debugMode && (
+            <Badge variant="outline" className="text-xs">
+              {pdfViewerMode} ({pdfLoadAttempts})
+            </Badge>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setDebugMode(!debugMode)} className="text-xs">
+            Debug
+          </Button>
+          <Button variant="outline" size="sm">
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Drawing
+          </Button>
+        </div>
       </div>
 
-      {/* Toolbar */}
+      {/* Toolbar - v-3-0 compliant spacing */}
       <div className="flex items-center gap-2 p-2 border-b bg-white dark:bg-gray-900">
         <Button variant="outline" size="sm">
           <ZoomOut className="h-4 w-4" />
@@ -394,55 +780,15 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
         <div className="flex-1 relative bg-gray-100 dark:bg-gray-800">
           {/* PDF Viewer */}
           <div className="w-full h-full relative">
-            {currentDrawing ? (
-              <div className="w-full h-full flex items-center justify-center bg-white">
-                <iframe
-                  src={`/drawings/A-415_Interior Elev. - Primary Bedroom.pdf#toolbar=1&navpanes=0&scrollbar=1&page=1&view=FitH`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: "none", minHeight: "600px" }}
-                  title="PDF Drawing Viewer"
-                >
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
-                      <Upload className="h-8 w-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Primary Bedroom Interior Elevation</h3>
-                    <p className="text-sm text-gray-500 mb-4">A-415_Interior Elev. - Primary Bedroom.pdf</p>
-                    <p className="text-xs text-gray-400 mb-4">
-                      This drawing contains the interior elevation view of the primary bedroom
-                    </p>
-                    <p className="text-xs text-blue-600 mb-4">
-                      AI has detected 8 construction elements with measurements and costs
-                    </p>
-                    <Button size="sm" variant="outline">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download PDF
-                    </Button>
-                  </div>
-                </iframe>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Drawing Loaded</h3>
-                  <p className="text-sm text-gray-500 mb-4">Upload a PDF, DWG, or image file to begin</p>
-                  <Button>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Drawing
-                  </Button>
-                </div>
-              </div>
-            )}
+            {renderPdfViewer()}
 
-            {/* AI Overlay */}
-            {showAiResults && aiAnalysisResults.length > 0 && (
+            {/* AI Overlay - v-3-0 compliant colors */}
+            {showAiResults && aiAnalysisResults.length > 0 && !pdfLoadError && (
               <div className="absolute inset-0 pointer-events-none">
                 {aiAnalysisResults.map((result) => (
                   <div
                     key={result.id}
-                    className="absolute border-2 border-blue-500 bg-blue-500/10 rounded pointer-events-auto cursor-pointer hover:bg-blue-500/20 transition-colors"
+                    className="absolute border-2 border-blue-500/60 bg-blue-500/5 rounded pointer-events-auto cursor-pointer hover:bg-blue-500/10 transition-colors"
                     style={{
                       left: `${(result.boundingBox.x / 800) * 100}%`,
                       top: `${(result.boundingBox.y / 600) * 100}%`,
@@ -451,7 +797,7 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
                     }}
                     onClick={() => setSelectedElement(result.id)}
                   >
-                    <div className="absolute -top-6 left-0 bg-blue-600 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    <div className="absolute -top-6 left-0 bg-blue-600/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                       {result.description} ({(result.confidence * 100).toFixed(0)}%)
                     </div>
                   </div>
@@ -461,8 +807,8 @@ export default function DrawingViewer({ onTakeoffAdd, projectId }: DrawingViewer
           </div>
         </div>
 
-        {/* AI-Generated Takeoff Elements Panel */}
-        <div className="w-80 border-l bg-white dark:bg-gray-900 flex flex-col">
+        {/* AI-Generated Takeoff Elements Panel - v-3-0 compliant spacing */}
+        <div className={`${isMobile ? "w-full" : "w-80"} border-l bg-white dark:bg-gray-900 flex flex-col`}>
           <div className="p-4 border-b">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold flex items-center gap-2">

@@ -27,7 +27,7 @@
       "title": "Financial Overview",
       "size": "medium",
       "position": { "x": 8, "y": 0 },
-      "span": { "cols": 8, "rows": 6 },
+      "span": { "cols": 4, "rows": 6 },
       "visible": true,
       "config": {
         "showOverview": true,

@@ -87,10 +87,10 @@ export function KPIRow({ userRole, isCompact }: KPIRowProps) {
 
   // Scale classes based on isCompact prop for 50% size reduction
   const compactScale = {
-    gap: isCompact ? "gap-1" : "gap-2",
+    gap: isCompact ? "gap-3" : "gap-4",
     height: isCompact ? "h-20" : "h-32",
     padding: isCompact ? "pb-1" : "pb-2",
-    marginBottom: isCompact ? "mb-2" : "mb-4",
+    marginBottom: isCompact ? "mb-4" : "mb-6",
   }
 
   // KPI configurations by role
@@ -398,7 +398,7 @@ export function KPIRow({ userRole, isCompact }: KPIRowProps) {
   const responsiveKpis = getResponsiveKPICount(kpis)
 
   return (
-    <div className="bg-card">
+    <div className={`bg-card ${compactScale.marginBottom}`}>
       {/* Header with collapse toggle - always visible */}
       <div className="flex items-center justify-between px-0 sm:px-0 lg:px-0 py-0 sm:py-0">
         {/* Collapse toggle - visible on tablet and mobile */}

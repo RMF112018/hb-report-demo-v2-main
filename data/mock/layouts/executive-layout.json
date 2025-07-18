@@ -7,10 +7,10 @@
     {
       "id": "financial-review-panel",
       "type": "financial-review-panel",
-      "title": "Financial Review Panel",
+      "title": "Financial Overview",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
-      "span": { "cols": 8, "rows": 5 },
+      "span": { "cols": 4, "rows": 6 },
       "visible": true,
       "config": {
         "panelProps": {
@@ -21,12 +21,12 @@
       }
     },
     {
-      "id": "placeholder-card",
-      "type": "portfolio-overview",
-      "title": "Placeholder Card",
+      "id": "portfolio-execution-dashboard",
+      "type": "health",
+      "title": "Portfolio Health Dashboard",
       "size": "optimal",
-      "position": { "x": 8, "y": 0 },
-      "span": { "cols": 8, "rows": 5 },
+      "position": { "x": 4, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {
         "executiveMode": true,
@@ -37,10 +37,10 @@
     {
       "id": "enhanced-hbi-insights",
       "type": "enhanced-hbi-insights",
-      "title": "HBI Portfolio Insights",
+      "title": "HBI AI Insights",
       "size": "optimal",
-      "position": { "x": 0, "y": 5 },
-      "span": { "cols": 8, "rows": 4 },
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 6, "rows": 4 },
       "visible": true,
       "config": {
         "executiveMode": true,
@@ -51,40 +51,11 @@
       }
     },
     {
-      "id": "portfolio-overview",
-      "type": "portfolio-overview",
-      "title": "Portfolio Overview",
-      "size": "optimal",
-      "position": { "x": 8, "y": 5 },
-      "span": { "cols": 8, "rows": 4 },
-      "visible": true,
-      "config": {
-        "executiveMode": true,
-        "showCharts": true,
-        "compactMetrics": true
-      }
-    },
-    {
-      "id": "pipeline-analytics",
-      "type": "pipeline-analytics",
-      "title": "Pipeline Analytics",
-      "size": "optimal",
-      "position": { "x": 0, "y": 9 },
-      "span": { "cols": 10, "rows": 4 },
-      "visible": true,
-      "config": {
-        "showTrends": true,
-        "showConversionRate": true,
-        "detailLevel": "executive",
-        "compactMode": true
-      }
-    },
-    {
       "id": "market-intelligence",
       "type": "market-intelligence",
       "title": "Market Intelligence",
       "size": "optimal",
-      "position": { "x": 10, "y": 9 },
+      "position": { "x": 6, "y": 6 },
       "span": { "cols": 6, "rows": 4 },
       "visible": true,
       "config": {
@@ -95,12 +66,27 @@
       }
     },
     {
+      "id": "pipeline-analytics",
+      "type": "pipeline-analytics",
+      "title": "Beta Pipeline Analytics",
+      "size": "optimal",
+      "position": { "x": 0, "y": 10 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrends": true,
+        "showConversionRate": true,
+        "detailLevel": "executive",
+        "compactMode": true
+      }
+    },
+    {
       "id": "staffing-distribution",
       "type": "staffing-distribution",
       "title": "Staffing Distribution",
       "size": "optimal",
-      "position": { "x": 0, "y": 13 },
-      "span": { "cols": 8, "rows": 4 },
+      "position": { "x": 6, "y": 10 },
+      "span": { "cols": 6, "rows": 4 },
       "visible": true,
       "config": {
         "executiveMode": true,
@@ -109,12 +95,12 @@
       }
     },
     {
-      "id": "company-quality-control",
+      "id": "quality-control",
       "type": "quality-control",
       "title": "Quality Control",
       "size": "optimal",
-      "position": { "x": 8, "y": 13 },
-      "span": { "cols": 4, "rows": 4 },
+      "position": { "x": 0, "y": 14 },
+      "span": { "cols": 4, "rows": 3 },
       "visible": true,
       "config": {
         "projectFilter": "all",
@@ -125,12 +111,12 @@
       }
     },
     {
-      "id": "company-safety-management",
+      "id": "safety-monitor",
       "type": "safety",
-      "title": "Safety Management",
+      "title": "Safety Monitor",
       "size": "optimal",
-      "position": { "x": 12, "y": 13 },
-      "span": { "cols": 4, "rows": 4 },
+      "position": { "x": 4, "y": 14 },
+      "span": { "cols": 4, "rows": 3 },
       "visible": true,
       "config": {
         "projectFilter": "all",
@@ -141,48 +127,18 @@
       }
     },
     {
-      "id": "executive-kpi-summary",
-      "type": "portfolio-overview",
-      "title": "Executive KPI Summary",
-      "size": "optimal",
-      "position": { "x": 0, "y": 17 },
-      "span": { "cols": 8, "rows": 3 },
-      "visible": true,
-      "config": {
-        "executiveMode": true,
-        "kpiOnly": true,
-        "showTrends": true,
-        "compactMode": true
-      }
-    },
-    {
-      "id": "cash-flow-summary",
+      "id": "cash-flow-analysis",
       "type": "cash-flow",
-      "title": "Cash Flow Summary",
+      "title": "Cash Flow Analysis",
       "size": "optimal",
-      "position": { "x": 8, "y": 17 },
-      "span": { "cols": 8, "rows": 3 },
+      "position": { "x": 8, "y": 14 },
+      "span": { "cols": 4, "rows": 3 },
       "visible": true,
       "config": {
         "executiveMode": true,
         "showTrends": true,
         "compactMode": true,
         "timeframe": "quarterly"
-      }
-    },
-    {
-      "id": "power-bi-enterprise-dashboard",
-      "type": "power-bi-dashboard",
-      "title": "Power BI Enterprise Dashboard",
-      "size": "optimal",
-      "position": { "x": 0, "y": 20 },
-      "span": { "cols": 16, "rows": 6 },
-      "visible": true,
-      "config": {
-        "executiveMode": true,
-        "showRealTime": true,
-        "compactMode": false,
-        "enableDrillDown": true
       }
     }
   ]

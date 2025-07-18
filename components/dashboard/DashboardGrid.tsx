@@ -741,6 +741,9 @@ function SortableCard({
     "draw-forecast",
   ]
 
+  // Special case: HealthCard should always render without wrapper
+  const shouldRenderWithoutWrapper = card.type === "health" || (useBetaDashboard && betaCards.includes(card.type))
+
   const isBetaCard = useBetaDashboard && betaCards.includes(card.type)
 
   return (
@@ -756,8 +759,8 @@ function SortableCard({
       {...attributes}
       {...(isEditing ? listeners : {})}
     >
-      {isBetaCard ? (
-        // Beta cards render directly without wrapper (they're self-contained)
+      {shouldRenderWithoutWrapper ? (
+        // HealthCard renders directly without wrapper
         <CardContent card={card} isCompact={isCompact} userRole={userRole} useBetaDashboard={useBetaDashboard} />
       ) : (
         // Legacy cards use wrapper for consistent styling

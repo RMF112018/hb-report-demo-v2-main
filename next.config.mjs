@@ -43,6 +43,21 @@ const nextConfig = {
           },
         ],
       },
+      // Allow iframe embedding for PDF files - more specific pattern
+      {
+        source: "/drawings/:path*",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Content-Type",
+            value: "application/pdf",
+          },
+        ],
+      },
+      // Default security headers for all other routes
       {
         source: "/(.*)",
         headers: [
@@ -53,6 +68,20 @@ const nextConfig = {
           {
             key: "X-Frame-Options",
             value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+      // Exclude API routes from X-Frame-Options DENY
+      {
+        source: "/api/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
             key: "X-XSS-Protection",
