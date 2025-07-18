@@ -151,6 +151,17 @@ import BetaProjectOverview from "@/components/cards/beta/BetaProjectOverview"
 import BetaProcurement from "@/components/cards/beta/BetaProcurement"
 import BetaProcurementStatsPanel from "@/components/cards/beta/BetaProcurementStatsPanel"
 
+// HR & Payroll card imports
+import HRWorkforceOverview from "@/components/cards/hr-payroll/HRWorkforceOverview"
+import PayrollAnalytics from "@/components/cards/hr-payroll/PayrollAnalytics"
+import BenefitsEnrollment from "@/components/cards/hr-payroll/BenefitsEnrollment"
+import ComplianceMonitoring from "@/components/cards/hr-payroll/ComplianceMonitoring"
+import RecruitingPipeline from "@/components/cards/hr-payroll/RecruitingPipeline"
+import PerformanceMetrics from "@/components/cards/hr-payroll/PerformanceMetrics"
+import TrainingDevelopment from "@/components/cards/hr-payroll/TrainingDevelopment"
+import ExpenseManagement from "@/components/cards/hr-payroll/ExpenseManagement"
+import TimesheetAnalytics from "@/components/cards/hr-payroll/TimesheetAnalytics"
+
 // IT Command Center placeholder cards
 import {
   UserAccessSummaryCard,
@@ -1126,6 +1137,25 @@ function CardContent({
       return <CompetitorBenchmarkCard {...commonProps} />
     case "risk-reward-radar":
       return <RiskRewardRadarCard {...commonProps} />
+    // HR & Payroll cards
+    case "hr-workforce-overview":
+      return <HRWorkforceOverview {...commonProps} />
+    case "payroll-analytics":
+      return <PayrollAnalytics {...commonProps} />
+    case "benefits-enrollment":
+      return <BenefitsEnrollment {...commonProps} />
+    case "compliance-monitoring":
+      return <ComplianceMonitoring {...commonProps} />
+    case "recruiting-pipeline":
+      return <RecruitingPipeline {...commonProps} />
+    case "performance-metrics":
+      return <PerformanceMetrics {...commonProps} />
+    case "training-development":
+      return <TrainingDevelopment {...commonProps} />
+    case "expense-management":
+      return <ExpenseManagement {...commonProps} />
+    case "timesheet-analytics":
+      return <TimesheetAnalytics {...commonProps} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -1195,6 +1225,25 @@ const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
       return { cols: 5, rows: 4 }
     case "risk-reward-radar":
       return { cols: 4, rows: 4 }
+    // HR & Payroll cards
+    case "hr-workforce-overview":
+      return { cols: 6, rows: 4 }
+    case "payroll-analytics":
+      return { cols: 6, rows: 4 }
+    case "benefits-enrollment":
+      return { cols: 4, rows: 4 }
+    case "compliance-monitoring":
+      return { cols: 4, rows: 4 }
+    case "recruiting-pipeline":
+      return { cols: 4, rows: 4 }
+    case "performance-metrics":
+      return { cols: 6, rows: 4 }
+    case "training-development":
+      return { cols: 6, rows: 4 }
+    case "expense-management":
+      return { cols: 6, rows: 4 }
+    case "timesheet-analytics":
+      return { cols: 6, rows: 4 }
     default:
       return { cols: 3, rows: 2 }
   }

@@ -133,6 +133,8 @@ export const useDashboardLayout = (userRole: UserRole): DashboardLayoutHookRetur
         ]
       case "estimator":
         return [{ filename: "estimator-layout.json", displayName: "Dashboard" }]
+      case "hr-payroll":
+        return [{ filename: "hr-payroll-layout.json", displayName: "HR Overview" }]
       case "admin":
         return [{ filename: "it-layout.json", displayName: "IT Command Center" }]
       default:

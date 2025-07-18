@@ -1,0 +1,143 @@
+{
+  "id": "hr-payroll-layout",
+  "name": "HR & Payroll Dashboard",
+  "description": "Comprehensive HR & Payroll analytics with Power BI-style visualizations",
+  "role": "hr-payroll",
+  "cards": [
+    {
+      "id": "hr-workforce-overview",
+      "type": "hr-workforce-overview",
+      "title": "Workforce Overview",
+      "size": "optimal",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showEmployeeDistribution": true,
+        "showDepartmentBreakdown": true,
+        "showHiringTrends": true,
+        "showTurnoverMetrics": true
+      }
+    },
+    {
+      "id": "payroll-analytics",
+      "type": "payroll-analytics",
+      "title": "Payroll Analytics",
+      "size": "optimal",
+      "position": { "x": 6, "y": 0 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showPayrollTrends": true,
+        "showOvertimeAnalysis": true,
+        "showDepartmentCosts": true,
+        "showTaxBreakdown": true
+      }
+    },
+    {
+      "id": "benefits-enrollment",
+      "type": "benefits-enrollment",
+      "title": "Benefits Enrollment",
+      "size": "optimal",
+      "position": { "x": 0, "y": 4 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showEnrollmentRates": true,
+        "showPlanDistribution": true,
+        "showCostAnalysis": true,
+        "showEligibilityStatus": true
+      }
+    },
+    {
+      "id": "compliance-monitoring",
+      "type": "compliance-monitoring",
+      "title": "Compliance Monitoring",
+      "size": "optimal",
+      "position": { "x": 4, "y": 4 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showDocumentStatus": true,
+        "showExpirationAlerts": true,
+        "showTrainingCompliance": true,
+        "showAuditReadiness": true
+      }
+    },
+    {
+      "id": "recruiting-pipeline",
+      "type": "recruiting-pipeline",
+      "title": "Recruiting Pipeline",
+      "size": "optimal",
+      "position": { "x": 8, "y": 4 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showPipelineStages": true,
+        "showTimeToHire": true,
+        "showSourceEffectiveness": true,
+        "showDiversityMetrics": true
+      }
+    },
+    {
+      "id": "performance-metrics",
+      "type": "performance-metrics",
+      "title": "Performance Metrics",
+      "size": "optimal",
+      "position": { "x": 0, "y": 8 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showReviewCompletion": true,
+        "showGoalProgress": true,
+        "showPerformanceDistribution": true,
+        "showDevelopmentNeeds": true
+      }
+    },
+    {
+      "id": "training-development",
+      "type": "training-development",
+      "title": "Training & Development",
+      "size": "optimal",
+      "position": { "x": 6, "y": 8 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrainingCompletion": true,
+        "showCertificationStatus": true,
+        "showSkillGaps": true,
+        "showDevelopmentPaths": true
+      }
+    },
+    {
+      "id": "expense-management",
+      "type": "expense-management",
+      "title": "Expense Management",
+      "size": "optimal",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showExpenseTrends": true,
+        "showApprovalStatus": true,
+        "showCategoryBreakdown": true,
+        "showPolicyCompliance": true
+      }
+    },
+    {
+      "id": "timesheet-analytics",
+      "type": "timesheet-analytics",
+      "title": "Timesheet Analytics",
+      "size": "optimal",
+      "position": { "x": 6, "y": 12 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTimeTracking": true,
+        "showOvertimeAnalysis": true,
+        "showProjectAllocation": true,
+        "showAttendancePatterns": true
+      }
+    }
+  ]
+}
