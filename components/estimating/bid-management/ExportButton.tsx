@@ -1,8 +1,8 @@
 import React from "react"
 import { Button } from "../../ui/button"
 import { Download } from "lucide-react"
-import { ProjectPursuit } from "../../../types/estimating"
-import * as XLSX from "xlsx"
+import type { ProjectPursuit } from "../../../types/estimating"
+import ExcelJS from "exceljs"
 
 interface ExportButtonProps {
   data: ProjectPursuit[]
@@ -34,112 +34,144 @@ const ExportButton: React.FC<ExportButtonProps> = ({
     })
   }
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!data || data.length === 0) {
       alert("No data to export")
       return
     }
 
-    // Transform data for Excel export
-    const exportData = data.map((project) => ({
-      "Project Name": project.name,
-      "Project Number": project.projectNumber,
-      Client: project.client,
-      Location: project.location,
-      Status: project.status,
-      Schedule: project.schedule,
-      "Current Stage": project.currentStage,
-      Deliverable: project.deliverable,
-      "Bid Book Log": project.bidBookLog,
-      Review: project.review,
-      Programming: project.programming,
-      "Pricing (%)": project.pricing,
-      "Lean Estimating": project.leanEstimating,
-      "Final Estimate": project.finalEstimate,
-      Contributors: project.contributors,
-      "Bid Bond": project.bidBond,
-      "Project Budget": formatCurrency(project.projectBudget),
-      "Original Budget": formatCurrency(project.originalBudget),
-      "Billed to Date": formatCurrency(project.billedToDate),
-      "Remaining Budget": formatCurrency(project.remainingBudget),
-      "Estimate Type": project.estimateType,
-      "Estimated Cost": formatCurrency(project.estimatedCost),
-      "Cost per SqFt": `$${project.costPerSqf.toFixed(2)}`,
-      "Cost per LF": `$${project.costPerLft.toFixed(2)}`,
-      "Square Footage": project.sqft.toLocaleString(),
-      "Submitted Date": formatDate(project.submitted),
-      "Bid Due Date": formatDate(project.bidDueDate),
-      Awarded: project.awarded ? "Yes" : "No",
-      "Precon Awarded": project.awardedPrecon ? "Yes" : "No",
-      Lead: project.lead,
-      "Confidence (%)": project.confidence,
-      "Risk Level": project.riskLevel,
-    }))
-
-    // Create workbook and worksheet
-    const wb = XLSX.utils.book_new()
-    const ws = XLSX.utils.json_to_sheet(exportData)
-
-    // Set column widths for better readability
-    const colWidths = [
-      { wch: 25 }, // Project Name
-      { wch: 15 }, // Project Number
-      { wch: 20 }, // Client
-      { wch: 15 }, // Location
-      { wch: 10 }, // Status
-      { wch: 12 }, // Schedule
-      { wch: 12 }, // Current Stage
-      { wch: 15 }, // Deliverable
-      { wch: 12 }, // Bid Book Log
-      { wch: 10 }, // Review
-      { wch: 12 }, // Programming
-      { wch: 10 }, // Pricing
-      { wch: 15 }, // Lean Estimating
-      { wch: 15 }, // Final Estimate
-      { wch: 12 }, // Contributors
-      { wch: 12 }, // Bid Bond
-      { wch: 15 }, // Project Budget
-      { wch: 15 }, // Original Budget
-      { wch: 15 }, // Billed to Date
-      { wch: 15 }, // Remaining Budget
-      { wch: 18 }, // Estimate Type
-      { wch: 15 }, // Estimated Cost
-      { wch: 12 }, // Cost per SqFt
-      { wch: 12 }, // Cost per LF
-      { wch: 15 }, // Square Footage
-      { wch: 12 }, // Submitted Date
-      { wch: 12 }, // Bid Due Date
-      { wch: 8 }, // Awarded
-      { wch: 12 }, // Precon Awarded
-      { wch: 15 }, // Lead
-      { wch: 12 }, // Confidence
-      { wch: 12 }, // Risk Level
-    ]
-
-    ws["!cols"] = colWidths
-
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, "Bid Tracking")
-
-    // Add metadata sheet
-    const metadata = [
-      { Field: "Export Date", Value: new Date().toLocaleString() },
-      { Field: "Total Projects", Value: data.length },
-      { Field: "File Name", Value: `${fileName}.xlsx` },
-      { Field: "Exported By", Value: "HB Report Demo v3.0" },
-    ]
-
-    const metaWs = XLSX.utils.json_to_sheet(metadata)
-    metaWs["!cols"] = [{ wch: 15 }, { wch: 25 }]
-    XLSX.utils.book_append_sheet(wb, metaWs, "Export Info")
-
-    // Generate timestamp for unique filename
-    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
-    const finalFileName = `${fileName}_${timestamp}.xlsx`
-
-    // Write and download file
     try {
-      XLSX.writeFile(wb, finalFileName)
+      // Create a new workbook and worksheet
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet("Bid Tracking")
+
+      // Define columns
+      worksheet.columns = [
+        { header: "Project Name", key: "projectName", width: 25 },
+        { header: "Project Number", key: "projectNumber", width: 15 },
+        { header: "Client", key: "client", width: 20 },
+        { header: "Location", key: "location", width: 15 },
+        { header: "Status", key: "status", width: 10 },
+        { header: "Schedule", key: "schedule", width: 12 },
+        { header: "Current Stage", key: "currentStage", width: 12 },
+        { header: "Deliverable", key: "deliverable", width: 15 },
+        { header: "Bid Book Log", key: "bidBookLog", width: 12 },
+        { header: "Review", key: "review", width: 10 },
+        { header: "Programming", key: "programming", width: 12 },
+        { header: "Pricing (%)", key: "pricing", width: 10 },
+        { header: "Lean Estimating", key: "leanEstimating", width: 15 },
+        { header: "Final Estimate", key: "finalEstimate", width: 15 },
+        { header: "Contributors", key: "contributors", width: 12 },
+        { header: "Bid Bond", key: "bidBond", width: 12 },
+        { header: "Project Budget", key: "projectBudget", width: 15 },
+        { header: "Original Budget", key: "originalBudget", width: 15 },
+        { header: "Billed to Date", key: "billedToDate", width: 15 },
+        { header: "Remaining Budget", key: "remainingBudget", width: 15 },
+        { header: "Estimate Type", key: "estimateType", width: 18 },
+        { header: "Estimated Cost", key: "estimatedCost", width: 15 },
+        { header: "Cost per SqFt", key: "costPerSqf", width: 12 },
+        { header: "Cost per LF", key: "costPerLft", width: 12 },
+        { header: "Square Footage", key: "sqft", width: 15 },
+        { header: "Submitted Date", key: "submitted", width: 12 },
+        { header: "Bid Due Date", key: "bidDueDate", width: 12 },
+        { header: "Awarded", key: "awarded", width: 8 },
+        { header: "Precon Awarded", key: "awardedPrecon", width: 12 },
+        { header: "Lead", key: "lead", width: 15 },
+        { header: "Confidence (%)", key: "confidence", width: 12 },
+        { header: "Risk Level", key: "riskLevel", width: 12 },
+      ]
+
+      // Add data rows
+      data.forEach((project) => {
+        worksheet.addRow({
+          projectName: project.name,
+          projectNumber: project.projectNumber,
+          client: project.client,
+          location: project.location,
+          status: project.status,
+          schedule: project.schedule,
+          currentStage: project.currentStage,
+          deliverable: project.deliverable,
+          bidBookLog: project.bidBookLog,
+          review: project.review,
+          programming: project.programming,
+          pricing: project.pricing,
+          leanEstimating: project.leanEstimating,
+          finalEstimate: project.finalEstimate,
+          contributors: project.contributors,
+          bidBond: project.bidBond,
+          projectBudget: formatCurrency(project.projectBudget),
+          originalBudget: formatCurrency(project.originalBudget),
+          billedToDate: formatCurrency(project.billedToDate),
+          remainingBudget: formatCurrency(project.remainingBudget),
+          estimateType: project.estimateType,
+          estimatedCost: formatCurrency(project.estimatedCost),
+          costPerSqf: `$${project.costPerSqf.toFixed(2)}`,
+          costPerLft: `$${project.costPerLft.toFixed(2)}`,
+          sqft: project.sqft.toLocaleString(),
+          submitted: formatDate(project.submitted),
+          bidDueDate: formatDate(project.bidDueDate),
+          awarded: project.awarded ? "Yes" : "No",
+          awardedPrecon: project.awardedPrecon ? "Yes" : "No",
+          lead: project.lead,
+          confidence: project.confidence,
+          riskLevel: project.riskLevel,
+        })
+      })
+
+      // Style the header row
+      const headerRow = worksheet.getRow(1)
+      headerRow.font = { bold: true }
+      headerRow.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFE0E0E0" },
+      }
+
+      // Add metadata sheet
+      const metadataSheet = workbook.addWorksheet("Export Info")
+      metadataSheet.columns = [
+        { header: "Field", key: "field", width: 15 },
+        { header: "Value", key: "value", width: 25 },
+      ]
+
+      const metadata = [
+        { field: "Export Date", value: new Date().toLocaleString() },
+        { field: "Total Projects", value: data.length.toString() },
+        { field: "File Name", value: `${fileName}.xlsx` },
+        { field: "Exported By", value: "HB Report Demo v3.0" },
+      ]
+
+      metadata.forEach((item) => {
+        metadataSheet.addRow(item)
+      })
+
+      // Style metadata header
+      const metadataHeaderRow = metadataSheet.getRow(1)
+      metadataHeaderRow.font = { bold: true }
+      metadataHeaderRow.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFE0E0E0" },
+      }
+
+      // Generate timestamp for unique filename
+      const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
+      const finalFileName = `${fileName}_${timestamp}.xlsx`
+
+      // Generate and download the file
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = finalFileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Export failed:", error)
       alert("Export failed. Please try again.")

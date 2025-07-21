@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,19 +29,6 @@ export function ResponsibilityMatrix({
 }: ResponsibilityMatrixProps) {
   const [selectedTask, setSelectedTask] = useState<ResponsibilityTask | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800"
-      case "low":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -98,14 +87,14 @@ export function ResponsibilityMatrix({
             })
           }
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2" />
           Add Task
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Task Assignments</CardTitle>
+          <CardTitle>Tasks Overview</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -113,42 +102,29 @@ export function ResponsibilityMatrix({
               <TableRow>
                 <TableHead>Task</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Assigned To</TableHead>
-                <TableHead>Priority</TableHead>
+                <TableHead>Responsible</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Due Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tasks.map((task) => (
                 <TableRow key={task.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{task.task}</div>
-                      <div className="text-sm text-gray-500">{task.responsible}</div>
-                    </div>
-                  </TableCell>
+                  <TableCell className="font-medium">{task.task}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{getCategoryName(task.category)}</Badge>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{getRoleName(task.responsible)}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getPriorityColor(task.type)}>{task.type}</Badge>
-                  </TableCell>
+                  <TableCell>{getRoleName(task.responsible)}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                   </TableCell>
-                  <TableCell>{task.updatedAt ? new Date(task.updatedAt).toLocaleDateString() : "N/A"}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm" onClick={() => handleEditTask(task)}>
-                        <Edit className="w-4 h-4" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => handleDeleteTask(task.id)}>
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -167,7 +143,7 @@ export function ResponsibilityMatrix({
           {selectedTask && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Task</label>
+                <label className="block text-sm font-medium mb-2">Task Name</label>
                 <input
                   type="text"
                   value={selectedTask.task}
@@ -176,68 +152,51 @@ export function ResponsibilityMatrix({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Responsible</label>
-                <input
-                  type="text"
+                <label className="block text-sm font-medium mb-2">Category</label>
+                <select
+                  value={selectedTask.category}
+                  onChange={(e) => setSelectedTask({ ...selectedTask, category: e.target.value })}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
+                    <option key={category.key} value={category.key}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Responsible</label>
+                <select
                   value={selectedTask.responsible}
                   onChange={(e) => setSelectedTask({ ...selectedTask, responsible: e.target.value })}
                   className="w-full p-2 border rounded"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Category</label>
-                  <select
-                    value={selectedTask.category}
-                    onChange={(e) => setSelectedTask({ ...selectedTask, category: e.target.value })}
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="">Select category</option>
-                    {categories
-                      .filter((cat) => cat.enabled)
-                      .map((category) => (
-                        <option key={category.key} value={category.key}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
-                  <select
-                    value={selectedTask.status}
-                    onChange={(e) =>
-                      setSelectedTask({
-                        ...selectedTask,
-                        status: e.target.value as "active" | "pending" | "completed",
-                      })
-                    }
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="active">Active</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                </div>
+                >
+                  <option value="">Select Role</option>
+                  {roles.map((role) => (
+                    <option key={role.key} value={role.key}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Annotations</label>
-                <textarea
-                  value={selectedTask.annotations?.map((ann) => ann.comment).join("\n") || ""}
-                  onChange={(e) => {
-                    const comments = e.target.value.split("\n").filter((c) => c.trim())
-                    const annotations = comments.map((comment, index) => ({
-                      id: `temp-${index}`,
-                      user: "Current User",
-                      timestamp: new Date().toISOString(),
-                      comment: comment.trim(),
-                    }))
-                    setSelectedTask({ ...selectedTask, annotations })
-                  }}
+                <label className="block text-sm font-medium mb-2">Status</label>
+                <select
+                  value={selectedTask.status}
+                  onChange={(e) =>
+                    setSelectedTask({
+                      ...selectedTask,
+                      status: e.target.value as "completed" | "pending" | "active",
+                    })
+                  }
                   className="w-full p-2 border rounded"
-                  rows={2}
-                  placeholder="Add annotations (one per line)"
-                />
+                >
+                  <option value="pending">Pending</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                </select>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>

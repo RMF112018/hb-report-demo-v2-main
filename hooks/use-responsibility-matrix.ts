@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useAuth } from "@/context/auth-context"
-import { logger } from "@/lib/logger"
+import { logger } from "@/lib/structured-logger"
 import responsibilityRawData from "@/data/mock/responsibility.json"
 
 /**
@@ -195,14 +195,11 @@ export const useResponsibilityMatrix = (projectId: string) => {
         try {
           localStorage.setItem(storageKey, JSON.stringify(typedData))
         } catch (error) {
-          logger.warn(
-            "Error saving responsibility matrix data",
-            {
-              component: "useResponsibilityMatrix",
-              function: "debouncedSave",
-            },
-            error
-          )
+          logger.warn("Error saving responsibility matrix data", {
+            component: "useResponsibilityMatrix",
+            function: "debouncedSave",
+            error,
+          })
         }
       }, 500),
     [storageKey]
@@ -295,14 +292,11 @@ export const useResponsibilityMatrix = (projectId: string) => {
           setActiveTab("team")
         }
       } catch (error) {
-        logger.warn(
-          "Error loading responsibility matrix data",
-          {
-            component: "useResponsibilityMatrix",
-            function: "loadData",
-          },
-          error
-        )
+        logger.warn("Error loading responsibility matrix data", {
+          component: "useResponsibilityMatrix",
+          function: "loadData",
+          error,
+        })
         // Fallback to mock data
         setTasks(transformedTasks)
         setActiveTab("team")
@@ -337,14 +331,11 @@ export const useResponsibilityMatrix = (projectId: string) => {
         setActiveTab("team")
         setIsInitialized(false)
       } catch (error) {
-        logger.warn(
-          "Error clearing responsibility matrix data",
-          {
-            component: "useResponsibilityMatrix",
-            function: "clearData",
-          },
-          error
-        )
+        logger.warn("Error clearing responsibility matrix data", {
+          component: "useResponsibilityMatrix",
+          function: "clearData",
+          error,
+        })
       }
     }
   }, [user, storageKey, isInitialized])
@@ -355,14 +346,11 @@ export const useResponsibilityMatrix = (projectId: string) => {
       try {
         localStorage.removeItem(storageKey)
       } catch (error) {
-        logger.warn(
-          "Error clearing data on window close",
-          {
-            component: "useResponsibilityMatrix",
-            function: "handleBeforeUnload",
-          },
-          error
-        )
+        logger.warn("Error clearing data on window close", {
+          component: "useResponsibilityMatrix",
+          function: "handleBeforeUnload",
+          error,
+        })
       }
     }
 

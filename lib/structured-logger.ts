@@ -1,314 +1,316 @@
+import { getLogger } from "@logtape/logtape"
+
 /**
- * Enhanced structured logging service using @logtape/logtape
- * Provides production-ready logging with structured output and security compliance
+ * Structured logging service for HB Report Demo v3.0
  *
- * @module StructuredLogger
- * @version 2.0.0
- * @author HB Development Team
- * @since 2025-01-29
+ * This service provides structured logging capabilities with:
+ * - Log levels (debug, info, warn, error)
+ * - Structured data with metadata
+ * - Performance tracking
+ * - Error handling with stack traces
+ * - Production-safe logging (debug logs disabled in production)
+ *
+ * @example
+ * ```typescript
+ * import { logger } from '@/lib/structured-logger'
+ *
+ * // Basic logging
+ * logger.info('User logged in', { userId: '123', role: 'project-manager' })
+ *
+ * // Error logging with context
+ * logger.error('Failed to load data', {
+ *   component: 'Dashboard',
+ *   function: 'loadData',
+ *   error: err
+ * })
+ *
+ * // Performance tracking
+ * logger.track('ExpensiveOperation', async () => {
+ *   return await expensiveCalculation()
+ * })
+ * ```
  */
 
-// Fallback for @logtape/logtape until package is installed
-interface LogLevel {
-  DEBUG: 0
-  INFO: 1
-  WARN: 2
-  ERROR: 3
-}
+// Create the main logger instance
+const logger = getLogger("hb-report-demo")
 
-interface Logger {
-  debug(message: string, context?: unknown): void
-  info(message: string, context?: unknown): void
-  warn(message: string, context?: unknown): void
-  error(message: string, context?: unknown): void
-}
+/**
+ * Performance logger for tracking component render times and operations
+ */
+export const performanceLogger = {
+  /**
+   * Track the performance of a function or operation
+   * @param name - Name of the operation being tracked
+   * @param fn - Function to execute and track
+   * @param metadata - Additional metadata for the operation
+   */
+  async track<T>(name: string, fn: () => Promise<T> | T, metadata?: Record<string, unknown>): Promise<T> {
+    const start = performance.now()
+    try {
+      const result = await fn()
+      const duration = performance.now() - start
 
-function createLogger(_options: { level: LogLevel; format: string; destination: NodeJS.WriteStream }): Logger {
-  return {
-    debug: (message: string, context?: unknown) => console.debug(message, context),
-    info: (message: string, context?: unknown) => console.info(message, context),
-    warn: (message: string, context?: unknown) => console.warn(message, context),
-    error: (message: string, context?: unknown) => console.error(message, context),
-  }
-}
+      logger.debug(`Performance [${name}]`, {
+        duration: `${duration.toFixed(2)}ms`,
+        success: true,
+        ...metadata,
+      })
 
-const LogLevel: LogLevel = {
-  DEBUG: 0,
-  INFO: 1,
-  WARN: 2,
-  ERROR: 3,
-}
+      return result
+    } catch (error) {
+      const duration = performance.now() - start
 
-export interface LogContext {
-  component?: string
-  function?: string
-  userId?: string
-  projectId?: string
-  sessionId?: string
-  requestId?: string
-  environment?: string
-  version?: string
-  [key: string]: unknown
-}
+      logger.error(`Performance [${name}] failed`, {
+        duration: `${duration.toFixed(2)}ms`,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        ...metadata,
+      })
 
-export interface SecurityContext {
-  sanitized: boolean
-  piiRemoved: boolean
-  sensitiveDataMasked: boolean
-}
+      throw error
+    }
+  },
 
-export interface LogEntry {
-  timestamp: string
-  level: number
-  message: string
-  context?: LogContext
-  security?: SecurityContext
-  error?: Error | undefined
-  data?: unknown
-  traceId?: string
+  /**
+   * Track synchronous operations
+   * @param name - Name of the operation being tracked
+   * @param fn - Function to execute and track
+   * @param metadata - Additional metadata for the operation
+   */
+  trackSync<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
+    const start = performance.now()
+    try {
+      const result = fn()
+      const duration = performance.now() - start
+
+      logger.debug(`Performance [${name}]`, {
+        duration: `${duration.toFixed(2)}ms`,
+        success: true,
+        ...metadata,
+      })
+
+      return result
+    } catch (error) {
+      const duration = performance.now() - start
+
+      logger.error(`Performance [${name}] failed`, {
+        duration: `${duration.toFixed(2)}ms`,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        ...metadata,
+      })
+
+      throw error
+    }
+  },
 }
 
 /**
- * Enhanced Logger class with security and compliance features
+ * Component logger for tracking React component lifecycle and performance
  */
-class StructuredLogger {
-  private logger: Logger
-  private isDevelopment: boolean
-  private isProduction: boolean
-  private currentLevel: number
-  private securityEnabled: boolean
-
-  constructor() {
-    this.isDevelopment = process.env.NODE_ENV === "development"
-    this.isProduction = process.env.NODE_ENV === "production"
-    this.currentLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.INFO
-    this.securityEnabled = this.isProduction
-
-    // Initialize @logtape/logtape logger
-    this.logger = createLogger({
-      level: LogLevel,
-      format: this.isDevelopment ? "human" : "json",
-      destination: process.stdout,
+export const componentLogger = {
+  /**
+   * Log component mount
+   * @param componentName - Name of the component
+   * @param props - Component props (sanitized)
+   */
+  mount(componentName: string, props?: Record<string, unknown>) {
+    logger.debug(`Component mounted`, {
+      component: componentName,
+      props: props ? sanitizeProps(props) : undefined,
     })
-  }
+  },
 
   /**
-   * Set the minimum log level for output
-   * @param level - The minimum log level to display
+   * Log component unmount
+   * @param componentName - Name of the component
    */
-  setLevel(level: number): void {
-    this.currentLevel = level
-    this.logger = createLogger({
-      level: LogLevel,
-      format: this.isDevelopment ? "human" : "json",
-      destination: process.stdout,
+  unmount(componentName: string) {
+    logger.debug(`Component unmounted`, {
+      component: componentName,
     })
-  }
+  },
 
   /**
-   * Sanitize sensitive data from log entries
-   * @param data - Data to sanitize
-   * @returns Sanitized data
+   * Log component render
+   * @param componentName - Name of the component
+   * @param renderTime - Time taken to render in milliseconds
    */
-  private sanitizeData(data: unknown): unknown {
-    if (typeof data !== "object" || data === null) {
-      return data
-    }
-
-    const sensitiveKeys = [
-      "password",
-      "token",
-      "secret",
-      "key",
-      "auth",
-      "authorization",
-      "apiKey",
-      "api_key",
-      "private_key",
-      "privateKey",
-      "credential",
-      "ssn",
-      "credit_card",
-      "creditCard",
-      "account_number",
-      "accountNumber",
-    ]
-
-    const sanitized = { ...(data as Record<string, unknown>) }
-
-    for (const key of Object.keys(sanitized)) {
-      const lowerKey = key.toLowerCase()
-      if (sensitiveKeys.some((sensitive) => lowerKey.includes(sensitive))) {
-        sanitized[key] = "[REDACTED]"
-      } else if (typeof sanitized[key] === "object" && sanitized[key] !== null) {
-        sanitized[key] = this.sanitizeData(sanitized[key])
-      }
-    }
-
-    return sanitized
-  }
-
-  /**
-   * Generate trace ID for request tracking
-   * @returns Unique trace ID
-   */
-  private generateTraceId(): string {
-    return `trace-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  /**
-   * Format log entry with security and compliance features
-   * @param level - Log level
-   * @param message - Log message
-   * @param context - Additional context
-   * @param error - Error object if applicable
-   * @param data - Additional data
-   * @returns Formatted log entry
-   */
-  private formatLog(level: number, message: string, context?: LogContext, error?: Error, data?: unknown): LogEntry {
-    const sanitizedData = this.securityEnabled ? this.sanitizeData(data) : data
-    const sanitizedContext = this.securityEnabled ? this.sanitizeData(context) : context
-
-    return {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      context: sanitizedContext as LogContext,
-      security: {
-        sanitized: this.securityEnabled,
-        piiRemoved: this.securityEnabled,
-        sensitiveDataMasked: this.securityEnabled,
-      },
-      error,
-      data: sanitizedData,
-      traceId: this.generateTraceId(),
-    }
-  }
-
-  /**
-   * Log debug message
-   * @param message - Debug message
-   * @param context - Additional context
-   * @param data - Additional data
-   */
-  debug(message: string, context?: LogContext, data?: unknown): void {
-    const entry = this.formatLog(LogLevel.DEBUG, message, context, undefined, data)
-    this.logger.debug(entry.message, { ...entry.context, data: entry.data })
-  }
-
-  /**
-   * Log info message
-   * @param message - Info message
-   * @param context - Additional context
-   * @param data - Additional data
-   */
-  info(message: string, context?: LogContext, data?: unknown): void {
-    const entry = this.formatLog(LogLevel.INFO, message, context, undefined, data)
-    this.logger.info(entry.message, { ...entry.context, data: entry.data })
-  }
-
-  /**
-   * Log warning message
-   * @param message - Warning message
-   * @param context - Additional context
-   * @param data - Additional data
-   */
-  warn(message: string, context?: LogContext, data?: unknown): void {
-    const entry = this.formatLog(LogLevel.WARN, message, context, undefined, data)
-    this.logger.warn(entry.message, { ...entry.context, data: entry.data })
-  }
-
-  /**
-   * Log error message
-   * @param message - Error message
-   * @param error - Error object
-   * @param context - Additional context
-   * @param data - Additional data
-   */
-  error(message: string, error?: Error, context?: LogContext, data?: unknown): void {
-    const entry = this.formatLog(LogLevel.ERROR, message, context, error, data)
-    this.logger.error(entry.message, {
-      ...entry.context,
-      error: error?.stack || error?.message,
-      data: entry.data,
+  render(componentName: string, renderTime: number) {
+    logger.debug(`Component rendered`, {
+      component: componentName,
+      renderTime: `${renderTime.toFixed(2)}ms`,
     })
-  }
+  },
 
   /**
-   * Log critical error message
-   * @param message - Critical error message
-   * @param error - Error object
-   * @param context - Additional context
-   * @param data - Additional data
+   * Log component error
+   * @param componentName - Name of the component
+   * @param error - Error that occurred
+   * @param errorBoundary - Whether error was caught by error boundary
    */
-  critical(message: string, error?: Error, context?: LogContext, data?: unknown): void {
-    const entry = this.formatLog(LogLevel.ERROR, message, context, error, data)
-    this.logger.error(`CRITICAL: ${entry.message}`, {
-      ...entry.context,
-      error: error?.stack || error?.message,
-      data: entry.data,
-      severity: "critical",
+  error(componentName: string, error: Error, errorBoundary = false) {
+    logger.error(`Component error`, {
+      component: componentName,
+      error: error.message,
+      stack: error.stack,
+      errorBoundary,
     })
-  }
-
-  /**
-   * Create a logger instance with predefined context
-   * @param context - Default context for all log entries
-   * @returns Logger instance with context
-   */
-  withContext(context: LogContext): StructuredLogger {
-    const logger = new StructuredLogger()
-    logger.currentLevel = this.currentLevel
-    logger.isDevelopment = this.isDevelopment
-    logger.isProduction = this.isProduction
-    logger.securityEnabled = this.securityEnabled
-
-    // Override logging methods to include context
-    const originalDebug = logger.debug.bind(logger)
-    const originalInfo = logger.info.bind(logger)
-    const originalWarn = logger.warn.bind(logger)
-    const originalError = logger.error.bind(logger)
-    const originalCritical = logger.critical.bind(logger)
-
-    logger.debug = (message: string, ctx?: LogContext, data?: unknown) => {
-      originalDebug(message, { ...context, ...ctx }, data)
-    }
-    logger.info = (message: string, ctx?: LogContext, data?: unknown) => {
-      originalInfo(message, { ...context, ...ctx }, data)
-    }
-    logger.warn = (message: string, ctx?: LogContext, data?: unknown) => {
-      originalWarn(message, { ...context, ...ctx }, data)
-    }
-    logger.error = (message: string, error?: Error, ctx?: LogContext, data?: unknown) => {
-      originalError(message, error, { ...context, ...ctx }, data)
-    }
-    logger.critical = (message: string, error?: Error, ctx?: LogContext, data?: unknown) => {
-      originalCritical(message, error, { ...context, ...ctx }, data)
-    }
-
-    return logger
-  }
-
-  /**
-   * Enable/disable security features
-   * @param enabled - Whether to enable security features
-   */
-  setSecurityEnabled(enabled: boolean): void {
-    this.securityEnabled = enabled
-  }
+  },
 }
 
-// Export singleton instance
-export const structuredLogger = new StructuredLogger()
+/**
+ * Hook logger for tracking custom hook usage and performance
+ */
+export const hookLogger = {
+  /**
+   * Log hook initialization
+   * @param hookName - Name of the hook
+   * @param params - Hook parameters
+   */
+  init(hookName: string, params?: Record<string, unknown>) {
+    logger.debug(`Hook initialized`, {
+      hook: hookName,
+      params: params ? sanitizeProps(params) : undefined,
+    })
+  },
 
-// Export convenience functions
-export const debug = (message: string, context?: LogContext, data?: unknown) =>
-  structuredLogger.debug(message, context, data)
-export const info = (message: string, context?: LogContext, data?: unknown) =>
-  structuredLogger.info(message, context, data)
-export const warn = (message: string, context?: LogContext, data?: unknown) =>
-  structuredLogger.warn(message, context, data)
-export const error = (message: string, error?: Error, context?: LogContext, data?: unknown) =>
-  structuredLogger.error(message, error, context, data)
-export const critical = (message: string, error?: Error, context?: LogContext, data?: unknown) =>
-  structuredLogger.critical(message, error, context, data)
+  /**
+   * Log hook state change
+   * @param hookName - Name of the hook
+   * @param stateName - Name of the state that changed
+   * @param oldValue - Previous value
+   * @param newValue - New value
+   */
+  stateChange(hookName: string, stateName: string, oldValue: unknown, newValue: unknown) {
+    logger.debug(`Hook state changed`, {
+      hook: hookName,
+      state: stateName,
+      oldValue: sanitizeValue(oldValue),
+      newValue: sanitizeValue(newValue),
+    })
+  },
+
+  /**
+   * Log hook error
+   * @param hookName - Name of the hook
+   * @param error - Error that occurred
+   */
+  error(hookName: string, error: Error) {
+    logger.error(`Hook error`, {
+      hook: hookName,
+      error: error.message,
+      stack: error.stack,
+    })
+  },
+}
+
+/**
+ * API logger for tracking API calls and responses
+ */
+export const apiLogger = {
+  /**
+   * Log API request
+   * @param method - HTTP method
+   * @param url - Request URL
+   * @param params - Request parameters
+   */
+  request(method: string, url: string, params?: Record<string, unknown>) {
+    logger.info(`API request`, {
+      method,
+      url,
+      params: params ? sanitizeProps(params) : undefined,
+    })
+  },
+
+  /**
+   * Log API response
+   * @param method - HTTP method
+   * @param url - Request URL
+   * @param status - Response status code
+   * @param duration - Request duration in milliseconds
+   */
+  response(method: string, url: string, status: number, duration: number) {
+    logger.info(`API response`, {
+      method,
+      url,
+      status,
+      duration: `${duration.toFixed(2)}ms`,
+    })
+  },
+
+  /**
+   * Log API error
+   * @param method - HTTP method
+   * @param url - Request URL
+   * @param error - Error that occurred
+   * @param duration - Request duration in milliseconds
+   */
+  error(method: string, url: string, error: Error, duration: number) {
+    logger.error(`API error`, {
+      method,
+      url,
+      error: error.message,
+      duration: `${duration.toFixed(2)}ms`,
+    })
+  },
+}
+
+/**
+ * Utility functions for sanitizing sensitive data
+ */
+
+/**
+ * Sanitize component props to remove sensitive information
+ * @param props - Component props to sanitize
+ * @returns Sanitized props
+ */
+function sanitizeProps(props: Record<string, unknown>): Record<string, unknown> {
+  const sensitiveKeys = ["password", "token", "secret", "key", "auth", "credential", "private"]
+
+  return Object.entries(props).reduce((acc, [key, value]) => {
+    const isSensitive = sensitiveKeys.some((sensitiveKey) => key.toLowerCase().includes(sensitiveKey))
+
+    if (isSensitive) {
+      acc[key] = "[REDACTED]"
+    } else {
+      acc[key] = sanitizeValue(value)
+    }
+
+    return acc
+  }, {} as Record<string, unknown>)
+}
+
+/**
+ * Sanitize a single value for logging
+ * @param value - Value to sanitize
+ * @returns Sanitized value
+ */
+function sanitizeValue(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value
+  }
+
+  if (typeof value === "string") {
+    // Truncate long strings
+    return value.length > 100 ? `${value.substring(0, 100)}...` : value
+  }
+
+  if (typeof value === "object") {
+    if (Array.isArray(value)) {
+      // Truncate long arrays
+      return value.length > 10 ? [...value.slice(0, 10), `...and ${value.length - 10} more`] : value
+    }
+
+    // For objects, sanitize recursively
+    return sanitizeProps(value as Record<string, unknown>)
+  }
+
+  return value
+}
+
+// Export the main logger and specialized loggers
+export { logger }
+
+// Export default logger for backward compatibility
+export default logger

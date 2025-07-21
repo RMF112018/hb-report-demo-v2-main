@@ -1,211 +1,209 @@
-/**
- * Authentication Cache Utilities
- *
- * Utility functions for managing and clearing cached authentication data
- * and user preferences in the HB Report Demo application.
- */
-
-export interface ClearCacheResult {
-  success: boolean
-  clearedCount: number
-  additionalCleared: number
-  error?: string
-}
+import { logger } from "./structured-logger"
 
 /**
- * Comprehensive function to clear all authentication cache data
- *
- * This function removes all stored user data, preferences, and session
- * information from localStorage, sessionStorage, and cookies.
- *
- * @returns Promise<ClearCacheResult> Result of the clearing operation
+ * Clear all HB Report authentication cache data
+ * @returns Promise that resolves when cache is cleared
  */
-export async function clearAllAuthCache(): Promise<ClearCacheResult> {
+export const clearAllAuthCache = async (): Promise<{ success: boolean; clearedCount: number }> => {
   try {
-    console.log("🧹 Clearing all HB Report authentication cache...")
+    logger.info("🧹 Clearing all HB Report authentication cache...")
 
     // Clear all localStorage data
     const localStorageKeys = [
-      "hb-demo-user", // User authentication data
-      "hb-viewing-as", // Presentation viewing role
-      "selectedProject", // Selected project
-      "hb-forecast-data", // Financial forecast data
-      "hb-forecast-acknowledgments", // Forecast acknowledgments
-      "hb-forecast-previous-methods", // Previous forecast methods
-      "hb-tours-completed", // Completed tours
-      "hb-tour-available", // Tour availability setting
-      "staffing-needing-filter", // Staffing filter preference
-      "hb-disable-auto-login", // Auto-login disable flag
-      "hb-last-server-start", // Last server start time
-      "hb-disable-auto-clean", // Auto-clean disable flag
+      "hb-demo-user",
+      "hb-viewing-as",
+      "selectedProject",
+      "hb-forecast-data",
+      "hb-forecast-acknowledgments",
+      "hb-forecast-previous-methods",
+      "hb-tours-completed",
+      "hb-tour-available",
+      "staffing-needing-filter",
+      "hb-disable-auto-login",
+      "hb-last-server-start",
+      "hb-disable-auto-clean",
     ]
 
     // Remove predefined keys
     let clearedCount = 0
     localStorageKeys.forEach((key) => {
-      if (typeof window !== "undefined" && localStorage.getItem(key)) {
+      if (localStorage.getItem(key)) {
         localStorage.removeItem(key)
-        console.log("✓ Cleared:", key)
+        logger.debug("✓ Cleared:", { key })
         clearedCount++
       }
     })
 
     // Clear all keys with specific prefixes
+    const allKeys = Object.keys(localStorage)
     let additionalCleared = 0
-    if (typeof window !== "undefined") {
-      const allKeys = Object.keys(localStorage)
-      allKeys.forEach((key) => {
-        if (
-          key.startsWith("report-config-") ||
-          key.startsWith("hb-tour-shown-") ||
-          key.startsWith("hb-welcome-") ||
-          key.startsWith("responsibility-matrix-") ||
-          key.startsWith("productivity-data-") ||
-          key.startsWith("startup-checklist-") ||
-          key.startsWith("preco-checklist-") ||
-          key.startsWith("financial-hub-storage") ||
-          key.startsWith("pursuits")
-        ) {
-          localStorage.removeItem(key)
-          additionalCleared++
-        }
-      })
+    allKeys.forEach((key) => {
+      if (
+        key.startsWith("report-config-") ||
+        key.startsWith("hb-tour-shown-") ||
+        key.startsWith("hb-welcome-") ||
+        key.startsWith("responsibility-matrix-") ||
+        key.startsWith("productivity-data-") ||
+        key.startsWith("startup-checklist-") ||
+        key.startsWith("preco-checklist-") ||
+        key.startsWith("financial-hub-storage") ||
+        key.startsWith("pursuits")
+      ) {
+        localStorage.removeItem(key)
+        additionalCleared++
+      }
+    })
 
-      // Clear all sessionStorage data
-      sessionStorage.clear()
-      console.log("✓ Cleared all sessionStorage data")
+    // Clear all sessionStorage data
+    sessionStorage.clear()
+    logger.debug("✓ Cleared all sessionStorage data")
 
-      // Clear cookies (if any)
-      document.cookie.split(";").forEach(function (c) {
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
-      })
-      console.log("✓ Cleared all cookies")
-    }
+    // Clear cookies (if any)
+    document.cookie.split(";").forEach(function (c) {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
+    })
+    logger.debug("✓ Cleared all cookies")
 
-    console.log("✅ Cache clearing complete!")
-    console.log(`📊 Cleared ${clearedCount} auth keys + ${additionalCleared} additional keys`)
-
-    return {
-      success: true,
+    logger.info("✅ Cache clearing complete!", {
       clearedCount,
       additionalCleared,
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    console.error("❌ Error clearing authentication cache:", error)
+      totalCleared: clearedCount + additionalCleared,
+    })
 
-    return {
-      success: false,
-      clearedCount: 0,
-      additionalCleared: 0,
-      error: errorMessage,
-    }
+    return { success: true, clearedCount: clearedCount + additionalCleared }
+  } catch (error) {
+    logger.error("Failed to clear authentication cache", { error })
+    return { success: false, clearedCount: 0 }
   }
 }
 
 /**
- * Clear only authentication-specific data (preserves user preferences)
- *
- * This function removes only the core authentication data but preserves
- * user preferences like tour settings, dashboard layouts, etc.
+ * Clear only authentication data while preserving user preferences
+ * @returns Promise that resolves when auth data is cleared
  */
-export async function clearAuthDataOnly(): Promise<ClearCacheResult> {
+export const clearAuthDataOnly = async (): Promise<{ success: boolean; clearedCount: number }> => {
   try {
-    console.log("🔐 Clearing authentication data only...")
+    logger.info("🔐 Clearing authentication data only...")
 
-    const authOnlyKeys = ["hb-demo-user", "hb-viewing-as", "hb-disable-auto-login"]
+    // Only clear authentication-related keys
+    const authKeys = [
+      "hb-demo-user",
+      "hb-viewing-as",
+      "selectedProject",
+      "hb-tours-completed",
+      "hb-tour-available",
+      "hb-disable-auto-login",
+      "hb-last-server-start",
+    ]
 
     let clearedCount = 0
-    authOnlyKeys.forEach((key) => {
-      if (typeof window !== "undefined" && localStorage.getItem(key)) {
+    authKeys.forEach((key) => {
+      if (localStorage.getItem(key)) {
         localStorage.removeItem(key)
-        console.log("✓ Cleared:", key)
+        logger.debug("✓ Cleared:", { key })
         clearedCount++
       }
     })
 
-    // Clear session data
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("hb-dev-session-active")
-    }
+    // Clear sessionStorage (contains session data)
+    sessionStorage.clear()
+    logger.debug("✓ Cleared all sessionStorage data")
 
-    console.log("✅ Authentication data cleared (preferences preserved)")
+    // Clear authentication cookies
+    document.cookie.split(";").forEach(function (c) {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
+    })
+    logger.debug("✓ Cleared all cookies")
+
+    logger.info("✅ Authentication data cleared (preferences preserved)", { clearedCount })
+
+    return { success: true, clearedCount }
+  } catch (error) {
+    logger.error("Failed to clear authentication data", { error })
+    return { success: false, clearedCount: 0 }
+  }
+}
+
+/**
+ * Disable auto-login temporarily
+ */
+export const disableAutoLogin = (): void => {
+  try {
+    localStorage.setItem("hb-disable-auto-login", "true")
+    logger.info("🚫 Auto-login disabled - login screen will be shown on next visit")
+  } catch (error) {
+    logger.error("Failed to disable auto-login", { error })
+  }
+}
+
+/**
+ * Enable auto-login (remove disable flag)
+ */
+export const enableAutoLogin = (): void => {
+  try {
+    localStorage.removeItem("hb-disable-auto-login")
+    logger.info("✅ Auto-login enabled - stored credentials will be restored")
+  } catch (error) {
+    logger.error("Failed to enable auto-login", { error })
+  }
+}
+
+/**
+ * Check if user has stored authentication data
+ * @returns True if auth data exists
+ */
+export const hasStoredAuthData = (): boolean => {
+  try {
+    const userData = localStorage.getItem("hb-demo-user")
+    const viewingAs = localStorage.getItem("hb-viewing-as")
+    return !!(userData || viewingAs)
+  } catch (error) {
+    logger.error("Failed to check stored auth data", { error })
+    return false
+  }
+}
+
+/**
+ * Get detailed cache status
+ * @returns Object with cache status information
+ */
+export const getAuthCacheStatus = (): {
+  hasUserData: boolean
+  hasViewingAs: boolean
+  hasSelectedProject: boolean
+  hasTourData: boolean
+  hasForecastData: boolean
+  totalKeys: number
+  sessionStorageKeys: number
+} => {
+  try {
+    const hasUserData = !!localStorage.getItem("hb-demo-user")
+    const hasViewingAs = !!localStorage.getItem("hb-viewing-as")
+    const hasSelectedProject = !!localStorage.getItem("selectedProject")
+    const hasTourData = !!localStorage.getItem("hb-tours-completed")
+    const hasForecastData = !!localStorage.getItem("hb-forecast-data")
+    const totalKeys = localStorage.length
+    const sessionStorageKeys = Object.keys(sessionStorage).length
 
     return {
-      success: true,
-      clearedCount,
-      additionalCleared: 0,
+      hasUserData,
+      hasViewingAs,
+      hasSelectedProject,
+      hasTourData,
+      hasForecastData,
+      totalKeys,
+      sessionStorageKeys,
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    console.error("❌ Error clearing authentication data:", error)
-
+    logger.error("Failed to get cache status", { error })
     return {
-      success: false,
-      clearedCount: 0,
-      additionalCleared: 0,
-      error: errorMessage,
+      hasUserData: false,
+      hasViewingAs: false,
+      hasSelectedProject: false,
+      hasTourData: false,
+      hasForecastData: false,
+      totalKeys: 0,
+      sessionStorageKeys: 0,
     }
-  }
-}
-
-/**
- * Disable auto-login to force login screen display
- *
- * This function sets a flag that prevents automatic login restoration
- * without clearing existing user data.
- */
-export function disableAutoLogin(): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("hb-disable-auto-login", "true")
-    console.log("🚫 Auto-login disabled - login screen will be shown on next visit")
-  }
-}
-
-/**
- * Enable auto-login (restore default behavior)
- */
-export function enableAutoLogin(): void {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("hb-disable-auto-login")
-    console.log("✅ Auto-login enabled - stored credentials will be restored")
-  }
-}
-
-/**
- * Check if authentication data exists in storage
- */
-export function hasStoredAuthData(): boolean {
-  if (typeof window === "undefined") return false
-
-  return !!(localStorage.getItem("hb-demo-user") || sessionStorage.getItem("hb-dev-session-active"))
-}
-
-/**
- * Get current authentication cache status
- */
-export function getAuthCacheStatus() {
-  if (typeof window === "undefined") {
-    return {
-      hasUser: false,
-      hasSession: false,
-      autoLoginDisabled: false,
-      autoCleanDisabled: false,
-      storageKeys: 0,
-    }
-  }
-
-  const allKeys = Object.keys(localStorage)
-  const hbKeys = allKeys.filter(
-    (key) => key.startsWith("hb-") || key.startsWith("report-") || key.startsWith("responsibility-")
-  )
-
-  return {
-    hasUser: !!localStorage.getItem("hb-demo-user"),
-    hasSession: !!sessionStorage.getItem("hb-dev-session-active"),
-    autoLoginDisabled: localStorage.getItem("hb-disable-auto-login") === "true",
-    autoCleanDisabled: localStorage.getItem("hb-disable-auto-clean") === "true",
-    storageKeys: hbKeys.length,
-    keys: hbKeys,
   }
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { logger } from "@/lib/structured-logger"
 import {
   microsoftGraphService,
   type Team,
@@ -32,15 +33,26 @@ export const useTeams = () => {
       const teamsData = await microsoftGraphService.getMyTeams()
       setTeams(teamsData)
     } catch (err) {
-      console.error("Error loading teams:", err)
-      setError(err instanceof Error ? err.message : "Failed to load teams")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load teams"
+      logger.error("Error loading teams", {
+        component: "useTeams",
+        function: "loadTeams",
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    loadTeams()
+    loadTeams().catch((err) => {
+      logger.error("Unhandled promise rejection in loadTeams", {
+        component: "useTeams",
+        function: "loadTeams",
+        error: err,
+      })
+    })
   }, [loadTeams])
 
   return {
@@ -66,8 +78,14 @@ export const useTeamMembers = (teamId: string | null) => {
       const membersData = await microsoftGraphService.getTeamMembers(teamIdToLoad)
       setMembers(membersData)
     } catch (err) {
-      console.error("Error loading team members:", err)
-      setError(err instanceof Error ? err.message : "Failed to load team members")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load team members"
+      logger.error("Error loading team members", {
+        component: "useTeamMembers",
+        function: "loadMembers",
+        teamId: teamIdToLoad,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -75,7 +93,14 @@ export const useTeamMembers = (teamId: string | null) => {
 
   useEffect(() => {
     if (teamId) {
-      loadMembers(teamId)
+      loadMembers(teamId).catch((err) => {
+        logger.error("Unhandled promise rejection in loadMembers", {
+          component: "useTeamMembers",
+          function: "loadMembers",
+          teamId,
+          error: err,
+        })
+      })
     } else {
       setMembers([])
       setLoading(false)
@@ -105,8 +130,14 @@ export const useTeamChannels = (teamId: string | null) => {
       const channelsData = await microsoftGraphService.getTeamChannels(teamIdToLoad)
       setChannels(channelsData)
     } catch (err) {
-      console.error("Error loading channels:", err)
-      setError(err instanceof Error ? err.message : "Failed to load channels")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load channels"
+      logger.error("Error loading channels", {
+        component: "useTeamChannels",
+        function: "loadChannels",
+        teamId: teamIdToLoad,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -114,7 +145,14 @@ export const useTeamChannels = (teamId: string | null) => {
 
   useEffect(() => {
     if (teamId) {
-      loadChannels(teamId)
+      loadChannels(teamId).catch((err) => {
+        logger.error("Unhandled promise rejection in loadChannels", {
+          component: "useTeamChannels",
+          function: "loadChannels",
+          teamId,
+          error: err,
+        })
+      })
     } else {
       setChannels([])
       setLoading(false)
@@ -149,8 +187,15 @@ export const useChannelMessages = (teamId: string | null, channelId: string | nu
       const messagesData = await microsoftGraphService.getChannelMessages(teamIdToLoad, channelIdToLoad)
       setMessages(messagesData)
     } catch (err) {
-      console.error("Error loading messages:", err)
-      setError(err instanceof Error ? err.message : "Failed to load messages")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load messages"
+      logger.error("Error loading messages", {
+        component: "useChannelMessages",
+        function: "loadMessages",
+        teamId: teamIdToLoad,
+        channelId: channelIdToLoad,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -169,8 +214,15 @@ export const useChannelMessages = (teamId: string | null, channelId: string | nu
         setMessages((prev) => [...prev, newMessage])
         return true
       } catch (err) {
-        console.error("Error sending message:", err)
-        setError(err instanceof Error ? err.message : "Failed to send message")
+        const errorMessage = err instanceof Error ? err.message : "Failed to send message"
+        logger.error("Error sending message", {
+          component: "useChannelMessages",
+          function: "sendMessage",
+          teamId,
+          channelId,
+          error: err,
+        })
+        setError(errorMessage)
         return false
       } finally {
         setSending(false)
@@ -181,7 +233,15 @@ export const useChannelMessages = (teamId: string | null, channelId: string | nu
 
   useEffect(() => {
     if (teamId && channelId) {
-      loadMessages(teamId, channelId)
+      loadMessages(teamId, channelId).catch((err) => {
+        logger.error("Unhandled promise rejection in loadMessages", {
+          component: "useChannelMessages",
+          function: "loadMessages",
+          teamId,
+          channelId,
+          error: err,
+        })
+      })
     } else {
       setMessages([])
       setLoading(false)
@@ -213,15 +273,26 @@ export const useChats = () => {
       const chatsData = await microsoftGraphService.getMyChats()
       setChats(chatsData)
     } catch (err) {
-      console.error("Error loading chats:", err)
-      setError(err instanceof Error ? err.message : "Failed to load chats")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load chats"
+      logger.error("Error loading chats", {
+        component: "useChats",
+        function: "loadChats",
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    loadChats()
+    loadChats().catch((err) => {
+      logger.error("Unhandled promise rejection in loadChats", {
+        component: "useChats",
+        function: "loadChats",
+        error: err,
+      })
+    })
   }, [loadChats])
 
   return {
@@ -251,8 +322,14 @@ export const usePlannerPlans = (groupId: string | null) => {
       const plansData = await microsoftGraphService.getPlannerPlans(groupIdToLoad)
       setPlans(plansData)
     } catch (err) {
-      console.error("Error loading planner plans:", err)
-      setError(err instanceof Error ? err.message : "Failed to load planner plans")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load planner plans"
+      logger.error("Error loading planner plans", {
+        component: "usePlannerPlans",
+        function: "loadPlans",
+        groupId: groupIdToLoad,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -260,7 +337,14 @@ export const usePlannerPlans = (groupId: string | null) => {
 
   useEffect(() => {
     if (groupId) {
-      loadPlans(groupId)
+      loadPlans(groupId).catch((err) => {
+        logger.error("Unhandled promise rejection in loadPlans", {
+          component: "usePlannerPlans",
+          function: "loadPlans",
+          groupId,
+          error: err,
+        })
+      })
     } else {
       setPlans([])
       setLoading(false)
@@ -292,8 +376,14 @@ export const usePlannerTasks = (planId: string | null) => {
       const tasksData = await microsoftGraphService.getPlannerTasks(planIdToLoad)
       setTasks(tasksData)
     } catch (err) {
-      console.error("Error loading planner tasks:", err)
-      setError(err instanceof Error ? err.message : "Failed to load planner tasks")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load planner tasks"
+      logger.error("Error loading planner tasks", {
+        component: "usePlannerTasks",
+        function: "loadTasks",
+        planId: planIdToLoad,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -325,8 +415,14 @@ export const usePlannerTasks = (planId: string | null) => {
         setTasks((prev) => [...prev, newTask])
         return newTask
       } catch (err) {
-        console.error("Error creating planner task:", err)
-        setError(err instanceof Error ? err.message : "Failed to create task")
+        const errorMessage = err instanceof Error ? err.message : "Failed to create task"
+        logger.error("Error creating planner task", {
+          component: "usePlannerTasks",
+          function: "createTask",
+          planId,
+          error: err,
+        })
+        setError(errorMessage)
         return null
       } finally {
         setCreating(false)
@@ -340,14 +436,20 @@ export const usePlannerTasks = (planId: string | null) => {
       try {
         setUpdating(true)
         setError(null)
-        const updatedTask = await microsoftGraphService.updatePlannerTaskProgress(taskId, percentComplete, etag)
+        await microsoftGraphService.updatePlannerTaskProgress(taskId, percentComplete, etag)
 
         // Update the task in the current tasks
         setTasks((prev) => prev.map((task) => (task.id === taskId ? { ...task, percentComplete } : task)))
         return true
       } catch (err) {
-        console.error("Error updating task progress:", err)
-        setError(err instanceof Error ? err.message : "Failed to update task progress")
+        const errorMessage = err instanceof Error ? err.message : "Failed to update task progress"
+        logger.error("Error updating task progress", {
+          component: "usePlannerTasks",
+          function: "updateTaskProgress",
+          taskId,
+          error: err,
+        })
+        setError(errorMessage)
         return false
       } finally {
         setUpdating(false)
@@ -358,7 +460,14 @@ export const usePlannerTasks = (planId: string | null) => {
 
   useEffect(() => {
     if (planId) {
-      loadTasks(planId)
+      loadTasks(planId).catch((err) => {
+        logger.error("Unhandled promise rejection in loadTasks", {
+          component: "usePlannerTasks",
+          function: "loadTasks",
+          planId,
+          error: err,
+        })
+      })
     } else {
       setTasks([])
       setLoading(false)
@@ -397,8 +506,15 @@ export const useCalendarEvents = (startDateTime?: string, endDateTime?: string) 
       const eventsData = await microsoftGraphService.getCalendarEvents(startDateTime, endDateTime)
       setEvents(eventsData)
     } catch (err) {
-      console.error("Error loading calendar events:", err)
-      setError(err instanceof Error ? err.message : "Failed to load calendar events")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load calendar events"
+      logger.error("Error loading calendar events", {
+        component: "useCalendarEvents",
+        function: "loadEvents",
+        startDateTime,
+        endDateTime,
+        error: err,
+      })
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -429,8 +545,13 @@ export const useCalendarEvents = (startDateTime?: string, endDateTime?: string) 
         setEvents((prev) => [...prev, newEvent])
         return newEvent
       } catch (err) {
-        console.error("Error creating calendar event:", err)
-        setError(err instanceof Error ? err.message : "Failed to create event")
+        const errorMessage = err instanceof Error ? err.message : "Failed to create event"
+        logger.error("Error creating calendar event", {
+          component: "useCalendarEvents",
+          function: "createEvent",
+          error: err,
+        })
+        setError(errorMessage)
         return null
       } finally {
         setCreating(false)
@@ -440,7 +561,13 @@ export const useCalendarEvents = (startDateTime?: string, endDateTime?: string) 
   )
 
   useEffect(() => {
-    loadEvents()
+    loadEvents().catch((err) => {
+      logger.error("Unhandled promise rejection in loadEvents", {
+        component: "useCalendarEvents",
+        function: "loadEvents",
+        error: err,
+      })
+    })
   }, [loadEvents])
 
   return {

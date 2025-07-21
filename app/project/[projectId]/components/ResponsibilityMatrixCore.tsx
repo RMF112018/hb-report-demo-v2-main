@@ -27,19 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {
-  RefreshCw,
-  Download,
-  Users,
-  BarChart3,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Filter,
-  Settings,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
+import { RefreshCw, Download, Users, BarChart3, CheckCircle, Clock, Filter, ChevronDown, ChevronUp } from "lucide-react"
 
 interface ResponsibilityMatrixCoreProps {
   projectId: string
@@ -48,15 +36,21 @@ interface ResponsibilityMatrixCoreProps {
 }
 
 // Intersection Observer Hook
-const useIntersectionObserver = (ref: React.RefObject<Element | null>, options: IntersectionObserverInit = {}) => {
+const useIntersectionObserver = (
+  ref: React.RefObject<Element | null>,
+  options: IntersectionObserverInit = {}
+): boolean => {
   const [isIntersecting, setIsIntersecting] = useState(false)
 
   // Memoize the options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(() => options, [options.threshold, options.rootMargin, options.root])
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting)
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        setIsIntersecting(entry.isIntersecting)
+      }
     }, memoizedOptions)
 
     if (ref.current) {
@@ -117,6 +111,7 @@ const AssignmentCell: React.FC<{
       document.addEventListener("mousedown", handleClickOutside)
       return () => document.removeEventListener("mousedown", handleClickOutside)
     }
+    return undefined
   }, [isOpen])
 
   if (disabled) {
@@ -202,6 +197,7 @@ const StatusCell: React.FC<{
       document.addEventListener("mousedown", handleClickOutside)
       return () => document.removeEventListener("mousedown", handleClickOutside)
     }
+    return undefined
   }, [isOpen])
 
   if (disabled) {
@@ -237,13 +233,13 @@ const StatusCell: React.FC<{
 StatusCell.displayName = "StatusCell"
 
 // Utility function to convert hex color to CSS style
-const hexToRgb = (hex: string) => {
+const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
   return result
     ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
+        r: parseInt(result[1] || "0", 16),
+        g: parseInt(result[2] || "0", 16),
+        b: parseInt(result[3] || "0", 16),
       }
     : null
 }
@@ -271,7 +267,7 @@ const TableRowMemo: React.FC<{
     [task.id, onStatusChange]
   )
 
-  // Get the responsible party's color
+  // Get the responsible party's color - memoized for performance
   const getResponsibleColor = useCallback(() => {
     const responsible = task.responsible
     if (!responsible || responsible === "" || responsible === "Unassigned") {
@@ -327,7 +323,7 @@ const TableRowMemo: React.FC<{
                   <div>
                     <AssignmentCell
                       assignment={assignment}
-                      onAssignmentChange={(newAssignment) => handleAssignmentChange(role.key, newAssignment)}
+                      onAssignmentChange={(newAssignment) => handleAssignmentChange(role.key || "", newAssignment)}
                     />
                   </div>
                 </TooltipTrigger>
@@ -427,7 +423,7 @@ const SummaryCards: React.FC<{ metrics: any }> = React.memo(({ metrics }) => {
 SummaryCards.displayName = "SummaryCards"
 
 const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.memo(
-  ({ projectId, userRole, className = "" }) => {
+  ({ projectId, className = "" }) => {
     const {
       tasks,
       roles,
@@ -450,7 +446,7 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
     const containerRef = useRef<HTMLDivElement>(null)
     const isVisible = useIntersectionObserver(containerRef, { threshold: 0.1 })
 
-    // Memoized filtered tasks
+    // Memoized filtered tasks - expensive calculation
     const filteredTasks = useMemo(() => {
       return tasks.filter((task) => {
         const statusMatch = filterStatus === "all" || task.status === filterStatus
@@ -459,7 +455,7 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
       })
     }, [tasks, filterStatus, filterCategory])
 
-    // Memoized categories
+    // Memoized categories - expensive calculation
     const categories = useMemo(() => {
       return [...new Set(tasks.map((task) => task.category))]
     }, [tasks])
@@ -471,19 +467,23 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
       }
     }, [categories])
 
-    // Group tasks by category
+    // Group tasks by category - memoized expensive calculation
     const groupedTasks = useMemo(() => {
       const groups: { [key: string]: any[] } = {}
       filteredTasks.forEach((task) => {
-        if (!groups[task.category]) {
-          groups[task.category] = []
+        const category = task.category || "Uncategorized"
+        if (!groups[category]) {
+          groups[category] = []
         }
-        groups[task.category].push(task)
+        const categoryGroup = groups[category]
+        if (categoryGroup) {
+          categoryGroup.push(task)
+        }
       })
       return groups
     }, [filteredTasks])
 
-    // Toggle category expansion
+    // Toggle category expansion - memoized callback
     const toggleCategory = useCallback((category: string) => {
       setExpandedCategories((prev) => {
         const newSet = new Set(prev)
@@ -523,6 +523,7 @@ const ResponsibilityMatrixCore: React.FC<ResponsibilityMatrixCoreProps> = React.
         }, 100)
         return () => clearTimeout(timer)
       }
+      return undefined
     }, [isVisible, loading, filteredTasks])
 
     // Reset rendering state when tasks change
