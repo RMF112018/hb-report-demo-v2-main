@@ -1,13 +1,6 @@
 "use client"
 
-import React, { useEffect, useCallback } from "react"
-import { X, ChevronLeft, ChevronRight, SkipForward } from "lucide-react"
-import { useTour } from "@/context/tour-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { TourStepImage } from "@/components/ui/TourStepImage"
-import { cn } from "@/lib/utils"
+import React from "react"
 
 /**
  * TourModal - Modal-based tour interface

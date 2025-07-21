@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { HbiResponsibilityInsights } from "@/components/responsibility/HbiResponsibilityInsights"
-import { mockMetrics, mockRoles, mockResponsibilityTasks } from "./mock-data"
+import { mockRoles, mockResponsibilityTasks } from "./mock-data"
 
 const meta: Meta<typeof HbiResponsibilityInsights> = {
   title: "Responsibility/HbiResponsibilityInsights",
@@ -46,8 +46,11 @@ proactive guidance and early warning of potential issues.
     roles: {
       description: "Array of project roles",
     },
-    metrics: {
-      description: "Calculated metrics from responsibility data",
+    maxInsights: {
+      description: "Maximum number of insights to display",
+    },
+    onInsightAction: {
+      description: "Callback for insight action handling",
     },
   },
 }
@@ -59,18 +62,8 @@ export const HealthyProject: Story = {
   args: {
     tasks: mockResponsibilityTasks.map((task) => ({ ...task, status: "completed" as const })),
     roles: mockRoles,
-    metrics: {
-      ...mockMetrics,
-      unassignedTasks: 0,
-      completionRate: 95,
-      roleWorkload: {
-        PX: 5,
-        PM1: 6,
-        PM2: 4,
-        QAC: 5,
-        ProjAcct: 3,
-      },
-    },
+    maxInsights: 6,
+    onInsightAction: (insight) => console.log("Insight action:", insight),
   },
   parameters: {
     docs: {
@@ -85,18 +78,8 @@ export const ProjectWithRisks: Story = {
   args: {
     tasks: mockResponsibilityTasks,
     roles: mockRoles,
-    metrics: {
-      ...mockMetrics,
-      unassignedTasks: 12,
-      completionRate: 35,
-      roleWorkload: {
-        PX: 15,
-        PM1: 18,
-        PM2: 2,
-        QAC: 12,
-        ProjAcct: 1,
-      },
-    },
+    maxInsights: 6,
+    onInsightAction: (insight) => console.log("Insight action:", insight),
   },
   parameters: {
     docs: {
@@ -111,24 +94,8 @@ export const NewProjectSetup: Story = {
   args: {
     tasks: mockResponsibilityTasks.slice(0, 8),
     roles: mockRoles,
-    metrics: {
-      totalTasks: 8,
-      unassignedTasks: 5,
-      completedTasks: 0,
-      pendingTasks: 3,
-      roleWorkload: {
-        PX: 2,
-        PM1: 1,
-      },
-      categoryDistribution: {
-        "Contract Management": 3,
-        "Quality Control": 2,
-        "Safety Management": 2,
-        "Schedule Management": 1,
-      },
-      completionRate: 0,
-      averageTasksPerRole: 0.6,
-    },
+    maxInsights: 6,
+    onInsightAction: (insight) => console.log("Insight action:", insight),
   },
   parameters: {
     docs: {
@@ -147,18 +114,8 @@ export const NoInsights: Story = {
       responsible: task.responsible || "PM1",
     })),
     roles: mockRoles,
-    metrics: {
-      ...mockMetrics,
-      unassignedTasks: 0,
-      completionRate: 100,
-      roleWorkload: {
-        PX: 6,
-        PM1: 7,
-        PM2: 5,
-        QAC: 6,
-        ProjAcct: 4,
-      },
-    },
+    maxInsights: 6,
+    onInsightAction: (insight) => console.log("Insight action:", insight),
   },
   parameters: {
     docs: {

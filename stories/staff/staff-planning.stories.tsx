@@ -35,7 +35,7 @@ The page automatically adapts based on user role and permissions, showing releva
     },
   },
   decorators: [
-    (Story, context) => (
+    (Story) => (
       <AuthProvider>
         <div className="min-h-screen bg-gray-50">
           <Story />
@@ -202,4 +202,14 @@ export const EmptyState: Story = {
       },
     ],
   },
+}
+
+export const DefaultPlanning: Story = {
+  decorators: [
+    (Story) => (
+      <div className="p-6">
+        <Story />
+      </div>
+    ),
+  ],
 }

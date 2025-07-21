@@ -110,17 +110,15 @@ export const WithActionItems: Story = {
       {
         id: "spcr-urgent-1",
         projectId: "401001",
+        projectName: "Hospital Expansion Project",
         type: "increase",
         position: "Safety Manager",
-        startDate: "2024-01-01T00:00:00Z",
-        endDate: "2024-12-31T23:59:59Z",
-        scheduleRef: "Critical Phase",
         budget: 95000,
-        explanation: "Urgent safety manager needed for high-risk phase",
+        justification: "Urgent safety manager needed for high-risk phase",
         status: "submitted",
-        createdBy: "emp-001",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z",
+        requestedBy: "Sarah Johnson",
+        requestedDate: "2024-01-01",
+        urgency: "high",
       },
     ],
   },
@@ -133,18 +131,18 @@ export const WithActionItems: Story = {
   },
 }
 
-export const ProjectFocused: Story = {
+export const FilteredByProject: Story = {
   args: {
-    employees: mockEmployees.employees.filter((emp) =>
-      ["401001", "401002", "401003"].includes(emp.assignment.projectId),
+    employees: mockEmployees.employees.filter(
+      (emp) => emp.currentProject && ["401001", "401002", "401003"].includes(emp.currentProject)
     ),
-    projects: mockProjects.projects.slice(0, 3),
+    projects: mockProjects.projects,
     spcrs: mockSpcrs.spcrs.filter((spcr) => ["401001", "401002", "401003"].includes(spcr.projectId)),
   },
   parameters: {
     docs: {
       description: {
-        story: "Analytics focused on a subset of projects, useful for project-specific views.",
+        story: "Analytics focused on specific projects, showing detailed metrics for selected project teams.",
       },
     },
   },

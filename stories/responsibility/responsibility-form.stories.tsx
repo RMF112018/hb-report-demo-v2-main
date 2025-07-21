@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { ResponsibilityForm } from "@/components/responsibility/ResponsibilityForm"
+import type { ResponsibilityTask } from "@/types/responsibility"
 import { mockRoles, mockCategories, mockResponsibilityTasks } from "./mock-data"
 
 const meta: Meta<typeof ResponsibilityForm> = {
@@ -40,10 +41,6 @@ for creating new tasks or editing existing ones.
     },
   },
   argTypes: {
-    isOpen: {
-      control: "boolean",
-      description: "Controls modal visibility",
-    },
     task: {
       description: "Existing task for editing (undefined for new task)",
     },
@@ -67,10 +64,9 @@ type Story = StoryObj<typeof ResponsibilityForm>
 
 export const CreateNewTask: Story = {
   args: {
-    isOpen: true,
     roles: mockRoles,
     categories: mockCategories,
-    onSave: (task) => console.log("Task saved:", task),
+    onSave: (task: any) => console.log("Task saved:", task),
     onCancel: () => console.log("Form cancelled"),
   },
   parameters: {
@@ -84,8 +80,7 @@ export const CreateNewTask: Story = {
 
 export const EditExistingTask: Story = {
   args: {
-    isOpen: true,
-    task: mockResponsibilityTasks[0],
+    task: mockResponsibilityTasks[0] as ResponsibilityTask,
     roles: mockRoles,
     categories: mockCategories,
     onSave: (task) => console.log("Task updated:", task),
@@ -102,10 +97,20 @@ export const EditExistingTask: Story = {
 
 export const ContractTaskForm: Story = {
   args: {
-    isOpen: true,
     task: {
-      ...mockResponsibilityTasks.find((t) => t.type === "prime-contract"),
+      id: "task-1",
+      projectId: "proj-001",
       type: "prime-contract" as const,
+      category: "contract",
+      task: "Contract Review and Approval",
+      page: "A101",
+      article: "Article 3.2",
+      responsible: "PM1",
+      assignments: { PM1: "Primary", PX: "Approve" },
+      status: "pending" as const,
+      createdAt: "2024-01-15T10:00:00Z",
+      updatedAt: "2024-01-15T10:00:00Z",
+      annotations: [],
     },
     roles: mockRoles,
     categories: mockCategories,
@@ -123,9 +128,19 @@ export const ContractTaskForm: Story = {
 
 export const TaskWithAnnotations: Story = {
   args: {
-    isOpen: true,
     task: {
-      ...mockResponsibilityTasks[0],
+      id: "task-2",
+      projectId: "proj-001",
+      type: "team" as const,
+      category: "quality",
+      task: "Quality Control Review",
+      page: "",
+      article: "",
+      responsible: "QAC",
+      assignments: { QAC: "Primary", PM1: "Support" },
+      status: "active" as const,
+      createdAt: "2024-01-15T10:00:00Z",
+      updatedAt: "2024-01-15T10:00:00Z",
       annotations: [
         {
           id: "ann-1",
@@ -157,7 +172,6 @@ export const TaskWithAnnotations: Story = {
 
 export const FormClosed: Story = {
   args: {
-    isOpen: false,
     roles: mockRoles,
     categories: mockCategories,
     onSave: (task) => console.log("Task saved:", task),

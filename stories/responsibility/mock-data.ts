@@ -1,82 +1,54 @@
-import type { ResponsibilityTask, ResponsibilityRole, ResponsibilityMetrics } from "@/types/responsibility"
+import type { ResponsibilityTask } from "@/types/responsibility"
 
-export const mockRoles: ResponsibilityRole[] = [
+export const mockRoles = [
   {
-    key: "PX",
-    name: "Project Executive",
+    key: "PM",
+    name: "Project Manager",
     color: "#3B82F6",
+    description: "Oversees project execution",
     enabled: true,
-    description: "Overall project oversight and client relations",
+    category: "Management",
   },
   {
-    key: "PM1",
-    name: "Project Manager 1",
+    key: "PE",
+    name: "Project Engineer",
     color: "#10B981",
+    description: "Handles technical project aspects",
     enabled: true,
-    description: "Primary project management responsibilities",
+    category: "Engineering",
   },
   {
-    key: "PM2",
-    name: "Project Manager 2",
-    color: "#8B5CF6",
+    key: "SU",
+    name: "Superintendent",
+    color: "#F59E42",
+    description: "Manages field operations",
     enabled: true,
-    description: "Secondary project management support",
-  },
-  {
-    key: "PA",
-    name: "Project Administrator",
-    color: "#EC4899",
-    enabled: true,
-    description: "Administrative support and documentation",
-  },
-  {
-    key: "QAC",
-    name: "Quality Assurance Coordinator",
-    color: "#F59E0B",
-    enabled: true,
-    description: "Quality control and assurance oversight",
-  },
-  {
-    key: "ProjAcct",
-    name: "Project Accountant",
-    color: "#06B6D4",
-    enabled: true,
-    description: "Financial management and accounting",
-  },
-  {
-    key: "A",
-    name: "Architect",
-    color: "#6366F1",
-    enabled: true,
-    description: "Design review and architectural oversight",
-  },
-  {
-    key: "C",
-    name: "Contractor",
-    color: "#F57734",
-    enabled: true,
-    description: "Construction execution and coordination",
-  },
-  {
-    key: "S",
-    name: "Safety Manager",
-    color: "#EF4444",
-    enabled: true,
-    description: "Safety compliance and management",
+    category: "Field",
   },
 ]
 
 export const mockCategories = [
-  "Contract Management",
-  "Financial Management",
-  "Procurement",
-  "Quality Control",
-  "Safety Management",
-  "Schedule Management",
-  "Risk Management",
-  "Document Control",
-  "Communication",
-  "Environmental Compliance",
+  {
+    key: "safety",
+    name: "Safety",
+    description: "Safety management and compliance",
+    color: "#EF4444",
+    enabled: true,
+  },
+  {
+    key: "quality",
+    name: "Quality",
+    description: "Quality assurance and control",
+    color: "#6366F1",
+    enabled: true,
+  },
+  {
+    key: "schedule",
+    name: "Schedule",
+    description: "Schedule management",
+    color: "#F59E42",
+    enabled: true,
+  },
 ]
 
 export const mockResponsibilityTasks: ResponsibilityTask[] = [
@@ -213,30 +185,3 @@ export const mockResponsibilityTasks: ResponsibilityTask[] = [
     annotations: [],
   },
 ]
-
-export const mockMetrics: ResponsibilityMetrics = {
-  totalTasks: 25,
-  unassignedTasks: 3,
-  completedTasks: 15,
-  pendingTasks: 7,
-  roleWorkload: {
-    PX: 8,
-    PM1: 12,
-    PM2: 5,
-    PA: 3,
-    QAC: 7,
-    ProjAcct: 4,
-    A: 6,
-    C: 9,
-    S: 4,
-  },
-  categoryDistribution: {
-    "Contract Management": 8,
-    "Financial Management": 6,
-    "Quality Control": 5,
-    "Safety Management": 3,
-    "Schedule Management": 3,
-  },
-  completionRate: 60,
-  averageTasksPerRole: 5.8,
-}

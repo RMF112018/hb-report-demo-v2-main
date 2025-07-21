@@ -1,0 +1,44 @@
+{
+  "projects": [
+    {
+      "id": "401001",
+      "name": "Hospital Expansion Project",
+      "status": "active",
+      "startDate": "2024-01-01",
+      "endDate": "2025-06-30",
+      "manager": "Sarah Johnson"
+    },
+    {
+      "id": "401002",
+      "name": "Office Building Renovation",
+      "status": "active",
+      "startDate": "2024-02-01",
+      "endDate": "2024-12-31",
+      "manager": "Mike Chen"
+    },
+    {
+      "id": "401003",
+      "name": "Shopping Center Development",
+      "status": "active",
+      "startDate": "2024-03-01",
+      "endDate": "2025-03-31",
+      "manager": "Lisa Rodriguez"
+    },
+    {
+      "id": "401004",
+      "name": "Residential Complex",
+      "status": "planning",
+      "startDate": "2024-06-01",
+      "endDate": "2026-06-30",
+      "manager": "David Wilson"
+    },
+    {
+      "id": "401005",
+      "name": "Industrial Warehouse",
+      "status": "completed",
+      "startDate": "2023-09-01",
+      "endDate": "2024-01-31",
+      "manager": "Jennifer Lee"
+    }
+  ]
+}

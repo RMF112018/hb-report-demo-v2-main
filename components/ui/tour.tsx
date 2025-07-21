@@ -1,14 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState, Suspense } from "react"
-import { X, ArrowLeft, ArrowRight, SkipForward } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useTour } from "@/context/tour-context"
-import { useTourPositioning } from "@/hooks/useTourPositioning"
-import { TOUR_CONSTANTS, TOUR_THEMES } from "@/lib/tour-constants"
-import { tourLogger, tourDOMUtils, tourAnimations, tourEventUtils, tourPerformance } from "@/lib/tour-utils"
+import React from "react"
 
 interface TourProps {
   className?: string
@@ -24,7 +16,7 @@ interface TourProps {
  *
  * @returns null (component is disabled)
  */
-export const Tour: React.FC<TourProps> = ({ className = "" }) => {
+export const Tour: React.FC<TourProps> = ({ className: _className = "" }) => {
   // TEMPORARILY DISABLED: Tour system is disabled
   // Return null to hide the tour completely
   return null

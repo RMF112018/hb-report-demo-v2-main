@@ -75,7 +75,7 @@ export const PDFExport: Story = {
     tasks: mockResponsibilityTasks,
     roles: mockRoles,
     onClose: () => console.log("Modal closed"),
-    onExport: (options) => console.log("Export options:", options),
+    onExport: (options: any) => console.log("Export options:", options),
   },
   parameters: {
     docs: {
@@ -92,7 +92,7 @@ export const ExcelExport: Story = {
     tasks: mockResponsibilityTasks,
     roles: mockRoles,
     onClose: () => console.log("Modal closed"),
-    onExport: (options) => console.log("Export options:", options),
+    onExport: (options: any) => console.log("Export options:", options),
   },
   parameters: {
     docs: {
@@ -109,7 +109,7 @@ export const WithEmailDistribution: Story = {
     tasks: mockResponsibilityTasks,
     roles: mockRoles,
     onClose: () => console.log("Modal closed"),
-    onExport: (options) => console.log("Export with email:", options),
+    onExport: (options: any) => console.log("Export with email:", options),
   },
   parameters: {
     docs: {

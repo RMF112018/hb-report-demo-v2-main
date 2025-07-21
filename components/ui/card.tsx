@@ -62,7 +62,7 @@ const CardTitle = React.forwardRef<
   React.HTMLAttributes<HTMLHeadingElement> & {
     size?: "sm" | "md" | "lg" | "xl"
   }
->(({ className, size = "md", ...props }, ref) => {
+>(({ className, size = "md", children, ...props }, ref) => {
   const sizeClasses = {
     sm: "text-lg font-semibold",
     md: "text-xl font-semibold",
@@ -75,7 +75,9 @@ const CardTitle = React.forwardRef<
       ref={ref}
       className={cn("leading-none tracking-tight text-foreground", sizeClasses[size], className)}
       {...props}
-    />
+    >
+      {children}
+    </h3>
   )
 })
 CardTitle.displayName = "CardTitle"

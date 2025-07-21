@@ -1,20 +1,16 @@
 "use client"
 
 import React, { useState, useMemo, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Calendar,
-  Filter,
   Download,
-  ZoomIn,
-  ZoomOut,
   GripVertical,
   Search,
   SortAsc,
@@ -27,17 +23,12 @@ import {
   MessageSquare,
   Save,
   Trash2,
-  ChevronDown,
-  ChevronRight,
-  AlertTriangle,
-  Clock,
   Maximize,
   Minimize,
 } from "lucide-react"
 import { useStaffingStore, type StaffMember, type Project } from "./useStaffingStore"
 import {
   format,
-  addDays,
   addWeeks,
   addMonths,
   addQuarters,
@@ -51,9 +42,7 @@ import {
   endOfQuarter,
   startOfYear,
   endOfYear,
-  eachDayOfInterval,
   isAfter,
-  isBefore,
 } from "date-fns"
 
 interface InteractiveStaffingGanttProps {
@@ -93,17 +82,6 @@ interface GroupedGanttData {
     project: Project
     assignments: GanttItem[]
   }[]
-}
-
-interface NeedingAssignmentItem {
-  staffMember: StaffMember
-  currentAssignment: {
-    project: Project
-    endDate: Date
-    daysUntilEnd: number
-  }
-  hasFollowUp: boolean
-  urgency: "high" | "medium" | "low"
 }
 
 interface AnnotationModal {
@@ -508,69 +486,6 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     return result
   }, [staffMembers, projects, ganttFilters, userRole, selectedProject, getCurrentPEsForProjects])
 
-  // Calculate staff needing assignments
-  const needingAssignments = useMemo((): NeedingAssignmentItem[] => {
-    const today = new Date()
-    const ninetyDaysFromNow = addDays(today, 90)
-    const result: NeedingAssignmentItem[] = []
-
-    staffMembers.forEach((staff) => {
-      // Find current assignments ending within 90 days
-      staff.assignments.forEach((assignment) => {
-        const endDate = new Date(assignment.endDate)
-
-        // Check if assignment ends within 90 days and after today
-        if (isAfter(endDate, today) && isBefore(endDate, ninetyDaysFromNow)) {
-          const daysUntilEnd = differenceInDays(endDate, today)
-
-          // Check if there's a follow-up assignment
-          const hasFollowUp = staff.assignments.some((otherAssignment) => {
-            const otherStart = new Date(otherAssignment.startDate)
-            return (
-              isAfter(otherStart, endDate) ||
-              (isAfter(otherStart, addDays(endDate, -7)) && assignment !== otherAssignment)
-            )
-          })
-
-          if (!hasFollowUp) {
-            const project = projects.find((p) => p.project_id === assignment.project_id)
-            if (project) {
-              // Determine urgency
-              let urgency: "high" | "medium" | "low" = "low"
-              if (daysUntilEnd < 30) urgency = "high"
-              else if (daysUntilEnd < 60) urgency = "medium"
-
-              result.push({
-                staffMember: staff,
-                currentAssignment: {
-                  project,
-                  endDate,
-                  daysUntilEnd,
-                },
-                hasFollowUp,
-                urgency,
-              })
-            }
-          }
-        }
-      })
-    })
-
-    // Apply position filter
-    const filtered =
-      needingAssignmentFilter === "all"
-        ? result
-        : result.filter((item) => item.staffMember.position === needingAssignmentFilter)
-
-    // Sort by urgency and days until end
-    return filtered.sort((a, b) => {
-      const urgencyOrder = { high: 0, medium: 1, low: 2 }
-      const urgencyCompare = urgencyOrder[a.urgency] - urgencyOrder[b.urgency]
-      if (urgencyCompare !== 0) return urgencyCompare
-      return a.currentAssignment.daysUntilEnd - b.currentAssignment.daysUntilEnd
-    })
-  }, [staffMembers, projects, needingAssignmentFilter])
-
   // Get unique positions and projects for filters
   const uniquePositions = useMemo(() => {
     return [...new Set(staffMembers.map((staff) => staff.position))].sort()
@@ -646,7 +561,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     setAnnotationModal({
       isOpen: true,
       item,
-      annotation: item.annotation || "",
+      annotation: item.annotation ?? "",
     })
   }
 
@@ -705,7 +620,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
   const addAssignment = () => {
     setAssignmentModal((prev) => ({
       ...prev,
-      assignments: [...prev.assignments, createNewAssignment(prev.staffMember?.position || "")],
+      assignments: [...prev.assignments, createNewAssignment(prev.staffMember?.position ?? "")],
     }))
   }
 
@@ -768,7 +683,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
     const staff = staffMembers.find((s) => s.id === staffMemberId)
     if (!staff) return
 
-    const initialAssignment = createNewAssignment(staff.position, assignmentModal.selectedProject || "")
+    const initialAssignment = createNewAssignment(staff.position, assignmentModal.selectedProject ?? "")
 
     // Pre-fill start date if search by date was used
     if (assignmentModal.searchMethod === "by-date" && assignmentModal.searchDate) {
@@ -809,11 +724,6 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
       ...prev,
       step: "project",
     }))
-  }
-
-  // Get staff members filtered by position
-  const getFilteredStaffMembers = (position: string) => {
-    return staffMembers.filter((staff) => staff.position === position)
   }
 
   const handleSaveAssignment = () => {
@@ -899,7 +809,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
   const getPositionColor = (position: string): string => {
     const baseType = getBasePositionType(position)
-    return BASE_POSITION_COLORS[baseType] || "bg-gray-500"
+    return BASE_POSITION_COLORS[baseType] ?? "bg-gray-500"
   }
 
   return (
@@ -1151,7 +1061,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
                                 {/* Timeline Bar */}
                                 <div className="flex-1 relative h-6">
-                                  <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded"></div>
+                                  <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded" />
 
                                   {/* Assignment Bar */}
                                   <div
@@ -1206,7 +1116,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
           <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded"></div>
+                <div className="w-3 h-3 bg-red-500 rounded" />
                 <span className="text-xs text-gray-600 dark:text-gray-400">Today</span>
               </div>
               <div className="flex items-center gap-2">
@@ -1222,7 +1132,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
 
                 return baseTypes.map((baseType) => (
                   <div key={baseType} className="flex items-center gap-1">
-                    <div className={`w-3 h-3 ${getPositionColor(baseType)} rounded`}></div>
+                    <div className={`w-3 h-3 ${getPositionColor(baseType)} rounded`} />
                     <span className="text-xs text-gray-600 dark:text-gray-400">{baseType}</span>
                   </div>
                 ))
@@ -1321,7 +1231,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   <p className="text-sm text-muted-foreground mb-4">
                     Choose the project for this assignment. This will be used to determine billable rate context.
                   </p>
-                  <Select value={assignmentModal.selectedProject?.toString() || ""} onValueChange={handleProjectSelect}>
+                  <Select value={assignmentModal.selectedProject?.toString() ?? ""} onValueChange={handleProjectSelect}>
                     <SelectTrigger>
                       <SelectValue placeholder="Search or select a project..." />
                     </SelectTrigger>
@@ -1544,9 +1454,6 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                           {availableStaff.map((staff) => {
                             const burden = staff.laborRate * 0.35 // 35% burden
                             const totalRate = staff.laborRate + burden
-                            const selectedProject = getActiveProjects.find(
-                              (p) => p.project_id === assignmentModal.selectedProject
-                            )
 
                             return (
                               <div
@@ -1564,7 +1471,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                                 </div>
                                 <div className="text-sm">
                                   <Badge variant="outline" className="text-xs">
-                                    {staff.discProfile || "N/A"}
+                                    {staff.discProfile ?? "N/A"}
                                   </Badge>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
@@ -1595,7 +1502,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                       ← Back to Staff
                     </Button>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 ${getPositionColor(assignmentModal.selectedPosition)} rounded`}></div>
+                      <div className={`w-3 h-3 ${getPositionColor(assignmentModal.selectedPosition)} rounded`} />
                       <span className="font-medium">{assignmentModal.staffMember?.name}</span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-sm text-muted-foreground">{assignmentModal.selectedPosition}</span>
@@ -1608,7 +1515,7 @@ export const InteractiveStaffingGantt: React.FC<InteractiveStaffingGanttProps> =
                   <div>
                     <label className="text-sm font-medium mb-2 block">Staff Member</label>
                     <Select
-                      value={assignmentModal.staffMember?.id || ""}
+                      value={assignmentModal.staffMember?.id ?? ""}
                       onValueChange={(value) => {
                         const staff = staffMembers.find((s) => s.id === value)
                         if (staff) {

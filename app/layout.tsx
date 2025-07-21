@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { TourModal } from "@/components/ui/TourModal"
 import { TakeTourButton } from "@/components/TakeTourButton"
 import { AppLayoutShell } from "@/components/layout/AppLayoutShell"
-import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { ClientErrorBoundary } from "@/components/ui/error-boundary"
 
 export const metadata: Metadata = {
   title: "HB Intel | Hedrick Brothers Construction",
@@ -68,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to navigation
         </a>
 
-        <ErrorBoundary>
+        <ClientErrorBoundary>
           <AuthProvider>
             <TourProvider>
               <ProjectProvider>
@@ -81,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </ProjectProvider>
             </TourProvider>
           </AuthProvider>
-        </ErrorBoundary>
+        </ClientErrorBoundary>
       </body>
     </html>
   )

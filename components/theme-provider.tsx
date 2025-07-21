@@ -1,18 +1,20 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import type { ThemeProviderProps } from 'next-themes'
+import * as React from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
 
-export const ThemeProvider = ({ children, ...props }: ThemeProviderProps) => {
+interface ThemeProviderProps {
+  children: React.ReactNode
+  attribute?: string
+  defaultTheme?: string
+  enableSystem?: boolean
+}
+
+export const ThemeProvider = ({ children, ...props }: ThemeProviderProps): React.JSX.Element => {
   const [mounted, setMounted] = React.useState(false)
 
   // Prevent hydration mismatch
   React.useEffect(() => setMounted(true), [])
 
-  return (
-    <NextThemesProvider {...props}>
-      {mounted && children}
-    </NextThemesProvider>
-  )
+  return <NextThemesProvider {...props}>{mounted && children}</NextThemesProvider>
 }

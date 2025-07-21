@@ -80,7 +80,7 @@ export const LargeDataset: Story = {
 export const FilteredByPosition: Story = {
   args: {
     employees: mockEmployees.employees.filter(
-      (emp) => emp.position.includes("Project Manager") || emp.position.includes("Superintendent"),
+      (emp) => emp.position.includes("Project Manager") || emp.position.includes("Superintendent")
     ),
     projects: mockProjects.projects,
   },
@@ -115,33 +115,19 @@ export const WithUnassignedStaff: Story = {
         id: "emp-unassigned-1",
         name: "John Unassigned",
         position: "Project Manager I",
-        assignment: {
-          projectId: "unassigned",
-          role: "Available",
-          startDate: "2024-01-01T00:00:00Z",
-          endDate: "2024-12-31T23:59:59Z",
-        },
+        department: "Project Management",
+        availability: 100,
+        currentProject: null,
         laborRate: 65.0,
-        billableRate: 130.0,
-        experience: 5,
-        strengths: ["Organization", "Communication"],
-        weaknesses: ["Experience", "Leadership"],
       },
       {
         id: "emp-unassigned-2",
         name: "Jane Available",
         position: "Superintendent I",
-        assignment: {
-          projectId: "unassigned",
-          role: "Available",
-          startDate: "2024-01-01T00:00:00Z",
-          endDate: "2024-12-31T23:59:59Z",
-        },
+        department: "Field Operations",
+        availability: 100,
+        currentProject: null,
         laborRate: 70.0,
-        billableRate: 140.0,
-        experience: 8,
-        strengths: ["Field Operations", "Safety"],
-        weaknesses: ["Technology", "Paperwork"],
       },
     ],
     projects: mockProjects.projects,
@@ -152,6 +138,37 @@ export const WithUnassignedStaff: Story = {
         story: "Staff table showing both assigned and unassigned employees, useful for resource allocation.",
       },
     },
+  },
+}
+
+export const WithCustomEmployees: Story = {
+  args: {
+    employees: [
+      ...mockEmployees.employees.slice(0, 15),
+      {
+        id: "EMP011",
+        name: "Alex Thompson",
+        position: "Senior Project Manager",
+        department: "Project Management",
+        availability: 95,
+        currentProject: "401001",
+        laborRate: 140,
+      },
+      {
+        id: "EMP012",
+        name: "Maria Garcia",
+        position: "Quality Assurance Manager",
+        department: "Quality",
+        availability: 88,
+        currentProject: "401002",
+        laborRate: 120,
+      },
+    ],
+    projects: mockProjects.projects,
+    onEdit: (employee) => console.log("Edit employee:", employee),
+    onView: (employee) => console.log("View employee:", employee),
+    onAssign: (employee, projectId) => console.log("Assign employee:", employee, "to project:", projectId),
+    onUnassign: (employee) => console.log("Unassign employee:", employee),
   },
 }
 

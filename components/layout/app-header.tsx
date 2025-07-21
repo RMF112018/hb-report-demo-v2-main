@@ -950,8 +950,9 @@ export const AppHeader = () => {
           <Button
             variant="ghost"
             size="default"
-            className="text-white hover:bg-white/20 px-3 py-2 rounded-lg"
+            className="text-white hover:bg-white/20 px-3 py-2 rounded-lg touch-target"
             onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle mobile menu"
           >
             {showMobileMenu ? (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -964,7 +965,7 @@ export const AppHeader = () => {
 
           {/* User Avatar - Right */}
           {user && (
-            <Avatar className="h-8 w-8 ring-2 ring-white/20">
+            <Avatar className="h-8 w-8 ring-2 ring-white/20 touch-target">
               <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.firstName} />
               <AvatarFallback className="bg-white text-[#1e3a8a] font-semibold text-sm">
                 {getUserInitials()}
@@ -1912,18 +1913,19 @@ export const AppHeader = () => {
             className="fixed inset-0 top-20 z-[104] bg-black/50 backdrop-blur-sm sm:hidden"
             onClick={() => setShowMobileMenu(false)}
           />
-          <div className="fixed left-0 right-0 top-20 z-[105] bg-white dark:bg-gray-900 sm:hidden animate-in slide-in-from-top-2 duration-300 shadow-lg rounded-b-lg">
+          <div className="fixed left-0 right-0 top-20 z-[105] bg-white dark:bg-gray-900 sm:hidden animate-in slide-in-from-top-2 duration-300 shadow-lg rounded-b-lg max-h-[80vh] overflow-hidden">
             <div className="flex flex-col max-h-[80vh] overflow-y-auto">
               {/* Main Menu View */}
               {mobileMenuView === "main" && (
-                <div className="p-4">
+                <div className="p-4 space-y-2">
                   {/* Menu Items */}
                   <div className="space-y-2">
                     {/* IT Tools - Only for IT Admin */}
                     {user?.role === "admin" && (
                       <button
                         onClick={() => setMobileMenuView("ittools")}
-                        className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
+                        aria-label="IT Tools menu"
                       >
                         <div className="flex items-center space-x-3">
                           <Archive className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -1938,7 +1940,8 @@ export const AppHeader = () => {
                     {/* Projects */}
                     <button
                       onClick={() => setMobileMenuView("projects")}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
+                      aria-label="Projects menu"
                     >
                       <div className="flex items-center space-x-3">
                         <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -1952,7 +1955,8 @@ export const AppHeader = () => {
                     {/* Tools */}
                     <button
                       onClick={() => setMobileMenuView("tools")}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
+                      aria-label="Tools menu"
                     >
                       <div className="flex items-center space-x-3">
                         <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -1970,7 +1974,8 @@ export const AppHeader = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 touch-target"
+                        aria-label="Messages"
                       >
                         <MessageCircle className="h-5 w-5" />
                       </Button>
@@ -1978,8 +1983,9 @@ export const AppHeader = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 touch-target"
                           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
                         >
                           {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                         </Button>

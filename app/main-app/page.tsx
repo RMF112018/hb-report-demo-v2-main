@@ -41,9 +41,6 @@ import {
   Users,
   Activity,
   Building,
-  MapPin,
-  DollarSign,
-  Calendar as CalendarIcon,
   ExternalLink,
   ChevronDown,
   ChevronUp,
@@ -56,7 +53,7 @@ import { Button } from "../../components/ui/button"
 
 // Mock data imports
 import projectsData from "../../data/mock/projects.json"
-import { filterProjectsByRole, getProjectStats } from "../../lib/project-access-utils"
+import { filterProjectsByRole } from "../../lib/project-access-utils"
 import type { UserRole } from "../project/[projectId]/types/project"
 import { ProjectPageCarousel } from "../../components/presentation/ProjectPageCarousel"
 
@@ -99,16 +96,6 @@ const MyProjects: React.FC<MyProjectsProps> = ({ projects, userRole, onProjectSe
         return []
     }
   }, [projects, userRole])
-
-  // Format currency
-  const formatCurrency = (value: number) => {
-    if (value >= 1000000) {
-      return `$${(value / 1000000).toFixed(1)}M`
-    } else if (value >= 1000) {
-      return `$${(value / 1000).toFixed(0)}K`
-    }
-    return `$${value.toLocaleString()}`
-  }
 
   // Get project status color
   const getProjectStatusColor = (project: any) => {
@@ -250,11 +237,46 @@ export default function MainApplicationPage() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
+  // Enhanced mobile detection with more breakpoints
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      const height = window.innerHeight
+
+      // Enhanced mobile detection
+      const isMobileDevice = width < 768 || (width < 1024 && height < 768)
+      setIsMobile(isMobileDevice)
+
+      // Additional responsive adjustments
+      if (width < 640) {
+        // Extra small devices (phones)
+        document.documentElement.classList.add("mobile-xs")
+        document.documentElement.classList.remove("mobile-sm", "tablet", "desktop")
+      } else if (width < 768) {
+        // Small devices (large phones)
+        document.documentElement.classList.add("mobile-sm")
+        document.documentElement.classList.remove("mobile-xs", "tablet", "desktop")
+      } else if (width < 1024) {
+        // Medium devices (tablets)
+        document.documentElement.classList.add("tablet")
+        document.documentElement.classList.remove("mobile-xs", "mobile-sm", "desktop")
+      } else {
+        // Large devices (desktops)
+        document.documentElement.classList.add("desktop")
+        document.documentElement.classList.remove("mobile-xs", "mobile-sm", "tablet")
+      }
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   // Measure header height dynamically
   useEffect(() => {
     if (headerRef.current) {
       const updateHeaderHeight = () => {
-        const height = headerRef.current?.offsetHeight || 140
+        const height = headerRef.current?.offsetHeight ?? 140
         setHeaderHeight(height)
       }
 
@@ -276,6 +298,7 @@ export default function MainApplicationPage() {
 
       return () => window.removeEventListener("resize", updateHeaderHeight)
     }
+    return undefined
   }, [mounted])
 
   // Handle URL navigation - Clear selections when directly navigating to /main-app
@@ -352,10 +375,11 @@ export default function MainApplicationPage() {
         console.log("⏭️ Intel Tour skipped - conditions not met")
       }
     }
+    return undefined
   }, [mounted])
 
   // Handle sidebar panel state changes - updates layout to account for sidebar width
-  const handleSidebarPanelStateChange = (isExpanded: boolean, totalWidth: number) => {
+  const handleSidebarPanelStateChange = (_isExpanded: boolean, totalWidth: number) => {
     setSidebarWidth(totalWidth)
   }
 
@@ -396,6 +420,7 @@ export default function MainApplicationPage() {
         document.removeEventListener("mouseup", handleResizeEnd)
       }
     }
+    return undefined
   }, [isResizing])
 
   // Toggle left panel collapse
@@ -445,11 +470,11 @@ export default function MainApplicationPage() {
       project_type_name: project.project_type_name,
       contract_value: project.contract_value,
       duration: project.duration,
-      start_date: (project as Record<string, unknown>).start_date as string | undefined,
-      end_date: (project as Record<string, unknown>).end_date as string | undefined,
-      location: (project as Record<string, unknown>).location as string | undefined,
-      project_manager: (project as Record<string, unknown>).project_manager as string | undefined,
-      client: (project as Record<string, unknown>).client as string | undefined,
+      start_date: ((project as Record<string, unknown>)["start_date"] as string | undefined) ?? "",
+      end_date: ((project as Record<string, unknown>)["end_date"] as string | undefined) ?? "",
+      location: ((project as Record<string, unknown>)["location"] as string | undefined) ?? "",
+      project_manager: ((project as Record<string, unknown>)["project_manager"] as string | undefined) ?? "",
+      client: ((project as Record<string, unknown>)["client"] as string | undefined) ?? "",
       active: project.active,
       project_number: project.project_number,
       metadata: {
@@ -989,18 +1014,18 @@ export default function MainApplicationPage() {
 
   // Get header configuration based on current selection
   const getHeaderConfig = () => {
-    const userName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email || "User"
+    const userName = user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email ?? "User"
 
     // Build navigation state for enhanced breadcrumbs
     const navigationState = {
       selectedProject,
-      selectedProjectName: selectedProjectData?.name,
+      selectedProjectName: selectedProjectData?.name ?? "",
       selectedModule,
       selectedTool,
       activeTab,
-      activeTabLabel: getTabsForContent().find((tab) => tab.id === activeTab)?.label,
-      projectStage: selectedProjectData?.project_stage_name,
-      fieldManagementTool: getFieldManagementTool(),
+      activeTabLabel: getTabsForContent().find((tab) => tab.id === activeTab)?.label ?? "",
+      projectStage: selectedProjectData?.project_stage_name ?? "",
+      fieldManagementTool: getFieldManagementTool() ?? "",
       currentViewType: getCurrentViewType(),
       isProjectView: !!selectedProject,
       isToolView: !!selectedTool,
@@ -1163,10 +1188,6 @@ export default function MainApplicationPage() {
         ...navigationCallbacks,
       }
     }
-
-    // Default dashboard (including IT administrators when no module selected)
-    const roleLabel =
-      userRole === "admin" ? "System Administrator" : `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} Access`
 
     // Check for specific tabs that need custom titles
     if (activeTab === "bid-management") {

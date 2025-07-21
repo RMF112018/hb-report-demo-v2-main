@@ -64,7 +64,7 @@ const mockActions = {
 
 export const PendingSPCR: Story = {
   args: {
-    spcr: mockSpcrs.spcrs.find((spcr) => spcr.status === "submitted") || mockSpcrs.spcrs[0],
+    spcr: mockSpcrs.spcrs.find((spcr) => spcr.status === "submitted") || mockSpcrs.spcrs[0]!,
     ...mockActions,
   },
   parameters: {
@@ -79,10 +79,17 @@ export const PendingSPCR: Story = {
 export const StaffIncrease: Story = {
   args: {
     spcr: mockSpcrs.spcrs.find((spcr) => spcr.type === "increase" && spcr.status === "submitted") || {
-      ...mockSpcrs.spcrs[0],
+      id: "SPCR-001",
+      projectId: "401001",
+      projectName: "Hospital Expansion Project",
       type: "increase",
       status: "submitted",
+      requestedBy: "Sarah Johnson",
+      requestedDate: "2024-01-15",
+      position: "Project Manager II",
       budget: 85000,
+      justification: "Additional PM support needed for complex MEP coordination",
+      urgency: "high",
     },
     ...mockActions,
   },
@@ -98,10 +105,17 @@ export const StaffIncrease: Story = {
 export const StaffDecrease: Story = {
   args: {
     spcr: mockSpcrs.spcrs.find((spcr) => spcr.type === "decrease") || {
-      ...mockSpcrs.spcrs[0],
+      id: "SPCR-002",
+      projectId: "401002",
+      projectName: "Office Building Renovation",
       type: "decrease",
       status: "submitted",
+      requestedBy: "Mike Chen",
+      requestedDate: "2024-01-10",
+      position: "Assistant Superintendent",
       budget: -45000,
+      justification: "Project scope reduced, can manage with existing team",
+      urgency: "medium",
     },
     ...mockActions,
   },
@@ -117,8 +131,17 @@ export const StaffDecrease: Story = {
 export const AlreadyApproved: Story = {
   args: {
     spcr: {
-      ...mockSpcrs.spcrs[0],
+      id: "SPCR-003",
+      projectId: "401003",
+      projectName: "Shopping Center Development",
+      type: "increase",
       status: "approved",
+      requestedBy: "David Wilson",
+      requestedDate: "2024-01-20",
+      position: "Site Superintendent",
+      budget: 75000,
+      justification: "Additional site supervision required for complex foundation work",
+      urgency: "medium",
     },
     ...mockActions,
   },
@@ -134,8 +157,17 @@ export const AlreadyApproved: Story = {
 export const RejectedSPCR: Story = {
   args: {
     spcr: {
-      ...mockSpcrs.spcrs[0],
+      id: "SPCR-004",
+      projectId: "401004",
+      projectName: "Residential Complex",
+      type: "increase",
       status: "rejected",
+      requestedBy: "Lisa Brown",
+      requestedDate: "2024-01-25",
+      position: "Quality Control Manager",
+      budget: 65000,
+      justification: "Additional QC support for final inspection phase",
+      urgency: "low",
     },
     ...mockActions,
   },
@@ -150,9 +182,19 @@ export const RejectedSPCR: Story = {
 
 export const BulkApproval: Story = {
   args: {
-    spcr: mockSpcrs.spcrs[0],
-    mode: "bulk",
-    selectedSpcrs: mockSpcrs.spcrs.filter((spcr) => spcr.status === "submitted").slice(0, 3),
+    spcr: {
+      id: "SPCR-006",
+      projectId: "401006",
+      projectName: "Multi-Building Complex",
+      type: "increase",
+      status: "submitted",
+      requestedBy: "Jennifer Davis",
+      requestedDate: "2024-02-01",
+      position: "Project Coordinator",
+      budget: 95000,
+      justification: "Multiple concurrent projects require additional coordination support",
+      urgency: "medium",
+    },
     ...mockActions,
   },
   parameters: {
@@ -167,12 +209,18 @@ export const BulkApproval: Story = {
 export const HighBudgetImpact: Story = {
   args: {
     spcr: {
-      ...mockSpcrs.spcrs[0],
-      budget: 150000,
-      position: "General Superintendent",
-      explanation:
-        "Critical project phase requires experienced general superintendent to ensure quality and schedule compliance. High-value project with significant risk exposure.",
+      id: "SPCR-005",
+      projectId: "401005",
+      projectName: "High-Rise Office Tower",
+      type: "increase",
       status: "submitted",
+      requestedBy: "Robert Martinez",
+      requestedDate: "2024-01-30",
+      position: "General Superintendent",
+      budget: 150000,
+      justification:
+        "Critical project phase requires experienced general superintendent to ensure quality and schedule compliance. High-value project with significant risk exposure.",
+      urgency: "high",
     },
     ...mockActions,
   },
@@ -188,12 +236,18 @@ export const HighBudgetImpact: Story = {
 export const UrgentRequest: Story = {
   args: {
     spcr: {
-      ...mockSpcrs.spcrs[0],
-      position: "Safety Manager",
-      explanation:
-        "URGENT: Safety incident requires immediate additional safety oversight. Critical for project continuation and regulatory compliance.",
+      id: "SPCR-007",
+      projectId: "401007",
+      projectName: "Industrial Facility",
+      type: "increase",
       status: "submitted",
-      createdAt: new Date().toISOString(), // Just created
+      requestedBy: "Michael Thompson",
+      requestedDate: "2024-02-05",
+      position: "Safety Manager",
+      budget: 120000,
+      justification:
+        "URGENT: Safety incident requires immediate additional safety oversight. Critical for project continuation and regulatory compliance.",
+      urgency: "high",
     },
     ...mockActions,
   },

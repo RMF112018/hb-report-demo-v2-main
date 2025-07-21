@@ -42,7 +42,7 @@ interface ErrorBoundaryProps {
 }
 
 /**
- * Default error fallback component
+ * Default error fallback component with responsive design
  * @param props - Error fallback props
  * @returns Error fallback JSX
  */
@@ -53,10 +53,15 @@ const DefaultErrorFallback: React.FC<{
   retry: () => void
 }> = ({ error, errorInfo, errorId, retry }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-      <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
-          <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+      <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg
+            className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -65,48 +70,52 @@ const DefaultErrorFallback: React.FC<{
             />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-red-800 dark:text-red-200">Something went wrong</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-red-800 dark:text-red-200 text-center sm:text-left">
+          Something went wrong
+        </h2>
       </div>
 
       <div className="text-center space-y-2">
-        <p className="text-sm text-red-600 dark:text-red-300">
+        <p className="text-xs sm:text-sm text-red-600 dark:text-red-300 px-2">
           An unexpected error occurred. Our team has been notified.
         </p>
-        {errorId && <p className="text-xs text-red-500 dark:text-red-400 font-mono">Error ID: {errorId}</p>}
+        {errorId && (
+          <p className="text-xs text-red-500 dark:text-red-400 font-mono break-all px-2">Error ID: {errorId}</p>
+        )}
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
         <button
           onClick={retry}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors text-sm sm:text-base"
         >
           Try Again
         </button>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-sm sm:text-base"
         >
           Reload Page
         </button>
       </div>
 
       {process.env.NODE_ENV === "development" && error && (
-        <details className="w-full max-w-2xl">
-          <summary className="cursor-pointer text-sm text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200">
+        <details className="w-full max-w-full">
+          <summary className="cursor-pointer text-xs sm:text-sm text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200 px-2 py-1">
             Error Details (Development)
           </summary>
-          <div className="mt-2 p-4 bg-red-100 dark:bg-red-900/40 rounded-md text-xs font-mono text-red-800 dark:text-red-200 overflow-auto max-h-64">
-            <div className="mb-2">
+          <div className="mt-2 p-3 sm:p-4 bg-red-100 dark:bg-red-900/40 rounded-md text-xs font-mono text-red-800 dark:text-red-200 overflow-auto max-h-32 sm:max-h-48 md:max-h-64">
+            <div className="mb-2 break-words">
               <strong>Error:</strong> {error.message}
             </div>
             <div className="mb-2">
               <strong>Stack:</strong>
-              <pre className="whitespace-pre-wrap">{error.stack}</pre>
+              <pre className="whitespace-pre-wrap break-words text-xs">{error.stack}</pre>
             </div>
             {errorInfo && (
               <div>
                 <strong>Component Stack:</strong>
-                <pre className="whitespace-pre-wrap">{errorInfo.componentStack}</pre>
+                <pre className="whitespace-pre-wrap break-words text-xs">{errorInfo.componentStack}</pre>
               </div>
             )}
           </div>
@@ -149,7 +158,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
     // Log the error with structured logging
     logger.error("React component error caught by ErrorBoundary", error, {
-      component: this.props.componentName || "Unknown",
+      component: this.props.componentName ?? "Unknown",
       function: "componentDidCatch",
       errorId,
       errorMessage: error.message,
@@ -184,7 +193,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
    */
   private handleRetry = (): void => {
     logger.info("Retrying component after error", {
-      component: this.props.componentName || "Unknown",
+      component: this.props.componentName ?? "Unknown",
       function: "handleRetry",
     })
 
@@ -214,7 +223,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
    */
   override render(): React.ReactNode {
     if (this.state.hasError) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback
+      const FallbackComponent = this.props.fallback ?? DefaultErrorFallback
 
       return (
         <FallbackComponent
@@ -228,6 +237,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
     return this.props.children
   }
+}
+
+/**
+ * Client-side wrapper for ErrorBoundary to fix server component issues
+ */
+export function ClientErrorBoundary(props: ErrorBoundaryProps) {
+  return <ErrorBoundary {...props} />
 }
 
 /**

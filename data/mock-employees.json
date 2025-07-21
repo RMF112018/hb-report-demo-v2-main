@@ -1,0 +1,94 @@
+{
+  "employees": [
+    {
+      "id": "EMP001",
+      "name": "Sarah Johnson",
+      "position": "Project Manager",
+      "department": "Project Management",
+      "availability": 85,
+      "currentProject": "401001",
+      "laborRate": 125
+    },
+    {
+      "id": "EMP002",
+      "name": "Mike Chen",
+      "position": "Senior Superintendent",
+      "department": "Field Operations",
+      "availability": 90,
+      "currentProject": "401002",
+      "laborRate": 110
+    },
+    {
+      "id": "EMP003",
+      "name": "Lisa Rodriguez",
+      "position": "Project Engineer",
+      "department": "Engineering",
+      "availability": 75,
+      "currentProject": "401003",
+      "laborRate": 95
+    },
+    {
+      "id": "EMP004",
+      "name": "David Wilson",
+      "position": "Safety Manager",
+      "department": "Safety",
+      "availability": 80,
+      "currentProject": "401001",
+      "laborRate": 105
+    },
+    {
+      "id": "EMP005",
+      "name": "Jennifer Lee",
+      "position": "Quality Control Specialist",
+      "department": "Quality",
+      "availability": 70,
+      "currentProject": "401002",
+      "laborRate": 90
+    },
+    {
+      "id": "EMP006",
+      "name": "Robert Martinez",
+      "position": "Assistant Project Manager",
+      "department": "Project Management",
+      "availability": 95,
+      "currentProject": null,
+      "laborRate": 85
+    },
+    {
+      "id": "EMP007",
+      "name": "Emily Davis",
+      "position": "Field Engineer",
+      "department": "Engineering",
+      "availability": 88,
+      "currentProject": "401003",
+      "laborRate": 88
+    },
+    {
+      "id": "EMP008",
+      "name": "James Thompson",
+      "position": "Superintendent",
+      "department": "Field Operations",
+      "availability": 82,
+      "currentProject": "401004",
+      "laborRate": 100
+    },
+    {
+      "id": "EMP009",
+      "name": "Amanda Garcia",
+      "position": "Project Coordinator",
+      "department": "Project Management",
+      "availability": 92,
+      "currentProject": null,
+      "laborRate": 75
+    },
+    {
+      "id": "EMP010",
+      "name": "Kevin Brown",
+      "position": "Safety Coordinator",
+      "department": "Safety",
+      "availability": 78,
+      "currentProject": "401005",
+      "laborRate": 85
+    }
+  ]
+}

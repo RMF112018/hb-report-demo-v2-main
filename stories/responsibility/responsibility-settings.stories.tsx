@@ -94,8 +94,8 @@ export const DefaultSettings: Story = {
 
 export const MinimalSetup: Story = {
   args: {
-    roles: mockRoles.slice(0, 3),
-    categories: mockCategories.slice(0, 5),
+    roles: mockRoles.slice(0, 2),
+    categories: mockCategories.slice(0, 2),
     onRoleUpdate: (role) => console.log("Role updated:", role),
     onRoleCreate: (role) => console.log("Role created:", role),
     onRoleDelete: (roleKey) => console.log("Role deleted:", roleKey),
@@ -121,6 +121,7 @@ export const ExtensiveSetup: Story = {
         color: "#9333EA",
         enabled: true,
         description: "Quality assurance and control oversight",
+        category: "Quality",
       },
       {
         key: "SM",
@@ -128,6 +129,7 @@ export const ExtensiveSetup: Story = {
         color: "#DC2626",
         enabled: true,
         description: "Safety compliance and risk management",
+        category: "Safety",
       },
       {
         key: "CM",
@@ -135,14 +137,39 @@ export const ExtensiveSetup: Story = {
         color: "#059669",
         enabled: false,
         description: "Contract administration and compliance",
+        category: "Management",
       },
     ],
     categories: [
       ...mockCategories,
-      "Environmental Compliance",
-      "Technology Integration",
-      "Vendor Management",
-      "Training & Development",
+      {
+        key: "env-compliance",
+        name: "Environmental Compliance",
+        description: "Environmental regulations and compliance",
+        color: "#22D3EE",
+        enabled: true,
+      },
+      {
+        key: "tech-integration",
+        name: "Technology Integration",
+        description: "Integration of technology solutions",
+        color: "#818CF8",
+        enabled: true,
+      },
+      {
+        key: "vendor-mgmt",
+        name: "Vendor Management",
+        description: "Managing vendors and suppliers",
+        color: "#FBBF24",
+        enabled: true,
+      },
+      {
+        key: "training-dev",
+        name: "Training & Development",
+        description: "Employee training and development",
+        color: "#A3E635",
+        enabled: true,
+      },
     ],
     onRoleUpdate: (role) => console.log("Role updated:", role),
     onRoleCreate: (role) => console.log("Role created:", role),

@@ -1,0 +1,69 @@
+{
+  "spcrs": [
+    {
+      "id": "SPCR-001",
+      "projectId": "401001",
+      "projectName": "Hospital Expansion Project",
+      "type": "increase",
+      "status": "submitted",
+      "requestedBy": "Sarah Johnson",
+      "requestedDate": "2024-01-15",
+      "position": "Project Manager II",
+      "budget": 85000,
+      "justification": "Additional PM support needed for complex MEP coordination and increased scope due to client change orders.",
+      "urgency": "high"
+    },
+    {
+      "id": "SPCR-002",
+      "projectId": "401002",
+      "projectName": "Office Building Renovation",
+      "type": "decrease",
+      "status": "approved",
+      "requestedBy": "Mike Chen",
+      "requestedDate": "2024-01-10",
+      "position": "Assistant Superintendent",
+      "budget": 65000,
+      "justification": "Project scope reduced, can manage with existing team.",
+      "urgency": "medium"
+    },
+    {
+      "id": "SPCR-003",
+      "projectId": "401003",
+      "projectName": "Shopping Center Development",
+      "type": "increase",
+      "status": "draft",
+      "requestedBy": "Lisa Rodriguez",
+      "requestedDate": "2024-01-20",
+      "position": "Quality Control Specialist",
+      "budget": 72000,
+      "justification": "Enhanced quality oversight required for high-profile retail project.",
+      "urgency": "medium"
+    },
+    {
+      "id": "SPCR-004",
+      "projectId": "401001",
+      "projectName": "Hospital Expansion Project",
+      "type": "increase",
+      "status": "submitted",
+      "requestedBy": "David Wilson",
+      "requestedDate": "2024-01-18",
+      "position": "Safety Coordinator",
+      "budget": 68000,
+      "justification": "Additional safety oversight needed for complex medical facility construction.",
+      "urgency": "high"
+    },
+    {
+      "id": "SPCR-005",
+      "projectId": "401002",
+      "projectName": "Office Building Renovation",
+      "type": "decrease",
+      "status": "rejected",
+      "requestedBy": "Jennifer Lee",
+      "requestedDate": "2024-01-12",
+      "position": "Project Engineer",
+      "budget": 75000,
+      "justification": "Reduced scope allows for team consolidation.",
+      "urgency": "low"
+    }
+  ]
+}

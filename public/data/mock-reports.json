@@ -1,0 +1,78 @@
+{
+  "reports": [
+    {
+      "id": "report-001",
+      "name": "Monthly Owner Report - Downtown Project",
+      "type": "monthly-owner",
+      "projectId": "proj-001",
+      "projectName": "Downtown Office Complex",
+      "createdBy": "user-001",
+      "approverId": "user-005",
+      "status": "approved",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "approvedAt": "2024-01-16T14:20:00Z",
+      "version": "1.0",
+      "fileSize": "2.4MB",
+      "downloadCount": 12
+    },
+    {
+      "id": "report-002",
+      "name": "Weekly Progress Report - Hospital Expansion",
+      "type": "weekly-progress",
+      "projectId": "proj-002",
+      "projectName": "Hospital Expansion Project",
+      "createdBy": "user-002",
+      "approverId": "user-005",
+      "status": "pending",
+      "createdAt": "2024-01-20T09:15:00Z",
+      "version": "1.0",
+      "fileSize": "1.8MB",
+      "downloadCount": 5
+    },
+    {
+      "id": "report-003",
+      "name": "Monthly Owner Report - Shopping Center",
+      "type": "monthly-owner",
+      "projectId": "proj-003",
+      "projectName": "Downtown Shopping Center",
+      "createdBy": "user-003",
+      "approverId": "user-006",
+      "status": "approved",
+      "createdAt": "2024-01-10T11:45:00Z",
+      "approvedAt": "2024-01-12T16:30:00Z",
+      "version": "1.0",
+      "fileSize": "3.1MB",
+      "downloadCount": 8
+    },
+    {
+      "id": "report-004",
+      "name": "Safety Report - Industrial Complex",
+      "type": "safety-report",
+      "projectId": "proj-004",
+      "projectName": "Industrial Manufacturing Complex",
+      "createdBy": "user-004",
+      "approverId": "user-007",
+      "status": "approved",
+      "createdAt": "2024-01-18T08:30:00Z",
+      "approvedAt": "2024-01-19T13:45:00Z",
+      "version": "1.0",
+      "fileSize": "1.2MB",
+      "downloadCount": 15
+    },
+    {
+      "id": "report-005",
+      "name": "Financial Summary - Downtown Project",
+      "type": "financial-summary",
+      "projectId": "proj-001",
+      "projectName": "Downtown Office Complex",
+      "createdBy": "user-001",
+      "approverId": "user-008",
+      "status": "approved",
+      "createdAt": "2024-01-25T14:20:00Z",
+      "approvedAt": "2024-01-26T10:15:00Z",
+      "version": "1.0",
+      "fileSize": "4.2MB",
+      "downloadCount": 20
+    }
+  ]
+}

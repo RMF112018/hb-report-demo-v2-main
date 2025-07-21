@@ -30,19 +30,14 @@ across different matrix types (Team, Prime Contract, Subcontract).
     },
   },
   argTypes: {
-    type: {
-      control: "select",
-      options: ["team", "prime-contract", "subcontract"],
-      description: "Matrix type determines which tasks are displayed",
-    },
     tasks: {
       description: "Array of responsibility tasks to display",
     },
     roles: {
       description: "Array of project roles with assignments",
     },
-    onTaskUpdate: {
-      description: "Callback when task is updated",
+    categories: {
+      description: "Array of task categories",
     },
     onTaskDelete: {
       description: "Callback when task is deleted",
@@ -52,9 +47,6 @@ across different matrix types (Team, Prime Contract, Subcontract).
     },
     onTaskEdit: {
       description: "Callback to edit existing task",
-    },
-    onExport: {
-      description: "Callback to trigger export modal",
     },
   },
 }
@@ -66,12 +58,32 @@ export const TeamMatrix: Story = {
   args: {
     tasks: mockResponsibilityTasks.filter((task) => task.type === "team"),
     roles: mockRoles,
-    type: "team",
-    onTaskUpdate: (task) => console.log("Task updated:", task),
+    categories: [
+      {
+        key: "contract",
+        name: "Contract Management",
+        description: "Contract related tasks",
+        color: "#3B82F6",
+        enabled: true,
+      },
+      {
+        key: "quality",
+        name: "Quality Control",
+        description: "Quality control tasks",
+        color: "#10B981",
+        enabled: true,
+      },
+      {
+        key: "safety",
+        name: "Safety Management",
+        description: "Safety related tasks",
+        color: "#F59E0B",
+        enabled: true,
+      },
+    ],
     onTaskDelete: (taskId) => console.log("Task deleted:", taskId),
-    onTaskCreate: () => console.log("Create new task"),
-    onTaskEdit: (task) => console.log("Edit task:", task),
-    onExport: () => console.log("Export matrix"),
+    onTaskCreate: (task: any) => console.log("Create new task:", task),
+    onTaskEdit: (task: any) => console.log("Edit task:", task),
   },
   parameters: {
     docs: {
@@ -86,12 +98,32 @@ export const PrimeContractMatrix: Story = {
   args: {
     tasks: mockResponsibilityTasks.filter((task) => task.type === "prime-contract"),
     roles: mockRoles,
-    type: "prime-contract",
-    onTaskUpdate: (task) => console.log("Task updated:", task),
+    categories: [
+      {
+        key: "contract",
+        name: "Contract Management",
+        description: "Contract related tasks",
+        color: "#3B82F6",
+        enabled: true,
+      },
+      {
+        key: "quality",
+        name: "Quality Control",
+        description: "Quality control tasks",
+        color: "#10B981",
+        enabled: true,
+      },
+      {
+        key: "safety",
+        name: "Safety Management",
+        description: "Safety related tasks",
+        color: "#F59E0B",
+        enabled: true,
+      },
+    ],
     onTaskDelete: (taskId) => console.log("Task deleted:", taskId),
-    onTaskCreate: () => console.log("Create new task"),
-    onTaskEdit: (task) => console.log("Edit task:", task),
-    onExport: () => console.log("Export matrix"),
+    onTaskCreate: (task: any) => console.log("Create new task:", task),
+    onTaskEdit: (task: any) => console.log("Edit task:", task),
   },
   parameters: {
     docs: {
@@ -106,12 +138,32 @@ export const SubcontractMatrix: Story = {
   args: {
     tasks: mockResponsibilityTasks.filter((task) => task.type === "subcontract"),
     roles: mockRoles,
-    type: "subcontract",
-    onTaskUpdate: (task) => console.log("Task updated:", task),
+    categories: [
+      {
+        key: "contract",
+        name: "Contract Management",
+        description: "Contract related tasks",
+        color: "#3B82F6",
+        enabled: true,
+      },
+      {
+        key: "quality",
+        name: "Quality Control",
+        description: "Quality control tasks",
+        color: "#10B981",
+        enabled: true,
+      },
+      {
+        key: "safety",
+        name: "Safety Management",
+        description: "Safety related tasks",
+        color: "#F59E0B",
+        enabled: true,
+      },
+    ],
     onTaskDelete: (taskId) => console.log("Task deleted:", taskId),
-    onTaskCreate: () => console.log("Create new task"),
-    onTaskEdit: (task) => console.log("Edit task:", task),
-    onExport: () => console.log("Export matrix"),
+    onTaskCreate: (task: any) => console.log("Create new task:", task),
+    onTaskEdit: (task: any) => console.log("Edit task:", task),
   },
   parameters: {
     docs: {
@@ -126,12 +178,32 @@ export const WithManyTasks: Story = {
   args: {
     tasks: mockResponsibilityTasks,
     roles: mockRoles,
-    type: "team",
-    onTaskUpdate: (task) => console.log("Task updated:", task),
+    categories: [
+      {
+        key: "contract",
+        name: "Contract Management",
+        description: "Contract related tasks",
+        color: "#3B82F6",
+        enabled: true,
+      },
+      {
+        key: "quality",
+        name: "Quality Control",
+        description: "Quality control tasks",
+        color: "#10B981",
+        enabled: true,
+      },
+      {
+        key: "safety",
+        name: "Safety Management",
+        description: "Safety related tasks",
+        color: "#F59E0B",
+        enabled: true,
+      },
+    ],
     onTaskDelete: (taskId) => console.log("Task deleted:", taskId),
-    onTaskCreate: () => console.log("Create new task"),
-    onTaskEdit: (task) => console.log("Edit task:", task),
-    onExport: () => console.log("Export matrix"),
+    onTaskCreate: (task: any) => console.log("Create new task:", task),
+    onTaskEdit: (task: any) => console.log("Edit task:", task),
   },
   parameters: {
     docs: {
@@ -146,12 +218,32 @@ export const EmptyMatrix: Story = {
   args: {
     tasks: [],
     roles: mockRoles,
-    type: "team",
-    onTaskUpdate: (task) => console.log("Task updated:", task),
+    categories: [
+      {
+        key: "contract",
+        name: "Contract Management",
+        description: "Contract related tasks",
+        color: "#3B82F6",
+        enabled: true,
+      },
+      {
+        key: "quality",
+        name: "Quality Control",
+        description: "Quality control tasks",
+        color: "#10B981",
+        enabled: true,
+      },
+      {
+        key: "safety",
+        name: "Safety Management",
+        description: "Safety related tasks",
+        color: "#F59E0B",
+        enabled: true,
+      },
+    ],
     onTaskDelete: (taskId) => console.log("Task deleted:", taskId),
-    onTaskCreate: () => console.log("Create new task"),
-    onTaskEdit: (task) => console.log("Edit task:", task),
-    onExport: () => console.log("Export matrix"),
+    onTaskCreate: (task: any) => console.log("Create new task:", task),
+    onTaskEdit: (task: any) => console.log("Edit task:", task),
   },
   parameters: {
     docs: {
