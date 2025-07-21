@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { LoadingWrapper } from "@/components/ui/loading-wrapper"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/context/auth-context"
 import { useTour } from "@/context/tour-context"
 import { useToast } from "@/hooks/use-toast"
+import { structuredLogger } from "@/lib/structured-logger"
 import {
   Building2,
   ArrowRight,
@@ -48,7 +49,13 @@ export default function LoginPage() {
   const { login, isLoading: authIsLoading, isClient } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
-  const { startTour, isTourAvailable, resetTourState } = useTour()
+  const { startTour, isTourAvailable } = useTour()
+
+  // Create logger with context
+  const logger = structuredLogger.withContext({
+    component: "LoginPage",
+    function: "LoginPage",
+  })
 
   // Clear presentation mode and Intel tour trigger on page load for clean start
   useEffect(() => {
@@ -67,7 +74,10 @@ export default function LoginPage() {
       const showPresentation = urlParams.get("showPresentation")
 
       if (showPresentation === "true") {
-        console.log("🎠 Triggering presentation carousel from query parameter")
+        logger.info("Triggering presentation carousel from query parameter", {
+          action: "presentation_carousel_trigger",
+          source: "query_parameter",
+        })
         localStorage.setItem("presentationMode", "true")
         setPresentationMode(true)
 
@@ -195,6 +205,7 @@ export default function LoginPage() {
       window.addEventListener("resize", handleResize)
       return () => window.removeEventListener("resize", handleResize)
     }
+    return undefined
   }, [])
 
   // Feature rotation
@@ -213,7 +224,10 @@ export default function LoginPage() {
         const hasDisabledTours = localStorage.getItem("hb-tour-available") === "false"
 
         if (hasDisabledTours) {
-          console.log("Tours disabled by user preference")
+          logger.info("Tours disabled by user preference", {
+            action: "tour_disabled",
+            reason: "user_preference",
+          })
           return
         }
 
@@ -221,7 +235,7 @@ export default function LoginPage() {
         const hasShownWelcome = sessionStorage.getItem("hb-welcome-shown")
         const hasShownTour = sessionStorage.getItem("hb-tour-shown-login-demo-accounts")
 
-        console.log("Tour auto-start check:", {
+        logger.debug("Tour auto-start check", {
           isTourAvailable,
           hasShownWelcome,
           hasShownTour,
@@ -243,12 +257,18 @@ export default function LoginPage() {
         // Auto-start login tour once per session
         if (!hasShownTour) {
           setTimeout(() => {
-            console.log("Auto-starting login tour...")
+            logger.info("Auto-starting login tour", {
+              action: "tour_auto_start",
+              tourName: "login-demo-accounts",
+            })
             startTour("login-demo-accounts", true) // true indicates auto-start
           }, 3000)
         }
       } catch (error) {
-        console.error("Error with storage access:", error)
+        logger.error("Error with storage access", error as Error, {
+          action: "storage_access_error",
+          location: "tour_initialization",
+        })
       }
     }
   }, [isTourAvailable, startTour, toast, isClient])
@@ -278,7 +298,11 @@ export default function LoginPage() {
         localStorage.setItem("triggerIntelTour", Date.now().toString())
         // Clear any previous completion flag to allow tour to auto-launch
         localStorage.removeItem("intelTourCompleted")
-        console.log("🎬 Login: Intel Tour flags set for presentation user")
+        logger.info("Intel Tour flags set for presentation user", {
+          action: "intel_tour_setup",
+          userRole: "presentation",
+          userId: email,
+        })
       }
 
       toast({
@@ -331,7 +355,11 @@ export default function LoginPage() {
         // Clear any previous completion flag to allow tour to auto-launch
         localStorage.removeItem("intelTourCompleted")
         setPresentationMode(true)
-        console.log("🎬 Demo Login: Intel Tour flags set for presentation account")
+        logger.info("Intel Tour flags set for presentation account", {
+          action: "demo_login_presentation",
+          accountType: "presentation",
+          userId: account.email,
+        })
         toast({
           title: `Welcome to HB Intel`,
           description: `Starting executive presentation...`,
@@ -361,17 +389,17 @@ export default function LoginPage() {
     // Clear any previous completion flag to allow tour to auto-launch
     localStorage.removeItem("intelTourCompleted")
     setPresentationMode(false)
-    console.log("🎬 Presentation Complete: Intel Tour flags set for transition to main app")
+    logger.info("Intel Tour flags set for transition to main app", {
+      action: "presentation_complete",
+      nextAction: "intel_tour_trigger",
+    })
     router.push("/main-app")
   }
 
-  const CurrentFeatureIcon = features[currentFeature].icon
-  const isSmallScreen = windowSize.width < 768
-  const isMediumScreen = windowSize.width >= 768 && windowSize.width < 1024
-  const isLargeScreen = windowSize.width >= 1024
-  const isExtraLargeScreen = windowSize.width >= 1280
-  const isMobile = windowSize.width < 480
-  const isTablet = windowSize.width >= 480 && windowSize.width < 1024
+  const CurrentFeatureIcon = features[currentFeature]?.icon || UserCheck
+  const isSmallScreen = (windowSize?.width ?? 0) < 768
+  const isMediumScreen = (windowSize?.width ?? 0) >= 768 && (windowSize?.width ?? 0) < 1024
+  const isLargeScreen = (windowSize?.width ?? 0) >= 1024
 
   return (
     // Force light mode for the entire login page, regardless of global theme
@@ -574,12 +602,18 @@ export default function LoginPage() {
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 sm:p-4 lg:p-6 xl:p-8 border border-white/20 shadow-2xl transform transition-all duration-500 hover:scale-[1.02]">
                     <div className="flex items-start mb-3 sm:mb-4 lg:mb-6">
                       <div
-                        className={`bg-gradient-to-r ${features[currentFeature].color} p-2 sm:p-3 lg:p-4 rounded-xl mr-3 sm:mr-4 lg:mr-6 transform transition-transform duration-300 hover:rotate-6`}
+                        className={`bg-gradient-to-r ${
+                          features[currentFeature]?.color || "from-blue-500 to-blue-600"
+                        } p-2 sm:p-3 lg:p-4 rounded-xl mr-3 sm:mr-4 lg:mr-6 transform transition-transform duration-300 hover:rotate-6`}
                       >
-                        <CurrentFeatureIcon
-                          className={`text-white ${isLargeScreen ? "h-8 w-8" : isMediumScreen ? "h-7 w-7" : "h-6 w-6"}`}
-                          aria-hidden="true"
-                        />
+                        {CurrentFeatureIcon && (
+                          <CurrentFeatureIcon
+                            className={`text-white ${
+                              isLargeScreen ? "h-8 w-8" : isMediumScreen ? "h-7 w-7" : "h-6 w-6"
+                            }`}
+                            aria-hidden="true"
+                          />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3
@@ -587,18 +621,18 @@ export default function LoginPage() {
                             isLargeScreen ? "text-2xl" : isMediumScreen ? "text-lg lg:text-xl" : "text-base lg:text-lg"
                           }`}
                         >
-                          {features[currentFeature].title}
+                          {features[currentFeature]?.title || "Feature"}
                         </h3>
                         <p
                           className={`text-blue-200 leading-relaxed mb-3 ${
                             isLargeScreen ? "text-lg" : isMediumScreen ? "text-sm lg:text-base" : "text-xs lg:text-sm"
                           }`}
                         >
-                          {features[currentFeature].description}
+                          {features[currentFeature]?.description || "Feature description"}
                         </p>
                         <div className="inline-flex items-center bg-green-500/20 text-green-300 px-2 sm:px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm font-medium">
                           <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                          {features[currentFeature].highlight}
+                          {features[currentFeature]?.highlight || "Feature highlight"}
                         </div>
                       </div>
                     </div>

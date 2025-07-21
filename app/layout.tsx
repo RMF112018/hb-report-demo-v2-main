@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "@/styles/globals.css"
 import { AuthProvider } from "@/context/auth-context"
 import { ProjectProvider } from "@/context/project-context"
@@ -11,8 +10,6 @@ import { TourModal } from "@/components/ui/TourModal"
 import { TakeTourButton } from "@/components/TakeTourButton"
 import { AppLayoutShell } from "@/components/layout/AppLayoutShell"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HB Intel | Hedrick Brothers Construction",
@@ -56,6 +53,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-white dark:bg-gray-950 text-foreground">
+        {/* Skip links for keyboard navigation */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded"
+        >
+          Skip to main content
+        </a>
+        <a
+          href="#navigation"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded"
+          style={{ top: "4rem" }}
+        >
+          Skip to navigation
+        </a>
+
         <ErrorBoundary>
           <AuthProvider>
             <TourProvider>

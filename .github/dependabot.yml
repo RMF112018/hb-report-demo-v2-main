@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "security-team"
+    assignees:
+      - "maintainers"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Allow up to 10 open pull requests for dependencies
+    open-pull-requests-limit: 10
+    # Group updates for minor and patch versions
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore major version updates for now
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    # Allow updates for development dependencies
+    allow:
+      - dependency-type: "development" 

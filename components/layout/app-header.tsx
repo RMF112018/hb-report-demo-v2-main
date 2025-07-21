@@ -13,7 +13,6 @@ import {
   Menu,
   MessageCircle,
   ChevronLeft,
-  X,
 } from "lucide-react"
 import { ProductivityPopover } from "./ProductivityPopover"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,18 +24,9 @@ import { useTheme } from "next-themes"
 import { useProjectContext } from "@/context/project-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Switch } from "@/components/ui/switch"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import projectsData from "@/data/mock/projects.json"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { Calendar, Users } from "lucide-react"
 
 /**
  * Enhanced AppHeader Component with Mega-Menu Navigation
@@ -71,11 +61,6 @@ export const AppHeader = () => {
   const [showToolMenu, setShowToolMenu] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [showProjectModal, setShowProjectModal] = useState(false)
-  const [projectModalContent, setProjectModalContent] = useState({
-    title: "",
-    description: "",
-  })
 
   // IT Admin menu states
   const [showITToolsMenu, setShowITToolsMenu] = useState(false)
@@ -158,8 +143,6 @@ export const AppHeader = () => {
 
   // Refs for click outside detection
   const headerRef = useRef<HTMLElement>(null)
-  const projectMenuRef = useRef<HTMLDivElement>(null)
-  const toolMenuRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
   const projectMenuContentRef = useRef<HTMLDivElement>(null)
@@ -484,14 +467,6 @@ export const AppHeader = () => {
     return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
   }, [user])
 
-  const hasPreConAccess = useCallback(() => {
-    if (!user) return false
-    // Corrected: Replaced 'c-suite' with 'executive'
-    if (["executive", "project-executive", "estimator", "admin"].includes(user.role)) return true
-    if (user.role === "project-manager") return user.permissions?.preConAccess === true
-    return false
-  }, [user])
-
   // Get project status color (keeping this for status badges)
   const getProjectStatusColor = useCallback((project: any) => {
     if (!project.active) {
@@ -684,11 +659,13 @@ export const AppHeader = () => {
         }
       }
 
-      const { title, description } = getProjectDisplayInfo()
+      const { title } = getProjectDisplayInfo()
 
-      // Show modal instead of toast
-      setProjectModalContent({ title, description })
-      setShowProjectModal(true)
+      // Show toast notification
+      toast({
+        title: "Project Changed",
+        description: `Switched to ${title}`,
+      })
 
       // Dispatch event with enhanced details
       if (typeof window !== "undefined") {
@@ -813,6 +790,9 @@ export const AppHeader = () => {
     <>
       <header
         ref={headerRef}
+        id="navigation"
+        role="banner"
+        aria-label="Main navigation"
         className="sticky top-0 z-[100] flex h-20 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-[#1e3a8a] to-[#2a5298] px-8 shadow-lg backdrop-blur-sm"
         data-tour="app-header"
       >

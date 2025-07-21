@@ -19,17 +19,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
+
 import { cn } from "@/lib/utils"
+import { structuredLogger } from "@/lib/structured-logger"
 import {
   MessageSquare,
   Send,
@@ -37,49 +38,13 @@ import {
   Users,
   Calendar,
   CheckSquare,
-  Video,
-  Phone,
-  AtSign,
-  Hash,
   Paperclip,
   Smile,
   MoreHorizontal,
-  Star,
   Reply,
-  Edit3,
-  Trash2,
   RefreshCw,
   AlertCircle,
-  ChevronDown,
-  Settings,
-  Bell,
-  Search,
-  Filter,
-  Archive,
-  Flag,
-  Clock,
   CheckCircle,
-  Circle,
-  UserPlus,
-  Share,
-  Eye,
-  EyeOff,
-  PinIcon,
-  Zap,
-  Mic,
-  MicOff,
-  Volume2,
-  VolumeX,
-  FileText,
-  Image,
-  Link,
-  MapPin,
-  Calendar as CalendarIcon,
-  User,
-  Mail,
-  Building,
-  Briefcase,
-  GraduationCap,
 } from "lucide-react"
 
 // Import Teams integration hooks
@@ -89,8 +54,8 @@ import { useTeamChannels } from "@/hooks/useTeamsIntegration"
 import { useChannelMessages } from "@/hooks/useTeamsIntegration"
 import { usePlannerPlans } from "@/hooks/useTeamsIntegration"
 import { usePlannerTasks } from "@/hooks/useTeamsIntegration"
-import { useCalendarEvents } from "@/hooks/useTeamsIntegration"
-import { Team, TeamMember, Channel, ChatMessage, PlannerTask } from "@/lib/msgraph"
+
+import type { Team, TeamMember, Channel, ChatMessage } from "@/lib/msgraph"
 
 // Types
 interface TeamsSlideOutPanelProps {
@@ -250,7 +215,7 @@ const MessageThread: React.FC<{
   messages: ChatMessage[]
   currentUser: any
   teamMembers: TeamMember[]
-}> = ({ messages, currentUser, teamMembers }) => {
+}> = ({ messages, teamMembers }) => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -303,7 +268,6 @@ const MessageThread: React.FC<{
       <ScrollArea className="h-full">
         <div className="space-y-1 p-3">
           {messages.map((message, index) => {
-            const isCurrentUser = message.from?.user?.id === currentUser?.id
             const previousMessage = index > 0 ? messages[index - 1] : null
             const isSameSender = previousMessage?.from?.user?.id === message.from?.user?.id
             const timeDiff = previousMessage
@@ -436,9 +400,7 @@ const QuickTaskCreator: React.FC<{
 export const TeamsSlideOutPanel: React.FC<TeamsSlideOutPanelProps> = ({
   isOpen,
   onClose,
-  projectId,
   projectName = "Project Team",
-  userRole = "team-member",
   currentUser,
 }) => {
   const [activeTab, setActiveTab] = useState("messages")
@@ -449,15 +411,9 @@ export const TeamsSlideOutPanel: React.FC<TeamsSlideOutPanelProps> = ({
   const { teams, loading: teamsLoading, error: teamsError } = useTeams()
   const { members, loading: membersLoading } = useTeamMembers(selectedTeam?.id || null)
   const { channels, loading: channelsLoading } = useTeamChannels(selectedTeam?.id || null)
-  const {
-    messages,
-    loading: messagesLoading,
-    sendMessage,
-    sending,
-  } = useChannelMessages(selectedTeam?.id || null, selectedChannel?.id || null)
+  const { messages, sendMessage } = useChannelMessages(selectedTeam?.id || null, selectedChannel?.id || null)
   const { plans, loading: plansLoading } = usePlannerPlans(selectedTeam?.id || null)
-  const { tasks, createTask } = usePlannerTasks(plans.length > 0 ? plans[0].id : null)
-  const { events, createEvent } = useCalendarEvents()
+  const { tasks, createTask } = usePlannerTasks(plans.length > 0 ? plans[0]?.id || null : null)
 
   // Auto-select first team and channel
   useEffect(() => {
@@ -468,25 +424,30 @@ export const TeamsSlideOutPanel: React.FC<TeamsSlideOutPanelProps> = ({
             team.displayName.toLowerCase().includes(projectName.toLowerCase()) ||
             team.displayName.toLowerCase().includes("project")
         ) || teams[0]
-      setSelectedTeam(projectTeam)
+      setSelectedTeam(projectTeam || null)
     }
   }, [teams, selectedTeam, projectName])
 
   useEffect(() => {
     if (channels.length > 0 && !selectedChannel) {
       const generalChannel = channels.find((ch) => ch.displayName.toLowerCase() === "general") || channels[0]
-      setSelectedChannel(generalChannel)
+      setSelectedChannel(generalChannel || null)
     }
   }, [channels, selectedChannel])
 
   const handleSendMessage = useCallback(
-    async (content: string, mentions?: string[]) => {
+    async (content: string) => {
       const success = await sendMessage(content, "normal")
       if (success) {
-        console.log("Message sent:", content)
+        structuredLogger.info("Message sent", {
+          component: "TeamsSlideOutPanel",
+          function: "handleSendMessage",
+          messageLength: content.length,
+          channelId: selectedChannel?.id,
+        })
       }
     },
-    [sendMessage]
+    [sendMessage, selectedChannel?.id]
   )
 
   const handleCreateTask = useCallback(
@@ -494,10 +455,16 @@ export const TeamsSlideOutPanel: React.FC<TeamsSlideOutPanelProps> = ({
       if (!selectedTeam) return
       const newTask = await createTask(title, undefined, assigneeId ? [assigneeId] : undefined)
       if (newTask) {
-        console.log("Task created:", newTask)
+        structuredLogger.info("Task created", {
+          component: "TeamsSlideOutPanel",
+          function: "handleCreateTask",
+          taskTitle: newTask.title,
+          taskPriority: newTask.priority,
+          channelId: selectedChannel?.id,
+        })
       }
     },
-    [selectedTeam, createTask]
+    [selectedTeam, createTask, selectedChannel?.id]
   )
 
   const isLoading = teamsLoading || membersLoading || channelsLoading || plansLoading
@@ -626,7 +593,7 @@ export const TeamsSlideOutPanel: React.FC<TeamsSlideOutPanelProps> = ({
                 <MessageComposer
                   onSendMessage={handleSendMessage}
                   teamMembers={members}
-                  disabled={sending}
+                  disabled={false}
                   placeholder={`Message #${selectedChannel.displayName}`}
                 />
               </TabsContent>

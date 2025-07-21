@@ -15,20 +15,18 @@
  * - Meeting attendee management
  */
 
-import React, { useState, useCallback, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useState, useCallback } from "react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
   Calendar as CalendarIcon,
   Plus,
@@ -38,14 +36,9 @@ import {
   MapPin,
   Users,
   Video,
-  Mail,
-  Phone,
   RefreshCw,
-  Filter,
   ChevronLeft,
   ChevronRight,
-  MoreHorizontal,
-  UserPlus,
   Link,
   AlertCircle,
   CheckCircle,
@@ -53,10 +46,9 @@ import {
 } from "lucide-react"
 import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isToday, parseISO } from "date-fns"
 import { cn } from "@/lib/utils"
-
-// Import hooks and types
+import { structuredLogger } from "@/lib/structured-logger"
 import { useCalendarEvents } from "@/hooks/useTeamsIntegration"
-import { CalendarEvent, TeamMember } from "@/lib/msgraph"
+import type { CalendarEvent, TeamMember } from "@/lib/msgraph"
 
 interface CalendarIntegrationContentProps {
   teamMembers: TeamMember[]
@@ -235,8 +227,6 @@ const EventCreationForm: React.FC<{
   const handleAttendeeToggle = (email: string) => {
     setSelectedAttendees((prev) => (prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]))
   }
-
-  const EventTypeIcon = EVENT_TYPES[formData.eventType].icon
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -475,12 +465,7 @@ const CalendarView: React.FC<{
 }
 
 // Main Component
-const CalendarIntegrationContent: React.FC<CalendarIntegrationContentProps> = ({
-  teamMembers,
-  currentUser,
-  projectData,
-  className,
-}) => {
+const CalendarIntegrationContent: React.FC<CalendarIntegrationContentProps> = ({ teamMembers, className }) => {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar")
@@ -507,12 +492,22 @@ const CalendarIntegrationContent: React.FC<CalendarIntegrationContentProps> = ({
 
   const handleEventEdit = useCallback((event: CalendarEvent) => {
     // TODO: Implement event editing
-    console.log("Edit event:", event)
+    structuredLogger.info("Edit event", {
+      component: "CalendarIntegrationContent",
+      function: "handleEventEdit",
+      eventId: event.id,
+      eventTitle: event.subject,
+      eventDate: event.start,
+    })
   }, [])
 
   const handleEventDelete = useCallback((eventId: string) => {
     // TODO: Implement event deletion
-    console.log("Delete event:", eventId)
+    structuredLogger.info("Delete event", {
+      component: "CalendarIntegrationContent",
+      function: "handleEventDelete",
+      eventId,
+    })
   }, [])
 
   // Filter events for current week

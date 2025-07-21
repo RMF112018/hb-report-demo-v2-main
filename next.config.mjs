@@ -1,16 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY:
-      "Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCeUx0R3xbf1x1ZFxMYlVbRHJPMyBoS35Rc0VkWHpeeXZcRmRdVU1xVEFd",
+    NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY: process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY || "",
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false, // Enable ESLint checking
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Enable TypeScript checking
   },
-  swcMinify: false, // Disable SWC minification to avoid potential issues
+
   images: {
     unoptimized: true,
   },
@@ -18,10 +17,75 @@ const nextConfig = {
   output: "standalone",
   // Optimize for static generation where possible
   experimental: {
-    optimizePackageImports: ["@radix-ui/react-icons", "lucide-react"],
+    optimizePackageImports: [
+      "@radix-ui/react-icons",
+      "lucide-react",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-select",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-collapsible",
+      "@radix-ui/react-context-menu",
+      "@radix-ui/react-hover-card",
+      "@radix-ui/react-label",
+      "@radix-ui/react-menubar",
+      "@radix-ui/react-navigation-menu",
+      "@radix-ui/react-progress",
+      "@radix-ui/react-radio-group",
+      "@radix-ui/react-scroll-area",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-slider",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-toggle",
+      "@radix-ui/react-toggle-group",
+    ],
   },
-  // Configure React for Bryntum compatibility
-  reactStrictMode: false, // Disable to prevent Bryntum double mounting issues
+  // Configure React for production readiness
+  reactStrictMode: true, // Enable React Strict Mode
+  // Performance optimizations
+  compiler: {
+    // Remove console.logs in production
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
+  },
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    // Tree shaking optimizations
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: "all",
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+            priority: 10,
+          },
+          common: {
+            name: "common",
+            minChunks: 2,
+            chunks: "all",
+            priority: 5,
+          },
+        },
+      },
+    }
+
+    return config
+  },
   // Ensure static files are served correctly
   async rewrites() {
     return [
@@ -72,6 +136,14 @@ const nextConfig = {
           {
             key: "X-XSS-Protection",
             value: "1; mode=block",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
           },
         ],
       },

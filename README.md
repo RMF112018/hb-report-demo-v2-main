@@ -1,330 +1,316 @@
 # HB Report Demo v3.0
 
-## Overview
+A comprehensive construction management platform built with Next.js, TypeScript, and modern web technologies.
 
-Enterprise-grade construction project management platform with comprehensive role-based dashboards, fluid navigation architecture, and integrated IT operations management. HB Report Demo v3.0 represents the next evolution in construction intelligence with enterprise-grade production standards and responsive design across all device sizes.
+## 🏗️ Architecture Overview
 
-## Architecture Overview
+### Tech Stack
 
-### Fluid Navigation System
+- **Framework**: Next.js 15.4.0 with App Router
+- **Language**: TypeScript 5.8.3
+- **UI Library**: React 19.0.0
+- **Styling**: Tailwind CSS 3.4.17
+- **State Management**: Zustand 4.5.7
+- **Form Handling**: React Hook Form 7.48.2
+- **Validation**: Zod 4.0.0
+- **Icons**: Lucide React 0.454.0
+- **Testing**: Vitest 2.1.9
+- **Storybook**: 7.6.20
 
-HB Report Demo v3.0 features a sophisticated fluid navigation architecture designed for enterprise productivity:
+### Core Features
 
-- **64px Perpetual Collapsed Sidebar**: Always-visible navigation with quick access to core functions
-- **320px Expandable Content Panels**: Rich content areas that expand on demand
-- **HB Logo Integration**: Professional 180x60px branding with responsive header positioning
-- **Mobile-Responsive Design**: Optimized for all device sizes with adaptive UI elements
-- **Role-Based Content Loading**: Dynamic content delivery based on user permissions
-
-### Authentication & Role Management
-
-The platform supports comprehensive role-based access control:
-
-```typescript
-type UserRole =
-  | "executive"
-  | "project-executive"
-  | "project-manager"
-  | "estimator"
-  | "admin"
-  | "presentation"
-  | "hr-payroll"
-```
-
-Each role provides tailored dashboard experiences and access to specific tools and features.
-
-## Core Application Flow
-
-### 1. Login & Authentication
-
-**Route**: `/login`
-
-- **Role-based authentication** with demo users for each role type
-- **Seamless role switching** for demonstration purposes
-- **Presentation mode** with guided tours and showcases
-- **Enterprise SSO ready** for production deployment
-
-### 2. Role-Based Dashboard Routing
-
-#### Executive Dashboard
-
-**Route**: `/main-app` (Executive role)
-
-- **Portfolio Overview**: Comprehensive company-wide project metrics
-- **Financial Review Panel**: Budget health, forecast indices, and cash flow analysis
-- **Market Intelligence**: Business development opportunities and market positioning
-- **Performance Metrics**: Schedule health, quality scores, and risk assessments
-- **Strategic KPIs**: Executive-level dashboard cards with enterprise insights
-
-#### Project Executive Dashboard
-
-**Route**: `/main-app` (Project Executive role)
-
-- **Project Portfolio Management**: Multi-project oversight and coordination
-- **Resource Allocation**: Staffing and equipment distribution across projects
-- **Risk Management**: Project-level risk assessment and mitigation strategies
-- **Performance Analytics**: Project health scores and trend analysis
-- **Responsibility Overview**: Task assignments and accountability tracking
-
-#### Project Manager Dashboard
-
-**Route**: `/main-app` (Project Manager role)
-
-- **Active Project Management**: Real-time project status and progress tracking
-- **Schedule Coordination**: Gantt charts, look-ahead scheduling, and milestone tracking
-- **Team Management**: Staff assignments, productivity metrics, and communication
-- **Quality Control**: Inspection schedules, compliance tracking, and documentation
-- **Budget Monitoring**: Cost tracking, change orders, and financial health
-
-#### Estimator Dashboard
-
-**Route**: `/main-app` (Estimator role)
-
-- **BidManagementCenter**: Primary tab with comprehensive bid management tools
-- **BuildingConnected Integration**: Projects dashboard with API synchronization
-- **Bid Form Templates**: Dynamic form builder with CSI scopes and regions
-- **Cost Analytics**: Pricing analysis, historical data, and market trends
-- **Proposal Management**: Bid tracking, submission workflows, and client communication
-
-#### IT Administrator Dashboard
-
-**Route**: `/it-command-center`
-
+- **Role-based Access Control**: Executive, Project Executive, Project Manager, Estimator, IT Administrator
+- **Fluid Navigation System**: 64px collapsed sidebar with 320px expandable panels
+- **Real-time Dashboards**: Power BI integration with live data visualization
+- **Bid Management**: BuildingConnected platform integration
 - **IT Command Center**: Comprehensive IT operations dashboard
-- **System Overview**: Infrastructure monitoring and performance metrics
-- **Help Desk Management**: Ticket tracking, priorities, and resolution metrics
-- **Security Operations**: SIEM integration, threat monitoring, and compliance
-- **Asset Management**: Hardware inventory, software licenses, and maintenance schedules
+- **Accessibility**: WCAG 2.2 AA compliant with focus management
+- **Security**: DOMPurify sanitization, input validation, secure authentication
 
-#### HR & Payroll Manager Dashboard
+## 🚀 Quick Start
 
-**Route**: `/main-app` (HR & Payroll Manager role)
+### Prerequisites
 
-- **HR Overview**: Employee management, payroll status, and benefits tracking
-- **My Dashboard**: Personalized HR dashboard with key metrics and insights
-- **Activity Feed**: Recent HR activities and updates
-- **Employee Management**: Staff records, performance tracking, and compliance
-- **Payroll Processing**: Payroll status monitoring and processing workflows
+- Node.js 18+
+- npm 9+
 
-## Core Features & Modules
+### Installation
 
-### 1. Project Management Suite
+```bash
+# Clone the repository
+git clone <repository-url>
+cd hb-report-demo
 
-#### Scheduler & Planning
+# Install dependencies
+npm install
 
-- **Project Schedule Gantt Chart**: Columnar layout with sticky columns (Activity ID, Activity, BL Start, BL Finish, Start, Finish)
-- **Look Ahead System**: Streamlined single-column interface with 1-12 week planning windows
-- **Update Management**: Progress tracking with previous update column support
-- **Critical Path Analysis**: Schedule health monitoring and variance tracking
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
 
-#### Field Operations
-
-- **Field Reports**: Daily logs, weather integration, and progress documentation
-- **Constraints Management**: Issue tracking, resolution workflows, and impact analysis
-- **Permit Log**: Regulatory compliance tracking and submission management
-- **Safety Management**: Incident reporting, certification tracking, and compliance monitoring
-
-#### Financial Management
-
-- **Budget Analysis**: Real-time budget health and variance tracking
-- **Cash Flow Management**: Forecasting, AR aging, and payment processing
-- **Change Order Management**: Approval workflows and cost impact analysis
-- **Pay Application Processing**: AIA forms, billing cycles, and payment tracking
-
-### 2. Pre-Construction Suite
-
-#### Estimating & Bidding
-
-- **BidManagementCenter**: Complete bid lifecycle management
-- **BuildingConnected Platform**: API integration with filtering, sorting, and search
-- **Bidder List Templates**: CSI scope organization and regional templates
-- **Cost Summary Module**: Detailed cost breakdowns and analysis
-- **Area Calculations**: Automated quantity takeoffs and measurements
-
-#### Business Development
-
-- **Pipeline Management**: Opportunity tracking and conversion analysis
-- **Market Intelligence**: Competitive analysis and market positioning
-- **Proposal Generation**: Automated proposal creation and customization
-- **Client Relationship Management**: Contact tracking and communication history
-
-### 3. IT Command Center
-
-#### Comprehensive IT Operations
-
-- **AI Pipelines**: Machine learning workflow management and monitoring
-- **Asset Management**: Hardware and software inventory with lifecycle tracking
-- **Backup Systems**: Data protection, recovery planning, and compliance
-- **Consultant Management**: External IT service provider coordination
-- **Email Security**: Threat protection, compliance, and user training
-- **Endpoint Management**: Device security, policy enforcement, and updates
-- **Governance**: IT policy management and compliance tracking
-- **Infrastructure**: Network monitoring, performance optimization, and capacity planning
-- **Management Tools**: IT service management and workflow automation
-- **SIEM Integration**: Security information and event management
-
-#### Help Desk Operations
-
-- **Ticket Management**: Comprehensive issue tracking and resolution
-- **Priority Classification**: Automated priority assignment and escalation
-- **Performance Metrics**: Response times, resolution rates, and satisfaction scores
-- **Knowledge Base**: Self-service documentation and troubleshooting guides
-
-### 4. Advanced Analytics & Reporting
-
-#### Power BI Integration
-
-- **Embedded Visualizations**: Professional chart libraries with real-time data
-- **Custom Chart Types**: Funnel charts, line charts, pie charts, bar charts, heatmaps, radar charts, and area charts
-- **Performance Dashboards**: Live data badges and HB brand styling
-- **Trend Analysis**: Historical data analysis and predictive modeling
-
-#### Business Intelligence
-
-- **KPI Dashboards**: Executive-level metrics and performance indicators
-- **Operational Reporting**: Detailed operational reports and analytics
-- **Compliance Reporting**: Regulatory compliance tracking and documentation
-- **Custom Report Builder**: User-defined reports and visualizations
-
-## Technical Architecture
-
-### Technology Stack
-
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **UI Framework**: shadcn/ui components with Tailwind CSS
-- **State Management**: React Context API with custom hooks
-- **Data Visualization**: Recharts, Chart.js, and custom Power BI components
-- **Authentication**: Enterprise-ready authentication system
-- **Icons**: Lucide React icon library
-- **Responsive Design**: Mobile-first approach with breakpoint optimization
-
-### Performance & Scalability
-
-- **Lazy Loading**: Dynamic component loading for optimal performance
-- **Error Boundaries**: Comprehensive error handling and recovery
-- **TypeScript Safety**: Full type safety throughout the application
-- **Code Splitting**: Optimized bundle loading and caching
-- **SEO Optimization**: Server-side rendering and metadata management
-
-### Enterprise Features
-
-- **Accessibility Compliance**: WCAG 2.1 AA compliance throughout
-- **Security Standards**: Enterprise-grade security implementation
-- **Audit Trail**: Comprehensive logging and activity tracking
-- **Multi-tenancy Ready**: Scalable architecture for enterprise deployment
-- **API Integration**: RESTful APIs with comprehensive documentation
-
-## Navigation Structure
-
-### Primary Navigation
-
-```
-├── Login (/login)
-├── Main App (/main-app)
-│   ├── Executive Dashboard (role: executive)
-│   ├── Project Executive Dashboard (role: project-executive)
-│   ├── Project Manager Dashboard (role: project-manager)
-│   ├── Estimator Dashboard (role: estimator)
-│   └── HR & Payroll Manager Dashboard (role: hr-payroll)
-├── IT Command Center (/it-command-center)
-├── Project Pages (/project/[projectId])
-│   ├── Core Project Tools
-│   ├── Scheduler
-│   ├── Field Reports
-│   ├── Financial Hub
-│   ├── Quality Control
-│   └── Safety Management
-└── Pre-Construction (/pre-con)
-    ├── Estimating
-    ├── Business Development
-    └── Pipeline Management
+# Start development server
+npm run dev
 ```
 
-### Responsive Design
+### Available Scripts
 
-- **Desktop**: Full feature set with expanded navigation and panels
-- **Tablet**: Optimized layout with collapsible panels and touch-friendly controls
-- **Mobile**: Streamlined interface with hidden elements and gesture navigation
-- **iPhone Specific**: Optimized badge and button visibility
+```bash
+# Development
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run start            # Start production server
 
-## Development & Deployment
+# Code Quality
+npm run lint             # Run ESLint
+npm run lint:fix         # Fix linting issues
+npm run type-check       # TypeScript type checking
 
-### Getting Started
+# Testing
+npm run test             # Run tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Generate coverage report
 
-1. **Clone Repository**
+# Security
+npm run audit            # Security audit
+npm run audit:fix        # Fix security issues
+npm run security-check   # Comprehensive security check
 
-   ```bash
-   git clone <repository-url>
-   cd hb-report-demo
-   ```
+# Documentation
+npm run storybook        # Start Storybook
+npm run build-storybook  # Build Storybook
 
-2. **Install Dependencies**
+# Utilities
+npm run clear-auth       # Clear authentication cache
+npm run generate-tour-screenshots  # Generate tour screenshots
+```
 
-   ```bash
-   npm install
-   # or
-   pnpm install
-   ```
+## 📁 Project Structure
 
-3. **Environment Configuration**
+```
+hb-report-demo/
+├── app/                    # Next.js App Router pages
+│   ├── dashboard/         # Dashboard pages by role
+│   ├── hr-payroll/       # HR & Payroll modules
+│   ├── it/               # IT Command Center
+│   ├── login/            # Authentication
+│   └── project/          # Project-specific pages
+├── components/            # Reusable React components
+│   ├── ui/               # Base UI components
+│   ├── cards/            # Dashboard cards
+│   ├── charts/           # Data visualization
+│   └── [feature]/        # Feature-specific components
+├── context/              # React Context providers
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+├── types/                # TypeScript type definitions
+├── styles/               # Global styles
+└── docs/                 # Documentation
+```
 
-   ```bash
-   cp .env.example .env.local
-   # Configure environment variables
-   ```
+## 🔐 Security Features
 
-4. **Run Development Server**
+### Input Sanitization
 
-   ```bash
-   npm run dev
-   # or
-   pnpm dev
-   ```
+- DOMPurify integration for XSS prevention
+- Zod schema validation for all forms
+- Type-safe API endpoints
 
-5. **Access Application**
-   - Local: `http://localhost:3000`
-   - Login with demo credentials for each role
+### Authentication
 
-### Production Deployment
+- Microsoft Graph API integration
+- Role-based access control
+- Secure session management
 
-- **Build Optimization**: `npm run build`
-- **Static Export**: `npm run export`
-- **Docker Ready**: Container deployment configuration
-- **CDN Integration**: Asset optimization and delivery
-- **Environment Management**: Multi-environment configuration
+### Security Monitoring
 
-## Documentation & Support
+- Automated vulnerability scanning
+- Dependency audit workflows
+- Security headers configuration
 
-### Component Documentation
+## ♿ Accessibility
 
-- **Storybook Integration**: Comprehensive component documentation
-- **API Documentation**: RESTful API specifications
-- **Type Definitions**: Complete TypeScript type documentation
-- **Code Examples**: Implementation examples and best practices
+### WCAG 2.2 AA Compliance
 
-### Enterprise Support
+- Semantic HTML structure
+- ARIA attributes and roles
+- Keyboard navigation support
+- Focus management and trapping
+- Screen reader compatibility
+- Color contrast ratios (4.5:1 minimum)
 
-- **Training Materials**: User guides and training documentation
-- **Implementation Support**: Technical implementation assistance
-- **Customization Services**: Tailored feature development
-- **Integration Support**: Third-party system integration
+### Accessibility Utilities
 
-## Version Information
+- `@/lib/accessibility-utils` - Focus management
+- `@/lib/aria-helpers` - ARIA utilities
+- `@/components/ui/accessible-modal` - Accessible modals
 
-**Current Version**: 3.0.0  
-**Release Date**: 2024  
-**License**: Enterprise License - Contact HB Development Team
+## 🧪 Testing Strategy
 
-### Key Improvements in v3.0
+### Test Coverage
 
-- **Complete architectural redesign** with fluid navigation
-- **Enhanced role-based access control** and personalized dashboards
-- **Comprehensive IT Command Center** with full operations management
-- **Advanced Power BI integration** with custom visualizations
-- **Mobile-responsive design** with optimized user experience
-- **Enterprise-grade security** and compliance features
-- **Modular architecture** for scalability and maintainability
+- **Unit Tests**: Component testing with Vitest
+- **Integration Tests**: API and workflow testing
+- **E2E Tests**: Playwright for critical user journeys
+- **Accessibility Tests**: Automated a11y testing
+
+### Testing Commands
+
+```bash
+npm run test              # Run all tests
+npm run test:coverage     # Generate coverage report
+npm run test:e2e          # Run E2E tests
+```
+
+## 📊 Performance
+
+### Optimization Features
+
+- Next.js App Router with streaming
+- Component lazy loading
+- Image optimization
+- Bundle analysis with `@next/bundle-analyzer`
+- Performance monitoring with Sentry
+
+### Performance Monitoring
+
+```bash
+npm run analyze           # Bundle analysis
+npm run lighthouse        # Performance audit
+```
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflows
+
+- **Security**: Automated vulnerability scanning
+- **Testing**: Unit, integration, and E2E tests
+- **Quality**: Linting, type checking, accessibility
+- **Deployment**: Automated deployment to staging/production
+
+### Dependabot Configuration
+
+- Automated dependency updates
+- Security vulnerability alerts
+- Breaking change notifications
+
+## 📚 Documentation
+
+### Comprehensive Documentation
+
+- **Architecture**: System design and patterns
+- **Features**: Implementation guides
+- **Development**: Setup and contribution guidelines
+- **API**: Endpoint documentation
+- **Components**: Storybook documentation
+
+### Documentation Structure
+
+```
+docs/
+├── architecture/         # System architecture
+├── features/            # Feature implementations
+├── implementations/     # Detailed guides
+├── development/         # Development process
+└── project-page/        # Project-specific docs
+```
+
+## 🛠️ Development Guidelines
+
+### Code Standards
+
+- **TypeScript**: Strict mode with comprehensive types
+- **ESLint**: Enforced code quality rules
+- **Prettier**: Consistent code formatting
+- **Conventional Commits**: Standardized commit messages
+
+### Component Guidelines
+
+- Functional components with hooks
+- TypeScript interfaces for all props
+- JSDoc documentation
+- Accessibility-first design
+- Error boundaries for resilience
+
+### State Management
+
+- **Zustand**: Global state management
+- **React Context**: Theme and auth providers
+- **Local State**: Component-specific state
+- **Server State**: React Query for API data
+
+## 🚨 Error Handling
+
+### Error Boundaries
+
+- Global error boundary for unhandled errors
+- Component-specific error boundaries
+- Graceful degradation strategies
+- User-friendly error messages
+
+### Monitoring
+
+- Sentry integration for error tracking
+- Performance monitoring
+- User analytics
+- Security event logging
+
+## 🔧 Maintenance
+
+### Regular Tasks
+
+- **Weekly**: Security audits and dependency updates
+- **Monthly**: Performance reviews and optimization
+- **Quarterly**: Accessibility audits and compliance checks
+- **Annually**: Architecture reviews and technical debt assessment
+
+### Monitoring
+
+- Application performance monitoring
+- Error tracking and alerting
+- Security vulnerability scanning
+- User experience metrics
+
+## 🤝 Contributing
+
+### Development Process
+
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Develop** with tests and documentation
+4. **Submit** a pull request
+5. **Review** and merge
+
+### Code Review Checklist
+
+- [ ] TypeScript types are comprehensive
+- [ ] Accessibility requirements met
+- [ ] Tests written and passing
+- [ ] Documentation updated
+- [ ] Security considerations addressed
+- [ ] Performance impact assessed
+
+## 📞 Support
+
+### Getting Help
+
+- **Documentation**: Check `/docs` directory
+- **Issues**: GitHub Issues for bug reports
+- **Discussions**: GitHub Discussions for questions
+- **Security**: Private security reports
+
+### Team Contacts
+
+- **Development**: Development team
+- **Product**: Product management
+- **Security**: Security team
+- **Accessibility**: A11y specialist
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
 
 ---
 
-_For technical support, customization requests, or enterprise licensing information, contact the HB Development Team._
+**Version**: 3.0.0  
+**Last Updated**: July 2025  
+**Status**: Production Ready ✅

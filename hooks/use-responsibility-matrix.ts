@@ -1,7 +1,23 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useAuth } from "@/context/auth-context"
+import { logger } from "@/lib/logger"
 import responsibilityRawData from "@/data/mock/responsibility.json"
 
+/**
+ * Annotation interface for responsibility task annotations
+ */
+export interface ResponsibilityAnnotation {
+  id: string
+  type: "comment" | "warning" | "note" | "requirement"
+  content: string
+  author: string
+  timestamp: string
+  priority: "low" | "medium" | "high"
+}
+
+/**
+ * Responsibility task interface with proper typing
+ */
 export interface ResponsibilityTask {
   id: string
   projectId: string
@@ -15,9 +31,12 @@ export interface ResponsibilityTask {
   status: "active" | "pending" | "completed"
   createdAt: string
   updatedAt: string
-  annotations: any[]
+  annotations: ResponsibilityAnnotation[]
 }
 
+/**
+ * Responsibility role interface
+ */
 export interface ResponsibilityRole {
   key: string
   name: string
@@ -26,6 +45,9 @@ export interface ResponsibilityRole {
   description: string
 }
 
+/**
+ * Responsibility metrics interface
+ */
 export interface ResponsibilityMetrics {
   totalTasks: number
   unassignedTasks: number
@@ -37,6 +59,27 @@ export interface ResponsibilityMetrics {
   averageTasksPerRole: number
 }
 
+/**
+ * Raw responsibility data interface
+ */
+export interface ResponsibilityRawData {
+  "Task Category": string | null
+  "Tasks/Role": string | null
+  [key: string]: unknown
+}
+
+/**
+ * Storage data interface for localStorage
+ */
+export interface ResponsibilityStorageData {
+  tasks: ResponsibilityTask[]
+  activeTab: "team" | "prime-contract" | "subcontract"
+  lastUpdated: string
+}
+
+/**
+ * Role color mapping
+ */
 const roleColors: { [key: string]: string } = {
   PX: "#1890ff",
   PM3: "#722ed1",
@@ -50,8 +93,16 @@ const roleColors: { [key: string]: string } = {
   SM: "#f57734",
 }
 
-// Debounce utility function
-const debounce = <T extends (...args: any[]) => any>(func: T, delay: number): ((...args: Parameters<T>) => void) => {
+/**
+ * Debounce utility function with proper typing
+ * @param func - Function to debounce
+ * @param delay - Delay in milliseconds
+ * @returns Debounced function
+ */
+const debounce = <T extends (...args: unknown[]) => unknown>(
+  func: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
   let timeoutId: NodeJS.Timeout
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId)
@@ -59,11 +110,27 @@ const debounce = <T extends (...args: any[]) => any>(func: T, delay: number): ((
   }
 }
 
-// Memoized data transformation
+/**
+ * Type guard to validate responsibility raw data
+ * @param data - Data to validate
+ * @returns True if data is valid responsibility raw data
+ */
+const isValidResponsibilityRawData = (data: unknown): data is ResponsibilityRawData => {
+  return typeof data === "object" && data !== null && "Task Category" in data && "Tasks/Role" in data
+}
+
+/**
+ * Transform raw responsibility data to tasks
+ * @param activeTab - Current active tab
+ * @returns Array of responsibility tasks
+ */
 const transformRawDataToTasks = (activeTab: string): ResponsibilityTask[] => {
   return responsibilityRawData
-    .filter((item) => item["Task Category"] && item["Tasks/Role"])
-    .map((item, index) => {
+    .filter((item: unknown) => {
+      if (!isValidResponsibilityRawData(item)) return false
+      return item["Task Category"] && item["Tasks/Role"]
+    })
+    .map((item: ResponsibilityRawData, index: number) => {
       const randomAssignments: { [key: string]: "Approve" | "Primary" | "Support" | "None" } = {}
       const category = item["Task Category"] || "General"
 
@@ -101,6 +168,11 @@ const transformRawDataToTasks = (activeTab: string): ResponsibilityTask[] => {
     })
 }
 
+/**
+ * Hook for managing responsibility matrix data
+ * @param projectId - Project identifier
+ * @returns Responsibility matrix state and actions
+ */
 export const useResponsibilityMatrix = (projectId: string) => {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<"team" | "prime-contract" | "subcontract">("team")
@@ -118,11 +190,19 @@ export const useResponsibilityMatrix = (projectId: string) => {
   // Debounced localStorage save function
   const debouncedSave = useMemo(
     () =>
-      debounce((data: any) => {
+      debounce((data: unknown) => {
+        const typedData = data as ResponsibilityStorageData
         try {
-          localStorage.setItem(storageKey, JSON.stringify(data))
+          localStorage.setItem(storageKey, JSON.stringify(typedData))
         } catch (error) {
-          console.warn("Error saving responsibility matrix data:", error)
+          logger.warn(
+            "Error saving responsibility matrix data",
+            {
+              component: "useResponsibilityMatrix",
+              function: "debouncedSave",
+            },
+            error
+          )
         }
       }, 500),
     [storageKey]
@@ -206,7 +286,7 @@ export const useResponsibilityMatrix = (projectId: string) => {
       try {
         const stored = localStorage.getItem(storageKey)
         if (stored) {
-          const parsedData = JSON.parse(stored)
+          const parsedData = JSON.parse(stored) as ResponsibilityStorageData
           setTasks(parsedData.tasks || [])
           setActiveTab(parsedData.activeTab || "team")
         } else {
@@ -215,7 +295,14 @@ export const useResponsibilityMatrix = (projectId: string) => {
           setActiveTab("team")
         }
       } catch (error) {
-        console.warn("Error loading responsibility matrix data:", error)
+        logger.warn(
+          "Error loading responsibility matrix data",
+          {
+            component: "useResponsibilityMatrix",
+            function: "loadData",
+          },
+          error
+        )
         // Fallback to mock data
         setTasks(transformedTasks)
         setActiveTab("team")
@@ -232,7 +319,7 @@ export const useResponsibilityMatrix = (projectId: string) => {
   // Optimized localStorage save with debouncing
   useEffect(() => {
     if (!loading && user && isInitialized) {
-      const dataToStore = {
+      const dataToStore: ResponsibilityStorageData = {
         tasks,
         activeTab,
         lastUpdated: new Date().toISOString(),
@@ -250,7 +337,14 @@ export const useResponsibilityMatrix = (projectId: string) => {
         setActiveTab("team")
         setIsInitialized(false)
       } catch (error) {
-        console.warn("Error clearing responsibility matrix data:", error)
+        logger.warn(
+          "Error clearing responsibility matrix data",
+          {
+            component: "useResponsibilityMatrix",
+            function: "clearData",
+          },
+          error
+        )
       }
     }
   }, [user, storageKey, isInitialized])
@@ -261,7 +355,14 @@ export const useResponsibilityMatrix = (projectId: string) => {
       try {
         localStorage.removeItem(storageKey)
       } catch (error) {
-        console.warn("Error clearing data on window close:", error)
+        logger.warn(
+          "Error clearing data on window close",
+          {
+            component: "useResponsibilityMatrix",
+            function: "handleBeforeUnload",
+          },
+          error
+        )
       }
     }
 

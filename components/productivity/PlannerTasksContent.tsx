@@ -16,7 +16,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -24,10 +24,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -37,11 +36,9 @@ import {
   Edit,
   Trash2,
   Clock,
-  User,
   Flag,
   Calendar as CalendarIcon,
   Users,
-  MoreHorizontal,
   Filter,
   SortDesc,
   RefreshCw,
@@ -52,14 +49,14 @@ import {
   Target,
   List,
   Kanban,
-  Grid,
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { structuredLogger } from "@/lib/structured-logger"
 
 // Import hooks and types
 import { usePlannerTasks } from "@/hooks/useTeamsIntegration"
-import { PlannerTask, TeamMember } from "@/lib/msgraph"
+import type { PlannerTask, TeamMember } from "@/lib/msgraph"
 
 interface PlannerTasksContentProps {
   planId: string | null
@@ -403,7 +400,7 @@ const TaskCreationForm: React.FC<{
 }
 
 // Main Component
-const PlannerTasksContent: React.FC<PlannerTasksContentProps> = ({ planId, teamMembers, currentUser, className }) => {
+const PlannerTasksContent: React.FC<PlannerTasksContentProps> = ({ planId, teamMembers, className }) => {
   const { tasks, loading, error, creating, createTask, updateTaskProgress, refresh } = usePlannerTasks(planId)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list")
@@ -462,12 +459,21 @@ const PlannerTasksContent: React.FC<PlannerTasksContentProps> = ({ planId, teamM
 
   const handleTaskEdit = useCallback((task: PlannerTask) => {
     // TODO: Implement task editing
-    console.log("Edit task:", task)
+    structuredLogger.info("Edit task", {
+      component: "PlannerTasksContent",
+      function: "handleTaskEdit",
+      taskId: task.id,
+      taskTitle: task.title,
+    })
   }, [])
 
   const handleTaskDelete = useCallback((taskId: string) => {
     // TODO: Implement task deletion
-    console.log("Delete task:", taskId)
+    structuredLogger.info("Delete task", {
+      component: "PlannerTasksContent",
+      function: "handleTaskDelete",
+      taskId,
+    })
   }, [])
 
   const handleProgressUpdate = useCallback(

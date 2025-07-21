@@ -21,11 +21,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -35,11 +35,6 @@ import {
   Trash2,
   Settings,
   Mail,
-  Phone,
-  Calendar,
-  MessageSquare,
-  Video,
-  Shield,
   Crown,
   UserCheck,
   Hash,
@@ -47,21 +42,19 @@ import {
   Lock,
   RefreshCw,
   Search,
-  Filter,
-  MoreHorizontal,
   ExternalLink,
   Copy,
   AlertCircle,
-  CheckCircle,
   UserPlus,
   UserMinus,
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { structuredLogger } from "@/lib/structured-logger"
 
 // Import hooks and types
 import { useTeamMembers, useTeamChannels } from "@/hooks/useTeamsIntegration"
-import { Team, TeamMember, Channel } from "@/lib/msgraph"
+import type { Team, TeamMember, Channel } from "@/lib/msgraph"
 
 interface TeamManagementContentProps {
   selectedTeam: Team | null
@@ -193,10 +186,9 @@ const MemberCard: React.FC<{
 // Channel Card Component
 const ChannelCard: React.FC<{
   channel: Channel
-  teamId: string
   onEdit: (channel: Channel) => void
   onDelete: (channelId: string) => void
-}> = ({ channel, teamId, onEdit, onDelete }) => {
+}> = ({ channel, onEdit, onDelete }) => {
   const typeConfig = CHANNEL_TYPES[channel.membershipType as keyof typeof CHANNEL_TYPES] || CHANNEL_TYPES.standard
   const TypeIcon = typeConfig.icon
 
@@ -371,25 +363,59 @@ const TeamManagementContent: React.FC<TeamManagementContentProps> = ({ selectedT
     return filtered
   }, [members, searchTerm, roleFilter])
 
-  const handleEditMemberRole = useCallback((memberId: string, newRole: string) => {
-    // TODO: Implement role update via Graph API
-    console.log("Update member role:", memberId, newRole)
-  }, [])
+  const handleEditMemberRole = useCallback(
+    (memberId: string, newRole: string) => {
+      // TODO: Implement role update via Graph API
+      structuredLogger.info("Update member role", {
+        component: "TeamManagementContent",
+        function: "handleEditMemberRole",
+        memberId,
+        newRole,
+        teamId: selectedTeam?.id,
+      })
+    },
+    [selectedTeam?.id]
+  )
 
-  const handleRemoveMember = useCallback((memberId: string) => {
-    // TODO: Implement member removal via Graph API
-    console.log("Remove member:", memberId)
-  }, [])
+  const handleRemoveMember = useCallback(
+    (memberId: string) => {
+      // TODO: Implement member removal via Graph API
+      structuredLogger.info("Remove member", {
+        component: "TeamManagementContent",
+        function: "handleRemoveMember",
+        memberId,
+        teamId: selectedTeam?.id,
+      })
+    },
+    [selectedTeam?.id]
+  )
 
-  const handleEditChannel = useCallback((channel: Channel) => {
-    // TODO: Implement channel editing
-    console.log("Edit channel:", channel)
-  }, [])
+  const handleEditChannel = useCallback(
+    (channel: Channel) => {
+      // TODO: Implement channel editing
+      structuredLogger.info("Edit channel", {
+        component: "TeamManagementContent",
+        function: "handleEditChannel",
+        channelId: channel.id,
+        channelName: channel.displayName,
+        teamId: selectedTeam?.id,
+      })
+    },
+    [selectedTeam?.id]
+  )
 
-  const handleDeleteChannel = useCallback((channelId: string) => {
-    // TODO: Implement channel deletion
-    console.log("Delete channel:", channelId)
-  }, [])
+  const handleDeleteChannel = useCallback(
+    (channelId: string) => {
+      // TODO: Implement channel deletion
+      structuredLogger.info("Delete channel", {
+        component: "TeamManagementContent",
+        function: "handleDeleteChannel",
+        channelId,
+        teamId: selectedTeam?.id,
+      })
+    },
+    [selectedTeam?.id]
+  )
 
   const isLoading = membersLoading || channelsLoading
   const error = membersError || channelsError
@@ -550,7 +576,6 @@ const TeamManagementContent: React.FC<TeamManagementContentProps> = ({ selectedT
                 <ChannelCard
                   key={channel.id}
                   channel={channel}
-                  teamId={selectedTeam.id}
                   onEdit={handleEditChannel}
                   onDelete={handleDeleteChannel}
                 />

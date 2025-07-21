@@ -13,7 +13,7 @@ export type DemoRole =
   | "hr-payroll"
 export type DemoUser = User
 
-interface AuthContextType {
+export interface AuthContextType {
   user: DemoUser | null
   login: (email: string, password: string) => Promise<{ redirectTo: string }>
   logout: () => void

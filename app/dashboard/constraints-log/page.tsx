@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { AppHeader } from "@/components/layout/app-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -27,7 +27,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Badge } from "@/components/ui/badge"
-import { ConstraintWidgets } from "@/components/constraints/ConstraintWidgets"
+
 import { HbiInsightsPanel } from "@/components/constraints/HbiInsightsPanel"
 import { GanttChart } from "@/components/constraints/GanttChart"
 import { EnhancedConstraintTable } from "@/components/constraints/EnhancedConstraintTable"
