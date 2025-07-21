@@ -54,7 +54,7 @@ import {
   X,
 } from "lucide-react"
 import { format } from "date-fns"
-import { useProductivityStore } from "@/app/tools/productivity/store/useProductivityStore"
+import { useProductivityStore } from "@/components/productivity/store/useProductivityStore"
 
 // Types
 export type CloseoutItemStatus = "Conforming" | "Deficient" | "Neutral" | "N/A"

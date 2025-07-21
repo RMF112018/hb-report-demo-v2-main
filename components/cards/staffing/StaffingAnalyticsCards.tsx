@@ -32,7 +32,7 @@ import {
   Minus,
   Eye,
 } from "lucide-react"
-import { useStaffingStore } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+import { useStaffingStore } from "@/components/staffing/legacy/useStaffingStore"
 
 // Power BI Visualization Component
 const PowerBIVisualization = ({

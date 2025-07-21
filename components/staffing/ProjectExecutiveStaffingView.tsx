@@ -39,9 +39,9 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 // Import components
-import { StaffTimelineChart } from "@/app/dashboard/staff-planning/components/StaffTimelineChart"
-import { SPCRInboxPanel } from "@/app/dashboard/staff-planning/components/SPCRInboxPanel"
-import { LaborVsRevenuePanel } from "@/app/dashboard/staff-planning/components/LaborVsRevenuePanel"
+import { StaffTimelineChart } from "@/components/staffing/legacy/StaffTimelineChart"
+import { SPCRInboxPanel } from "@/components/staffing/legacy/SPCRInboxPanel"
+import { LaborVsRevenuePanel } from "@/components/staffing/legacy/LaborVsRevenuePanel"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 
 // Import mock data

@@ -1,25 +1,25 @@
 "use client"
 
-import React, { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
+import React, { useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
   Users,
   Building,
   ArrowRight,
   Target,
-  Zap
-} from 'lucide-react'
-import { useStaffingStore } from '../store/useStaffingStore'
+  Zap,
+} from "lucide-react"
+import { useStaffingStore } from "./useStaffingStore"
 
 interface LaborVsRevenuePanelProps {
-  userRole: 'executive' | 'project-executive' | 'project-manager'
+  userRole: "executive" | "project-executive" | "project-manager"
 }
 
 interface ProjectFinancials {
@@ -31,7 +31,7 @@ interface ProjectFinancials {
   marginPercent: number
   staffCount: number
   utilizationRate: number
-  riskLevel: 'low' | 'medium' | 'high'
+  riskLevel: "low" | "medium" | "high"
 }
 
 export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRole }) => {
@@ -42,35 +42,35 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
     let targetProjects = projects
 
     // Filter projects based on role
-    if (userRole === 'project-executive') {
+    if (userRole === "project-executive") {
       // PE oversees 6 projects in portfolio
       const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
-      targetProjects = projects.filter(p => portfolioProjects.includes(p.project_id))
-    } else if (userRole === 'project-manager') {
+      targetProjects = projects.filter((p) => portfolioProjects.includes(p.project_id))
+    } else if (userRole === "project-manager") {
       // PM manages one project
-      targetProjects = projects.filter(p => p.project_id === 2525840)
+      targetProjects = projects.filter((p) => p.project_id === 2525840)
     }
 
-    return targetProjects.map(project => {
+    return targetProjects.map((project) => {
       const projectStaff = getStaffByProject(project.project_id)
-      const staffIds = projectStaff.map(s => s.id)
-      
+      const staffIds = projectStaff.map((s) => s.id)
+
       // Calculate labor cost (weekly hours * rate * estimated project duration in weeks)
       const weeklyLaborCost = calculateLaborCost(staffIds, 40)
       const projectDurationWeeks = 52 // Estimate 1 year project duration
       const totalLaborCost = weeklyLaborCost * projectDurationWeeks
-      
+
       // Calculate gross margin
       const grossMargin = project.contract_value - totalLaborCost
       const marginPercent = (grossMargin / project.contract_value) * 100
-      
+
       // Calculate utilization rate (mock calculation)
-      const utilizationRate = Math.min(95, Math.max(65, 80 + (Math.random() * 20)))
-      
+      const utilizationRate = Math.min(95, Math.max(65, 80 + Math.random() * 20))
+
       // Determine risk level
-      let riskLevel: 'low' | 'medium' | 'high' = 'low'
-      if (marginPercent < 10) riskLevel = 'high'
-      else if (marginPercent < 20) riskLevel = 'medium'
+      let riskLevel: "low" | "medium" | "high" = "low"
+      if (marginPercent < 10) riskLevel = "high"
+      else if (marginPercent < 20) riskLevel = "medium"
 
       return {
         projectId: project.project_id,
@@ -81,7 +81,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
         marginPercent,
         staffCount: projectStaff.length,
         utilizationRate,
-        riskLevel
+        riskLevel,
       }
     })
   }, [projects, userRole, staffMembers, calculateLaborCost, getStaffByProject])
@@ -102,36 +102,39 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
       avgMarginPercent,
       totalStaffCount,
       avgUtilization,
-      projectCount: financialData.length
+      projectCount: financialData.length,
     }
   }, [financialData])
 
   // Get risk color
-  const getRiskColor = (riskLevel: 'low' | 'medium' | 'high') => {
+  const getRiskColor = (riskLevel: "low" | "medium" | "high") => {
     switch (riskLevel) {
-      case 'low': return 'text-green-600 dark:text-green-400'
-      case 'medium': return 'text-yellow-600 dark:text-yellow-400'
-      case 'high': return 'text-red-600 dark:text-red-400'
+      case "low":
+        return "text-green-600 dark:text-green-400"
+      case "medium":
+        return "text-yellow-600 dark:text-yellow-400"
+      case "high":
+        return "text-red-600 dark:text-red-400"
     }
   }
 
   // Get margin color
   const getMarginColor = (marginPercent: number) => {
-    if (marginPercent >= 20) return 'text-green-600 dark:text-green-400'
-    if (marginPercent >= 10) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
+    if (marginPercent >= 20) return "text-green-600 dark:text-green-400"
+    if (marginPercent >= 10) return "text-yellow-600 dark:text-yellow-400"
+    return "text-red-600 dark:text-red-400"
   }
 
   const getTitle = () => {
     switch (userRole) {
-      case 'executive':
-        return 'Enterprise Labor vs Revenue Analysis'
-      case 'project-executive':
-        return 'Portfolio Financial Performance'
-      case 'project-manager':
-        return 'Project Financial Dashboard'
+      case "executive":
+        return "Enterprise Labor vs Revenue Analysis"
+      case "project-executive":
+        return "Portfolio Financial Performance"
+      case "project-manager":
+        return "Project Financial Dashboard"
       default:
-        return 'Labor vs Revenue Analysis'
+        return "Labor vs Revenue Analysis"
     }
   }
 
@@ -143,14 +146,12 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
             <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
             {getTitle()}
           </CardTitle>
-          
+
           <div className="flex items-center gap-2">
             <Badge variant="outline">
-              {aggregateMetrics.projectCount} Project{aggregateMetrics.projectCount !== 1 ? 's' : ''}
+              {aggregateMetrics.projectCount} Project{aggregateMetrics.projectCount !== 1 ? "s" : ""}
             </Badge>
-            <Badge variant="outline">
-              {aggregateMetrics.totalStaffCount} Staff
-            </Badge>
+            <Badge variant="outline">{aggregateMetrics.totalStaffCount} Staff</Badge>
           </div>
         </div>
       </CardHeader>
@@ -200,10 +201,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
               <span>Current: {aggregateMetrics.avgMarginPercent.toFixed(1)}%</span>
               <span>Target: 25%</span>
             </div>
-            <Progress 
-              value={Math.min(100, (aggregateMetrics.avgMarginPercent / 25) * 100)} 
-              className="h-3"
-            />
+            <Progress value={Math.min(100, (aggregateMetrics.avgMarginPercent / 25) * 100)} className="h-3" />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
               <span>25% Target</span>
@@ -216,13 +214,13 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">Project Breakdown</h4>
-            {userRole === 'executive' && (
+            {userRole === "executive" && (
               <Button variant="outline" size="sm">
                 View All Projects
               </Button>
             )}
           </div>
-          
+
           <div className="space-y-2">
             {financialData.map((project) => (
               <Card key={project.projectId} className="border hover:bg-accent/50 transition-colors">
@@ -232,26 +230,19 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
                       <div className="flex items-center gap-2 mb-2">
                         <Building className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">{project.projectName}</span>
-                        <Badge 
-                          variant="outline" 
-                          className={`${getRiskColor(project.riskLevel)} border-current`}
-                        >
+                        <Badge variant="outline" className={`${getRiskColor(project.riskLevel)} border-current`}>
                           {project.riskLevel.toUpperCase()} RISK
                         </Badge>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <div className="text-muted-foreground">Contract Value</div>
-                          <div className="font-medium">
-                            ${(project.contractValue / 1000000).toFixed(1)}M
-                          </div>
+                          <div className="font-medium">${(project.contractValue / 1000000).toFixed(1)}M</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground">Labor Cost</div>
-                          <div className="font-medium">
-                            ${(project.laborCost / 1000000).toFixed(1)}M
-                          </div>
+                          <div className="font-medium">${(project.laborCost / 1000000).toFixed(1)}M</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground">Gross Margin</div>
@@ -271,9 +262,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
 
                     <div className="ml-4 text-right">
                       <div className="text-sm text-muted-foreground">Utilization</div>
-                      <div className="text-lg font-bold">
-                        {project.utilizationRate.toFixed(0)}%
-                      </div>
+                      <div className="text-lg font-bold">{project.utilizationRate.toFixed(0)}%</div>
                       <div className="w-12 mt-1">
                         <Progress value={project.utilizationRate} className="h-1" />
                       </div>
@@ -291,9 +280,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
             <CardContent className="p-4 text-center">
               <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
               <div className="text-sm text-muted-foreground">Margin Trend</div>
-              <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                +2.3%
-              </div>
+              <div className="text-lg font-bold text-green-600 dark:text-green-400">+2.3%</div>
               <div className="text-xs text-muted-foreground">vs Last Quarter</div>
             </CardContent>
           </Card>
@@ -302,9 +289,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
             <CardContent className="p-4 text-center">
               <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
               <div className="text-sm text-muted-foreground">Efficiency Rating</div>
-              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                A-
-              </div>
+              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">A-</div>
               <div className="text-xs text-muted-foreground">Labor Efficiency</div>
             </CardContent>
           </Card>
@@ -314,7 +299,7 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
               <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
               <div className="text-sm text-muted-foreground">Risk Score</div>
               <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                {financialData.filter(p => p.riskLevel === 'high').length}
+                {financialData.filter((p) => p.riskLevel === "high").length}
               </div>
               <div className="text-xs text-muted-foreground">High Risk Projects</div>
             </CardContent>
@@ -328,13 +313,26 @@ export const LaborVsRevenuePanel: React.FC<LaborVsRevenuePanelProps> = ({ userRo
             Key Insights
           </h4>
           <ul className="text-sm space-y-1 text-muted-foreground">
-            <li>• Average margin is {aggregateMetrics.avgMarginPercent.toFixed(1)}% {aggregateMetrics.avgMarginPercent >= 25 ? 'above' : 'below'} target</li>
-            <li>• Staff utilization at {aggregateMetrics.avgUtilization.toFixed(0)}% indicates {aggregateMetrics.avgUtilization >= 80 ? 'optimal' : 'underutilized'} capacity</li>
-            <li>• {financialData.filter(p => p.riskLevel === 'high').length} project{financialData.filter(p => p.riskLevel === 'high').length !== 1 ? 's' : ''} require{financialData.filter(p => p.riskLevel === 'high').length === 1 ? 's' : ''} immediate attention</li>
-            <li>• Total gross margin: ${(aggregateMetrics.totalGrossMargin / 1000000).toFixed(1)}M across {aggregateMetrics.projectCount} projects</li>
+            <li>
+              • Average margin is {aggregateMetrics.avgMarginPercent.toFixed(1)}%{" "}
+              {aggregateMetrics.avgMarginPercent >= 25 ? "above" : "below"} target
+            </li>
+            <li>
+              • Staff utilization at {aggregateMetrics.avgUtilization.toFixed(0)}% indicates{" "}
+              {aggregateMetrics.avgUtilization >= 80 ? "optimal" : "underutilized"} capacity
+            </li>
+            <li>
+              • {financialData.filter((p) => p.riskLevel === "high").length} project
+              {financialData.filter((p) => p.riskLevel === "high").length !== 1 ? "s" : ""} require
+              {financialData.filter((p) => p.riskLevel === "high").length === 1 ? "s" : ""} immediate attention
+            </li>
+            <li>
+              • Total gross margin: ${(aggregateMetrics.totalGrossMargin / 1000000).toFixed(1)}M across{" "}
+              {aggregateMetrics.projectCount} projects
+            </li>
           </ul>
         </div>
       </CardContent>
     </Card>
   )
-} 
+}

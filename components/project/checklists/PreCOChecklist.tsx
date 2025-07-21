@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/use-toast"
-import { useProductivityStore } from "@/app/tools/productivity/store/useProductivityStore"
+import { useProductivityStore } from "@/components/productivity/store/useProductivityStore"
 import {
   CheckSquare,
   AlertCircle,

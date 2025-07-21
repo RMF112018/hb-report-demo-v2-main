@@ -106,10 +106,10 @@ const ProjectManagerStaffingView = React.lazy(() =>
 
 // Import staffing components
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
-import { EnhancedInteractiveStaffingGantt } from "../../dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
-import { SPCRInboxPanel } from "../../dashboard/staff-planning/components/SPCRInboxPanel"
-import { LaborVsRevenuePanel } from "../../dashboard/staff-planning/components/LaborVsRevenuePanel"
-import { useStaffingStore } from "../../dashboard/staff-planning/store/useStaffingStore"
+import { EnhancedInteractiveStaffingGantt } from "../../../components/staffing/legacy/EnhancedInteractiveStaffingGantt"
+import { SPCRInboxPanel } from "../../../components/staffing/legacy/SPCRInboxPanel"
+import { LaborVsRevenuePanel } from "../../../components/staffing/legacy/LaborVsRevenuePanel"
+import { useStaffingStore } from "../../../components/staffing/legacy/useStaffingStore"
 import { ExportModal } from "../../../components/constraints/ExportModal"
 
 // Import new modular staffing components
@@ -117,7 +117,7 @@ import { ExecutivePortfolioStats } from "../../../components/staffing/ExecutiveP
 import { ExecutivePortfolioSidebar } from "../../../components/staffing/ExecutivePortfolioSidebar"
 import { ExecutivePortfolioOverview } from "../../../components/staffing/ExecutivePortfolioOverview"
 import { ExecutiveStaffingInsights } from "../../../components/staffing/ExecutiveStaffingInsights"
-import { StaffTimelineChart } from "../../dashboard/staff-planning/components/StaffTimelineChart"
+import { StaffTimelineChart } from "../../../components/staffing/legacy/StaffTimelineChart"
 
 // Import mock data
 import staffingData from "../../../data/mock/staffing/staffing.json"

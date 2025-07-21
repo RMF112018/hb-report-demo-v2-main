@@ -34,7 +34,7 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react"
-import { useStaffingStore, type StaffMember, type Project } from "../store/useStaffingStore"
+import { useStaffingStore, type StaffMember, type Project } from "./useStaffingStore"
 import {
   format,
   addDays,

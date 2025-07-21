@@ -1,59 +1,46 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { 
-  Plus, 
-  MessageSquare, 
-  CheckSquare,
-  X,
-  Link,
-  Users,
-  Calendar,
-  AlertTriangle
-} from 'lucide-react'
-import { useProductivityStore } from '../store/useProductivityStore'
-import { LinkedEntity, Task, User } from '@/types/productivity'
-import { cn } from '@/lib/utils'
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Plus, MessageSquare, CheckSquare, X, Link, Users, Calendar, AlertTriangle } from "lucide-react"
+import { useProductivityStore } from "@/components/productivity/store/useProductivityStore"
+import { LinkedEntity, Task, User } from "@/types/productivity"
+import { cn } from "@/lib/utils"
 
 interface QuickComposerProps {
   className?: string
-  initialType?: 'message' | 'task' | null
+  initialType?: "message" | "task" | null
   onClose?: () => void
 }
 
-export const QuickComposer = ({ 
-  className, 
-  initialType, 
-  onClose 
-}: QuickComposerProps) => {
+export const QuickComposer = ({ className, initialType, onClose }: QuickComposerProps) => {
   const { users, addTask } = useProductivityStore()
   const [showDialog, setShowDialog] = useState(false)
-  
+
   // Convert users object to array for mapping
   const usersArray = Object.values(users || {})
-  const [composerType, setComposerType] = useState<'message' | 'task'>('message')
+  const [composerType, setComposerType] = useState<"message" | "task">("message")
 
   // Message thread state
-  const [messageTitle, setMessageTitle] = useState('')
-  const [messageContent, setMessageContent] = useState('')
+  const [messageTitle, setMessageTitle] = useState("")
+  const [messageContent, setMessageContent] = useState("")
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([])
 
   // Task state
-  const [taskTitle, setTaskTitle] = useState('')
-  const [taskDescription, setTaskDescription] = useState('')
-  const [taskAssignee, setTaskAssignee] = useState('')
-  const [taskDueDate, setTaskDueDate] = useState('')
-  const [taskPriority, setTaskPriority] = useState<Task['priority']>('medium')
+  const [taskTitle, setTaskTitle] = useState("")
+  const [taskDescription, setTaskDescription] = useState("")
+  const [taskAssignee, setTaskAssignee] = useState("")
+  const [taskDueDate, setTaskDueDate] = useState("")
+  const [taskPriority, setTaskPriority] = useState<Task["priority"]>("medium")
 
   // Shared state
   const [linkedEntity, setLinkedEntity] = useState<LinkedEntity | null>(null)
@@ -74,64 +61,68 @@ export const QuickComposer = ({
   const getUserInitials = (userId: string): string => {
     const user = getUserById(userId)
     if (!user) return userId.slice(0, 2).toUpperCase()
-    return user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    return user.name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
   }
 
   const mockEntityOptions: LinkedEntity[] = [
-    { type: 'daily-log', id: 'field-log:2025-06-14', label: 'Field Log – June 14, 2025' },
-    { type: 'forecast', id: 'draw-forecast:2525844', label: 'Draw Forecast – Project Falcon' },
-    { type: 'procurement', id: 'po:VDR-305', label: 'Vendor PO Review – Bid Package 305' },
-    { type: 'schedule', id: 'lookahead:week25', label: 'Schedule Lookahead – Week 25' },
-    { type: 'inspection', id: 'safety:site-01', label: 'Safety Inspection – Site 01' },
-    { type: 'constraint', id: 'constraint:weather-delay', label: 'Weather Delay Constraint' },
-    { type: 'permit', id: 'permit:electrical-rough', label: 'Electrical Rough-in Permit' },
-    { type: 'financial', id: 'budget:monthly-review', label: 'Monthly Budget Review' },
-    { type: 'report', id: 'report:weekly-progress', label: 'Weekly Progress Report' }
+    { type: "daily-log", id: "field-log:2025-06-14", label: "Field Log – June 14, 2025" },
+    { type: "forecast", id: "draw-forecast:2525844", label: "Draw Forecast – Project Falcon" },
+    { type: "procurement", id: "po:VDR-305", label: "Vendor PO Review – Bid Package 305" },
+    { type: "schedule", id: "lookahead:week25", label: "Schedule Lookahead – Week 25" },
+    { type: "safety", id: "safety:site-01", label: "Safety Inspection – Site 01" },
+    { type: "quality", id: "quality:weather-delay", label: "Weather Delay Constraint" },
+    { type: "permit", id: "permit:electrical-rough", label: "Electrical Rough-in Permit" },
+    { type: "budget", id: "budget:monthly-review", label: "Monthly Budget Review" },
+    { type: "other", id: "report:weekly-progress", label: "Weekly Progress Report" },
   ]
 
   const getEntityTypeDisplayName = (type: string) => {
     const displayNames: { [key: string]: string } = {
-      'daily-log': 'Daily Log',
-      'forecast': 'Forecast',
-      'procurement': 'Procurement',
-      'schedule': 'Schedule',
-      'inspection': 'Inspection',
-      'constraint': 'Constraint',
-      'permit': 'Permit',
-      'financial': 'Financial',
-      'report': 'Report'
+      "daily-log": "Daily Log",
+      forecast: "Forecast",
+      procurement: "Procurement",
+      schedule: "Schedule",
+      safety: "Safety",
+      quality: "Quality",
+      permit: "Permit",
+      budget: "Budget",
+      other: "Report",
     }
     return displayNames[type] || type
   }
 
   const getEntityTypeColor = (type: string) => {
     const typeColors = {
-      'daily-log': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-      'forecast': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      'procurement': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-      'schedule': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-      'inspection': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      'constraint': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-      'permit': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-      'financial': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-      'report': 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+      "daily-log": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      forecast: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      procurement: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      schedule: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+      safety: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+      quality: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      permit: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+      budget: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+      other: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
     }
-    return typeColors[type] || typeColors['report']
+    return typeColors[type as keyof typeof typeColors] || typeColors["other"]
   }
 
   const resetForm = () => {
-    setMessageTitle('')
-    setMessageContent('')
+    setMessageTitle("")
+    setMessageContent("")
     setSelectedParticipants([])
-    setTaskTitle('')
-    setTaskDescription('')
-    setTaskAssignee('')
-    setTaskDueDate('')
-    setTaskPriority('medium')
+    setTaskTitle("")
+    setTaskDescription("")
+    setTaskAssignee("")
+    setTaskDueDate("")
+    setTaskPriority("medium")
     setLinkedEntity(null)
   }
 
-  const handleOpenDialog = (type: 'message' | 'task') => {
+  const handleOpenDialog = (type: "message" | "task") => {
     setComposerType(type)
     setShowDialog(true)
   }
@@ -143,11 +134,7 @@ export const QuickComposer = ({
   }
 
   const toggleParticipant = (userId: string) => {
-    setSelectedParticipants(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    )
+    setSelectedParticipants((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]))
   }
 
   const handleCreateMessage = () => {
@@ -160,8 +147,8 @@ export const QuickComposer = ({
     //   linkedTo: linkedEntity || undefined
     // }
 
-    console.log('Create message thread:', messageTitle, selectedParticipants, linkedEntity)
-    
+    console.log("Create message thread:", messageTitle, selectedParticipants, linkedEntity)
+
     handleCloseDialog()
   }
 
@@ -171,12 +158,13 @@ export const QuickComposer = ({
     const taskData = {
       title: taskTitle,
       description: taskDescription || undefined,
-      status: 'todo' as const,
+      status: "todo" as const,
       priority: taskPriority,
-      createdBy: 'current-user',
+      createdBy: "current-user",
       assignedTo: taskAssignee,
       dueDate: new Date(taskDueDate),
-      linkedTo: linkedEntity || undefined
+      linkedTo: linkedEntity || undefined,
+      comments: [],
     }
 
     addTask(taskData)
@@ -189,12 +177,12 @@ export const QuickComposer = ({
   return (
     <>
       {/* Floating Action Button */}
-      <div className={cn('fixed bottom-6 right-6 z-50', className)}>
+      <div className={cn("fixed bottom-6 right-6 z-50", className)}>
         <div className="flex flex-col space-y-2">
           <Button
             size="sm"
             className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-            onClick={() => handleOpenDialog('task')}
+            onClick={() => handleOpenDialog("task")}
           >
             <CheckSquare className="w-4 h-4 mr-2" />
             New Task
@@ -202,7 +190,7 @@ export const QuickComposer = ({
           <Button
             size="sm"
             className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-            onClick={() => handleOpenDialog('message')}
+            onClick={() => handleOpenDialog("message")}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             New Message
@@ -215,7 +203,7 @@ export const QuickComposer = ({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center">
-              {composerType === 'message' ? (
+              {composerType === "message" ? (
                 <>
                   <MessageSquare className="w-5 h-5 mr-2" />
                   New Message Thread
@@ -243,27 +231,19 @@ export const QuickComposer = ({
                       {getEntityTypeDisplayName(linkedEntity.type)}
                     </Badge>
                     <span className="text-sm flex-1 mx-3">{linkedEntity.label}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setLinkedEntity(null)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setLinkedEntity(null)}>
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowEntityPicker(true)}
-                    className="w-full justify-start"
-                  >
+                  <Button variant="outline" onClick={() => setShowEntityPicker(true)} className="w-full justify-start">
                     <Plus className="w-4 h-4 mr-2" />
                     Link to a feature
                   </Button>
                 )}
               </div>
 
-              {composerType === 'message' ? (
+              {composerType === "message" ? (
                 // Message Thread Form
                 <>
                   <div className="space-y-2">
@@ -290,14 +270,9 @@ export const QuickComposer = ({
                             onCheckedChange={() => toggleParticipant(user.id)}
                           />
                           <Avatar className="w-6 h-6">
-                            <AvatarFallback className="text-xs">
-                              {getUserInitials(user.id)}
-                            </AvatarFallback>
+                            <AvatarFallback className="text-xs">{getUserInitials(user.id)}</AvatarFallback>
                           </Avatar>
-                          <label 
-                            htmlFor={`user-${user.id}`}
-                            className="text-sm cursor-pointer flex-1"
-                          >
+                          <label htmlFor={`user-${user.id}`} className="text-sm cursor-pointer flex-1">
                             {user.name}
                           </label>
                         </div>
@@ -355,9 +330,7 @@ export const QuickComposer = ({
                             <SelectItem key={user.id} value={user.id}>
                               <div className="flex items-center space-x-2">
                                 <Avatar className="w-5 h-5">
-                                  <AvatarFallback className="text-xs">
-                                    {getUserInitials(user.id)}
-                                  </AvatarFallback>
+                                  <AvatarFallback className="text-xs">{getUserInitials(user.id)}</AvatarFallback>
                                 </Avatar>
                                 <span>{user.name}</span>
                               </div>
@@ -376,7 +349,7 @@ export const QuickComposer = ({
                         type="date"
                         value={taskDueDate}
                         onChange={(e) => setTaskDueDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={new Date().toISOString().split("T")[0]}
                       />
                     </div>
                   </div>
@@ -386,7 +359,7 @@ export const QuickComposer = ({
                       <AlertTriangle className="w-4 h-4 mr-2" />
                       Priority
                     </Label>
-                    <Select value={taskPriority} onValueChange={(value: Task['priority']) => setTaskPriority(value)}>
+                    <Select value={taskPriority} onValueChange={(value: Task["priority"]) => setTaskPriority(value)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -407,10 +380,10 @@ export const QuickComposer = ({
               Cancel
             </Button>
             <Button
-              onClick={composerType === 'message' ? handleCreateMessage : handleCreateTask}
-              disabled={composerType === 'message' ? !canCreateMessage : !canCreateTask}
+              onClick={composerType === "message" ? handleCreateMessage : handleCreateTask}
+              disabled={composerType === "message" ? !canCreateMessage : !canCreateTask}
             >
-              Create {composerType === 'message' ? 'Thread' : 'Task'}
+              Create {composerType === "message" ? "Thread" : "Task"}
             </Button>
           </div>
         </DialogContent>
@@ -448,4 +421,4 @@ export const QuickComposer = ({
       </Dialog>
     </>
   )
-} 
+}

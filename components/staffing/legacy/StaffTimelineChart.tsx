@@ -1,26 +1,17 @@
 "use client"
 
-import React, { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Calendar, 
-  Filter, 
-  Download, 
-  Search,
-  FileText,
-  User,
-  Building,
-  MessageSquare
-} from 'lucide-react'
-import { useStaffingStore, type StaffMember, type Project } from '../store/useStaffingStore'
-import { format, addDays, differenceInDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns'
+import React, { useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Calendar, Filter, Download, Search, FileText, User, Building, MessageSquare } from "lucide-react"
+import { useStaffingStore, type StaffMember, type Project } from "./useStaffingStore"
+import { format, addDays, differenceInDays, startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns"
 
 interface StaffTimelineChartProps {
-  userRole: 'project-executive' | 'project-manager'
+  userRole: "project-executive" | "project-manager"
   title?: string
 }
 
@@ -33,19 +24,9 @@ interface TimelineItem {
   annotation?: string
 }
 
-export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
-  userRole,
-  title
-}) => {
-  const {
-    staffMembers,
-    projects,
-    ganttFilters,
-    ganttViewMode,
-    setGanttFilters,
-    setGanttViewMode,
-    selectedProject
-  } = useStaffingStore()
+export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({ userRole, title }) => {
+  const { staffMembers, projects, ganttFilters, ganttViewMode, setGanttFilters, setGanttViewMode, selectedProject } =
+    useStaffingStore()
 
   // Calculate date range based on view mode
   const dateRange = useMemo(() => {
@@ -59,36 +40,36 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
   const timePeriods = useMemo(() => {
     const { start, end } = dateRange
     const days = eachDayOfInterval({ start, end })
-    
+
     switch (ganttViewMode) {
-      case 'week':
+      case "week":
         return days.filter((_, index) => index % 7 === 0)
-      case 'month':
-        return days.filter(day => day.getDate() === 1)
-      case 'quarter':
-        return days.filter(day => day.getDate() === 1 && day.getMonth() % 3 === 0)
+      case "month":
+        return days.filter((day) => day.getDate() === 1)
+      case "quarter":
+        return days.filter((day) => day.getDate() === 1 && day.getMonth() % 3 === 0)
       default:
-        return days.filter(day => day.getDate() === 1)
+        return days.filter((day) => day.getDate() === 1)
     }
   }, [dateRange, ganttViewMode])
 
   // Convert staff data to timeline items
   const timelineItems = useMemo((): TimelineItem[] => {
     let items: TimelineItem[] = []
-    
+
     staffMembers.forEach((staff, staffIndex) => {
       staff.assignments.forEach((assignment, assignmentIndex) => {
-        const project = projects.find(p => p.project_id === assignment.project_id)
+        const project = projects.find((p) => p.project_id === assignment.project_id)
         if (!project) return
 
         // Apply project filter for Project Executive and Project Manager
-        if (userRole === 'project-executive') {
+        if (userRole === "project-executive") {
           const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
           if (!portfolioProjects.includes(assignment.project_id)) return
         }
-        
-        if (userRole === 'project-manager' && assignment.project_id !== 2525840) return
-        
+
+        if (userRole === "project-manager" && assignment.project_id !== 2525840) return
+
         // Apply selected project filter
         if (selectedProject && assignment.project_id !== selectedProject) return
 
@@ -97,7 +78,7 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
           staffMember: staff,
           project,
           startDate: new Date(assignment.startDate),
-          endDate: new Date(assignment.endDate)
+          endDate: new Date(assignment.endDate),
         })
       })
     })
@@ -105,19 +86,20 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
     // Apply filters
     if (ganttFilters.search) {
       const searchLower = ganttFilters.search.toLowerCase()
-      items = items.filter(item =>
-        item.staffMember.name.toLowerCase().includes(searchLower) ||
-        item.staffMember.position.toLowerCase().includes(searchLower) ||
-        item.project.name.toLowerCase().includes(searchLower)
+      items = items.filter(
+        (item) =>
+          item.staffMember.name.toLowerCase().includes(searchLower) ||
+          item.staffMember.position.toLowerCase().includes(searchLower) ||
+          item.project.name.toLowerCase().includes(searchLower)
       )
     }
 
-    if (ganttFilters.position !== 'all') {
-      items = items.filter(item => item.staffMember.position === ganttFilters.position)
+    if (ganttFilters.position !== "all") {
+      items = items.filter((item) => item.staffMember.position === ganttFilters.position)
     }
 
-    if (ganttFilters.project !== 'all') {
-      items = items.filter(item => item.project.project_id.toString() === ganttFilters.project)
+    if (ganttFilters.project !== "all") {
+      items = items.filter((item) => item.project.project_id.toString() === ganttFilters.project)
     }
 
     // Sort by staff name
@@ -126,60 +108,64 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
 
   // Get unique positions and projects for filters
   const uniquePositions = useMemo(() => {
-    return [...new Set(staffMembers.map(staff => staff.position))].sort()
+    return [...new Set(staffMembers.map((staff) => staff.position))].sort()
   }, [staffMembers])
 
   const uniqueProjects = useMemo(() => {
-    const projectIds = new Set(
-      staffMembers.flatMap(staff => staff.assignments.map(a => a.project_id))
-    )
-    let filteredProjects = projects.filter(p => projectIds.has(p.project_id))
-    
+    const projectIds = new Set(staffMembers.flatMap((staff) => staff.assignments.map((a) => a.project_id)))
+    let filteredProjects = projects.filter((p) => projectIds.has(p.project_id))
+
     // Filter based on role
-    if (userRole === 'project-executive') {
+    if (userRole === "project-executive") {
       const portfolioProjects = [2525840, 2525841, 2525842, 2525843, 2525844, 2525845]
-      filteredProjects = filteredProjects.filter(p => portfolioProjects.includes(p.project_id))
-    } else if (userRole === 'project-manager') {
-      filteredProjects = filteredProjects.filter(p => p.project_id === 2525840)
+      filteredProjects = filteredProjects.filter((p) => portfolioProjects.includes(p.project_id))
+    } else if (userRole === "project-manager") {
+      filteredProjects = filteredProjects.filter((p) => p.project_id === 2525840)
     }
-    
+
     return filteredProjects
   }, [staffMembers, projects, userRole])
 
   // Calculate position and width for timeline bars
-  const calculatePosition = React.useCallback((date: Date) => {
-    const { start, end } = dateRange
-    const totalDays = differenceInDays(end, start)
-    const daysSinceStart = differenceInDays(date, start)
-    return Math.max(0, Math.min(100, (daysSinceStart / totalDays) * 100))
-  }, [dateRange])
+  const calculatePosition = React.useCallback(
+    (date: Date) => {
+      const { start, end } = dateRange
+      const totalDays = differenceInDays(end, start)
+      const daysSinceStart = differenceInDays(date, start)
+      return Math.max(0, Math.min(100, (daysSinceStart / totalDays) * 100))
+    },
+    [dateRange]
+  )
 
-  const calculateWidth = React.useCallback((startDate: Date, endDate: Date) => {
-    const { start, end } = dateRange
-    const totalDays = differenceInDays(end, start)
-    const itemDays = differenceInDays(endDate, startDate)
-    return Math.max(1, (itemDays / totalDays) * 100)
-  }, [dateRange])
+  const calculateWidth = React.useCallback(
+    (startDate: Date, endDate: Date) => {
+      const { start, end } = dateRange
+      const totalDays = differenceInDays(end, start)
+      const itemDays = differenceInDays(endDate, startDate)
+      return Math.max(1, (itemDays / totalDays) * 100)
+    },
+    [dateRange]
+  )
 
   // Export handlers (read-only - no modification capabilities)
   const handleExportPDF = () => {
-    console.log('Exporting timeline to PDF...')
+    console.log("Exporting timeline to PDF...")
   }
 
   const handleExportExcel = () => {
-    console.log('Exporting timeline to Excel...')
+    console.log("Exporting timeline to Excel...")
   }
 
   const getTitle = () => {
     if (title) return title
-    
+
     switch (userRole) {
-      case 'project-executive':
-        return 'Portfolio Staffing Timeline'
-      case 'project-manager':
-        return 'Project Staffing Timeline'
+      case "project-executive":
+        return "Portfolio Staffing Timeline"
+      case "project-manager":
+        return "Project Staffing Timeline"
       default:
-        return 'Staff Timeline'
+        return "Staff Timeline"
     }
   }
 
@@ -197,7 +183,7 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
               Read-Only
             </Badge>
           </CardTitle>
-          
+
           <div className="flex items-center gap-2">
             <Select value={ganttViewMode} onValueChange={(value: any) => setGanttViewMode(value)}>
               <SelectTrigger className="w-32">
@@ -209,7 +195,7 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
                 <SelectItem value="quarter">Quarterly</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <div className="flex items-center gap-1">
               <Button variant="outline" size="sm" onClick={handleExportPDF}>
                 <FileText className="h-4 w-4 mr-1" />
@@ -236,17 +222,14 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
               className="w-64"
             />
           </div>
-          
-          <Select 
-            value={ganttFilters.position} 
-            onValueChange={(value) => setGanttFilters({ position: value })}
-          >
+
+          <Select value={ganttFilters.position} onValueChange={(value) => setGanttFilters({ position: value })}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="All Positions" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Positions</SelectItem>
-              {uniquePositions.map(position => (
+              {uniquePositions.map((position) => (
                 <SelectItem key={position} value={position}>
                   {position}
                 </SelectItem>
@@ -255,16 +238,13 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
           </Select>
 
           {uniqueProjects.length > 1 && (
-            <Select 
-              value={ganttFilters.project} 
-              onValueChange={(value) => setGanttFilters({ project: value })}
-            >
+            <Select value={ganttFilters.project} onValueChange={(value) => setGanttFilters({ project: value })}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="All Projects" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Projects</SelectItem>
-                {uniqueProjects.map(project => (
+                {uniqueProjects.map((project) => (
                   <SelectItem key={project.project_id} value={project.project_id.toString()}>
                     {project.name}
                   </SelectItem>
@@ -273,10 +253,10 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
             </Select>
           )}
 
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setGanttFilters({ search: '', position: 'all', project: 'all' })}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setGanttFilters({ search: "", position: "all", project: "all" })}
           >
             Clear Filters
           </Button>
@@ -302,7 +282,10 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                     {timePeriods.map((period, index) => (
                       <div key={index} style={{ left: `${calculatePosition(period)}%` }} className="absolute">
-                        {format(period, ganttViewMode === 'week' ? "MMM dd" : ganttViewMode === 'month' ? "MMM yyyy" : "Qo yyyy")}
+                        {format(
+                          period,
+                          ganttViewMode === "week" ? "MMM dd" : ganttViewMode === "month" ? "MMM yyyy" : "Qo yyyy"
+                        )}
                       </div>
                     ))}
                   </div>
@@ -319,18 +302,14 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {item.staffMember.name}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {item.staffMember.position}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {item.project.name}
-                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">{item.staffMember.position}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">{item.project.name}</div>
                   </div>
 
                   {/* Timeline Bar */}
                   <div className="flex-1 relative h-8">
                     <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded"></div>
-                    
+
                     {/* Assignment Bar */}
                     <div
                       className="absolute inset-y-1 rounded bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors cursor-pointer group"
@@ -338,12 +317,15 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
                         left: `${calculatePosition(item.startDate)}%`,
                         width: `${calculateWidth(item.startDate, item.endDate)}%`,
                       }}
-                      title={`${item.staffMember.name} - ${item.project.name}\n${format(item.startDate, 'MMM dd')} - ${format(item.endDate, 'MMM dd')}`}
+                      title={`${item.staffMember.name} - ${item.project.name}\n${format(
+                        item.startDate,
+                        "MMM dd"
+                      )} - ${format(item.endDate, "MMM dd")}`}
                     >
                       <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                         {differenceInDays(item.endDate, item.startDate)}d
                       </div>
-                      
+
                       {item.annotation && (
                         <MessageSquare className="absolute -top-1 -right-1 h-3 w-3 text-yellow-500" />
                       )}
@@ -358,9 +340,7 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
 
                   {/* Rate Info */}
                   <div className="w-16 flex-shrink-0 text-right">
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      ${item.staffMember.laborRate}/hr
-                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">${item.staffMember.laborRate}/hr</div>
                   </div>
                 </div>
               ))}
@@ -382,7 +362,9 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
                   <span className="text-xs text-gray-600 dark:text-gray-400">Has Annotation</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">Read-Only</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    Read-Only
+                  </Badge>
                   <span className="text-xs text-gray-600 dark:text-gray-400">View Only Access</span>
                 </div>
               </div>
@@ -401,4 +383,4 @@ export const StaffTimelineChart: React.FC<StaffTimelineChartProps> = ({
       </CardContent>
     </Card>
   )
-} 
+}

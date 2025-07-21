@@ -36,7 +36,7 @@ import {
   Target,
   Users,
 } from "lucide-react"
-import { useStaffingStore, type SPCR } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+import { useStaffingStore, type SPCR } from "@/components/staffing/legacy/useStaffingStore"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 

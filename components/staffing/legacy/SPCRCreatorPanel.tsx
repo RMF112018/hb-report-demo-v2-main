@@ -1,27 +1,16 @@
 "use client"
 
-import React, { useState, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Plus, 
-  FileText, 
-  Calculator, 
-  Send, 
-  Save, 
-  AlertTriangle,
-  Info,
-  DollarSign,
-  Calendar,
-  User
-} from 'lucide-react'
-import { useStaffingStore, type SPCR } from '../store/useStaffingStore'
+import React, { useState, useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Plus, FileText, Calculator, Send, Save, AlertTriangle, Info, DollarSign, Calendar, User } from "lucide-react"
+import { useStaffingStore, type SPCR } from "./useStaffingStore"
 
 interface SPCRCreatorPanelProps {
   projectId?: number
@@ -30,40 +19,33 @@ interface SPCRCreatorPanelProps {
 
 export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
   projectId = 2525840, // Default to Palm Beach project for PM
-  onSuccess
+  onSuccess,
 }) => {
-  const {
-    spcrDraft,
-    setSPCRDraft,
-    saveSPCRDraft,
-    clearSPCRDraft,
-    calculateLaborCost,
-    getStaffByProject,
-    projects
-  } = useStaffingStore()
+  const { spcrDraft, setSPCRDraft, saveSPCRDraft, clearSPCRDraft, calculateLaborCost, getStaffByProject, projects } =
+    useStaffingStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
-  const project = projects.find(p => p.project_id === projectId)
+  const project = projects.find((p) => p.project_id === projectId)
   const currentProjectStaff = getStaffByProject(projectId)
 
   // Common position options for construction projects
   const positionOptions = [
-    'Project Manager I',
-    'Project Manager II',
-    'Project Manager III',
-    'Senior Project Manager',
-    'Assistant Project Manager',
-    'Superintendent I',
-    'Superintendent II',
-    'Superintendent III',
-    'General Superintendent',
-    'Assistant Superintendent',
-    'Project Executive',
-    'Field Engineer',
-    'Safety Manager',
-    'Quality Manager'
+    "Project Manager I",
+    "Project Manager II",
+    "Project Manager III",
+    "Senior Project Manager",
+    "Assistant Project Manager",
+    "Superintendent I",
+    "Superintendent II",
+    "Superintendent III",
+    "General Superintendent",
+    "Assistant Superintendent",
+    "Project Executive",
+    "Field Engineer",
+    "Safety Manager",
+    "Quality Manager",
   ]
 
   // Update draft function
@@ -71,9 +53,9 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
     setSPCRDraft({
       ...spcrDraft,
       project_id: projectId,
-      createdBy: 'current-user', // Would use actual user ID
-      status: 'pending',
-      ...updates
+      createdBy: "current-user", // Would use actual user ID
+      status: "pending",
+      ...updates,
     })
   }
 
@@ -95,13 +77,14 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
     const totalCost = estimatedRate * weeklyHours * durationWeeks
 
     // Check for potential conflicts
-    const conflicts = currentProjectStaff.filter(staff => 
-      staff.position === spcrDraft.position &&
-      staff.assignments.some(assignment => {
-        const assignStart = new Date(assignment.startDate)
-        const assignEnd = new Date(assignment.endDate)
-        return (startDate <= assignEnd && endDate >= assignStart)
-      })
+    const conflicts = currentProjectStaff.filter(
+      (staff) =>
+        staff.position === spcrDraft.position &&
+        staff.assignments.some((assignment) => {
+          const assignStart = new Date(assignment.startDate)
+          const assignEnd = new Date(assignment.endDate)
+          return startDate <= assignEnd && endDate >= assignStart
+        })
     )
 
     return {
@@ -110,27 +93,27 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
       estimatedRate,
       totalCost,
       conflicts: conflicts.length,
-      conflictNames: conflicts.map(staff => staff.name)
+      conflictNames: conflicts.map((staff) => staff.name),
     }
   }, [spcrDraft, currentProjectStaff])
 
   // Helper function to estimate labor rate
   const getEstimatedRateForPosition = (position: string): number => {
     const rateMap: Record<string, number> = {
-      'Project Executive': 85,
-      'Senior Project Manager': 75,
-      'Project Manager III': 70,
-      'Project Manager II': 65,
-      'Project Manager I': 60,
-      'Assistant Project Manager': 50,
-      'General Superintendent': 80,
-      'Superintendent III': 75,
-      'Superintendent II': 65,
-      'Superintendent I': 55,
-      'Assistant Superintendent': 45,
-      'Field Engineer': 58,
-      'Safety Manager': 62,
-      'Quality Manager': 60
+      "Project Executive": 85,
+      "Senior Project Manager": 75,
+      "Project Manager III": 70,
+      "Project Manager II": 65,
+      "Project Manager I": 60,
+      "Assistant Project Manager": 50,
+      "General Superintendent": 80,
+      "Superintendent III": 75,
+      "Superintendent II": 65,
+      "Superintendent I": 55,
+      "Assistant Superintendent": 45,
+      "Field Engineer": 58,
+      "Safety Manager": 62,
+      "Quality Manager": 60,
     }
     return rateMap[position] || 55
   }
@@ -145,20 +128,20 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
       const finalDraft = {
         ...spcrDraft,
         budget: impactPreview?.totalCost || 0,
-        scheduleRef: spcrDraft.scheduleRef || `${project?.name} - ${spcrDraft.position} Assignment`
+        scheduleRef: spcrDraft.scheduleRef || `${project?.name} - ${spcrDraft.position} Assignment`,
       }
-      
+
       setSPCRDraft(finalDraft)
       saveSPCRDraft()
-      
+
       // Success callback
       onSuccess?.()
-      
+
       // Reset form
       clearSPCRDraft()
       setShowPreview(false)
     } catch (error) {
-      console.error('Failed to submit SPCR:', error)
+      console.error("Failed to submit SPCR:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -166,14 +149,20 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
 
   // Validate draft
   const validateDraft = (): boolean => {
-    return !!(spcrDraft?.type && spcrDraft?.position && spcrDraft?.startDate && spcrDraft?.endDate && spcrDraft?.explanation)
+    return !!(
+      spcrDraft?.type &&
+      spcrDraft?.position &&
+      spcrDraft?.startDate &&
+      spcrDraft?.endDate &&
+      spcrDraft?.explanation
+    )
   }
 
   // Save as draft
   const handleSaveDraft = () => {
     if (spcrDraft) {
       // In a real implementation, this would save to a drafts collection
-      console.log('Saving draft:', spcrDraft)
+      console.log("Saving draft:", spcrDraft)
     }
   }
 
@@ -185,9 +174,7 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
             <Plus className="h-5 w-5 text-green-600 dark:text-green-400" />
             Create Staffing Plan Change Request
           </CardTitle>
-          <Badge variant="outline">
-            {project?.name || 'Project'}
-          </Badge>
+          <Badge variant="outline">{project?.name || "Project"}</Badge>
         </div>
       </CardHeader>
 
@@ -196,9 +183,9 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="type">Request Type *</Label>
-            <Select 
-              value={spcrDraft?.type || ''} 
-              onValueChange={(value) => updateDraft({ type: value as 'increase' | 'decrease' })}
+            <Select
+              value={spcrDraft?.type || ""}
+              onValueChange={(value) => updateDraft({ type: value as "increase" | "decrease" })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select request type" />
@@ -212,15 +199,12 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="position">Position *</Label>
-            <Select 
-              value={spcrDraft?.position || ''} 
-              onValueChange={(value) => updateDraft({ position: value })}
-            >
+            <Select value={spcrDraft?.position || ""} onValueChange={(value) => updateDraft({ position: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select position" />
               </SelectTrigger>
               <SelectContent>
-                {positionOptions.map(position => (
+                {positionOptions.map((position) => (
                   <SelectItem key={position} value={position}>
                     {position}
                   </SelectItem>
@@ -237,8 +221,8 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
             <Input
               id="startDate"
               type="date"
-              value={spcrDraft?.startDate?.split('T')[0] || ''}
-              onChange={(e) => updateDraft({ startDate: e.target.value + 'T00:00:00Z' })}
+              value={spcrDraft?.startDate?.split("T")[0] || ""}
+              onChange={(e) => updateDraft({ startDate: e.target.value + "T00:00:00Z" })}
             />
           </div>
 
@@ -247,8 +231,8 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
             <Input
               id="endDate"
               type="date"
-              value={spcrDraft?.endDate?.split('T')[0] || ''}
-              onChange={(e) => updateDraft({ endDate: e.target.value + 'T23:59:59Z' })}
+              value={spcrDraft?.endDate?.split("T")[0] || ""}
+              onChange={(e) => updateDraft({ endDate: e.target.value + "T23:59:59Z" })}
             />
           </div>
         </div>
@@ -259,7 +243,7 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
           <Input
             id="scheduleRef"
             placeholder="e.g., Foundation Work - Task 152, MEP Rough-In - Phase 3"
-            value={spcrDraft?.scheduleRef || ''}
+            value={spcrDraft?.scheduleRef || ""}
             onChange={(e) => updateDraft({ scheduleRef: e.target.value })}
           />
         </div>
@@ -270,7 +254,7 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
           <Textarea
             id="explanation"
             placeholder="Provide detailed justification for this staffing change..."
-            value={spcrDraft?.explanation || ''}
+            value={spcrDraft?.explanation || ""}
             onChange={(e) => updateDraft({ explanation: e.target.value })}
             rows={4}
           />
@@ -306,7 +290,13 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
                   <div className="text-xs text-muted-foreground">Total Cost</div>
                 </div>
                 <div className="text-center">
-                  <div className={`text-lg font-bold ${impactPreview.conflicts > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                  <div
+                    className={`text-lg font-bold ${
+                      impactPreview.conflicts > 0
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-green-600 dark:text-green-400"
+                    }`}
+                  >
                     {impactPreview.conflicts}
                   </div>
                   <div className="text-xs text-muted-foreground">Conflicts</div>
@@ -317,7 +307,7 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    Potential scheduling conflicts with: {impactPreview.conflictNames.join(', ')}
+                    Potential scheduling conflicts with: {impactPreview.conflictNames.join(", ")}
                   </AlertDescription>
                 </Alert>
               )}
@@ -329,48 +319,38 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
         {!validateDraft() && spcrDraft && Object.keys(spcrDraft).length > 0 && (
           <Alert>
             <Info className="h-4 w-4" />
-            <AlertDescription>
-              Please fill in all required fields to proceed with submission.
-            </AlertDescription>
+            <AlertDescription>Please fill in all required fields to proceed with submission.</AlertDescription>
           </Alert>
         )}
 
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleSaveDraft}
               disabled={!spcrDraft || Object.keys(spcrDraft).length === 0}
             >
               <Save className="h-4 w-4 mr-1" />
               Save Draft
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={clearSPCRDraft}
-              disabled={!spcrDraft}
-            >
+            <Button variant="outline" onClick={clearSPCRDraft} disabled={!spcrDraft}>
               Clear
             </Button>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline"
-              onClick={() => setShowPreview(!showPreview)}
-              disabled={!validateDraft()}
-            >
+            <Button variant="outline" onClick={() => setShowPreview(!showPreview)} disabled={!validateDraft()}>
               <FileText className="h-4 w-4 mr-1" />
-              {showPreview ? 'Hide' : 'Preview'}
+              {showPreview ? "Hide" : "Preview"}
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmit}
               disabled={!validateDraft() || isSubmitting}
               className="bg-green-600 hover:bg-green-700"
             >
               <Send className="h-4 w-4 mr-1" />
-              {isSubmitting ? 'Submitting...' : 'Submit Request'}
+              {isSubmitting ? "Submitting..." : "Submit Request"}
             </Button>
           </div>
         </div>
@@ -384,14 +364,18 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <strong>Type:</strong> {spcrDraft?.type === 'increase' ? 'Add Staff' : 'Remove Staff'}
+                  <strong>Type:</strong> {spcrDraft?.type === "increase" ? "Add Staff" : "Remove Staff"}
                 </div>
                 <div>
                   <strong>Position:</strong> {spcrDraft?.position}
                 </div>
                 <div>
-                  <strong>Duration:</strong> {spcrDraft?.startDate && spcrDraft?.endDate && 
-                    `${new Date(spcrDraft.startDate).toLocaleDateString()} - ${new Date(spcrDraft.endDate).toLocaleDateString()}`}
+                  <strong>Duration:</strong>{" "}
+                  {spcrDraft?.startDate &&
+                    spcrDraft?.endDate &&
+                    `${new Date(spcrDraft.startDate).toLocaleDateString()} - ${new Date(
+                      spcrDraft.endDate
+                    ).toLocaleDateString()}`}
                 </div>
                 <div>
                   <strong>Estimated Cost:</strong> ${impactPreview?.totalCost.toLocaleString()}
@@ -407,4 +391,4 @@ export const SPCRCreatorPanel: React.FC<SPCRCreatorPanelProps> = ({
       </CardContent>
     </Card>
   )
-} 
+}

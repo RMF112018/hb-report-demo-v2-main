@@ -32,7 +32,7 @@ import {
 import { MessageBoard } from "./components/MessageBoard"
 import { TaskBoard } from "./components/TaskBoard"
 import { QuickComposer } from "./components/QuickComposer"
-import { useProductivityStore } from "./store/useProductivityStore"
+import { useProductivityStore } from "@/components/productivity/store/useProductivityStore"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ProductivityPage() {

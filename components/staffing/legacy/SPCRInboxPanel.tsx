@@ -1,19 +1,19 @@
 "use client"
 
-import React, { useState, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Inbox, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  MessageSquare, 
+import React, { useState, useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Inbox,
+  CheckCircle,
+  XCircle,
+  Clock,
+  MessageSquare,
   DollarSign,
   Calendar,
   User,
@@ -22,37 +22,30 @@ import {
   Eye,
   Filter,
   AlertTriangle,
-  Info
-} from 'lucide-react'
-import { useStaffingStore, type SPCR } from '../store/useStaffingStore'
-import { format } from 'date-fns'
+  Info,
+} from "lucide-react"
+import { useStaffingStore, type SPCR } from "./useStaffingStore"
+import { format } from "date-fns"
 
 interface SPCRInboxPanelProps {
-  userRole: 'executive' | 'project-executive' | 'project-manager'
+  userRole: "executive" | "project-executive" | "project-manager"
 }
 
 interface ActionModal {
   isOpen: boolean
   spcr: SPCR | null
-  action: 'approve' | 'reject' | 'view' | 'implement' | 'close-reject'
+  action: "approve" | "reject" | "view" | "implement" | "close-reject"
   comment: string
 }
 
 export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
-  const {
-    getSPCRsByRole,
-    updateSPCR,
-    addSPCRComment,
-    spcrViewFilter,
-    setSPCRViewFilter,
-    projects
-  } = useStaffingStore()
+  const { getSPCRsByRole, updateSPCR, addSPCRComment, spcrViewFilter, setSPCRViewFilter, projects } = useStaffingStore()
 
   const [actionModal, setActionModal] = useState<ActionModal>({
     isOpen: false,
     spcr: null,
-    action: 'view',
-    comment: ''
+    action: "view",
+    comment: "",
   })
 
   const allSPCRs = getSPCRsByRole(userRole)
@@ -62,27 +55,27 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
     let spcrs = allSPCRs
 
     switch (spcrViewFilter) {
-      case 'pending':
-        if (userRole === 'project-executive') {
-          spcrs = spcrs.filter(spcr => spcr.workflowStage === 'pe-review')
-        } else if (userRole === 'executive') {
-          spcrs = spcrs.filter(spcr => spcr.workflowStage === 'executive-review')
+      case "pending":
+        if (userRole === "project-executive") {
+          spcrs = spcrs.filter((spcr) => spcr.workflowStage === "pe-review")
+        } else if (userRole === "executive") {
+          spcrs = spcrs.filter((spcr) => spcr.workflowStage === "executive-review")
         } else {
-          spcrs = spcrs.filter(spcr => ['submitted', 'pe-review', 'executive-review'].includes(spcr.workflowStage))
+          spcrs = spcrs.filter((spcr) => ["submitted", "pe-review", "executive-review"].includes(spcr.workflowStage))
         }
         break
-      case 'approved':
-        spcrs = spcrs.filter(spcr => ['pe-approved', 'final-approved'].includes(spcr.workflowStage))
+      case "approved":
+        spcrs = spcrs.filter((spcr) => ["pe-approved", "final-approved"].includes(spcr.workflowStage))
         break
-      case 'rejected':
-        spcrs = spcrs.filter(spcr => ['pe-rejected', 'final-rejected'].includes(spcr.workflowStage))
+      case "rejected":
+        spcrs = spcrs.filter((spcr) => ["pe-rejected", "final-rejected"].includes(spcr.workflowStage))
         break
-      case 'closed':
-        spcrs = spcrs.filter(spcr => spcr.workflowStage === 'closed')
+      case "closed":
+        spcrs = spcrs.filter((spcr) => spcr.workflowStage === "closed")
         break
       default:
         // 'all' - show all except closed (which are hidden by default)
-        spcrs = spcrs.filter(spcr => spcr.workflowStage !== 'closed')
+        spcrs = spcrs.filter((spcr) => spcr.workflowStage !== "closed")
         break
     }
 
@@ -93,47 +86,68 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
   // Calculate counts for filter options
   const spcrCounts = useMemo(() => {
     return {
-      total: allSPCRs.filter(s => s.workflowStage !== 'closed').length, // Exclude closed from total
-      pending: allSPCRs.filter(s => {
-        if (userRole === 'project-executive') return s.workflowStage === 'pe-review'
-        if (userRole === 'executive') return s.workflowStage === 'executive-review'
-        return ['submitted', 'pe-review', 'executive-review'].includes(s.workflowStage)
+      total: allSPCRs.filter((s) => s.workflowStage !== "closed").length, // Exclude closed from total
+      pending: allSPCRs.filter((s) => {
+        if (userRole === "project-executive") return s.workflowStage === "pe-review"
+        if (userRole === "executive") return s.workflowStage === "executive-review"
+        return ["submitted", "pe-review", "executive-review"].includes(s.workflowStage)
       }).length,
-      approved: allSPCRs.filter(s => ['pe-approved', 'final-approved'].includes(s.workflowStage)).length,
-      rejected: allSPCRs.filter(s => ['pe-rejected', 'final-rejected'].includes(s.workflowStage)).length,
-      closed: allSPCRs.filter(s => s.workflowStage === 'closed').length,
-      needsAction: allSPCRs.filter(s => 
-        (userRole === 'project-executive' && s.workflowStage === 'pe-review') ||
-        (userRole === 'executive' && s.workflowStage === 'executive-review')
-      ).length
+      approved: allSPCRs.filter((s) => ["pe-approved", "final-approved"].includes(s.workflowStage)).length,
+      rejected: allSPCRs.filter((s) => ["pe-rejected", "final-rejected"].includes(s.workflowStage)).length,
+      closed: allSPCRs.filter((s) => s.workflowStage === "closed").length,
+      needsAction: allSPCRs.filter(
+        (s) =>
+          (userRole === "project-executive" && s.workflowStage === "pe-review") ||
+          (userRole === "executive" && s.workflowStage === "executive-review")
+      ).length,
     }
   }, [allSPCRs, userRole])
 
   // Get project name
   const getProjectName = (projectId: number) => {
-    const project = projects.find(p => p.project_id === projectId)
-    return project ? project.name : 'Unknown Project'
+    const project = projects.find((p) => p.project_id === projectId)
+    return project ? project.name : "Unknown Project"
   }
 
   // Get status badge
   const getStatusBadge = (spcr: SPCR) => {
     switch (spcr.workflowStage) {
-      case 'submitted':
+      case "submitted":
         return <Badge variant="secondary">Submitted</Badge>
-      case 'pe-review':
-        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">PE Review</Badge>
-      case 'pe-approved':
-        return <Badge variant="outline" className="border-blue-500 text-blue-600">PE Approved</Badge>
-      case 'pe-rejected':
+      case "pe-review":
+        return (
+          <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+            PE Review
+          </Badge>
+        )
+      case "pe-approved":
+        return (
+          <Badge variant="outline" className="border-blue-500 text-blue-600">
+            PE Approved
+          </Badge>
+        )
+      case "pe-rejected":
         return <Badge variant="destructive">PE Rejected</Badge>
-      case 'executive-review':
-        return <Badge variant="outline" className="border-orange-500 text-orange-600">Executive Review</Badge>
-      case 'final-approved':
-        return <Badge variant="default" className="bg-green-500">Final Approved</Badge>
-      case 'final-rejected':
+      case "executive-review":
+        return (
+          <Badge variant="outline" className="border-orange-500 text-orange-600">
+            Executive Review
+          </Badge>
+        )
+      case "final-approved":
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Final Approved
+          </Badge>
+        )
+      case "final-rejected":
         return <Badge variant="destructive">Final Rejected</Badge>
-      case 'closed':
-        return <Badge variant="outline" className="border-gray-500 text-gray-600">Closed</Badge>
+      case "closed":
+        return (
+          <Badge variant="outline" className="border-gray-500 text-gray-600">
+            Closed
+          </Badge>
+        )
       default:
         return <Badge variant="outline">{spcr.workflowStage}</Badge>
     }
@@ -141,7 +155,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
 
   // Get type badge
   const getTypeBadge = (type: string) => {
-    return type === 'increase' ? (
+    return type === "increase" ? (
       <Badge variant="outline" className="border-green-500 text-green-600">
         + Add Staff
       </Badge>
@@ -153,12 +167,12 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
   }
 
   // Handle SPCR action
-  const handleSPCRAction = (spcr: SPCR, action: 'approve' | 'reject' | 'view' | 'implement' | 'close-reject') => {
+  const handleSPCRAction = (spcr: SPCR, action: "approve" | "reject" | "view" | "implement" | "close-reject") => {
     setActionModal({
       isOpen: true,
       spcr,
       action,
-      comment: ''
+      comment: "",
     })
   }
 
@@ -168,103 +182,111 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
 
     const { spcr, action, comment } = actionModal
 
-    if (action === 'view') {
-      setActionModal({ isOpen: false, spcr: null, action: 'view', comment: '' })
+    if (action === "view") {
+      setActionModal({ isOpen: false, spcr: null, action: "view", comment: "" })
       return
     }
 
-    let newWorkflowStage: SPCR['workflowStage']
-    let newStatus: SPCR['status']
+    let newWorkflowStage: SPCR["workflowStage"] = "submitted"
+    let newStatus: SPCR["status"] = "pending"
 
-    if (action === 'approve') {
-      if (userRole === 'project-executive') {
-        newWorkflowStage = 'pe-approved'
-        newStatus = 'pending' // Still needs executive review
+    if (action === "approve") {
+      if (userRole === "project-executive") {
+        newWorkflowStage = "pe-approved"
+        newStatus = "pending" // Still needs executive review
       } else {
-        newWorkflowStage = 'final-approved'
-        newStatus = 'approved'
+        newWorkflowStage = "final-approved"
+        newStatus = "approved"
       }
-    } else if (action === 'reject') {
-      if (userRole === 'project-executive') {
-        newWorkflowStage = 'pe-rejected'
-        newStatus = 'rejected'
+    } else if (action === "reject") {
+      if (userRole === "project-executive") {
+        newWorkflowStage = "pe-rejected"
+        newStatus = "rejected"
       } else {
-        newWorkflowStage = 'final-rejected'
-        newStatus = 'rejected'
+        newWorkflowStage = "final-rejected"
+        newStatus = "rejected"
       }
-    } else if (action === 'implement') {
+    } else if (action === "implement") {
       // Executive implementing an approved SPCR
-      newWorkflowStage = 'closed'
-      newStatus = 'approved'
-    } else if (action === 'close-reject') {
+      newWorkflowStage = "closed"
+      newStatus = "approved"
+    } else if (action === "close-reject") {
       // Executive rejecting an approved SPCR post-approval
-      newWorkflowStage = 'closed'
-      newStatus = 'rejected'
+      newWorkflowStage = "closed"
+      newStatus = "rejected"
     }
 
     // Update SPCR
     updateSPCR(spcr.id, {
       workflowStage: newWorkflowStage,
-      status: newStatus
+      status: newStatus,
     })
 
     // Add comment if provided
     if (comment.trim()) {
+      // Map action to valid comment action type
+      let commentAction: "approve" | "reject" | "forward" | undefined
+      if (action === "approve") {
+        commentAction = "approve"
+      } else if (action === "reject") {
+        commentAction = "reject"
+      } else if (action === "implement" || action === "close-reject") {
+        commentAction = "forward" // Map implement/close-reject to forward
+      }
+
       addSPCRComment(spcr.id, {
         id: `comment-${Date.now()}`,
-        author: 'Current User', // Would use actual user name
+        author: "Current User", // Would use actual user name
         content: comment,
         timestamp: new Date().toISOString(),
-        action
+        action: commentAction,
       })
     }
 
-    setActionModal({ isOpen: false, spcr: null, action: 'view', comment: '' })
+    setActionModal({ isOpen: false, spcr: null, action: "view", comment: "" })
   }
 
   // Get filter options based on role
   const getFilterOptions = () => {
-    const baseOptions = [
-      { value: 'all', label: 'All SPCRs', count: spcrCounts.total }
-    ]
+    const baseOptions = [{ value: "all", label: "All SPCRs", count: spcrCounts.total }]
 
-    if (userRole === 'project-manager') {
+    if (userRole === "project-manager") {
       return [
         ...baseOptions,
-        { value: 'pending', label: 'In Progress', count: spcrCounts.pending },
-        { value: 'approved', label: 'Approved', count: spcrCounts.approved },
-        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected },
-        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
+        { value: "pending", label: "In Progress", count: spcrCounts.pending },
+        { value: "approved", label: "Approved", count: spcrCounts.approved },
+        { value: "rejected", label: "Rejected", count: spcrCounts.rejected },
+        { value: "closed", label: "Closed", count: spcrCounts.closed },
       ]
-    } else if (userRole === 'project-executive') {
+    } else if (userRole === "project-executive") {
       return [
-        { value: 'pending', label: 'Awaiting Review', count: spcrCounts.pending },
+        { value: "pending", label: "Awaiting Review", count: spcrCounts.pending },
         ...baseOptions,
-        { value: 'approved', label: 'Approved by Me', count: spcrCounts.approved },
-        { value: 'rejected', label: 'Rejected by Me', count: spcrCounts.rejected },
-        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
+        { value: "approved", label: "Approved by Me", count: spcrCounts.approved },
+        { value: "rejected", label: "Rejected by Me", count: spcrCounts.rejected },
+        { value: "closed", label: "Closed", count: spcrCounts.closed },
       ]
     } else {
       return [
-        { value: 'approved', label: 'Approved', count: spcrCounts.approved }, // Default view for executives
-        { value: 'pending', label: 'Awaiting Review', count: spcrCounts.pending },
+        { value: "approved", label: "Approved", count: spcrCounts.approved }, // Default view for executives
+        { value: "pending", label: "Awaiting Review", count: spcrCounts.pending },
         ...baseOptions,
-        { value: 'rejected', label: 'Rejected', count: spcrCounts.rejected },
-        { value: 'closed', label: 'Closed', count: spcrCounts.closed }
+        { value: "rejected", label: "Rejected", count: spcrCounts.rejected },
+        { value: "closed", label: "Closed", count: spcrCounts.closed },
       ]
     }
   }
 
   const getTitle = () => {
     switch (userRole) {
-      case 'executive':
-        return 'Executive SPCR Review'
-      case 'project-executive':
-        return 'Portfolio SPCR Inbox'
-      case 'project-manager':
-        return 'My SPCR Requests'
+      case "executive":
+        return "Executive SPCR Review"
+      case "project-executive":
+        return "Portfolio SPCR Inbox"
+      case "project-manager":
+        return "My SPCR Requests"
       default:
-        return 'SPCR Inbox'
+        return "SPCR Inbox"
     }
   }
 
@@ -276,7 +298,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
             <Inbox className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             {getTitle()}
           </CardTitle>
-          
+
           {spcrCounts.needsAction > 0 && (
             <Badge variant="destructive" className="animate-pulse">
               {spcrCounts.needsAction} Need Action
@@ -318,7 +340,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {getFilterOptions().map(option => (
+              {getFilterOptions().map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label} ({option.count})
                 </SelectItem>
@@ -340,7 +362,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                         <span className="text-sm font-medium">{spcr.position}</span>
                         {getStatusBadge(spcr)}
                       </div>
-                      
+
                       <div className="text-sm text-muted-foreground">
                         <div className="flex items-center gap-4 mb-1">
                           <span className="flex items-center gap-1">
@@ -348,45 +370,38 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                             {getProjectName(spcr.project_id)}
                           </span>
                           <span className="flex items-center gap-1">
-                            <DollarSign className="h-3 w-3" />
-                            ${spcr.budget.toLocaleString()}
+                            <DollarSign className="h-3 w-3" />${spcr.budget.toLocaleString()}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {format(new Date(spcr.createdAt), 'MMM dd, yyyy')}
+                            {format(new Date(spcr.createdAt), "MMM dd, yyyy")}
                           </span>
                         </div>
-                        <div className="text-xs">
-                          {spcr.explanation.slice(0, 100)}...
-                        </div>
+                        <div className="text-xs">{spcr.explanation.slice(0, 100)}...</div>
                       </div>
 
                       {spcr.comments && spcr.comments.length > 0 && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MessageSquare className="h-3 w-3" />
-                          {spcr.comments.length} comment{spcr.comments.length !== 1 ? 's' : ''}
+                          {spcr.comments.length} comment{spcr.comments.length !== 1 ? "s" : ""}
                         </div>
                       )}
                     </div>
 
                     <div className="flex items-center gap-2 ml-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSPCRAction(spcr, 'view')}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleSPCRAction(spcr, "view")}>
                         <Eye className="h-4 w-4 mr-1" />
                         View
                       </Button>
 
                       {/* Show action buttons based on role and SPCR status */}
-                      {((userRole === 'project-executive' && spcr.workflowStage === 'pe-review') ||
-                        (userRole === 'executive' && spcr.workflowStage === 'executive-review')) && (
+                      {((userRole === "project-executive" && spcr.workflowStage === "pe-review") ||
+                        (userRole === "executive" && spcr.workflowStage === "executive-review")) && (
                         <>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleSPCRAction(spcr, 'approve')}
+                            onClick={() => handleSPCRAction(spcr, "approve")}
                             className="border-green-500 text-green-600 hover:bg-green-50"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
@@ -395,7 +410,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleSPCRAction(spcr, 'reject')}
+                            onClick={() => handleSPCRAction(spcr, "reject")}
                             className="border-red-500 text-red-600 hover:bg-red-50"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
@@ -405,12 +420,12 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                       )}
 
                       {/* Executive final actions on approved SPCRs */}
-                      {userRole === 'executive' && ['pe-approved', 'final-approved'].includes(spcr.workflowStage) && (
+                      {userRole === "executive" && ["pe-approved", "final-approved"].includes(spcr.workflowStage) && (
                         <>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleSPCRAction(spcr, 'implement')}
+                            onClick={() => handleSPCRAction(spcr, "implement")}
                             className="border-blue-500 text-blue-600 hover:bg-blue-50"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
@@ -419,7 +434,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleSPCRAction(spcr, 'close-reject')}
+                            onClick={() => handleSPCRAction(spcr, "close-reject")}
                             className="border-orange-500 text-orange-600 hover:bg-orange-50"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
@@ -437,7 +452,7 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
               <Inbox className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <div className="text-sm">No SPCRs found</div>
               <div className="text-xs">
-                {spcrViewFilter === 'all' ? 'No SPCRs in your scope' : `No ${spcrViewFilter} SPCRs`}
+                {spcrViewFilter === "all" ? "No SPCRs in your scope" : `No ${spcrViewFilter} SPCRs`}
               </div>
             </div>
           )}
@@ -453,30 +468,36 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
       </CardContent>
 
       {/* Action Modal */}
-      <Dialog open={actionModal.isOpen} onOpenChange={(open) => !open && setActionModal({ isOpen: false, spcr: null, action: 'view', comment: '' })}>
+      <Dialog
+        open={actionModal.isOpen}
+        onOpenChange={(open) => !open && setActionModal({ isOpen: false, spcr: null, action: "view", comment: "" })}
+      >
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {actionModal.action === 'view' ? 'SPCR Details' : 
-               actionModal.action === 'approve' ? 'Approve SPCR' : 'Reject SPCR'}
+              {actionModal.action === "view"
+                ? "SPCR Details"
+                : actionModal.action === "approve"
+                ? "Approve SPCR"
+                : "Reject SPCR"}
             </DialogTitle>
           </DialogHeader>
-          
+
           {actionModal.spcr && (
             <div className="space-y-4">
               {/* SPCR Details */}
               <div className="p-4 bg-muted/50 rounded-lg space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">SPCR-{actionModal.spcr.id.split('-')[1]}</span>
+                  <span className="font-medium">SPCR-{actionModal.spcr.id.split("-")[1]}</span>
                   {getStatusBadge(actionModal.spcr)}
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <strong>Project:</strong> {getProjectName(actionModal.spcr.project_id)}
                   </div>
                   <div>
-                    <strong>Type:</strong> {actionModal.spcr.type === 'increase' ? 'Add Staff' : 'Remove Staff'}
+                    <strong>Type:</strong> {actionModal.spcr.type === "increase" ? "Add Staff" : "Remove Staff"}
                   </div>
                   <div>
                     <strong>Position:</strong> {actionModal.spcr.position}
@@ -485,13 +506,13 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                     <strong>Budget Impact:</strong> ${actionModal.spcr.budget.toLocaleString()}
                   </div>
                   <div>
-                    <strong>Start Date:</strong> {format(new Date(actionModal.spcr.startDate), 'MMM dd, yyyy')}
+                    <strong>Start Date:</strong> {format(new Date(actionModal.spcr.startDate), "MMM dd, yyyy")}
                   </div>
                   <div>
-                    <strong>End Date:</strong> {format(new Date(actionModal.spcr.endDate), 'MMM dd, yyyy')}
+                    <strong>End Date:</strong> {format(new Date(actionModal.spcr.endDate), "MMM dd, yyyy")}
                   </div>
                 </div>
-                
+
                 <div>
                   <strong>Justification:</strong>
                   <p className="text-sm text-muted-foreground mt-1">{actionModal.spcr.explanation}</p>
@@ -515,12 +536,15 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
                         <span className="text-sm font-medium">{comment.author}</span>
                         <div className="flex items-center gap-2">
                           {comment.action && (
-                            <Badge variant={comment.action === 'approve' ? 'default' : 'destructive'} className="text-xs">
+                            <Badge
+                              variant={comment.action === "approve" ? "default" : "destructive"}
+                              className="text-xs"
+                            >
                               {comment.action}
                             </Badge>
                           )}
                           <span className="text-xs text-muted-foreground">
-                            {format(new Date(comment.timestamp), 'MMM dd, yyyy HH:mm')}
+                            {format(new Date(comment.timestamp), "MMM dd, yyyy HH:mm")}
                           </span>
                         </div>
                       </div>
@@ -531,24 +555,25 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
               )}
 
               {/* Action Form */}
-              {actionModal.action !== 'view' && (
+              {actionModal.action !== "view" && (
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      {actionModal.action === 'approve' ? 'Approval Comments' : 'Rejection Reason'}
+                      {actionModal.action === "approve" ? "Approval Comments" : "Rejection Reason"}
                     </label>
                     <Textarea
-                      placeholder={actionModal.action === 'approve' 
-                        ? "Add any comments for the approval..."
-                        : "Please provide a reason for rejection..."
+                      placeholder={
+                        actionModal.action === "approve"
+                          ? "Add any comments for the approval..."
+                          : "Please provide a reason for rejection..."
                       }
                       value={actionModal.comment}
-                      onChange={(e) => setActionModal(prev => ({ ...prev, comment: e.target.value }))}
+                      onChange={(e) => setActionModal((prev) => ({ ...prev, comment: e.target.value }))}
                       rows={4}
                     />
                   </div>
-                  
-                  {actionModal.action === 'approve' && userRole === 'project-executive' && (
+
+                  {actionModal.action === "approve" && userRole === "project-executive" && (
                     <Alert>
                       <Info className="h-4 w-4" />
                       <AlertDescription>
@@ -561,19 +586,27 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
 
               {/* Action Buttons */}
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setActionModal({ isOpen: false, spcr: null, action: 'view', comment: '' })}>
-                  {actionModal.action === 'view' ? 'Close' : 'Cancel'}
+                <Button
+                  variant="outline"
+                  onClick={() => setActionModal({ isOpen: false, spcr: null, action: "view", comment: "" })}
+                >
+                  {actionModal.action === "view" ? "Close" : "Cancel"}
                 </Button>
-                
-                {actionModal.action !== 'view' && (
-                  <Button 
+
+                {actionModal.action !== "view" && (
+                  <Button
                     onClick={submitAction}
-                    className={actionModal.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
-                  >
-                    {actionModal.action === 'approve' 
-                      ? (userRole === 'project-executive' ? 'Approve & Forward' : 'Final Approve')
-                      : 'Reject SPCR'
+                    className={
+                      actionModal.action === "approve"
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-red-600 hover:bg-red-700"
                     }
+                  >
+                    {actionModal.action === "approve"
+                      ? userRole === "project-executive"
+                        ? "Approve & Forward"
+                        : "Final Approve"
+                      : "Reject SPCR"}
                   </Button>
                 )}
               </div>
@@ -583,4 +616,4 @@ export const SPCRInboxPanel: React.FC<SPCRInboxPanelProps> = ({ userRole }) => {
       </Dialog>
     </Card>
   )
-} 
+}

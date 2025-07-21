@@ -54,7 +54,7 @@ import { PresentationCarousel } from "@/components/presentation/PresentationCaro
 import { executiveStaffingSlides } from "@/components/presentation/executiveStaffingSlides"
 
 // Import components
-import { EnhancedInteractiveStaffingGantt } from "@/app/dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
+import { EnhancedInteractiveStaffingGantt } from "@/components/staffing/legacy/EnhancedInteractiveStaffingGantt"
 import { EnhancedHBIInsights } from "@/components/cards/EnhancedHBIInsights"
 import { ExportModal } from "@/components/constraints/ExportModal"
 import { BehavioralTeamCompatibility } from "@/components/staffing/BehavioralTeamCompatibility"

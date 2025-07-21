@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Filter, Download, Search, SortAsc, SortDesc, User, Users, RefreshCw } from "lucide-react"
-import { useStaffingStore, type StaffMember, type Project } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+import { useStaffingStore, type StaffMember, type Project } from "@/components/staffing/legacy/useStaffingStore"
 import {
   format,
   addDays,

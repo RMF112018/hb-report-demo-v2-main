@@ -1,19 +1,19 @@
 "use client"
 
-import { useState, useMemo, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import { 
-  CheckSquare, 
-  Clock, 
-  User, 
+import { useState, useMemo, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  CheckSquare,
+  Clock,
+  User,
   Calendar,
   ExternalLink,
   MessageSquare,
@@ -23,13 +23,13 @@ import {
   Filter,
   ArrowUp,
   ArrowDown,
-  Minus
-} from 'lucide-react'
-import { Task, User as UserType } from '@/types/productivity'
-import { useProductivityStore } from '../store/useProductivityStore'
-import { ThreadPanel } from './ThreadPanel'
-import { cn } from '@/lib/utils'
-import { formatDistanceToNow, parseISO, format } from 'date-fns'
+  Minus,
+} from "lucide-react"
+import { Task, User as UserType } from "@/types/productivity"
+import { useProductivityStore } from "@/components/productivity/store/useProductivityStore"
+import { ThreadPanel } from "./ThreadPanel"
+import { cn } from "@/lib/utils"
+import { formatDistanceToNow, parseISO, format } from "date-fns"
 
 interface TaskBoardProps {
   className?: string
@@ -37,24 +37,20 @@ interface TaskBoardProps {
   autoCreate?: boolean
 }
 
-export const TaskBoard = ({ 
-  className, 
-  selectedTaskId, 
-  autoCreate 
-}: TaskBoardProps) => {
+export const TaskBoard = ({ className, selectedTaskId, autoCreate }: TaskBoardProps) => {
   const { tasks, users, filterTasks, updateTaskStatus } = useProductivityStore()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterUser, setFilterUser] = useState<string>('all')
-  const [filterFeature, setFilterFeature] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filterUser, setFilterUser] = useState<string>("all")
+  const [filterFeature, setFilterFeature] = useState<string>("all")
   const [showCompletionDialog, setShowCompletionDialog] = useState(false)
-  const [completionComment, setCompletionComment] = useState('')
+  const [completionComment, setCompletionComment] = useState("")
   const [taskToComplete, setTaskToComplete] = useState<Task | null>(null)
 
   // Handle selectedTaskId prop
   useEffect(() => {
     if (selectedTaskId) {
-      const task = tasks.find(t => t.id === selectedTaskId)
+      const task = tasks.find((t) => t.id === selectedTaskId)
       if (task) {
         setSelectedTask(task)
       }
@@ -76,7 +72,11 @@ export const TaskBoard = ({
   const getUserInitials = (userId: string): string => {
     const user = getUserById(userId)
     if (!user) return userId.slice(0, 2).toUpperCase()
-    return user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    return user.name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
   }
 
   const filteredTasks = useMemo(() => {
@@ -85,24 +85,27 @@ export const TaskBoard = ({
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      allTasks = allTasks.filter(task => 
-        task.title.toLowerCase().includes(query) ||
-        task.description?.toLowerCase().includes(query) ||
-        task.linkedTo?.label.toLowerCase().includes(query)
+      allTasks = allTasks.filter(
+        (task) =>
+          task.title.toLowerCase().includes(query) ||
+          task.description?.toLowerCase().includes(query) ||
+          task.linkedTo?.label.toLowerCase().includes(query)
       )
     }
 
     // Apply other filters
     const filters: any = {}
-    if (filterUser !== 'all') filters.assignedTo = filterUser
-    if (filterFeature !== 'all') filters.linkedType = filterFeature
+    if (filterUser !== "all") filters.assignedTo = filterUser
+    if (filterFeature !== "all") filters.linkedType = filterFeature
 
-    return filterTasks(filters).filter(task => {
+    return filterTasks(filters).filter((task) => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
-        return task.title.toLowerCase().includes(query) ||
-               task.description?.toLowerCase().includes(query) ||
-               task.linkedTo?.label.toLowerCase().includes(query)
+        return (
+          task.title.toLowerCase().includes(query) ||
+          task.description?.toLowerCase().includes(query) ||
+          task.linkedTo?.label.toLowerCase().includes(query)
+        )
       }
       return true
     })
@@ -110,71 +113,71 @@ export const TaskBoard = ({
 
   const tasksByStatus = useMemo(() => {
     return {
-      todo: filteredTasks.filter(task => task.status === 'todo'),
-      'in-progress': filteredTasks.filter(task => task.status === 'in-progress'),
-      blocked: filteredTasks.filter(task => task.status === 'blocked'),
-      completed: filteredTasks.filter(task => task.status === 'completed')
+      todo: filteredTasks.filter((task) => task.status === "todo"),
+      "in-progress": filteredTasks.filter((task) => task.status === "in-progress"),
+      blocked: filteredTasks.filter((task) => task.status === "blocked"),
+      completed: filteredTasks.filter((task) => task.status === "completed"),
     }
   }, [filteredTasks])
 
   const getFeatureTypes = () => {
-    const types = new Set(tasks.map(t => t.linkedTo?.type).filter(Boolean))
+    const types = new Set(tasks.map((t) => t.linkedTo?.type).filter(Boolean) as string[])
     return Array.from(types)
   }
 
   const getFeatureDisplayName = (type: string) => {
     const displayNames: { [key: string]: string } = {
-      'daily-log': 'Daily Log',
-      'forecast': 'Forecast',
-      'procurement': 'Procurement',
-      'schedule': 'Schedule',
-      'inspection': 'Inspection',
-      'constraint': 'Constraint',
-      'permit': 'Permit',
-      'financial': 'Financial',
-      'report': 'Report'
+      "daily-log": "Daily Log",
+      forecast: "Forecast",
+      procurement: "Procurement",
+      schedule: "Schedule",
+      safety: "Safety",
+      quality: "Quality",
+      permit: "Permit",
+      budget: "Budget",
+      other: "Report",
     }
     return displayNames[type] || type
   }
 
-  const getPriorityIcon = (priority: Task['priority']) => {
+  const getPriorityIcon = (priority: Task["priority"]) => {
     switch (priority) {
-      case 'high':
+      case "high":
         return <ArrowUp className="w-3 h-3 text-red-500" />
-      case 'medium':
+      case "medium":
         return <Minus className="w-3 h-3 text-yellow-500" />
-      case 'low':
+      case "low":
         return <ArrowDown className="w-3 h-3 text-green-500" />
       default:
         return null
     }
   }
 
-  const getPriorityColor = (priority: Task['priority']) => {
+  const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
-      case 'high':
-        return 'border-l-red-500'
-      case 'medium':
-        return 'border-l-yellow-500'
-      case 'low':
-        return 'border-l-green-500'
+      case "high":
+        return "border-l-red-500"
+      case "medium":
+        return "border-l-yellow-500"
+      case "low":
+        return "border-l-green-500"
       default:
-        return 'border-l-gray-300'
+        return "border-l-gray-300"
     }
   }
 
-  const getStatusColor = (status: Task['status']) => {
+  const getStatusColor = (status: Task["status"]) => {
     switch (status) {
-      case 'todo':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-      case 'blocked':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-      case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+      case "todo":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
+      case "in-progress":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+      case "blocked":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+      case "completed":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
     }
   }
 
@@ -182,27 +185,27 @@ export const TaskBoard = ({
     if (!task.linkedTo) return null
 
     const typeColors = {
-      'daily-log': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-      'forecast': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      'procurement': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-      'schedule': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-      'inspection': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      'constraint': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-      'permit': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-      'financial': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-      'report': 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+      "daily-log": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      forecast: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      procurement: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      schedule: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+      safety: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+      quality: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      permit: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+      budget: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+      other: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
     }
 
     return (
-      <Badge variant="outline" className={cn('text-xs', typeColors[task.linkedTo.type])}>
+      <Badge variant="outline" className={cn("text-xs", typeColors[task.linkedTo.type as keyof typeof typeColors])}>
         <ExternalLink className="w-2 h-2 mr-1" />
         {getFeatureDisplayName(task.linkedTo.type)}
       </Badge>
     )
   }
 
-  const handleStatusChange = (task: Task, newStatus: Task['status']) => {
-    if (newStatus === 'completed') {
+  const handleStatusChange = (task: Task, newStatus: Task["status"]) => {
+    if (newStatus === "completed") {
       setTaskToComplete(task)
       setShowCompletionDialog(true)
     } else {
@@ -212,15 +215,15 @@ export const TaskBoard = ({
 
   const handleCompleteTask = () => {
     if (taskToComplete) {
-      updateTaskStatus(taskToComplete.id, 'completed', completionComment || undefined)
+      updateTaskStatus(taskToComplete.id, "completed", completionComment || undefined)
       setShowCompletionDialog(false)
-      setCompletionComment('')
+      setCompletionComment("")
       setTaskToComplete(null)
     }
   }
 
   const isOverdue = (task: Task) => {
-    return task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed'
+    return task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "completed"
   }
 
   const renderTaskCard = (task: Task) => {
@@ -232,9 +235,9 @@ export const TaskBoard = ({
       <Card
         key={task.id}
         className={cn(
-          'cursor-pointer transition-all duration-200 hover:shadow-md border-l-4',
+          "cursor-pointer transition-all duration-200 hover:shadow-md border-l-4",
           getPriorityColor(task.priority),
-          selectedTask?.id === task.id && 'ring-2 ring-blue-500'
+          selectedTask?.id === task.id && "ring-2 ring-blue-500"
         )}
         onClick={() => setSelectedTask(task)}
       >
@@ -246,22 +249,17 @@ export const TaskBoard = ({
               <h4 className="font-medium text-sm line-clamp-2 flex-1">{task.title}</h4>
             </div>
             <div className="flex items-center space-x-1 shrink-0">
-              {overdue && (
-                <AlertCircle className="w-4 h-4 text-red-500" />
-              )}
-              <Select
-                value={task.status}
-                onValueChange={(value) => handleStatusChange(task, value as Task['status'])}
-              >
+              {overdue && <AlertCircle className="w-4 h-4 text-red-500" />}
+              <Select value={task.status} onValueChange={(value) => handleStatusChange(task, value as Task["status"])}>
                 <SelectTrigger className="w-auto h-7 text-xs px-3 border-none shadow-none">
-                  <span className={cn(
-                    'px-2 py-1 rounded-full text-xs font-medium',
-                    getStatusColor(task.status)
-                  )}>
-                    {task.status === 'in-progress' ? 'In Progress' : 
-                     task.status === 'todo' ? 'To Do' :
-                     task.status === 'completed' ? 'Done' : 
-                     'Blocked'}
+                  <span className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(task.status))}>
+                    {task.status === "in-progress"
+                      ? "In Progress"
+                      : task.status === "todo"
+                      ? "To Do"
+                      : task.status === "completed"
+                      ? "Done"
+                      : "Blocked"}
                   </span>
                 </SelectTrigger>
                 <SelectContent>
@@ -275,28 +273,18 @@ export const TaskBoard = ({
           </div>
 
           {/* Linked entity badge */}
-          <div className="mb-2">
-            {getLinkedEntityBadge(task)}
-          </div>
+          <div className="mb-2">{getLinkedEntityBadge(task)}</div>
 
           {/* Description */}
-          {task.description && (
-            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-              {task.description}
-            </p>
-          )}
+          {task.description && <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>}
 
           {/* Footer with assignee and metadata */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center space-x-2 min-w-0">
               <Avatar className="w-6 h-6 shrink-0">
-                <AvatarFallback className="text-xs">
-                  {getUserInitials(task.assignedTo)}
-                </AvatarFallback>
+                <AvatarFallback className="text-xs">{getUserInitials(task.assignedTo)}</AvatarFallback>
               </Avatar>
-              <span className="text-xs text-muted-foreground truncate">
-                {user?.name || `User ${task.assignedTo}`}
-              </span>
+              <span className="text-xs text-muted-foreground truncate">{user?.name || `User ${task.assignedTo}`}</span>
             </div>
 
             <div className="flex items-center space-x-3 text-xs text-muted-foreground shrink-0">
@@ -308,8 +296,8 @@ export const TaskBoard = ({
               )}
               <div className="flex items-center space-x-1">
                 <Calendar className="w-3 h-3" />
-                <span className={overdue ? 'text-red-500 font-medium' : ''}>
-                  {task.dueDate ? format(task.dueDate, 'MMM d') : 'No date'}
+                <span className={overdue ? "text-red-500 font-medium" : ""}>
+                  {task.dueDate ? format(task.dueDate, "MMM d") : "No date"}
                 </span>
               </div>
             </div>
@@ -319,7 +307,7 @@ export const TaskBoard = ({
     )
   }
 
-  const renderColumn = (status: Task['status'], title: string, tasks: Task[]) => {
+  const renderColumn = (status: Task["status"], title: string, tasks: Task[]) => {
     return (
       <div className="flex-1 min-w-0">
         <Card>
@@ -329,7 +317,9 @@ export const TaskBoard = ({
                 <CheckSquare className="w-4 h-4 mr-2" />
                 {title}
               </CardTitle>
-              <Badge variant="secondary" className="shrink-0">{tasks.length}</Badge>
+              <Badge variant="secondary" className="shrink-0">
+                {tasks.length}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
@@ -349,7 +339,7 @@ export const TaskBoard = ({
   }
 
   return (
-    <div className={cn('h-full flex flex-col', className)}>
+    <div className={cn("h-full flex flex-col", className)}>
       {/* Header with Filters */}
       <div className="mb-6 space-y-4 shrink-0">
         <div className="flex items-center justify-between">
@@ -406,27 +396,21 @@ export const TaskBoard = ({
         <div className="flex-1 min-w-0 overflow-auto">
           {/* Mobile: Vertical stack */}
           <div className="flex flex-col gap-4 sm:hidden">
-            {renderColumn('todo', 'To Do', tasksByStatus.todo)}
-            {renderColumn('in-progress', 'In Progress', tasksByStatus['in-progress'])}
-            {renderColumn('blocked', 'Blocked', tasksByStatus.blocked)}
-            {renderColumn('completed', 'Done', tasksByStatus.completed)}
+            {renderColumn("todo", "To Do", tasksByStatus.todo)}
+            {renderColumn("in-progress", "In Progress", tasksByStatus["in-progress"])}
+            {renderColumn("blocked", "Blocked", tasksByStatus.blocked)}
+            {renderColumn("completed", "Done", tasksByStatus.completed)}
           </div>
-          
+
           {/* Desktop: Horizontal layout */}
           <div className="hidden sm:block">
             <div className="flex gap-4 items-start">
+              <div className="flex-1 min-w-64">{renderColumn("todo", "To Do", tasksByStatus.todo)}</div>
               <div className="flex-1 min-w-64">
-                {renderColumn('todo', 'To Do', tasksByStatus.todo)}
+                {renderColumn("in-progress", "In Progress", tasksByStatus["in-progress"])}
               </div>
-              <div className="flex-1 min-w-64">
-                {renderColumn('in-progress', 'In Progress', tasksByStatus['in-progress'])}
-              </div>
-              <div className="flex-1 min-w-64">
-                {renderColumn('blocked', 'Blocked', tasksByStatus.blocked)}
-              </div>
-              <div className="flex-1 min-w-64">
-                {renderColumn('completed', 'Done', tasksByStatus.completed)}
-              </div>
+              <div className="flex-1 min-w-64">{renderColumn("blocked", "Blocked", tasksByStatus.blocked)}</div>
+              <div className="flex-1 min-w-64">{renderColumn("completed", "Done", tasksByStatus.completed)}</div>
             </div>
           </div>
         </div>
@@ -444,9 +428,7 @@ export const TaskBoard = ({
             <DialogTitle>Complete Task</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Add a comment about completing this task (optional):
-            </p>
+            <p className="text-sm text-muted-foreground">Add a comment about completing this task (optional):</p>
             <Textarea
               value={completionComment}
               onChange={(e) => setCompletionComment(e.target.value)}
@@ -457,9 +439,7 @@ export const TaskBoard = ({
               <Button variant="outline" onClick={() => setShowCompletionDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleCompleteTask}>
-                Complete Task
-              </Button>
+              <Button onClick={handleCompleteTask}>Complete Task</Button>
             </div>
           </div>
         </DialogContent>

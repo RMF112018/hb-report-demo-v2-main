@@ -42,7 +42,7 @@ import {
   SortDesc,
   Filter,
 } from "lucide-react"
-import { useStaffingStore } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+import { useStaffingStore } from "@/components/staffing/legacy/useStaffingStore"
 import { BehavioralTeamCompatibility } from "@/components/staffing/BehavioralTeamCompatibility"
 import { TeamCompatibilityEngine } from "@/components/staffing/TeamCompatibilityEngine"
 
@@ -52,7 +52,7 @@ interface EnhancedInteractiveStaffingGanttProps {
 }
 
 // Use the StaffMember type from the store
-import type { StaffMember as BaseStaffMember } from "@/app/dashboard/staff-planning/store/useStaffingStore"
+import type { StaffMember as BaseStaffMember } from "@/components/staffing/legacy/useStaffingStore"
 
 // Extended StaffMember type with behavioral profile
 interface StaffMember extends BaseStaffMember {
