@@ -37,3 +37,11 @@ data/mock/logs/daily-log.json
 
 # previous build
 /hb-report-mvp-wireFrame-main
+
+# Explicitly include .cursor directories to prevent accidental deletion
+!.cursor/
+!.cursor/rules/
+!.cursor/rules/audits/
+!.cursor/rules/features/
+!.cursor/rules/tests/
+!.cursor/rules/**/*.mdc
