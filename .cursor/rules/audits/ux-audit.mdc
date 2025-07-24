@@ -1,0 +1,178 @@
+title: Comprehensive UX and Display Quality Audit Ruleset for HB Report Demo v3.0
+version: 1.0.0
+date: 2025-07-24
+description: Ruleset for conducting a deep audit of user experience and display quality within the HB Report Demo application. Focused on navigation, flow, interactivity, accessibility, responsiveness, and feedback, this audit aims to produce actionable insights that elevate the UX while preserving the minimalist aesthetic.
+scope:
+
+- user_experience
+- interaction_quality
+- accessibility
+- display_consistency
+- minimalist_ui_enhancement
+  output:
+  report: /docs/maintenance/UX_DISPLAY_AUDIT_REPORT.md
+  artifacts: /docs/audits/ux-display/
+
+---
+
+# Comprehensive UX and Display Quality Audit Ruleset
+
+## :overview
+
+This ruleset defines the procedures for a full-spectrum UX and display quality audit of the HB Report Demo v3.0 application (built with React, Next.js, and TypeScript). The objective is to identify and recommend improvements to core UX principles—flow, intuitiveness, interactivity, accessibility, feedback, and navigation—while preserving and enhancing the app’s minimalist design philosophy.
+
+This audit emphasizes both macro and micro-level interactions, evaluating how well the system supports user needs, provides feedback, avoids confusion, and ensures aesthetic and functional consistency across devices and roles.
+
+## :scope
+
+- **Primary Focus**:
+
+  - **User Experience**: Flow, navigational clarity, role-specific pathways, discoverability, and predictability
+  - **Interactivity**: Input responsiveness, microinteractions, hover/press states, empty states, and system feedback
+  - **Accessibility**: Keyboard navigability, screen reader readiness, contrast, semantic structure, and ARIA support
+  - **Responsiveness**: Layout adaptability across breakpoints (tablet, desktop, widescreen)
+  - **Visual and Display Quality**: Minimalist design execution, spatial balance, color usage, and animation harmony
+
+- **Secondary Focus**:
+
+  - Enhancement opportunities without compromising the minimalist UI (e.g., refined transitions, intentional whitespace, subtle cues)
+  - UX inconsistencies across user roles (Executive, PX, PM, Estimator, Admin)
+
+- **Output**:
+  - Structured report at `/docs/maintenance/UX_DISPLAY_AUDIT_REPORT.md`
+  - Artifact repository at `/docs/audits/ux-display/` with supporting materials (screenshots, flow maps, accessibility logs)
+
+## :instructions
+
+### :preparation
+
+**Access Requirements**:
+
+- Full codebase visibility within the Cursor workspace
+- Active development server for real-time user interaction simulation
+
+**Tool Setup**:
+
+- Use browser devtools, Lighthouse, Axe, React DevTools, and screen reader simulation
+- Simulate user roles and flows by logging in with different demo accounts
+- Emulate device sizes and interaction patterns (e.g., mouse, keyboard, touch)
+- Prepare visual mapping tools (e.g., wireflow or screen transition map) to track navigation
+
+### :audit_execution
+
+**Documentation Reference**:
+Align evaluations with:
+
+- `/docs/DOCUMENTATION_TREE.md`
+- `guides/user-guides/responsive-enhancement-report.md`
+- `architecture/layout-standards.md`
+- `guides/developer-guides/ui-design.md`
+- `CONTRIBUTING.md`
+
+**Systematic Review**:
+
+#### 1. **User Experience Evaluation**
+
+- **Navigation Flow**:
+  - Are menus, pages, and buttons logically placed?
+  - Do role-based dashboards provide intuitive access to critical features?
+- **Task Continuity**:
+  - Is it easy to resume or complete tasks without interruption or disorientation?
+- **Onboarding & Discoverability**:
+  - Are key functions discoverable without help documentation?
+  - Are unused or hidden features visible but unobtrusive?
+- **Feedback & Communication**:
+  - Are form submissions, loading states, success/failure feedback consistent and immediate?
+- **Empty, Loading, and Error States**:
+  - Do all views gracefully handle zero data, slow connections, or failed fetches?
+
+#### 2. **Interactivity and Microfeedback**
+
+- Inspect:
+  - Hover, press, focus, and disabled states for all interactive elements
+  - Transitions on modals, dropdowns, tabs, cards, and tooltips
+  - Form behavior including validation and correction
+
+#### 3. **Accessibility**
+
+- Audit:
+  - Keyboard navigation support across all interactive elements
+  - Logical tab order and focus indicators
+  - Color contrast (WCAG 2.1 AA minimum)
+  - ARIA labels and roles
+  - Semantic HTML usage
+
+#### 4. **Responsiveness**
+
+- Evaluate:
+  - Layout reflow across breakpoints: 768px+, 1024px+, 1440px+, and ultra-wide
+  - Collapse logic of navigation components and card grids
+  - Alignment and spacing integrity across screen sizes
+  - Font scaling and line wrapping
+
+#### 5. **Visual & Display Quality**
+
+- Assess:
+  - Visual hierarchy, whitespace usage, typography consistency
+  - Iconography and button sizing
+  - Minimalist integrity: balance between information density and clarity
+  - Motion: evaluate tasteful use of transitions and animation pacing
+
+#### 6. **Role-Based UX Consistency**
+
+- Compare:
+  - Experience parity and clarity across user roles
+  - Inconsistencies in component rendering or layout logic
+  - Appropriateness of displayed features and data by role
+
+### :report_structure
+
+**Markdown Report Structure in `/docs/maintenance/UX_DISPLAY_AUDIT_REPORT.md`:**
+
+- **Executive Summary**: Brief overview of UX quality and display health
+- **User Flow Maps**: Key journeys (e.g., login → dashboard → detail view)
+- **Strengths**: Highlight standout areas (e.g., dashboard card modularity, fast rendering)
+- **Issues Identified**:
+  - **Critical**: UX blockers, accessibility violations
+  - **High**: Interaction breakdowns, navigation friction
+  - **Medium**: Aesthetic inconsistencies, weak feedback states
+- **UX Analysis**:
+  - Flow clarity, feedback reliability, task continuity
+  - Interactive component audit (by file/component)
+- **Accessibility Summary**: Violations and risk levels
+- **Display Quality**: Evaluation of visual consistency, hierarchy, and minimalism adherence
+- **Enhancement Opportunities**: Low-effort, high-impact improvements (e.g., add focus state to buttons)
+- **Action Plan**:
+  - **Immediate (1 week)**: Accessibility remediations
+  - **Short-term (2–4 weeks)**: Flow refinements, loading/error UX
+  - **Medium-term (2–3 months)**: Navigation optimizations, interaction polish
+  - **Long-term (4–6 months)**: UX research loops and formalized feedback collection
+- **Recommendations**:
+  - Incorporate user testing and feedback analytics
+  - Add responsive/motion/UX standards to documentation
+  - Integrate Lighthouse into CI for regression control
+- **Conclusion**: Summary of UX value and visual cohesion gains
+
+### :output_documentation
+
+- Append or revise `/docs/maintenance/UX_DISPLAY_AUDIT_REPORT.md`, preserving historical data (e.g., `"Audit Update: UX and Display [2025-07-24]"`)
+- Save:
+  - Annotated screenshots
+  - Accessibility tool outputs
+  - UX flow diagrams (PNG/SVG)
+  - Suggestions summary
+- Create `/docs/audits/ux-display/` if missing
+- Update:
+  - `/guides/user-guides/responsive-enhancement-report.md`
+  - `/architecture/layout-standards.md` with design consistency recommendations
+- Follow Markdown and tone conventions in `CONTRIBUTING.md`
+
+### :constraints
+
+- Do not modify source code
+- Manual inspection required if automated tools fail
+- Avoid introducing complexity—enhancements must serve clarity and usability within the minimalist framework
+
+### :execution
+
+Begin immediately. Conduct methodical evaluations of all user flows, UI surfaces, and interaction points with an emphasis on elevating UX maturity, design cohesion, and system clarity. The goal is a refined, effortless, and consistent user experience across all roles and screen sizes.

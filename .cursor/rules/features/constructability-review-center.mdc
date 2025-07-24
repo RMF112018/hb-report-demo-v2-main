@@ -1,0 +1,190 @@
+# constructability-review-center.mdc
+
+## Overview
+
+Refactor and expand the HB Intel platform’s constructability review workflow. This module is embedded into the **Project Control Center** under the `Pre-Construction > Pre-Construction` tab. It should feature a live dashboard, review log, review creation form, and downloadable report generator. Each review uses a stage-specific scorecard tied to a 1–10 scale and weighted category system.
+
+---
+
+## Features
+
+### 1. Constructability Review Dashboard
+
+- View live scores from current reviews per project.
+- Filter by project stage, reviewer, or completion status.
+- Include stage status indicator and weighted average score.
+
+### 2. Constructability Review Log
+
+- Historical list of all completed reviews.
+- Table columns: project name, design stage, date, reviewer, overall score, report download.
+- Grouped by design stage.
+
+### 3. Review Creation Tool
+
+- Trigger new review based on current project stage.
+- Score 1–10 per review item.
+- Scores are weighted by stage-specific ratios.
+- Auto-calculate and display overall score.
+- Save draft, submit final, or export PDF.
+
+---
+
+## Design Stages & Weighting Ratios
+
+| Stage                 | Design Feas. | Coord/Complete | Compliance | Cost/Schedule | Constructability | BIM Review |
+| --------------------- | ------------ | -------------- | ---------- | ------------- | ---------------- | ---------- |
+| Schematic Design      | 35%          | 15%            | 20%        | 20%           | 10%              | —          |
+| 50% Design Dev        | 25%          | 20%            | 15%        | 20%           | 15%              | 5%         |
+| 100% Design Dev       | 15%          | 25%            | 20%        | 15%           | 15%              | 10%        |
+| 80% Construction Docs | 10%          | 25%            | 20%        | 15%           | 15%              | 15%        |
+| 100% Construction Doc | 5%           | 25%            | 20%        | 15%           | 15%              | 20%        |
+
+---
+
+## Grading Scale (1–10)
+
+- **1–3:** Major issues, severe risks, incomplete or conflicting design.
+- **4–6:** Average quality, minor gaps, some uncertainty.
+- **7–8:** High-quality documents with few risks.
+- **9–10:** Fully coordinated, code-compliant, and constructible documents.
+
+---
+
+## Review Item Templates
+
+### Schematic Design (SD)
+
+#### Design Feasibility
+
+- Verify conceptual layouts align with project goals
+- Assess feasibility of proposed building systems
+- Confirm design supports intended use
+
+#### Coordination and Completeness
+
+- Check basic alignment between disciplines
+- Verify inclusion of major project components
+
+#### Compliance and Regulatory
+
+- Assess compliance with zoning regulations
+- Review environmental constraints
+
+#### Cost and Schedule
+
+- Evaluate design against initial budget
+- Identify early value engineering opportunities
+- Assess impact on preliminary schedule
+
+#### Constructability and Safety
+
+- Evaluate site access for construction
+- Identify major constructability challenges
+- Ensure design avoids obvious safety risks
+
+---
+
+### 50% Design Development (DD)
+
+(Same review items as SD. See rationale for adjusted weightings.)
+
+---
+
+### 100% Design Development (DD)
+
+#### Design Feasibility
+
+- Confirm design supports functionality and aesthetics
+- Assess feasibility of selected materials and systems
+
+#### Coordination and Completeness
+
+- Verify completeness of architectural and engineering drawings
+- Check coordination between disciplines
+- Confirm specifications outline major materials
+
+#### Compliance and Regulatory
+
+- Verify compliance with building codes
+- Ensure accessibility requirements are met
+- Assess environmental compliance
+
+#### Cost and Schedule
+
+- Review design alignment with updated budget
+- Evaluate value engineering options
+- Assess schedule impacts of design choices
+
+#### Constructability and Safety
+
+- Evaluate constructability of detailed designs
+- Identify sequencing challenges
+- Ensure safety in design implementation
+
+#### BIM Team Review
+
+- Verify BIM model accuracy for all major systems
+- Check clash detection for preliminary conflicts
+- Confirm BIM model includes specifications data
+- Review BEP implementation and updates
+- Assess model readiness for CD phase
+
+(80% CD and 100% CD will follow same item structure, with increased BIM and execution emphasis.)
+
+---
+
+## Report Generator
+
+- Export completed reviews as branded PDF report
+- Include: project metadata, design stage, scores per category, item comments (if any), weighted calculation table, signature line
+- Embed methodology and weighting table at end
+
+---
+
+## Mock Data
+
+- Add `mock/preconstruction/reviewLog.json`
+- Add `mock/preconstruction/reviewTemplates.json`
+
+---
+
+## Access + Visibility
+
+- Only available to: Precon Manager, Estimator, Project Manager
+- Route: `/projects/[project_id]/preconstruction/reviews`
+
+---
+
+## Integration Notes
+
+- Use localStorage to track draft progress
+- Scores stored in JSON structure:
+
+```json
+{
+  "project_id": 123456,
+  "stage": "100% DD",
+  "date": "2025-07-10",
+  "reviewer": "Jane Smith",
+  "scores": {
+    "Design Feasibility": 7.5,
+    "Coordination and Completeness": 8,
+    "Compliance and Regulatory": 8,
+    "Cost and Schedule": 7,
+    "Constructability and Safety": 7,
+    "BIM Team Review": 8
+  },
+  "overall_score": 7.45
+}
+```
+
+---
+
+## Implementation Tips
+
+- Use consistent table/grid UI components
+- Visualize category weighting in side-by-side bar
+- Offer keyboard input + slider for score entry
+- Allow future filtering by stage, score range, reviewer
+- Ensure report export is print-optimized

@@ -1,0 +1,120 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# 🧭 Cursor Ruleset: Guided Tour Modal Refactor
+
+---
+
+## 🎯 Objective
+
+Replace the current guided tour popover system with a **static modal-based tour interface**. Each step should display a centered modal with a supporting screenshot or visual highlight of the target UI.
+
+---
+
+## 🧱 Modal-Based Tour Architecture
+
+### 🔧 Components to Create
+
+#### `TourModal.tsx`
+- A full-screen overlay modal rendered in the center of the screen.
+- Displays:
+  - Step title
+  - Description/instructions
+  - Screenshot or annotated image (`screenshotUrl`)
+  - Navigation buttons (`Back`, `Next`, `Done`)
+- Optional: Use a semi-transparent backdrop with dark/light compatibility.
+
+#### `TourStepImage.tsx`
+- Optional component to render an image (`screenshotUrl`) with an optional `highlightRect` overlay.
+
+#### `useTour.ts`
+- Hook that controls tour step sequencing (start, next, back, finish).
+- Integrates with `tour-context.tsx` for state.
+
+---
+
+## 🧩 Tour Step Definition Model (Refactored)
+
+Update `tour-definitions.ts` to use the following schema per step:
+
+```ts
+{
+  id: string;
+  title: string;
+  description: string;
+  screenshotUrl: string;
+  highlightRect?: { x: number; y: number; width: number; height: number };
+}
+```
+
+- `screenshotUrl`: path to pre-generated image
+- `highlightRect`: optional bounding box (used by TourStepImage to render a highlight)
+
+---
+
+## 🧰 Supporting Logic
+
+#### Screenshot Generator (dev-only)
+Use Puppeteer or html2canvas to automate screenshot generation:
+
+- Navigate to route
+- Locate element by `[data-tour-id]`
+- Capture screenshot and save to `/public/tours/{page}/step-{n}.png`
+
+Puppeteer example:
+```js
+await page.goto('http://localhost:3000/dashboard');
+const el = await page.$('[data-tour-id="dashboard-widget"]');
+await el.screenshot({ path: 'public/tours/dashboard/step-3.png' });
+```
+
+---
+
+## 🎨 Styling
+
+- Modal and tour components must:
+  - Support light and dark mode (`bg-background`, `text-foreground`)
+  - Use `shadcn/ui` modal/card components
+  - Be fully responsive and keyboard accessible
+
+---
+
+## 🧪 Testing & QA
+
+- Validate all modal steps render from real step definitions
+- Confirm that fallback steps (e.g., missing image) degrade gracefully
+- Ensure keyboard navigation and focus traps work inside modal
+- Run snapshot tests or visual regression tests (optional)
+
+---
+
+## 📂 File Placement
+
+- `components/ui/TourModal.tsx`
+- `components/ui/TourStepImage.tsx`
+- `data/tours/tour-definitions.ts` (updated)
+- `hooks/useTour.ts`
+- `/public/tours/` → static screenshots
+
+---
+
+## 🔁 Transition Plan
+
+- Preserve `TakeTourButton.tsx` and `tour-context.tsx`
+- Disable/remove floating popover logic in `tour.tsx` and `useTourPositioning.ts`
+- Replace usage with modal-based system
+
+---
+
+## 🚀 Optional Enhancements
+
+- Add animated transitions between steps
+- Add call-to-action at the end of each tour
+- Track step progress in localStorage or context for resuming
+
+---
+# END OF RULESET
+

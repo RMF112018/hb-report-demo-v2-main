@@ -1,0 +1,106 @@
+title: QA/QC Ruleset for Dashboard UI Analysis and Refactoring
+version: 1.0.0
+date: 2025-07-24
+description: Ruleset for conducting a QA/QC audit focused on tracing files and components loaded after user login, analyzing the dashboard UI and associated layout, grid, and card files, with emphasis on UI responsiveness, overflow, clashing, and refactoring for consistent display across display sizes.
+scope:
+
+- ui_analysis
+- responsiveness
+- refactoring
+  output:
+  report: /docs/maintenance/UI_ANALYSIS_REPORT.md
+  artifacts: /docs/audits/ui-responsiveness/
+
+---
+
+# QA/QC Ruleset for Dashboard UI Analysis and Refactoring
+
+## :overview
+
+This ruleset provides structured instructions for the Cursor platform to conduct a focused Quality Assurance and Quality Control (QA/QC) audit of the dashboard UI in the React application (Next.js, TypeScript). The audit involves tracing files and components loaded post-login, performing a comprehensive UI analysis, and recommending refactors to ensure consistency across display sizes, excluding small mobile devices which require a distinct configuration.
+
+## :scope
+
+**Primary Focus:**
+
+- Tracing of files and components post-login
+- Analysis of dashboard UI elements including layouts, grids, and cards
+- Checks for overflow, element clashing, responsiveness, and overall UI integrity
+
+**Secondary Focus:**
+
+- Identification of refactoring opportunities to achieve consistent display on medium to large screens
+- Noting unique setups for small mobile devices
+
+**Output:**
+
+- Updates `/docs/maintenance/UI_ANALYSIS_REPORT.md` with audit findings
+- Saves analysis artifacts (e.g., screenshots, diagrams) to `/docs/audits/ui-responsiveness/`
+
+## :instructions
+
+### :preparation
+
+**Access:**  
+Assume full access to the codebase in the current Cursor workspace.
+
+**Tool Setup:**
+
+- Launch the application in a development environment to simulate user login.
+- Use browser developer tools (React DevTools, Network tab) to trace loaded components and assets post-login.
+- If automated tracing is unavailable, manually inspect code from login handlers (e.g., `app/login/page.tsx`) to dashboard entry (e.g., `app/dashboard/page.tsx`).
+- Emulate various screen sizes in browser tools (exclude <768px for main focus, but note findings separately).
+
+### :audit_execution
+
+**Documentation Reference:**
+
+- Align with `/docs/DOCUMENTATION_TREE.md`, `CONTRIBUTING.md`, and related guides (e.g., `architecture/layout-standards.md`, `ui-design.md`).
+
+**Systematic Review:**
+
+- **Post-Login Tracing:** List all loaded files, components, and assets. Map imports and renders from login to dashboard (layouts, grids, cards).
+- **UI Analysis:** Evaluate for overflow (e.g., scrollbars, truncation), element clashing, alignment issues, flex/grid layout performance, and visual consistency.
+- **Specific Checks:**
+  - Verify breakpoints (tablet, desktop) via media queries.
+  - Assess card/grid flexibility and style behavior.
+  - Confirm accessibility of responsive elements (e.g., focus states).
+- **Refactoring Focus:** Evaluate files like `components/ui/grid.tsx`, `components/ui/card.tsx`, layout wrappers for opportunities to consolidate Tailwind classes or define responsive design standards.
+
+## :report_structure
+
+Update `/docs/maintenance/UI_ANALYSIS_REPORT.md` with:
+
+1. **Executive Summary**: Overview of tracing, major findings, and priority refactoring needs
+2. **Post-Login Trace Analysis**: Component load map, file list, and render sequences
+3. **Strengths**: Highlight well-implemented patterns or responsive behaviors
+4. **Issues Found**
+   - **Critical**: Severe UI failures on standard screen sizes
+   - **High**: Major responsiveness issues
+   - **Medium**: Minor inconsistencies or visual misalignments
+5. **UI Responsiveness Analysis**: Findings from layout checks (e.g., overflow, grid breakdowns)
+6. **Refactoring Recommendations**: Targeted changes to ensure layout consistency across medium-to-large screens
+7. **Prioritized Action Plan**
+   - Immediate (1 week): Critical fixes
+   - Short-term (2–4 weeks): High-priority refactors
+   - Medium-term (2–3 months): Design consistency enhancements
+   - Long-term (4–6 months): Introduce automated visual regression/UI tests
+8. **Conclusion**: Restate key benefits of UI consistency and responsive improvements
+
+## :output_documentation
+
+- Append or revise `/docs/maintenance/UI_ANALYSIS_REPORT.md`, preserving history (e.g., section: `"Audit Update: Dashboard UI Analysis [2025-07-24]"`)
+- Save screenshots, trace maps, and diagrams to `/docs/audits/ui-responsiveness/`
+- Update `/guides/developer-guides/ui-design.md` with a section on responsive best practices based on audit findings
+- If UI refactoring needs are significant, update `/maintenance/ui-issues-summary.md`
+- Follow formatting in `CONTRIBUTING.md`: use Markdown, structured tables, code blocks, and clear professional language
+
+## :constraints
+
+- Do **not** modify code during audit
+- If tracing tools fail, use manual tracing via import and render analysis
+- Emphasize analysis for medium-to-large displays; small mobile views should be noted but not prioritized for this audit
+
+## :execution
+
+Begin the audit immediately. Ensure comprehensive tracing and UI evaluation, with clear documentation and refactoring recommendations focused on responsive design and cross-device consistency.

@@ -1,0 +1,90 @@
+---
+title: QA/QC Audit Ruleset for HB Report Demo v3.0
+version: 1.0.0
+date: 2025-07-22
+description: Ruleset for conducting a QA/QC audit focused on code quality and maintainability for the HB Report Demo React application, with dependency analysis using Dependency Cruiser.
+scope:
+  - code_quality
+  - maintainability
+  - dependency_analysis
+output:
+  report: /docs/maintenance/QA_QC_AUDIT_REPORT.md
+  artifacts: /docs/audits/code-quality/
+---
+
+# QA/QC Audit Ruleset
+
+## :overview
+
+This ruleset provides structured instructions for the Cursor platform to conduct a focused Quality Assurance and Quality Control (QA/QC) audit of the HB Report Demo React application (Next.js, TypeScript), emphasizing code quality and maintainability. The audit integrates a dependency analysis using Dependency Cruiser and ensures alignment with documentation standards in the `/docs` directory.
+
+## :scope
+
+- **Primary Focus**: Code quality (ESLint violations, TypeScript strictness, code style) and maintainability (modular architecture, dependency management, technical debt).
+- **Secondary Focus**: Performance, security, accessibility, and testing coverage as they relate to maintainability.
+- **Output**: Updates `docs/maintenance/QA_QC_AUDIT_REPORT.md` with audit findings, saves dependency graphs and analyses to `/docs/audits/code-quality/`.
+
+## :instructions
+
+### :preparation
+
+- **Access**: Assume full access to the codebase in the current Cursor workspace.
+- **Tool Setup**:
+  - Install Dependency Cruiser temporarily via npm: `npx dependency-cruiser --init` if configuration is needed.
+  - Run `npx depcruise --output-type dot src > dependencies.dot` to generate a dependency graph for `src/` or `app/`, capturing import/export relationships, circular dependencies, and module hierarchies.
+  - Provide a textual summary of key file relationships (e.g., component-to-utility imports, API route dependencies) if visualization is unavailable.
+  - If tool installation fails, perform a manual analysis of import statements across key files.
+
+### :audit_execution
+
+- **Documentation Reference**: Align with standards in `docs/DOCUMENTATION_TREE.md`, `CONTRIBUTING.md`, and guides (e.g., `architecture/layout-standards.md`, `guides/developer-guides/architecture.md`).
+- **Systematic Review**:
+  - **Code Quality**: Check for ESLint violations (e.g., missing return types, unused variables), TypeScript strict mode compliance, Prettier formatting, and React best practices.
+  - **Maintainability**: Assess modular separation, file size (e.g., `components/estimating/CostSummaryModule.tsx`), circular dependencies, and orphaned files (e.g., unused types in `/types`).
+  - **Secondary Areas**: Evaluate performance (e.g., bundle size, re-renders), security (e.g., mock data exposure in `data/mock/`), accessibility (e.g., ARIA labels, keyboard navigation), and testing coverage (e.g., Vitest/Jest, Playwright) as they impact maintainability.
+- **Dependency Analysis**: Use the Dependency Cruiser file map to identify issues like tight coupling, circular dependencies (e.g., in `components/estimating/`), or unused files.
+
+### :report_structure
+
+Generate a markdown report updating `docs/maintenance/QA_QC_AUDIT_REPORT.md` with the following structure:
+
+- **Executive Summary**: Summarize findings, emphasizing code quality and maintainability insights from the file map.
+- **File Map and Dependency Analysis**: Include the DOT file content or a textual summary of key relationships (e.g., tables of file-to-file dependencies), highlighting issues like circular imports or high-dependency modules.
+- **Strengths**: Note positive aspects (e.g., consistent TypeScript usage, modular architecture).
+- **Issues Found**:
+  - **Critical**: Build-breaking issues (e.g., missing imports like `@/components/ui/date-picker`).
+  - **High**: Significant maintainability concerns (e.g., large files, ESLint violations).
+  - **Medium**: Secondary issues impacting quality (e.g., inconsistent nullish coalescing).
+- **Code Quality Analysis**: Detail positive aspects (e.g., Prettier configuration) and areas for improvement (e.g., missing return types, unused imports).
+- **Performance Analysis**: Assess bundle size and re-renders, focusing on maintainability impact.
+- **Security Assessment**: Identify concerns like mock data exposure that could complicate maintenance.
+- **Accessibility Assessment**: Highlight issues (e.g., missing keyboard listeners) affecting code quality.
+- **Testing Coverage**: Evaluate setup (Vitest, Jest, Playwright) and gaps in complex components.
+- **Prioritized Action Plan**:
+  - Immediate (1 week): Fix critical issues.
+  - Short-term (2–4 weeks): Address high-priority issues.
+  - Medium-term (2–3 months): Optimize performance and security.
+  - Long-term (4–6 months): Enhance testing and documentation.
+- **Recommendations**: Suggest improvements in development process (e.g., pre-commit hooks), monitoring (e.g., Sentry), documentation, and team training.
+- **Conclusion**: Summarize findings and next steps.
+
+### :output_documentation
+
+- **Update Existing Report**: Append or revise `docs/maintenance/QA_QC_AUDIT_REPORT.md` with new findings, preserving historical data (e.g., add a section titled "Audit Update: Code Quality and Maintainability [Date]").
+- **Save Artifacts**:
+  - Save dependency graphs (e.g., `dependencies.dot`) and textual summaries to `/docs/audits/code-quality/`.
+  - Create `/docs/audits/code-quality/` if it does not exist, ensuring logical placement per `docs/DOCUMENTATION_TREE.md`.
+- **Additional Updates**:
+  - Update `guides/developer-guides/architecture.md` with a section on dependency management best practices, referencing file map findings.
+  - Update `maintenance/cleanup-summary.md` if orphaned files or unused imports are identified.
+  - Follow `CONTRIBUTING.md` guidelines: use Markdown, include code blocks, tables for comparisons, and maintain a professional tone.
+
+### :constraints
+
+- Do not make code modifications; focus on analysis and recommendations.
+- If Dependency Cruiser fails, manually analyze import statements in key files (e.g., `app/main-app/page.tsx`, `components/ui/protected-grid.tsx`).
+- Prioritize code quality and maintainability, with secondary focus on performance, security, accessibility, and testing only as they impact these goals.
+
+### :execution
+
+Begin the audit immediately, ensuring systematic coverage of all files while focusing on code quality and maintainability metrics.

@@ -1,0 +1,184 @@
+title: Comprehensive Standards-Aligned Test Creation Ruleset
+version: 1.0.0
+date: 2025-07-24
+description: Cursor ruleset to generate high-assurance tests for specified application files, covering functional, UI/UX, rendering, layout, security, accessibility, and compliance criteria according to industry and regulatory standards.
+scope:
+
+- test_creation
+- security_compliance
+- accessibility_validation
+- ui_ux_quality
+- functional_integrity
+- layout_validation
+  output:
+  tests: /**tests**/
+  reports: /docs/audits/test-coverage/
+
+---
+
+# Comprehensive Standards-Aligned Test Creation Ruleset
+
+## :overview
+
+This ruleset guides the Cursor IDE to generate **rigorous, standards-compliant automated and manual test files** for any specified code file in the HB Intel application. The tests must provide full validation of:
+
+- Code quality and maintainability
+- Functional correctness
+- UI/UX fidelity
+- Visual rendering and responsiveness
+- Layout positioning and overflow avoidance
+- Feedback, interactivity, and state behavior
+- Accessibility compliance (WCAG 2.2 AAA, EN 301 549, Section 508)
+- Security conformance (OWASP ASVS Level 3, ISO 27001, SOC 2 Type II)
+- Regulatory alignment (NIST SP 800-53 High, PCI DSS 4.0 where applicable)
+
+## :scope
+
+### Covered Test Categories
+
+- **Functional Tests**: Expected output, edge case handling, data flow integrity
+- **UI/UX Tests**: Layout rendering, interactivity, feedback states, transitions
+- **Responsive Behavior**: Breakpoint-specific behavior for tablet, desktop, ultrawide
+- **Accessibility Tests**: Semantic structure, keyboard nav, ARIA, WCAG AAA checks
+- **Layout and Positioning Tests**: Detect element overlap, scrollbars, and overflow issues across viewports
+- **Security Tests**:
+  - Input validation / sanitization
+  - Component-level access control
+  - Secure session handling
+  - Secure error messages and logging
+  - Injection and XSS prevention
+- **Compliance Tests** (if relevant):
+  - Audit logging readiness
+  - Masking of sensitive data
+  - Privacy flags and consent
+  - Multi-factor authentication enforcement
+- **Code Quality Tests**: Static analysis, typing, coverage completeness
+
+## :instructions
+
+### :test_generation_flow
+
+For each file specified:
+
+1. **Identify Component Type**:
+
+   - React component, server utility, route handler, or UI element
+
+2. **Generate Baseline Test File**:
+
+   - Create a test file in `/__tests__/` matching the source file structure
+   - Use `jest`, `react-testing-library`, and `@testing-library/user-event` for UI
+   - Use `axe-core` or `jest-axe` for accessibility assertions
+
+3. **Create and Annotate Test Suites**:
+
+   - Structure test blocks using `describe` and `it/test`
+   - Group by: Rendering, Functionality, Accessibility, Security, UX Feedback, Layout
+
+4. **Functional Validation**:
+
+   - Validate input props, events, hooks, side effects
+   - Ensure correct fallback and error boundaries
+
+5. **UI/UX Testing**:
+
+   - Validate placement of interactive elements
+   - Simulate all interaction paths (hover, click, focus, etc.)
+   - Include snapshot testing for visual diffs (if not disabled)
+
+6. **Responsiveness Simulation**:
+
+   - Emulate viewports for `768px`, `1024px`, `1440px`, and `1920px+`
+   - Validate conditional rendering, CSS class behavior, grid/flex wrapping
+
+7. **Accessibility Audits**:
+
+   - Validate ARIA roles and labels
+   - Simulate screen reader access via `jest-axe`
+   - Validate keyboard-only navigation paths
+   - Include compliance checks for EN 301 549 (e.g., label programmatic access)
+
+8. **Security Coverage (ASVS Level 3)**:
+
+   - Test component input validation, escaping, and sanitization
+   - Mock API or form interactions to test authentication flow and data leakage
+   - Ensure sensitive data is not exposed in logs or responses
+   - Verify session expiration and token handling if applicable
+
+9. **Compliance (NIST, PCI, SOC2)**:
+
+   - If the file handles financial or user data, check logging/redaction/consent
+   - Add assertions to ensure MFA and PII masking
+   - Include permission-based rendering logic (RBAC/ABAC)
+
+10. **Layout & Positioning Validation**:
+
+- Use Cypress or Playwright to:
+  - Detect container overflow and forced scrollbars
+  - Measure bounding boxes to prevent element overlaps
+  - Validate responsive stacking and grid positioning across breakpoints
+- Use visual regression tools (e.g., Percy, Chromatic) for layout diffs
+- Confirm modal/dialog/tooltip visibility and containment within viewport
+
+11. **Performance & Feedback**:
+
+- Measure user feedback speed (e.g., loading indicator shown within 200ms)
+- Test animation completion and interruption handling
+- Validate retry or fail gracefully for async interactions
+
+12. **Documentation and Notes**:
+
+- Add inline comments referencing standards or violations
+- Save metadata in `/docs/audits/test-coverage/<filename>-audit.md`
+
+## :report_structure
+
+For each file tested, generate:
+
+- A test file in `/__tests__/[mirrored-path].test.tsx`
+- An audit report in `/docs/audits/test-coverage/` using the format:
+
+```
+## Test Coverage Report for [component-name]
+**File:** /path/to/component.tsx
+**Audit Date:** YYYY-MM-DD
+
+### ✅ Coverage Summary
+- [x] Functional Testing
+- [x] Rendering Validation
+- [x] UX Feedback Interaction
+- [x] Accessibility (WCAG 2.2 AAA, Section 508)
+- [x] Security (OWASP Level 3)
+- [ ] PCI Compliance (N/A)
+
+### 🟢 Strengths
+- Excellent form state management
+- Passes all keyboard-accessibility requirements
+
+### 🔴 Issues Found
+- ❗ Password input not masked (Fails PCI DSS)
+- ⚠ Missing focus ring for keyboard tabs (Minor WCAG AAA failure)
+
+### 📌 Recommendations
+- Refactor input sanitization
+- Add aria-describedby to field groups
+```
+
+## :output_documentation
+
+- Save all test files to `/__tests__/` matching component structure
+- Save audit reports and compliance metadata to `/docs/audits/test-coverage/`
+- Update `/docs/DOCUMENTATION_TREE.md` to reflect new reports
+- If relevant, flag issues in `/docs/maintenance/security-accessibility-summary.md`
+
+## :constraints
+
+- Do not modify source files during test generation
+- Maintain test isolation (no global state pollution)
+- Tests must be idempotent and CI-compatible
+- Use realistic mock data for simulations
+- Align with principles of clean code and standard test naming conventions
+
+## :execution
+
+Begin immediately. For each specified file, generate a comprehensive test suite covering all functional, visual, layout, security, and accessibility dimensions, ensuring measurable conformance to enterprise-grade web development standards.

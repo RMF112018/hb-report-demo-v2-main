@@ -1,0 +1,50 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🧠 Cursor Rules: Enhanced Staffing Suite (Executive, Project Executive, Project Manager)
+
+---
+
+## 🆕 Excel-Workflow Alignment Enhancements
+
+### 📊 Assignment Table Enhancements
+- Refactor the current assignment table to group data by:
+  - 1️⃣ Project Executive
+  - 2️⃣ Then by Project (under each PE group)
+- Use expandable/collapsible group headers
+- Within each project group, show staff assignments sorted by start date
+
+---
+
+### 🧩 “Needing Assignment” Panel
+- Add a panel directly **below** the assignment table
+- Title: `"Needing Assignment"`
+- Filters:
+  - Position (dropdown or segmented control)
+- Logic:
+  - Show all employees who:
+    - Have a current assignment ending within **90 calendar days**
+    - AND have **no follow-up assignment** scheduled
+- Data Source: `staffing.json` assignment history
+- Bonus: Color indicators for urgency (e.g. red = <30 days, yellow = <60)
+
+---
+
+## 🧱 GLOBAL LAYOUT EXPECTATIONS
+
+- Light/Dark theme compliant (Tailwind tokens)
+- All logic wired to `useStaffingStore.ts`
+- Assignment + Needing Assignment panels live in same scrollable container
+- Ensure keyboard navigation works for grouping/filters
+
+## 🔁 Persist Filters & View
+- Save selected position filter and panel open states to `localStorage`
+- Restore on page reload
+
+## 📦 MOCK DATA
+- `staffing.json` for employee data + assignments
+- `projects.json` to determine which Project Exec owns which project
+
+---

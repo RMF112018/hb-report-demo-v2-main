@@ -1,0 +1,88 @@
+---
+title: Testing Coverage and Functionality Audit Ruleset for HB Report Demo v3.0
+version: 1.0.0
+date: 2025-07-23
+description: Ruleset for conducting an audit focused on testing coverage and test functionality for the HB Report Demo React application, ensuring comprehensive evaluation of unit, integration, E2E tests, and overall test maintainability.
+scope:
+  - testing_coverage
+  - test_functionality
+  - test_maintainability
+output:
+  report: /docs/maintenance/TESTING_AUDIT_REPORT.md
+  artifacts: /docs/audits/testing/
+---
+
+# Testing Coverage and Functionality Audit Ruleset
+
+## :overview
+
+This ruleset provides structured instructions for the Cursor platform to conduct a focused audit of testing coverage and functionality in the HB Report Demo React application (Next.js, TypeScript). The audit evaluates test completeness, effectiveness, and maintainability, integrating analysis of test files and coverage reports.
+
+## :scope
+
+- **Primary Focus**: Testing coverage (e.g., unit, integration, E2E test completeness using Vitest, Jest, Playwright) and test functionality (e.g., ensuring tests pass, cover critical paths, and detect failures correctly).
+- **Secondary Focus**: Test maintainability (e.g., test organization, mocking strategies, parallelization) and integration with code quality (e.g., how tests align with TypeScript strictness and architecture).
+- **Output**: Updates a dedicated report at `docs/maintenance/TESTING_AUDIT_REPORT.md`, saves coverage reports and analyses to `/docs/audits/testing/`.
+
+## :instructions
+
+### :preparation
+
+- **Access**: Assume full access to the codebase in the current Cursor workspace.
+- **Tool Setup**:
+  - Run existing test commands to generate coverage: `npm test -- --coverage` to execute tests and produce coverage reports (e.g., using Vitest/Jest configurations).
+  - Analyze test files in directories like `tests/`, `__tests__/` subdirs, or inline tests, focusing on coverage metrics (e.g., lines, branches, functions covered).
+  - If coverage tools fail or are unavailable, perform a manual review of test files, counting test cases and mapping them to codebase components.
+- **Fallback**: If automated coverage generation encounters issues, manually inspect key test files (e.g., for complex components like `components/estimating/CostSummaryModule.tsx`) and estimate coverage.
+
+### :audit_execution
+
+- **Documentation Reference**: Align with standards in `docs/DOCUMENTATION_TREE.md`, `CONTRIBUTING.md`, and guides (e.g., `implementations/testing/testing-enhancements-changelog.md` for testing history, `guides/developer-guides/testing-strategies.md` for best practices).
+- **Systematic Review**:
+  - **Testing Coverage**: Evaluate coverage reports for metrics (e.g., aim for 80%+), identify gaps in complex components (e.g., data grids, state management), and check for unit (Vitest/Jest), component (React Testing Library), integration, and E2E (Playwright) tests.
+  - **Test Functionality**: Verify tests run without errors, cover edge cases and critical flows (e.g., role-based access, form validations), and use proper assertions/mocking. Assess if tests are flaky or inefficient.
+  - **Secondary Areas**: Review test maintainability (e.g., organization, reuse of utilities), performance (e.g., test runtime, parallelization), and alignment with architecture (e.g., testing modular separation).
+- **Coverage Analysis**: Use generated reports to identify low-coverage areas (e.g., orphaned types or large files) and recommend improvements.
+
+### :report_structure
+
+Generate a markdown report updating `docs/maintenance/TESTING_AUDIT_REPORT.md` with the following structure:
+
+- **Executive Summary**: Summarize findings, emphasizing coverage metrics and functionality insights.
+- **Coverage and Functionality Analysis**: Include coverage report summaries (e.g., tables of metrics by directory), textual overviews of test relationships (e.g., which components have dedicated tests), and detected issues (e.g., gaps in E2E tests).
+- **Strengths**: Note positive aspects (e.g., comprehensive unit testing setup, Storybook integration).
+- **Issues Found**:
+  - **Critical**: Major gaps (e.g., no tests for critical components like `protected-grid.tsx`).
+  - **High**: Insufficient coverage (e.g., below 50% in complex modules) or failing tests.
+  - **Medium**: Maintainability issues (e.g., unmocked dependencies, flaky E2E tests).
+- **Coverage Analysis**: Detail positive aspects (e.g., high unit test coverage) and areas for improvement (e.g., missing visual regression).
+- **Functionality Analysis**: Assess test effectiveness, runtime, and concerns (e.g., slow E2E tests).
+- **Maintainability Assessment**: Strengths (e.g., reusable test utilities) and issues (e.g., outdated mocks).
+- **Prioritized Action Plan**:
+  - Immediate (1 week): Fix failing tests and critical gaps.
+  - Short-term (2–4 weeks): Increase coverage to 80%+ for key areas.
+  - Medium-term (2–3 months): Implement performance testing and visual regression.
+  - Long-term (4–6 months): Integrate automated testing in CI/CD.
+- **Recommendations**: Suggest improvements in testing process (e.g., TDD adoption), monitoring (e.g., coverage thresholds in CI), documentation, and team training.
+- **Conclusion**: Summarize findings and next steps.
+
+### :output_documentation
+
+- **Update Existing Report**: Append or revise `docs/maintenance/TESTING_AUDIT_REPORT.md` with new findings, preserving historical data (e.g., add a section titled "Audit Update: Testing Coverage and Functionality [Date]").
+- **Save Artifacts**:
+  - Save coverage reports (e.g., `coverage-summary.txt`) and textual summaries to `/docs/audits/testing/`.
+  - Create `/docs/audits/testing/` if it does not exist, ensuring logical placement per `docs/DOCUMENTATION_TREE.md`.
+- **Additional Updates**:
+  - Update `implementations/testing/testing-enhancements-changelog.md` with recommended changes.
+  - Update `guides/developer-guides/testing-strategies.md` with best practices based on findings.
+  - Follow `CONTRIBUTING.md` guidelines: use Markdown, include code blocks, tables for metrics, and maintain a professional tone.
+
+### :constraints
+
+- Do not make code modifications; focus on analysis and recommendations.
+- If coverage generation fails, manually review test files (e.g., for `app/dashboard/` pages) and estimate metrics.
+- Prioritize testing coverage and functionality, with secondary focus on related areas only as they impact these goals.
+
+### :execution
+
+Begin the audit immediately, ensuring systematic coverage of all test-related files and configurations while focusing on testing metrics and functionality.
