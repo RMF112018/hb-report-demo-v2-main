@@ -112,6 +112,16 @@ const ROLE_PROJECT_ACCESS: Record<
     stages: ["Construction", "Closeout", "Warranty"],
     description: "Site supervision access to construction projects",
   },
+
+  "hr-payroll": {
+    accessType: "all",
+    description: "HR & Payroll management access to all projects for employee data",
+  },
+
+  presentation: {
+    accessType: "all",
+    description: "Presentation mode access to all projects for demonstration",
+  },
 }
 
 /**

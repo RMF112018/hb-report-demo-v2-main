@@ -5,29 +5,38 @@
   "role": "executive",
   "cards": [
     {
-      "id": "project-overview-executive",
-      "type": "project-overview",
+      "id": "portfolio-overview-executive",
+      "type": "portfolio-overview",
       "title": "Portfolio Overview",
       "size": "optimal",
       "position": { "x": 0, "y": 0 },
-      "span": { "cols": 6, "rows": 6 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "executiveMode": true,
-        "scope": "portfolio"
+        "scope": "portfolio",
+        "totalProjects": 20,
+        "activeProjects": 17,
+        "completedThisYear": 12,
+        "averageDuration": 185,
+        "averageContractValue": 45000000,
+        "totalSqFt": 2850000,
+        "totalValue": 850000000,
+        "netCashFlow": 42500000,
+        "averageWorkingCapital": 125000000
       }
     },
     {
-      "id": "schedule-performance-executive",
-      "type": "schedule-performance",
-      "title": "Schedule Performance",
+      "id": "enhanced-hbi-insights-financial-executive",
+      "type": "enhanced-hbi-insights",
+      "title": "HBI Financial Forecast Insights",
       "size": "optimal",
-      "position": { "x": 6, "y": 0 },
-      "span": { "cols": 6, "rows": 4 },
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
-        "aggregateView": true,
-        "portfolioLevel": true
+        "focusArea": "financial-forecasting",
+        "executiveLevel": true
       }
     },
     {
@@ -35,8 +44,8 @@
       "type": "financial-status",
       "title": "Financial Status",
       "size": "optimal",
-      "position": { "x": 12, "y": 0 },
-      "span": { "cols": 4, "rows": 4 },
+      "position": { "x": 0, "y": 5 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "executiveMetrics": true,
@@ -44,38 +53,12 @@
       }
     },
     {
-      "id": "general-conditions-executive",
-      "type": "general-conditions",
-      "title": "General Conditions",
-      "size": "optimal",
-      "position": { "x": 16, "y": 0 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true,
-      "config": {
-        "executiveView": true,
-        "companyWide": true
-      }
-    },
-    {
-      "id": "contingency-analysis-executive",
-      "type": "contingency-analysis",
-      "title": "Contingency Analysis",
-      "size": "optimal",
-      "position": { "x": 0, "y": 6 },
-      "span": { "cols": 6, "rows": 6 },
-      "visible": true,
-      "config": {
-        "portfolioLevel": true,
-        "riskAssessment": true
-      }
-    },
-    {
       "id": "cash-flow-executive",
       "type": "cash-flow",
       "title": "Cash Flow Analysis",
       "size": "optimal",
-      "position": { "x": 6, "y": 4 },
-      "span": { "cols": 8, "rows": 6 },
+      "position": { "x": 8, "y": 5 },
+      "span": { "cols": 8, "rows": 5 },
       "visible": true,
       "config": {
         "executiveLevel": true,
@@ -84,12 +67,51 @@
       }
     },
     {
+      "id": "contingency-analysis-executive",
+      "type": "contingency-analysis",
+      "title": "Contingency Analysis",
+      "size": "optimal",
+      "position": { "x": 0, "y": 10 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "portfolioLevel": true,
+        "riskAssessment": true
+      }
+    },
+    {
+      "id": "schedule-performance-executive",
+      "type": "schedule-performance",
+      "title": "Schedule Performance",
+      "size": "optimal",
+      "position": { "x": 8, "y": 10 },
+      "span": { "cols": 8, "rows": 5 },
+      "visible": true,
+      "config": {
+        "aggregateView": true,
+        "portfolioLevel": true
+      }
+    },
+    {
+      "id": "general-conditions-executive",
+      "type": "general-conditions",
+      "title": "General Conditions",
+      "size": "optimal",
+      "position": { "x": 0, "y": 15 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveView": true,
+        "companyWide": true
+      }
+    },
+    {
       "id": "procurement-executive",
       "type": "procurement",
       "title": "Procurement Management",
       "size": "optimal",
-      "position": { "x": 14, "y": 4 },
-      "span": { "cols": 6, "rows": 6 },
+      "position": { "x": 8, "y": 15 },
+      "span": { "cols": 8, "rows": 4 },
       "visible": true,
       "config": {
         "executiveView": true,
@@ -101,25 +123,12 @@
       "type": "draw-forecast",
       "title": "Draw Forecast",
       "size": "optimal",
-      "position": { "x": 0, "y": 12 },
-      "span": { "cols": 10, "rows": 6 },
+      "position": { "x": 0, "y": 19 },
+      "span": { "cols": 16, "rows": 4 },
       "visible": true,
       "config": {
         "executiveLevel": true,
         "portfolioForecasting": true
-      }
-    },
-    {
-      "id": "enhanced-hbi-insights-financial-executive",
-      "type": "enhanced-hbi-insights",
-      "title": "HBI Financial Forecast Insights",
-      "size": "optimal",
-      "position": { "x": 10, "y": 10 },
-      "span": { "cols": 10, "rows": 5 },
-      "visible": true,
-      "config": {
-        "focusArea": "financial-forecasting",
-        "executiveLevel": true
       }
     }
   ]

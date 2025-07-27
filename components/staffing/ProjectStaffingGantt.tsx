@@ -423,12 +423,14 @@ export const ProjectStaffingGantt: React.FC<ProjectStaffingGanttProps> = ({
   // Auto-scroll to current date
   useEffect(() => {
     const scrollToToday = () => {
-      const container = document.getElementById("project-timeline-scroll")
-      if (container) {
-        const todayPosition = calculatePosition(new Date())
-        const containerWidth = container.clientWidth
-        const scrollPosition = Math.max(0, (todayPosition / 100) * container.scrollWidth - containerWidth / 2)
-        container.scrollLeft = scrollPosition
+      if (typeof window !== "undefined") {
+        const container = document.getElementById("project-timeline-scroll")
+        if (container) {
+          const todayPosition = calculatePosition(new Date())
+          const containerWidth = container.clientWidth
+          const scrollPosition = Math.max(0, (todayPosition / 100) * container.scrollWidth - containerWidth / 2)
+          container.scrollLeft = scrollPosition
+        }
       }
     }
 

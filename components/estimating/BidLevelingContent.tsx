@@ -12,14 +12,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { 
-  Search, 
-  Plus, 
-  Download, 
-  Upload, 
-  FileText, 
-  TrendingUp, 
-  AlertTriangle, 
+import {
+  Search,
+  Plus,
+  Download,
+  Upload,
+  FileText,
+  TrendingUp,
+  AlertTriangle,
   CheckCircle,
   Eye,
   Edit,
@@ -35,31 +35,31 @@ import {
   BarChart3,
   Target,
   Clock,
-  Shield
+  Shield,
 } from "lucide-react"
-import type { 
-  TradeBids, 
-  Bid, 
-  BidLevelingSummary, 
-  BidLevelingFilters, 
+import type {
+  TradeBids,
+  Bid,
+  BidLevelingSummary,
+  BidLevelingFilters,
   BidLevelingExportOptions,
   BidLevelingImportResult,
-  BidComparison
+  BidComparison,
 } from "@/types/estimating-tracker"
 
 interface BidLevelingContentProps {
   tradeBids: TradeBids[]
   bidComparisons: BidComparison[]
   bidLevelingNotes: string
-  onAddTradeBids: (tradeBids: Omit<TradeBids, 'createdAt' | 'updatedAt'>) => void
+  onAddTradeBids: (tradeBids: Omit<TradeBids, "createdAt" | "updatedAt">) => void
   onUpdateTradeBids: (id: string, updates: Partial<TradeBids>) => void
   onDeleteTradeBids: (id: string) => void
-  onAddBidToTrade: (tradeId: string, bid: Omit<Bid, 'id'>) => void
+  onAddBidToTrade: (tradeId: string, bid: Omit<Bid, "id">) => void
   onUpdateBid: (tradeId: string, bidId: string, updates: Partial<Bid>) => void
   onDeleteBid: (tradeId: string, bidId: string) => void
   onSelectBid: (tradeId: string, bidId: string) => void
   onGetSummary: () => BidLevelingSummary
-  onCreateComparison: (comparison: Omit<BidComparison, 'totalScores' | 'recommendation'>) => void
+  onCreateComparison: (comparison: Omit<BidComparison, "totalScores" | "recommendation">) => void
   onImportFromFile: (file: File) => Promise<BidLevelingImportResult>
   onExportToCSV: (options: BidLevelingExportOptions) => void
   onGenerateTemplate: () => void
@@ -82,7 +82,7 @@ export function BidLevelingContent({
   onImportFromFile,
   onExportToCSV,
   onGenerateTemplate,
-  onUpdateNotes
+  onUpdateNotes,
 }: BidLevelingContentProps) {
   const { toast } = useToast()
   const [filters, setFilters] = useState<BidLevelingFilters>({})
@@ -99,10 +99,15 @@ export function BidLevelingContent({
 
   // Filter trade bids
   const filteredTradeBids = useMemo(() => {
-    return tradeBids.filter(trade => {
-      if (filters.search && !trade.tradeName.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !trade.csiDivision?.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !trade.bids.some(bid => bid.vendor.toLowerCase().includes(filters.search.toLowerCase()))) {
+    return tradeBids.filter((trade) => {
+      const searchTerm = filters.search?.trim()
+      if (
+        searchTerm &&
+        searchTerm !== "" &&
+        !trade.tradeName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !trade.csiDivision?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !trade.bids.some((bid) => bid.vendor.toLowerCase().includes(searchTerm.toLowerCase()))
+      ) {
         return false
       }
       if (filters.riskLevel && trade.riskLevel !== filters.riskLevel) return false
@@ -121,7 +126,7 @@ export function BidLevelingContent({
     try {
       const result = await onImportFromFile(file)
       setImportResult(result)
-      
+
       if (result.success) {
         toast({
           title: "Import Successful",
@@ -165,46 +170,48 @@ export function BidLevelingContent({
 
   const getRiskLevelIcon = (level: string) => {
     switch (level) {
-      case 'low': return <CheckCircle className="h-4 w-4 text-green-500" />
-      case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-500" />
-      case 'high': return <Shield className="h-4 w-4 text-red-500" />
-      default: return null
+      case "low":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "medium":
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+      case "high":
+        return <Shield className="h-4 w-4 text-red-500" />
+      default:
+        return null
     }
   }
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      'received': 'secondary',
-      'reviewed': 'outline',
-      'selected': 'default',
-      'rejected': 'destructive'
+      received: "secondary",
+      reviewed: "outline",
+      selected: "default",
+      rejected: "destructive",
     } as const
 
-    return (
-      <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>
-        {status}
-      </Badge>
-    )
+    return <Badge variant={variants[status as keyof typeof variants] || "secondary"}>{status}</Badge>
   }
 
   const getBiddingStatusBadge = (status: string) => {
     const variants = {
-      'pending': 'secondary',
-      'open': 'outline',
-      'closed': 'default',
-      'awarded': 'default'
+      pending: "secondary",
+      open: "outline",
+      closed: "default",
+      awarded: "default",
     } as const
 
     const colors = {
-      'pending': 'bg-gray-100 text-gray-800',
-      'open': 'bg-blue-100 text-blue-800',
-      'closed': 'bg-yellow-100 text-yellow-800',
-      'awarded': 'bg-green-100 text-green-800'
+      pending: "bg-gray-100 text-gray-800",
+      open: "bg-blue-100 text-blue-800",
+      closed: "bg-yellow-100 text-yellow-800",
+      awarded: "bg-green-100 text-green-800",
     } as const
 
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'secondary'} 
-             className={colors[status as keyof typeof colors]}>
+      <Badge
+        variant={variants[status as keyof typeof variants] || "secondary"}
+        className={colors[status as keyof typeof colors]}
+      >
         {status}
       </Badge>
     )
@@ -270,14 +277,18 @@ export function BidLevelingContent({
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search trades, vendors, or CSI divisions..."
-              value={filters.search || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              value={filters.search || ""}
+              onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
               className="pl-8"
             />
           </div>
-          
-          <Select value={filters.riskLevel || 'all'} onValueChange={(value) => 
-            setFilters(prev => ({ ...prev, riskLevel: value === 'all' ? undefined : value }))}>
+
+          <Select
+            value={filters.riskLevel || "all"}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, riskLevel: value === "all" ? undefined : value }))
+            }
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Risk" />
             </SelectTrigger>
@@ -289,8 +300,12 @@ export function BidLevelingContent({
             </SelectContent>
           </Select>
 
-          <Select value={filters.biddingStatus || 'all'} onValueChange={(value) => 
-            setFilters(prev => ({ ...prev, biddingStatus: value === 'all' ? undefined : value }))}>
+          <Select
+            value={filters.biddingStatus || "all"}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, biddingStatus: value === "all" ? undefined : value }))
+            }
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -304,12 +319,7 @@ export function BidLevelingContent({
           </Select>
 
           {Object.keys(filters).length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setFilters({})}
-              className="h-8 px-2 lg:px-3"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setFilters({})} className="h-8 px-2 lg:px-3">
               Reset
               <X className="ml-1 h-4 w-4" />
             </Button>
@@ -330,15 +340,8 @@ export function BidLevelingContent({
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Input
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={handleFileUpload}
-                    disabled={isImporting}
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Upload CSV or Excel file with bid leveling data
-                  </p>
+                  <Input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileUpload} disabled={isImporting} />
+                  <p className="text-sm text-muted-foreground mt-2">Upload CSV or Excel file with bid leveling data</p>
                 </div>
                 <Button onClick={onGenerateTemplate} variant="outline" className="w-full">
                   <FileText className="mr-2 h-4 w-4" />
@@ -360,27 +363,31 @@ export function BidLevelingContent({
                 <DialogTitle>Export Bid Leveling Data</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <Button 
-                  onClick={() => handleExport({
-                    format: 'csv',
-                    includeNotes: true,
-                    includeAIRecommendations: true,
-                    selectedOnly: false,
-                    groupByTrade: true
-                  })} 
+                <Button
+                  onClick={() =>
+                    handleExport({
+                      format: "csv",
+                      includeNotes: true,
+                      includeAIRecommendations: true,
+                      selectedOnly: false,
+                      groupByTrade: true,
+                    })
+                  }
                   className="w-full"
                 >
                   Export All Data
                 </Button>
-                <Button 
-                  onClick={() => handleExport({
-                    format: 'csv',
-                    includeNotes: false,
-                    includeAIRecommendations: false,
-                    selectedOnly: true,
-                    groupByTrade: true
-                  })} 
-                  variant="outline" 
+                <Button
+                  onClick={() =>
+                    handleExport({
+                      format: "csv",
+                      includeNotes: false,
+                      includeAIRecommendations: false,
+                      selectedOnly: true,
+                      groupByTrade: true,
+                    })
+                  }
+                  variant="outline"
                   className="w-full"
                 >
                   Export Selected Bids Only
@@ -404,10 +411,9 @@ export function BidLevelingContent({
               <Building className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No Trade Bids</h3>
               <p className="text-muted-foreground text-center mb-4">
-                {tradeBids.length === 0 
+                {tradeBids.length === 0
                   ? "Get started by adding trade bids or importing from a file."
-                  : "No trade bids match your current filters."
-                }
+                  : "No trade bids match your current filters."}
               </p>
               {tradeBids.length === 0 && (
                 <div className="flex gap-2">
@@ -473,12 +479,10 @@ export function BidLevelingContent({
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="font-medium">{bid.vendor}</h4>
                             {getStatusBadge(bid.status)}
-                            {bid.status === 'selected' && <Star className="h-4 w-4 text-yellow-500 fill-current" />}
+                            {bid.status === "selected" && <Star className="h-4 w-4 text-yellow-500 fill-current" />}
                           </div>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground">
-                              ${bid.amount.toLocaleString()}
-                            </span>
+                            <span className="font-medium text-foreground">${bid.amount.toLocaleString()}</span>
                             <span>Confidence: {bid.confidence}%</span>
                             {bid.schedule?.duration && (
                               <span className="flex items-center gap-1">
@@ -487,23 +491,14 @@ export function BidLevelingContent({
                               </span>
                             )}
                           </div>
-                          {bid.notes && (
-                            <p className="text-xs text-muted-foreground mt-1">{bid.notes}</p>
-                          )}
+                          {bid.notes && <p className="text-xs text-muted-foreground mt-1">{bid.notes}</p>}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setShowBidDialog({ trade, bid })}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => setShowBidDialog({ trade, bid })}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {bid.status !== 'selected' && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSelectBid(trade.tradeId, bid.id)}
-                            >
+                          {bid.status !== "selected" && (
+                            <Button size="sm" onClick={() => handleSelectBid(trade.tradeId, bid.id)}>
                               Select
                             </Button>
                           )}
@@ -512,8 +507,8 @@ export function BidLevelingContent({
                     ))}
                     <div className="flex justify-between items-center pt-2 border-t">
                       <div className="text-sm text-muted-foreground">
-                        {trade.bids.length} bid{trade.bids.length !== 1 ? 's' : ''} received
-                        {trade.selectedBid && ' • 1 selected'}
+                        {trade.bids.length} bid{trade.bids.length !== 1 ? "s" : ""} received
+                        {trade.selectedBid && " • 1 selected"}
                       </div>
                       <Button size="sm" variant="outline" onClick={() => setShowBidDialog({ trade })}>
                         <Plus className="mr-2 h-4 w-4" />
@@ -544,4 +539,4 @@ export function BidLevelingContent({
       </Card>
     </div>
   )
-} 
+}

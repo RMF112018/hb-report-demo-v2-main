@@ -82,7 +82,7 @@ export const PredictiveAnalytics = ({ project, currentStage, userRole }: Predict
         type: "prediction",
         title: "Schedule Acceleration Opportunity",
         description:
-          "AI analysis predicts 12-day schedule acceleration through optimized resource allocation during electrical phase.",
+          "HBI Analysis predicts 12-day schedule acceleration through optimized resource allocation during electrical phase.",
         confidence: 87,
         impact: "high",
         category: "Schedule",

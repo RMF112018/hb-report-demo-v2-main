@@ -115,7 +115,7 @@ export default function SIEMEventMonitorPage() {
       type: "opportunity",
       severity: "medium",
       title: "Correlation Rule Optimization",
-      text: "AI analysis suggests 18% improvement in threat detection through rule optimization.",
+      text: "HBI Analysis suggests 18% improvement in threat detection through rule optimization.",
       action: "Review and optimize SIEM correlation rules based on recent attack patterns.",
       confidence: 85,
       relatedMetrics: ["Rule Optimization", "Detection Accuracy", "False Positives"],
@@ -213,64 +213,7 @@ export default function SIEMEventMonitorPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
-
-      {/* Sticky Header - Following project page structure */}
-      <div className="sticky top-16 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
-        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
-          <div className="max-w-[1920px] mx-auto">
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb className="mb-3">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="flex items-center gap-1">
-                    <Home className="h-3 w-3" />
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/it-command-center" className="text-muted-foreground hover:text-foreground">
-                    IT Command Center
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>SIEM & Event Monitor</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Page Title and Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground">SIEM & Event Monitor</h1>
-                <Badge variant="destructive" className="text-xs whitespace-nowrap">
-                  {siemData.activeThreats} Active Threats
-                </Badge>
-              </div>
-
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <RefreshCw className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Refresh</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Settings className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Settings</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* IT Module Navigation */}
-            <div className="mt-3">
-              <ITModuleNavigation />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout - Following project page structure */}
+      {/* Removed AppHeader and all header elements */}
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         {/* Mobile Priority Cards - Show at top on small screens */}
         <div className="block xl:hidden mb-4 sm:mb-6">
@@ -339,10 +282,10 @@ export default function SIEMEventMonitorPage() {
           </div>
         </div>
 
-        {/* Desktop Layout - Responsive Grid */}
+        {/* Main Responsive Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
-          {/* Sidebar - Hidden on mobile, shown on xl+ */}
-          <div className="hidden xl:block xl:col-span-3 space-y-4">
+          {/* Sidebar - Hidden on mobile, shown on xl+ screens */}
+          <div className="hidden xl:block xl:col-span-3 space-y-4 2xl:space-y-6">
             {/* Security Overview */}
             <div className="bg-card border border-border rounded-lg p-2">
               <h3 className="font-semibold text-sm mb-4 text-foreground">Security Overview</h3>
@@ -855,6 +798,8 @@ export default function SIEMEventMonitorPage() {
           </div>
         </div>
       </div>
+      {/* Integration Info */}
+      <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-6">{/* ...integration info... */}</div>
     </div>
   )
 }

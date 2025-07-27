@@ -79,7 +79,7 @@ const ExpandableDescription: React.FC<{ description: string }> = ({ description 
 }
 
 interface SchedulerContentProps {
-  selectedSubTool: string
+  selectedSubTool?: string
   projectData: any
   userRole: string
   projectId?: string
@@ -383,6 +383,11 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
     }
   }, [selectedSubTool, updatePackage, aiInsights, filteredActivities, onSidebarContentChange, projectData, projectId])
 
+  // Handle redirect to Bryntum Gantt baselines example
+  const handleProjectScheduleRedirect = () => {
+    window.open("https://bryntum.com/products/gantt/examples/baselines/", "_blank")
+  }
+
   const renderContent = () => {
     if (!selectedSubTool || selectedSubTool === "overview") {
       return <SchedulerOverview userRole={userRole} projectData={projectData} />
@@ -390,7 +395,9 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
 
     switch (selectedSubTool) {
       case "project-schedule":
-        return <ProjectSchedule userRole={userRole} projectData={projectData} projectId={projectId} />
+        // Redirect to Bryntum Gantt baselines example
+        handleProjectScheduleRedirect()
+        return <ProjectSchedule userRole={userRole} projectData={projectData} projectId={projectId || ""} />
       case "update":
         return (
           <ScheduleUpdate
@@ -430,22 +437,36 @@ export const SchedulerContent: React.FC<SchedulerContentProps> = ({
   const activeTab = selectedSubTool || "overview"
 
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={onSubToolChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+    <div className="space-y-6 h-full flex flex-col min-h-0 overflow-hidden">
+      <Tabs
+        value={activeTab || "overview"}
+        onValueChange={(value) => onSubToolChange?.(value)}
+        className="w-full h-full flex flex-col min-h-0 overflow-hidden"
+      >
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 min-w-0 max-w-full overflow-hidden">
           {availableTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm">
-              <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
+            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm min-w-0">
+              <tab.icon className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline truncate">{tab.label}</span>
             </TabsTrigger>
           ))}
         </TabsList>
 
         {availableTabs.map((tab) => (
-          <TabsContent key={tab.id} value={tab.id} className="mt-6 w-full max-w-full overflow-hidden">
-            <div className="space-y-4 w-full max-w-full overflow-hidden">
-              {/* Tab Content */}
-              {renderContent()}
+          <TabsContent
+            key={tab.id}
+            value={tab.id}
+            className="mt-6 w-full min-w-0 max-w-full overflow-hidden flex-1 min-h-0"
+          >
+            <div className="space-y-4 w-full min-w-0 max-w-full overflow-hidden h-full flex flex-col min-h-0">
+              <div className="w-full min-w-0 max-w-full overflow-hidden flex-1 min-h-0">
+                <div className="w-full min-w-0 max-w-full overflow-x-auto overflow-y-visible h-full">
+                  <div style={{ width: "100%", minWidth: 0, maxWidth: "100%", height: "100%" }}>
+                    {/* Tab Content */}
+                    {renderContent()}
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
         ))}

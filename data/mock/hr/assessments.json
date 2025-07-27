@@ -1,0 +1,488 @@
+{
+  "assessments": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "Sarah Johnson",
+      "department": "Project Management",
+      "position": "Senior Project Manager",
+      "discProfile": {
+        "type": "DC",
+        "primaryStyle": "Dominance",
+        "secondaryStyle": "Conscientiousness",
+        "summary": "Sarah is a results-driven leader who combines assertiveness with attention to detail. She excels at setting clear goals and ensuring high-quality outcomes through systematic approaches.",
+        "strengths": [
+          "Direct and decisive communication",
+          "Strong goal orientation",
+          "High standards for quality",
+          "Analytical problem-solving"
+        ],
+        "growthAreas": [
+          "Building rapport with team members",
+          "Showing more patience with process",
+          "Balancing task focus with relationship building"
+        ],
+        "communicationTips": [
+          "Be direct and concise in communication",
+          "Provide clear expectations and deadlines",
+          "Use data and facts to support decisions",
+          "Allow time for questions and clarification"
+        ],
+        "stressResponse": "Under stress, Sarah becomes more task-focused and may appear impatient. She prefers to solve problems quickly and may need reminders to consider team input.",
+        "motivators": [
+          "Achieving measurable results",
+          "Leading challenging projects",
+          "Improving processes and efficiency",
+          "Recognition for accomplishments"
+        ],
+        "deMotivators": [
+          "Unclear expectations",
+          "Lack of progress or results",
+          "Excessive bureaucracy",
+          "Being micromanaged"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Driver",
+        "color": "Red",
+        "profile": {
+          "type": "Driver",
+          "description": "Sarah is a natural leader who thrives on challenges and drives results through direct action and clear direction.",
+          "leadershipStrengths": [
+            "Goal-oriented and results-driven",
+            "Decisive decision-making",
+            "Strong project management skills",
+            "Ability to motivate through achievement"
+          ],
+          "developmentAreas": [
+            "Building deeper team relationships",
+            "Developing coaching skills",
+            "Enhancing emotional intelligence",
+            "Balancing drive with team needs"
+          ],
+          "communicationStyle": "Direct and action-oriented",
+          "conflictResolution": "Prefers to address issues head-on and find quick solutions",
+          "teamMotivation": "Motivates through clear goals, recognition, and visible progress",
+          "stressManagement": "Uses action and problem-solving to manage stress",
+          "pdfUrl": "/assessments/sarah-johnson-integrus360.pdf",
+          "lastUpdated": "2024-11-15"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 85,
+        "compatibilityMatrix": {
+          "EMP002": { "score": 78, "notes": "Good collaboration, different but complementary styles" },
+          "EMP003": { "score": 92, "notes": "Excellent partnership, shared values and communication" },
+          "EMP004": { "score": 65, "notes": "Some friction due to different work paces" },
+          "EMP005": { "score": 88, "notes": "Strong working relationship, clear roles" }
+        },
+        "teamDynamics": [
+          "Works best with detail-oriented team members",
+          "May need support with relationship-focused colleagues",
+          "Excels in structured, goal-driven environments",
+          "Benefits from team members who can provide emotional support"
+        ],
+        "recommendations": [
+          "Pair with relationship-focused team members for balance",
+          "Provide opportunities to mentor detail-oriented staff",
+          "Consider team building activities to strengthen relationships"
+        ]
+      }
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "Michael Chen",
+      "department": "Estimating",
+      "position": "Senior Estimator",
+      "discProfile": {
+        "type": "CS",
+        "primaryStyle": "Conscientiousness",
+        "secondaryStyle": "Steadiness",
+        "summary": "Michael is a methodical and reliable professional who values accuracy and consistency. He excels at detailed analysis and maintaining high standards in his work.",
+        "strengths": [
+          "Attention to detail and accuracy",
+          "Reliable and consistent performance",
+          "Analytical thinking",
+          "Quality-focused approach"
+        ],
+        "growthAreas": [
+          "Taking more initiative in decision-making",
+          "Being more flexible with changes",
+          "Building confidence in presenting ideas"
+        ],
+        "communicationTips": [
+          "Provide detailed information and context",
+          "Allow time for thorough analysis",
+          "Be patient with questions and clarifications",
+          "Recognize and appreciate accuracy and quality"
+        ],
+        "stressResponse": "Under stress, Michael becomes more cautious and may need reassurance. He prefers to have all information before making decisions.",
+        "motivators": [
+          "Producing high-quality, accurate work",
+          "Having clear processes and expectations",
+          "Recognition for attention to detail",
+          "Stable and predictable work environment"
+        ],
+        "deMotivators": [
+          "Rushed deadlines without proper planning",
+          "Frequent changes without notice",
+          "Lack of clear expectations",
+          "Being pressured to compromise quality"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Refiner",
+        "color": "Green",
+        "profile": {
+          "type": "Refiner",
+          "description": "Michael is a detail-oriented leader who excels at improving processes and ensuring quality through systematic approaches.",
+          "leadershipStrengths": [
+            "Process improvement and optimization",
+            "Quality control and standards",
+            "Analytical problem-solving",
+            "Reliable and consistent performance"
+          ],
+          "developmentAreas": [
+            "Taking more initiative in leadership",
+            "Building confidence in decision-making",
+            "Developing strategic thinking",
+            "Enhancing communication skills"
+          ],
+          "communicationStyle": "Thorough and detail-oriented",
+          "conflictResolution": "Prefers to analyze situations thoroughly before addressing conflicts",
+          "teamMotivation": "Motivates through quality standards and process improvement",
+          "stressManagement": "Uses systematic analysis and planning to manage stress",
+          "pdfUrl": "/assessments/michael-chen-integrus360.pdf",
+          "lastUpdated": "2024-10-20"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 82,
+        "compatibilityMatrix": {
+          "EMP001": { "score": 78, "notes": "Good collaboration, different but complementary styles" },
+          "EMP003": { "score": 75, "notes": "Respectful working relationship, different approaches" },
+          "EMP004": { "score": 88, "notes": "Excellent partnership, shared focus on quality" },
+          "EMP005": { "score": 85, "notes": "Strong collaboration, complementary skills" }
+        },
+        "teamDynamics": [
+          "Works well with detail-oriented team members",
+          "Provides stability and reliability to teams",
+          "May need support with fast-paced environments",
+          "Excels in structured, process-driven teams"
+        ],
+        "recommendations": [
+          "Pair with action-oriented team members for balance",
+          "Provide opportunities to lead process improvements",
+          "Consider mentoring roles for junior staff"
+        ]
+      }
+    },
+    {
+      "employeeId": "EMP003",
+      "employeeName": "Emily Davis",
+      "department": "Safety",
+      "position": "Safety Coordinator",
+      "discProfile": {
+        "type": "IS",
+        "primaryStyle": "Influence",
+        "secondaryStyle": "Steadiness",
+        "summary": "Emily is a people-oriented professional who builds strong relationships and creates positive work environments. She excels at collaboration and team support.",
+        "strengths": [
+          "Building relationships and rapport",
+          "Collaborative team approach",
+          "Positive and encouraging communication",
+          "Creating supportive work environments"
+        ],
+        "growthAreas": [
+          "Being more direct with difficult feedback",
+          "Setting firmer boundaries",
+          "Taking more initiative in decision-making"
+        ],
+        "communicationTips": [
+          "Use warm and encouraging communication",
+          "Allow time for relationship building",
+          "Provide positive reinforcement",
+          "Be patient with collaborative decision-making"
+        ],
+        "stressResponse": "Under stress, Emily may become more accommodating and may need support to address difficult situations directly.",
+        "motivators": [
+          "Building positive relationships",
+          "Team collaboration and support",
+          "Recognition for helping others",
+          "Harmonious work environment"
+        ],
+        "deMotivators": [
+          "Conflict and confrontation",
+          "Working in isolation",
+          "Lack of team collaboration",
+          "Being rushed or pressured"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Supporter",
+        "color": "Blue",
+        "profile": {
+          "type": "Supporter",
+          "description": "Emily is a relationship-focused leader who excels at building strong teams and creating supportive work environments.",
+          "leadershipStrengths": [
+            "Building strong team relationships",
+            "Creating supportive work environments",
+            "Collaborative leadership style",
+            "Positive team motivation"
+          ],
+          "developmentAreas": [
+            "Being more direct with difficult decisions",
+            "Setting clearer boundaries",
+            "Developing strategic thinking",
+            "Enhancing conflict resolution skills"
+          ],
+          "communicationStyle": "Warm and relationship-focused",
+          "conflictResolution": "Prefers to resolve conflicts through collaboration and understanding",
+          "teamMotivation": "Motivates through positive relationships and team support",
+          "stressManagement": "Uses relationship building and team support to manage stress",
+          "pdfUrl": "/assessments/emily-davis-integrus360.pdf",
+          "lastUpdated": "2024-11-05"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 90,
+        "compatibilityMatrix": {
+          "EMP001": { "score": 92, "notes": "Excellent partnership, shared values and communication" },
+          "EMP002": { "score": 75, "notes": "Respectful working relationship, different approaches" },
+          "EMP004": { "score": 88, "notes": "Strong collaboration, complementary skills" },
+          "EMP005": { "score": 95, "notes": "Outstanding partnership, natural collaboration" }
+        },
+        "teamDynamics": [
+          "Works excellently with relationship-focused team members",
+          "Provides emotional support and team cohesion",
+          "May need support with task-focused environments",
+          "Excels in collaborative, team-oriented settings"
+        ],
+        "recommendations": [
+          "Pair with task-oriented team members for balance",
+          "Provide opportunities to lead team-building initiatives",
+          "Consider roles that require strong interpersonal skills"
+        ]
+      }
+    },
+    {
+      "employeeId": "EMP004",
+      "employeeName": "James Thompson",
+      "department": "Field Operations",
+      "position": "Field Superintendent",
+      "discProfile": {
+        "type": "DI",
+        "primaryStyle": "Dominance",
+        "secondaryStyle": "Influence",
+        "summary": "James is a dynamic and energetic leader who combines assertiveness with people skills. He excels at motivating teams and driving results through positive relationships.",
+        "strengths": [
+          "Dynamic leadership and motivation",
+          "Building team enthusiasm",
+          "Quick decision-making",
+          "Inspiring team performance"
+        ],
+        "growthAreas": [
+          "Being more patient with process details",
+          "Following through on administrative tasks",
+          "Balancing enthusiasm with planning"
+        ],
+        "communicationTips": [
+          "Use energetic and motivational communication",
+          "Provide clear direction and goals",
+          "Allow opportunities for team input",
+          "Recognize and celebrate achievements"
+        ],
+        "stressResponse": "Under stress, James may become more intense and may need support to maintain focus on details and follow-through.",
+        "motivators": [
+          "Leading dynamic teams and projects",
+          "Achieving visible results",
+          "Building team enthusiasm",
+          "Recognition for leadership"
+        ],
+        "deMotivators": [
+          "Excessive paperwork and bureaucracy",
+          "Slow-moving processes",
+          "Lack of team enthusiasm",
+          "Being micromanaged"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Creator",
+        "color": "Yellow",
+        "profile": {
+          "type": "Creator",
+          "description": "James is an innovative and energetic leader who excels at inspiring teams and driving creative solutions to challenges.",
+          "leadershipStrengths": [
+            "Inspiring and motivating teams",
+            "Creative problem-solving",
+            "Dynamic leadership style",
+            "Building team enthusiasm"
+          ],
+          "developmentAreas": [
+            "Following through on administrative details",
+            "Developing more systematic approaches",
+            "Enhancing planning and organization",
+            "Balancing creativity with execution"
+          ],
+          "communicationStyle": "Energetic and inspiring",
+          "conflictResolution": "Prefers to resolve conflicts through positive motivation and team building",
+          "teamMotivation": "Motivates through enthusiasm, recognition, and dynamic leadership",
+          "stressManagement": "Uses energy and team motivation to manage stress",
+          "pdfUrl": "/assessments/james-thompson-integrus360.pdf",
+          "lastUpdated": "2024-10-15"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 87,
+        "compatibilityMatrix": {
+          "EMP001": { "score": 65, "notes": "Some friction due to different work paces" },
+          "EMP002": { "score": 88, "notes": "Excellent partnership, shared focus on quality" },
+          "EMP003": { "score": 88, "notes": "Strong collaboration, complementary skills" },
+          "EMP005": { "score": 92, "notes": "Excellent partnership, dynamic collaboration" }
+        },
+        "teamDynamics": [
+          "Works well with energetic and dynamic team members",
+          "Provides motivation and enthusiasm to teams",
+          "May need support with detail-oriented tasks",
+          "Excels in fast-paced, dynamic environments"
+        ],
+        "recommendations": [
+          "Pair with detail-oriented team members for balance",
+          "Provide opportunities to lead dynamic projects",
+          "Consider mentoring roles for enthusiastic junior staff"
+        ]
+      }
+    },
+    {
+      "employeeId": "EMP005",
+      "employeeName": "Jennifer Lee",
+      "department": "Human Resources",
+      "position": "HR Specialist",
+      "discProfile": {
+        "type": "SC",
+        "primaryStyle": "Steadiness",
+        "secondaryStyle": "Conscientiousness",
+        "summary": "Jennifer is a reliable and supportive professional who values stability and quality. She excels at providing consistent support and maintaining high standards.",
+        "strengths": [
+          "Reliable and consistent support",
+          "Attention to detail and quality",
+          "Patient and supportive approach",
+          "Building trust and relationships"
+        ],
+        "growthAreas": [
+          "Taking more initiative in leadership",
+          "Being more direct with difficult situations",
+          "Building confidence in decision-making"
+        ],
+        "communicationTips": [
+          "Provide patient and supportive communication",
+          "Allow time for thorough understanding",
+          "Recognize and appreciate reliability",
+          "Be patient with collaborative approaches"
+        ],
+        "stressResponse": "Under stress, Jennifer may become more cautious and may need reassurance and support to maintain confidence.",
+        "motivators": [
+          "Providing reliable support to others",
+          "Maintaining high quality standards",
+          "Building trust and relationships",
+          "Stable and supportive work environment"
+        ],
+        "deMotivators": [
+          "Frequent changes without notice",
+          "High-pressure, fast-paced environments",
+          "Lack of support and recognition",
+          "Being rushed or pressured"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Supporter",
+        "color": "Blue",
+        "profile": {
+          "type": "Supporter",
+          "description": "Jennifer is a supportive and reliable leader who excels at building trust and providing consistent support to teams.",
+          "leadershipStrengths": [
+            "Building trust and relationships",
+            "Providing consistent support",
+            "Reliable and dependable leadership",
+            "Creating stable work environments"
+          ],
+          "developmentAreas": [
+            "Taking more initiative in leadership",
+            "Building confidence in decision-making",
+            "Developing strategic thinking",
+            "Enhancing direct communication skills"
+          ],
+          "communicationStyle": "Supportive and relationship-focused",
+          "conflictResolution": "Prefers to resolve conflicts through understanding and support",
+          "teamMotivation": "Motivates through support, trust, and relationship building",
+          "stressManagement": "Uses support and relationship building to manage stress",
+          "pdfUrl": "/assessments/jennifer-lee-integrus360.pdf",
+          "lastUpdated": "2024-11-10"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 89,
+        "compatibilityMatrix": {
+          "EMP001": { "score": 88, "notes": "Strong working relationship, clear roles" },
+          "EMP002": { "score": 85, "notes": "Strong collaboration, complementary skills" },
+          "EMP003": { "score": 95, "notes": "Outstanding partnership, natural collaboration" },
+          "EMP004": { "score": 92, "notes": "Excellent partnership, dynamic collaboration" }
+        },
+        "teamDynamics": [
+          "Works excellently with supportive team members",
+          "Provides stability and reliability to teams",
+          "May need support with fast-paced environments",
+          "Excels in supportive, relationship-focused teams"
+        ],
+        "recommendations": [
+          "Pair with dynamic team members for balance",
+          "Provide opportunities to lead support initiatives",
+          "Consider roles that require strong interpersonal skills"
+        ]
+      }
+    }
+  ],
+  "discTypes": {
+    "D": {
+      "name": "Dominance",
+      "description": "Direct, results-oriented, and decisive",
+      "color": "#DC2626"
+    },
+    "I": {
+      "name": "Influence",
+      "description": "Optimistic, outgoing, and people-oriented",
+      "color": "#F59E0B"
+    },
+    "S": {
+      "name": "Steadiness",
+      "description": "Patient, reliable, and team-oriented",
+      "color": "#059669"
+    },
+    "C": {
+      "name": "Conscientiousness",
+      "description": "Analytical, systematic, and quality-focused",
+      "color": "#2563EB"
+    }
+  },
+  "integrusTypes": {
+    "Driver": {
+      "name": "Driver",
+      "description": "Results-oriented leaders who drive action and achievement",
+      "color": "#DC2626"
+    },
+    "Creator": {
+      "name": "Creator",
+      "description": "Innovative leaders who inspire and motivate through creativity",
+      "color": "#F59E0B"
+    },
+    "Supporter": {
+      "name": "Supporter",
+      "description": "Relationship-focused leaders who build strong teams",
+      "color": "#2563EB"
+    },
+    "Refiner": {
+      "name": "Refiner",
+      "description": "Process-oriented leaders who optimize and improve systems",
+      "color": "#059669"
+    }
+  }
+}

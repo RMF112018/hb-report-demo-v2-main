@@ -46,10 +46,14 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  TestTube,
+  Clock,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DashboardCardWrapper } from "./DashboardCardWrapper"
+import { Badge } from "@/components/ui/badge"
 
 // Modern card components
 import PortfolioOverview from "@/components/cards/PortfolioOverview"
@@ -64,10 +68,10 @@ import GeneralConditionsCard from "@/components/cards/GeneralConditionsCard"
 import ContingencyAnalysisCard from "@/components/cards/ContingencyAnalysisCard"
 import CashFlowCard from "@/components/cards/CashFlowCard"
 import ProcurementCard from "@/components/cards/ProcurementCard"
-import DrawForecastCard from "@/components/cards/DrawForecastCard"
+import PowerBIDrawForecastCard from "@/components/cards/PowerBIDrawForecastCard"
 import QualityControlCard from "@/components/cards/QualityControlCard"
 import SafetyCard from "@/components/cards/SafetyCard"
-import StaffingDistributionCard from "@/components/cards/StaffingDistributionCard"
+import PowerBIStaffingCard from "@/components/cards/PowerBIStaffingCard"
 import ChangeOrderAnalysisCard from "@/components/cards/ChangeOrderAnalysisCard"
 import CloseoutCard from "@/components/cards/CloseoutCard"
 import StartupCard from "@/components/cards/StartupCard"
@@ -79,6 +83,84 @@ import { HealthCard } from "@/components/cards/HealthCard"
 import { ScheduleMonitorCard } from "@/components/cards/ScheduleMonitorCard"
 import { BDOpportunitiesCard } from "@/components/cards/BDOpportunitiesCard"
 import { FinancialDashboard } from "@/components/dashboard/FinancialDashboard"
+import PowerBIDashboardCard from "@/components/cards/PowerBIDashboardCard"
+
+// Simplified My Dashboard cards
+import SimpleProjectMetricsCard from "@/components/cards/SimpleProjectMetricsCard"
+import SimpleFinancialSummaryCard from "@/components/cards/SimpleFinancialSummaryCard"
+import SimpleActivityTrendsCard from "@/components/cards/SimpleActivityTrendsCard"
+import SimpleProcurementAnalyticsCard from "@/components/cards/SimpleProcurementAnalyticsCard"
+import SimplePermitTrackingCard from "@/components/cards/SimplePermitTrackingCard"
+import SimpleRFIStatusCard from "@/components/cards/SimpleRFIStatusCard"
+import SimpleMarketInsightsCard from "@/components/cards/SimpleMarketInsightsCard"
+import SimpleEstimatingProgressCard from "@/components/cards/SimpleEstimatingProgressCard"
+
+// Market Intelligence Dashboard cards
+import SimpleMarketIntelCard from "@/components/cards/SimpleMarketIntelCard"
+import MarketAnalyticsCard from "@/components/cards/MarketAnalyticsCard"
+import AIMarketInsightsCard from "@/components/cards/AIMarketInsightsCard"
+import { FloridaMarketGrowthCard } from "@/components/cards/FloridaMarketGrowthCard"
+import { RegionalHotspotsCard } from "@/components/cards/RegionalHotspotsCard"
+import { DeveloperSentimentCard } from "@/components/cards/DeveloperSentimentCard"
+import { ThreatTrackerCard } from "@/components/cards/ThreatTrackerCard"
+import { AIOpportunitiesCard } from "@/components/cards/AIOpportunitiesCard"
+import { CompetitorBenchmarkCard } from "@/components/cards/CompetitorBenchmarkCard"
+import { RiskRewardRadarCard } from "@/components/cards/RiskRewardRadarCard"
+
+// Beta card components
+import BetaPortfolioOverview from "@/components/cards/beta/BetaPortfolioOverview"
+import BetaEnhancedHBIInsights from "@/components/cards/beta/BetaEnhancedHBIInsights"
+import BetaFinancialStatus from "@/components/cards/beta/BetaFinancialStatus"
+import BetaCashFlowAnalysis from "@/components/cards/beta/BetaCashFlowAnalysis"
+import BetaContingencyAnalysis from "@/components/cards/beta/BetaContingencyAnalysis"
+import BetaFinancialOverview from "@/components/cards/beta/BetaFinancialOverview"
+import BetaSchedulePerformance from "@/components/cards/beta/BetaSchedulePerformance"
+import BetaGeneralConditions from "@/components/cards/beta/BetaGeneralConditions"
+import BetaMarketIntelligence from "@/components/cards/beta/BetaMarketIntelligence"
+import BetaPipelineAnalytics from "@/components/cards/beta/BetaPipelineAnalytics"
+import BetaCriticalDates from "@/components/cards/beta/BetaCriticalDates"
+import BetaScheduleMonitor from "@/components/cards/beta/BetaScheduleMonitor"
+import BetaHealth from "@/components/cards/beta/BetaHealth"
+import BetaChangeOrderAnalysis from "@/components/cards/beta/BetaChangeOrderAnalysis"
+import BetaBDOpportunities from "@/components/cards/beta/BetaBDOpportunities"
+
+// Add the 7 new beta card imports
+import BetaStartup from "@/components/cards/beta/BetaStartup"
+import BetaFieldReports from "@/components/cards/beta/BetaFieldReports"
+import BetaSafety from "@/components/cards/beta/BetaSafety"
+import BetaQualityControl from "@/components/cards/beta/BetaQualityControl"
+import BetaRFI from "@/components/cards/beta/BetaRFI"
+
+// Add the new IT beta card imports
+import BetaHbIntelManagement from "@/components/cards/beta/BetaHbIntelManagement"
+import BetaInfrastructureMonitor from "@/components/cards/beta/BetaInfrastructureMonitor"
+import BetaUserAccessSummary from "@/components/cards/beta/BetaUserAccessSummary"
+import BetaAiPipelineStatus from "@/components/cards/beta/BetaAiPipelineStatus"
+import BetaAssetTracker from "@/components/cards/beta/BetaAssetTracker"
+import BetaSystemLogs from "@/components/cards/beta/BetaSystemLogs"
+import BetaNetworkPerformance from "@/components/cards/beta/BetaNetworkPerformance"
+import BetaEndpointHealth from "@/components/cards/beta/BetaEndpointHealth"
+import BetaEmailSecurityHealth from "@/components/cards/beta/BetaEmailSecurityHealth"
+import BetaBackupRestoreStatus from "@/components/cards/beta/BetaBackupRestoreStatus"
+import BetaSiemLogOverview from "@/components/cards/beta/BetaSiemLogOverview"
+import BetaSubmittal from "@/components/cards/beta/BetaSubmittal"
+import BetaCloseout from "@/components/cards/beta/BetaCloseout"
+
+// Add the financial panel beta card imports
+import BetaProjectOverview from "@/components/cards/beta/BetaProjectOverview"
+import BetaProcurement from "@/components/cards/beta/BetaProcurement"
+import BetaProcurementStatsPanel from "@/components/cards/beta/BetaProcurementStatsPanel"
+
+// HR & Payroll card imports
+import HRWorkforceOverview from "@/components/cards/hr-payroll/HRWorkforceOverview"
+import PayrollAnalytics from "@/components/cards/hr-payroll/PayrollAnalytics"
+import BenefitsEnrollment from "@/components/cards/hr-payroll/BenefitsEnrollment"
+import ComplianceMonitoring from "@/components/cards/hr-payroll/ComplianceMonitoring"
+import RecruitingPipeline from "@/components/cards/hr-payroll/RecruitingPipeline"
+import PerformanceMetrics from "@/components/cards/hr-payroll/PerformanceMetrics"
+import TrainingDevelopment from "@/components/cards/hr-payroll/TrainingDevelopment"
+import ExpenseManagement from "@/components/cards/hr-payroll/ExpenseManagement"
+import TimesheetAnalytics from "@/components/cards/hr-payroll/TimesheetAnalytics"
 
 // IT Command Center placeholder cards
 import {
@@ -102,6 +184,7 @@ import {
   LaborCostAnalysisCard,
   SPCRActivityCard,
   TeamExperienceCard,
+  TeamCompatibilityCard,
   ProjectStaffingOverviewCard,
   StaffingAlertsCard,
 } from "@/components/cards/staffing/StaffingAnalyticsCards"
@@ -131,6 +214,7 @@ interface DashboardGridProps {
   isCompact?: boolean
   spacingClass?: string
   userRole?: string
+  useBetaDashboard?: boolean
 }
 
 // Responsive grid configuration
@@ -143,15 +227,15 @@ const GRID_CONFIG = {
     xl: 16, // Large desktop - optimized for executive dashboard
     "2xl": 16, // Extra large desktop - consistent 16 columns
   },
-  // Base row height (in pixels)
+  // Base row height (in pixels) - reduced by 50% for compact view
   rowHeight: {
-    compact: 60,
-    normal: 80,
+    compact: 28,
+    normal: 35,
   },
-  // Grid gaps
+  // Grid gaps - reduced by 50% for compact view
   gap: {
-    compact: 16,
-    normal: 24,
+    compact: 6,
+    normal: 8,
   },
 }
 
@@ -161,7 +245,7 @@ const getGridClasses = (isCompact: boolean, spacingClass: string) => {
 
   return cn(
     "grid w-full",
-    "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-16 xl:grid-cols-16 2xl:grid-cols-16",
+    "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4",
     spacingClass || `gap-${gap / 4}`, // Convert px to Tailwind spacing
     "transition-all duration-300 ease-in-out"
   )
@@ -195,20 +279,20 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
     return card.span.rows * rowHeight
   }
 
-  // Content-aware heights for different card types
+  // Content-aware heights for different card types - reduced by 50% for all cards
   switch (card.type) {
     case "financial-review-panel":
-      return isCompact ? 400 : 500
+      return isCompact ? 100 : 125
     case "enhanced-hbi-insights":
-      return isCompact ? 350 : 400
+      return isCompact ? 87 : 100
     case "portfolio-overview":
-      return isCompact ? 300 : 350
+      return isCompact ? 75 : 87
     case "market-intelligence":
-      return isCompact ? 450 : 500
+      return isCompact ? 112 : 125
     case "staffing-distribution":
-      return isCompact ? 400 : 450
+      return isCompact ? 100 : 112
     default:
-      return isCompact ? 300 : 350
+      return isCompact ? 75 : 87
   }
 }
 
@@ -222,6 +306,7 @@ export function DashboardGrid({
   isCompact = false,
   spacingClass = "gap-6",
   userRole,
+  useBetaDashboard,
 }: DashboardGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [draggedCard, setDraggedCard] = useState<DashboardCard | null>(null)
@@ -240,7 +325,7 @@ export function DashboardGrid({
 
   // Calculate grid position from mouse coordinates
   const getGridPosition = (x: number, y: number, containerRect: DOMRect, isCompact: boolean) => {
-    const gridColumns = 16 // Optimized grid columns for executive dashboard
+    const gridColumns = 12 // Updated to 12-column grid for 50% narrower cards
     const gridRows = 50 // Allow for tall layouts
 
     const relativeX = x - containerRect.left
@@ -263,20 +348,36 @@ export function DashboardGrid({
     let maxY = 0
     const occupiedPositions = new Set<string>()
 
-    // First pass: track existing positions
-    cards.forEach((card) => {
+    // First pass: validate and fix existing positions, track occupied spaces
+    const validatedCards = cards.map((card) => {
       if (card.position && card.span) {
-        for (let x = card.position.x; x < card.position.x + card.span.cols; x++) {
-          for (let y = card.position.y; y < card.position.y + card.span.rows; y++) {
+        // Validate position is within grid bounds
+        const validatedPosition = {
+          x: Math.max(0, Math.min(card.position.x, 11)), // Ensure x is within 0-11 (12-column grid)
+          y: Math.max(0, card.position.y),
+        }
+
+        // Validate span doesn't exceed grid bounds
+        const validatedSpan = {
+          cols: Math.min(card.span.cols, 12 - validatedPosition.x), // Ensure span doesn't exceed grid width
+          rows: Math.max(1, card.span.rows),
+        }
+
+        // Track occupied positions
+        for (let x = validatedPosition.x; x < validatedPosition.x + validatedSpan.cols; x++) {
+          for (let y = validatedPosition.y; y < validatedPosition.y + validatedSpan.rows; y++) {
             occupiedPositions.add(`${x},${y}`)
             maxY = Math.max(maxY, y + 1)
           }
         }
+
+        return { ...card, position: validatedPosition, span: validatedSpan }
       }
+      return card
     })
 
     // Second pass: assign positions to cards without them
-    return cards.map((card) => {
+    return validatedCards.map((card) => {
       if (card.position) return card
 
       const span = card.span || getOptimalSize(card.type)
@@ -285,7 +386,7 @@ export function DashboardGrid({
 
       // Try to find an available position
       for (let y = 0; y <= maxY + 10 && !foundPosition; y++) {
-        for (let x = 0; x <= 16 - span.cols && !foundPosition; x++) {
+        for (let x = 0; x <= 12 - span.cols && !foundPosition; x++) {
           let canPlace = true
 
           // Check if this position is available
@@ -329,10 +430,10 @@ export function DashboardGrid({
     const endX = position.x + span.cols
     const endY = position.y + span.rows
 
-    // Check bounds
-    if (position.x < 0 || position.y < 0 || endX > 16) return false
+    // Check bounds - ensure position is within 12-column grid
+    if (position.x < 0 || position.y < 0 || position.x >= 12 || endX > 12) return false
 
-    return !cards.some((card) => {
+    return !initializedCards.some((card) => {
       if (card.id === excludeCardId) return false
       if (!card.position || !card.span) return false
 
@@ -350,9 +451,15 @@ export function DashboardGrid({
     span: { cols: number; rows: number },
     excludeCardId?: string
   ) => {
+    // Ensure target position is within bounds
+    const boundedTarget = {
+      x: Math.max(0, Math.min(targetPosition.x, 16 - span.cols)),
+      y: Math.max(0, targetPosition.y),
+    }
+
     // Try the exact position first
-    if (isPositionAvailable(targetPosition, span, excludeCardId)) {
-      return targetPosition
+    if (isPositionAvailable(boundedTarget, span, excludeCardId)) {
+      return boundedTarget
     }
 
     // Search in expanding circles around the target position
@@ -361,8 +468,8 @@ export function DashboardGrid({
         for (let dy = -radius; dy <= radius; dy++) {
           if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
             const testPosition = {
-              x: Math.max(0, Math.min(targetPosition.x + dx, 16 - span.cols)),
-              y: Math.max(0, targetPosition.y + dy),
+              x: Math.max(0, Math.min(boundedTarget.x + dx, 16 - span.cols)),
+              y: Math.max(0, boundedTarget.y + dy),
             }
 
             if (isPositionAvailable(testPosition, span, excludeCardId)) {
@@ -373,8 +480,8 @@ export function DashboardGrid({
       }
     }
 
-    // Fallback to original position if no space found
-    return targetPosition
+    // Fallback to a safe position if no space found
+    return boundedTarget
   }
 
   // Initialize cards with positions on first render
@@ -487,20 +594,49 @@ export function DashboardGrid({
               width: "100%",
             }}
           >
-            {sortedCards.map((card) => (
-              <SortableCard
-                key={card.id}
-                card={card}
-                isEditing={isEditing}
-                isCompact={isCompact}
-                onCardRemove={onCardRemove}
-                onCardConfigure={onCardConfigure}
-                onCardSizeChange={onCardSizeChange}
-                onCardFocus={handleCardFocus}
-                height={getCardHeight(card, isCompact)}
-                userRole={userRole}
-              />
-            ))}
+            {sortedCards.map((card) => {
+              // Detect if we're in a Financial Review context based on card IDs
+              const isFinancialReviewContext =
+                card.id.includes("financial") ||
+                card.id.includes("procurement-executive") ||
+                card.id.includes("procurement-pe") ||
+                card.id.includes("procurement-pm") ||
+                card.id.includes("procurement-1")
+
+              // Detect if we're in an Executive Overview context based on role and card patterns
+              const isExecutiveOverviewContext =
+                userRole === "executive" &&
+                (card.id.includes("portfolio-overview") ||
+                  card.id.includes("enhanced-hbi-insights") ||
+                  card.id.includes("pipeline-analytics") ||
+                  card.id.includes("market-intelligence") ||
+                  card.id.includes("executive-kpi-summary") ||
+                  card.id.includes("cash-flow-summary") ||
+                  card.id.includes("power-bi-enterprise-dashboard") ||
+                  card.type === "financial-review-panel" ||
+                  card.type === "staffing-distribution" ||
+                  card.type === "quality-control" ||
+                  card.type === "safety")
+
+              // Use enhanced dashboard for Financial Review contexts, Executive Overview contexts, or when beta is enabled
+              const useEnhancedDashboard = isFinancialReviewContext || isExecutiveOverviewContext || useBetaDashboard
+
+              return (
+                <SortableCard
+                  key={card.id}
+                  card={card}
+                  isEditing={isEditing}
+                  isCompact={isCompact}
+                  onCardRemove={onCardRemove}
+                  onCardConfigure={onCardConfigure}
+                  onCardSizeChange={onCardSizeChange}
+                  onCardFocus={handleCardFocus}
+                  height={getCardHeight(card, isCompact)}
+                  userRole={userRole}
+                  useBetaDashboard={useEnhancedDashboard}
+                />
+              )
+            })}
           </div>
         </SortableContext>
       </div>
@@ -517,7 +653,12 @@ export function DashboardGrid({
               "transition-transform duration-200"
             )}
           >
-            <CardContent card={draggedCard} isCompact={isCompact} userRole={userRole} />
+            <CardContent
+              card={draggedCard}
+              isCompact={isCompact}
+              userRole={userRole}
+              useBetaDashboard={useBetaDashboard}
+            />
           </div>
         ) : null}
       </DragOverlay>
@@ -536,6 +677,7 @@ interface SortableCardProps {
   onCardFocus?: (card: DashboardCard) => void
   height: number | "auto"
   userRole?: string
+  useBetaDashboard?: boolean
 }
 
 function SortableCard({
@@ -548,6 +690,7 @@ function SortableCard({
   onCardFocus,
   height,
   userRole,
+  useBetaDashboard,
 }: SortableCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
 
@@ -558,6 +701,61 @@ function SortableCard({
     ...gridArea,
     ...(typeof height === "number" && card.type !== "pipeline-analytics" ? { minHeight: `${height}px` } : {}),
   }
+
+  // Beta cards that don't need DashboardCardWrapper (they're self-contained)
+  const betaCards = [
+    "portfolio-overview",
+    "enhanced-hbi-insights",
+    "financial-review-panel",
+    "pipeline-analytics",
+    "market-intelligence",
+    "critical-dates",
+    "schedule-monitor",
+    "health",
+    "change-order-analysis",
+    "bd-opportunities",
+    "schedule-performance",
+    "financial-status",
+    "general-conditions",
+    "contingency-analysis",
+    "cash-flow",
+    "startup",
+    "field-reports",
+    "safety",
+    "quality-control",
+    "rfi",
+    "submittal",
+    "closeout",
+    "project-overview",
+    "procurement",
+    "staffing-distribution",
+    // IT Command Center Beta Cards
+    "hb-intel-management",
+    "infrastructure-monitor",
+    "user-access-summary",
+    "ai-pipeline-status",
+    "asset-tracker",
+    "system-logs",
+    "endpoint-health",
+    "email-security-health",
+    "backup-restore-status",
+    "siem-log-overview",
+    // Simple Power BI embedded cards (My Dashboard)
+    "simple-project-metrics",
+    "simple-financial-summary",
+    "simple-activity-trends",
+    "simple-procurement-analytics",
+    "simple-permit-tracking",
+    "simple-rfi-status",
+    "simple-market-insights",
+    "simple-estimating-progress",
+    "draw-forecast",
+  ]
+
+  // Special case: HealthCard should always render without wrapper
+  const shouldRenderWithoutWrapper = card.type === "health" || (useBetaDashboard && betaCards.includes(card.type))
+
+  const isBetaCard = useBetaDashboard && betaCards.includes(card.type)
 
   return (
     <div
@@ -572,23 +770,64 @@ function SortableCard({
       {...attributes}
       {...(isEditing ? listeners : {})}
     >
-      <DashboardCardWrapper
-        card={card}
-        onRemove={onCardRemove}
-        onConfigure={onCardConfigure}
-        onSizeChange={onCardSizeChange}
-        dragHandleClass="cursor-grab active:cursor-grabbing"
-        isEditing={isEditing}
-        isCompact={isCompact}
-      >
-        <CardContent card={card} isCompact={isCompact} userRole={userRole} />
-      </DashboardCardWrapper>
+      {shouldRenderWithoutWrapper ? (
+        // HealthCard renders directly without wrapper
+        <CardContent card={card} isCompact={isCompact} userRole={userRole} useBetaDashboard={useBetaDashboard} />
+      ) : (
+        // Legacy cards use wrapper for consistent styling
+        <DashboardCardWrapper
+          card={card}
+          onRemove={onCardRemove}
+          onConfigure={onCardConfigure}
+          onSizeChange={onCardSizeChange}
+          dragHandleClass="cursor-grab active:cursor-grabbing"
+          isEditing={isEditing}
+          isCompact={isCompact}
+        >
+          <CardContent card={card} isCompact={isCompact} userRole={userRole} useBetaDashboard={useBetaDashboard} />
+        </DashboardCardWrapper>
+      )}
     </div>
   )
 }
 
 // Card content renderer
-function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCompact: boolean; userRole?: string }) {
+function CardContent({
+  card,
+  isCompact,
+  userRole,
+  useBetaDashboard,
+}: {
+  card: DashboardCard
+  isCompact: boolean
+  userRole?: string
+  useBetaDashboard?: boolean
+}) {
+  // Detect if we're in a Financial Review context based on card IDs
+  const isFinancialReviewContext =
+    card.id.includes("financial") ||
+    card.id.includes("procurement-executive") ||
+    card.id.includes("procurement-pe") ||
+    card.id.includes("procurement-pm") ||
+    card.id.includes("procurement-1")
+
+  // Detect if we're in an Executive Overview context based on role and card patterns
+  const isExecutiveOverviewContext =
+    userRole === "executive" &&
+    (card.id.includes("portfolio-overview") ||
+      card.id.includes("enhanced-hbi-insights") ||
+      card.id.includes("pipeline-analytics") ||
+      card.id.includes("market-intelligence") ||
+      card.id.includes("executive-kpi-summary") ||
+      card.id.includes("cash-flow-summary") ||
+      card.id.includes("power-bi-enterprise-dashboard") ||
+      card.type === "financial-review-panel" ||
+      card.type === "staffing-distribution" ||
+      card.type === "quality-control" ||
+      card.type === "safety")
+
+  // Use enhanced dashboard for Financial Review contexts, Executive Overview contexts, or when beta is enabled
+  const useEnhancedDashboard = isFinancialReviewContext || isExecutiveOverviewContext || useBetaDashboard
   // Calculate span for components that need it
   const span = card.span || getOptimalSize(card.type)
 
@@ -616,82 +855,225 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
 
   switch (card.type) {
     case "portfolio-overview":
-      return <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      return useEnhancedDashboard ? (
+        <BetaPortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      ) : (
+        <PortfolioOverview {...commonProps} config={card.config || defaultPortfolioConfig} />
+      )
     case "enhanced-hbi-insights":
-      return <EnhancedHBIInsights {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaEnhancedHBIInsights {...commonProps} />
+      ) : (
+        <EnhancedHBIInsights {...commonProps} />
+      )
     case "financial-review-panel":
-      return <FinancialReviewPanel {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaFinancialOverview {...commonProps} />
+      ) : (
+        <FinancialReviewPanel {...commonProps} />
+      )
     case "pipeline-analytics":
-      return <PipelineAnalytics {...commonProps} />
+    case "beta-pipeline-analytics":
+      return useEnhancedDashboard ? <BetaPipelineAnalytics {...commonProps} /> : <PipelineAnalytics {...commonProps} />
     case "market-intelligence":
-      return <MarketIntelligence {...commonProps} />
-    case "project-overview":
-      return <ProjectOverviewCard {...commonProps} />
-    case "schedule-performance":
-      return <SchedulePerformanceCard {...commonProps} />
-    case "financial-status":
-      return <FinancialStatusCard {...commonProps} />
-    case "general-conditions":
-      return <GeneralConditionsCard {...commonProps} />
-    case "contingency-analysis":
-      return <ContingencyAnalysisCard {...commonProps} />
-    case "cash-flow":
-      return <CashFlowCard {...commonProps} />
-    case "procurement":
-      return <ProcurementCard {...commonProps} />
-    case "draw-forecast":
-      return <DrawForecastCard {...commonProps} />
-    case "quality-control":
-      return <QualityControlCard {...commonProps} />
-    case "safety":
-      return <SafetyCard {...commonProps} />
-    case "staffing-distribution":
-      return <StaffingDistributionCard {...commonProps} />
-    case "change-order-analysis":
-      return <ChangeOrderAnalysisCard {...commonProps} />
-    case "closeout":
-      return <CloseoutCard {...commonProps} />
-    case "startup":
-      return <StartupCard {...commonProps} />
+      return useEnhancedDashboard ? (
+        <BetaMarketIntelligence {...commonProps} />
+      ) : (
+        <MarketIntelligence {...commonProps} />
+      )
     case "critical-dates":
-      return <CriticalDatesCard {...commonProps} />
-    case "field-reports":
-      return <FieldReportsCard {...commonProps} />
-    case "rfi":
-      return <RFICard {...commonProps} />
-    case "submittal":
-      return <SubmittalCard {...commonProps} />
-    case "health":
-      return <HealthCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaCriticalDates {...commonProps} /> : <CriticalDatesCard {...commonProps} />
     case "schedule-monitor":
-      return <ScheduleMonitorCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaScheduleMonitor {...commonProps} /> : <ScheduleMonitorCard {...commonProps} />
+    case "health":
+      return useEnhancedDashboard ? <BetaHealth {...commonProps} /> : <HealthCard {...commonProps} />
+    case "change-order-analysis":
+      return useEnhancedDashboard ? (
+        <BetaChangeOrderAnalysis {...commonProps} />
+      ) : (
+        <ChangeOrderAnalysisCard {...commonProps} />
+      )
     case "bd-opportunities":
-      return <BDOpportunitiesCard {...commonProps} />
+      return useEnhancedDashboard ? <BetaBDOpportunities {...commonProps} /> : <BDOpportunitiesCard {...commonProps} />
+    case "project-overview":
+      return useEnhancedDashboard ? <BetaProjectOverview {...commonProps} /> : <ProjectOverviewCard {...commonProps} />
+    case "schedule-performance":
+      return useEnhancedDashboard ? (
+        <BetaSchedulePerformance {...commonProps} />
+      ) : (
+        <SchedulePerformanceCard {...commonProps} />
+      )
+    case "financial-status":
+      return useEnhancedDashboard ? <BetaFinancialStatus {...commonProps} /> : <FinancialStatusCard {...commonProps} />
+    // Add beta placeholders for other common cards
+    case "general-conditions":
+      return useEnhancedDashboard ? (
+        <BetaGeneralConditions {...commonProps} />
+      ) : (
+        <GeneralConditionsCard {...commonProps} />
+      )
+    case "contingency-analysis":
+      return useEnhancedDashboard ? (
+        <BetaContingencyAnalysis {...commonProps} />
+      ) : (
+        <ContingencyAnalysisCard {...commonProps} />
+      )
+    case "cash-flow":
+      return useEnhancedDashboard ? <BetaCashFlowAnalysis {...commonProps} /> : <CashFlowCard {...commonProps} />
+    case "procurement":
+      // Use stats panel for Financial Review dashboards, regular procurement card for others
+      const isFinancialReview =
+        card.id.includes("procurement-executive") ||
+        card.id.includes("procurement-pe") ||
+        card.id.includes("procurement-pm") ||
+        card.id.includes("procurement-1")
+
+      return useEnhancedDashboard ? (
+        isFinancialReview ? (
+          <BetaProcurementStatsPanel {...commonProps} />
+        ) : (
+          <BetaProcurement {...commonProps} />
+        )
+      ) : (
+        <ProcurementCard {...commonProps} />
+      )
+    case "draw-forecast":
+      return <PowerBIDrawForecastCard {...commonProps} />
+    case "quality-control":
+      return useEnhancedDashboard ? <BetaQualityControl {...commonProps} /> : <QualityControlCard {...commonProps} />
+    case "safety":
+      return useEnhancedDashboard ? <BetaSafety {...commonProps} /> : <SafetyCard {...commonProps} />
+    case "staffing-distribution":
+      return <PowerBIStaffingCard {...commonProps} />
+    case "startup":
+      return useEnhancedDashboard ? <BetaStartup {...commonProps} /> : <StartupCard {...commonProps} />
+    case "field-reports":
+      return useEnhancedDashboard ? <BetaFieldReports {...commonProps} /> : <FieldReportsCard {...commonProps} />
+    case "power-bi-embedded":
+      // Generic Power BI embedded card - customize based on config
+      return (
+        <div className="h-full p-4 bg-background border rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">{card.title}</h3>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-muted-foreground">Live Data</span>
+            </div>
+          </div>
+          <div className="h-[calc(100%-3rem)] bg-gradient-to-br from-[#0021A5]/5 to-[#FA4616]/5 rounded border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📊</div>
+              <div className="text-lg font-medium">Power BI Report</div>
+              <div className="text-sm text-muted-foreground">{card.config?.reportType || "Embedded Analytics"}</div>
+            </div>
+          </div>
+        </div>
+      )
+    case "kpi-summary":
+      // Pre-construction KPI summary card
+      return (
+        <div className="h-full p-4 bg-background border rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">{card.title}</h3>
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-muted-foreground">Q1 2025</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-primary">45%</div>
+              <div className="text-xs text-muted-foreground">Win Rate</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-green-600">$850M</div>
+              <div className="text-xs text-muted-foreground">Pipeline Value</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-blue-600">12</div>
+              <div className="text-xs text-muted-foreground">Active Pursuits</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded">
+              <div className="text-2xl font-bold text-purple-600">92%</div>
+              <div className="text-xs text-muted-foreground">Cost Accuracy</div>
+            </div>
+          </div>
+        </div>
+      )
+    case "rfi":
+      return useEnhancedDashboard ? <BetaRFI {...commonProps} /> : <RFICard {...commonProps} />
+    case "submittal":
+      return useEnhancedDashboard ? <BetaSubmittal {...commonProps} /> : <SubmittalCard {...commonProps} />
+    case "closeout":
+      return useEnhancedDashboard ? <BetaCloseout {...commonProps} /> : <CloseoutCard {...commonProps} />
     // IT Command Center cards
     case "user-access-summary":
-      return <UserAccessSummaryCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaUserAccessSummary {...commonProps} />
+      ) : (
+        <UserAccessSummaryCard {...commonProps} />
+      )
     case "system-logs":
-      return <SystemLogsCard {...commonProps} />
+      // Check if this is a network performance focused card
+      if (card.config?.focus === "network-metrics") {
+        return <BetaNetworkPerformance {...commonProps} />
+      }
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaSystemLogs {...commonProps} />
+      ) : (
+        <SystemLogsCard {...commonProps} />
+      )
     case "infrastructure-monitor":
-      return <InfrastructureMonitorCard {...commonProps} />
-    case "endpoint-health":
-      return <EndpointHealthCard {...commonProps} />
-    case "siem-log-overview":
-      return <SiemLogOverviewCard {...commonProps} />
-    case "email-security-health":
-      return <EmailSecurityHealthCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaInfrastructureMonitor {...commonProps} />
+      ) : (
+        <InfrastructureMonitorCard {...commonProps} />
+      )
+    case "hb-intel-management":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaHbIntelManagement {...commonProps} />
+      ) : (
+        <HbIntelManagementCard {...commonProps} />
+      )
+    case "ai-pipeline-status":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaAiPipelineStatus {...commonProps} />
+      ) : (
+        <AiPipelineStatusCard {...commonProps} />
+      )
     case "asset-tracker":
-      return <AssetTrackerCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaAssetTracker {...commonProps} />
+      ) : (
+        <AssetTrackerCard {...commonProps} />
+      )
+    case "endpoint-health":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaEndpointHealth {...commonProps} />
+      ) : (
+        <EndpointHealthCard {...commonProps} />
+      )
+    case "siem-log-overview":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaSiemLogOverview {...commonProps} />
+      ) : (
+        <SiemLogOverviewCard {...commonProps} />
+      )
+    case "email-security-health":
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaEmailSecurityHealth {...commonProps} />
+      ) : (
+        <EmailSecurityHealthCard {...commonProps} />
+      )
     case "change-governance-panel":
       return <ChangeGovernancePanelCard {...commonProps} />
     case "backup-restore-status":
-      return <BackupRestoreStatusCard {...commonProps} />
-    case "ai-pipeline-status":
-      return <AiPipelineStatusCard {...commonProps} />
+      return useEnhancedDashboard || userRole === "admin" ? (
+        <BetaBackupRestoreStatus {...commonProps} />
+      ) : (
+        <BackupRestoreStatusCard {...commonProps} />
+      )
     case "consultant-dashboard":
       return <ConsultantDashboardCard {...commonProps} />
-    case "hb-intel-management":
-      return <HbIntelManagementCard {...commonProps} />
     case "financial-dashboard":
       return (
         <FinancialDashboard
@@ -709,10 +1091,71 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
       return <SPCRActivityCard {...commonProps} projectId={card.config?.projectId} />
     case "team-experience":
       return <TeamExperienceCard {...commonProps} projectId={card.config?.projectId} />
+    case "team-compatibility":
+      return <TeamCompatibilityCard {...commonProps} projectId={card.config?.projectId} />
     case "project-staffing-overview":
       return <ProjectStaffingOverviewCard {...commonProps} projectId={card.config?.projectId} />
     case "staffing-alerts":
       return <StaffingAlertsCard {...commonProps} projectId={card.config?.projectId} />
+    case "power-bi-dashboard":
+      return <PowerBIDashboardCard {...commonProps} />
+    // Simplified My Dashboard cards
+    case "simple-project-metrics":
+      return <SimpleProjectMetricsCard {...commonProps} />
+    case "simple-financial-summary":
+      return <SimpleFinancialSummaryCard {...commonProps} />
+    case "simple-activity-trends":
+      return <SimpleActivityTrendsCard {...commonProps} />
+    case "simple-procurement-analytics":
+      return <SimpleProcurementAnalyticsCard {...commonProps} />
+    case "simple-permit-tracking":
+      return <SimplePermitTrackingCard {...commonProps} />
+    case "simple-rfi-status":
+      return <SimpleRFIStatusCard {...commonProps} />
+    case "simple-market-insights":
+      return <SimpleMarketInsightsCard {...commonProps} />
+    case "simple-estimating-progress":
+      return <SimpleEstimatingProgressCard {...commonProps} />
+    // Market Intelligence Dashboard cards
+    case "simple-market-intel":
+      return <SimpleMarketIntelCard {...commonProps} />
+    case "market-analytics":
+      return <MarketAnalyticsCard {...commonProps} />
+    case "ai-market-insights":
+      return <AIMarketInsightsCard {...commonProps} />
+    case "florida-market-growth":
+      return <FloridaMarketGrowthCard {...commonProps} />
+    case "regional-hotspots":
+      return <RegionalHotspotsCard {...commonProps} />
+    case "developer-sentiment":
+      return <DeveloperSentimentCard {...commonProps} />
+    case "threat-tracker":
+      return <ThreatTrackerCard {...commonProps} />
+    case "ai-opportunities":
+      return <AIOpportunitiesCard {...commonProps} />
+    case "competitor-benchmark":
+      return <CompetitorBenchmarkCard {...commonProps} />
+    case "risk-reward-radar":
+      return <RiskRewardRadarCard {...commonProps} />
+    // HR & Payroll cards
+    case "hr-workforce-overview":
+      return <HRWorkforceOverview {...commonProps} />
+    case "payroll-analytics":
+      return <PayrollAnalytics {...commonProps} />
+    case "benefits-enrollment":
+      return <BenefitsEnrollment {...commonProps} />
+    case "compliance-monitoring":
+      return <ComplianceMonitoring {...commonProps} />
+    case "recruiting-pipeline":
+      return <RecruitingPipeline {...commonProps} />
+    case "performance-metrics":
+      return <PerformanceMetrics {...commonProps} />
+    case "training-development":
+      return <TrainingDevelopment {...commonProps} />
+    case "expense-management":
+      return <ExpenseManagement {...commonProps} />
+    case "timesheet-analytics":
+      return <TimesheetAnalytics {...commonProps} />
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
@@ -725,30 +1168,83 @@ function CardContent({ card, isCompact, userRole }: { card: DashboardCard; isCom
   }
 }
 
-// Get optimal size for cards (optimized for 16-column executive layout)
+// Get optimal size for cards (optimized for 16-column executive layout) - reduced by ~50% for compact view
+// Maximum 5 columns per card to ensure minimum 3 cards per row (16÷5 = 3.2 cards minimum)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 16, rows: 6 }
+      return { cols: 8, rows: 5 }
     case "financial-dashboard":
-      return { cols: 16, rows: 20 }
+      return { cols: 5, rows: 9 }
     case "enhanced-hbi-insights":
-      return { cols: 8, rows: 5 }
+      return { cols: 4, rows: 2 }
     case "portfolio-overview":
-      return { cols: 8, rows: 5 }
+      return { cols: 4, rows: 2 }
     case "pipeline-analytics":
-      return { cols: 10, rows: 4 }
+      return { cols: 5, rows: 2 }
     case "market-intelligence":
-      return { cols: 6, rows: 5 }
+      return { cols: 3, rows: 2 }
     case "staffing-distribution":
-      return { cols: 8, rows: 5 }
+      return { cols: 4, rows: 2 }
     case "quality-control":
-      return { cols: 4, rows: 5 }
+      return { cols: 2, rows: 2 }
     case "safety":
-      return { cols: 4, rows: 5 }
+      return { cols: 2, rows: 2 }
     case "cash-flow":
-      return { cols: 8, rows: 4 }
-    default:
+      return { cols: 4, rows: 2 }
+    case "power-bi-dashboard":
+      return { cols: 4, rows: 3 }
+    case "critical-dates":
+      return { cols: 3, rows: 2 }
+    case "schedule-monitor":
+      return { cols: 4, rows: 2 }
+    case "health":
+      return { cols: 3, rows: 2 }
+    case "change-order-analysis":
+      return { cols: 4, rows: 2 }
+    case "bd-opportunities":
+      return { cols: 3, rows: 2 }
+    // Market Intelligence Dashboard cards
+    case "simple-market-intel":
+      return { cols: 5, rows: 3 }
+    case "market-analytics":
+      return { cols: 5, rows: 4 }
+    case "ai-market-insights":
+      return { cols: 3, rows: 4 }
+    case "florida-market-growth":
+      return { cols: 4, rows: 4 }
+    case "regional-hotspots":
+      return { cols: 4, rows: 4 }
+    case "developer-sentiment":
+      return { cols: 4, rows: 4 }
+    case "threat-tracker":
+      return { cols: 4, rows: 4 }
+    case "ai-opportunities":
+      return { cols: 4, rows: 4 }
+    case "competitor-benchmark":
+      return { cols: 5, rows: 4 }
+    case "risk-reward-radar":
+      return { cols: 4, rows: 4 }
+    // HR & Payroll cards
+    case "hr-workforce-overview":
       return { cols: 6, rows: 4 }
+    case "payroll-analytics":
+      return { cols: 6, rows: 4 }
+    case "benefits-enrollment":
+      return { cols: 4, rows: 4 }
+    case "compliance-monitoring":
+      return { cols: 4, rows: 4 }
+    case "recruiting-pipeline":
+      return { cols: 4, rows: 4 }
+    case "performance-metrics":
+      return { cols: 6, rows: 4 }
+    case "training-development":
+      return { cols: 6, rows: 4 }
+    case "expense-management":
+      return { cols: 6, rows: 4 }
+    case "timesheet-analytics":
+      return { cols: 6, rows: 4 }
+    default:
+      return { cols: 3, rows: 2 }
   }
 }

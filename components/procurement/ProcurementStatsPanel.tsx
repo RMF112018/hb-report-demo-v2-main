@@ -4,16 +4,7 @@ import React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { 
-  DollarSign, 
-  FileText, 
-  CheckCircle, 
-  Clock, 
-  AlertTriangle, 
-  TrendingUp,
-  TrendingDown,
-  Link
-} from "lucide-react"
+import { DollarSign, FileText, CheckCircle, Clock, AlertTriangle, TrendingUp, TrendingDown, Link } from "lucide-react"
 import type { ProcurementStats } from "@/types/procurement"
 
 interface ProcurementStatsPanelProps {
@@ -22,11 +13,11 @@ interface ProcurementStatsPanelProps {
 
 export function ProcurementStatsPanel({ stats }: ProcurementStatsPanelProps) {
   const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('en-US', { 
-      style: 'currency', 
-      currency: 'USD', 
+    return amount.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     })
   }
 
@@ -35,21 +26,17 @@ export function ProcurementStatsPanel({ stats }: ProcurementStatsPanelProps) {
   }
 
   const getCompletionRate = () => {
-    return stats.totalRecords > 0 
-      ? (stats.completedProcurements / stats.totalRecords) * 100 
-      : 0
+    return stats.totalRecords > 0 ? (stats.completedProcurements / stats.totalRecords) * 100 : 0
   }
 
   const getLinkageRate = () => {
-    return stats.totalRecords > 0 
-      ? (stats.linkedToBidTabs / stats.totalRecords) * 100 
-      : 0
+    return stats.totalRecords > 0 ? (stats.linkedToBidTabs / stats.totalRecords) * 100 : 0
   }
 
   return (
     <div className="space-y-6">
       {/* Financial Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -128,7 +115,7 @@ export function ProcurementStatsPanel({ stats }: ProcurementStatsPanelProps) {
               </div>
               <div className="text-sm font-medium">{stats.pendingApprovals}</div>
             </div>
-            
+
             <div className="pt-2">
               <div className="flex justify-between text-xs text-muted-foreground mb-1">
                 <span>Completion Rate</span>
@@ -159,7 +146,7 @@ export function ProcurementStatsPanel({ stats }: ProcurementStatsPanelProps) {
               </div>
               <div className="text-sm font-medium">{stats.totalRecords - stats.linkedToBidTabs}</div>
             </div>
-            
+
             <div className="pt-2">
               <div className="flex justify-between text-xs text-muted-foreground mb-1">
                 <span>Linkage Rate</span>
@@ -219,13 +206,11 @@ export function ProcurementStatsPanel({ stats }: ProcurementStatsPanelProps) {
               <div className="text-2xl font-bold">
                 {stats.complianceRate >= 90 ? "Low" : stats.complianceRate >= 70 ? "Medium" : "High"}
               </div>
-              <div className="text-xs text-muted-foreground">
-                Based on compliance rate
-              </div>
+              <div className="text-xs text-muted-foreground">Based on compliance rate</div>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
   )
-} 
+}

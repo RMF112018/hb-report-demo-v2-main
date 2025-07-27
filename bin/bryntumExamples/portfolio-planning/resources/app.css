@@ -1,0 +1,113 @@
+.b-icon-tree-leaf:before{
+  font-size:0.6em;
+}
+
+.b-gantt{
+  --task-border-radius:.3em;
+}
+
+.b-gantt-task{
+  border-radius:var(--task-border-radius);
+}
+
+.b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task{
+  border-radius:var(--task-border-radius) var(--task-border-radius) 0 0;
+  max-height:1.6em;
+}
+
+.b-gantt-task-wrap .b-sch-label{
+  display:flex;
+  gap:1.5em;
+  font-weight:400;
+}
+
+.b-sch-dependency.crossProject{
+  stroke-dasharray:6;
+  stroke-width:2;
+}
+
+.b-sch-dependency-tooltip .b-tooltip-content{
+  grid-template-columns:auto auto;
+}
+.b-sch-dependency-tooltip .b-tooltip-content label{
+  font-size:1em;
+  font-weight:500;
+  margin-inline-end:1em;
+}
+
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled){
+  flex:0 0 1px;
+}
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-inner{
+  width:1px;
+}
+
+.b-prio-tag{
+  display:inline-flex;
+  background:hsl(var(--event-primary-color-h), var(--event-primary-color-s), var(--event-primary-color-l), 0.2);
+  color:var(--event-primary-color);
+  padding:0.08em 0.6em;
+  border-radius:3px;
+  align-items:center;
+  justify-content:center;
+}
+
+.b-task-rollup-wrap{
+  position:absolute;
+  margin-top:0;
+  grid-area:none;
+  z-index:10;
+}
+
+.b-task-rollup.b-milestone{
+  background-color:var(--event-primary-color);
+  top:0.29em;
+  width:0.4em;
+  height:0.4em;
+  filter:brightness(1.75);
+}
+
+.b-rollups .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task{
+  min-height:1.3em;
+}
+
+.b-gantt-task-tooltip{
+  max-width:none;
+}
+.b-gantt-task-tooltip,
+.b-gantt-task-tooltip > .b-panel-body-wrap > .b-panel-content{
+  border-radius:0.5em !important;
+}
+.b-gantt-task-tooltip .b-panel-content{
+  display:grid;
+  grid-template-columns:15em auto;
+  grid-column-gap:2em;
+  grid-row-gap:2em;
+  padding:2em !important;
+  margin:0 !important;
+}
+.b-gantt-task-tooltip .field{
+  display:flex;
+  flex-direction:column;
+  font-weight:500;
+}
+.b-gantt-task-tooltip .field label{
+  margin-bottom:0.5em;
+  color:#888;
+}
+.b-gantt-task-tooltip .b-prio-tag{
+  background:#eee;
+}
+
+body.b-theme-classic-dark .b-prio-tag{
+  filter:brightness(1.3);
+}
+body.b-theme-classic-dark .b-gantt-task-tooltip .b-prio-tag{
+  background:#444;
+}
+
+.b-gantt-task-tooltip.b-popup{
+  max-width:30em;
+}
+
+/*# sourceMappingURL=app.css.map */

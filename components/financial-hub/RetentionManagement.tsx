@@ -26,6 +26,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FullscreenToggle } from "@/components/ui/fullscreen-toggle"
 import { CollapseWrapper } from "@/components/ui/collapse-wrapper"
 import { useFinancialHubStore } from "@/hooks/use-financial-hub-store"
+import { ProtectedGrid, createReadOnlyColumn, GridRow, ProtectedColDef } from "@/components/ui/protected-grid"
 import {
   AreaChart,
   Area,
@@ -114,6 +115,114 @@ export default function RetentionManagement({ userRole, projectData }: Retention
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>("overview")
+
+  // Convert retention data to GridRow format
+  const retentionGridData: GridRow[] = retentionData.map((item, index) => ({
+    id: index.toString(),
+    contractor: item.contractor,
+    category: item.category,
+    totalContract: item.totalContract,
+    retentionRate: item.retentionRate,
+    retentionHeld: item.retentionHeld,
+    retentionReleased: item.retentionReleased,
+    status: item.status,
+    releaseDate: item.releaseDate,
+  }))
+
+  // Create column definitions for retention tracking grid
+  const retentionColumnDefs: ProtectedColDef[] = [
+    createReadOnlyColumn("contractor", "Contractor", {
+      width: 180,
+      pinned: "left",
+      cellStyle: { fontWeight: "500" },
+    }),
+    createReadOnlyColumn("category", "Category", {
+      width: 120,
+      pinned: "left",
+    }),
+    createReadOnlyColumn("totalContract", "Contract Value", {
+      width: 140,
+      type: "numericColumn",
+      valueFormatter: (params: any) => {
+        const value = params.value
+        return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+      },
+      cellStyle: { fontFamily: "monospace" },
+    }),
+    createReadOnlyColumn("retentionRate", "Rate", {
+      width: 80,
+      type: "numericColumn",
+      valueFormatter: (params: any) => {
+        const value = params.value
+        return typeof value === "number" && !isNaN(value) ? `${(value * 100).toFixed(1)}%` : "0.0%"
+      },
+      cellStyle: { fontFamily: "monospace" },
+    }),
+    createReadOnlyColumn("retentionHeld", "Held", {
+      width: 120,
+      type: "numericColumn",
+      valueFormatter: (params: any) => {
+        const value = params.value
+        return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+      },
+      cellStyle: { fontFamily: "monospace", color: "#dc2626", fontWeight: "500" },
+    }),
+    createReadOnlyColumn("retentionReleased", "Released", {
+      width: 120,
+      type: "numericColumn",
+      valueFormatter: (params: any) => {
+        const value = params.value
+        return typeof value === "number" && !isNaN(value) ? formatCurrency(value) : "$0"
+      },
+      cellStyle: { fontFamily: "monospace", color: "#16a34a", fontWeight: "500" },
+    }),
+    createReadOnlyColumn("status", "Status", {
+      width: 140,
+      cellRenderer: (params: any) => {
+        const status = params.value
+        let variant: "default" | "secondary" | "outline" = "default"
+
+        if (status === "Active") {
+          variant = "default"
+        } else if (status === "Partial Release") {
+          variant = "secondary"
+        } else if (status === "Released") {
+          variant = "outline"
+        }
+
+        return (
+          <Badge variant={variant} className="text-xs">
+            {status}
+          </Badge>
+        )
+      },
+    }),
+    createReadOnlyColumn("releaseDate", "Release Date", {
+      width: 120,
+      valueFormatter: (params: any) => {
+        const value = params.value
+        return value ? new Date(value).toLocaleDateString() : "-"
+      },
+      cellStyle: { fontFamily: "monospace", color: "#6b7280" },
+    }),
+  ]
+
+  // Custom totals calculator for retention grid
+  const retentionTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+    if (columnField === "contractor") return "Totals"
+    if (["category", "status", "releaseDate"].includes(columnField)) return ""
+    if (columnField === "retentionRate") return "5.0%" // Average rate
+
+    const values = data
+      .map((row) => {
+        const value = row[columnField]
+        return typeof value === "number" && !isNaN(value) ? value : 0
+      })
+      .filter((val) => typeof val === "number" && !isNaN(val))
+
+    if (values.length === 0) return 0
+    return values.reduce((sum, val) => sum + val, 0)
+  }
 
   const getRetentionSummary = () => {
     switch (userRole) {
@@ -325,7 +434,7 @@ export default function RetentionManagement({ userRole, projectData }: Retention
       case "tracking":
         return (
           <div className="space-y-6">
-            {/* Retention Table */}
+            {/* Retention Tracking Grid */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -335,50 +444,40 @@ export default function RetentionManagement({ userRole, projectData }: Retention
                 <CardDescription>Active retention management and release schedule</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Contractor</th>
-                        <th className="text-left p-2">Category</th>
-                        <th className="text-right p-2">Contract Value</th>
-                        <th className="text-right p-2">Rate</th>
-                        <th className="text-right p-2">Held</th>
-                        <th className="text-right p-2">Released</th>
-                        <th className="text-center p-2">Status</th>
-                        <th className="text-center p-2">Release Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {retentionData.map((retention, index) => (
-                        <tr key={index} className="border-b hover:bg-muted/50">
-                          <td className="p-2 font-medium">{retention.contractor}</td>
-                          <td className="p-2">{retention.category}</td>
-                          <td className="text-right p-2 font-mono">{formatCurrency(retention.totalContract)}</td>
-                          <td className="text-right p-2">{(retention.retentionRate * 100).toFixed(1)}%</td>
-                          <td className="text-right p-2 font-mono">{formatCurrency(retention.retentionHeld)}</td>
-                          <td className="text-right p-2 font-mono">{formatCurrency(retention.retentionReleased)}</td>
-                          <td className="text-center p-2">
-                            <Badge
-                              variant={
-                                retention.status === "Active"
-                                  ? "default"
-                                  : retention.status === "Partial Release"
-                                  ? "secondary"
-                                  : "outline"
-                              }
-                            >
-                              {retention.status}
-                            </Badge>
-                          </td>
-                          <td className="text-center p-2 text-muted-foreground">
-                            {new Date(retention.releaseDate).toLocaleDateString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ProtectedGrid
+                  title="Retention Tracking Analysis"
+                  columnDefs={retentionColumnDefs}
+                  rowData={retentionGridData}
+                  height="500px"
+                  config={{
+                    allowExport: true,
+                    allowImport: false,
+                    allowRowSelection: false,
+                    allowMultiSelection: false,
+                    allowColumnReordering: false,
+                    allowColumnResizing: true,
+                    allowSorting: true,
+                    allowFiltering: true,
+                    allowCellEditing: false,
+                    showToolbar: true,
+                    showStatusBar: true,
+                    enableRangeSelection: false,
+                    protectionEnabled: true,
+                    userRole: userRole,
+                    theme: "quartz",
+                    enableTotalsRow: true,
+                    stickyColumnsCount: 2, // Pin first two columns (Contractor and Category)
+                  }}
+                  events={{
+                    onGridReady: (event) => {
+                      // Auto-size columns to fit content
+                      event.api.autoSizeAllColumns()
+                    },
+                  }}
+                  enableSearch={true}
+                  totalsCalculator={retentionTotalsCalculator}
+                  className="border rounded-lg"
+                />
               </CardContent>
             </Card>
           </div>

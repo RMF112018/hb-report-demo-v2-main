@@ -36,6 +36,8 @@ app/project/[projectId]/
 - **UI Components**: `components/ui/` - Shadcn/UI component library
 - **Context**: `context/auth-context.tsx` - Authentication and user state
 - **Hooks**: `hooks/` - Custom React hooks for state management
+- **Dashboard Components**: `components/dashboard/DashboardGrid.tsx` - Dashboard grid system
+- **Analytics Cards**: `components/cards/` - Analytics card components
 
 ## Page Layout Architecture
 
@@ -94,7 +96,14 @@ case "staffing":
           <TabsTrigger value="spcr">SPCR</TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-          {/* Content */}
+          <StaffingDashboard
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            className="w-full"
+            isCompact={false}
+            isFullScreen={isFocusMode}
+          />
         </TabsContent>
         {/* Additional TabsContent blocks */}
       </Tabs>
@@ -137,6 +146,8 @@ const renderCoreTabContent = () => {
       return <DashboardContent />
     case "checklists":
       return <ChecklistsContent />
+    case "staffing":
+      return <StaffingContent />
     // ... other cases
   }
 }
@@ -153,6 +164,152 @@ export const getProjectSidebarContent = (
   activeTab?: string
 ) => {
   // Return sidebar JSX based on current state
+}
+```
+
+## Dashboard Integration Standards
+
+### 1. Analytics Cards Implementation
+
+**All dashboard tabs must use the DashboardGrid system with analytics cards:**
+
+```typescript
+// Required structure for dashboard tabs
+<DashboardComponent
+  projectId={projectId}
+  projectData={projectData}
+  userRole={userRole}
+  className="w-full"
+  isCompact={false}
+  isFullScreen={isFocusMode}
+/>
+```
+
+### 2. Analytics Card Architecture
+
+**Cards must be created in dedicated directories:**
+- `components/cards/staffing/` - Staffing analytics cards
+- `components/cards/financial/` - Financial analytics cards
+- `components/cards/it/` - IT analytics cards
+
+**Card Implementation Pattern:**
+
+```typescript
+// Example: StaffingAnalyticsCards.tsx
+export const TeamUtilizationCard: React.FC<DashboardCardProps> = ({ 
+  projectId, 
+  isCompact = false 
+}) => {
+  const { getProjectStaff } = useStaffingStore()
+  const staffData = getProjectStaff(projectId)
+  
+  return (
+    <DashboardCardWrapper
+      title="Team Utilization"
+      description="Current team utilization rates"
+      className="h-full"
+    >
+      {/* Card content */}
+    </DashboardCardWrapper>
+  )
+}
+```
+
+### 3. Dashboard Grid Integration
+
+**All dashboard cards must be registered in DashboardGrid.tsx:**
+
+```typescript
+// Add new card types to CARD_COMPONENTS
+const CARD_COMPONENTS = {
+  // ... existing cards
+  'team-utilization': TeamUtilizationCard,
+  'labor-cost-analysis': LaborCostAnalysisCard,
+  'spcr-activity': SPCRActivityCard,
+  'team-experience': TeamExperienceCard,
+  'project-staffing-overview': ProjectStaffingOverviewCard,
+  'staffing-alerts': StaffingAlertsCard,
+}
+```
+
+### 4. Dashboard Component Standards
+
+**Dashboard components must follow this interface:**
+
+```typescript
+interface DashboardComponentProps {
+  projectId: string
+  projectData: any
+  userRole: string
+  className?: string
+  isCompact?: boolean
+  isFullScreen?: boolean
+}
+```
+
+## Focus Mode Implementation
+
+### 1. Focus Mode Container Structure
+
+**Critical: Focus mode must support proper scrolling:**
+
+```typescript
+// Focus mode rendering with proper scrolling
+if (isFocusMode) {
+  return (
+    <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+        <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+      </div>
+    </div>
+  )
+}
+```
+
+### 2. Content Area Scrolling Fix
+
+**Content areas must handle focus mode properly:**
+
+```typescript
+// Content area with conditional styling for focus mode
+<div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+  <div className={cn(
+    "w-full min-w-0 max-w-full",
+    isFocusMode ? "min-h-full" : "h-full overflow-hidden"
+  )}>
+    {renderCoreTabContent()}
+  </div>
+</div>
+```
+
+### 3. Dashboard Focus Mode Integration
+
+**Dashboard components must support isFullScreen prop:**
+
+```typescript
+// Dashboard component with focus mode support
+const DashboardComponent: React.FC<DashboardComponentProps> = ({
+  projectId,
+  isFullScreen = false,
+  // ... other props
+}) => {
+  return (
+    <div className={cn(
+      isFullScreen ? "h-full flex flex-col overflow-hidden" : "space-y-4"
+    )}>
+      {/* Header sections with flex-shrink-0 in full screen */}
+      <div className={cn(isFullScreen && "flex-shrink-0")}>
+        {/* Header content */}
+      </div>
+      
+      {/* Main content with proper scrolling */}
+      <div className={cn(
+        isFullScreen ? "flex-1 overflow-y-auto overflow-x-hidden" : ""
+      )}>
+        {/* Dashboard content */}
+      </div>
+    </div>
+  )
 }
 ```
 
@@ -182,13 +339,14 @@ export const getProjectSidebarContent = (
 - **Card components**: `shadow-sm hover:shadow-md transition-shadow duration-200`
 - **Tab navigation**: `py-3 px-1 border-b-2 font-medium text-sm`
 - **Content areas**: `min-h-96 w-full max-w-full overflow-hidden`
+- **Focus mode containers**: `min-h-0` for proper flex behavior
 
 ### 3. Color and Theme Consistency
 
 - **Active states**: `border-primary text-primary`
 - **Inactive states**: `border-transparent text-muted-foreground`
 - **Hover states**: `hover:text-foreground hover:border-gray-300`
-- **Focus modes**: Implemented with overlay pattern
+- **Focus modes**: Implemented with overlay pattern and proper scrolling
 
 ## Component Development Standards
 
@@ -202,11 +360,26 @@ interface ComponentProps {
   user: any
   activeTab?: string
   onTabChange?: (tabId: string) => void
+  isFullScreen?: boolean // Required for focus mode support
 }
 
-const Component: React.FC<ComponentProps> = ({ projectId, projectData, userRole, user, activeTab, onTabChange }) => {
+const Component: React.FC<ComponentProps> = ({ 
+  projectId, 
+  projectData, 
+  userRole, 
+  user, 
+  activeTab, 
+  onTabChange,
+  isFullScreen = false 
+}) => {
   // Component logic
-  return <div className="space-y-4 w-full max-w-full">{/* Component content */}</div>
+  return (
+    <div className={cn(
+      isFullScreen ? "h-full flex flex-col overflow-hidden" : "space-y-4 w-full max-w-full"
+    )}>
+      {/* Component content */}
+    </div>
+  )
 }
 ```
 
@@ -222,23 +395,41 @@ if (!mounted) {
 }
 ```
 
-### 3. Focus Mode Implementation
+### 3. Analytics Card Development Pattern
+
+**All analytics cards must follow this pattern:**
 
 ```typescript
-// Focus mode toggle
-const handleFocusToggle = () => {
-  setIsFocusMode(!isFocusMode)
+// 1. Create card component file
+// components/cards/[module]/[ModuleName]AnalyticsCards.tsx
+
+// 2. Define card interface
+interface CardProps extends DashboardCardProps {
+  projectId: string
+  isCompact?: boolean
 }
 
-// Focus mode rendering
-if (isFocusMode) {
+// 3. Implement card with data integration
+export const AnalyticsCard: React.FC<CardProps> = ({ projectId, isCompact = false }) => {
+  // Use appropriate store/hook for data
+  const data = useModuleStore()
+  
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="p-6 h-full w-full max-w-full">{mainContent}</div>
-      </div>
-    </div>
+    <DashboardCardWrapper
+      title="Card Title"
+      description="Card description"
+      className="h-full"
+    >
+      {/* Card content with proper responsive design */}
+    </DashboardCardWrapper>
   )
+}
+
+// 4. Export all cards from single file
+export {
+  AnalyticsCard1,
+  AnalyticsCard2,
+  // ... other cards
 }
 ```
 
@@ -266,18 +457,30 @@ if (activeTab === "financial-management" || activeTab === "financial-hub") {
 const { user, userRole } = useAuth()
 ```
 
+### 4. Store Integration
+
+**All modules must integrate with appropriate Zustand stores:**
+
+```typescript
+// Example: Staffing module integration
+import { useStaffingStore } from '@/app/dashboard/staff-planning/store/useStaffingStore'
+
+const { staff, projects, spcrs, getProjectStaff } = useStaffingStore()
+```
+
 ## Data Flow Patterns
 
 ### 1. Props Flow
 
 ```
-MainApp → ProjectContent → ProjectControlCenterContent → TabContent
+MainApp → ProjectContent → ProjectControlCenterContent → TabContent → DashboardComponent
 ```
 
 ### 2. State Management
 
 - **Local state**: Navigation, UI states, form data
 - **Context state**: User authentication, global preferences
+- **Store state**: Module-specific data (staffing, financial, etc.)
 - **Prop drilling**: Project data, user role, handlers
 
 ### 3. Event Handling
@@ -297,24 +500,28 @@ const handleTabChange = (tabId: string) => {
 - Always define proper interfaces for component props
 - Use union types for tab IDs and navigation states
 - Implement proper null checking and optional chaining
+- Define card-specific interfaces extending DashboardCardProps
 
 ### 2. Performance Optimization
 
 - Implement lazy loading for heavy components
 - Use React.memo for expensive renders
 - Optimize re-renders with useCallback and useMemo
+- Use proper data memoization in analytics cards
 
 ### 3. Testing Considerations
 
 - Test files should mirror component structure
 - Mock all external dependencies
 - Test responsive behavior and state changes
+- Test focus mode functionality and scrolling
 
 ### 4. Accessibility Standards
 
 - Implement proper ARIA labels for navigation
 - Ensure keyboard navigation works correctly
 - Maintain focus management in dynamic content
+- Support screen readers in analytics cards
 
 ## File Modification Guidelines
 
@@ -324,20 +531,31 @@ const handleTabChange = (tabId: string) => {
 2. Add case in `renderCoreTabContent()` function
 3. Update sidebar content functions
 4. Add corresponding metric and action definitions
+5. Create dashboard component if analytics are needed
 
-### 2. Modifying Existing Components
+### 2. Adding New Analytics Cards
+
+1. Create card component file in `components/cards/[module]/`
+2. Implement cards following the analytics card pattern
+3. Register cards in `DashboardGrid.tsx`
+4. Create dashboard component using `DashboardGrid`
+5. Integrate with appropriate data stores
+
+### 3. Modifying Existing Components
 
 1. Maintain existing prop interfaces
 2. Preserve responsive design patterns
 3. Update related sidebar content
 4. Test integration with main app
+5. Ensure focus mode compatibility
 
-### 3. Adding Sub-Tab Systems
+### 4. Adding Sub-Tab Systems
 
 1. Follow the established Tabs component pattern
 2. Use consistent styling with `TabsList` and `TabsTrigger`
 3. Implement proper content organization
 4. Maintain mobile responsiveness
+5. Support focus mode with `isFullScreen` prop
 
 ## Integration with v3.0 Architecture
 
@@ -352,12 +570,14 @@ const handleTabChange = (tabId: string) => {
 - Use components from `components/ui/` for consistency
 - Leverage shared layout components
 - Maintain styling consistency with v3.0 design system
+- Use `DashboardGrid` and `DashboardCardWrapper` for analytics
 
 ### 3. Future Extensibility
 
 - Component architecture supports easy addition of new tabs
 - Sidebar content system allows for dynamic content based on context
 - Responsive design patterns ensure mobile compatibility
+- Dashboard system supports unlimited analytics cards
 
 ## Critical Implementation Notes
 
@@ -365,9 +585,71 @@ const handleTabChange = (tabId: string) => {
 2. **Maintain three-panel layout proportions**: 20% - 60% - 20%
 3. **Implement proper loading states** for all async operations
 4. **Use consistent tab navigation patterns** across all implementations
-5. **Preserve focus mode functionality** in all content components
+5. **Preserve focus mode functionality** with proper scrolling support
 6. **Maintain sidebar content injection** through dedicated functions
 7. **Follow responsive design patterns** for mobile compatibility
 8. **Use TypeScript interfaces** for all component props and state
+9. **Implement analytics cards** using DashboardGrid system
+10. **Support isFullScreen prop** in all dashboard components
+11. **Use proper flex patterns** for focus mode containers
+12. **Import cn utility** from `@/lib/utils` for conditional styling
+13. **Pass isFullScreen={isFocusMode}** to all dashboard components
+14. **Use min-h-0 and min-h-full** for proper flex behavior in focus mode
 
-This ruleset should be consulted for all project page development to ensure consistency with the v3.0 architecture and design standards.
+## Focus Mode Scrolling Requirements
+
+### 1. Container Structure
+
+```typescript
+// Focus mode container - REQUIRED structure
+if (isFocusMode) {
+  return (
+    <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+        <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+      </div>
+    </div>
+  )
+}
+```
+
+### 2. Content Area Fixes
+
+```typescript
+// Content area - REQUIRED for proper scrolling
+<div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+  <div className={cn(
+    "w-full min-w-0 max-w-full",
+    isFocusMode ? "min-h-full" : "h-full overflow-hidden"
+  )}>
+    {renderCoreTabContent()}
+  </div>
+</div>
+```
+
+### 3. Dashboard Component Focus Mode
+
+```typescript
+// Dashboard component focus mode support - REQUIRED
+const DashboardComponent: React.FC<Props> = ({ isFullScreen = false }) => {
+  return (
+    <div className={cn(
+      isFullScreen ? "h-full flex flex-col overflow-hidden" : "space-y-4"
+    )}>
+      {/* Header sections */}
+      <div className={cn(isFullScreen && "flex-shrink-0")}>
+        {/* Header content */}
+      </div>
+      
+      {/* Scrollable content */}
+      <div className={cn(
+        isFullScreen ? "flex-1 overflow-y-auto overflow-x-hidden" : ""
+      )}>
+        <DashboardGrid />
+      </div>
+    </div>
+  )
+}
+```
+
+This ruleset should be consulted for all project page development to ensure consistency with the v3.0 architecture and design standards, including the new analytics dashboard requirements and focus mode scrolling fixes.

@@ -16,7 +16,7 @@
 
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -89,25 +89,28 @@ import { ReportViewer } from "@/components/reports/ReportViewer"
 import { ReportApprovalWorkflow } from "@/components/reports/ReportApprovalWorkflow"
 import { ReportHistory } from "@/components/reports/ReportHistory"
 import { ReportAnalytics } from "@/components/reports/ReportAnalytics"
+import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
+import FieldManagementContent from "./content/FieldManagementContent"
+import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
+import { SharePointLibraryViewer } from "@/components/sharepoint/SharePointLibraryViewer"
+import SidebarPanelRenderer from "@/components/project/sidebar/SidebarPanelRenderer"
 import { ReportsDashboard } from "@/components/reports/ReportsDashboard"
 import { ProjectReports } from "@/components/reports/ProjectReports"
-import { StartUpChecklist } from "@/components/startup/StartUpChecklist"
-import CloseoutChecklist from "@/components/closeout/CloseoutChecklist"
-import ResponsibilityMatrixCore from "./ResponsibilityMatrixCore"
-import FinancialHubProjectContent from "./content/FinancialHubProjectContent"
-import { ProjectManagerStaffingView } from "@/components/staffing/ProjectManagerStaffingView"
-import { ProjectStaffingGantt } from "@/components/staffing/ProjectStaffingGantt"
-import { ProjectSPCRManager } from "@/components/staffing/ProjectSPCRManager"
-import { StaffingDashboard } from "@/components/staffing/StaffingDashboard"
-import { ProjectProductivityContent } from "@/components/productivity/ProjectProductivityContent"
-import FieldManagementContent from "./content/FieldManagementContent"
-import { AreaCalculationsModule } from "@/components/estimating/AreaCalculationsModule"
-import { ProjectBidManagement } from "@/components/estimating/BidManagement"
-import BidMessagePanel from "@/components/estimating/bid-management/components/BidMessagePanel"
-import BiddersList from "@/components/estimating/bid-management/components/BiddersList"
-import BidLeveling from "@/components/estimating/bid-management/components/BidLeveling"
-import BiddingOverview from "@/components/estimating/BiddingOverview"
-import SharePointFilesTab from "@/components/sharepoint/SharePointFilesTab"
+import EstimatingSuite from "@/components/estimating/EstimatingSuite"
+import { EstimatingProvider } from "@/components/estimating/EstimatingProvider"
+import { ProjectActivityFeed } from "@/components/feed/ProjectActivityFeed"
+import ProjectSafetyForms from "@/components/project/safety/ProjectSafetyForms"
+import QualityProjectContent from "./content/QualityProjectContent"
+import QualityControlProjectContent from "./content/QualityControlProjectContent"
+import SafetyProjectContent from "./content/SafetyProjectContent"
+
+// Lazy load ProjectTabsShell for better performance
+const ProjectTabsShell = React.lazy(() => import("@/components/project/ProjectTabsShell"))
+
+// Lazy load ConstructabilityReviewCenter for better performance
+const ConstructabilityReviewCenter = React.lazy(
+  () => import("@/components/constructability/ConstructabilityReviewCenter")
+)
 
 interface ProjectControlCenterContentProps {
   projectId: string
@@ -123,9 +126,9 @@ interface NavigationState {
   category: string | null
   tool: string | null
   subTool: string | null
-  coreTab: string | null
-  staffingSubTab: string | null
-  reportsSubTab: string | null
+  coreTab?: string | null
+  staffingSubTab?: string
+  reportsSubTab?: string
 }
 
 // Expandable Description Component
@@ -203,1065 +206,111 @@ const PreConstructionContent: React.FC<{
   userRole: string
   user: any
 }> = ({ projectId, projectData, userRole, user }) => {
-  const [activePreconTab, setActivePreconTab] = useState("estimating")
-  const [activeEstimatingSubTab, setActiveEstimatingSubTab] = useState("overview")
-  const [selectedBidPackage, setSelectedBidPackage] = useState<string | null>(null)
-  const [activeBidPackageTab, setActiveBidPackageTab] = useState("overview")
+  const [activePreconTab, setActivePreconTab] = useState<string>("estimating")
+  const [showConstructabilityReviews, setShowConstructabilityReviews] = useState<boolean>(false)
 
-  // Helper function to get bid package name
   const getBidPackageName = (packageId: string) => {
     const packages: { [key: string]: string } = {
-      "01-00": "Materials Testing",
-      "02-21": "Surveying",
-      "03-33": "Concrete",
-      "04-21": "Masonry",
-      "05-12": "Structural Steel",
-      "06-10": "Carpentry",
-      "07-11": "Waterproofing",
-      "08-11": "Steel Doors",
+      "MRC-001": "Concrete Work",
+      "MRC-002": "Masonry Work",
+      "MRC-003": "Metals",
+      "MRC-004": "Wood, Plastics, and Composites",
+      "MRC-005": "Thermal and Moisture Protection",
+      "MRC-006": "Openings",
+      "MRC-007": "Finishes",
+      "MRC-008": "Specialties",
+      "MRC-009": "Equipment",
+      "MRC-010": "Furnishings",
+      "MRC-011": "Special Construction",
+      "MRC-012": "Conveying Equipment",
+      "MRC-013": "Fire Suppression",
+      "MRC-014": "Plumbing",
+      "MRC-015": "HVAC",
+      "MRC-016": "Electrical",
+      "MRC-017": "Communications",
+      "MRC-018": "Electronic Safety and Security",
+      "MRC-019": "Instrumentation",
+      "MRC-020": "Earthwork",
+      "MRC-021": "Exterior Improvements",
+      "MRC-022": "Utilities",
+      "MRC-023": "Transportation",
+      "MRC-024": "Hazardous Materials",
+      "MRC-025": "Pollution Control",
+      "MRC-026": "Process Equipment",
+      "MRC-027": "Process Instrumentation",
+      "MRC-028": "Process Electrical",
+      "MRC-029": "Process Controls",
+      "MRC-030": "General Requirements",
+      "MRC-031": "Existing Conditions",
+      "MRC-032": "Site Preparation",
+      "MRC-033": "Concrete",
+      "MRC-034": "Masonry",
+      "MRC-035": "Metals",
+      "MRC-036": "Wood and Plastics",
+      "MRC-037": "Thermal and Moisture Protection",
+      "MRC-038": "Doors and Windows",
+      "MRC-039": "Finishes",
+      "MRC-040": "Specialties",
+      "MRC-041": "Equipment",
+      "MRC-042": "Furnishings",
+      "MRC-043": "Special Construction",
+      "MRC-044": "Conveying Equipment",
+      "MRC-045": "Fire Suppression",
+      "MRC-046": "Plumbing",
+      "MRC-047": "HVAC",
+      "MRC-048": "Electrical",
+      "MRC-049": "Communications",
+      "MRC-050": "Electronic Safety and Security",
+      "MRC-051": "Instrumentation",
+      "MRC-052": "Earthwork",
+      "MRC-053": "Exterior Improvements",
+      "MRC-054": "Utilities",
+      "MRC-055": "Transportation",
+      "MRC-056": "Hazardous Materials",
+      "MRC-057": "Pollution Control",
+      "MRC-058": "Process Equipment",
+      "MRC-059": "Process Instrumentation",
+      "MRC-060": "Process Electrical",
+      "MRC-061": "Process Controls",
+      "MRC-062": "General Requirements",
+      "MRC-063": "Existing Conditions",
+      "MRC-064": "Site Preparation",
+      "MRC-065": "Concrete",
+      "MRC-066": "Masonry",
+      "MRC-067": "Metals",
+      "MRC-068": "Wood and Plastics",
+      "MRC-069": "Thermal and Moisture Protection",
+      "MRC-070": "Doors and Windows",
+      "MRC-071": "Finishes",
+      "MRC-072": "Specialties",
+      "MRC-073": "Equipment",
+      "MRC-074": "Furnishings",
+      "MRC-075": "Special Construction",
+      "MRC-076": "Conveying Equipment",
+      "MRC-077": "Fire Suppression",
+      "MRC-078": "Plumbing",
+      "MRC-079": "HVAC",
+      "MRC-080": "Electrical",
+      "MRC-081": "Communications",
+      "MRC-082": "Electronic Safety and Security",
     }
     return packages[packageId] || "Unknown Package"
   }
 
-  // Render content based on active tab
   const renderPreconTabContent = () => {
     switch (activePreconTab) {
       case "estimating":
         return (
-          <div className="space-y-6">
-            {/* Estimating Sub-Tab Navigation */}
-            <Tabs value={activeEstimatingSubTab} onValueChange={setActiveEstimatingSubTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 gap-1 h-auto p-1">
-                <TabsTrigger value="overview" className="text-xs px-2 py-1">
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="bidding" className="text-xs px-2 py-1">
-                  Bidding
-                </TabsTrigger>
-                <TabsTrigger value="area-calculation" className="text-xs px-2 py-1">
-                  Area Calc
-                </TabsTrigger>
-                <TabsTrigger value="allowances" className="text-xs px-2 py-1">
-                  Allowances
-                </TabsTrigger>
-                <TabsTrigger value="clarifications" className="text-xs px-2 py-1">
-                  Clarifications
-                </TabsTrigger>
-                <TabsTrigger value="value-analysis" className="text-xs px-2 py-1">
-                  Value Analysis
-                </TabsTrigger>
-                <TabsTrigger value="documents" className="text-xs px-2 py-1">
-                  Documents
-                </TabsTrigger>
-                <TabsTrigger value="trade-partners" className="text-xs px-2 py-1">
-                  Trade Partners
-                </TabsTrigger>
-                <TabsTrigger value="bid-leveling" className="text-xs px-2 py-1">
-                  Bid Leveling
-                </TabsTrigger>
-                <TabsTrigger value="cost-summary" className="text-xs px-2 py-1">
-                  Cost Summary
-                </TabsTrigger>
-                <TabsTrigger value="gc-gr" className="text-xs px-2 py-1">
-                  GC GR
-                </TabsTrigger>
-                <TabsTrigger value="bid-tabs" className="text-xs px-2 py-1">
-                  Bid Tabs
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="mt-6">
-                <div className="space-y-6">
-                  {/* Estimating Dashboard */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Calculator className="h-5 w-5" />
-                          Cost Analysis
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                              ${projectData?.contract_value ? (projectData.contract_value / 1000000).toFixed(1) : "0"}M
-                            </div>
-                            <p className="text-sm text-muted-foreground">Estimated Value</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <FileText className="h-4 w-4 mr-2" />
-                              View Cost Breakdown
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <BarChart3 className="h-4 w-4 mr-2" />
-                              Bid Leveling
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Target className="h-4 w-4 mr-2" />
-                              Accuracy Tracking
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Building2 className="h-5 w-5" />
-                          Project Scope
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                              {projectData?.project_type_name || "Commercial"}
-                            </div>
-                            <p className="text-sm text-muted-foreground">Project Type</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Scope Details
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Calculator className="h-4 w-4 mr-2" />
-                              Estimate Builder
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <TrendingUp className="h-5 w-5" />
-                          Estimating Progress
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">85%</div>
-                            <p className="text-sm text-muted-foreground">Complete</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Button size="sm" className="w-full justify-start">
-                              <Plus className="h-4 w-4 mr-2" />
-                              New Estimate
-                            </Button>
-                            <Button size="sm" variant="outline" className="w-full justify-start">
-                              <Download className="h-4 w-4 mr-2" />
-                              Export Templates
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Estimating Activities */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <ClipboardList className="h-5 w-5" />
-                        Estimating Activities
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {[
-                          { task: "Quantity Takeoff", status: "completed", progress: 100 },
-                          { task: "Material Pricing", status: "in-progress", progress: 75 },
-                          { task: "Labor Calculations", status: "in-progress", progress: 60 },
-                          { task: "Equipment Costs", status: "pending", progress: 30 },
-                          { task: "Final Review", status: "pending", progress: 0 },
-                        ].map((item, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className={`w-3 h-3 rounded-full ${
-                                  item.status === "completed"
-                                    ? "bg-green-500"
-                                    : item.status === "in-progress"
-                                    ? "bg-yellow-500"
-                                    : "bg-gray-300"
-                                }`}
-                              />
-                              <span className="font-medium">{item.task}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-20 bg-gray-200 rounded-full h-2">
-                                <div
-                                  className={`h-2 rounded-full ${
-                                    item.status === "completed"
-                                      ? "bg-green-500"
-                                      : item.status === "in-progress"
-                                      ? "bg-yellow-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  style={{ width: `${item.progress}%` }}
-                                />
-                              </div>
-                              <span className="text-sm text-muted-foreground w-12">{item.progress}%</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* All other estimating sub-tabs */}
-
-              <TabsContent value="bidding" className="mt-6">
-                {selectedBidPackage ? (
-                  <div className="space-y-6">
-                    {/* Breadcrumb */}
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <span className="cursor-pointer hover:text-blue-600" onClick={() => setSelectedBidPackage(null)}>
-                        Bid Packages
-                      </span>
-                      <span>&gt;</span>
-                      <span className="text-foreground font-medium">
-                        {selectedBidPackage}: {getBidPackageName(selectedBidPackage)}
-                      </span>
-                    </div>
-
-                    {/* Bid Package Detail View */}
-                    <div className="space-y-6">
-                      {/* Header */}
-                      <div>
-                        <h1 className="text-2xl font-semibold text-foreground">
-                          {selectedBidPackage}: {getBidPackageName(selectedBidPackage)}
-                        </h1>
-                      </div>
-
-                      {/* Tab Navigation */}
-                      <div className="border-b border-border">
-                        <div className="flex space-x-6 overflow-x-auto">
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "overview"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("overview")}
-                          >
-                            <span>Overview</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "files"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("files")}
-                          >
-                            <span>Files</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "messages"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("messages")}
-                          >
-                            <span>Messages</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bidders"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bidders")}
-                          >
-                            <span>Bidders</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bid-form"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bid-form")}
-                          >
-                            <span>Bid Form</span>
-                          </button>
-                          <button
-                            className={`flex items-center space-x-2 py-3 px-1 border-b-2 ${
-                              activeBidPackageTab === "bid-leveling"
-                                ? "border-blue-600 text-blue-600 font-medium"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
-                            onClick={() => setActiveBidPackageTab("bid-leveling")}
-                          >
-                            <span>Bid Leveling</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      {activeBidPackageTab === "overview" && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                          {/* Left Column - Main Content */}
-                          <div className="lg:col-span-2 space-y-6">
-                            {/* Company Invitation Status */}
-                            <Card>
-                              <CardHeader>
-                                <CardTitle className="text-lg">13 companies invited</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="grid grid-cols-4 gap-4">
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="110"
-                                          className="text-gray-400"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">8</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Undecided</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="94"
-                                          className="text-teal-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">6</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Viewed</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="148"
-                                          className="text-green-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">2</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Bidding</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="relative w-16 h-16 mx-auto mb-2">
-                                      <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          className="text-gray-200"
-                                        />
-                                        <circle
-                                          cx="32"
-                                          cy="32"
-                                          r="28"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                          fill="none"
-                                          strokeDasharray="175.929"
-                                          strokeDashoffset="175"
-                                          className="text-red-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold">0</span>
-                                      </div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">of 13</div>
-                                    <div className="text-sm font-medium">Declined</div>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Files Tab Content */}
-                      {activeBidPackageTab === "files" && (
-                        <div className="space-y-6">
-                          {/* SharePoint Integration Header */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12.5,2.5h7C20.9,2.5,22,3.6,22,5v14c0,1.4-1.1,2.5-2.5,2.5h-15C3.1,21.5,2,20.4,2,19V5c0-1.4,1.1-2.5,2.5-2.5H12.5z M12.5,8h7C20.3,8,21,8.7,21,9.5S20.3,11,19.5,11h-7C11.7,11,11,10.3,11,9.5S11.7,8,12.5,8z M12.5,13h7c0.8,0,1.5,0.7,1.5,1.5S20.3,16,19.5,16h-7c-0.8,0-1.5-0.7-1.5-1.5S11.7,13,12.5,13z" />
-                                </svg>
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-semibold">SharePoint Document Library</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Microsoft Graph API Integration • Materials Testing Bid Package
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Badge variant="outline" className="text-xs">
-                                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                                Connected
-                              </Badge>
-                              <Button variant="outline" size="sm">
-                                <svg
-                                  className="w-4 h-4 mr-2"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                  <polyline points="7,10 12,15 17,10" />
-                                  <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg>
-                                Upload Files
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <svg
-                                  className="w-4 h-4 mr-2"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                </svg>
-                                New Folder
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            {/* Left Sidebar - Folder Structure */}
-                            <div className="lg:col-span-1">
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-sm font-medium">Folder Structure</CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-0">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                      </svg>
-                                      <span className="text-sm font-medium">📁 Materials Testing</span>
-                                    </div>
-                                    <div className="ml-6 space-y-1">
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📄 Specifications</span>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📋 Proposals</span>
-                                        <Badge variant="secondary" className="text-xs ml-auto">
-                                          3
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">📑 Drawings</span>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded bg-blue-50 border-l-2 border-blue-600 cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm font-medium">📤 Submissions</span>
-                                        <Badge variant="default" className="text-xs ml-auto">
-                                          1
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-2 py-1 px-2 rounded hover:bg-muted cursor-pointer">
-                                        <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <span className="text-sm">💬 Communications</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-
-                              {/* Graph API Status */}
-                              <Card className="mt-4">
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-sm font-medium">Microsoft Graph API</CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-0 space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">Connection Status</span>
-                                    <Badge variant="outline" className="text-xs">
-                                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                                      Active
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">Last Sync</span>
-                                    <span className="text-xs">2 min ago</span>
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground">API Version</span>
-                                    <span className="text-xs">v1.0</span>
-                                  </div>
-                                  <Button variant="outline" size="sm" className="w-full text-xs">
-                                    <svg
-                                      className="w-3 h-3 mr-1"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    >
-                                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                      <circle cx="12" cy="12" r="3" />
-                                    </svg>
-                                    View Permissions
-                                  </Button>
-                                </CardContent>
-                              </Card>
-                            </div>
-
-                            {/* Main Content - File List */}
-                            <div className="lg:col-span-3">
-                              <Card>
-                                <CardHeader className="flex flex-row items-center justify-between pb-4">
-                                  <div>
-                                    <CardTitle className="text-base">Submissions Folder</CardTitle>
-                                    <CardDescription className="text-sm">
-                                      /Materials Testing/Submissions • SharePoint Online
-                                    </CardDescription>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Button variant="ghost" size="sm">
-                                      <svg
-                                        className="w-4 h-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                      </svg>
-                                    </Button>
-                                    <Button variant="ghost" size="sm">
-                                      <svg
-                                        className="w-4 h-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                      >
-                                        <line x1="8" y1="6" x2="21" y2="6" />
-                                        <line x1="8" y1="12" x2="21" y2="12" />
-                                        <line x1="8" y1="18" x2="21" y2="18" />
-                                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                                        <line x1="3" y1="18" x2="3.01" y2="18" />
-                                      </svg>
-                                    </Button>
-                                  </div>
-                                </CardHeader>
-                                <CardContent>
-                                  {/* File Upload Area */}
-                                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center mb-6 hover:border-blue-400 transition-colors">
-                                    <div className="flex flex-col items-center space-y-3">
-                                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <svg
-                                          className="w-6 h-6 text-blue-600"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                        >
-                                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                          <polyline points="7,10 12,15 17,10" />
-                                          <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium">Drag and drop files here</p>
-                                        <p className="text-xs text-muted-foreground">
-                                          Files uploaded here are automatically synced to SharePoint
-                                        </p>
-                                      </div>
-                                      <div className="flex items-center space-x-2">
-                                        <Button variant="outline" size="sm">
-                                          Upload Files
-                                        </Button>
-                                        <span className="text-xs text-muted-foreground">or</span>
-                                        <Button variant="ghost" size="sm" className="text-blue-600">
-                                          Connect to OneDrive
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* File List */}
-                                  <div className="space-y-1">
-                                    <div className="grid grid-cols-12 gap-4 py-2 px-3 text-xs font-medium text-muted-foreground border-b">
-                                      <div className="col-span-6">Name</div>
-                                      <div className="col-span-2">Modified</div>
-                                      <div className="col-span-2">Size</div>
-                                      <div className="col-span-1">Shared</div>
-                                      <div className="col-span-1">Actions</div>
-                                    </div>
-
-                                    {/* Deatrick Engineering Associates File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                                          <svg className="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">
-                                            Materials Testing Proposal - Deatrick Engineering.pdf
-                                          </div>
-                                          <div className="text-xs text-muted-foreground">Proposal • $178,994.58</div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/18/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">2.4 MB</div>
-                                      <div className="col-span-1">
-                                        <div className="flex -space-x-1">
-                                          <div className="w-6 h-6 bg-blue-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            K
-                                          </div>
-                                          <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            W
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    {/* Specifications File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                                          <svg
-                                            className="w-4 h-4 text-blue-600"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                          >
-                                            <path d="M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">Testing Specifications.docx</div>
-                                          <div className="text-xs text-muted-foreground">
-                                            Project requirements • Updated by W. Stan
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/15/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">156 KB</div>
-                                      <div className="col-span-1">
-                                        <div className="flex -space-x-1">
-                                          <div className="w-6 h-6 bg-purple-500 rounded-full border-2 border-background flex items-center justify-center text-xs text-white font-medium">
-                                            S
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-
-                                    {/* Addendum File */}
-                                    <div className="grid grid-cols-12 gap-4 py-3 px-3 hover:bg-muted/50 rounded-md items-center">
-                                      <div className="col-span-6 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                                          <svg
-                                            className="w-4 h-4 text-orange-600"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                          >
-                                            <path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z" />
-                                          </svg>
-                                        </div>
-                                        <div>
-                                          <div className="text-sm font-medium">Addendum #1 - Clarifications.pdf</div>
-                                          <div className="text-xs text-muted-foreground">
-                                            Project clarification • Shared via link
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">3/16/2025</div>
-                                      <div className="col-span-2 text-sm text-muted-foreground">842 KB</div>
-                                      <div className="col-span-1">
-                                        <Badge variant="outline" className="text-xs">
-                                          <svg
-                                            className="w-3 h-3 mr-1"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                                          </svg>
-                                          Public
-                                        </Badge>
-                                      </div>
-                                      <div className="col-span-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                          <svg
-                                            className="h-4 w-4"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                          </svg>
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* SharePoint Integration Footer */}
-                                  <div className="mt-6 pt-4 border-t border-border">
-                                    <div className="flex items-center justify-between text-sm">
-                                      <div className="flex items-center space-x-2 text-muted-foreground">
-                                        <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
-                                          <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12.5,2.5h7C20.9,2.5,22,3.6,22,5v14c0,1.4-1.1,2.5-2.5,2.5h-15C3.1,21.5,2,20.4,2,19V5c0-1.4,1.1-2.5,2.5-2.5H12.5z" />
-                                          </svg>
-                                        </div>
-                                        <span>Synced with SharePoint Online</span>
-                                        <Badge variant="outline" className="text-xs">
-                                          Real-time
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center space-x-4 text-muted-foreground">
-                                        <span>3 files • 3.4 MB total</span>
-                                        <Button variant="ghost" size="sm" className="text-xs">
-                                          <svg
-                                            className="w-3 h-3 mr-1"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
-                                          </svg>
-                                          Share Folder
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Messages Tab Content */}
-                      {activeBidPackageTab === "messages" && (
-                        <div className="space-y-6">
-                          <BidMessagePanel projectId={projectId} packageId={selectedBidPackage} className="h-[800px]" />
-                        </div>
-                      )}
-
-                      {/* Bidders Tab Content */}
-                      {activeBidPackageTab === "bidders" && (
-                        <div className="space-y-6">
-                          <BiddersList projectId={projectId} packageId={selectedBidPackage || ""} className="" />
-                        </div>
-                      )}
-
-                      {/* Bid Form Tab Content */}
-                      {activeBidPackageTab === "bid-form" && (
-                        <div className="space-y-6">
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>Bid Form</CardTitle>
-                              <CardDescription>Bid form template and submissions</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              <p className="text-muted-foreground">
-                                Bid form template and submission details will be displayed here.
-                              </p>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      )}
-
-                      {/* Bid Leveling Tab Content */}
-                      {activeBidPackageTab === "bid-leveling" && (
-                        <div className="space-y-6">
-                          <BidLeveling projectId={projectId} packageId={selectedBidPackage || ""} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <BiddingOverview
-                    projectId={projectId}
-                    projectData={projectData}
-                    userRole={userRole}
-                    user={user}
-                    onPackageSelect={setSelectedBidPackage}
-                  />
-                )}
-              </TabsContent>
-
-              <TabsContent value="area-calculation" className="mt-6">
-                <AreaCalculationsModule
-                  projectId={projectId}
-                  projectName={projectData?.name || `Project ${projectId}`}
-                  onSave={(data) => {
-                    console.log("Area calculations saved:", data)
-                    // Handle save logic here
-                  }}
-                  onExport={(format) => {
-                    console.log("Exporting area calculations as:", format)
-                    // Handle export logic here
-                  }}
-                />
-              </TabsContent>
-
-              <TabsContent value="allowances" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Allowances</CardTitle>
-                    <CardDescription>Project allowances and contingency management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Allowances management and contingency tracking will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="clarifications" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Clarifications</CardTitle>
-                    <CardDescription>Bid clarifications and RFI management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Clarifications and RFI management interface will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="value-analysis" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Value Analysis</CardTitle>
-                    <CardDescription>Value engineering and cost optimization</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Value analysis and cost optimization tools will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="documents" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Documents</CardTitle>
-                    <CardDescription>Estimating documents and specifications</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Document management and specification viewer will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="trade-partners" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Trade Partners</CardTitle>
-                    <CardDescription>Subcontractor and vendor management</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Trade partner management and vendor database will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="bid-leveling" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bid Leveling</CardTitle>
-                    <CardDescription>Bid comparison and leveling analysis</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Bid leveling and comparison tools will be displayed here.</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="cost-summary" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Cost Summary</CardTitle>
-                    <CardDescription>Comprehensive cost summary and breakdown</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Cost summary and detailed breakdown will be displayed here.</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="gc-gr" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>GC GR</CardTitle>
-                    <CardDescription>General contractor and general requirements</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      General contractor and general requirements management will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="bid-tabs" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bid Tabs</CardTitle>
-                    <CardDescription>Organized bid tabulation and comparison</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Bid tabulation and comparison interface will be displayed here.
-                    </p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
+          <EstimatingProvider>
+            <EstimatingSuite projectId={projectId} projectData={projectData} user={user} userRole={userRole} />
+          </EstimatingProvider>
         )
 
       case "pre-construction":
         return (
           <div className="space-y-6">
             {/* Pre-Construction Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1344,6 +393,45 @@ const PreConstructionContent: React.FC<{
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Constructability Reviews Card - Role-based access */}
+              {["project-manager", "estimator", "project-executive", "executive"].includes(userRole) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Constructability Reviews
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">8.2</div>
+                        <p className="text-sm text-muted-foreground">Average Score</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Button
+                          size="sm"
+                          className="w-full justify-start"
+                          onClick={() => setShowConstructabilityReviews(true)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          View Reviews
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => setShowConstructabilityReviews(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Review
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Pre-Construction Activities */}
@@ -1546,47 +634,77 @@ const PreConstructionContent: React.FC<{
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation - Styled like Financial Hub */}
-      <div className="border-b border-border">
-        <div className="flex space-x-6 overflow-x-auto">
-          <button
-            onClick={() => setActivePreconTab("estimating")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "estimating"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Calculator className="h-4 w-4" />
-            <span>Estimating</span>
-          </button>
-          <button
-            onClick={() => setActivePreconTab("pre-construction")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "pre-construction"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Building2 className="h-4 w-4" />
-            <span>Pre-Construction</span>
-          </button>
-          <button
-            onClick={() => setActivePreconTab("ids-bim-coordination")}
-            className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-              activePreconTab === "ids-bim-coordination"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-            }`}
-          >
-            <Brain className="h-4 w-4" />
-            <span>IDS & BIM Coordination</span>
-          </button>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div
+          onClick={() => setActivePreconTab("estimating")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "estimating"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Calculator className="h-6 w-6" />
+            <span className="text-sm font-medium">Estimating</span>
+            <span className="text-xs text-muted-foreground">Cost estimation and bidding tools</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActivePreconTab("pre-construction")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "pre-construction"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Building2 className="h-6 w-6" />
+            <span className="text-sm font-medium">Pre-Construction</span>
+            <span className="text-xs text-muted-foreground">Planning and coordination activities</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActivePreconTab("ids-bim-coordination")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activePreconTab === "ids-bim-coordination"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Brain className="h-6 w-6" />
+            <span className="text-sm font-medium">IDS & BIM Coordination</span>
+            <span className="text-xs text-muted-foreground">Digital services and model coordination</span>
+          </div>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">{renderPreconTabContent()}</div>
+      <div className="mt-6">
+        {showConstructabilityReviews ? (
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading constructability reviews...</p>
+                </div>
+              </div>
+            }
+          >
+            <ConstructabilityReviewCenter
+              projectId={projectId}
+              projectData={projectData}
+              userRole={userRole}
+              user={user}
+              onNavigateBack={() => setShowConstructabilityReviews(false)}
+            />
+          </Suspense>
+        ) : (
+          renderPreconTabContent()
+        )}
+      </div>
     </div>
   )
 }
@@ -3188,24 +2306,25 @@ const WarrantyManagementContent: React.FC<{
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-border">
-        <nav className="-mb-px flex space-x-8">
-          {warrantyTabsConfig.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </nav>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        {warrantyTabsConfig.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+              activeTab === tab.id
+                ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+                : "border-border hover:border-[#FA4616]/30"
+            }`}
+          >
+            <div className="flex flex-col items-center text-center space-y-2">
+              <tab.icon className="h-6 w-6" />
+              <span className="text-sm font-medium">{tab.label}</span>
+              <span className="text-xs text-muted-foreground">{tab.description}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Content Area */}
@@ -3845,40 +2964,50 @@ const TradePartnersPanel: React.FC<{
 
   return (
     <div className="space-y-6 w-full max-w-full">
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveView("directory")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "directory"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Directory
-          </button>
-          <button
-            onClick={() => setActiveView("project")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "project"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Project View
-          </button>
-          <button
-            onClick={() => setActiveView("scorecard")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === "scorecard"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-            }`}
-          >
-            Scorecards
-          </button>
-        </nav>
+      {/* Card-based Tab Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div
+          onClick={() => setActiveView("directory")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "directory"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Building className="h-6 w-6" />
+            <span className="text-sm font-medium">Directory</span>
+            <span className="text-xs text-muted-foreground">Complete regional directory</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActiveView("project")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "project"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Briefcase className="h-6 w-6" />
+            <span className="text-sm font-medium">Project View</span>
+            <span className="text-xs text-muted-foreground">Project-specific trade partners</span>
+          </div>
+        </div>
+        <div
+          onClick={() => setActiveView("scorecard")}
+          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            activeView === "scorecard"
+              ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+              : "border-border hover:border-[#FA4616]/30"
+          }`}
+        >
+          <div className="flex flex-col items-center text-center space-y-2">
+            <Star className="h-6 w-6" />
+            <span className="text-sm font-medium">Scorecards</span>
+            <span className="text-xs text-muted-foreground">Internal performance reviews</span>
+          </div>
+        </div>
       </div>
 
       {/* View Content */}
@@ -3889,48 +3018,8 @@ const TradePartnersPanel: React.FC<{
   )
 }
 
-// Enhanced Contract Document Review Panel
-const ContractDocumentReviewPanel: React.FC<{
-  projectId: string
-  projectData: any
-  userRole: string
-}> = ({ projectId, projectData, userRole }) => {
-  const [selectedDocument, setSelectedDocument] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<"dashboard" | "review">("dashboard")
-  const [selectedClause, setSelectedClause] = useState<string | null>(null)
-  const [flaggedClauses, setFlaggedClauses] = useState<any[]>([])
-  const [aiInsights, setAiInsights] = useState<any[]>([])
-
-  const handleDocumentSelect = (documentId: string) => {
-    setSelectedDocument(documentId)
-    setViewMode("review")
-  }
-
-  const handleClauseSelect = (clauseId: string) => {
-    setSelectedClause(clauseId)
-  }
-
-  const handleFlagClause = (clauseId: string, category: string, comment: string) => {
-    // Implementation for flagging clauses
-  }
-
-  return (
-    <div className="space-y-6 w-full max-w-full">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Contract Document Review</CardTitle>
-          <p className="text-sm text-muted-foreground">AI-powered contract analysis and review</p>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">Contract document review interface</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+// Import the enhanced Contract Documents component
+import { EnhancedContractDocuments } from "@/components/compliance/EnhancedContractDocuments"
 
 // Compliance Management Content Component
 const ComplianceContent: React.FC<{
@@ -3939,15 +3028,27 @@ const ComplianceContent: React.FC<{
   userRole: string
   user: any
 }> = ({ projectId, projectData, userRole, user }) => {
-  const [activeTab, setActiveTab] = useState("contract-documents")
+  const [activeTab, setActiveTab] = useState("safety")
   const [isFocusMode, setIsFocusMode] = useState(false)
 
   const handleFocusToggle = () => {
     setIsFocusMode(!isFocusMode)
   }
 
-  // Tab configuration
+  // Tab configuration with all four categories
   const complianceTabsConfig = [
+    {
+      id: "safety",
+      label: "Safety",
+      icon: Shield,
+      description: "Safety management and compliance",
+    },
+    {
+      id: "quality-control",
+      label: "Quality Control",
+      icon: CheckCircle,
+      description: "Quality control programs and inspections",
+    },
     {
       id: "contract-documents",
       label: "Contract Documents",
@@ -3964,8 +3065,34 @@ const ComplianceContent: React.FC<{
 
   const renderComplianceTabContent = () => {
     switch (activeTab) {
+      case "safety":
+        return (
+          <SafetyProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        )
+
+      case "quality-control":
+        return (
+          <QualityControlProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        )
+
       case "contract-documents":
-        return <ContractDocumentReviewPanel projectId={projectId} projectData={projectData} userRole={userRole} />
+        return (
+          <EnhancedContractDocuments projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+        )
 
       case "trade-partners":
         return <TradePartnersPanel projectId={projectId} projectData={projectData} userRole={userRole} />
@@ -3982,8 +3109,10 @@ const ComplianceContent: React.FC<{
       <div className="pb-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-foreground">Compliance Tools</h2>
-            <p className="text-sm text-muted-foreground">Contract management and trade partner compliance</p>
+            <h2 className="text-xl font-semibold text-foreground">Compliance & Safety</h2>
+            <p className="text-sm text-muted-foreground">
+              Safety, quality control, contracts, and trade partner compliance
+            </p>
           </div>
           <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
             {isFocusMode ? (
@@ -4001,29 +3130,102 @@ const ComplianceContent: React.FC<{
         </div>
       </div>
 
-      {/* Responsive Tab Navigation */}
-      <div className="border-b border-border flex-shrink-0">
-        <div className="flex space-x-6 overflow-x-auto">
-          {complianceTabsConfig.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground"
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
+      {/* Card-based Tab Navigation - 2x2 Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 flex-shrink-0">
+        {complianceTabsConfig.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-sm ${
+              activeTab === tab.id
+                ? "border-[#FA4616] bg-[#FA4616]/10 text-[#FA4616]"
+                : "border-border hover:border-[#FA4616]/30"
+            }`}
+          >
+            <div className="flex flex-col items-center text-center space-y-2">
+              <tab.icon className="h-6 w-6" />
+              <span className="text-sm font-medium">{tab.label}</span>
+              <span className="text-xs text-muted-foreground">{tab.description}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Content Area */}
       <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
         <div className="w-full min-w-0 max-w-full h-full overflow-hidden">{renderComplianceTabContent()}</div>
+      </div>
+    </div>
+  )
+
+  // Return focus mode if active
+  if (isFocusMode) {
+    return (
+      <div className="fixed inset-0 bg-white dark:bg-gray-950 flex flex-col z-50">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-6 min-h-full w-full max-w-full">{mainContent}</div>
+        </div>
+      </div>
+    )
+  }
+
+  return mainContent
+}
+
+// Recent Activity Management Content Component
+const RecentActivityContent: React.FC<{
+  projectId: string
+  projectData: any
+  userRole: string
+  user: any
+}> = ({ projectId, projectData, userRole, user }) => {
+  const [isFocusMode, setIsFocusMode] = useState(false)
+
+  const handleFocusToggle = () => {
+    setIsFocusMode(!isFocusMode)
+  }
+
+  // Main content
+  const mainContent = (
+    <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+      {/* Module Title with Focus Button */}
+      <div className="pb-2 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Recent Activity</h2>
+            <p className="text-sm text-muted-foreground">Real-time project activities, updates, and communications</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
+            {isFocusMode ? (
+              <>
+                <Minimize2 className="h-3 w-3 mr-1" />
+                Exit Focus
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3 w-3 mr-1" />
+                Focus
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
+        <div className="w-full min-w-0 max-w-full h-full overflow-hidden">
+          <ProjectActivityFeed
+            config={{
+              userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+              projectId: parseInt(projectId),
+              showFilters: true,
+              showPagination: true,
+              itemsPerPage: 20,
+              allowExport: true,
+            }}
+            className="h-full"
+          />
+        </div>
       </div>
     </div>
   )
@@ -4055,9 +3257,6 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     category: null,
     tool: null,
     subTool: null,
-    coreTab: "dashboard", // Default to dashboard tab
-    staffingSubTab: "dashboard", // Default to dashboard sub-tab
-    reportsSubTab: "dashboard", // Default to dashboard sub-tab
   })
   const [mounted, setMounted] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
@@ -4081,6 +3280,20 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     activeRFIs: 5,
     changeOrders: 3,
     riskItems: 2,
+  }
+
+  // Get HBI Insights title based on active tab
+  const getHBIInsightsTitle = () => {
+    if (activeTab === "activity-feed") {
+      return "HBI Activity Feed Insights"
+    }
+    if (activeTab === "documents") {
+      return "HBI Document Management Insights"
+    }
+    if (activeTab === "financial-management" || activeTab === "financial-hub") {
+      return "HBI Financial Hub Insights"
+    }
+    return "HBI Core Tools Insights"
   }
 
   // Handle core tab changes
@@ -4112,107 +3325,63 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     }))
   }
 
-  // Get HBI Insights title based on active tab
-  const getHBIInsightsTitle = () => {
-    if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      return "HBI Financial Hub Insights"
-    }
-    return "HBI Core Tools Insights"
-  }
-
   // Get sidebar content for main app injection
   const getSidebarContent = () => {
     return (
-      <div className="space-y-4">
-        {/* Project Overview Panel - Always visible */}
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Project Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-0">
-            {/* Project Description */}
-            <div className="pb-3 border-b border-border">
-              <p className="text-xs text-muted-foreground mb-2">Description</p>
-              <ExpandableDescription description={projectData?.description || "No description available"} />
-            </div>
-
-            {/* Project Metrics */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Contract Value</span>
-                <span className="font-medium">${projectMetrics.totalBudget.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Spent to Date</span>
-                <span className="font-medium">${projectMetrics.spentToDate.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Schedule Progress</span>
-                <span className="font-medium text-blue-600">{projectMetrics.scheduleProgress}%</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Budget Progress</span>
-                <span className="font-medium text-green-600">{projectMetrics.budgetProgress}%</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Team Members</span>
-                <span className="font-medium">{projectMetrics.activeTeamMembers}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* HBI Insights Panel - Moved to second position */}
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">{getHBIInsightsTitle()}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <ExpandableHBIInsights config={getHBIInsights()} title={getHBIInsightsTitle()} />
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions Panel */}
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            {getQuickActions().map((action, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-sm h-8"
-                onClick={action.onClick}
-              >
-                <action.icon className="h-4 w-4 mr-2" />
-                {action.label}
-              </Button>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Key Metrics Panel */}
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Key Metrics</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-0">
-            {getKeyMetrics().map((metric, index) => (
-              <div key={index} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{metric.label}</span>
-                <span className={`font-medium text-${metric.color}-600`}>{metric.value}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      <SidebarPanelRenderer
+        activePanel="all"
+        projectId={projectId}
+        projectData={projectData}
+        user={user}
+        userRole={userRole}
+        navigation={navigation}
+        projectMetrics={projectMetrics}
+        getHBIInsightsTitle={getHBIInsightsTitle}
+        getHBIInsights={getHBIInsights}
+        activeTab={activeTab}
+      />
     )
   }
 
+  // Update sidebar content when activeTab changes
+  React.useEffect(() => {
+    if (onSidebarContentChange) {
+      onSidebarContentChange(getSidebarContent())
+    }
+  }, [
+    activeTab,
+    navigation.coreTab,
+    navigation.tool,
+    navigation.subTool,
+    onSidebarContentChange,
+    projectId,
+    projectData,
+    user,
+    userRole,
+    projectMetrics,
+  ])
+
   // Get quick actions based on current core tab
   const getQuickActions = () => {
+    // Handle main module tabs first
+    if (activeTab === "activity-feed") {
+      return [
+        { label: "Refresh Feed", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Feed", icon: Download, onClick: () => {} },
+        { label: "Filter Activities", icon: Filter, onClick: () => {} },
+        { label: "Search Activities", icon: Search, onClick: () => {} },
+      ]
+    }
+
+    if (activeTab === "documents") {
+      return [
+        { label: "Upload Files", icon: Upload, onClick: () => {} },
+        { label: "New Folder", icon: Folder, onClick: () => {} },
+        { label: "Sync SharePoint", icon: RefreshCw, onClick: () => {} },
+        { label: "Export List", icon: Download, onClick: () => {} },
+      ]
+    }
+
     if (navigation.coreTab === "reports") {
       return [
         { label: "Create Report", icon: Plus, onClick: () => {} },
@@ -4261,6 +3430,25 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
 
   // Get key metrics based on current core tab
   const getKeyMetrics = () => {
+    // Handle main module tabs first
+    if (activeTab === "activity-feed") {
+      return [
+        { label: "Total Activities", value: "147", color: "blue" },
+        { label: "Today's Updates", value: "23", color: "green" },
+        { label: "Active RFIs", value: "5", color: "orange" },
+        { label: "Change Orders", value: "3", color: "purple" },
+      ]
+    }
+
+    if (activeTab === "documents") {
+      return [
+        { label: "Total Documents", value: "1,247", color: "blue" },
+        { label: "Recent Uploads", value: "28", color: "green" },
+        { label: "Shared Files", value: "156", color: "orange" },
+        { label: "Storage Used", value: "2.4 GB", color: "purple" },
+      ]
+    }
+
     if (navigation.coreTab === "reports") {
       return [
         { label: "Total Reports", value: "0", color: "blue" },
@@ -4312,9 +3500,1101 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   const getHBIInsights = () => {
+    // Activity Feed insights
+    if (activeTab === "activity-feed") {
+      return [
+        {
+          id: "activity-1",
+          type: "info",
+          severity: "low",
+          title: "High Activity Period",
+          text: "Project activity is 40% above average with 23 updates today. Multiple teams are actively collaborating.",
+          action: "View details",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "activity-2",
+          type: "warning",
+          severity: "medium",
+          title: "Pending RFI Response",
+          text: "RFI-2024-047 regarding electrical specifications has been pending for 3 days and needs immediate attention.",
+          action: "Review RFI",
+          timestamp: "3 hours ago",
+        },
+        {
+          id: "activity-3",
+          type: "success",
+          severity: "low",
+          title: "Change Order Approved",
+          text: "Change Order CO-2024-012 for additional electrical outlets has been approved and is ready for execution.",
+          action: "View CO",
+          timestamp: "5 hours ago",
+        },
+        {
+          id: "activity-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Communication Pattern",
+          text: "Identified frequent questions about material specifications. Consider proactive documentation updates.",
+          action: "View patterns",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
+    // Documents insights
+    if (activeTab === "documents") {
+      return [
+        {
+          id: "doc-1",
+          type: "info",
+          severity: "low",
+          title: "Storage Optimization",
+          text: "SharePoint library is using 2.4 GB of 5 GB capacity. Consider archiving older documents to optimize storage.",
+          action: "Manage storage",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "doc-2",
+          type: "warning",
+          severity: "medium",
+          title: "Sync Required",
+          text: "28 documents have been modified externally and need to be synced. Ensure all team members have latest versions.",
+          action: "Sync documents",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "doc-3",
+          type: "success",
+          severity: "low",
+          title: "Version Control Active",
+          text: "All critical project documents are under version control with automatic backup enabled.",
+          action: "View history",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "doc-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Collaboration Efficiency",
+          text: "156 files are shared with external stakeholders. Consider access review for security optimization.",
+          action: "Review access",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
+    // Financial Management tabs - comprehensive insights for all financial sub-tabs
+    if (activeTab === "financial-management" || activeTab === "financial-hub") {
+      // Get current financial sub-tab from navigation
+      const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
+
+      // Budget Analysis insights
+      if (currentFinancialTab === "budget-analysis") {
+        return [
+          {
+            id: "budget-1",
+            type: "warning",
+            severity: "medium",
+            title: "Budget Variance Alert",
+            text: "Material costs are tracking 3.2% above budget. Steel and concrete prices have increased significantly.",
+            action: "Review variance",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "budget-2",
+            type: "success",
+            severity: "low",
+            title: "Labor Cost Efficiency",
+            text: "Labor costs are running 5% under budget due to improved productivity and scheduling optimization.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "budget-3",
+            type: "alert",
+            severity: "high",
+            title: "Change Order Impact",
+            text: "Pending change orders totaling $245K may impact current budget projections by Q3.",
+            action: "Review COs",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "budget-4",
+            type: "info",
+            severity: "low",
+            title: "Budget Milestone Achieved",
+            text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
+            action: "View milestone",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // JCHR insights
+      if (currentFinancialTab === "jchr") {
+        return [
+          {
+            id: "jchr-1",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Variance Detected",
+            text: "Electrical work showing 8% cost overrun. Recommend immediate review of labor allocation.",
+            action: "Review variance",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "jchr-2",
+            type: "info",
+            severity: "low",
+            title: "Spend Velocity Analysis",
+            text: "Current spend rate is 92% of forecasted velocity. Project financial health is stable.",
+            action: "View analysis",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "jchr-3",
+            type: "success",
+            severity: "low",
+            title: "Performance Tracking",
+            text: "Concrete work completed 15% ahead of schedule with cost savings of $12K.",
+            action: "View details",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "jchr-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Profitability Optimization",
+            text: "Identified opportunity to improve margins by 2.1% through resource reallocation.",
+            action: "Review opportunity",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // AR Aging insights
+      if (currentFinancialTab === "ar-aging") {
+        return [
+          {
+            id: "ar-1",
+            type: "alert",
+            severity: "high",
+            title: "Collection Priority Alert",
+            text: "Invoice #INV-2024-156 ($47K) is 45 days overdue. Immediate collection action required.",
+            action: "Initiate collection",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "ar-2",
+            type: "warning",
+            severity: "medium",
+            title: "Cash Flow Impact",
+            text: "Outstanding receivables over 30 days total $234K, affecting cash flow projections.",
+            action: "Review aging",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "ar-3",
+            type: "info",
+            severity: "low",
+            title: "Retainage Analysis",
+            text: "Total retainage held: $89K. First release eligible in 14 days upon milestone completion.",
+            action: "View retainage",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "ar-4",
+            type: "success",
+            severity: "low",
+            title: "Collection Efficiency",
+            text: "Payment collection rate improved to 94% this quarter, up from 87% last quarter.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Cash Flow insights
+      if (currentFinancialTab === "cash-flow") {
+        return [
+          {
+            id: "cash-1",
+            type: "warning",
+            severity: "medium",
+            title: "Liquidity Alert",
+            text: "Projected cash flow dips below $50K threshold in 3 weeks. Plan accelerated collections.",
+            action: "Review forecast",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "cash-2",
+            type: "success",
+            severity: "low",
+            title: "Forecast Accuracy",
+            text: "Cash flow projections were 96% accurate this month, exceeding 90% target.",
+            action: "View analysis",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "cash-3",
+            type: "info",
+            severity: "low",
+            title: "Seasonal Trends",
+            text: "Historical data shows 15% cash flow improvement expected in Q4 due to project completions.",
+            action: "View trends",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "cash-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Investment Opportunity",
+            text: "Excess cash position of $125K available for short-term investment opportunities.",
+            action: "Explore options",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Forecasting insights
+      if (currentFinancialTab === "forecasting") {
+        return [
+          {
+            id: "forecast-1",
+            type: "success",
+            severity: "low",
+            title: "Accuracy Improvement",
+            text: "Forecasting accuracy improved to 94% this quarter, up from 89% last quarter.",
+            action: "View metrics",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "forecast-2",
+            type: "info",
+            severity: "low",
+            title: "Revenue Projection",
+            text: "Q4 revenue forecast updated to $2.1M based on current project pipeline and completion rates.",
+            action: "Review projections",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "forecast-3",
+            type: "warning",
+            severity: "medium",
+            title: "Cost Trend Analysis",
+            text: "Material cost inflation trending 4.2% above forecast. Adjust pricing models accordingly.",
+            action: "Review trends",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "forecast-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Schedule Impact",
+            text: "Early project completion could improve Q4 margins by 3.5% through accelerated revenue recognition.",
+            action: "Analyze impact",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Change Management insights
+      if (currentFinancialTab === "change-management") {
+        return [
+          {
+            id: "change-1",
+            type: "alert",
+            severity: "high",
+            title: "Change Order Volume",
+            text: "Change order volume increased 45% this month. Review change management processes.",
+            action: "Review process",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "change-2",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Bottleneck",
+            text: "Average change order approval time: 8.2 days. Target is 5 days for optimal cash flow.",
+            action: "Review workflow",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "change-3",
+            type: "info",
+            severity: "low",
+            title: "Cost Impact Analysis",
+            text: "Approved change orders total $145K (3.2% of contract value). Within acceptable range.",
+            action: "View analysis",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "change-4",
+            type: "success",
+            severity: "low",
+            title: "Efficiency Improvement",
+            text: "Change order processing time reduced by 25% through workflow optimization.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Pay Authorization insights
+      if (currentFinancialTab === "pay-authorization") {
+        return [
+          {
+            id: "pay-1",
+            type: "warning",
+            severity: "medium",
+            title: "Authorization Delay",
+            text: "3 payment authorizations pending approval for over 48 hours. Review approval workflow.",
+            action: "Review queue",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "pay-2",
+            type: "success",
+            severity: "low",
+            title: "Processing Efficiency",
+            text: "Payment processing time improved to 2.1 days average, down from 3.5 days last month.",
+            action: "View metrics",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "pay-3",
+            type: "info",
+            severity: "low",
+            title: "Compliance Monitoring",
+            text: "All payment authorizations meet compliance requirements. No regulatory issues identified.",
+            action: "View compliance",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "pay-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Automation Opportunity",
+            text: "65% of payment authorizations are routine and could benefit from automated processing.",
+            action: "Explore automation",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Pay Applications insights
+      if (currentFinancialTab === "pay-applications") {
+        return [
+          {
+            id: "payapp-1",
+            type: "success",
+            severity: "low",
+            title: "Application Submitted",
+            text: "Pay Application #08 submitted successfully. $234K requested for October progress.",
+            action: "Track status",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "payapp-2",
+            type: "info",
+            severity: "low",
+            title: "Cash Flow Optimization",
+            text: "Early submission of pay applications improved cash flow by 12% compared to last quarter.",
+            action: "View analysis",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "payapp-3",
+            type: "warning",
+            severity: "medium",
+            title: "Documentation Review",
+            text: "Pay Application #07 requires additional documentation. Submit within 48 hours to avoid delays.",
+            action: "Upload docs",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "payapp-4",
+            type: "opportunity",
+            severity: "medium",
+            title: "Retention Management",
+            text: "Opportunity to negotiate reduced retention rate based on project performance history.",
+            action: "Review options",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Retention insights
+      if (currentFinancialTab === "retention") {
+        return [
+          {
+            id: "retention-1",
+            type: "alert",
+            severity: "high",
+            title: "Retention Release Due",
+            text: "Retention release of $67K eligible for release upon completion of punch list items.",
+            action: "Review release",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "retention-2",
+            type: "success",
+            severity: "low",
+            title: "Retention Optimization",
+            text: "Negotiated retention rate reduced to 8% (from 10%) based on excellent performance record.",
+            action: "View details",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "retention-3",
+            type: "info",
+            severity: "low",
+            title: "Release Schedule",
+            text: "Planned retention releases: $45K in Q4, $67K in Q1 2025, subject to completion milestones.",
+            action: "View schedule",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "retention-4",
+            type: "warning",
+            severity: "medium",
+            title: "Risk Assessment",
+            text: "Total retention held: $234K. Monitor project completion closely to ensure timely release.",
+            action: "Review risk",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Default financial insights
+      return [
+        {
+          id: "financial-1",
+          type: "success",
+          severity: "low",
+          title: "Financial Health Score",
+          text: "Project financial health rated 'Excellent' with 94% budget efficiency and positive cash flow.",
+          action: "View dashboard",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "financial-2",
+          type: "info",
+          severity: "low",
+          title: "Budget Performance",
+          text: "Current budget utilization: 68% with remaining budget of $1.2M for project completion.",
+          action: "View budget",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "financial-3",
+          type: "opportunity",
+          severity: "medium",
+          title: "Cash Flow Monitoring",
+          text: "Optimize payment scheduling to maintain positive cash flow throughout project lifecycle.",
+          action: "Review schedule",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
+    // Field Management tabs
+    if (activeTab === "field-management") {
+      // Get current field management sub-tab from navigation
+      const currentFieldTab = navigation.tool === "field-management" ? navigation.subTool : "scheduler"
+
+      // Scheduler insights
+      if (currentFieldTab === "scheduler") {
+        return [
+          {
+            id: "scheduler-1",
+            type: "warning",
+            severity: "medium",
+            title: "Critical Path Delay Risk",
+            text: "Weather delays may impact concrete pour schedule. Consider accelerating prep work.",
+            action: "Review schedule",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "scheduler-2",
+            type: "opportunity",
+            severity: "medium",
+            title: "Weather Window Opportunity",
+            text: "Extended favorable weather forecast allows for advancing roofing activities by 5 days.",
+            action: "Optimize schedule",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "scheduler-3",
+            type: "success",
+            severity: "low",
+            title: "Resource Optimization",
+            text: "Crew scheduling optimization improved productivity by 12% this week.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "scheduler-4",
+            type: "alert",
+            severity: "high",
+            title: "Material Delivery Alert",
+            text: "Steel delivery delayed by 3 days. Coordinate with supplier to minimize schedule impact.",
+            action: "Contact supplier",
+            timestamp: "6 hours ago",
+          },
+        ]
+      }
+
+      // Field Reports insights
+      if (currentFieldTab === "field-reports") {
+        return [
+          {
+            id: "field-1",
+            type: "success",
+            severity: "low",
+            title: "Progress Trending",
+            text: "Daily progress reports show 15% ahead of schedule for structural work completion.",
+            action: "View progress",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "field-2",
+            type: "warning",
+            severity: "medium",
+            title: "Weather Impact",
+            text: "Rain delays accumulated 2.5 days this week. Adjust weekend crew schedule to compensate.",
+            action: "Review schedule",
+            timestamp: "5 hours ago",
+          },
+          {
+            id: "field-3",
+            type: "info",
+            severity: "low",
+            title: "Quality Milestone",
+            text: "Structural inspections completed with zero defects. Excellent quality control maintained.",
+            action: "View inspections",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "field-4",
+            type: "alert",
+            severity: "high",
+            title: "Safety Incident",
+            text: "Near-miss incident reported in Area C. Immediate safety briefing scheduled for tomorrow.",
+            action: "Review incident",
+            timestamp: "4 hours ago",
+          },
+        ]
+      }
+
+      // Constraints insights
+      if (currentFieldTab === "constraints") {
+        return [
+          {
+            id: "constraints-1",
+            type: "alert",
+            severity: "high",
+            title: "Critical Constraint Impact",
+            text: "Utility relocation delay affecting foundation work. Estimated 5-day schedule impact.",
+            action: "Review mitigation",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "constraints-2",
+            type: "warning",
+            severity: "medium",
+            title: "Material Supply Risk",
+            text: "Concrete supplier capacity constraints may affect pour schedule in November.",
+            action: "Secure backup",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "constraints-3",
+            type: "opportunity",
+            severity: "medium",
+            title: "Constraint Resolution",
+            text: "Permit approval received early. Electrical work can begin 3 days ahead of schedule.",
+            action: "Update schedule",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "constraints-4",
+            type: "info",
+            severity: "low",
+            title: "Constraint Monitoring",
+            text: "15 active constraints tracked. 3 resolved this week, 2 new constraints identified.",
+            action: "View all",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Permit Log insights
+      if (currentFieldTab === "permit-log") {
+        return [
+          {
+            id: "permit-1",
+            type: "warning",
+            severity: "medium",
+            title: "Permit Expiration Alert",
+            text: "Building permit #BP-2024-789 expires in 14 days. Renewal required to continue work.",
+            action: "Renew permit",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "permit-2",
+            type: "success",
+            severity: "low",
+            title: "Inspection Passed",
+            text: "Framing inspection completed successfully. Electrical rough-in can proceed as scheduled.",
+            action: "View report",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "permit-3",
+            type: "info",
+            severity: "low",
+            title: "Permit Application Status",
+            text: "Plumbing permit application submitted. Expected approval within 5-7 business days.",
+            action: "Track status",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "permit-4",
+            type: "alert",
+            severity: "high",
+            title: "Inspection Failure",
+            text: "Electrical inspection failed due to code violations. Rework required before re-inspection.",
+            action: "Review violations",
+            timestamp: "6 hours ago",
+          },
+        ]
+      }
+
+      // Default field management insights
+      return [
+        {
+          id: "field-default-1",
+          type: "info",
+          severity: "low",
+          title: "Field Operations Update",
+          text: "All field operations running smoothly with no critical issues reported.",
+          action: "View summary",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "field-default-2",
+          type: "success",
+          severity: "low",
+          title: "Progress Tracking",
+          text: "Project progress maintains steady pace with 72% completion and on-schedule delivery.",
+          action: "View progress",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
+    // Core Project Tools tabs
+    if (activeTab === "core" || !activeTab) {
+      // Dashboard tab (default)
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return [
+          {
+            id: "dashboard-1",
+            type: "success",
+            severity: "low",
+            title: "Project Health Score",
+            text: "Project health rated 'Excellent' with 94% efficiency across all key performance indicators.",
+            action: "View dashboard",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "dashboard-2",
+            type: "info",
+            severity: "low",
+            title: "Milestone Achievement",
+            text: "Structural milestone completed 3 days ahead of schedule. Team performance exceptional.",
+            action: "View milestones",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "dashboard-3",
+            type: "opportunity",
+            severity: "medium",
+            title: "Budget Variance Trending",
+            text: "Budget variance trending positive. Opportunity to reallocate savings to value-add items.",
+            action: "Review variance",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Tab-specific insights for core tools
+      switch (navigation.coreTab) {
+        case "checklists":
+          return [
+            {
+              id: "checklist-1",
+              type: "warning",
+              severity: "medium",
+              title: "StartUp Progress Alert",
+              text: "StartUp checklist 78% complete. 5 critical items require attention before project handoff.",
+              action: "Review items",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "checklist-2",
+              type: "success",
+              severity: "low",
+              title: "Safety Compliance",
+              text: "Safety checklist 100% complete. All regulatory requirements met for current phase.",
+              action: "View compliance",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "checklist-3",
+              type: "info",
+              severity: "low",
+              title: "Quality Review",
+              text: "Quality checklist items trending well. 92% completion rate across all categories.",
+              action: "View quality",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "checklist-4",
+              type: "alert",
+              severity: "high",
+              title: "Closeout Preparation",
+              text: "Closeout checklist preparation should begin. Schedule owner training and documentation.",
+              action: "Start closeout",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "productivity":
+          return [
+            {
+              id: "productivity-1",
+              type: "success",
+              severity: "low",
+              title: "Team Collaboration",
+              text: "Team collaboration metrics improved 18% this month. Message response time down to 2.1 hours.",
+              action: "View metrics",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "productivity-2",
+              type: "info",
+              severity: "low",
+              title: "Task Completion Trends",
+              text: "Task completion rate: 94% this week. Productivity tools driving efficiency gains.",
+              action: "View tasks",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "productivity-3",
+              type: "opportunity",
+              severity: "medium",
+              title: "Communication Efficiency",
+              text: "Opportunity to further streamline communication workflows. Consider automation tools.",
+              action: "Explore tools",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "productivity-4",
+              type: "warning",
+              severity: "medium",
+              title: "Overdue Tasks",
+              text: "3 tasks overdue by more than 48 hours. Review task assignments and capacity.",
+              action: "Review tasks",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "staffing":
+          return [
+            {
+              id: "staffing-1",
+              type: "success",
+              severity: "low",
+              title: "Resource Allocation",
+              text: "Staffing efficiency at 96% with optimal resource allocation across all project phases.",
+              action: "View allocation",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "staffing-2",
+              type: "info",
+              severity: "low",
+              title: "Team Efficiency",
+              text: "Team efficiency metrics show 15% improvement over baseline. Excellent performance.",
+              action: "View metrics",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "staffing-3",
+              type: "warning",
+              severity: "medium",
+              title: "Training Completion",
+              text: "2 team members pending safety training completion. Schedule before next phase begins.",
+              action: "Schedule training",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "staffing-4",
+              type: "opportunity",
+              severity: "medium",
+              title: "SPCR Review",
+              text: "Opportunity to optimize SPCR assignments based on current project performance data.",
+              action: "Review SPCR",
+              timestamp: "2 days ago",
+            },
+          ]
+
+        case "responsibility-matrix":
+          return [
+            {
+              id: "matrix-1",
+              type: "warning",
+              severity: "medium",
+              title: "Coverage Analysis",
+              text: "2 responsibility areas lack clear assignment. Define ownership before critical path activities.",
+              action: "Assign roles",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "matrix-2",
+              type: "success",
+              severity: "low",
+              title: "Matrix Optimization",
+              text: "Responsibility matrix updated with 97% coverage. Clear accountability established.",
+              action: "View matrix",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "matrix-3",
+              type: "info",
+              severity: "low",
+              title: "Role Clarity",
+              text: "Team feedback indicates 94% satisfaction with role clarity and responsibility definition.",
+              action: "View feedback",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "matrix-4",
+              type: "alert",
+              severity: "high",
+              title: "Conflict Resolution",
+              text: "Overlapping responsibilities identified between trades. Resolve conflicts immediately.",
+              action: "Resolve conflicts",
+              timestamp: "6 hours ago",
+            },
+          ]
+
+        case "reports":
+          return [
+            {
+              id: "reports-1",
+              type: "info",
+              severity: "low",
+              title: "Report Generation",
+              text: "Weekly progress report generated successfully. Distribution scheduled for 2 PM today.",
+              action: "View report",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "reports-2",
+              type: "warning",
+              severity: "medium",
+              title: "Approval Delays",
+              text: "2 reports pending approval for over 48 hours. Follow up with stakeholders needed.",
+              action: "Follow up",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "reports-3",
+              type: "success",
+              severity: "low",
+              title: "Data Quality",
+              text: "Report data quality score: 98%. Automated validation catching errors effectively.",
+              action: "View metrics",
+              timestamp: "1 day ago",
+            },
+            {
+              id: "reports-4",
+              type: "opportunity",
+              severity: "medium",
+              title: "Reporting Efficiency",
+              text: "Opportunity to automate 65% of routine reports. Could save 8 hours per week.",
+              action: "Explore automation",
+              timestamp: "2 days ago",
+            },
+          ]
+
+        default:
+          return [
+            {
+              id: "core-1",
+              type: "success",
+              severity: "low",
+              title: "Project Health Score",
+              text: "Project health rated 'Excellent' with 94% efficiency across all key performance indicators.",
+              action: "View dashboard",
+              timestamp: "2 hours ago",
+            },
+            {
+              id: "core-2",
+              type: "info",
+              severity: "low",
+              title: "Milestone Achievement",
+              text: "Structural milestone completed 3 days ahead of schedule. Team performance exceptional.",
+              action: "View milestones",
+              timestamp: "4 hours ago",
+            },
+            {
+              id: "core-3",
+              type: "opportunity",
+              severity: "medium",
+              title: "Budget Variance Trending",
+              text: "Budget variance trending positive. Opportunity to reallocate savings to value-add items.",
+              action: "Review variance",
+              timestamp: "1 day ago",
+            },
+          ]
+      }
+    }
+
+    // Pre-Construction insights
+    if (activeTab === "pre-construction") {
+      return [
+        {
+          id: "precon-1",
+          type: "success",
+          severity: "low",
+          title: "Estimate Accuracy",
+          text: "Final estimate accuracy: 97.2%. Excellent alignment with actual costs and market conditions.",
+          action: "View estimate",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "precon-2",
+          type: "info",
+          severity: "low",
+          title: "BIM Coordination",
+          text: "BIM model coordination 85% complete. Clash detection identified and resolved 23 conflicts.",
+          action: "View model",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "precon-3",
+          type: "warning",
+          severity: "medium",
+          title: "Permit Timeline",
+          text: "Building permit application review may extend 2 weeks. Consider expedited processing option.",
+          action: "Review options",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "precon-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Value Engineering",
+          text: "Value engineering review identified $45K in potential savings without compromising quality.",
+          action: "Review options",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Warranty Management insights
+    if (activeTab === "warranty") {
+      return [
+        {
+          id: "warranty-1",
+          type: "alert",
+          severity: "high",
+          title: "Warranty Claim",
+          text: "New warranty claim submitted for HVAC system. Response required within 24 hours.",
+          action: "Review claim",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "warranty-2",
+          type: "success",
+          severity: "low",
+          title: "Claim Resolution",
+          text: "Roofing warranty claim resolved successfully. Customer satisfaction rating: 4.8/5.",
+          action: "View details",
+          timestamp: "3 hours ago",
+        },
+        {
+          id: "warranty-3",
+          type: "info",
+          severity: "low",
+          title: "Coverage Analysis",
+          text: "Current warranty coverage: $1.2M across 15 active projects. No coverage gaps identified.",
+          action: "View coverage",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "warranty-4",
+          type: "warning",
+          severity: "medium",
+          title: "Expiration Notice",
+          text: "3 warranty periods expiring within 60 days. Schedule final inspections and documentation.",
+          action: "Schedule inspections",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Compliance insights
+    if (activeTab === "compliance") {
+      return [
+        {
+          id: "compliance-1",
+          type: "success",
+          severity: "low",
+          title: "Compliance Rating",
+          text: "Current compliance rating: 98%. All regulatory requirements met or exceeded.",
+          action: "View details",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "compliance-2",
+          type: "info",
+          severity: "low",
+          title: "Contract Review",
+          text: "Quarterly contract review completed. All trade partner agreements current and compliant.",
+          action: "View contracts",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "compliance-3",
+          type: "warning",
+          severity: "medium",
+          title: "Documentation Gap",
+          text: "2 trade partners missing current insurance certificates. Obtain before work continuation.",
+          action: "Request certificates",
+          timestamp: "1 day ago",
+        },
+        {
+          id: "compliance-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Process Improvement",
+          text: "Opportunity to streamline compliance workflow. Digital documentation could save 6 hours/week.",
+          action: "Explore options",
+          timestamp: "2 days ago",
+        },
+      ]
+    }
+
+    // Default insights for any other tabs
     return [
       {
-        id: "core-1",
+        id: "default-1",
         type: "info",
         severity: "low",
         title: "Project Status Update",
@@ -4323,7 +4603,7 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
         timestamp: "1 day ago",
       },
       {
-        id: "core-2",
+        id: "default-2",
         type: "opportunity",
         severity: "medium",
         title: "Process Optimization",
@@ -4335,230 +4615,6 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
   }
 
   // Render core tab content
-  const renderCoreTabContent = () => {
-    switch (navigation.coreTab) {
-      case "dashboard":
-        return (
-          <div className="space-y-6 w-full max-w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Project Summary Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Project Type</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_type_name || "Commercial"}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
-                        <p className="font-medium text-sm text-foreground">{projectData?.duration || "365"} days</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Contract Value</p>
-                        <p className="font-medium text-sm text-foreground">
-                          ${projectData?.contract_value?.toLocaleString() || "57,235,491"}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Stage</p>
-                        <p className="font-medium text-sm text-foreground">
-                          {projectData?.project_stage_name || "Construction"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Project Metrics Card */}
-              <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-foreground">Project Metrics</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Schedule Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.scheduleProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Budget Progress</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.budgetProgress}%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Team</p>
-                      <p className="font-medium text-sm text-foreground">{projectMetrics.activeTeamMembers} members</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Milestones</p>
-                      <p className="font-medium text-sm text-foreground">
-                        {projectMetrics.completedMilestones}/{projectMetrics.totalMilestones}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )
-
-      case "checklists":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="startup" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="startup">StartUp Checklist</TabsTrigger>
-                <TabsTrigger value="closeout">Closeout Checklist</TabsTrigger>
-              </TabsList>
-              <TabsContent value="startup" className="w-full max-w-full overflow-hidden">
-                <StartUpChecklist projectId={projectId} projectName={projectName} />
-              </TabsContent>
-              <TabsContent value="closeout" className="w-full max-w-full overflow-hidden">
-                <CloseoutChecklist projectId={projectId} />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "reports":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="project-reports">Project Reports</TabsTrigger>
-              </TabsList>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-                <ReportsDashboard
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  user={user}
-                  onTabChange={handleReportsSubTabChange}
-                />
-              </TabsContent>
-              <TabsContent value="project-reports" className="w-full max-w-full overflow-hidden">
-                <ProjectReports
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  user={user}
-                  activeTab={navigation.reportsSubTab || "overview"}
-                  onTabChange={handleReportsSubTabChange}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "responsibility-matrix":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold">Responsibility Matrix</h3>
-                <p className="text-xs text-muted-foreground">
-                  Manage task assignments and accountability across project teams
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Download className="h-3 w-3 mr-1" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Task
-                </Button>
-              </div>
-            </div>
-
-            <Card>
-              <CardContent className="p-0">
-                <ResponsibilityMatrixCore projectId={projectId} userRole={userRole} className="border-0 shadow-none" />
-              </CardContent>
-            </Card>
-          </div>
-        )
-
-      case "productivity":
-        return (
-          <div className="w-full max-w-full">
-            <ProjectProductivityContent
-              projectId={projectId}
-              projectData={projectData}
-              userRole={userRole}
-              user={user}
-              className="w-full"
-            />
-          </div>
-        )
-
-      case "staffing":
-        return (
-          <div className="space-y-4 w-full max-w-full">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                <TabsTrigger value="spcr">SPCR</TabsTrigger>
-              </TabsList>
-              <TabsContent value="timeline" className="w-full max-w-full overflow-hidden">
-                <ProjectStaffingGantt
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  isReadOnly={userRole === "viewer"}
-                  className="w-full"
-                  height="600px"
-                />
-              </TabsContent>
-              <TabsContent value="dashboard" className="w-full max-w-full overflow-hidden">
-                <StaffingDashboard
-                  projectId={projectId}
-                  projectData={projectData}
-                  userRole={userRole}
-                  className="w-full"
-                  isCompact={false}
-                  isFullScreen={isFocusMode}
-                />
-              </TabsContent>
-              <TabsContent value="spcr" className="w-full max-w-full overflow-hidden">
-                <ProjectSPCRManager
-                  projectId={parseInt(projectId)}
-                  projectData={projectData}
-                  userRole={userRole}
-                  className="h-full"
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )
-
-      case "pre-construction":
-        return (
-          <PreConstructionContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
-        )
-
-      case "field-management":
-        return getFieldManagementRightPanelContent(
-          projectData,
-          userRole,
-          projectId,
-          navigation.subTool || "scheduler",
-          onSidebarContentChange
-        )
-
-      default:
-        return null
-    }
-  }
 
   if (!mounted) {
     return (
@@ -4637,6 +4693,64 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           <WarrantyManagementContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
         )
 
+      case "recent-activity":
+        return <RecentActivityContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
+
+      case "activity-feed":
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title */}
+            <div className="pb-4 flex-shrink-0">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-foreground">Project Activity Feed</h2>
+                <p className="text-sm text-muted-foreground">
+                  Real-time project activity, updates, and collaboration feed
+                </p>
+              </div>
+            </div>
+
+            {/* Activity Feed Content */}
+            <div className="flex-1 w-full min-w-0 max-w-full min-h-0 overflow-hidden">
+              <ProjectActivityFeed
+                config={{
+                  userRole: userRole as "executive" | "project-executive" | "project-manager" | "estimator",
+                  projectId: parseInt(projectId),
+                  showFilters: true,
+                  showPagination: true,
+                  itemsPerPage: 15,
+                  allowExport: true,
+                }}
+                className="h-full"
+              />
+            </div>
+          </div>
+        )
+
+      case "documents":
+        return (
+          <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
+            {/* Module Title */}
+            <div className="pb-4 flex-shrink-0">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-foreground">Project Documents</h2>
+                <p className="text-sm text-muted-foreground">
+                  SharePoint document library with file management and collaboration tools
+                </p>
+              </div>
+            </div>
+
+            {/* SharePoint Library Viewer Component */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <SharePointLibraryViewer
+                projectId={projectId}
+                projectName={projectData?.name || "Project"}
+                projectData={projectData}
+                className="h-full"
+              />
+            </div>
+          </div>
+        )
+
       case "compliance":
         return <ComplianceContent projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
 
@@ -4649,19 +4763,17 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
           onSidebarContentChange
         )
 
-      case "core":
-      case undefined:
-      case null:
-      default:
-        // Render Core Project Tools content with internal navigation
+      case "safety":
         return (
           <div className="flex flex-col h-full w-full min-w-0 max-w-full overflow-hidden">
             {/* Module Title with Focus Button */}
             <div className="pb-2 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h2 className="text-xl font-semibold text-foreground">Core Project Tools</h2>
-                  <p className="text-sm text-muted-foreground">Essential project management tools and resources</p>
+                  <h2 className="text-xl font-semibold text-foreground">Project Safety</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Safety forms management, assignments, and compliance tracking
+                  </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleFocusToggle} className="h-8 px-3 text-xs">
                   {isFocusMode ? (
@@ -4679,64 +4791,51 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
               </div>
             </div>
 
-            {/* Responsive Core Tab Navigation */}
-            <div className="border-b border-border flex-shrink-0">
-              {/* Desktop/Tablet Tab Navigation - Hidden on mobile */}
-              <div className="hidden sm:block">
-                <div className="flex space-x-6 overflow-x-auto">
-                  {coreTabsConfig.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleCoreTabChange(tab.id)}
-                      className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                        navigation.coreTab === tab.id
-                          ? "border-primary text-primary"
-                          : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
-                      }`}
-                    >
-                      <tab.icon className="h-4 w-4" />
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mobile Dropdown Navigation - Only visible on mobile */}
-              <div className="sm:hidden py-3">
-                <Select value={navigation.coreTab || "dashboard"} onValueChange={(value) => handleCoreTabChange(value)}>
-                  <SelectTrigger className="w-full">
-                    <div className="flex items-center space-x-2">
-                      <Settings className="h-4 w-4" />
-                      <span>Core Tools</span>
-                      <Badge variant="secondary" className="ml-auto">
-                        {coreTabsConfig.find((tab) => tab.id === navigation.coreTab)?.label || "Dashboard"}
-                      </Badge>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {coreTabsConfig.map((tab) => (
-                      <SelectItem key={tab.id} value={tab.id}>
-                        <div className="flex items-center space-x-2">
-                          <tab.icon className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">{tab.label}</div>
-                            <div className="text-xs text-muted-foreground">{tab.description}</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
             {/* Content Area */}
             <div className="flex-1 w-full min-w-0 max-w-full min-h-0">
-              <div className={cn("w-full min-w-0 max-w-full", isFocusMode ? "min-h-full" : "h-full overflow-hidden")}>
-                {renderCoreTabContent()}
+              <div className="w-full min-w-0 max-w-full h-full overflow-auto">
+                <ProjectSafetyForms projectId={projectId} projectData={projectData} userRole={userRole} user={user} />
               </div>
             </div>
           </div>
+        )
+
+      case "quality":
+        return (
+          <QualityProjectContent
+            projectId={projectId}
+            projectData={projectData}
+            userRole={userRole}
+            user={user}
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+          />
+        )
+
+      case "core":
+      case undefined:
+      case null:
+      default:
+        // Render Core Project Tools content with internal navigation
+        return (
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="text-muted-foreground">Loading project tools...</span>
+                </div>
+              </div>
+            }
+          >
+            <ProjectTabsShell
+              projectId={projectId}
+              user={user}
+              userRole={userRole}
+              projectData={projectData}
+              onTabChange={onTabChange}
+            />
+          </Suspense>
         )
     }
   }
@@ -4755,8 +4854,12 @@ const ProjectControlCenterContent: React.FC<ProjectControlCenterContentProps> = 
     )
   }
 
-  // Return the main content with proper JSX structure
-  return mainContent
+  // Return the main content with proper JSX structure and overflow constraints
+  return (
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden">
+      <div className="h-full w-full min-w-0 max-w-full overflow-hidden">{mainContent}</div>
+    </div>
+  )
 }
 
 // Export the left sidebar content as a separate function
@@ -4787,6 +4890,27 @@ export const getProjectSidebarContent = (
         { label: "Upload Documents", icon: Upload, onClick: () => {} },
         { label: "Trade Partner Review", icon: Users, onClick: () => {} },
         { label: "Compliance Report", icon: FileText, onClick: () => {} },
+      ]
+    } else if (activeTab === "recent-activity") {
+      return [
+        { label: "Refresh Activity", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Activity", icon: Download, onClick: () => {} },
+        { label: "Filter Activity", icon: Filter, onClick: () => {} },
+        { label: "Activity Search", icon: Search, onClick: () => {} },
+      ]
+    } else if (activeTab === "activity-feed") {
+      return [
+        { label: "Refresh Feed", icon: RefreshCw, onClick: () => {} },
+        { label: "Export Feed", icon: Download, onClick: () => {} },
+        { label: "Filter Activities", icon: Filter, onClick: () => {} },
+        { label: "Search Activities", icon: Search, onClick: () => {} },
+      ]
+    } else if (activeTab === "documents") {
+      return [
+        { label: "Upload Files", icon: Upload, onClick: () => {} },
+        { label: "New Folder", icon: Folder, onClick: () => {} },
+        { label: "Sync SharePoint", icon: RefreshCw, onClick: () => {} },
+        { label: "Export List", icon: Download, onClick: () => {} },
       ]
     } else if (navigation.coreTab === "reports") {
       return [
@@ -4849,6 +4973,20 @@ export const getProjectSidebarContent = (
         { label: "Compliance Rate", value: "94%", color: "green" },
         { label: "Expiring Soon", value: "3", color: "orange" },
       ]
+    } else if (activeTab === "recent-activity") {
+      return [
+        { label: "Today's Activities", value: "15", color: "blue" },
+        { label: "This Week", value: "89", color: "green" },
+        { label: "Active Users", value: "8", color: "purple" },
+        { label: "Latest Update", value: "2m ago", color: "orange" },
+      ]
+    } else if (activeTab === "documents") {
+      return [
+        { label: "Total Documents", value: "1,247", color: "blue" },
+        { label: "Recent Uploads", value: "28", color: "green" },
+        { label: "Shared Files", value: "156", color: "orange" },
+        { label: "Storage Used", value: "2.4 GB", color: "purple" },
+      ]
     } else if (navigation.coreTab === "reports") {
       return [
         { label: "Total Reports", value: "0", color: "blue" },
@@ -4902,6 +5040,49 @@ export const getProjectSidebarContent = (
   }
 
   const getHBIInsights = () => {
+    // Documents insights
+    if (activeTab === "documents") {
+      return [
+        {
+          id: "doc-1",
+          type: "info",
+          severity: "low",
+          title: "Storage Optimization",
+          text: "SharePoint library is using 2.4 GB of 5 GB capacity. Consider archiving older documents to optimize storage.",
+          action: "Manage storage",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "doc-2",
+          type: "warning",
+          severity: "medium",
+          title: "Sync Required",
+          text: "28 documents have been modified externally and need to be synced. Ensure all team members have latest versions.",
+          action: "Sync documents",
+          timestamp: "1 hour ago",
+        },
+        {
+          id: "doc-3",
+          type: "success",
+          severity: "low",
+          title: "Version Control Active",
+          text: "All critical project documents are under version control with automatic backup enabled.",
+          action: "View history",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "doc-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Collaboration Efficiency",
+          text: "156 files are shared with external stakeholders. Consider access review for security optimization.",
+          action: "Review access",
+          timestamp: "4 hours ago",
+        },
+      ]
+    }
+
+    // Financial Management tabs - comprehensive insights for all financial sub-tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
       // Get current financial sub-tab from navigation
       const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
@@ -4944,24 +5125,6 @@ export const getProjectSidebarContent = (
             text: "Project reached 68% budget completion, aligning with 72% schedule progress.",
             action: "View milestone",
             timestamp: "1 day ago",
-          },
-          {
-            id: "budget-5",
-            type: "warning",
-            severity: "medium",
-            title: "Contingency Usage",
-            text: "Contingency fund is at 45% utilization. Consider reviewing remaining scope for potential risks.",
-            action: "Analyze contingency",
-            timestamp: "2 days ago",
-          },
-          {
-            id: "budget-6",
-            type: "info",
-            severity: "low",
-            title: "Cost Forecast Update",
-            text: "Updated cost forecasting models show project completion within 2% of original budget.",
-            action: "View forecast",
-            timestamp: "3 days ago",
           },
         ]
       }
@@ -5343,6 +5506,180 @@ export const getProjectSidebarContent = (
       ]
     }
 
+    // Field Management tabs - unique insights for each field management sub-tool
+    if (activeTab === "field-management") {
+      const fieldSubTool = navigation.subTool || "scheduler"
+
+      // Scheduler insights
+      if (fieldSubTool === "scheduler") {
+        return [
+          {
+            id: "scheduler-1",
+            type: "warning",
+            severity: "medium",
+            title: "Critical Path Delay Risk",
+            text: "Foundation work is 3 days behind schedule. HBI recommends immediate mitigation to prevent cascade delays.",
+            action: "Review schedule",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "scheduler-2",
+            type: "success",
+            severity: "low",
+            title: "Weather Window Opportunity",
+            text: "7-day clear weather forecast allows acceleration of exterior work. Consider overtime to gain schedule.",
+            action: "Optimize schedule",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "scheduler-3",
+            type: "info",
+            severity: "medium",
+            title: "Resource Optimization",
+            text: "MEP trade coordination shows 95% efficiency. Excellent collaboration reducing typical conflicts.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "scheduler-4",
+            type: "alert",
+            severity: "high",
+            title: "Material Delivery Alert",
+            text: "Steel delivery delayed 5 days due to supplier issues. Critical path impact imminent without action.",
+            action: "Contact supplier",
+            timestamp: "2 hours ago",
+          },
+        ]
+      }
+
+      // Field Reports insights
+      if (fieldSubTool === "field-reports") {
+        return [
+          {
+            id: "field-reports-1",
+            type: "info",
+            severity: "low",
+            title: "Daily Progress Trending",
+            text: "Daily log completion rate at 98%. Excellent field documentation consistency maintained.",
+            action: "View reports",
+            timestamp: "30 minutes ago",
+          },
+          {
+            id: "field-reports-2",
+            type: "warning",
+            severity: "medium",
+            title: "Weather Impact Analysis",
+            text: "3 weather delays this week affecting masonry work. Total schedule impact: 1.5 days.",
+            action: "Review impacts",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "field-reports-3",
+            type: "success",
+            severity: "low",
+            title: "Quality Milestone Achieved",
+            text: "Zero quality defects reported in past 7 days. Strong craftwork and supervision performance.",
+            action: "View quality data",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "field-reports-4",
+            type: "alert",
+            severity: "high",
+            title: "Safety Incident Reported",
+            text: "Minor safety incident in Zone B requires immediate corrective action and crew briefing.",
+            action: "Review incident",
+            timestamp: "45 minutes ago",
+          },
+        ]
+      }
+
+      // Constraints insights
+      if (fieldSubTool === "constraints") {
+        return [
+          {
+            id: "constraints-1",
+            type: "alert",
+            severity: "high",
+            title: "Critical Constraint Impact",
+            text: "Electrical permit delay creating 7-day constraint on MEP rough-in. Immediate escalation required.",
+            action: "Escalate constraint",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "constraints-2",
+            type: "warning",
+            severity: "medium",
+            title: "Material Constraint Risk",
+            text: "Structural steel delivery showing high-risk indicators. Potential 5-day schedule impact.",
+            action: "Review delivery",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "constraints-3",
+            type: "success",
+            severity: "low",
+            title: "Constraint Resolution",
+            text: "Crane availability constraint resolved 2 days early. Schedule acceleration opportunity identified.",
+            action: "Optimize schedule",
+            timestamp: "6 hours ago",
+          },
+          {
+            id: "constraints-4",
+            type: "info",
+            severity: "medium",
+            title: "Constraint Trending",
+            text: "12 active constraints down from 18 last week. Strong constraint management performance.",
+            action: "View trends",
+            timestamp: "1 day ago",
+          },
+        ]
+      }
+
+      // Permit Log insights
+      if (fieldSubTool === "permit-log") {
+        return [
+          {
+            id: "permit-1",
+            type: "warning",
+            severity: "medium",
+            title: "Permit Expiration Alert",
+            text: "Building permit expires in 15 days. Renewal process should begin immediately to avoid delays.",
+            action: "Begin renewal",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "permit-2",
+            type: "success",
+            severity: "low",
+            title: "Inspection Passed",
+            text: "Electrical rough-in inspection passed with zero defects. Work can proceed to next phase.",
+            action: "View inspection",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "permit-3",
+            type: "alert",
+            severity: "high",
+            title: "Failed Inspection",
+            text: "Plumbing inspection failed due to code violations. Immediate remediation required.",
+            action: "Review violations",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "permit-4",
+            type: "info",
+            severity: "low",
+            title: "Permit Application Status",
+            text: "3 new permit applications submitted and under review. Expected approval within 5-7 business days.",
+            action: "Track applications",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+    }
+
+    // Pre-Construction tab insights
     if (activeTab === "pre-construction") {
       return [
         {
@@ -5381,18 +5718,10 @@ export const getProjectSidebarContent = (
           action: "Review bids",
           timestamp: "4 days ago",
         },
-        {
-          id: "precon-5",
-          type: "info",
-          severity: "medium",
-          title: "Team Mobilization",
-          text: "Site team members identified and ready for project mobilization.",
-          action: "View team",
-          timestamp: "5 days ago",
-        },
       ]
     }
 
+    // Warranty Management tab insights
     if (activeTab === "warranty") {
       return [
         {
@@ -5434,50 +5763,349 @@ export const getProjectSidebarContent = (
       ]
     }
 
-    if (navigation.coreTab === "productivity") {
+    // Compliance tab insights
+    if (activeTab === "compliance") {
       return [
         {
-          id: "prod-1",
-          type: "success",
-          severity: "low",
-          title: "Team Collaboration Active",
-          text: "Team communication frequency has increased 25% this week, indicating good engagement.",
-          action: "View activity",
+          id: "compliance-1",
+          type: "warning",
+          severity: "medium",
+          title: "Contract Review Required",
+          text: "3 trade partner contracts require compliance review before execution. Legal review needed.",
+          action: "Schedule review",
           timestamp: "1 hour ago",
         },
         {
-          id: "prod-2",
-          type: "warning",
-          severity: "medium",
-          title: "Task Completion Trend",
-          text: "Task completion rate has dropped 15% from last week. Consider workload redistribution.",
-          action: "Review tasks",
-          timestamp: "4 hours ago",
+          id: "compliance-2",
+          type: "success",
+          severity: "low",
+          title: "Insurance Verification Complete",
+          text: "All subcontractor insurance certificates verified and current. 100% compliance achieved.",
+          action: "View certificates",
+          timestamp: "3 hours ago",
         },
         {
-          id: "prod-3",
-          type: "info",
-          severity: "low",
-          title: "Communication Efficiency",
-          text: "Average response time to messages has improved to 2.3 hours.",
-          action: "View metrics",
+          id: "compliance-3",
+          type: "alert",
+          severity: "high",
+          title: "License Expiration Alert",
+          text: "Electrical contractor license expires in 30 days. Renewal documentation required.",
+          action: "Request renewal",
           timestamp: "1 day ago",
         },
         {
-          id: "prod-4",
-          type: "alert",
-          severity: "high",
-          title: "Overdue Tasks Alert",
-          text: "3 tasks are approaching their due dates. Immediate attention required.",
-          action: "Review overdue",
+          id: "compliance-4",
+          type: "info",
+          severity: "low",
+          title: "Trade Partner Scorecard",
+          text: "Overall trade partner compliance score: 94%. Strong performance across all metrics.",
+          action: "View scorecard",
           timestamp: "2 days ago",
         },
       ]
     }
 
+    // Recent Activity tab insights
+    if (activeTab === "recent-activity") {
+      return [
+        {
+          id: "activity-1",
+          type: "info",
+          severity: "low",
+          title: "High Activity Detected",
+          text: "Project activity level 35% above baseline this week. Strong collaboration and progress momentum.",
+          action: "View trends",
+          timestamp: "30 minutes ago",
+        },
+        {
+          id: "activity-2",
+          type: "success",
+          severity: "low",
+          title: "Communication Efficiency",
+          text: "Response time to RFIs improved by 40% this month. Excellent project coordination.",
+          action: "View metrics",
+          timestamp: "2 hours ago",
+        },
+        {
+          id: "activity-3",
+          type: "warning",
+          severity: "medium",
+          title: "Change Order Activity",
+          text: "Increased change order activity detected. 3 new change events this week require attention.",
+          action: "Review changes",
+          timestamp: "4 hours ago",
+        },
+        {
+          id: "activity-4",
+          type: "opportunity",
+          severity: "medium",
+          title: "Automation Opportunity",
+          text: "Routine reporting activities could benefit from automation. Potential 6-hour weekly savings.",
+          action: "Explore automation",
+          timestamp: "1 day ago",
+        },
+      ]
+    }
+
+    // Core Project Tools tabs - unique insights for each core tab
+    if (activeTab === "core" || !activeTab) {
+      // Dashboard tab (default)
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return [
+          {
+            id: "dashboard-1",
+            type: "info",
+            severity: "low",
+            title: "Project Health Score",
+            text: "Overall project health score of 87% indicates strong performance across all KPIs.",
+            action: "View details",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "dashboard-2",
+            type: "success",
+            severity: "low",
+            title: "Milestone Achievement",
+            text: "Foundation milestone completed 2 days ahead of schedule. Excellent progress momentum.",
+            action: "View milestone",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "dashboard-3",
+            type: "warning",
+            severity: "medium",
+            title: "Budget Variance Trending",
+            text: "Material costs trending 2.1% above baseline. Monitor for potential budget impact.",
+            action: "Review budget",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "dashboard-4",
+            type: "info",
+            severity: "medium",
+            title: "Team Performance",
+            text: "Project team productivity up 15% this month. Strong collaboration and efficiency.",
+            action: "View metrics",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Checklists tab
+      if (navigation.coreTab === "checklists") {
+        return [
+          {
+            id: "checklist-1",
+            type: "success",
+            severity: "low",
+            title: "StartUp Checklist Progress",
+            text: "78% of startup checklist items completed. On track for project launch milestone.",
+            action: "View checklist",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "checklist-2",
+            type: "warning",
+            severity: "medium",
+            title: "Safety Checklist Gap",
+            text: "5 safety checklist items require immediate attention before next phase can begin.",
+            action: "Complete items",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "checklist-3",
+            type: "info",
+            severity: "low",
+            title: "Quality Checklist Review",
+            text: "Quality control checklist shows 95% completion rate. Excellent quality management.",
+            action: "View quality data",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "checklist-4",
+            type: "alert",
+            severity: "high",
+            title: "Closeout Preparation",
+            text: "Closeout checklist preparation needed for upcoming substantial completion milestone.",
+            action: "Start closeout prep",
+            timestamp: "3 days ago",
+          },
+        ]
+      }
+
+      // Productivity tab
+      if (navigation.coreTab === "productivity") {
+        return [
+          {
+            id: "prod-1",
+            type: "success",
+            severity: "low",
+            title: "Team Collaboration Active",
+            text: "Team communication frequency has increased 25% this week, indicating good engagement.",
+            action: "View activity",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "prod-2",
+            type: "warning",
+            severity: "medium",
+            title: "Task Completion Trend",
+            text: "Task completion rate has dropped 15% from last week. Consider workload redistribution.",
+            action: "Review tasks",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "prod-3",
+            type: "info",
+            severity: "low",
+            title: "Communication Efficiency",
+            text: "Average response time to messages has improved to 2.3 hours.",
+            action: "View metrics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "prod-4",
+            type: "alert",
+            severity: "high",
+            title: "Overdue Tasks Alert",
+            text: "3 tasks are approaching their due dates. Immediate attention required.",
+            action: "Review overdue",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Staffing tab
+      if (navigation.coreTab === "staffing") {
+        return [
+          {
+            id: "staffing-1",
+            type: "warning",
+            severity: "medium",
+            title: "Resource Allocation Gap",
+            text: "Electrical crew understaffed by 2 members for next phase. Consider reallocating resources.",
+            action: "Review staffing",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "staffing-2",
+            type: "success",
+            severity: "low",
+            title: "Team Efficiency High",
+            text: "Current team showing 112% productivity versus baseline. Excellent performance metrics.",
+            action: "View performance",
+            timestamp: "3 hours ago",
+          },
+          {
+            id: "staffing-3",
+            type: "info",
+            severity: "medium",
+            title: "Training Completion",
+            text: "Safety training completion rate at 95%. All team members current on certifications.",
+            action: "View training",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "staffing-4",
+            type: "alert",
+            severity: "high",
+            title: "SPCR Review Required",
+            text: "3 Staffing Plan Change Requests require approval before implementation.",
+            action: "Review SPCRs",
+            timestamp: "2 days ago",
+          },
+        ]
+      }
+
+      // Responsibility Matrix tab
+      if (navigation.coreTab === "responsibility-matrix") {
+        return [
+          {
+            id: "responsibility-1",
+            type: "info",
+            severity: "low",
+            title: "Matrix Coverage Analysis",
+            text: "Responsibility matrix shows 87% role assignment coverage. Strong accountability structure.",
+            action: "View matrix",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "responsibility-2",
+            type: "warning",
+            severity: "medium",
+            title: "Unassigned Responsibilities",
+            text: "5 critical responsibilities lack clear ownership. Assign accountable parties immediately.",
+            action: "Assign roles",
+            timestamp: "4 hours ago",
+          },
+          {
+            id: "responsibility-3",
+            type: "success",
+            severity: "low",
+            title: "Decision Authority Clear",
+            text: "Decision-making authority clearly defined for 95% of project activities.",
+            action: "View decisions",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "responsibility-4",
+            type: "alert",
+            severity: "high",
+            title: "Role Conflict Identified",
+            text: "Overlapping responsibilities between trades creating coordination issues.",
+            action: "Resolve conflict",
+            timestamp: "3 days ago",
+          },
+        ]
+      }
+
+      // Reports tab
+      if (navigation.coreTab === "reports") {
+        return [
+          {
+            id: "reports-1",
+            type: "info",
+            severity: "low",
+            title: "Report Generation Status",
+            text: "Weekly project report generated automatically. 15 stakeholders notified via email distribution.",
+            action: "View report",
+            timestamp: "1 hour ago",
+          },
+          {
+            id: "reports-2",
+            type: "warning",
+            severity: "medium",
+            title: "Approval Workflow Delay",
+            text: "2 reports pending executive approval for 5+ days. Consider expediting review process.",
+            action: "Expedite approval",
+            timestamp: "2 hours ago",
+          },
+          {
+            id: "reports-3",
+            type: "success",
+            severity: "low",
+            title: "Data Quality Excellent",
+            text: "Report data accuracy at 98.5%. High-quality information driving decision making.",
+            action: "View analytics",
+            timestamp: "1 day ago",
+          },
+          {
+            id: "reports-4",
+            type: "alert",
+            severity: "high",
+            title: "Critical Report Due",
+            text: "Monthly executive dashboard due in 24 hours. Finalize data validation immediately.",
+            action: "Complete report",
+            timestamp: "4 hours ago",
+          },
+        ]
+      }
+    }
+
+    // Default fallback insights
     return [
       {
-        id: "core-1",
+        id: "default-1",
         type: "info",
         severity: "low",
         title: "Project Status Update",
@@ -5486,7 +6114,7 @@ export const getProjectSidebarContent = (
         timestamp: "1 day ago",
       },
       {
-        id: "core-2",
+        id: "default-2",
         type: "warning",
         severity: "medium",
         title: "Budget Variance Alert",
@@ -5495,7 +6123,7 @@ export const getProjectSidebarContent = (
         timestamp: "2 days ago",
       },
       {
-        id: "core-3",
+        id: "default-3",
         type: "success",
         severity: "low",
         title: "Safety Milestone",
@@ -5504,7 +6132,7 @@ export const getProjectSidebarContent = (
         timestamp: "3 days ago",
       },
       {
-        id: "core-4",
+        id: "default-4",
         type: "info",
         severity: "medium",
         title: "Schedule Optimization",
@@ -5512,31 +6140,180 @@ export const getProjectSidebarContent = (
         action: "Update schedule",
         timestamp: "4 days ago",
       },
-      {
-        id: "core-5",
-        type: "alert",
-        severity: "high",
-        title: "Permit Expiration",
-        text: "Building permit expires in 30 days. Renewal required to continue work.",
-        action: "Renew permit",
-        timestamp: "5 days ago",
-      },
     ]
   }
 
   // Get HBI Insights title based on active tab
   const getHBIInsightsTitle = () => {
+    // Financial Management tabs
     if (activeTab === "financial-management" || activeTab === "financial-hub") {
-      return "HBI Financial Hub Insights"
-    } else if (activeTab === "pre-construction") {
-      return "HBI Pre-Construction Insights"
-    } else if (activeTab === "warranty") {
-      return "HBI Warranty Insights"
-    } else if (navigation.coreTab === "productivity") {
-      return "HBI Productivity Insights"
+      const currentFinancialTab = navigation.tool === "financial-management" ? navigation.subTool : "overview"
+
+      switch (currentFinancialTab) {
+        case "budget-analysis":
+          return "HBI Budget Analysis Insights"
+        case "jchr":
+          return "HBI Job Cost History Insights"
+        case "ar-aging":
+          return "HBI AR Aging Insights"
+        case "cash-flow":
+          return "HBI Cash Flow Insights"
+        case "forecasting":
+          return "HBI Forecasting Insights"
+        case "change-management":
+          return "HBI Change Management Insights"
+        case "pay-authorization":
+          return "HBI Pay Authorization Insights"
+        case "pay-application":
+          return "HBI Pay Application Insights"
+        case "retention":
+          return "HBI Retention Management Insights"
+        default:
+          return "HBI Financial Hub Insights"
+      }
     }
-    return "HBI Core Tools Insights"
+
+    // Field Management tabs
+    if (activeTab === "field-management") {
+      const fieldSubTool = navigation.subTool || "scheduler"
+
+      switch (fieldSubTool) {
+        case "scheduler":
+          return "HBI Scheduler Insights"
+        case "field-reports":
+          return "HBI Field Reports Insights"
+        case "constraints":
+          return "HBI Constraints Management Insights"
+        case "permit-log":
+          return "HBI Permit Log Insights"
+        default:
+          return "HBI Field Management Insights"
+      }
+    }
+
+    // Pre-Construction tab
+    if (activeTab === "pre-construction") {
+      return "HBI Pre-Construction Insights"
+    }
+
+    // Warranty Management tab
+    if (activeTab === "warranty") {
+      return "HBI Warranty Management Insights"
+    }
+
+    // Compliance tab
+    if (activeTab === "compliance") {
+      return "HBI Compliance Insights"
+    }
+
+    // Recent Activity tab
+    if (activeTab === "recent-activity") {
+      return "HBI Activity Insights"
+    }
+
+    // Documents tab
+    if (activeTab === "documents") {
+      return "HBI Document Management Insights"
+    }
+
+    // Core Project Tools tabs
+    if (activeTab === "core" || !activeTab) {
+      if (!navigation.coreTab || navigation.coreTab === "dashboard") {
+        return "HBI Project Dashboard Insights"
+      }
+
+      switch (navigation.coreTab) {
+        case "checklists":
+          return "HBI Checklists Insights"
+        case "productivity":
+          return "HBI Productivity Insights"
+        case "staffing":
+          return "HBI Staffing Insights"
+        case "responsibility-matrix":
+          return "HBI Responsibility Matrix Insights"
+        case "reports":
+          return "HBI Reports Insights"
+        default:
+          return "HBI Core Tools Insights"
+      }
+    }
+
+    return "HBI Project Insights"
   }
+
+  // Check project stage
+  const isBiddingStage = projectData?.project_stage_name === "Bidding"
+  const isConstructionStage = projectData?.project_stage_name === "Construction"
+
+  // Calculate bidding-specific metrics
+  const getBiddingMetrics = () => {
+    const today = new Date()
+    const clientBidDueDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000) // 14 days from now
+    const subBidDueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+    const deliverablesToMarketing = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000) // 10 days from now
+    const preSubmissionReview = new Date(today.getTime() + 12 * 24 * 60 * 60 * 1000) // 12 days from now
+    const winStrategy = new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000) // 5 days from now
+
+    // Calculate coverage score (mock calculation based on project stage timing)
+    const daysUntilClientDue = Math.ceil((clientBidDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    const baseCoverage = 3.25 // Base coverage score
+    const timeFactorAdjustment = daysUntilClientDue > 10 ? 0.75 : daysUntilClientDue > 5 ? 0.25 : -0.25
+    const coverageScore = Math.max(1.0, Math.min(5.0, baseCoverage + timeFactorAdjustment))
+
+    return {
+      clientBidDueDate: clientBidDueDate.toLocaleDateString(),
+      subBidDueDate: subBidDueDate.toLocaleDateString(),
+      coverageScore: coverageScore.toFixed(2),
+      deliverablesToMarketing: deliverablesToMarketing.toLocaleDateString(),
+      preSubmissionReview: `${preSubmissionReview.toLocaleDateString()} 10:00`,
+      winStrategy: `${winStrategy.toLocaleDateString()} 14:30`,
+    }
+  }
+
+  // Calculate construction-specific metrics
+  const getConstructionMetrics = () => {
+    // Mock dollar data for PCCOs and PCOs
+    const totalPCCOsApproved = "$245,000"
+    const pcosPendingPCCO = "$67,500"
+
+    // Get dates from projectData and format as mm/dd/yyyy
+    const formatDate = (dateString: string) => {
+      if (!dateString) return "N/A"
+      const date = new Date(dateString)
+      return date.toLocaleDateString("en-US")
+    }
+
+    // Calculate projected completion date with fallback
+    const getProjectedCompletionDate = () => {
+      // Try to use projectData first
+      if (projectData?.projected_finish_date) {
+        return formatDate(projectData.projected_finish_date)
+      }
+
+      // Fallback: if we have a contract completion date, use that
+      if (projectData?.original_completion_date) {
+        return formatDate(projectData.original_completion_date)
+      }
+
+      // Final fallback: calculate from contract value and typical duration
+      const contractValue = projectData?.contract_value || 75000000
+      const estimatedDurationMonths = Math.ceil((contractValue / 10000000) * 12) // Rough estimate: $10M = 12 months
+      const fallbackDate = new Date()
+      fallbackDate.setMonth(fallbackDate.getMonth() + estimatedDurationMonths)
+      return fallbackDate.toLocaleDateString("en-US")
+    }
+
+    return {
+      totalPCCOsApproved,
+      pcosPendingPCCO,
+      approvedExtensions: projectData?.approved_extensions || 0,
+      contractCompletionDate: formatDate(projectData?.original_completion_date),
+      projectedCompletionDate: getProjectedCompletionDate(),
+    }
+  }
+
+  const biddingMetrics = getBiddingMetrics()
+  const constructionMetrics = getConstructionMetrics()
 
   return (
     <div className="space-y-4">
@@ -5550,27 +6327,100 @@ export const getProjectSidebarContent = (
             <p className="text-xs text-muted-foreground mb-2">Description</p>
             <ExpandableDescription description={projectData?.description || "No description available"} />
           </div>
+          {/* Project Metrics - Conditional based on project stage */}
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Contract Value</span>
-              <span className="font-medium">${(projectMetrics?.totalBudget || 0).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Spent to Date</span>
-              <span className="font-medium">${(projectMetrics?.spentToDate || 0).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Schedule Progress</span>
-              <span className="font-medium text-blue-600">{projectMetrics?.scheduleProgress || 0}%</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Budget Progress</span>
-              <span className="font-medium text-green-600">{projectMetrics?.budgetProgress || 0}%</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Team Members</span>
-              <span className="font-medium">{projectMetrics?.activeTeamMembers || 0}</span>
-            </div>
+            {isBiddingStage ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Client Bid Due Date</span>
+                  <span className="font-medium">{biddingMetrics.clientBidDueDate}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Sub Bid Due Date</span>
+                  <span className="font-medium">{biddingMetrics.subBidDueDate}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Current Coverage Score</span>
+                  <span
+                    className={`font-medium ${
+                      parseFloat(biddingMetrics.coverageScore) >= 4.0
+                        ? "text-green-600"
+                        : parseFloat(biddingMetrics.coverageScore) >= 3.0
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {biddingMetrics.coverageScore}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Deliverables to Marketing</span>
+                  <span className="font-medium">{biddingMetrics.deliverablesToMarketing}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Pre-Submission Review</span>
+                  <span className="font-medium">{biddingMetrics.preSubmissionReview}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Win Strategy</span>
+                  <span className="font-medium">{biddingMetrics.winStrategy}</span>
+                </div>
+              </>
+            ) : isConstructionStage ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Value</span>
+                  <span className="font-medium">${(projectMetrics?.totalBudget || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Job Cost to Date</span>
+                  <span className="font-medium">${(projectMetrics?.spentToDate || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total PCCOs Approved</span>
+                  <span className="font-medium">{constructionMetrics.totalPCCOsApproved}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">PCOs Pending PCCO</span>
+                  <span className="font-medium">{constructionMetrics.pcosPendingPCCO}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Approved Extensions</span>
+                  <span className="font-medium">{constructionMetrics.approvedExtensions}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Completion Date</span>
+                  <span className="font-medium">{constructionMetrics.contractCompletionDate}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Projected Completion Date</span>
+                  <span className="font-medium">{constructionMetrics.projectedCompletionDate}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contract Value</span>
+                  <span className="font-medium">${(projectMetrics?.totalBudget || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Spent to Date</span>
+                  <span className="font-medium">${(projectMetrics?.spentToDate || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Schedule Progress</span>
+                  <span className="font-medium text-blue-600">{projectMetrics?.scheduleProgress || 0}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Budget Progress</span>
+                  <span className="font-medium text-green-600">{projectMetrics?.budgetProgress || 0}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Team Members</span>
+                  <span className="font-medium">{projectMetrics?.activeTeamMembers || 0}</span>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -5617,14 +6467,7 @@ export const getProjectSidebarContent = (
       )}
 
       {/* HBI Insights Panel */}
-      <Card className="border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">{getHBIInsightsTitle()}</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ExpandableHBIInsights config={getHBIInsights()} title={getHBIInsightsTitle()} />
-        </CardContent>
-      </Card>
+      <ExpandableHBIInsights config={getHBIInsights()} title={getHBIInsightsTitle()} />
 
       {/* Quick Actions Panel */}
       <Card className="border-border">
@@ -5681,7 +6524,6 @@ function getBidPackageName(packageId: string): string {
 }
 
 export default ProjectControlCenterContent
-
 // Export the Field Management content for right panel injection
 export const getFieldManagementRightPanelContent = (
   projectData: any,
@@ -5691,15 +6533,69 @@ export const getFieldManagementRightPanelContent = (
   onSidebarContentChange?: (content: React.ReactNode) => void
 ) => {
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="h-full w-full min-w-0 max-w-full overflow-hidden">
       <FieldManagementContent
         selectedSubTool={selectedSubTool}
         projectData={projectData}
         userRole={userRole}
         projectId={projectId}
         onSidebarContentChange={onSidebarContentChange}
-        className="w-full h-full"
+        className="w-full h-full min-w-0 max-w-full"
       />
     </div>
   )
+}
+
+// Brand color utilities
+const getBrandColorClasses = (type: "orange" | "blue", variant: "primary" | "secondary" | "accent" = "primary") => {
+  if (type === "orange") {
+    switch (variant) {
+      case "primary":
+        return "bg-[#FA4616] text-white border-[#FA4616]"
+      case "secondary":
+        return "text-[#FA4616] border-[#FA4616]"
+      case "accent":
+        return "border-l-[#FA4616] bg-gradient-to-r from-[#FA4616]/10 to-transparent"
+      default:
+        return "bg-[#FA4616] text-white"
+    }
+  } else {
+    switch (variant) {
+      case "primary":
+        return "bg-[#0021A5] text-white border-[#0021A5]"
+      case "secondary":
+        return "text-[#0021A5] border-[#0021A5]"
+      case "accent":
+        return "border-l-[#0021A5] bg-gradient-to-r from-[#0021A5]/10 to-transparent"
+      default:
+        return "bg-[#0021A5] text-white"
+    }
+  }
+}
+
+const getBadgeColorForStatus = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "active":
+    case "in-progress":
+    case "current":
+      return getBrandColorClasses("orange", "primary")
+    case "completed":
+    case "approved":
+      return "bg-green-500 text-white"
+    case "pending":
+    case "review":
+      return getBrandColorClasses("blue", "primary")
+    case "overdue":
+    case "critical":
+      return "bg-red-500 text-white"
+    default:
+      return "bg-gray-500 text-white"
+  }
+}
+
+const getSectionBorderClass = (isActive: boolean, isPrimary: boolean = false) => {
+  if (isActive) {
+    return isPrimary ? getBrandColorClasses("orange", "accent") : getBrandColorClasses("blue", "accent")
+  }
+  return "border-l-gray-200 dark:border-l-gray-700"
 }

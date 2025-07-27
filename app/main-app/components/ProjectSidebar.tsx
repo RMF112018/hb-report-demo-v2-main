@@ -23,6 +23,11 @@ import { useTheme } from "next-themes"
 import { useToast } from "../../../components/ui/use-toast"
 import { ProductivityPopover } from "../../../components/layout/ProductivityPopover"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
+import { TeamsSlideOutPanel } from "../../../components/productivity/TeamsSlideOutPanel"
+import { QualityWarrantyCarousel } from "../../../components/quality/QualityWarrantyCarousel"
+import { ProjectPageCarousel } from "../../../components/presentation/ProjectPageCarousel"
+import { CoreTabCarousel } from "../../../components/presentation/CoreTabCarousel"
+import { HBIntelPitchCarousel } from "../../../components/presentation/HBIntelPitchCarousel"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,8 +42,6 @@ import {
   ChevronRight,
   Search,
   Home,
-  Folder,
-  FolderOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Moon,
@@ -60,10 +63,30 @@ import {
   Monitor,
   Gavel,
   Server,
-  Eye,
   Drill,
+  GitCompareArrows,
+  MessageSquare,
+  BriefcaseBusiness,
+  UsersRound,
+  DollarSign,
+  Clock,
+  UserPlus,
+  GraduationCap,
+  FileText,
+  TrendingUp,
 } from "lucide-react"
-import type { UserRole } from "../../project/[projectId]/types/project"
+
+type UserRole =
+  | "executive"
+  | "project-executive"
+  | "project-manager"
+  | "superintendent"
+  | "estimator"
+  | "team-member"
+  | "admin"
+  | "viewer"
+  | "presentation"
+  | "hr-payroll"
 
 interface ProjectData {
   id: string
@@ -98,10 +121,11 @@ interface ProjectSidebarProps {
   onToolSelect?: (toolName: string | null) => void
   selectedModule?: string | null
   selectedTool?: string | null
+  onLaunchProjectPageCarousel?: () => void
 }
 
 // Define sidebar categories
-type SidebarCategory = "dashboard" | "projects" | "tools" | "tools-menu" | "settings" | "notifications" | "it-modules"
+type SidebarCategory = "dashboard" | "projects" | "tools-menu" | "notifications" | "it-modules" | "hr-tools"
 
 interface SidebarCategoryConfig {
   id: SidebarCategory
@@ -110,16 +134,34 @@ interface SidebarCategoryConfig {
   tooltip: string
   adminOnly?: boolean
   executiveOnly?: boolean
+  hrOnly?: boolean
 }
 
 const SIDEBAR_CATEGORIES: SidebarCategoryConfig[] = [
-  { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Main Dashboard" },
-  { id: "projects", label: "Projects", icon: Building, tooltip: "Project Navigation" },
-  { id: "it-modules", label: "IT Modules", icon: Microchip, tooltip: "IT Command Center Modules", adminOnly: true },
-  { id: "tools", label: "Tools", icon: Folder, tooltip: "Application Tools" },
-  { id: "tools-menu", label: "Tools Menu", icon: Drill, tooltip: "Advanced Tools Menu", executiveOnly: true },
-  { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Notifications & Updates" },
-  { id: "settings", label: "Settings", icon: Settings, tooltip: "User Settings" },
+  { id: "dashboard", label: "Dashboard", icon: Home, tooltip: "Return to Main Dashboard" },
+  { id: "projects", label: "Projects", icon: BriefcaseBusiness, tooltip: "Browse & Select Projects" },
+  {
+    id: "it-modules",
+    label: "IT Modules",
+    icon: Microchip,
+    tooltip: "IT Command Center & System Management",
+    adminOnly: true,
+  },
+  {
+    id: "tools-menu",
+    label: "Tools Menu",
+    icon: Drill,
+    tooltip: "Advanced Project Tools & Features",
+    executiveOnly: true,
+  },
+  {
+    id: "hr-tools",
+    label: "HR & Payroll Tools",
+    icon: UsersRound,
+    tooltip: "HR & Payroll Management Tools",
+    hrOnly: true,
+  },
+  { id: "notifications", label: "Notifications", icon: Bell, tooltip: "Messages, Tasks & System Alerts" },
 ]
 
 // IT Modules configuration for IT Administrator
@@ -131,6 +173,99 @@ interface ITModuleConfig {
   path: string
   status: "active" | "maintenance" | "planned"
 }
+
+// HR Tools configuration for HR & Payroll Manager
+interface HRToolConfig {
+  id: string
+  label: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  path: string
+  status: "active" | "maintenance" | "planned"
+}
+
+const HR_TOOLS: HRToolConfig[] = [
+  {
+    id: "personnel",
+    label: "Personnel Management",
+    description: "Employee records, org chart, and staff directory",
+    icon: UsersRound,
+    path: "/hr-payroll/personnel",
+    status: "active",
+  },
+  {
+    id: "recruiting",
+    label: "Recruiting",
+    description: "Job postings, candidate management, and hiring workflow",
+    icon: UserPlus,
+    path: "/hr-payroll/recruiting",
+    status: "active",
+  },
+  {
+    id: "timesheets",
+    label: "Timesheets",
+    description: "Time and attendance tracking, overtime management",
+    icon: Clock,
+    path: "/hr-payroll/timesheets",
+    status: "active",
+  },
+  {
+    id: "expenses",
+    label: "Expenses",
+    description: "Expense reports, reimbursements, and approvals",
+    icon: DollarSign,
+    path: "/hr-payroll/expenses",
+    status: "active",
+  },
+  {
+    id: "payroll",
+    label: "Payroll",
+    description: "Payroll processing, deductions, and payment tracking",
+    icon: BriefcaseBusiness,
+    path: "/hr-payroll/payroll",
+    status: "active",
+  },
+  {
+    id: "benefits",
+    label: "Benefits",
+    description: "Health plans, retirement, and enrollment management",
+    icon: Shield,
+    path: "/hr-payroll/benefits",
+    status: "active",
+  },
+  {
+    id: "training",
+    label: "Training",
+    description: "Certifications, training programs, and development",
+    icon: GraduationCap,
+    path: "/hr-payroll/training",
+    status: "active",
+  },
+  {
+    id: "compliance",
+    label: "Compliance",
+    description: "Regulatory requirements, audit trails, and monitoring",
+    icon: FileText,
+    path: "/hr-payroll/compliance",
+    status: "active",
+  },
+  {
+    id: "performance",
+    label: "Performance",
+    description: "Performance reviews, goal setting, and feedback",
+    icon: TrendingUp,
+    path: "/hr-payroll/performance",
+    status: "active",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    description: "System preferences and user permissions",
+    icon: Settings,
+    path: "/hr-payroll/settings",
+    status: "active",
+  },
+]
 
 const IT_MODULES: ITModuleConfig[] = [
   {
@@ -265,6 +400,13 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     category: "Financial Management",
     description: "Subcontractor buyout and material procurement management",
   },
+  {
+    name: "Market Intelligence",
+    href: "/dashboard/market-intel",
+    category: "Core Tools",
+    description: "AI-powered market analysis, competitive positioning, and predictive insights",
+    visibleRoles: ["executive", "project-executive", "project-manager", "estimator"],
+  },
 
   // Field Management
   {
@@ -305,6 +447,18 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     category: "Compliance",
     description: "Comprehensive subcontractor and vendor management system",
   },
+  {
+    name: "Safety",
+    href: "/dashboard/safety",
+    category: "Compliance",
+    description: "Safety management, incident reporting, and compliance tracking",
+  },
+  {
+    name: "Quality Control & Warranty",
+    href: "/dashboard/quality-warranty",
+    category: "Compliance",
+    description: "Quality control processes, inspections, and warranty management",
+  },
 
   // Pre-Construction
   {
@@ -340,6 +494,15 @@ const TOOLS_MENU: ToolMenuConfig[] = [
     description: "Warranty management and tracking tools",
   },
 
+  // HR & Payroll Management
+  {
+    name: "HR & Payroll",
+    href: "/hr-payroll",
+    category: "HR & Payroll Management",
+    description: "Comprehensive human resources and payroll management system",
+    visibleRoles: ["hr-payroll", "admin"],
+  },
+
   // Historical Projects
   {
     name: "Archive",
@@ -361,6 +524,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onToolSelect,
   selectedModule,
   selectedTool,
+  onLaunchProjectPageCarousel,
 }) => {
   const { user, logout, isPresentationMode, viewingAs, switchRole, returnToPresentation } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -372,23 +536,23 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [productivityNotifications] = useState(3)
+  const [showTeamsPanel, setShowTeamsPanel] = useState(false)
+  const [showQualityCarousel, setShowQualityCarousel] = useState(false)
+  const [qualityCarouselTimeout, setQualityCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showProjectPageCarousel, setShowProjectPageCarousel] = useState(false)
+  const [projectPageCarouselTimeout, setProjectPageCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showCoreTabCarousel, setShowCoreTabCarousel] = useState(false)
+  const [coreTabCarouselTimeout, setCoreTabCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [showHBIntelPitchCarousel, setShowHBIntelPitchCarousel] = useState(false)
 
   // New state for fluid navigation
   const [activeCategory, setActiveCategory] = useState<SidebarCategory | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSubMenuOpen, setMobileSubMenuOpen] = useState(false)
-  const [activeSubCategory, setActiveSubCategory] = useState<SidebarCategory | null>(null)
+  const [activeSubCategory, setActiveSubCategory] = useState<SidebarCategory | "settings" | "tools" | null>(null)
   const [collapsedToolsCategories, setCollapsedToolsCategories] = useState<Set<string>>(
-    new Set([
-      "Core Tools",
-      "Pre-Construction",
-      "Financial Management",
-      "Field Management",
-      "Compliance",
-      "Warranty",
-      "Historical Projects",
-    ])
+    new Set(["Core Tools", "Pre-Construction", "Compliance", "Warranty"])
   )
 
   // Refs for click outside detection
@@ -406,8 +570,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     checkMobile()
     window.addEventListener("resize", checkMobile)
 
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [])
+    return () => {
+      window.removeEventListener("resize", checkMobile)
+      // Cleanup timeouts on unmount
+      if (qualityCarouselTimeout) {
+        clearTimeout(qualityCarouselTimeout)
+      }
+      if (projectPageCarouselTimeout) {
+        clearTimeout(projectPageCarouselTimeout)
+      }
+      if (coreTabCarouselTimeout) {
+        clearTimeout(coreTabCarouselTimeout)
+      }
+    }
+  }, [qualityCarouselTimeout, projectPageCarouselTimeout, coreTabCarouselTimeout])
 
   // Helper function to determine the dashboard path based on user role
   const getDashboardPath = useCallback(() => {
@@ -544,11 +720,24 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Filter categories based on user role
   const visibleCategories = useMemo(() => {
     return SIDEBAR_CATEGORIES.filter((category) => {
+      // Hide notifications category (bell icon)
+      if (category.id === "notifications") {
+        return false
+      }
+
+      // For HR & Payroll Manager, only show dashboard and HR tools
+      if (userRole === "hr-payroll") {
+        return category.id === "dashboard" || category.id === "hr-tools"
+      }
+
       if (category.adminOnly) {
         return userRole === "admin"
       }
       if (category.executiveOnly) {
         return userRole === "executive" || userRole === "project-executive"
+      }
+      if (category.hrOnly) {
+        return false // already handled above
       }
       return true
     })
@@ -559,6 +748,24 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     return TOOLS_MENU.filter((tool) => {
       // Filter by role visibility for individual tools
       const isRoleVisible = !tool.visibleRoles || tool.visibleRoles.includes(userRole)
+
+      // Hide specific tools
+      if (tool.name === "Responsibility Matrix") {
+        return false
+      }
+
+      if (tool.name === "Dashboard") {
+        return false
+      }
+
+      if (tool.name === "Market Intelligence") {
+        return false
+      }
+
+      if (tool.name === "Contract Documents") {
+        return false
+      }
+
       return isRoleVisible
     })
   }, [userRole])
@@ -567,24 +774,25 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const toolsByCategory = useMemo(() => {
     const categories = new Map<string, ToolMenuConfig[]>()
 
+    // Hidden categories that should not appear in the UI
+    const hiddenCategories = new Set(["Financial Management", "Field Management", "Historical Projects", "Warranty"])
+
     filteredTools.forEach((tool) => {
       const category = tool.category
+
+      // Skip hidden categories
+      if (hiddenCategories.has(category)) {
+        return
+      }
+
       if (!categories.has(category)) {
         categories.set(category, [])
       }
       categories.get(category)!.push(tool)
     })
 
-    // Sort categories by logical order
-    const categoryOrder = [
-      "Core Tools",
-      "Pre-Construction",
-      "Financial Management",
-      "Field Management",
-      "Compliance",
-      "Warranty",
-      "Historical Projects",
-    ]
+    // Sort categories by logical order (excluding hidden categories)
+    const categoryOrder = ["Core Tools", "Pre-Construction", "Compliance", "Warranty"]
 
     const sortedCategories = Array.from(categories.entries()).sort(([a], [b]) => {
       return categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
@@ -658,6 +866,16 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     }
   }
 
+  // Handle user avatar click
+  const handleUserAvatarClick = () => {
+    if (isMobile) {
+      setActiveSubCategory("settings")
+      setMobileSubMenuOpen(true)
+    } else {
+      setShowUserMenu(!showUserMenu)
+    }
+  }
+
   // Handle IT module navigation
   const handleITModuleClick = (moduleId: string) => {
     onModuleSelect?.(moduleId)
@@ -670,15 +888,98 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     }
   }
 
+  // Handle HR module navigation
+  const handleHRModuleClick = (moduleId: string) => {
+    // Navigate to HR & Payroll Suite page with module parameter
+    router.push(`/hr-payroll?module=${moduleId}`)
+
+    if (isMobile) {
+      setMobileMenuOpen(false)
+      setMobileSubMenuOpen(false)
+    } else {
+      setActiveCategory(null)
+    }
+  }
+
+  // Handle quality carousel completion
+  const handleQualityCarouselComplete = () => {
+    setShowQualityCarousel(false)
+    // Clear the timeout if it exists
+    if (qualityCarouselTimeout) {
+      clearTimeout(qualityCarouselTimeout)
+      setQualityCarouselTimeout(null)
+    }
+  }
+
+  // Handle project page carousel completion
+  const handleProjectPageCarouselComplete = () => {
+    setShowProjectPageCarousel(false)
+    // Clear the timeout if it exists
+    if (projectPageCarouselTimeout) {
+      clearTimeout(projectPageCarouselTimeout)
+      setProjectPageCarouselTimeout(null)
+    }
+
+    // Trigger Core Tab carousel with 2-second delay
+    if (isPresentationMode) {
+      const timeout = setTimeout(() => {
+        setShowCoreTabCarousel(true)
+      }, 2000)
+      setCoreTabCarouselTimeout(timeout)
+    }
+  }
+
+  // Handle core tab carousel completion
+  const handleCoreTabCarouselComplete = () => {
+    setShowCoreTabCarousel(false)
+    // Clear the timeout if it exists
+    if (coreTabCarouselTimeout) {
+      clearTimeout(coreTabCarouselTimeout)
+      setCoreTabCarouselTimeout(null)
+    }
+  }
+
+  // Handle HB Intel Pitch carousel completion
+  const handleHBIntelPitchCarouselComplete = () => {
+    setShowHBIntelPitchCarousel(false)
+  }
+
+  // Helper function to handle project selection with carousel logic
+  const handleProjectSelect = (projectId: string) => {
+    // Check if user is in presentation mode and a project is being selected
+    if (isPresentationMode && projectId) {
+      // Clear any existing timeout
+      if (projectPageCarouselTimeout) {
+        clearTimeout(projectPageCarouselTimeout)
+      }
+
+      // Set 3-second delay before showing carousel
+      const timeout = setTimeout(() => {
+        setShowProjectPageCarousel(true)
+      }, 3000)
+      setProjectPageCarouselTimeout(timeout)
+    }
+
+    // Call the original project selection function
+    onProjectSelect(projectId)
+  }
+
+  // Update the carousel trigger logic to use the callback
+  const triggerProjectPageCarousel = () => {
+    if (onLaunchProjectPageCarousel) {
+      onLaunchProjectPageCarousel()
+    }
+  }
+
   // Mobile floating button
   if (isMobile) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-[115]">
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button
               size="lg"
-              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
+              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 z-[120]"
             >
               <Menu className="h-6 w-6" />
             </Button>
@@ -691,7 +992,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                   <div className="flex items-center gap-3">
                     <div
                       className="text-white rounded-lg flex items-center justify-center text-sm font-bold"
-                      style={{ width: "2.5rem", height: "2.5rem", backgroundColor: "rgba(250, 70, 22, 1)" }}
+                      style={{ width: "2.5rem", height: "2.5rem", backgroundColor: "#FA4616" }}
                     >
                       HBI
                     </div>
@@ -728,13 +1029,19 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         <IconComponent className="h-5 w-5 mr-3" />
                         {category.label}
                         {category.id === "notifications" && productivityNotifications > 0 && (
-                          <Badge variant="destructive" className="ml-auto">
+                          <Badge variant="destructive" className="ml-auto z-[125]">
                             {productivityNotifications}
                           </Badge>
                         )}
                       </Button>
                     )
                   })}
+
+                  {/* User Settings Button for Mobile */}
+                  <Button variant="ghost" onClick={handleUserAvatarClick} className="w-full justify-start h-12">
+                    <User className="h-5 w-5 mr-3" />
+                    User Settings
+                  </Button>
                 </div>
               </div>
 
@@ -762,6 +1069,21 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                       )}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      // Show Microsoft Teams integration slide-out panel
+                      setShowTeamsPanel(true)
+                      setMobileMenuOpen(false)
+                    }}
+                    className="h-8 w-8 p-0 relative"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    {productivityNotifications > 0 && (
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-[#FA4616] rounded-full z-[125]"></div>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -828,13 +1150,13 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                               key={project.id}
                               variant={selectedProject === project.id ? "default" : "ghost"}
                               onClick={() => {
-                                onProjectSelect(project.id)
+                                handleProjectSelect(project.id)
                                 setMobileSubMenuOpen(false)
                                 setMobileMenuOpen(false)
                               }}
                               className="w-full justify-start p-3 h-auto text-left"
                             >
-                              <Building className="h-4 w-4 mr-3 flex-shrink-0" />
+                              <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-sm truncate">{project.name}</div>
                                 <div className="text-xs text-muted-foreground">#{project.project_number}</div>
@@ -871,11 +1193,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                             ) : (
                               <ChevronRight className="h-4 w-4 mr-2" />
                             )}
-                            {expandedStages.has(stage) ? (
-                              <FolderOpen className="h-4 w-4 mr-2" />
-                            ) : (
-                              <Folder className="h-4 w-4 mr-2" />
-                            )}
                             <span className="flex-1 text-left">{stage}</span>
                             <Badge variant="secondary" className="text-xs">
                               {stageProjects.length}
@@ -889,13 +1206,13 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                   key={project.id}
                                   variant={selectedProject === project.id ? "default" : "ghost"}
                                   onClick={() => {
-                                    onProjectSelect(project.id)
+                                    handleProjectSelect(project.id)
                                     setMobileSubMenuOpen(false)
                                     setMobileMenuOpen(false)
                                   }}
                                   className="w-full justify-start p-3 h-auto text-left"
                                 >
-                                  <Building className="h-4 w-4 mr-3 flex-shrink-0" />
+                                  <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <div className="font-medium text-sm truncate">{project.name}</div>
                                     <div className="text-xs text-muted-foreground">#{project.project_number}</div>
@@ -912,14 +1229,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
                 {activeSubCategory === "tools" && (
                   <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start h-12">
-                      <Eye className="h-5 w-5 mr-3" />
-                      Construction Analytics
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start h-12">
-                      <Monitor className="h-5 w-5 mr-3" />
-                      Report Generator
-                    </Button>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 p-4">
+                      No tools available in this category.
+                    </div>
                   </div>
                 )}
 
@@ -958,21 +1270,61 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                         <Button
                           key={module.id}
                           variant="ghost"
-                          className="w-full justify-start h-12 px-3"
+                          className="w-full justify-start px-3 py-3 h-auto text-left group hover:bg-gray-100 dark:hover:bg-gray-800"
                           onClick={() => handleITModuleClick(module.id)}
                         >
-                          <ModuleIcon className="h-5 w-5 mr-3" />
-                          <div className="flex-1 text-left">
-                            <div className="font-medium text-sm">{module.label}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                              {module.description}
+                          <div className="flex items-center w-full">
+                            <div className="flex-shrink-0 mr-3">
+                              <ModuleIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-gray-900 dark:text-gray-100">{module.label}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                                {module.description}
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 ml-2">
+                              <Badge variant={module.status === "active" ? "default" : "secondary"} className="text-xs">
+                                {module.status}
+                              </Badge>
                             </div>
                           </div>
-                          <Badge
-                            variant={module.status === "active" ? "default" : "secondary"}
-                            className="ml-2 text-xs"
-                          >
-                            {module.status}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {activeSubCategory === "hr-tools" && (
+                  <div className="space-y-2">
+                    <div className="mb-4">
+                      <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                        HR & Payroll Tools
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Comprehensive HR and payroll management tools
+                      </p>
+                    </div>
+                    {HR_TOOLS.map((tool) => {
+                      const ToolIcon = tool.icon
+                      return (
+                        <Button
+                          key={tool.id}
+                          variant="ghost"
+                          className="w-full justify-start h-12 px-3"
+                          onClick={() => {
+                            handleHRModuleClick(tool.id)
+                            setMobileSubMenuOpen(false)
+                            setMobileMenuOpen(false)
+                          }}
+                        >
+                          <ToolIcon className="h-5 w-5 mr-3" />
+                          <div className="flex-1 text-left">
+                            <div className="font-medium text-sm">{tool.label}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{tool.description}</div>
+                          </div>
+                          <Badge variant={tool.status === "active" ? "default" : "secondary"} className="ml-2 text-xs">
+                            {tool.status}
                           </Badge>
                         </Button>
                       )
@@ -1016,6 +1368,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 key={tool.name}
                                 variant="ghost"
                                 onClick={() => {
+                                  // Check if Quality Control & Warranty is selected and trigger carousel
+                                  if (tool.name === "Quality Control & Warranty") {
+                                    // Clear any existing timeout
+                                    if (qualityCarouselTimeout) {
+                                      clearTimeout(qualityCarouselTimeout)
+                                    }
+
+                                    // Set 3-second delay before showing carousel
+                                    const timeout = setTimeout(() => {
+                                      setShowQualityCarousel(true)
+                                    }, 3000)
+                                    setQualityCarouselTimeout(timeout)
+                                  }
+
                                   onToolSelect?.(tool.name)
                                   setActiveSubCategory(null) // Close the panel after selection
                                 }}
@@ -1134,7 +1500,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   // Desktop/Tablet Layout
   if (!isMobile) {
     return (
-      <div className="fixed top-0 left-0 z-40 h-screen">
+      <div className="fixed top-0 left-0 z-[50] h-screen">
         {/* Sidebar Container - Dynamic width based on expanded state */}
         <div
           className={`
@@ -1155,12 +1521,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           {/* Collapsed Sidebar - Always visible */}
           <aside
             id="collapsed-sidebar"
-            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-30"
+            className="w-16 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col z-[55]"
           >
             {/* Logo */}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="w-full flex items-center justify-center">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#FA4616] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">HBI</span>
                 </div>
               </div>
@@ -1179,27 +1545,27 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                           size="sm"
                           onClick={() => handleCategorySelect(category.id)}
                           className={`
-                            w-full h-10 p-0 rounded-lg relative
+                            w-full h-10 p-0 rounded-lg relative z-[60]
                             ${
                               activeCategory === category.id ||
                               (category.id === "dashboard" &&
                                 selectedProject === null &&
                                 selectedModule === null &&
                                 selectedTool === null)
-                                ? "bg-primary text-primary-foreground"
+                                ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-800"
                             }
                           `}
                         >
                           <IconComponent className="h-4 w-4" />
                           {category.id === "notifications" && productivityNotifications > 0 && (
-                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+                            <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[65]">
                               <span className="text-xs text-white font-bold">{productivityNotifications}</span>
                             </div>
                           )}
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
+                      <TooltipContent side="right" className="z-[70]">
                         <p>{category.tooltip}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -1208,37 +1574,150 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
               })}
             </div>
 
-            {/* User Avatar */}
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+            {/* Productivity Quick Access */}
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleCategorySelect("settings")}
-                      className={`
-                        w-full h-10 p-0 rounded-lg
-                        ${
-                          activeCategory === "settings"
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }
-                      `}
+                      onClick={() => {
+                        // Launch HB Intel Pitch carousel for executives
+                        setShowHBIntelPitchCarousel(true)
+                      }}
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
                     >
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
-                        <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                          {getUserInitials()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <GitCompareArrows className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>User menu</p>
+                  <TooltipContent side="right" className="z-[70]">
+                    <p>HB Intel Executive Pitch Presentation</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // Show Microsoft Teams integration slide-out panel
+                        setShowTeamsPanel(true)
+                      }}
+                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      {productivityNotifications > 0 && (
+                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-[#FA4616] rounded-full flex items-center justify-center z-[65]">
+                          <span className="text-xs text-white font-bold">{productivityNotifications}</span>
+                        </div>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="z-[70]">
+                    <p>Microsoft Teams & Productivity Tools</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            {/* User Avatar */}
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="relative" ref={userMenuRef}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleUserAvatarClick}
+                        className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 z-[60]"
+                      >
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                          <AvatarFallback className="text-xs bg-[#FA4616] text-white">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="z-[70]">
+                      <p>User Settings & Profile</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                {/* User Menu Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute bottom-full left-16 mb-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[75]">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">
+                            {user?.firstName} {user?.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          router.push("/profile")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <User className="h-4 w-4 mr-3" />
+                        Profile
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          router.push("/settings")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <Settings className="h-4 w-4 mr-3" />
+                        Settings
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setTheme(theme === "dark" ? "light" : "dark")
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        {theme === "dark" ? <Sun className="h-4 w-4 mr-3" /> : <Moon className="h-4 w-4 mr-3" />}
+                        Toggle Theme
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          handleLogout()
+                          setShowUserMenu(false)
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-3" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </aside>
 
@@ -1246,7 +1725,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
           {activeCategory && (
             <aside
               ref={expandedContentRef}
-              className="w-80 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-xl"
+              className="w-80 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-xl z-[112]"
             >
               <div className="flex flex-col h-full">
                 {/* Content Header */}
@@ -1255,8 +1734,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     <h2 className="text-lg font-semibold">
                       {activeCategory === "projects"
                         ? "Projects"
-                        : activeCategory === "tools"
-                        ? "Tools"
                         : activeCategory === "tools-menu"
                         ? "Tools Menu"
                         : activeCategory === "notifications"
@@ -1287,10 +1764,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 key={project.id}
                                 variant={selectedProject === project.id ? "default" : "ghost"}
                                 size="sm"
-                                onClick={() => onProjectSelect(project.id)}
-                                className="w-full justify-start px-3 py-2 h-auto text-left"
+                                onClick={() => handleProjectSelect(project.id)}
+                                className={`w-full justify-start px-3 py-2 h-auto text-left ${
+                                  selectedProject === project.id
+                                    ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
+                                    : ""
+                                }`}
                               >
-                                <Building className="h-4 w-4 mr-3 flex-shrink-0" />
+                                <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
                                   <div className="font-medium text-sm truncate">{project.name}</div>
                                   <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -1333,11 +1814,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                               ) : (
                                 <ChevronRight className="h-4 w-4 mr-2" />
                               )}
-                              {expandedStages.has(stage) ? (
-                                <FolderOpen className="h-4 w-4 mr-2" />
-                              ) : (
-                                <Folder className="h-4 w-4 mr-2" />
-                              )}
                               <span className="flex-1 text-left">{stage}</span>
                               <Badge variant="secondary" className="text-xs">
                                 {stageProjects.length}
@@ -1351,10 +1827,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     key={project.id}
                                     variant={selectedProject === project.id ? "default" : "ghost"}
                                     size="sm"
-                                    onClick={() => onProjectSelect(project.id)}
-                                    className="w-full justify-start px-3 py-1.5 h-auto text-left"
+                                    onClick={() => handleProjectSelect(project.id)}
+                                    className={`w-full justify-start px-3 py-1.5 h-auto text-left ${
+                                      selectedProject === project.id
+                                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800"
+                                        : ""
+                                    }`}
                                   >
-                                    <Building className="h-4 w-4 mr-3 flex-shrink-0" />
+                                    <BriefcaseBusiness className="h-4 w-4 mr-3 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <div className="font-medium text-sm truncate">{project.name}</div>
                                       <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -1374,19 +1854,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
-
-                  {activeCategory === "tools" && (
-                    <div className="p-4 space-y-2">
-                      <Button variant="ghost" className="w-full justify-start">
-                        <Eye className="h-4 w-4 mr-3" />
-                        Construction Analytics
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start">
-                        <Monitor className="h-4 w-4 mr-3" />
-                        Report Generator
-                      </Button>
                     </div>
                   )}
 
@@ -1461,6 +1928,58 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                     </div>
                   )}
 
+                  {activeCategory === "hr-tools" && (
+                    <div className="p-4 space-y-4">
+                      <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          HR & Payroll Tools
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          Comprehensive HR and payroll management tools
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        {HR_TOOLS.map((tool) => {
+                          const ToolIcon = tool.icon
+                          return (
+                            <Button
+                              key={tool.id}
+                              variant="ghost"
+                              className="w-full justify-start px-3 py-3 h-auto text-left group hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => {
+                                handleHRModuleClick(tool.id)
+                                setActiveCategory(null)
+                              }}
+                            >
+                              <div className="flex items-center w-full">
+                                <div className="flex-shrink-0 mr-3">
+                                  <ToolIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                    {tool.label}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                                    {tool.description}
+                                  </div>
+                                </div>
+                                <div className="flex-shrink-0 ml-2">
+                                  <Badge
+                                    variant={tool.status === "active" ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {tool.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {activeCategory === "tools-menu" && (
                     <div className="p-4 space-y-4">
                       <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
@@ -1499,6 +2018,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     key={tool.name}
                                     variant="ghost"
                                     onClick={() => {
+                                      // Check if Quality Control & Warranty is selected and trigger carousel
+                                      if (tool.name === "Quality Control & Warranty") {
+                                        // Clear any existing timeout
+                                        if (qualityCarouselTimeout) {
+                                          clearTimeout(qualityCarouselTimeout)
+                                        }
+
+                                        // Set 3-second delay before showing carousel
+                                        const timeout = setTimeout(() => {
+                                          setShowQualityCarousel(true)
+                                        }, 3000)
+                                        setQualityCarouselTimeout(timeout)
+                                      }
+
                                       onToolSelect?.(tool.name)
                                       setActiveCategory(null) // Close the panel after selection
                                     }}
@@ -1521,116 +2054,37 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                       </div>
                     </div>
                   )}
-
-                  {activeCategory === "settings" && (
-                    <div className="p-4 space-y-2">
-                      <div className="pb-3 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={user?.avatar} alt={user?.firstName || "User"} />
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              {getUserInitials()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">
-                              {user?.firstName} {user?.lastName}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
-                            {isPresentationMode && (
-                              <Badge variant="outline" className="mt-1 text-xs">
-                                {viewingAs
-                                  ? `Viewing as ${
-                                      viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")
-                                    }`
-                                  : "Presentation Mode"}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Role Switching for Presentation Mode */}
-                      {isPresentationMode && (
-                        <div className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Switch Demo Role</p>
-                          <div className="space-y-1">
-                            <Button
-                              variant={viewingAs === "executive" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("executive")}
-                            >
-                              Executive
-                            </Button>
-                            <Button
-                              variant={viewingAs === "project-executive" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("project-executive")}
-                            >
-                              Project Executive
-                            </Button>
-                            <Button
-                              variant={viewingAs === "project-manager" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("project-manager")}
-                            >
-                              Project Manager
-                            </Button>
-                            <Button
-                              variant={viewingAs === "estimator" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("estimator")}
-                            >
-                              Estimator
-                            </Button>
-                            <Button
-                              variant={viewingAs === "admin" ? "default" : "ghost"}
-                              className="w-full justify-start text-sm"
-                              onClick={() => switchRole("admin")}
-                            >
-                              Admin
-                            </Button>
-                            {viewingAs && (
-                              <Button
-                                variant="outline"
-                                className="w-full justify-start text-sm mt-2"
-                                onClick={returnToPresentation}
-                              >
-                                Return to Presentation
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/profile")}>
-                        <User className="h-4 w-4 mr-3" />
-                        Profile
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/settings")}>
-                        <Settings className="h-4 w-4 mr-3" />
-                        Settings
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                      >
-                        {theme === "dark" ? <Sun className="h-4 w-4 mr-3" /> : <Moon className="h-4 w-4 mr-3" />}
-                        Toggle Theme
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-3" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </div>
             </aside>
           )}
         </div>
+
+        {/* Microsoft Teams Integration Slide-Out Panel */}
+        <div className="z-[140]">
+          <TeamsSlideOutPanel
+            isOpen={showTeamsPanel}
+            onClose={() => setShowTeamsPanel(false)}
+            projectId={selectedProject || undefined}
+            projectName={selectedProject ? projects.find((p) => p.id === selectedProject)?.name : undefined}
+            userRole={userRole}
+            currentUser={user}
+          />
+        </div>
+
+        {/* Quality Control & Warranty Carousel */}
+        {showQualityCarousel && <QualityWarrantyCarousel onComplete={handleQualityCarouselComplete} />}
+
+        {/* Project Page Carousel */}
+        {showProjectPageCarousel && <ProjectPageCarousel onComplete={handleProjectPageCarouselComplete} />}
+
+        {/* Core Tab Carousel */}
+        {showCoreTabCarousel && <CoreTabCarousel onComplete={handleCoreTabCarouselComplete} />}
+
+        {/* HB Intel Pitch Carousel */}
+        {showHBIntelPitchCarousel && <HBIntelPitchCarousel onComplete={handleHBIntelPitchCarouselComplete} />}
       </div>
     )
   }
+  return null
 }

@@ -15,10 +15,12 @@
 
 "use client"
 
-import React from "react"
-import { ChevronRight, Home } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { ChevronRight, Home, ChevronDown, Play } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export interface PageHeaderTab {
   id: string
@@ -75,6 +77,13 @@ export interface PageHeaderProps {
   // Presentation mode
   isPresentationMode?: boolean
   viewingAs?: string | null
+  onRoleSwitch?: (
+    role: "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "hr-payroll"
+  ) => void
+  onReturnToPresentation?: () => void
+
+  // Carousel controls
+  onLaunchCarousel?: (carouselType: string) => void
 
   // Additional props
   className?: string
@@ -96,9 +105,16 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   onTabChange,
   isPresentationMode = false,
   viewingAs = null,
+  onRoleSwitch,
+  onReturnToPresentation,
+  onLaunchCarousel,
   className = "",
   isSticky = true,
 }) => {
+  const [roleSwitchPopoverOpen, setRoleSwitchPopoverOpen] = useState(false)
+  const [carouselPopoverOpen, setCarouselPopoverOpen] = useState(false)
+  const [hasTriggeredITCarousel, setHasTriggeredITCarousel] = useState(false)
+
   // Capitalize first letter of each word
   const capitalizeTitle = (title: string) => {
     return title.replace(/\b\w/g, (l) => l.toUpperCase())
@@ -111,6 +127,81 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ")
   }
+
+  // Handle demo role selection
+  const handleRoleSelection = (role: string) => {
+    onRoleSwitch?.(role as "executive" | "project-executive" | "project-manager" | "estimator" | "admin" | "hr-payroll")
+    setRoleSwitchPopoverOpen(false)
+
+    // Trigger IT Command Center carousel for admin role with 2-second delay
+    if (role === "admin" && isPresentationMode && !hasTriggeredITCarousel) {
+      setHasTriggeredITCarousel(true)
+      setTimeout(() => {
+        onLaunchCarousel?.("it-command-center")
+      }, 2000)
+    }
+  }
+
+  // Handle carousel selection
+  const handleCarouselSelection = (carouselType: string) => {
+    onLaunchCarousel?.(carouselType)
+    setCarouselPopoverOpen(false)
+  }
+
+  // Demo roles configuration
+  const demoRoles = [
+    { id: "executive", label: "Executive" },
+    { id: "project-executive", label: "Project Executive" },
+    { id: "project-manager", label: "Project Manager" },
+    { id: "estimator", label: "Estimator" },
+    { id: "admin", label: "Admin" },
+    { id: "hr-payroll", label: "HR & Payroll Manager" },
+  ]
+
+  // Available carousels based on user role/presentation mode
+  const getAvailableCarousels = () => {
+    const carousels = []
+
+    // Login Presentation (intro) - available for presentation users, shown first
+    if (isPresentationMode) {
+      carousels.push({
+        id: "login-presentation",
+        label: "Login Presentation",
+        description: "Welcome presentation carousel from login experience",
+      })
+    }
+
+    // HBI Intel Tour - available for presentation users, shown second
+    if (isPresentationMode) {
+      carousels.push({
+        id: "hbi-intel-tour",
+        label: "HBI Intel Tour",
+        description: "15-slide comprehensive tour of AI-powered construction intelligence",
+      })
+    }
+
+    // Executive Staffing Tour - available for presentation users, shown third
+    if (isPresentationMode) {
+      carousels.push({
+        id: "executive-staffing-tour",
+        label: "Executive Staffing Tour",
+        description: "6-slide workforce management transformation from spreadsheets to strategic intelligence",
+      })
+    }
+
+    // IT Command Center Tour - available for presentation users, shown fourth
+    if (isPresentationMode) {
+      carousels.push({
+        id: "it-command-center",
+        label: "IT Command Center Tour",
+        description: "Comprehensive tour of centralized IT management and operations",
+      })
+    }
+
+    return carousels
+  }
+
+  const availableCarousels = getAvailableCarousels()
 
   // Build dynamic breadcrumb based on navigation state
   const buildBreadcrumb = (): BreadcrumbItem[] => {
@@ -272,12 +363,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
   const breadcrumbItems = buildBreadcrumb()
 
-  const stickyClasses = isSticky ? "sticky top-0 z-50" : ""
-
   return (
-    <div
-      className={`bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 ${stickyClasses} ${className}`}
-    >
+    <div className={`bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 ${className}`}>
       {/* Header Content */}
       <div className="px-6 py-4">
         <div className="flex items-start justify-between">
@@ -318,7 +405,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </nav>
 
             {/* Row 2: Module Title */}
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{capitalizeTitle(moduleTitle)}</h1>
+            <h1
+              className="text-2xl font-bold text-gray-900 dark:text-gray-100"
+              {...(moduleTitle.toLowerCase().includes("executive dashboard") && {
+                "data-tour-highlight": "executive-dashboard",
+              })}
+            >
+              {capitalizeTitle(moduleTitle)}
+            </h1>
 
             {/* Row 3: Sub-head */}
             {subHead && <p className="text-sm text-gray-600 dark:text-gray-400">{subHead}</p>}
@@ -331,18 +425,110 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               <Image
                 src="/images/HB_Logo_Large.png"
                 alt="Hedrick Brothers Construction"
-                width={270}
-                height={90}
+                width={203}
+                height={68}
+                style={{ width: "auto", height: "auto" }}
                 className="object-contain"
                 priority
               />
             </div>
 
-            {/* Row 2: Role Badge */}
+            {/* Row 2: Role Badge with Popover */}
             {isPresentationMode && viewingAs && (
-              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
-                Viewing {viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")} Demo
-              </Badge>
+              <Popover open={roleSwitchPopoverOpen} onOpenChange={setRoleSwitchPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-auto px-3 py-1 text-xs bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+                  >
+                    Viewing {viewingAs.charAt(0).toUpperCase() + viewingAs.slice(1).replace("-", " ")} Demo
+                    <ChevronDown className="ml-1 h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-2" align="end">
+                  <div className="space-y-1">
+                    <div className="px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Switch Demo Role
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    {demoRoles.map((role) => (
+                      <Button
+                        key={role.id}
+                        variant={viewingAs === role.id ? "default" : "ghost"}
+                        size="sm"
+                        className="w-full justify-start text-sm h-8"
+                        onClick={() => handleRoleSelection(role.id)}
+                      >
+                        {role.label}
+                      </Button>
+                    ))}
+                    {viewingAs && (
+                      <>
+                        <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start text-sm h-8"
+                          onClick={() => {
+                            onReturnToPresentation?.()
+                            setRoleSwitchPopoverOpen(false)
+                          }}
+                        >
+                          Return to Presentation
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {/* Row 3: Tour Carousel Badge - Hidden */}
+            {/* Tour Carousel Badge and Menu functionality commented out */}
+            {false && isPresentationMode && availableCarousels.length > 0 && (
+              <Popover open={carouselPopoverOpen} onOpenChange={setCarouselPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-auto px-3 py-1 text-xs bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                  >
+                    <Play className="mr-1 h-3 w-3" />
+                    Tour Carousel
+                    <ChevronDown className="ml-1 h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-3" align="end">
+                  <div className="space-y-2">
+                    <div className="px-1 py-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Launch Tour Carousel
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700"></div>
+                    <div className="space-y-1">
+                      {availableCarousels.map((carousel) => (
+                        <Button
+                          key={carousel.id}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-left h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          onClick={() => handleCarouselSelection(carousel.id)}
+                        >
+                          <div className="flex items-start space-x-3 w-full">
+                            <Play className="mt-0.5 h-4 w-4 text-blue-600 flex-shrink-0" />
+                            <div className="flex flex-col items-start text-left min-w-0 flex-1">
+                              <span className="font-medium text-gray-900 dark:text-gray-100">{carousel.label}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                {carousel.description}
+                              </span>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
           </div>
         </div>
@@ -350,8 +536,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* Tab Navigation - Full Width - Executive Dashboard Style */}
       {tabs.length > 0 && (
-        <div className="px-6 pb-0">
-          <div className="flex items-center gap-1 mb-6">
+        <div className="px-6">
+          <div className="flex items-center gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

@@ -51,6 +51,7 @@ import {
   Pie,
   Cell,
 } from "recharts"
+import { ProtectedGrid, createGridWithTotalsAndSticky, ProtectedColDef } from "@/components/ui/protected-grid"
 
 interface ChangeManagementProps {
   userRole: string
@@ -172,6 +173,91 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
   }
 
   const data = getChangeOrderData()
+
+  // Transform change order data for grid
+  const transformedChangeOrderData = useMemo(() => {
+    return changeOrderData.map((co, index) => ({
+      id: `change-order-${index}`,
+      changeOrderId: co.id,
+      description: co.description,
+      amount: co.amount,
+      status: co.status,
+      category: co.category,
+      impact: co.impact,
+      submittedDate: co.submittedDate,
+      approvedDate: co.approvedDate,
+      reason: co.reason,
+    }))
+  }, [])
+
+  // Column definitions for change orders grid
+  const changeOrderColumns: ProtectedColDef[] = [
+    {
+      field: "changeOrderId",
+      headerName: "ID",
+      width: 100,
+      pinned: "left",
+      cellRenderer: (params: any) => <span className="font-medium text-primary">{params.value}</span>,
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 300,
+      pinned: "left",
+      cellRenderer: (params: any) => (
+        <div className="max-w-xs truncate" title={params.value}>
+          {params.value}
+        </div>
+      ),
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      width: 120,
+      type: "rightAligned",
+      cellRenderer: (params: any) => <span className="font-mono text-right">{formatCurrency(params.value)}</span>,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 100,
+      cellRenderer: (params: any) => (
+        <Badge
+          variant={params.value === "Approved" ? "default" : params.value === "Pending" ? "secondary" : "destructive"}
+        >
+          {params.value}
+        </Badge>
+      ),
+    },
+    {
+      field: "category",
+      headerName: "Category",
+      width: 120,
+    },
+    {
+      field: "impact",
+      headerName: "Impact",
+      width: 100,
+      cellRenderer: (params: any) => (
+        <Badge variant="outline" className="text-xs">
+          {params.value}
+        </Badge>
+      ),
+    },
+    {
+      field: "submittedDate",
+      headerName: "Submitted",
+      width: 120,
+      cellRenderer: (params: any) => (
+        <span className="text-muted-foreground">{new Date(params.value).toLocaleDateString()}</span>
+      ),
+    },
+    {
+      field: "reason",
+      headerName: "Reason",
+      width: 150,
+    },
+  ]
 
   // Exposure Analysis Calculations
   const exposureAnalysis = useMemo(() => {
@@ -434,7 +520,7 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
       case "tracking":
         return (
           <div className="space-y-6">
-            {/* Change Orders Table */}
+            {/* Change Orders Grid */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -452,55 +538,26 @@ export default function ChangeManagement({ userRole, projectData }: ChangeManage
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">ID</th>
-                        <th className="text-left p-2">Description</th>
-                        <th className="text-right p-2">Amount</th>
-                        <th className="text-center p-2">Status</th>
-                        <th className="text-center p-2">Category</th>
-                        <th className="text-center p-2">Impact</th>
-                        <th className="text-center p-2">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {changeOrderData.map((co, index) => (
-                        <tr key={index} className="border-b hover:bg-muted/50">
-                          <td className="p-2 font-medium">{co.id}</td>
-                          <td className="p-2 max-w-xs">
-                            <div className="truncate" title={co.description}>
-                              {co.description}
-                            </div>
-                          </td>
-                          <td className="text-right p-2 font-mono">{formatCurrency(co.amount)}</td>
-                          <td className="text-center p-2">
-                            <Badge
-                              variant={
-                                co.status === "Approved"
-                                  ? "default"
-                                  : co.status === "Pending"
-                                  ? "secondary"
-                                  : "destructive"
-                              }
-                            >
-                              {co.status}
-                            </Badge>
-                          </td>
-                          <td className="text-center p-2">{co.category}</td>
-                          <td className="text-center p-2">
-                            <Badge variant="outline" className="text-xs">
-                              {co.impact}
-                            </Badge>
-                          </td>
-                          <td className="text-center p-2 text-muted-foreground">
-                            {new Date(co.submittedDate).toLocaleDateString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="min-w-0 max-w-full overflow-hidden">
+                  <ProtectedGrid
+                    columnDefs={changeOrderColumns}
+                    rowData={transformedChangeOrderData}
+                    config={createGridWithTotalsAndSticky(2, false, {
+                      allowExport: true,
+                      allowRowSelection: true,
+                      allowColumnResizing: true,
+                      allowSorting: true,
+                      allowFiltering: true,
+                      allowCellEditing: false,
+                      showToolbar: true,
+                      showStatusBar: true,
+                      protectionEnabled: true,
+                      userRole: userRole,
+                    })}
+                    height="500px"
+                    enableSearch={true}
+                    title=""
+                  />
                 </div>
               </CardContent>
             </Card>

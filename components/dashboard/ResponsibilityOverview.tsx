@@ -169,12 +169,12 @@ export function ResponsibilityOverview({ className }: ResponsibilityOverviewProp
   const totalResponsibilities = Object.values(groupedResponsibilities).reduce((sum, items) => sum + items.length, 0)
 
   return (
-    <Card className={cn("w-full border-l-4 border-l-[rgb(250,70,22)]", className)}>
-      <CardHeader className="pb-3">
+    <Card className={cn("w-full border-l-4 border-l-[#FA4616]", className)}>
+      <CardHeader className="pb-3 bg-gradient-to-r from-[#FA4616]/5 to-transparent">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Target className="w-4 h-4" />
+          <Target className="w-4 h-4" style={{ color: "#FA4616" }} />
           Responsibility Overview
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="ml-auto bg-[#0021A5]/10 text-[#0021A5] border-[#0021A5]/20">
             {totalResponsibilities}
           </Badge>
         </CardTitle>

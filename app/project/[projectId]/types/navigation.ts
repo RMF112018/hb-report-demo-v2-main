@@ -33,6 +33,7 @@ export type UserRole =
   | "team-member"
   | "admin"
   | "viewer"
+  | "hr-payroll"
 
 /**
  * Project stage types

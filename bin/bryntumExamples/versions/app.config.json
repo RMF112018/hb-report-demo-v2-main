@@ -1,0 +1,15 @@
+{
+  "title": "Versioning demo",
+  "description": "Shows a Gantt setup with versioning",
+  "source": [
+    "app.js",
+    "index.html",
+    "lib/MyVersionGrid.js",
+    "lib/websocket/ProjectWebSocketHandlerMixin.js",
+    "lib/websocket/ProjectWebSocketSubscriberMixin.js",
+    "lib/websocket/WebSocketHelper.js",
+    "lib/websocket/WebSocketManager.js",
+    "lib/websocket/WebSocketProjectModel.js",
+    "resources/app.scss"
+  ]
+}

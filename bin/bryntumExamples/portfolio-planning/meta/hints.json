@@ -1,0 +1,7 @@
+{
+  ".b-tree-parent-row": {
+    "title": "Multiple projects",
+    "content": "Root level tasks represent different projects, and cross project dependencies are highlighted",
+    "align": "l0-r0"
+  }
+}

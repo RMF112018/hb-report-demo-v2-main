@@ -1,0 +1,7 @@
+{
+  "[data-ref=\"editProject\"]": {
+    "title": "<i class='b-fa b-fa-star b-color-yellow'></i> Project Editor",
+    "content": "Click to <b>edit</b> the selected Project data in the Project Editor widget",
+    "align": "t0-b0"
+  }
+}

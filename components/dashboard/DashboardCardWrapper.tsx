@@ -64,7 +64,7 @@ const getCardCategory = (cardType: string): "financial" | "operational" | "analy
     "contingency-analysis",
   ]
   const operationalCards = ["safety", "quality-control", "field-reports", "staffing-distribution"]
-  const analyticsCards = ["enhanced-hbi-insights", "pipeline-analytics", "market-intelligence"]
+  const analyticsCards = ["enhanced-hbi-insights", "pipeline-analytics", "market-intelligence", "power-bi-dashboard"]
   const projectCards = ["project-overview", "portfolio-overview", "bd-opportunities"]
   const scheduleCards = ["schedule-performance", "schedule-monitor", "critical-dates"]
 
@@ -77,38 +77,43 @@ const getCardCategory = (cardType: string): "financial" | "operational" | "analy
   return "project" // default
 }
 
-// Enhanced category theming with HB brand colors
+// Enhanced category theming with HB brand colors (Blue: #0021A5, Orange: #FA4616)
 const getCategoryTheme = (category: "financial" | "operational" | "analytics" | "project" | "schedule") => {
   const themes = {
     financial: {
-      accent: "bg-gradient-to-r from-green-500 to-emerald-600",
-      border: "border-green-200 dark:border-green-800",
-      shadow: "shadow-green-100/50 dark:shadow-green-900/30",
-      icon: "text-green-600 dark:text-green-400",
+      accent: "bg-gradient-to-r from-[#0021A5] to-[#0039B8]",
+      border: "border-[#0021A5]/20 dark:border-[#0021A5]/40",
+      shadow: "shadow-[#0021A5]/10 dark:shadow-[#0021A5]/20",
+      icon: "text-[#0021A5] dark:text-[#4A7FD6]",
+      headerBg: "bg-gradient-to-r from-[#0021A5]/5 to-transparent",
     },
     operational: {
-      accent: "bg-gradient-to-r from-blue-500 to-cyan-600",
-      border: "border-blue-200 dark:border-blue-800",
-      shadow: "shadow-blue-100/50 dark:shadow-blue-900/30",
-      icon: "text-blue-600 dark:text-blue-400",
+      accent: "bg-gradient-to-r from-[#0021A5] to-[#1E40D0]",
+      border: "border-[#0021A5]/20 dark:border-[#0021A5]/40",
+      shadow: "shadow-[#0021A5]/10 dark:shadow-[#0021A5]/20",
+      icon: "text-[#0021A5] dark:text-[#4A7FD6]",
+      headerBg: "bg-gradient-to-r from-[#0021A5]/5 to-transparent",
     },
     analytics: {
-      accent: "bg-gradient-to-r from-purple-500 to-violet-600",
-      border: "border-purple-200 dark:border-purple-800",
-      shadow: "shadow-purple-100/50 dark:shadow-purple-900/30",
-      icon: "text-purple-600 dark:text-purple-400",
+      accent: "bg-gradient-to-r from-[#FA4616] to-[#FF6B3D]",
+      border: "border-[#FA4616]/20 dark:border-[#FA4616]/40",
+      shadow: "shadow-[#FA4616]/10 dark:shadow-[#FA4616]/20",
+      icon: "text-[#FA4616] dark:text-[#FF8A67]",
+      headerBg: "bg-gradient-to-r from-[#FA4616]/5 to-transparent",
     },
     project: {
-      accent: "bg-gradient-to-r from-orange-500 to-red-500",
-      border: "border-orange-200 dark:border-orange-800",
-      shadow: "shadow-orange-100/50 dark:shadow-orange-900/30",
-      icon: "text-orange-600 dark:text-orange-400",
+      accent: "bg-gradient-to-r from-[#FA4616] to-[#FF5722]",
+      border: "border-[#FA4616]/20 dark:border-[#FA4616]/40",
+      shadow: "shadow-[#FA4616]/10 dark:shadow-[#FA4616]/20",
+      icon: "text-[#FA4616] dark:text-[#FF8A67]",
+      headerBg: "bg-gradient-to-r from-[#FA4616]/5 to-transparent",
     },
     schedule: {
-      accent: "bg-gradient-to-r from-indigo-500 to-blue-600",
-      border: "border-indigo-200 dark:border-indigo-800",
-      shadow: "shadow-indigo-100/50 dark:shadow-indigo-900/30",
-      icon: "text-indigo-600 dark:text-indigo-400",
+      accent: "bg-gradient-to-r from-[#0021A5] to-[#0033C7]",
+      border: "border-[#0021A5]/20 dark:border-[#0021A5]/40",
+      shadow: "shadow-[#0021A5]/10 dark:shadow-[#0021A5]/20",
+      icon: "text-[#0021A5] dark:text-[#4A7FD6]",
+      headerBg: "bg-gradient-to-r from-[#0021A5]/5 to-transparent",
     },
   }
 
@@ -173,6 +178,8 @@ const getCardIcon = (cardType: string) => {
       return <Calendar className={iconClass} style={iconStyle} />
     case "bd-opportunities":
       return <Building2 className={iconClass} style={iconStyle} />
+    case "power-bi-dashboard":
+      return <BarChart3 className={iconClass} style={iconStyle} />
     default:
       return <TrendingUp className={iconClass} style={iconStyle} />
   }
@@ -194,7 +201,7 @@ const SMART_PRESETS = [
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 16, rows: 6 }
+      return { cols: 8, rows: 5 }
     case "enhanced-hbi-insights":
       return { cols: 8, rows: 5 }
     case "portfolio-overview":
@@ -211,6 +218,8 @@ const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
       return { cols: 4, rows: 5 }
     case "cash-flow":
       return { cols: 8, rows: 4 }
+    case "power-bi-dashboard":
+      return { cols: 8, rows: 6 }
     default:
       return { cols: 6, rows: 4 }
   }
@@ -331,9 +340,10 @@ export const DashboardCardWrapper = ({
           "border border-gray-200 dark:border-gray-700",
           "rounded-xl shadow-sm",
           "transition-all duration-300 ease-in-out",
-          "hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-gray-900/50",
+          "hover:shadow-lg",
           "hover:-translate-y-1",
           theme.border,
+          theme.shadow,
           isCompact && "text-sm",
           !card.visible && "opacity-50",
           dragHandleClass,
@@ -341,7 +351,7 @@ export const DashboardCardWrapper = ({
         )}
         style={{
           boxShadow: `
-            inset 4px 0 0 rgb(0, 33, 165),
+            inset 4px 0 0 ${category === "analytics" || category === "project" ? "#FA4616" : "#0021A5"},
             0 1px 3px rgba(0, 0, 0, 0.1)
           `,
         }}
@@ -350,18 +360,20 @@ export const DashboardCardWrapper = ({
         <div
           className={cn(
             "absolute top-0 left-0 right-0 h-1 rounded-t-xl",
-            "bg-gradient-to-r from-[#FA4616] to-[#ff8a5b]",
+            theme.accent,
             "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           )}
         />
 
-        {/* Professional Header */}
+        {/* Professional Header with HB Brand Styling */}
         <div
           className={cn(
             "dashboard-card-header",
             "flex items-center justify-between",
             "px-4 py-3 border-b border-gray-100 dark:border-gray-700",
             "rounded-t-xl",
+            theme.headerBg,
+            "backdrop-blur-sm",
             isCompact && "px-3 py-2"
           )}
         >

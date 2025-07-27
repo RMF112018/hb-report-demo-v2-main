@@ -51,7 +51,7 @@ export interface ActivityFeedFilters {
 }
 
 export interface ActivityFeedConfig {
-  userRole: "executive" | "project-executive" | "project-manager" | "estimator"
+  userRole: "executive" | "project-executive" | "project-manager" | "estimator" | "admin"
   projectId?: number
   showFilters?: boolean
   showPagination?: boolean

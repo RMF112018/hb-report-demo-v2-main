@@ -4,7 +4,7 @@ import React from "react"
 import { useAuth } from "@/context/auth-context"
 import { useTour } from "@/context/tour-context"
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { DashboardLayout as DashboardLayoutComponent } from "@/components/dashboard/DashboardLayout"
 import { DashboardProvider, useDashboardContext } from "@/context/dashboard-context"
 import type { DashboardCard, DashboardLayout } from "@/types/dashboard"
@@ -387,9 +387,11 @@ function DashboardContent({ user }: { user: any }) {
     }
   }
 
-  // Inject data into specific card types
-  if (currentDashboard) {
-    currentDashboard.cards = currentDashboard.cards.map((card) => {
+  // Process cards with injected data - moved to useMemo to avoid mutations during render
+  const processedDashboard = useMemo(() => {
+    if (!currentDashboard) return null
+
+    const processedCards = currentDashboard.cards.map((card) => {
       switch (card.type) {
         case "financial-review-panel":
           return {
@@ -439,7 +441,12 @@ function DashboardContent({ user }: { user: any }) {
           return card
       }
     })
-  }
+
+    return {
+      ...currentDashboard,
+      cards: processedCards,
+    }
+  }, [currentDashboard, cashflowMonth, cashflowProject])
 
   if (loading) {
     return (
@@ -898,9 +905,9 @@ function DashboardContent({ user }: { user: any }) {
 
           {/* Main Content - Dashboard Cards */}
           <div className={`xl:col-span-9 ${isFullscreen ? "relative" : ""}`} data-tour="dashboard-content">
-            {currentDashboard && (
+            {processedDashboard && (
               <DashboardLayoutComponent
-                cards={currentDashboard.cards}
+                cards={processedDashboard.cards}
                 onLayoutChange={handleLayoutChange}
                 onCardRemove={handleCardRemove}
                 onCardConfigure={handleCardConfigure}
@@ -946,9 +953,9 @@ function DashboardContent({ user }: { user: any }) {
 
             {/* Fullscreen Dashboard Content */}
             <div className="p-6 overflow-auto" style={{ height: "calc(100vh - 80px - 80px)" }}>
-              {currentDashboard && (
+              {processedDashboard && (
                 <DashboardLayoutComponent
-                  cards={currentDashboard.cards}
+                  cards={processedDashboard.cards}
                   onLayoutChange={handleLayoutChange}
                   onCardRemove={handleCardRemove}
                   onCardConfigure={handleCardConfigure}
@@ -1019,5 +1026,9 @@ export default function DashboardPage() {
   }
 
   // If user is authenticated, render the dashboard content
-  return <DashboardContent user={user} />
+  return (
+    <DashboardProvider userId={user.id} role={user.role}>
+      <DashboardContent user={user} />
+    </DashboardProvider>
+  )
 }

@@ -105,6 +105,7 @@ export type UserRole =
   | "admin"
   | "viewer"
   | "presentation"
+  | "hr-payroll"
 
 /**
  * Project stage types
@@ -165,7 +166,7 @@ export interface StageConfig {
 }
 
 /**
- * Project insights from AI analysis
+ * Project insights from HBI Analysis
  */
 export interface ProjectInsight {
   /** Unique insight identifier */

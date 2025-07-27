@@ -1,0 +1,78 @@
+[
+  {
+    "id": "clarification-001",
+    "number": "CL-001",
+    "title": "Site Access Restrictions",
+    "description": "Clarification on construction hours and site access limitations during school hours",
+    "status": "active",
+    "priority": "high",
+    "submittedBy": "Sarah Chen",
+    "dateCreated": "2025-01-08",
+    "category": "Site Conditions",
+    "scope": "General",
+    "assumptions": [
+      "Construction work permitted Monday-Friday 7:00 AM to 3:00 PM",
+      "No heavy equipment operation during class hours",
+      "Emergency vehicle access must be maintained at all times"
+    ],
+    "tags": ["site access", "schedule", "restrictions"]
+  },
+  {
+    "id": "clarification-002",
+    "number": "CL-002",
+    "title": "Material Staging Area",
+    "description": "Available space for material staging and temporary storage",
+    "status": "resolved",
+    "priority": "medium",
+    "submittedBy": "Mike Rodriguez",
+    "dateCreated": "2025-01-05",
+    "dateResolved": "2025-01-12",
+    "category": "Logistics",
+    "scope": "General",
+    "assumptions": [
+      "East parking lot available for material staging",
+      "Maximum storage height 12 feet",
+      "Covered storage required for weather-sensitive materials"
+    ],
+    "resolution": "Approved staging area as outlined in assumptions",
+    "tags": ["staging", "logistics", "storage"]
+  },
+  {
+    "id": "clarification-003",
+    "number": "CL-003",
+    "title": "Utility Connections",
+    "description": "Existing utility locations and connection requirements",
+    "status": "pending",
+    "priority": "high",
+    "submittedBy": "Jennifer Park",
+    "dateCreated": "2025-01-10",
+    "category": "Utilities",
+    "scope": "Multiple",
+    "assumptions": [
+      "Electrical service entrance located on north wall",
+      "Water main connection at street level",
+      "Natural gas service available at property line",
+      "Telecommunications infrastructure to be coordinated with campus IT"
+    ],
+    "tags": ["utilities", "connections", "coordination"]
+  },
+  {
+    "id": "clarification-004",
+    "number": "CL-004",
+    "title": "Environmental Considerations",
+    "description": "Environmental protection measures and permit requirements",
+    "status": "active",
+    "priority": "medium",
+    "submittedBy": "Alex Johnson",
+    "dateCreated": "2025-01-07",
+    "category": "Environmental",
+    "scope": "Site Work",
+    "assumptions": [
+      "Erosion control measures per state regulations",
+      "Stormwater management plan required",
+      "Protected tree areas clearly marked",
+      "Noise limitations per local ordinance"
+    ],
+    "tags": ["environmental", "permits", "protection"]
+  }
+]

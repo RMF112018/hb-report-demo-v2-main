@@ -12,6 +12,9 @@ import {
   ArrowUpDown,
   ArrowDown,
   ArrowUp,
+  Eye,
+  Edit,
+  MoreHorizontal,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -21,7 +24,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ProtectedGrid, ProtectedColDef, GridRow, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
 import { cn } from "@/lib/utils"
 import {
   ActivityFeedItem,
@@ -124,13 +128,96 @@ export function ProjectActivityFeed({ config, className }: ProjectActivityFeedPr
     return data
   }, [getRawData, searchTerm, selectedTypes, selectedSources, filters, sortBy, sortOrder, config.projectId])
 
-  // Pagination
+  // Transform data for ProtectedGrid
+  const transformedData = useMemo(() => {
+    return filteredAndSortedData.map((activity) => ({
+      id: activity.id,
+      project_name: activity.project_name,
+      type: activity.type,
+      description: activity.description,
+      timestamp: activity.timestamp,
+      user: activity.user,
+      _originalData: activity,
+    }))
+  }, [filteredAndSortedData])
+
+  // Column definitions for ProtectedGrid
+  const columnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        headerName: "Project",
+        field: "project_name",
+        width: 200,
+        pinned: "left",
+        cellRenderer: (params: any) => (
+          <div className="truncate" title={params.value}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        headerName: "Type",
+        field: "type",
+        width: 120,
+        cellRenderer: (params: any) => (
+          <Badge variant="secondary" className={cn("text-xs", getActivityBadgeColor(params.value as ActivityType))}>
+            {ACTIVITY_TYPE_LABELS[params.value as ActivityType]}
+          </Badge>
+        ),
+      },
+      {
+        headerName: "Description",
+        field: "description",
+        minWidth: 300,
+        flex: 1,
+        cellRenderer: (params: any) => (
+          <div className="max-w-md">
+            <div className="truncate" title={params.value}>
+              {params.value}
+            </div>
+            {params.data.user && <div className="text-xs text-muted-foreground mt-1">by {params.data.user}</div>}
+          </div>
+        ),
+      },
+      {
+        headerName: "Time & Date",
+        field: "timestamp",
+        width: 150,
+        cellRenderer: (params: any) => (
+          <div className="text-sm text-muted-foreground">{formatTimestamp(params.value)}</div>
+        ),
+      },
+      {
+        headerName: "Actions",
+        field: "actions",
+        width: 80,
+        cellRenderer: (params: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    []
+  )
+
+  // Pagination is handled internally by ProtectedGrid
   const itemsPerPage = config.itemsPerPage || 10
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage)
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredAndSortedData, currentPage, itemsPerPage])
 
   // Handle type selection
   const handleTypeToggle = (type: ActivityType) => {
@@ -342,84 +429,30 @@ export function ProjectActivityFeed({ config, className }: ProjectActivityFeedPr
 
         {/* Activity Table */}
         <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">Project</TableHead>
-                <TableHead className="w-[120px]">Type</TableHead>
-                <TableHead className="min-w-[300px]">Description</TableHead>
-                <TableHead className="w-[120px]">Time & Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    No activities found matching your criteria.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedData.map((activity, index) => (
-                  <TableRow key={activity.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/50"}>
-                    <TableCell className="font-medium">
-                      <div className="truncate" title={activity.project_name}>
-                        {activity.project_name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={cn("text-xs", getActivityBadgeColor(activity.type))}>
-                        {ACTIVITY_TYPE_LABELS[activity.type]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="max-w-md">
-                        <div className="truncate" title={activity.description}>
-                          {activity.description}
-                        </div>
-                        {activity.user && <div className="text-xs text-muted-foreground mt-1">by {activity.user}</div>}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatTimestamp(activity.timestamp)}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <ProtectedGrid
+            columnDefs={columnDefs}
+            rowData={transformedData}
+            config={createGridWithTotalsAndSticky(1, false, {
+              allowExport: config.allowExport,
+              allowRowSelection: true,
+              allowColumnResizing: true,
+              allowSorting: true,
+              allowFiltering: true,
+              allowCellEditing: false,
+              showToolbar: true,
+              showStatusBar: true,
+              enableTotalsRow: false,
+              stickyColumnsCount: 1,
+            })}
+            height="500px"
+            enableSearch={true}
+            defaultSearch={searchTerm}
+            title=""
+            className="border-none"
+          />
         </div>
 
-        {/* Pagination */}
-        {config.showPagination && totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-muted-foreground">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length}{" "}
-              activities
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              <span className="text-sm px-3 py-1">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Pagination is handled internally by ProtectedGrid */}
       </CardContent>
     </Card>
   )

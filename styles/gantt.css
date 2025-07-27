@@ -1,0 +1,863 @@
+/* HB Gantt Chart Styles - Aligned with Bryntum Portfolio Planning Example */
+
+/* Bryntum Gantt Sizing - Following Official Documentation */
+.b-gantt {
+  flex: 1 !important; /* Drives height for parent flex column layout */
+  width: 100% !important; /* Fill parent width */
+  height: 100% !important; /* Explicit height to prevent sizing issues */
+  display: flex !important; /* Required by Bryntum */
+  min-height: 400px; /* Minimum height fallback */
+  --task-border-radius: 0.3em; /* Custom property from portfolio example */
+  overflow-x: auto !important; /* Allow horizontal scrolling */
+  overflow-y: hidden !important; /* Prevent vertical overflow */
+}
+
+/* Ensure Gantt container handles overflow properly */
+.b-gantt .b-grid-container,
+.b-gantt .b-timeline-container {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  height: 100% !important;
+}
+
+/* Remove vertical interior cell borders */
+.b-grid-cell {
+  border-right: none !important; /* Remove right border from cells */
+}
+
+.b-grid-header {
+  border-right: none !important; /* Remove right border from headers */
+}
+
+.b-grid-subgrid .b-grid-cell {
+  border-right: none !important; /* Remove right border from subgrid cells */
+}
+
+.b-grid-subgrid .b-grid-header {
+  border-right: none !important; /* Remove right border from subgrid headers */
+}
+
+/* Remove column lines completely */
+.b-grid-columnlines {
+  display: none !important;
+}
+
+.b-grid-columnline {
+  display: none !important;
+}
+
+/* Timeline/Scheduler area styling */
+.b-timeline-scroller {
+  background: var(--background) !important;
+  overflow-x: auto !important; /* Allow horizontal scrolling in timeline */
+  height: 100% !important;
+}
+
+.b-sch-timeaxis-cell {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.b-grid-row {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+}
+
+.b-grid-row:nth-child(even) {
+  background: var(--muted/20) !important;
+}
+
+.b-grid-row.b-selected {
+  background: hsl(var(--accent)) !important;
+}
+
+/* Ensure proper task visibility in timeline */
+.b-sch-event-wrap {
+  z-index: 10 !important;
+}
+
+.b-gantt-task-wrap {
+  z-index: 10 !important;
+}
+
+/* Task styling - from portfolio-planning example */
+.b-gantt-task {
+  border-radius: var(--task-border-radius);
+}
+
+.b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
+  border-radius: var(--task-border-radius) var(--task-border-radius) 0 0;
+  max-height: 18px !important; /* Override the 1.6em to ensure consistency */
+}
+
+.b-gantt-task-wrap .b-sch-label {
+  display: flex;
+  gap: 1.5em;
+  font-weight: 400;
+}
+
+/* Ensure all Bryntum Gantt instances use flex sizing */
+.b-gantt,
+[class*="b-gantt"] {
+  flex: 1 !important;
+  height: 100% !important; /* Explicit height */
+  min-height: 400px !important;
+  overflow-x: auto !important; /* Allow horizontal scrolling */
+}
+
+/* Grid and column styling */
+.b-grid-headers {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+}
+
+.b-grid-header {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+  font-weight: 600 !important;
+}
+
+.b-grid-cell {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+
+.b-grid-subgrid {
+  background: var(--background) !important;
+}
+
+/* Parent container must use flexbox */
+.hb-gantt-parent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden; /* Prevent container overflow */
+}
+
+/* Ensure Gantt chart can scroll horizontally when needed */
+.hb-gantt-parent .b-gantt {
+  min-width: 0; /* Allow shrinking */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  height: 100% !important; /* Explicit height */
+}
+
+/* Grid splitter styling - from portfolio example */
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled) {
+  flex: 0 0 1px;
+}
+
+.b-gridbase.b-split .b-grid-splitter:not(.b-disabled) .b-grid-splitter-inner {
+  width: 1px;
+}
+
+/* Rollup styling - from portfolio example */
+.b-task-rollup-wrap {
+  position: absolute;
+  margin-top: 0;
+  grid-area: none;
+  z-index: 10;
+}
+
+.b-task-rollup.b-milestone {
+  background-color: var(--event-primary-color);
+  top: 0.29em;
+  width: 0.4em;
+  height: 0.4em;
+  filter: brightness(1.75);
+}
+
+.b-rollups .b-gantt-task-parent:not(.b-milestone-wrap) .b-gantt-task {
+  min-height: 18px !important; /* Override 1.3em to ensure consistency */
+  max-height: 18px !important;
+}
+
+/* Tooltip styling - from portfolio example */
+.b-gantt-task-tooltip {
+  max-width: none;
+}
+
+.b-gantt-task-tooltip,
+.b-gantt-task-tooltip > .b-panel-body-wrap > .b-panel-content {
+  border-radius: 0.5em !important;
+}
+
+.b-gantt-task-tooltip .b-panel-content {
+  display: grid;
+  grid-template-columns: 15em auto;
+  grid-column-gap: 2em;
+  grid-row-gap: 2em;
+  padding: 2em !important;
+  margin: 0 !important;
+}
+
+.b-gantt-task-tooltip .field {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+
+.b-gantt-task-tooltip .field label {
+  margin-bottom: 0.5em;
+  color: #888;
+}
+
+.b-gantt-task-tooltip.b-popup {
+  max-width: 30em;
+}
+
+/* Base container styles */
+.hb-gantt-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* SVAR Gantt container overrides - Light Theme (Willow) */
+.hb-gantt-container .gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+}
+
+/* Grid styling - Light Theme */
+.hb-gantt-container .gantt_grid {
+  background: var(--card);
+  border-right: 1px solid var(--border);
+}
+
+.hb-gantt-container .gantt_grid_scale {
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.hb-gantt-container .gantt_grid_head_cell {
+  background: var(--muted);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-weight: 600;
+  padding: 8px;
+}
+
+.hb-gantt-container .gantt_cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Task area styling - Light Theme */
+.hb-gantt-container .gantt_task_bg {
+  background: var(--card);
+}
+
+.hb-gantt-container .gantt_scale_cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.hb-gantt-container .gantt_task_line {
+  border-bottom: 1px solid var(--border);
+}
+
+.hb-gantt-container .gantt_task_line:nth-child(even) {
+  background: var(--muted/20);
+}
+
+/* Task bar styling - Light Theme (Bryntum Classes) */
+.b-gantt-task {
+  background: hsl(var(--primary)) !important;
+  border: 1px solid hsl(var(--primary)) !important;
+  border-radius: var(--task-border-radius) !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.b-gantt-task.b-gantt-task-parent {
+  background: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+}
+
+.b-gantt-task.b-milestone {
+  background: hsl(var(--chart-3)) !important;
+  border-color: hsl(var(--chart-3)) !important;
+}
+
+/* Task content styling */
+.b-gantt-task .b-gantt-task-content {
+  color: white !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Alternative SVAR styling if present */
+.hb-gantt-container .gantt_task_bar {
+  background: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary));
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+}
+
+.hb-gantt-container .gantt_task_bar.gantt_project {
+  background: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
+}
+
+.hb-gantt-container .gantt_task_bar.gantt_milestone {
+  background: hsl(var(--chart-3));
+  border-color: hsl(var(--chart-3));
+}
+
+/* Links/Dependencies - Light Theme */
+.hb-gantt-container .gantt_link_line {
+  stroke: hsl(var(--muted-foreground));
+  stroke-width: 2px;
+}
+
+.hb-gantt-container .gantt_link_arrow {
+  fill: hsl(var(--muted-foreground));
+}
+
+/* Scrollbars - Light Theme */
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+.hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Dark theme overrides */
+.dark .hb-gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt-container {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_grid {
+  background: var(--card);
+  border-right-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt_grid_scale {
+  background: var(--muted);
+  border-bottom-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_grid_head_cell {
+  background: var(--muted);
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_cell {
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .hb-gantt-container .gantt_task_bg {
+  background: var(--card);
+}
+
+.dark .hb-gantt-container .gantt_scale_cell {
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.dark .hb-gantt-container .gantt_task_line {
+  border-bottom-color: var(--border);
+}
+
+.dark .hb-gantt-container .gantt_task_line:nth-child(even) {
+  background: var(--muted/10);
+}
+
+/* Dark theme task bar styling */
+.dark .b-gantt-task {
+  background: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+  color: white !important;
+}
+
+.dark .b-gantt-task.b-gantt-task-parent {
+  background: hsl(var(--destructive)) !important;
+  border-color: hsl(var(--destructive)) !important;
+}
+
+.dark .b-gantt-task.b-milestone {
+  background: hsl(var(--chart-3)) !important;
+  border-color: hsl(var(--chart-3)) !important;
+}
+
+.dark .b-gantt-task .b-gantt-task-content {
+  color: white !important;
+}
+
+/* Dark theme scrollbars */
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+}
+
+.dark .hb-gantt-container .gantt_layout_content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Custom HB enhancements */
+.hb-gantt-container .gantt_grid_head_cell,
+.hb-gantt-container .gantt_cell {
+  font-family: inherit;
+}
+
+.hb-gantt-container .gantt_task_content {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hb-gantt-container .gantt_grid_head_cell,
+  .hb-gantt-container .gantt_cell {
+    padding: 4px;
+    font-size: 0.875rem;
+  }
+
+  .hb-gantt-container .gantt_task_content {
+    font-size: 0.75rem;
+  }
+}
+
+/* Focus and selection states */
+.hb-gantt-container .gantt_task_bar.gantt_selected {
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+.hb-gantt-container .gantt_cell.gantt_selected {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* Loading state */
+.hb-gantt-container.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hb-gantt-container.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 3px solid hsl(var(--muted));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ensures proper container sizing for Next.js layouts */
+.gantt-layout-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Gantt Chart Container Sizing */
+.hb-gantt-parent {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt .b-grid-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.hb-gantt-parent .b-gantt .b-timeline-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+/* Ensure grid columns don't exceed container width */
+.hb-gantt-parent .b-grid-container .b-grid-column {
+  max-width: 200px !important;
+  min-width: 60px !important;
+}
+
+/* Baseline styling aligned with baselines example */
+.b-task-baseline[data-index="0"] {
+  background-color: #ddd;
+}
+
+.b-task-baseline[data-index="1"] {
+  background-color: #d4d4d4;
+}
+
+.b-task-baseline[data-index="2"] {
+  background-color: #c9c9c9;
+}
+
+.b-task-baseline.b-baseline-ahead {
+  background-color: lightgreen;
+}
+
+.b-task-baseline.b-baseline-behind {
+  background-color: indianred;
+}
+
+.b-task-baseline.b-baseline-on-time {
+  background-color: lightblue;
+}
+
+.b-hide-baseline-1 .b-task-baseline[data-index="0"] {
+  display: none;
+}
+
+.b-hide-baseline-2 .b-task-baseline[data-index="1"] {
+  display: none;
+}
+
+.b-hide-baseline-3 .b-task-baseline[data-index="2"] {
+  display: none;
+}
+
+/* Baseline status message styling exactly as in example */
+h4.statusmessage {
+  margin: 1em 0 0 0;
+}
+
+.b-fa.statusicon {
+  margin-inline-end: 0.5em;
+}
+
+.b-toolbar > .b-content-element .b-button {
+  margin-inline-end: 1em;
+}
+
+/* Force visibility and proper rendering of task bars */
+.b-gantt-task,
+.b-gantt-task-content,
+.b-sch-event,
+.b-sch-event-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+/* Ensure timeline background is visible */
+.b-sch-timeline-scroller,
+.b-timeline-subgrid {
+  background: var(--background) !important;
+}
+
+/* Fix any potential layout issues */
+.b-gantt .b-grid-body-container,
+.b-gantt .b-timeline-body {
+  background: var(--background) !important;
+}
+
+/* Ensure proper task bar visibility and styling */
+.b-gantt-task {
+  min-height: 20px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 2px 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure Gantt bars are not oversized and are vertically centered */
+.b-gantt-task {
+  height: 18px !important;
+  min-height: 0 !important;
+  max-height: 18px !important;
+  margin-top: 9px !important; /* (36 - 18) / 2 */
+  margin-bottom: 9px !important;
+  box-sizing: border-box;
+}
+
+/* Ensure all summary bars (parent tasks) have consistent height */
+.b-gantt-task-parent,
+.b-gantt-task.b-gantt-task-parent,
+.b-sch-event.b-sch-event-parent {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure summary bars have consistent styling */
+.b-gantt-task-parent .b-gantt-task,
+.b-sch-event-parent .b-sch-event {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Additional Bryntum summary bar classes for consistency */
+.b-gantt-task-summary,
+.b-sch-event-summary,
+.b-gantt-task.b-gantt-task-summary,
+.b-sch-event.b-sch-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure all task types have consistent height */
+.b-gantt-task,
+.b-sch-event,
+.b-gantt-task-parent,
+.b-sch-event-parent,
+.b-gantt-task-summary,
+.b-sch-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+}
+
+/* Target ALL possible Bryntum summary and rollup classes */
+.b-gantt-task-summary,
+.b-sch-event-summary,
+.b-gantt-task.b-gantt-task-summary,
+.b-sch-event.b-sch-event-summary,
+.b-task-summary,
+.b-sch-summary,
+.b-gantt-summary,
+.b-sch-event.b-summary,
+.b-gantt-task.b-summary,
+.b-rollup,
+.b-task-rollup,
+.b-gantt-rollup,
+.b-sch-rollup,
+.b-gantt-task.b-rollup,
+.b-sch-event.b-rollup,
+.b-summary-task,
+.b-summary-event,
+.b-gantt-task.b-summary-task,
+.b-sch-event.b-summary-event,
+.b-gantt-task.b-gantt-summary,
+.b-sch-event.b-sch-summary,
+.b-gantt-task.b-task-summary,
+.b-sch-event.b-event-summary {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+
+/* Force all timeline elements to respect row height */
+.b-timeline-body .b-gantt-task,
+.b-timeline-body .b-sch-event,
+.b-timeline-body .b-gantt-task-parent,
+.b-timeline-body .b-sch-event-parent,
+.b-timeline-body .b-gantt-task-summary,
+.b-timeline-body .b-sch-event-summary,
+.b-timeline-body .b-task-summary,
+.b-timeline-body .b-sch-summary,
+.b-timeline-body .b-gantt-summary,
+.b-timeline-body .b-rollup,
+.b-timeline-body .b-task-rollup,
+.b-timeline-body .b-gantt-rollup,
+.b-timeline-body .b-sch-rollup {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+
+/* Override any absolute positioning that might cause full-height spans */
+.b-timeline-container .b-gantt-task,
+.b-timeline-container .b-sch-event,
+.b-timeline-container .b-gantt-task-parent,
+.b-timeline-container .b-sch-event-parent,
+.b-timeline-container .b-gantt-task-summary,
+.b-timeline-container .b-sch-event-summary,
+.b-timeline-container .b-task-summary,
+.b-timeline-container .b-sch-summary,
+.b-timeline-container .b-gantt-summary,
+.b-timeline-container .b-rollup,
+.b-timeline-container .b-task-rollup,
+.b-timeline-container .b-gantt-rollup,
+.b-timeline-container .b-sch-rollup {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element that might be a summary bar by color */
+.b-timeline-container [style*="background-color: yellow"],
+.b-timeline-container [style*="background-color: #ffff00"],
+.b-timeline-container [style*="background-color: #ffeb3b"],
+.b-timeline-container [style*="background-color: #ffc107"],
+.b-timeline-container [style*="background-color: #ffd700"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element with yellow background in the timeline */
+.b-timeline-container div[style*="background-color: yellow"],
+.b-timeline-container div[style*="background-color: #ffff00"],
+.b-timeline-container div[style*="background-color: #ffeb3b"],
+.b-timeline-container div[style*="background-color: #ffc107"],
+.b-timeline-container div[style*="background-color: #ffd700"],
+.b-timeline-container span[style*="background-color: yellow"],
+.b-timeline-container span[style*="background-color: #ffff00"],
+.b-timeline-container span[style*="background-color: #ffeb3b"],
+.b-timeline-container span[style*="background-color: #ffc107"],
+.b-timeline-container span[style*="background-color: #ffd700"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Target any element that spans the full height of the timeline */
+.b-timeline-container div[style*="height: 100%"],
+.b-timeline-container div[style*="height: 100vh"],
+.b-timeline-container div[style*="top: 0"],
+.b-timeline-container div[style*="bottom: 0"] {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin-top: 9px !important;
+  margin-bottom: 9px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* Progress bar styling if present */
+.b-gantt-task .b-gantt-task-progress {
+  background: rgba(255, 255, 255, 0.3) !important;
+  height: 100% !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  border-radius: inherit !important;
+}
+
+/* Task text styling */
+.b-gantt-task .b-gantt-task-content,
+.b-gantt-task .b-gantt-task-text {
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  z-index: 2 !important;
+  position: relative !important;
+}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   FileText,
   Users,
@@ -16,10 +16,25 @@ import {
   User,
   BarChart3,
   X,
+  Shield,
+  Clipboard,
+  Eye,
+  Edit,
+  MoreHorizontal,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ProtectedGrid, ProtectedColDef, GridRow, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   PieChart,
   Pie,
@@ -74,6 +89,564 @@ export default function FieldReportsCard({ card, config, span, isCompact, userRo
       window.removeEventListener("cardDrillDownStateChange", handleCardDrillDownStateChange as EventListener)
     }
   }, [card.id])
+
+  // Mock data for Daily Logs table
+  const dailyLogsData = useMemo(
+    () => [
+      {
+        id: "1",
+        date: "2025-01-13",
+        weather: "Partly Cloudy, 72°F",
+        crewSize: 24,
+        visitors: 3,
+        delays: 0,
+        safetyIssues: 0,
+        workCompleted: "Foundation pour zone 3, steel delivery inspection",
+        submissionTime: "9:32 AM",
+        status: "Submitted",
+        submittedBy: "Mike Rodriguez",
+      },
+      {
+        id: "2",
+        date: "2025-01-12",
+        weather: "Clear, 68°F",
+        crewSize: 26,
+        visitors: 1,
+        delays: 1,
+        safetyIssues: 0,
+        workCompleted: "Foundation forms installation, MEP rough-in",
+        submissionTime: "10:15 AM",
+        status: "Submitted",
+        submittedBy: "Mike Rodriguez",
+      },
+      {
+        id: "3",
+        date: "2025-01-11",
+        weather: "Overcast, 65°F",
+        crewSize: 22,
+        visitors: 2,
+        delays: 0,
+        safetyIssues: 1,
+        workCompleted: "Site preparation, utility connections",
+        submissionTime: "11:20 AM",
+        status: "Submitted",
+        submittedBy: "Mike Rodriguez",
+      },
+      {
+        id: "4",
+        date: "2025-01-10",
+        weather: "Rainy, 58°F",
+        crewSize: 15,
+        visitors: 0,
+        delays: 2,
+        safetyIssues: 0,
+        workCompleted: "Indoor work only - electrical rough-in",
+        submissionTime: "2:45 PM",
+        status: "Late",
+        submittedBy: "Mike Rodriguez",
+      },
+    ],
+    []
+  )
+
+  // Mock data for Safety Audits table
+  const safetyAuditsData = useMemo(
+    () => [
+      {
+        id: "1",
+        date: "2025-01-13",
+        auditor: "Sarah Wilson",
+        type: "Daily Safety Check",
+        score: 95,
+        violations: 1,
+        category: "PPE Compliance",
+        severity: "Low",
+        status: "Resolved",
+        notes: "Minor hard hat violation - corrected immediately",
+        followUpDate: "2025-01-14",
+      },
+      {
+        id: "2",
+        date: "2025-01-12",
+        auditor: "David Chen",
+        type: "Weekly Inspection",
+        score: 88,
+        violations: 2,
+        category: "Fall Protection",
+        severity: "Medium",
+        status: "In Progress",
+        notes: "Guardrail installation needed on level 2",
+        followUpDate: "2025-01-15",
+      },
+      {
+        id: "3",
+        date: "2025-01-11",
+        auditor: "Maria Lopez",
+        type: "Equipment Inspection",
+        score: 92,
+        violations: 1,
+        category: "Equipment Safety",
+        severity: "Low",
+        status: "Resolved",
+        notes: "Crane inspection documentation update",
+        followUpDate: "2025-01-12",
+      },
+      {
+        id: "4",
+        date: "2025-01-10",
+        auditor: "James Park",
+        type: "Site Safety Audit",
+        score: 78,
+        violations: 3,
+        category: "Housekeeping",
+        severity: "High",
+        status: "Open",
+        notes: "Multiple debris hazards, trip hazards identified",
+        followUpDate: "2025-01-11",
+      },
+    ],
+    []
+  )
+
+  // Mock data for Quality Control table
+  const qualityControlData = useMemo(
+    () => [
+      {
+        id: "1",
+        date: "2025-01-13",
+        inspector: "Tom Bradley",
+        type: "Concrete Inspection",
+        area: "Foundation Zone 3",
+        result: "Pass",
+        score: 94,
+        defects: 0,
+        severity: "None",
+        status: "Approved",
+        notes: "Excellent concrete finish quality",
+        nextInspection: "2025-01-20",
+      },
+      {
+        id: "2",
+        date: "2025-01-12",
+        inspector: "Lisa Chang",
+        type: "Steel Inspection",
+        area: "Structural Frame",
+        result: "Conditional",
+        score: 82,
+        defects: 2,
+        severity: "Minor",
+        status: "Pending",
+        notes: "Minor weld touch-ups required",
+        nextInspection: "2025-01-15",
+      },
+      {
+        id: "3",
+        date: "2025-01-11",
+        inspector: "Robert Smith",
+        type: "MEP Rough-in",
+        area: "Electrical Systems",
+        result: "Pass",
+        score: 91,
+        defects: 1,
+        severity: "Low",
+        status: "Approved",
+        notes: "One conduit routing adjustment needed",
+        nextInspection: "2025-01-18",
+      },
+      {
+        id: "4",
+        date: "2025-01-10",
+        inspector: "Anna Garcia",
+        type: "Waterproofing",
+        area: "Basement Level",
+        result: "Fail",
+        score: 65,
+        defects: 4,
+        severity: "High",
+        status: "Rejected",
+        notes: "Multiple membrane defects, rework required",
+        nextInspection: "2025-01-16",
+      },
+    ],
+    []
+  )
+
+  // Column definitions for Daily Logs table
+  const dailyLogsColumns: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "date",
+        headerName: "Date",
+        width: 100,
+        cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+        pinned: "left",
+      },
+      {
+        field: "weather",
+        headerName: "Weather",
+        width: 140,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "crewSize",
+        headerName: "Crew Size",
+        width: 80,
+        cellRenderer: (params: any) => <div className="text-center font-medium">{params.value}</div>,
+      },
+      {
+        field: "visitors",
+        headerName: "Visitors",
+        width: 70,
+        cellRenderer: (params: any) => <div className="text-center">{params.value}</div>,
+      },
+      {
+        field: "delays",
+        headerName: "Delays",
+        width: 70,
+        cellRenderer: (params: any) => (
+          <div className={`text-center font-medium ${params.value > 0 ? "text-red-600" : "text-green-600"}`}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "safetyIssues",
+        headerName: "Safety Issues",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <div className={`text-center font-medium ${params.value > 0 ? "text-red-600" : "text-green-600"}`}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "workCompleted",
+        headerName: "Work Completed",
+        width: 200,
+        cellRenderer: (params: any) => (
+          <div className="text-sm truncate" title={params.value}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge
+            className={`text-xs ${
+              params.value === "Submitted"
+                ? "bg-green-100 text-green-700"
+                : params.value === "Late"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 60,
+        cellRenderer: (params: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Report
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    []
+  )
+
+  // Column definitions for Safety Audits table
+  const safetyAuditsColumns: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "date",
+        headerName: "Date",
+        width: 100,
+        cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+        pinned: "left",
+      },
+      {
+        field: "auditor",
+        headerName: "Auditor",
+        width: 120,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "type",
+        headerName: "Type",
+        width: 130,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "score",
+        headerName: "Score",
+        width: 70,
+        cellRenderer: (params: any) => (
+          <div
+            className={`text-center font-medium ${
+              params.value >= 90 ? "text-green-600" : params.value >= 80 ? "text-yellow-600" : "text-red-600"
+            }`}
+          >
+            {params.value}%
+          </div>
+        ),
+      },
+      {
+        field: "violations",
+        headerName: "Violations",
+        width: 80,
+        cellRenderer: (params: any) => (
+          <div className={`text-center font-medium ${params.value > 0 ? "text-red-600" : "text-green-600"}`}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "severity",
+        headerName: "Severity",
+        width: 80,
+        cellRenderer: (params: any) => (
+          <Badge
+            className={`text-xs ${
+              params.value === "Low"
+                ? "bg-green-100 text-green-700"
+                : params.value === "Medium"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge
+            className={`text-xs ${
+              params.value === "Resolved"
+                ? "bg-green-100 text-green-700"
+                : params.value === "In Progress"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "notes",
+        headerName: "Notes",
+        width: 200,
+        cellRenderer: (params: any) => (
+          <div className="text-sm truncate" title={params.value}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 60,
+        cellRenderer: (params: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Audit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    []
+  )
+
+  // Column definitions for Quality Control table
+  const qualityControlColumns: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "date",
+        headerName: "Date",
+        width: 100,
+        cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+        pinned: "left",
+      },
+      {
+        field: "inspector",
+        headerName: "Inspector",
+        width: 120,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "type",
+        headerName: "Type",
+        width: 130,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "area",
+        headerName: "Area",
+        width: 120,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "result",
+        headerName: "Result",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge
+            className={`text-xs ${
+              params.value === "Pass"
+                ? "bg-green-100 text-green-700"
+                : params.value === "Conditional"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "score",
+        headerName: "Score",
+        width: 70,
+        cellRenderer: (params: any) => (
+          <div
+            className={`text-center font-medium ${
+              params.value >= 90 ? "text-green-600" : params.value >= 80 ? "text-yellow-600" : "text-red-600"
+            }`}
+          >
+            {params.value}%
+          </div>
+        ),
+      },
+      {
+        field: "defects",
+        headerName: "Defects",
+        width: 70,
+        cellRenderer: (params: any) => (
+          <div className={`text-center font-medium ${params.value > 0 ? "text-red-600" : "text-green-600"}`}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge
+            className={`text-xs ${
+              params.value === "Approved"
+                ? "bg-green-100 text-green-700"
+                : params.value === "Pending"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "notes",
+        headerName: "Notes",
+        width: 200,
+        cellRenderer: (params: any) => (
+          <div className="text-sm truncate" title={params.value}>
+            {params.value}
+          </div>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 60,
+        cellRenderer: (params: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Inspection
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    []
+  )
+
+  // Grid configuration
+  const gridConfig = createGridWithTotalsAndSticky(1, false, {
+    allowExport: true,
+    allowRowSelection: false,
+    allowMultiSelection: false,
+    allowColumnReordering: false,
+    allowColumnResizing: true,
+    allowSorting: true,
+    allowFiltering: true,
+    allowCellEditing: false,
+    showToolbar: false,
+    showStatusBar: false,
+    theme: "quartz",
+  })
 
   // Calculate business days since start of month
   const getBusinessDaysSinceMonthStart = () => {
@@ -511,144 +1084,67 @@ export default function FieldReportsCard({ card, config, span, isCompact, userRo
               </div>
             </div>
 
-            {/* Project-Specific or Portfolio View */}
-            {userRole === "project-manager" ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project: {data.projectName}
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Superintendent:</span>
-                    <span className="font-medium">{data.superintendent}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Avg Crew Size:</span>
-                    <span className="font-medium">{data.keyMetrics?.avgCrewSize || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Delays:</span>
-                    <span className="font-medium">{data.keyMetrics?.totalDelays || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Safety Incidents:</span>
-                    <span className="font-medium">{data.keyMetrics?.safetyIncidents || 0}</span>
-                  </div>
-                  <div className="pt-2 border-t border-green-700">
-                    <div className="text-green-200 mb-1">Recent Reports Quality:</div>
-                    {data.recentReports?.slice(0, 3).map((report: any, index: number) => (
-                      <div key={index} className="text-green-300 text-xs">
-                        • {report.date}: {report.workCompleted.slice(0, 30)}...
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : userRole === "project-executive" ? (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Project Performance (6 Projects)
-                </h4>
-                <div className="space-y-1 text-xs max-h-32 overflow-y-auto">
-                  {data.projectReports?.map((project: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center border-b border-green-800 pb-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-green-200">{project.project}</div>
-                        <div className="text-green-300">
-                          {project.submitted}/{project.reports} • {formatPercentage(project.completion)}
-                        </div>
-                        <div className="text-green-400">Supt: {project.superintendent.split(" ")[0]}</div>
-                      </div>
-                      <div className="text-right">
-                        <Badge
-                          className={`text-xs ${
-                            project.completion >= 90
-                              ? "bg-green-200 text-green-800"
-                              : project.completion >= 80
-                              ? "bg-yellow-200 text-yellow-800"
-                              : "bg-red-200 text-red-800"
-                          }`}
-                        >
-                          {formatPercentage(project.completion)}
-                        </Badge>
-                        {project.issues > 0 && <div className="text-red-300 text-xs">⚠ {project.issues} issues</div>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Portfolio Metrics
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Projects:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.totalProjects || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Avg Crew Size:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.avgCrewSize || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Total Delays:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.totalDelays || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Safety Incidents:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.safetyIncidents || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-green-200">Missed Reports:</span>
-                    <span className="font-medium">{data.portfolioMetrics?.missedReports || 0}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Field Reports Tables */}
+            <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
+              <Tabs defaultValue="daily-logs" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-3">
+                  <TabsTrigger value="daily-logs" className="flex items-center gap-1 text-xs">
+                    <FileText className="w-3 h-3" />
+                    Daily Logs
+                  </TabsTrigger>
+                  <TabsTrigger value="safety-audits" className="flex items-center gap-1 text-xs">
+                    <Shield className="w-3 h-3" />
+                    Safety Audits
+                  </TabsTrigger>
+                  <TabsTrigger value="quality-control" className="flex items-center gap-1 text-xs">
+                    <Clipboard className="w-3 h-3" />
+                    Quality Control
+                  </TabsTrigger>
+                </TabsList>
 
-            {/* Performance Insights */}
-            {userRole !== "project-manager" && (
-              <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">
-                <h4 className="font-semibold mb-2 flex items-center text-sm">
-                  <Award className="w-4 h-4 mr-2" />
-                  Performance Insights
-                </h4>
-                <div className="space-y-1 text-xs">
-                  {userRole === "project-executive" ? (
-                    <>
-                      <div className="text-green-200 mb-1">Top Performers:</div>
-                      {data.projectReports
-                        ?.slice(0, 3)
-                        .sort((a: any, b: any) => b.completion - a.completion)
-                        .map((project: any, index: number) => (
-                          <div key={index} className="text-green-300">
-                            • {project.project}: {formatPercentage(project.completion)}
-                          </div>
-                        ))}
-                    </>
-                  ) : (
-                    <>
-                      <div className="text-green-200 mb-1">Top Performers:</div>
-                      {data.topPerformers?.map((project: any, index: number) => (
-                        <div key={index} className="text-green-300">
-                          • {project.project}: {formatPercentage(project.completion)}
-                        </div>
-                      ))}
-                      <div className="text-green-200 mb-1 mt-2">Needs Attention:</div>
-                      {data.underPerformers?.map((project: any, index: number) => (
-                        <div key={index} className="text-red-300">
-                          • {project.project}: {formatPercentage(project.completion)}
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
+                <TabsContent value="daily-logs" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={dailyLogsColumns}
+                      rowData={dailyLogsData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="safety-audits" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={safetyAuditsColumns}
+                      rowData={safetyAuditsData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="quality-control" className="mt-0">
+                  <div className="min-w-0 max-w-full overflow-hidden">
+                    <ProtectedGrid
+                      columnDefs={qualityControlColumns}
+                      rowData={qualityControlData}
+                      config={gridConfig}
+                      height="250px"
+                      loading={false}
+                      enableSearch={true}
+                      title=""
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
 
             {/* Key Insights */}
             <div className="bg-white/10 dark:bg-black/10 rounded-lg p-1.5 sm:p-2 lg:p-2.5">

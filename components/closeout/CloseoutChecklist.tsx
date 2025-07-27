@@ -1027,29 +1027,21 @@ export default function CloseoutChecklist({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="bg-slate-900/95 dark:bg-slate-900/95 light:bg-blue-50/80 border-slate-800/50 dark:border-slate-800/50 light:border-blue-200/30">
-        <CardHeader className="bg-gradient-to-r from-slate-800/30 to-blue-900/20 dark:from-slate-800/30 dark:to-blue-900/20 light:from-blue-100/40 light:to-blue-200/30">
+      <Card className="bg-card border-border">
+        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted/30">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2 text-blue-100 dark:text-blue-100 light:text-blue-900">
-                <Archive className="h-5 w-5 text-blue-400 dark:text-blue-400 light:text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-card-foreground">
+                <Archive className="h-5 w-5 text-primary" />
                 Closeout & Pre-CO Checklist
-                <Badge
-                  variant="secondary"
-                  className="bg-blue-800/50 text-blue-100 dark:bg-blue-800/50 dark:text-blue-100 light:bg-blue-200 light:text-blue-800"
-                >
-                  {projectId}
-                </Badge>
+                <Badge variant="secondary">{projectId}</Badge>
               </CardTitle>
-              <p className="text-sm text-slate-300 dark:text-slate-300 light:text-blue-700/80 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Track and manage all closeout requirements and deliverables
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge
-                variant="outline"
-                className="text-sm border-blue-400/50 text-blue-200 dark:border-blue-400/50 dark:text-blue-200 light:border-blue-600/50 light:text-blue-800"
-              >
+              <Badge variant="outline" className="text-sm">
                 {Math.round(calculateProgress())}% Complete
               </Badge>
               <div className="flex items-center gap-2">
@@ -1057,62 +1049,53 @@ export default function CloseoutChecklist({
                   variant="outline"
                   className={
                     currentMode === "review"
-                      ? "bg-orange-800/30 text-orange-200 border-orange-600/50 dark:bg-orange-800/30 dark:text-orange-200 dark:border-orange-600/50 light:bg-orange-100 light:text-orange-800 light:border-orange-400"
-                      : "bg-green-800/30 text-green-200 border-green-600/50 dark:bg-green-800/30 dark:text-green-200 dark:border-green-600/50 light:bg-green-100 light:text-green-800 light:border-green-400"
+                      ? "bg-orange-500/10 text-orange-600 border-orange-500/30 dark:bg-orange-500/20 dark:text-orange-400 dark:border-orange-500/50"
+                      : "bg-green-500/10 text-green-600 border-green-500/30 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/50"
                   }
                 >
                   {currentMode === "review" ? "Review Mode" : "Edit Mode"}
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                  onClick={toggleMode}
-                >
+                <Button variant="outline" size="sm" onClick={toggleMode}>
                   {currentMode === "review" ? "Switch to Edit" : "Switch to Review"}
                 </Button>
               </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="bg-slate-850/50 dark:bg-slate-850/50 light:bg-blue-50/50">
+        <CardContent className="bg-muted/20">
           {/* Statistics Bar */}
           <div className="grid grid-cols-6 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-100 dark:text-blue-100 light:text-blue-900">
-                {sections.flatMap((s) => s.items).length}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Total Items</div>
+              <div className="text-2xl font-bold text-foreground">{sections.flatMap((s) => s.items).length}</div>
+              <div className="text-sm text-muted-foreground">Total Items</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400 dark:text-green-400 light:text-green-700">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {sections.flatMap((s) => s.items).filter((item) => item.status === "Conforming").length}
               </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Conforming</div>
+              <div className="text-sm text-muted-foreground">Conforming</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-400 dark:text-red-400 light:text-red-700">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {sections.flatMap((s) => s.items).filter((item) => item.status === "Deficient").length}
               </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Deficient</div>
+              <div className="text-sm text-muted-foreground">Deficient</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-400 dark:text-slate-400 light:text-slate-600">
+              <div className="text-2xl font-bold text-muted-foreground">
                 {sections.flatMap((s) => s.items).filter((item) => item.status === "Neutral").length}
               </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Neutral</div>
+              <div className="text-sm text-muted-foreground">Neutral</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400 dark:text-blue-400 light:text-blue-700">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {sections.flatMap((s) => s.items).filter((item) => item.status === "N/A").length}
               </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">N/A</div>
+              <div className="text-sm text-muted-foreground">N/A</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400 dark:text-purple-400 light:text-purple-700">
-                {sections.length}
-              </div>
-              <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/70">Sections</div>
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{sections.length}</div>
+              <div className="text-sm text-muted-foreground">Sections</div>
             </div>
           </div>
 
@@ -1172,30 +1155,15 @@ export default function CloseoutChecklist({
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={() => setShowCompactView(!showCompactView)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowCompactView(!showCompactView)}>
                 {showCompactView ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
                 {showCompactView ? "Full View" : "Compact"}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={handleExportPDF}
-              >
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
                 <Download className="h-4 w-4 mr-2" />
                 Export PDF
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-400/50 text-blue-200 hover:bg-blue-800/30 dark:border-blue-400/50 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-600/50 light:text-blue-800 light:hover:bg-blue-200/30"
-                onClick={handleExportExcel}
-              >
+              <Button variant="outline" size="sm" onClick={handleExportExcel}>
                 <Download className="h-4 w-4 mr-2" />
                 Export Excel
               </Button>
@@ -1211,41 +1179,28 @@ export default function CloseoutChecklist({
           if (filteredItems.length === 0) return null
 
           return (
-            <Card
-              key={section.id}
-              className="bg-slate-800/80 dark:bg-slate-800/80 light:bg-blue-100/60 border-slate-700/50 dark:border-slate-700/50 light:border-blue-300/40"
-            >
+            <Card key={section.id} className="bg-card border-border">
               <Collapsible open={expandedSections.has(section.id)} onOpenChange={() => toggleSection(section.id)}>
                 <CollapsibleTrigger asChild>
-                  <CardHeader className="cursor-pointer hover:bg-slate-700/30 dark:hover:bg-slate-700/30 light:hover:bg-blue-200/40 transition-colors bg-gradient-to-r from-slate-700/20 to-blue-800/15 dark:from-slate-700/20 dark:to-blue-800/15 light:from-blue-200/30 light:to-blue-300/20">
+                  <CardHeader className="cursor-pointer hover:bg-muted/40 transition-colors bg-gradient-to-r from-muted/30 to-muted/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {expandedSections.has(section.id) ? (
-                          <ChevronDown className="h-5 w-5 text-blue-300 dark:text-blue-300 light:text-blue-700" />
+                          <ChevronDown className="h-5 w-5 text-primary" />
                         ) : (
-                          <ChevronRight className="h-5 w-5 text-blue-300 dark:text-blue-300 light:text-blue-700" />
+                          <ChevronRight className="h-5 w-5 text-primary" />
                         )}
-                        <SafeIcon
-                          IconComponent={section.icon}
-                          className="h-4 w-4 text-blue-400 dark:text-blue-400 light:text-blue-600"
-                        />
+                        <SafeIcon IconComponent={section.icon} className="h-4 w-4 text-primary" />
                         <div>
-                          <CardTitle className="text-lg text-blue-200 dark:text-blue-200 light:text-blue-900">
-                            {section.title}
-                          </CardTitle>
-                          <CardDescription className="text-slate-400 dark:text-slate-400 light:text-blue-700/80">
-                            {section.description}
-                          </CardDescription>
+                          <CardTitle className="text-lg text-card-foreground">{section.title}</CardTitle>
+                          <CardDescription className="text-muted-foreground">{section.description}</CardDescription>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <Badge
-                          variant="outline"
-                          className="border-blue-300/50 text-blue-200 dark:border-blue-300/50 dark:text-blue-200 light:border-blue-600/60 light:text-blue-800"
-                        >
+                        <Badge variant="outline" className="text-sm">
                           {Math.round(getProgressBySection(section))}% Complete
                         </Badge>
-                        <div className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80">
+                        <div className="text-sm text-muted-foreground">
                           {filteredItems.filter((item) => item.status === "Conforming").length} / {filteredItems.length}
                         </div>
                       </div>
@@ -1253,7 +1208,7 @@ export default function CloseoutChecklist({
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="pt-0 bg-slate-750/60 dark:bg-slate-750/60 light:bg-blue-150/40">
+                  <CardContent className="pt-0 bg-muted/10">
                     <div className="space-y-3">
                       {filteredItems.map((item) => {
                         const isExpanded = expandedItems.has(item.id)
@@ -1262,7 +1217,7 @@ export default function CloseoutChecklist({
                         return (
                           <div
                             key={item.id}
-                            className="border border-slate-600/40 dark:border-slate-600/40 light:border-blue-400/30 rounded-lg hover:bg-slate-700/30 dark:hover:bg-slate-700/30 light:hover:bg-blue-200/30 transition-colors bg-slate-700/20 dark:bg-slate-700/20 light:bg-blue-200/20"
+                            className="border border-border rounded-lg hover:bg-muted/30 transition-colors bg-muted/10"
                           >
                             {/* Collapsed view - clickable item header */}
                             <div
@@ -1271,25 +1226,20 @@ export default function CloseoutChecklist({
                             >
                               <div className="flex items-center gap-3">
                                 {expandedItems.has(item.id) ? (
-                                  <ChevronDown className="h-4 w-4 text-blue-400 dark:text-blue-400 light:text-blue-700 flex-shrink-0" />
+                                  <ChevronDown className="h-4 w-4 text-primary flex-shrink-0" />
                                 ) : (
-                                  <ChevronRight className="h-4 w-4 text-blue-400 dark:text-blue-400 light:text-blue-700 flex-shrink-0" />
+                                  <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
                                 )}
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-blue-100 dark:text-blue-100 light:text-blue-900">
-                                      {item.title}
-                                    </span>
+                                    <span className="font-medium text-foreground">{item.title}</span>
                                     {item.isRequired && (
                                       <Badge variant="destructive" className="text-xs">
                                         Required
                                       </Badge>
                                     )}
                                     {item.category && (
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-xs bg-blue-700/30 text-blue-200 dark:bg-blue-700/30 dark:text-blue-200 light:bg-blue-300/50 light:text-blue-800"
-                                      >
+                                      <Badge variant="secondary" className="text-xs">
                                         {item.category}
                                       </Badge>
                                     )}
@@ -1297,16 +1247,10 @@ export default function CloseoutChecklist({
                                   {!isExpanded && (
                                     <>
                                       {item.description && (
-                                        <p className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80 mt-1">
-                                          {item.description}
-                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
                                       )}
-                                      {item.comments && (
-                                        <p className="text-sm text-blue-300 dark:text-blue-300 light:text-blue-600 mt-1">
-                                          💬 {item.comments}
-                                        </p>
-                                      )}
-                                      <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 dark:text-slate-400 light:text-blue-700/80">
+                                      {item.comments && <p className="text-sm text-primary mt-1">💬 {item.comments}</p>}
+                                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                                         {item.assignedTo && (
                                           <span className="flex items-center gap-1">
                                             <User className="h-3 w-3" />
@@ -1332,18 +1276,15 @@ export default function CloseoutChecklist({
 
                             {/* Expanded view - interactive form */}
                             {isExpanded && (
-                              <div className="px-4 pb-4 space-y-3 bg-gradient-to-b from-slate-600/30 to-blue-900/20 dark:from-slate-600/30 dark:to-blue-900/20 light:from-blue-300/25 light:to-blue-400/15 border-t border-slate-600/40 dark:border-slate-600/40 light:border-blue-400/30">
+                              <div className="px-4 pb-4 space-y-3 bg-gradient-to-b from-muted/30 to-muted/20 border-t border-border">
                                 <div className="flex items-center justify-between">
-                                  <h4 className="font-medium text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Item Details
-                                  </h4>
+                                  <h4 className="font-medium text-foreground">Item Details</h4>
                                   <div className="flex items-center gap-2">
                                     {!isReadOnly && (
                                       <>
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          className="border-blue-600/40 text-blue-200 hover:bg-blue-800/30 dark:border-blue-600/40 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-500/50 light:text-blue-800 light:hover:bg-blue-300/30"
                                           onClick={(e) => {
                                             e.stopPropagation()
                                             setEditingItem(isEditing ? null : item.id)
@@ -1354,7 +1295,7 @@ export default function CloseoutChecklist({
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          className="border-red-600/40 text-red-200 hover:bg-red-800/30 dark:border-red-600/40 dark:text-red-200 dark:hover:bg-red-800/30 light:border-red-500/50 light:text-red-800 light:hover:bg-red-300/30"
+                                          className="border-red-600/40 text-red-600 hover:bg-red-500/10 dark:border-red-500/50 dark:text-red-400 dark:hover:bg-red-500/20"
                                           onClick={(e) => {
                                             e.stopPropagation()
                                             const section = sections.find((s) => s.items.some((i) => i.id === item.id))
@@ -1373,9 +1314,7 @@ export default function CloseoutChecklist({
                                 {/* Item title editing */}
                                 {isEditing ? (
                                   <div className="space-y-2">
-                                    <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                      Title
-                                    </Label>
+                                    <Label className="text-foreground">Title</Label>
                                     <Input
                                       value={item.title}
                                       onChange={(e) => {
@@ -1390,19 +1329,15 @@ export default function CloseoutChecklist({
                                           setEditingItem(null)
                                         }
                                       }}
-                                      className="border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50 bg-slate-600/20 dark:bg-slate-600/20 light:bg-blue-100/30 text-blue-100 dark:text-blue-100 light:text-blue-900"
+                                      className="bg-muted/20 text-foreground"
                                       autoFocus
                                     />
                                   </div>
                                 ) : (
                                   <div>
-                                    <h4 className="font-medium text-blue-100 dark:text-blue-100 light:text-blue-800">
-                                      {item.title}
-                                    </h4>
+                                    <h4 className="font-medium text-foreground">{item.title}</h4>
                                     {item.description && (
-                                      <p className="text-sm text-slate-400 dark:text-slate-400 light:text-blue-700/80 mt-1">
-                                        {item.description}
-                                      </p>
+                                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
                                     )}
                                   </div>
                                 )}
@@ -1410,9 +1345,7 @@ export default function CloseoutChecklist({
                                 {/* Status and Assignment */}
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="space-y-2">
-                                    <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                      Status
-                                    </Label>
+                                    <Label className="text-foreground">Status</Label>
                                     <Select
                                       value={item.status}
                                       onValueChange={(value) => {
@@ -1423,7 +1356,7 @@ export default function CloseoutChecklist({
                                       }}
                                       disabled={isReadOnly}
                                     >
-                                      <SelectTrigger className="border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50">
+                                      <SelectTrigger>
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -1436,9 +1369,7 @@ export default function CloseoutChecklist({
                                   </div>
 
                                   <div className="space-y-2">
-                                    <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                      Assign To
-                                    </Label>
+                                    <Label className="text-foreground">Assign To</Label>
                                     <Select
                                       value={item.assignedTo || ""}
                                       onValueChange={(value) => {
@@ -1449,7 +1380,7 @@ export default function CloseoutChecklist({
                                       }}
                                       disabled={isReadOnly}
                                     >
-                                      <SelectTrigger className="border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50">
+                                      <SelectTrigger>
                                         <SelectValue placeholder="Select assignee" />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -1465,9 +1396,7 @@ export default function CloseoutChecklist({
 
                                 {/* Comments */}
                                 <div className="space-y-2">
-                                  <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Comments
-                                  </Label>
+                                  <Label className="text-foreground">Comments</Label>
                                   <Textarea
                                     value={item.comments || ""}
                                     onChange={(e) => {
@@ -1477,21 +1406,19 @@ export default function CloseoutChecklist({
                                       }
                                     }}
                                     placeholder="Add comments or notes..."
-                                    className="min-h-[60px] border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50 bg-slate-600/20 dark:bg-slate-600/20 light:bg-blue-100/30 text-blue-100 dark:text-blue-100 light:text-blue-900"
+                                    className="min-h-[60px] bg-muted/20 text-foreground"
                                     disabled={isReadOnly}
                                   />
                                 </div>
 
                                 {/* Attachments */}
                                 <div className="space-y-2">
-                                  <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                                    Attachments
-                                  </Label>
+                                  <Label className="text-foreground">Attachments</Label>
                                   <div className="flex flex-wrap gap-2">
                                     {item.attachments?.map((fileName) => (
                                       <div
                                         key={fileName}
-                                        className="flex items-center gap-2 bg-blue-900/30 dark:bg-blue-900/30 light:bg-blue-300/30 rounded px-2 py-1 text-sm text-blue-200 dark:text-blue-200 light:text-blue-800"
+                                        className="flex items-center gap-2 bg-muted/30 rounded px-2 py-1 text-sm text-foreground"
                                       >
                                         <Paperclip className="h-3 w-3" />
                                         <span>{fileName}</span>
@@ -1499,7 +1426,7 @@ export default function CloseoutChecklist({
                                           <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-4 w-4 p-0 hover:bg-blue-800/30 dark:hover:bg-blue-800/30 light:hover:bg-blue-400/30"
+                                            className="h-4 w-4 p-0 hover:bg-muted/50"
                                             onClick={(e) => {
                                               e.stopPropagation()
                                               const section = sections.find((s) =>
@@ -1519,7 +1446,6 @@ export default function CloseoutChecklist({
                                       <Button
                                         variant="outline"
                                         size="sm"
-                                        className="border-blue-600/40 text-blue-200 hover:bg-blue-800/30 dark:border-blue-600/40 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-500/50 light:text-blue-800 light:hover:bg-blue-300/30"
                                         onClick={(e) => {
                                           e.stopPropagation()
                                           const fileName = prompt("Enter attachment name:")
@@ -1544,7 +1470,6 @@ export default function CloseoutChecklist({
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="border-blue-600/40 text-blue-200 hover:bg-blue-800/30 dark:border-blue-600/40 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-500/50 light:text-blue-800 light:hover:bg-blue-300/30"
                                       onClick={(e) => {
                                         e.stopPropagation()
                                         handleTaskGenerate(item)
@@ -1556,7 +1481,7 @@ export default function CloseoutChecklist({
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="border-orange-600/40 text-orange-200 hover:bg-orange-800/30 dark:border-orange-600/40 dark:text-orange-200 dark:hover:bg-orange-800/30 light:border-orange-500/50 light:text-orange-800 light:hover:bg-orange-300/30"
+                                      className="border-orange-600/40 text-orange-600 hover:bg-orange-500/10 dark:border-orange-500/50 dark:text-orange-400 dark:hover:bg-orange-500/20"
                                       onClick={(e) => {
                                         e.stopPropagation()
                                         handleConstraintCreate(item)
@@ -1568,7 +1493,7 @@ export default function CloseoutChecklist({
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="border-green-600/40 text-green-200 hover:bg-green-800/30 dark:border-green-600/40 dark:text-green-200 dark:hover:bg-green-800/30 light:border-green-500/50 light:text-green-800 light:hover:bg-green-300/30"
+                                      className="border-green-600/40 text-green-600 hover:bg-green-500/10 dark:border-green-500/50 dark:text-green-400 dark:hover:bg-green-500/20"
                                       onClick={(e) => {
                                         e.stopPropagation()
                                         handleNotificationSend(item, "email")
@@ -1580,7 +1505,7 @@ export default function CloseoutChecklist({
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="border-purple-600/40 text-purple-200 hover:bg-purple-800/30 dark:border-purple-600/40 dark:text-purple-200 dark:hover:bg-purple-800/30 light:border-purple-500/50 light:text-purple-800 light:hover:bg-purple-300/30"
+                                      className="border-purple-600/40 text-purple-600 hover:bg-purple-500/10 dark:border-purple-500/50 dark:text-purple-400 dark:hover:bg-purple-500/20"
                                       onClick={(e) => {
                                         e.stopPropagation()
                                         handleNotificationSend(item, "teams")
@@ -1599,14 +1524,12 @@ export default function CloseoutChecklist({
 
                       {/* Add new item */}
                       {!isReadOnly && showAddItem === section.id && (
-                        <div className="border border-slate-600/40 dark:border-slate-600/40 light:border-blue-400/30 rounded-lg p-4 bg-slate-700/20 dark:bg-slate-700/20 light:bg-blue-200/20">
+                        <div className="border border-border rounded-lg p-4 bg-muted/10">
                           <div className="space-y-2">
-                            <Label className="text-blue-200 dark:text-blue-200 light:text-blue-900">
-                              New Item Title
-                            </Label>
+                            <Label className="text-foreground">New Item Title</Label>
                             <Input
                               placeholder="Enter item title..."
-                              className="border-blue-600/40 dark:border-blue-600/40 light:border-blue-500/50 bg-slate-600/20 dark:bg-slate-600/20 light:bg-blue-100/30 text-blue-100 dark:text-blue-100 light:text-blue-900"
+                              className=""
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   const title = e.currentTarget.value.trim()
@@ -1626,11 +1549,7 @@ export default function CloseoutChecklist({
                       )}
 
                       {!isReadOnly && showAddItem !== section.id && (
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowAddItem(section.id)}
-                          className="w-full border-blue-600/40 text-blue-200 hover:bg-blue-800/30 dark:border-blue-600/40 dark:text-blue-200 dark:hover:bg-blue-800/30 light:border-blue-500/50 light:text-blue-800 light:hover:bg-blue-300/30"
-                        >
+                        <Button variant="outline" onClick={() => setShowAddItem(section.id)} className="w-full">
                           <Plus className="h-4 w-4 mr-2" />
                           Add New Item
                         </Button>

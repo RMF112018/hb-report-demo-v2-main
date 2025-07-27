@@ -21,6 +21,7 @@ import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useToast } from "@/components/ui/use-toast"
+import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 /**
@@ -35,7 +36,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
  * - Mobile-responsive
  */
 export const AppHeaderSimple = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, hasAutoInsightsMode } = useAuth()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
   const { toast } = useToast()
@@ -53,6 +54,25 @@ export const AppHeaderSimple = () => {
   // Mobile menu states
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [mobileMenuView, setMobileMenuView] = useState<"main" | "tools" | "ittools">("main")
+  const [autoInsightsEnabled, setAutoInsightsEnabled] = useState(false)
+
+  // Auto insights mode toggle handler
+  const handleAutoInsightsToggle = (enabled: boolean) => {
+    setAutoInsightsEnabled(enabled)
+    localStorage.setItem("autoInsightsEnabled", enabled.toString())
+
+    if (enabled) {
+      toast({
+        title: "Auto Insights Mode Enabled",
+        description: "Market intelligence will auto-refresh every 12-24 hours",
+      })
+    } else {
+      toast({
+        title: "Auto Insights Mode Disabled",
+        description: "Market intelligence will only refresh manually",
+      })
+    }
+  }
 
   // Refs for click outside detection
   const headerRef = useRef<HTMLElement>(null)
@@ -62,6 +82,16 @@ export const AppHeaderSimple = () => {
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Load auto insights preference from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("autoInsightsEnabled")
+      if (saved) {
+        setAutoInsightsEnabled(saved === "true")
+      }
+    }
   }, [])
 
   // Helper function to determine the dashboard path based on user role
@@ -106,6 +136,13 @@ export const AppHeaderSimple = () => {
         href: "/tools/productivity",
         category: "Core Tools",
         description: "Threaded messaging and task management",
+      },
+      {
+        name: "Market Intelligence",
+        href: "/dashboard/market-intel",
+        category: "Core Tools",
+        description: "AI-powered market analysis, competitive positioning, and predictive insights",
+        visibleRoles: ["executive", "project-executive", "project-manager", "estimator"],
       },
 
       // Financial Management
@@ -470,6 +507,31 @@ export const AppHeaderSimple = () => {
               >
                 {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
+            )}
+
+            {/* Auto Insights Mode Toggle */}
+            {hasAutoInsightsMode && mounted && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center space-x-2 bg-white/10 rounded-lg px-3 py-2">
+                      <span className="text-xs font-medium text-white">Auto Insights</span>
+                      <Switch
+                        checked={autoInsightsEnabled}
+                        onCheckedChange={handleAutoInsightsToggle}
+                        className="data-[state=checked]:bg-orange-500"
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {autoInsightsEnabled
+                        ? "Auto-refresh market intelligence every 12-24 hours"
+                        : "Enable auto-refresh for market intelligence"}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
 
             {/* Productivity */}

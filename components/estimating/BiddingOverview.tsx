@@ -10,7 +10,25 @@ import React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Users, Calculator, TrendingUp } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  FileText,
+  Users,
+  Calculator,
+  TrendingUp,
+  Search,
+  Filter,
+  Columns,
+  Download,
+  Upload,
+  Plus,
+  MoreHorizontal,
+  Copy,
+  MessageCircle,
+  ChevronDown,
+} from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface BiddingOverviewProps {
   projectId: string
@@ -18,6 +36,7 @@ interface BiddingOverviewProps {
   userRole: string
   user: any
   onPackageSelect: (packageId: string) => void
+  onPackageSelectWithTab?: (packageId: string, tab: string) => void
 }
 
 const BiddingOverview: React.FC<BiddingOverviewProps> = ({
@@ -26,18 +45,203 @@ const BiddingOverview: React.FC<BiddingOverviewProps> = ({
   userRole,
   user,
   onPackageSelect,
+  onPackageSelectWithTab,
 }) => {
+  const bidPackages = [
+    {
+      id: "01-00",
+      name: "Materials Testing",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 13,
+      viewed: 6,
+      bidding: 2,
+      bids: 1,
+      estimatedCost: null,
+      softAwardedCompany: "Level bids",
+      leveledBid: null,
+      hasLevelBids: true,
+    },
+    {
+      id: "02-21",
+      name: "Surveying",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 11,
+      viewed: 4,
+      bidding: 3,
+      bids: 1,
+      estimatedCost: null,
+      softAwardedCompany: "Level bids",
+      leveledBid: null,
+      hasLevelBids: true,
+    },
+    {
+      id: "03-33",
+      name: "Concrete",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 29,
+      viewed: 13,
+      bidding: 1,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "03-35",
+      name: "Hollow Core Concrete",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 1,
+      viewed: 0,
+      bidding: 0,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "04-22",
+      name: "Masonry",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 14,
+      viewed: 9,
+      bidding: 0,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "05-70",
+      name: "Decorative Metals",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 14,
+      viewed: 3,
+      bidding: 0,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "06-11",
+      name: "Wood Framing",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 30,
+      viewed: 10,
+      bidding: 1,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "06-17",
+      name: "Wood Trusses",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 8,
+      viewed: 7,
+      bidding: 3,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "06-41",
+      name: "Millwork",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 22,
+      viewed: 3,
+      bidding: 0,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+    {
+      id: "06-61",
+      name: "Rough Carpentry Hardware",
+      lead: "WS",
+      bidsDate: "4/18/2025",
+      bidsTime: "5:00 PM EDT",
+      companies: 6,
+      viewed: 0,
+      bidding: 0,
+      bids: 0,
+      estimatedCost: null,
+      softAwardedCompany: "no bids",
+      leveledBid: null,
+      hasLevelBids: false,
+    },
+  ]
+
   return (
     <div className="space-y-6">
-      {/* Bidding Overview Analytics */}
+      {/* Header Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Filter bid packages" className="pl-9 w-64" />
+          </div>
+          <Button variant="outline" size="sm">
+            <Search className="h-4 w-4 mr-2" />
+            Find
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm">
+            <Columns className="h-4 w-4 mr-2" />
+            Column
+          </Button>
+          <Button variant="outline" size="sm">
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New Bid Package
+          </Button>
+        </div>
+      </div>
+
+      {/* Summary Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* KPI Cards */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Total Packages</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{bidPackages.length}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+2</span> from last month
             </p>
@@ -46,12 +250,28 @@ const BiddingOverview: React.FC<BiddingOverviewProps> = ({
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Invited Companies</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">115</div>
+            <div className="text-2xl font-bold">{bidPackages.reduce((sum, pkg) => sum + pkg.companies, 0)}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-blue-600">14.4</span> avg per package
+              <span className="text-blue-600">
+                {(bidPackages.reduce((sum, pkg) => sum + pkg.companies, 0) / bidPackages.length).toFixed(1)}
+              </span>{" "}
+              avg per package
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Active Bidding</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{bidPackages.reduce((sum, pkg) => sum + pkg.bidding, 0)}</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-orange-600">{bidPackages.filter((pkg) => pkg.bidding > 0).length}</span> packages
+              active
             </p>
           </CardContent>
         </Card>
@@ -61,283 +281,128 @@ const BiddingOverview: React.FC<BiddingOverviewProps> = ({
             <CardTitle className="text-sm font-medium">Bids Received</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{bidPackages.reduce((sum, pkg) => sum + pkg.bids, 0)}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-orange-600">20.9%</span> response rate
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Bid Value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$12.4M</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">-3.2%</span> under estimate
+              <span className="text-green-600">{bidPackages.filter((pkg) => pkg.bids > 0).length}</span> packages with
+              bids
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Charts and Analytics */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Bid Distribution Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Bid Distribution by Package</CardTitle>
-              <CardDescription>Comparison of low, average, and high bids</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <div className="flex items-end justify-between h-full space-x-2">
-                  {[
-                    { name: "01-00", low: 45, avg: 65, high: 85, label: "Materials Testing" },
-                    { name: "02-21", low: 30, avg: 45, high: 60, label: "Surveying" },
-                    { name: "03-33", low: 120, avg: 145, high: 170, label: "Concrete" },
-                    { name: "04-21", low: 80, avg: 95, high: 110, label: "Masonry" },
-                    { name: "05-12", low: 200, avg: 235, high: 270, label: "Structural Steel" },
-                    { name: "06-10", low: 60, avg: 75, high: 90, label: "Carpentry" },
-                    { name: "07-11", low: 40, avg: 55, high: 70, label: "Waterproofing" },
-                    { name: "08-11", low: 25, avg: 35, high: 45, label: "Steel Doors" },
-                  ].map((pkg, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div className="w-full max-w-16 mb-2">
-                        <div className="flex flex-col space-y-1">
-                          <div
-                            className="bg-red-200 dark:bg-red-800 rounded-t"
-                            style={{ height: `${(pkg.high / 270) * 200}px` }}
-                          />
-                          <div
-                            className="bg-yellow-200 dark:bg-yellow-800"
-                            style={{ height: `${(pkg.avg / 270) * 200}px` }}
-                          />
-                          <div
-                            className="bg-green-200 dark:bg-green-800 rounded-b"
-                            style={{ height: `${(pkg.low / 270) * 200}px` }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground text-center">
-                        <div className="font-medium">{pkg.name}</div>
-                        <div className="text-[10px] mt-1 leading-tight">{pkg.label}</div>
-                      </div>
+      {/* Bid Packages Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Bid Packages</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">
+                  <input type="checkbox" className="rounded" />
+                </TableHead>
+                <TableHead className="w-16">Lead</TableHead>
+                <TableHead className="w-20">Number</TableHead>
+                <TableHead className="min-w-48">Name</TableHead>
+                <TableHead className="w-32">Bids Due</TableHead>
+                <TableHead className="w-24">Companies</TableHead>
+                <TableHead className="w-20">Viewed</TableHead>
+                <TableHead className="w-20">Bidding</TableHead>
+                <TableHead className="w-16">Bids</TableHead>
+                <TableHead className="w-32">Estimated Cost</TableHead>
+                <TableHead className="min-w-40">Soft Awarded Company</TableHead>
+                <TableHead className="w-28">Leveled Bid</TableHead>
+                <TableHead className="w-20">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {bidPackages.map((pkg) => (
+                <TableRow key={pkg.id} className="hover:bg-muted/50">
+                  <TableCell>
+                    <input type="checkbox" className="rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      {pkg.lead}
                     </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-center mt-4 space-x-6">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-200 dark:bg-green-800 rounded"></div>
-                    <span className="text-xs">Low Bid</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-yellow-200 dark:bg-yellow-800 rounded"></div>
-                    <span className="text-xs">Average Bid</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-red-200 dark:bg-red-800 rounded"></div>
-                    <span className="text-xs">High Bid</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Bidder Performance Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Bidder Performance Analysis</CardTitle>
-              <CardDescription>Response rates and competitiveness by bidder</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { company: "Apex Construction LLC", packages: 8, bids: 6, winRate: 75, avgRank: 1.2 },
-                  { company: "Premier Contractors", packages: 6, bids: 4, winRate: 50, avgRank: 2.1 },
-                  { company: "BuildRight Corp", packages: 5, bids: 3, winRate: 33, avgRank: 2.8 },
-                  { company: "Elite Builders", packages: 4, bids: 2, winRate: 25, avgRank: 3.2 },
-                  { company: "Skyline Construction", packages: 3, bids: 2, winRate: 0, avgRank: 4.0 },
-                ].map((bidder, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                          {bidder.company
-                            .split(" ")
-                            .map((word) => word[0])
-                            .join("")
-                            .slice(0, 2)}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-medium">{bidder.company}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {bidder.bids}/{bidder.packages} packages bid
-                        </div>
-                      </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-medium">{pkg.id}</span>
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                      onClick={() => onPackageSelect(pkg.id)}
+                    >
+                      {pkg.name}
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>{pkg.bidsDate}</div>
+                      <div className="text-muted-foreground">{pkg.bidsTime}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{bidder.winRate}% win rate</div>
-                      <div className="text-sm text-muted-foreground">Avg rank: {bidder.avgRank}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Cost Variance Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Cost Variance Analysis</CardTitle>
-              <CardDescription>Bid variance from engineer's estimate</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  { package: "01-00 Materials Testing", estimate: 52000, low: 45000, high: 58000 },
-                  { package: "02-21 Surveying", estimate: 38000, low: 32000, high: 42000 },
-                  { package: "03-33 Concrete", estimate: 1450000, low: 1250000, high: 1600000 },
-                  { package: "04-21 Masonry", estimate: 985000, low: 890000, high: 1120000 },
-                  { package: "05-12 Structural Steel", estimate: 2350000, low: 2100000, high: 2650000 },
-                ].map((item, index) => {
-                  const lowVariance = ((item.low - item.estimate) / item.estimate) * 100
-                  const highVariance = ((item.high - item.estimate) / item.estimate) * 100
-                  return (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{item.package}</div>
-                        <div className="text-sm text-muted-foreground">Est: ${item.estimate.toLocaleString()}</div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="text-center">
-                          <div className={`text-sm font-medium ${lowVariance < 0 ? "text-green-600" : "text-red-600"}`}>
-                            {lowVariance.toFixed(1)}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Low</div>
-                        </div>
-                        <div className="text-center">
-                          <div
-                            className={`text-sm font-medium ${highVariance < 0 ? "text-green-600" : "text-red-600"}`}
-                          >
-                            {highVariance.toFixed(1)}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">High</div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column - Package List and Actions */}
-        <div className="space-y-6">
-          {/* Package Status Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Package Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Active Bidding</span>
-                <span className="font-medium">3</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Under Review</span>
-                <span className="font-medium">2</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Awarded</span>
-                <span className="font-medium">2</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Pending</span>
-                <span className="font-medium">1</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <FileText className="h-4 w-4 mr-2" />
-                Export Bid Summary
-              </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Send Invitations
-              </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <Calculator className="h-4 w-4 mr-2" />
-                Generate Reports
-              </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Analysis Dashboard
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Bid Package List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Bid Packages</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {[
-                  { id: "01-00", name: "Materials Testing", status: "active", bids: 1 },
-                  { id: "02-21", name: "Surveying", status: "active", bids: 1 },
-                  { id: "03-33", name: "Concrete", status: "review", bids: 3 },
-                  { id: "04-21", name: "Masonry", status: "awarded", bids: 2 },
-                  { id: "05-12", name: "Structural Steel", status: "awarded", bids: 4 },
-                  { id: "06-10", name: "Carpentry", status: "active", bids: 2 },
-                  { id: "07-11", name: "Waterproofing", status: "review", bids: 1 },
-                  { id: "08-11", name: "Steel Doors", status: "pending", bids: 0 },
-                ].map((pkg) => (
-                  <div
-                    key={pkg.id}
-                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onPackageSelect(pkg.id)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          pkg.status === "active"
-                            ? "bg-blue-500"
-                            : pkg.status === "review"
-                            ? "bg-yellow-500"
-                            : pkg.status === "awarded"
-                            ? "bg-green-500"
-                            : "bg-gray-300"
-                        }`}
-                      />
-                      <div>
-                        <div className="text-sm font-medium">{pkg.id}</div>
-                        <div className="text-xs text-muted-foreground">{pkg.name}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{pkg.bids}</div>
-                      <div className="text-xs text-muted-foreground">bids</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="font-medium">{pkg.companies}</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="font-medium">{pkg.viewed}</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="font-medium">{pkg.bidding}</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="font-medium">{pkg.bids}</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-muted-foreground">-</span>
+                  </TableCell>
+                  <TableCell>
+                    {pkg.hasLevelBids ? (
+                      <button
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                        onClick={() =>
+                          onPackageSelectWithTab
+                            ? onPackageSelectWithTab(pkg.id, "bid-leveling")
+                            : onPackageSelect(pkg.id)
+                        }
+                      >
+                        Level bids »
+                      </button>
+                    ) : (
+                      <span className="text-muted-foreground text-sm italic">no bids</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-muted-foreground">-</span>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <MessageCircle className="h-4 w-4 mr-2" />
+                          Message
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -113,7 +113,7 @@ export function ProjectPageWrapper({
         description: "Project information refreshed",
         timestamp: new Date().toISOString(),
         read: false,
-        color: "blue",
+        color: "#FA4616", // Use company orange color
         icon: FileText,
         onClick: () => console.log("Activity clicked"),
       },

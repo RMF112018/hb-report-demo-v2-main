@@ -1,0 +1,9 @@
+{
+  "title": "Baselines demo",
+  "description": "Illustrates usage of baselines",
+  "source": [
+    "app.js",
+    "index.html",
+    "resources/app.scss"
+  ]
+}

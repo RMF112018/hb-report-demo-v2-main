@@ -11,9 +11,9 @@
 
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -59,9 +59,24 @@ interface FinancialHubContentProps {
   selectedSubTool: string
   projectData: any
   userRole: string
+  onTabChange?: (tabId: string) => void
 }
 
-export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({ selectedSubTool, projectData, userRole }) => {
+export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({
+  selectedSubTool,
+  projectData,
+  userRole,
+  onTabChange,
+}) => {
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
   const getFinancialData = () => ({
     totalContractValue: projectData?.contract_value || 57235491,
     netCashFlow: 8215006.64,
@@ -317,44 +332,71 @@ export const FinancialHubContent: React.FC<FinancialHubContentProps> = ({ select
   const availableTabs = getTabsForRole()
   const activeTab = selectedSubTool || "overview"
 
+  const handleTabChange = (tabId: string) => {
+    if (onTabChange) {
+      onTabChange(tabId)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
-          {availableTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-sm">
-              <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </TabsTrigger>
+      {/* Horizontal Navigation Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-11 gap-3">
+        {availableTabs.map((tab) => {
+          const IconComponent = tab.icon
+          const isActive = activeTab === tab.id
+
+          return (
+            <Card
+              key={tab.id}
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                isActive ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "hover:border-gray-300"
+              }`}
+              onClick={() => handleTabChange(tab.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <div className="relative">
+                    <IconComponent className={`h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-600"}`} />
+                  </div>
+                  <div>
+                    <p
+                      className={`text-xs font-medium ${
+                        isActive ? "text-blue-600" : "text-gray-900 dark:text-gray-100"
+                      }`}
+                    >
+                      {tab.label}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* Main Content */}
+      <div className="space-y-4">
+        {/* Tab-specific KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-3">
+          {getFinancialKPIs(activeTab).map((kpi, index) => (
+            <Card key={index}>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <kpi.icon className={`h-5 w-5 text-${kpi.color}-600`} />
+                  <div>
+                    <p className="text-sm font-medium">{kpi.value}</p>
+                    <p className="text-xs text-muted-foreground">{kpi.label}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
-        </TabsList>
+        </div>
 
-        {availableTabs.map((tab) => (
-          <TabsContent key={tab.id} value={tab.id} className="mt-6">
-            <div className="space-y-4">
-              {/* Tab-specific KPIs */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {getFinancialKPIs(tab.id).map((kpi, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-2">
-                        <kpi.icon className={`h-5 w-5 text-${kpi.color}-600`} />
-                        <div>
-                          <p className="text-sm font-medium">{kpi.value}</p>
-                          <p className="text-xs text-muted-foreground">{kpi.label}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Tab Content */}
-              {renderContent()}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+        {/* Tab Content */}
+        {renderContent()}
+      </div>
     </div>
   )
 }

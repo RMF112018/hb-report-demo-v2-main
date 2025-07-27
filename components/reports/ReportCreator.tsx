@@ -58,6 +58,10 @@ import {
 import type { Report, ReportSection } from "@/types/report-types"
 import { FinancialForecastMemo } from "./demo/FinancialForecastMemo"
 import { DrawForecast } from "./demo/DrawForecast"
+import { BudgetSnapshot } from "@/components/reports/demo/BudgetSnapshot"
+import { JobCostHistory } from "@/components/reports/demo/JobCostHistory"
+import { GcGrForecast } from "@/components/reports/demo/GcGrForecast"
+import { FinancialReviewReport } from "./demo/FinancialReviewReport"
 
 interface SortableSectionProps {
   section: ReportSection
@@ -421,20 +425,21 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
           })
         } else {
           // Create blank report
+          const defaultSections = getTemplateSections("financial-review")
           setCurrentReport({
             id: `rpt-${Date.now()}`,
-            name: "New Report",
+            name: "New Financial Review Report",
             type: "financial-review",
             projectId: "1",
             projectName: "Select Project",
-            sections: [],
+            sections: defaultSections,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             version: 1,
             tags: [],
             metadata: {
-              sectionCount: 0,
-              pageCount: 0,
+              sectionCount: defaultSections.length,
+              pageCount: defaultSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
               size: "0 MB",
               automationLevel: 0,
             },
@@ -469,9 +474,36 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
   }
 
   const getTemplateSections = (templateId: string): ReportSection[] => {
-    const requiredSections = sectionTemplates.filter((template) => template.requiredFor.includes(templateId))
-
-    return requiredSections.map((template, index) => ({
+    // For 'financial-review', enforce the correct order and inclusion of all required sections
+    if (templateId === "financial-review") {
+      const orderedSectionTypes = [
+        "financial-forecast-memo",
+        "procore-budget-snapshot",
+        "sage-job-cost-history",
+        "gc-gr-forecast",
+        "draw-forecast",
+      ]
+      const orderedTemplates = orderedSectionTypes
+        .map((type) => sectionTemplates.find((template) => template.contentType === type))
+        .filter((template): template is (typeof sectionTemplates)[number] => Boolean(template))
+      return orderedTemplates.map((template, index) => ({
+        id: `sec-${Date.now()}-${index}`,
+        title: template.title,
+        contentType: template.contentType,
+        paperSize: template.defaultPaperSize,
+        orientation: template.defaultOrientation,
+        order: index + 1,
+        required: true,
+        enabled: true,
+        lastUpdated: new Date().toISOString(),
+        dataSource: template.dataSource,
+        pageCount: template.estimatedPages,
+        reviewed: false,
+      }))
+    }
+    // Default behavior for other templates
+    const filteredRequiredSections = sectionTemplates.filter((template) => template.requiredFor.includes(templateId))
+    return filteredRequiredSections.map((template, index) => ({
       id: `sec-${Date.now()}-${index}`,
       title: template.title,
       contentType: template.contentType,
@@ -643,12 +675,36 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
       return <div className="text-center py-16 text-muted-foreground">No sections to preview</div>
     }
 
-    // Find the first available demo section to show
+    // If this is a Financial Review report and all required sections are present, show the full package
+    if (
+      currentReport.type === "financial-review" &&
+      Array.isArray(currentReport.sections) &&
+      [
+        "financial-forecast-memo",
+        "procore-budget-snapshot",
+        "sage-job-cost-history",
+        "gc-gr-forecast",
+        "draw-forecast",
+      ].every((type) => currentReport.sections?.some((s) => s.contentType === type))
+    ) {
+      return <FinancialReviewReport />
+    }
+
+    // Fallback: show first available section
     const financialForecastSection = currentReport.sections.find((s) => s.contentType === "financial-forecast-memo")
+    const budgetSnapshotSection = currentReport.sections.find((s) => s.contentType === "procore-budget-snapshot")
+    const jobCostHistorySection = currentReport.sections.find((s) => s.contentType === "sage-job-cost-history")
+    const gcGrForecastSection = currentReport.sections.find((s) => s.contentType === "gc-gr-forecast")
     const drawForecastSection = currentReport.sections.find((s) => s.contentType === "draw-forecast")
 
     if (financialForecastSection) {
       return <FinancialForecastMemo />
+    } else if (budgetSnapshotSection) {
+      return <BudgetSnapshot />
+    } else if (jobCostHistorySection) {
+      return <JobCostHistory />
+    } else if (gcGrForecastSection) {
+      return <GcGrForecast />
     } else if (drawForecastSection) {
       return <DrawForecast />
     } else {
@@ -656,7 +712,10 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
         <div className="text-center py-16 text-muted-foreground">
           <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
           <p>Preview not available for selected sections</p>
-          <p className="text-xs mt-2">Add Financial Forecast Memo or Draw Forecast to see preview</p>
+          <p className="text-xs mt-2">
+            Add Financial Forecast Memo, Budget Snapshot, Job Cost History, GC & GR Forecast, or Draw Forecast to see
+            preview
+          </p>
         </div>
       )
     }
@@ -717,10 +776,22 @@ export function ReportCreator({ reportId, templateId, onSave, onCancel }: Report
               <Select
                 value={currentReport.type}
                 onValueChange={(type: any) => {
+                  // Auto-populate sections when Financial Review is selected
+                  let newSections = currentReport.sections || []
+                  if (type === "financial-review" && (!currentReport.sections || currentReport.sections.length === 0)) {
+                    newSections = getTemplateSections("financial-review")
+                  }
+
                   setCurrentReport({
                     ...currentReport,
                     type,
+                    sections: newSections,
                     updatedAt: new Date().toISOString(),
+                    metadata: {
+                      ...currentReport.metadata!,
+                      sectionCount: newSections.length,
+                      pageCount: newSections.reduce((sum, s) => sum + (s.pageCount || 1), 0),
+                    },
                   })
                   setIsDirty(true)
                 }}

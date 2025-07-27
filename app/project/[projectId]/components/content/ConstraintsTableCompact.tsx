@@ -15,12 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ProtectedGrid, ProtectedColDef, GridRow, createGridWithTotalsAndSticky } from "@/components/ui/protected-grid"
 import {
   AlertTriangle,
   CheckCircle,
@@ -176,6 +176,25 @@ const ConstraintsTableCompact: React.FC<ConstraintsTableCompactProps> = ({
     return filtered
   }, [constraints, activeTab, searchTerm, selectedCategory, selectedPriority])
 
+  // Transform constraints data for the grid
+  const transformedConstraints = useMemo(() => {
+    return filteredConstraints.map((constraint) => ({
+      id: constraint.id,
+      no: constraint.no,
+      description: constraint.description,
+      category: constraint.category,
+      priority: constraint.priority,
+      status: constraint.status,
+      assigned: constraint.assigned,
+      dateIdentified: constraint.dateIdentified,
+      dueDate: constraint.dueDate,
+      daysElapsed: constraint.daysElapsed,
+      impact: constraint.impact,
+      resolution: constraint.resolution,
+      _originalData: constraint, // Keep reference to original data
+    }))
+  }, [filteredConstraints])
+
   const categories = useMemo(() => {
     return [...new Set(constraints.map((c) => c.category))].sort()
   }, [constraints])
@@ -207,6 +226,194 @@ const ConstraintsTableCompact: React.FC<ConstraintsTableCompactProps> = ({
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+    }
+  }
+
+  // Define column definitions for open constraints
+  const openColumnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "no",
+        headerName: "ID",
+        width: 80,
+        cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+        pinned: "left",
+      },
+      {
+        field: "description",
+        headerName: "Description",
+        width: 300,
+        cellRenderer: (params: any) => {
+          const constraint = params.data._originalData
+          return (
+            <div className="max-w-xs">
+              <p className="text-sm font-medium truncate">{constraint.description}</p>
+              {constraint.impact && <p className="text-xs text-muted-foreground truncate">{constraint.impact}</p>}
+            </div>
+          )
+        },
+      },
+      {
+        field: "category",
+        headerName: "Category",
+        width: 100,
+        cellRenderer: (params: any) => (
+          <Badge variant="outline" className="text-xs">
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "priority",
+        headerName: "Priority",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge className={cn("text-xs", getPriorityColor(params.value))}>{params.value}</Badge>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 100,
+        cellRenderer: (params: any) => (
+          <Badge className={cn("text-xs", getStatusColor(params.value))}>{params.value}</Badge>
+        ),
+      },
+      {
+        field: "assigned",
+        headerName: "Assigned",
+        width: 130,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "dueDate",
+        headerName: "Due Date",
+        width: 100,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "daysElapsed",
+        headerName: "Days",
+        width: 70,
+        cellRenderer: (params: any) => <div className="text-sm font-medium">{params.value}d</div>,
+      },
+      {
+        field: "actions",
+        headerName: "",
+        width: 60,
+        cellRenderer: (params: any) => {
+          const constraint = params.data._originalData
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEditConstraint(constraint)}>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDeleteConstraint(constraint.id)} className="text-red-600">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+        pinned: "right",
+        sortable: false,
+        filter: false,
+      },
+    ],
+    []
+  )
+
+  // Define column definitions for resolved constraints
+  const resolvedColumnDefs: ProtectedColDef[] = useMemo(
+    () => [
+      {
+        field: "no",
+        headerName: "ID",
+        width: 80,
+        cellRenderer: (params: any) => <div className="font-medium">{params.value}</div>,
+        pinned: "left",
+      },
+      {
+        field: "description",
+        headerName: "Description",
+        width: 250,
+        cellRenderer: (params: any) => {
+          const constraint = params.data._originalData
+          return (
+            <div className="max-w-xs">
+              <p className="text-sm font-medium truncate">{constraint.description}</p>
+            </div>
+          )
+        },
+      },
+      {
+        field: "category",
+        headerName: "Category",
+        width: 100,
+        cellRenderer: (params: any) => (
+          <Badge variant="outline" className="text-xs">
+            {params.value}
+          </Badge>
+        ),
+      },
+      {
+        field: "priority",
+        headerName: "Priority",
+        width: 90,
+        cellRenderer: (params: any) => (
+          <Badge className={cn("text-xs", getPriorityColor(params.value))}>{params.value}</Badge>
+        ),
+      },
+      {
+        field: "assigned",
+        headerName: "Assigned",
+        width: 130,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+      {
+        field: "resolution",
+        headerName: "Resolution",
+        width: 250,
+        cellRenderer: (params: any) => <p className="text-sm truncate max-w-xs">{params.value}</p>,
+      },
+      {
+        field: "dueDate",
+        headerName: "Resolved",
+        width: 100,
+        cellRenderer: (params: any) => <div className="text-sm">{params.value}</div>,
+      },
+    ],
+    []
+  )
+
+  // Grid configuration
+  const gridConfig = createGridWithTotalsAndSticky(1, false, {
+    allowExport: true,
+    allowRowSelection: false,
+    allowMultiSelection: false,
+    allowColumnReordering: false,
+    allowColumnResizing: true,
+    allowSorting: true,
+    allowFiltering: false, // We handle filtering externally
+    allowCellEditing: false,
+    showToolbar: false, // We have custom toolbar
+    showStatusBar: false,
+    theme: "quartz",
+  })
+
+  // Handle row click
+  const handleRowClick = (event: any) => {
+    const constraint = event.data._originalData
+    if (onConstraintClick) {
+      onConstraintClick(constraint)
     }
   }
 
@@ -266,12 +473,6 @@ const ConstraintsTableCompact: React.FC<ConstraintsTableCompactProps> = ({
 
   const handleDeleteConstraint = (id: string) => {
     setConstraints(constraints.filter((c) => c.id !== id))
-  }
-
-  const handleRowClick = (constraint: any) => {
-    if (onConstraintClick) {
-      onConstraintClick(constraint)
-    }
   }
 
   const stats = useMemo(() => {
@@ -466,78 +667,23 @@ const ConstraintsTableCompact: React.FC<ConstraintsTableCompactProps> = ({
         <TabsContent value="open" className="mt-4">
           <Card>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-16">ID</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="w-24">Category</TableHead>
-                    <TableHead className="w-20">Priority</TableHead>
-                    <TableHead className="w-24">Status</TableHead>
-                    <TableHead className="w-32">Assigned</TableHead>
-                    <TableHead className="w-24">Due Date</TableHead>
-                    <TableHead className="w-20">Days</TableHead>
-                    <TableHead className="w-16"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredConstraints.map((constraint) => (
-                    <TableRow
-                      key={constraint.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(constraint)}
-                    >
-                      <TableCell className="font-medium">{constraint.no}</TableCell>
-                      <TableCell>
-                        <div className="max-w-xs">
-                          <p className="text-sm font-medium truncate">{constraint.description}</p>
-                          {constraint.impact && (
-                            <p className="text-xs text-muted-foreground truncate">{constraint.impact}</p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {constraint.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={cn("text-xs", getPriorityColor(constraint.priority))}>
-                          {constraint.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={cn("text-xs", getStatusColor(constraint.status))}>{constraint.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-sm">{constraint.assigned}</TableCell>
-                      <TableCell className="text-sm">{constraint.dueDate}</TableCell>
-                      <TableCell className="text-sm font-medium">{constraint.daysElapsed}d</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditConstraint(constraint)}>
-                              <Edit2 className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteConstraint(constraint.id)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="min-w-0 max-w-full overflow-hidden">
+                <ProtectedGrid
+                  columnDefs={openColumnDefs}
+                  rowData={transformedConstraints}
+                  config={gridConfig}
+                  events={{
+                    onRowSelected: handleRowClick,
+                    onGridReady: (event) => {
+                      // Grid ready event
+                    },
+                  }}
+                  height="400px"
+                  loading={false}
+                  enableSearch={false} // We handle search externally
+                  title=""
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -545,50 +691,23 @@ const ConstraintsTableCompact: React.FC<ConstraintsTableCompactProps> = ({
         <TabsContent value="resolved" className="mt-4">
           <Card>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-16">ID</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="w-24">Category</TableHead>
-                    <TableHead className="w-20">Priority</TableHead>
-                    <TableHead className="w-32">Assigned</TableHead>
-                    <TableHead>Resolution</TableHead>
-                    <TableHead className="w-24">Resolved</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredConstraints.map((constraint) => (
-                    <TableRow
-                      key={constraint.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(constraint)}
-                    >
-                      <TableCell className="font-medium">{constraint.no}</TableCell>
-                      <TableCell>
-                        <div className="max-w-xs">
-                          <p className="text-sm font-medium truncate">{constraint.description}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {constraint.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={cn("text-xs", getPriorityColor(constraint.priority))}>
-                          {constraint.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm">{constraint.assigned}</TableCell>
-                      <TableCell>
-                        <p className="text-sm truncate max-w-xs">{constraint.resolution}</p>
-                      </TableCell>
-                      <TableCell className="text-sm">{constraint.dueDate}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="min-w-0 max-w-full overflow-hidden">
+                <ProtectedGrid
+                  columnDefs={resolvedColumnDefs}
+                  rowData={transformedConstraints}
+                  config={gridConfig}
+                  events={{
+                    onRowSelected: handleRowClick,
+                    onGridReady: (event) => {
+                      // Grid ready event
+                    },
+                  }}
+                  height="400px"
+                  loading={false}
+                  enableSearch={false} // We handle search externally
+                  title=""
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

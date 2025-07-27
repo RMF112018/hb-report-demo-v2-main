@@ -14,6 +14,17 @@ export interface User {
   }
 }
 
+export type UserRole =
+  | "executive"
+  | "project-executive"
+  | "project-manager"
+  | "superintendent"
+  | "estimator"
+  | "team-member"
+  | "admin"
+  | "viewer"
+  | "hr-payroll"
+
 export interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<{ redirectTo: string }>

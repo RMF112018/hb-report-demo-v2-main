@@ -585,5 +585,207 @@
       "user": "John Doe"
     }
   ],
-  "estimator": []
+  "estimator": [],
+  "admin": [
+    {
+      "id": "it_001",
+      "project_id": 2525840,
+      "project_name": "IT Infrastructure Monitoring",
+      "type": "note",
+      "description": "Server health check completed - All 24 servers operational, CPU usage optimal",
+      "timestamp": "2024-12-27T15:45:00Z",
+      "source": "hb_report",
+      "user": "IT Admin"
+    },
+    {
+      "id": "it_002",
+      "project_id": 2525841,
+      "project_name": "User Access Management",
+      "type": "assignment",
+      "description": "New user onboarding completed for 3 project team members - Access permissions configured",
+      "timestamp": "2024-12-27T14:20:00Z",
+      "source": "hb_report",
+      "user": "Security Admin"
+    },
+    {
+      "id": "it_003",
+      "project_id": 2525842,
+      "project_name": "System Security Monitoring",
+      "type": "note",
+      "description": "Security scan completed - 0 critical vulnerabilities detected, 2 minor issues patched",
+      "timestamp": "2024-12-27T13:30:00Z",
+      "source": "hb_report",
+      "user": "Security Operations"
+    },
+    {
+      "id": "it_004",
+      "project_id": 2525843,
+      "project_name": "AI Pipeline Operations",
+      "type": "note",
+      "description": "Data processing pipeline executed successfully - 15,000 records processed in 2.3 minutes",
+      "timestamp": "2024-12-27T12:45:00Z",
+      "source": "hb_report",
+      "user": "AI Operations"
+    },
+    {
+      "id": "it_005",
+      "project_id": 2525844,
+      "project_name": "Asset & License Management",
+      "type": "assignment",
+      "description": "Software license renewal processed for Microsoft Office 365 - 150 licenses updated",
+      "timestamp": "2024-12-27T11:15:00Z",
+      "source": "hb_report",
+      "user": "Asset Manager"
+    },
+    {
+      "id": "it_006",
+      "project_id": 2525845,
+      "project_name": "Backup & Recovery Operations",
+      "type": "note",
+      "description": "Daily backup completed successfully - 2.3TB data backed up, all systems verified",
+      "timestamp": "2024-12-27T10:30:00Z",
+      "source": "hb_report",
+      "user": "Backup Admin"
+    },
+    {
+      "id": "it_007",
+      "project_id": 2525846,
+      "project_name": "Network Infrastructure",
+      "type": "note",
+      "description": "Network performance optimization completed - Latency reduced by 15% across all sites",
+      "timestamp": "2024-12-27T09:45:00Z",
+      "source": "hb_report",
+      "user": "Network Admin"
+    },
+    {
+      "id": "it_008",
+      "project_id": 2525847,
+      "project_name": "Endpoint Security",
+      "type": "note",
+      "description": "Endpoint protection update deployed to 245 devices - All endpoints now compliant",
+      "timestamp": "2024-12-27T08:20:00Z",
+      "source": "hb_report",
+      "user": "Endpoint Security"
+    },
+    {
+      "id": "it_009",
+      "project_id": 2525848,
+      "project_name": "Email Security Monitoring",
+      "type": "note",
+      "description": "Email threat analysis completed - 47 phishing attempts blocked, 0 successful breaches",
+      "timestamp": "2024-12-26T16:30:00Z",
+      "source": "hb_report",
+      "user": "Email Security"
+    },
+    {
+      "id": "it_010",
+      "project_id": 2525849,
+      "project_name": "System Log Analysis",
+      "type": "note",
+      "description": "Log aggregation and analysis completed - 1.2M events processed, no critical issues found",
+      "timestamp": "2024-12-26T15:15:00Z",
+      "source": "hb_report",
+      "user": "Log Analyst"
+    },
+    {
+      "id": "it_011",
+      "project_id": 2525850,
+      "project_name": "Infrastructure Capacity Planning",
+      "type": "forecast",
+      "description": "Quarterly capacity analysis completed - Storage capacity at 68%, recommend expansion Q2 2025",
+      "timestamp": "2024-12-26T14:00:00Z",
+      "source": "hb_report",
+      "user": "Capacity Planning"
+    },
+    {
+      "id": "it_012",
+      "project_id": 2525851,
+      "project_name": "Security Incident Response",
+      "type": "resolution",
+      "description": "Security incident INC-2024-127 resolved - False positive detection, system performance restored",
+      "timestamp": "2024-12-26T13:45:00Z",
+      "source": "hb_report",
+      "user": "Incident Response"
+    },
+    {
+      "id": "it_013",
+      "project_id": 2525852,
+      "project_name": "Consultant Access Management",
+      "type": "assignment",
+      "description": "External consultant access configured for Acme IT Services - 30-day temporary access granted",
+      "timestamp": "2024-12-26T12:30:00Z",
+      "source": "hb_report",
+      "user": "Access Control"
+    },
+    {
+      "id": "it_014",
+      "project_id": 2525853,
+      "project_name": "Change Management",
+      "type": "note",
+      "description": "Change request CHG-2024-456 approved - Database maintenance window scheduled for weekend",
+      "timestamp": "2024-12-26T11:20:00Z",
+      "source": "hb_report",
+      "user": "Change Manager"
+    },
+    {
+      "id": "it_015",
+      "project_id": 2525854,
+      "project_name": "AI Pipeline Monitoring",
+      "type": "note",
+      "description": "Machine learning model retrained with new data - Model accuracy improved to 94.2%",
+      "timestamp": "2024-12-26T10:10:00Z",
+      "source": "hb_report",
+      "user": "ML Engineer"
+    },
+    {
+      "id": "it_016",
+      "project_id": 2525855,
+      "project_name": "Disaster Recovery Testing",
+      "type": "note",
+      "description": "Monthly DR test completed - RTO achieved in 3.2 hours, all systems recovered successfully",
+      "timestamp": "2024-12-26T09:00:00Z",
+      "source": "hb_report",
+      "user": "DR Coordinator"
+    },
+    {
+      "id": "it_017",
+      "project_id": 2525856,
+      "project_name": "System Performance Analysis",
+      "type": "note",
+      "description": "Performance baseline updated - Database query optimization resulted in 25% speed improvement",
+      "timestamp": "2024-12-25T17:30:00Z",
+      "source": "hb_report",
+      "user": "Performance Engineer"
+    },
+    {
+      "id": "it_018",
+      "project_id": 2525857,
+      "project_name": "Compliance Audit",
+      "type": "compliance",
+      "description": "SOC 2 compliance check completed - All security controls verified and documented",
+      "timestamp": "2024-12-25T16:15:00Z",
+      "source": "hb_report",
+      "user": "Compliance Officer"
+    },
+    {
+      "id": "it_019",
+      "project_id": 2525858,
+      "project_name": "Infrastructure Monitoring",
+      "type": "note",
+      "description": "Critical alert resolved - Primary data center power redundancy restored to full capacity",
+      "timestamp": "2024-12-25T15:45:00Z",
+      "source": "hb_report",
+      "user": "Infrastructure Engineer"
+    },
+    {
+      "id": "it_020",
+      "project_id": 2525859,
+      "project_name": "User Training & Support",
+      "type": "assignment",
+      "description": "Security awareness training completed for 125 employees - 98% completion rate achieved",
+      "timestamp": "2024-12-25T14:20:00Z",
+      "source": "hb_report",
+      "user": "Training Coordinator"
+    }
+  ]
 }

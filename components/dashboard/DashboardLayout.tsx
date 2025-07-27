@@ -22,6 +22,8 @@ interface DashboardLayoutProps {
   dashboards?: Array<{ id: string; name: string }>
   currentDashboardId?: string
   onDashboardSelect?: (dashboardId: string) => void
+  // Beta dashboard toggle
+  useBetaDashboard?: boolean
 }
 
 /**
@@ -46,6 +48,7 @@ export function DashboardLayout({
   dashboards = [],
   currentDashboardId,
   onDashboardSelect,
+  useBetaDashboard,
 }: DashboardLayoutProps) {
   const router = useRouter()
 
@@ -74,10 +77,10 @@ export function DashboardLayout({
 
       <div className="relative z-10">
         {/* KPI Row with enhanced styling */}
-        <div data-tour="kpi-widgets" className="mb-4">
+        <div data-tour="kpi-widgets" className="mb-8">
           <div className="px-0 sm:px-0 lg:px-0 xl:px-0 2xl:px-0 pt-0 sm:pt-0">
             <div className="mx-auto max-w-[1920px]">
-              <KPIRow userRole={userRole} />
+              <KPIRow userRole={userRole} isCompact={isCompact} />
             </div>
           </div>
         </div>
@@ -98,6 +101,7 @@ export function DashboardLayout({
               isCompact={isCompact}
               spacingClass={getSpacingClass()}
               userRole={userRole}
+              useBetaDashboard={useBetaDashboard}
             />
           </div>
         </div>

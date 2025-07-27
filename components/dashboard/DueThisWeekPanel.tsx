@@ -38,111 +38,236 @@ interface DueItem {
 }
 
 export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps) {
-  // Get current week end date (Friday)
+  // Get current week end date (Friday) - Fixed calculation
   const getEndOfWeek = () => {
     const today = new Date()
-    const dayOfWeek = today.getDay()
-    const daysUntilFriday = dayOfWeek === 0 ? 5 : 5 - dayOfWeek // Sunday = 0, Friday = 5
+    const dayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+    // Calculate days until next Friday (or today if it's Friday)
+    let daysUntilFriday: number
+    if (dayOfWeek === 5) {
+      // Friday
+      daysUntilFriday = 0 // Today is Friday
+    } else if (dayOfWeek === 6) {
+      // Saturday
+      daysUntilFriday = 6 // Next Friday
+    } else if (dayOfWeek === 0) {
+      // Sunday
+      daysUntilFriday = 5 // This Friday
+    } else {
+      // Monday through Thursday
+      daysUntilFriday = 5 - dayOfWeek // Days until Friday
+    }
+
     const endOfWeek = new Date(today)
     endOfWeek.setDate(today.getDate() + daysUntilFriday)
+    endOfWeek.setHours(23, 59, 59, 999) // End of Friday
     return endOfWeek
   }
 
-  // Generate mock due items based on user role and existing data
+  // Generate comprehensive mock due items based on user role
   const dueItems = useMemo(() => {
     const endOfWeek = getEndOfWeek()
+    const today = new Date()
     const items: DueItem[] = []
 
-    // Filter projects based on user role
-    const userProjects =
-      userRole === "project-executive"
-        ? projectsData.filter((p) => p.active).slice(0, 6)
-        : projectsData.filter((p) => p.active).slice(0, 1)
+    // Helper function to generate dates within the current week for demo purposes
+    const generateDemoDate = (offsetHours: number) => {
+      const date = new Date(today.getTime() + offsetHours * 60 * 60 * 1000)
+      // Ensure the date is within this week window
+      if (date > endOfWeek) {
+        // If the date would be beyond this week, put it earlier in the week
+        return new Date(today.getTime() + (offsetHours % 72) * 60 * 60 * 1000).toISOString()
+      }
+      return date.toISOString()
+    }
 
-    // Get responsibilities based on user role
+    // Role-specific mock data
+    const mockDataByRole = {
+      "project-executive": {
+        projects: [
+          "Downtown Medical Center",
+          "Riverside Office Tower",
+          "Tech Campus Phase II",
+          "Harbor View Apartments",
+          "City Hall Renovation",
+          "Industrial Park Expansion",
+        ],
+        items: [
+          {
+            title: "Board presentation for Q4 portfolio review",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(-24), // Yesterday (overdue)
+            priority: "high" as const,
+            project: "Downtown Medical Center",
+            status: "overdue" as const,
+            category: "PX",
+          },
+          {
+            title: "Respond to owner's concerns about MEP coordination",
+            type: "message" as const,
+            dueDate: generateDemoDate(8), // Later today
+            priority: "high" as const,
+            project: "Tech Campus Phase II",
+            status: "due-soon" as const,
+            category: "PX",
+          },
+          {
+            title: "Weekly executive dashboard review meeting",
+            type: "task" as const,
+            dueDate: generateDemoDate(30), // Tomorrow
+            priority: "medium" as const,
+            project: "Portfolio Overview",
+            status: "pending" as const,
+            category: "PX",
+          },
+          {
+            title: "Sign-off on change orders exceeding $50K threshold",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(54), // Day after tomorrow
+            priority: "high" as const,
+            project: "Harbor View Apartments",
+            status: "pending" as const,
+            category: "PX",
+          },
+          {
+            title: "Client relationship review with major stakeholders",
+            type: "task" as const,
+            dueDate: generateDemoDate(78), // Three days from now
+            priority: "medium" as const,
+            project: "City Hall Renovation",
+            status: "pending" as const,
+            category: "PX",
+          },
+          {
+            title: "Risk assessment report for new project pursuits",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(102), // Four days from now
+            priority: "medium" as const,
+            project: "Industrial Park Expansion",
+            status: "pending" as const,
+            category: "PX",
+          },
+        ],
+      },
+      "project-manager": {
+        projects: ["Downtown Medical Center", "Riverside Office Tower"],
+        items: [
+          {
+            title: "Submit weekly progress report to owner",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(6), // Later today
+            priority: "high" as const,
+            project: "Downtown Medical Center",
+            status: "due-soon" as const,
+            category: "SPM",
+          },
+          {
+            title: "Coordinate with MEP contractor on ceiling conflicts",
+            type: "task" as const,
+            dueDate: generateDemoDate(26), // Tomorrow morning
+            priority: "high" as const,
+            project: "Downtown Medical Center",
+            status: "pending" as const,
+            category: "SPM",
+          },
+          {
+            title: "Review and approve concrete pour schedule",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(38), // Tomorrow afternoon
+            priority: "high" as const,
+            project: "Downtown Medical Center",
+            status: "pending" as const,
+            category: "SPM",
+          },
+          {
+            title: "Respond to architect's RFI about facade details",
+            type: "message" as const,
+            dueDate: generateDemoDate(50), // Day after tomorrow
+            priority: "medium" as const,
+            project: "Downtown Medical Center",
+            status: "pending" as const,
+            category: "SPM",
+          },
+          {
+            title: "Conduct weekly safety walkthrough with superintendent",
+            type: "task" as const,
+            dueDate: generateDemoDate(62), // Mid-week
+            priority: "medium" as const,
+            project: "Downtown Medical Center",
+            status: "pending" as const,
+            category: "SPM",
+          },
+          {
+            title: "Update project schedule for elevator delays",
+            type: "responsibility" as const,
+            dueDate: generateDemoDate(74), // Later in week
+            priority: "high" as const,
+            project: "Downtown Medical Center",
+            status: "pending" as const,
+            category: "SPM",
+          },
+        ],
+      },
+    }
+
+    // Get role-specific data
+    const roleData = mockDataByRole[userRole]
     const taskCategory = userRole === "project-executive" ? "PX" : "SPM"
-    const userResponsibilities = responsibilityData.filter((r) => r && r["Task Category"] === taskCategory)
 
-    // Generate responsibilities due this week from actual data
-    userResponsibilities.slice(0, 3).forEach((resp, respIndex) => {
-      const dueDate = new Date()
-      dueDate.setDate(dueDate.getDate() + (respIndex + 1)) // Due in 1-3 days
-
-      if (dueDate <= endOfWeek) {
-        items.push({
-          id: `resp-${respIndex}`,
-          title: resp["Tasks/Role"] || "Unknown Task",
-          type: "responsibility",
-          dueDate: dueDate.toISOString(),
-          priority: respIndex === 0 ? "high" : respIndex === 1 ? "medium" : "low",
-          project:
-            userProjects[respIndex % userProjects.length]?.display_name ||
-            userProjects[respIndex % userProjects.length]?.name,
-          status:
-            dueDate < new Date()
-              ? "overdue"
-              : dueDate.getTime() - new Date().getTime() < 24 * 60 * 60 * 1000
-              ? "due-soon"
-              : "pending",
-          category: taskCategory,
-        })
-      }
+    // Add role-specific items (always show for demo purposes)
+    roleData.items.forEach((item, index) => {
+      items.push({
+        ...item,
+        id: `${userRole}-${index}`,
+      })
     })
 
-    // Add mock messages and tasks
-    const mockItems: Omit<DueItem, "id">[] = [
-      {
-        title: "Respond to owner's RFI about electrical changes",
-        type: "message",
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-        priority: "high",
-        project: userProjects[0]?.display_name || userProjects[0]?.name,
-        status: "due-soon",
-        category: taskCategory,
-      },
-      {
-        title: "Weekly safety meeting minutes submission",
-        type: "task",
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-        priority: "medium",
-        project: userProjects[0]?.display_name || userProjects[0]?.name,
-        status: "pending",
-        category: taskCategory,
-      },
-      {
-        title: "Budget variance report review",
-        type: "task",
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        priority: "medium",
-        project: userProjects[1]?.display_name || userProjects[1]?.name || userProjects[0]?.display_name,
-        status: "pending",
-        category: taskCategory,
-      },
-    ]
+    // If no items were added (shouldn't happen with our demo dates), add at least one demo item
+    if (items.length === 0) {
+      items.push({
+        id: `${userRole}-demo`,
+        title: "Demo task - Review project status",
+        type: "task" as const,
+        dueDate: today.toISOString(),
+        priority: "medium" as const,
+        project: "Demo Project",
+        status: "pending" as const,
+        category: userRole === "project-executive" ? "PX" : "SPM",
+      })
+    }
 
-    // Add mock items with unique IDs
-    mockItems.forEach((item, index) => {
-      const dueDate = new Date(item.dueDate)
-      if (dueDate <= endOfWeek) {
-        items.push({
-          ...item,
-          id: `mock-${index}`,
-        })
-      }
+    // Sort by due date and status priority (overdue first, then due-soon, then pending)
+    const sortedItems = items
+      .sort((a, b) => {
+        // First sort by status priority
+        const statusOrder = { overdue: 0, "due-soon": 1, pending: 2 }
+        const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+        if (statusDiff !== 0) return statusDiff
+
+        // Then sort by due date
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+      })
+      .slice(0, 6) // Show up to 6 items
+
+    // Debug logging
+    console.log(`DueThisWeekPanel - ${userRole}:`, {
+      totalItems: sortedItems.length,
+      endOfWeek: endOfWeek.toISOString(),
+      items: sortedItems.map((item) => ({ title: item.title, dueDate: item.dueDate, status: item.status })),
     })
 
-    // Sort by due date (earliest first)
-    return items.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()).slice(0, 5)
+    return sortedItems
   }, [userRole])
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "responsibility":
-        return <Target className="h-3 w-3 text-blue-600" />
+        return <Target className="h-3 w-3" style={{ color: "#0021A5" }} />
       case "task":
         return <CheckCircle className="h-3 w-3 text-green-600" />
       case "message":
-        return <Mail className="h-3 w-3 text-purple-600" />
+        return <Mail className="h-3 w-3" style={{ color: "#FA4616" }} />
       default:
         return <Clock className="h-3 w-3 text-gray-600" />
     }
@@ -153,9 +278,9 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
       case "overdue":
         return "text-red-600"
       case "due-soon":
-        return "text-orange-600"
+        return "text-[#FA4616]"
       case "pending":
-        return "text-blue-600"
+        return "text-[#0021A5]"
       default:
         return "text-gray-600"
     }
@@ -166,7 +291,7 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
       case "high":
         return "bg-red-100 text-red-800 border-red-200"
       case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+        return "bg-[#FA4616]/10 text-[#FA4616] border-[#FA4616]/20"
       case "low":
         return "bg-green-100 text-green-800 border-green-200"
       default:
@@ -195,17 +320,17 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
   }
 
   return (
-    <Card className={cn("border-l-4 border-l-[rgb(250,70,22)]", className)}>
-      <CardHeader className="pb-3">
+    <Card className={cn("border-l-4 border-l-[#FA4616]", className)}>
+      <CardHeader className="pb-3 bg-gradient-to-r from-[#FA4616]/5 to-transparent">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <Calendar className="h-5 w-5" style={{ color: "#FA4616" }} />
             <div>
               <div className="text-sm font-semibold">Due This Week</div>
               <div className="text-xs text-muted-foreground">Until {getWeekEndDate()}</div>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs border-[#0021A5]/20 text-[#0021A5]">
             {dueItems.length}
           </Badge>
         </CardTitle>
@@ -244,9 +369,9 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#0021A5]/10"
                   >
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3 w-3" style={{ color: "#0021A5" }} />
                   </Button>
                 </div>
               </div>
@@ -256,9 +381,9 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
 
         {dueItems.length > 0 && (
           <div className="pt-2 border-t">
-            <Button variant="ghost" size="sm" className="w-full text-xs">
-              <TrendingUp className="h-3 w-3 mr-2" />
-              View All Due Items
+            <Button variant="ghost" size="sm" className="w-full text-xs hover:bg-[#0021A5]/10">
+              <TrendingUp className="h-3 w-3 mr-2" style={{ color: "#0021A5" }} />
+              <span style={{ color: "#0021A5" }}>View All Due Items</span>
             </Button>
           </div>
         )}

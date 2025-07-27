@@ -19,21 +19,22 @@ The Enhanced HBI Insights component provides AI-powered intelligence analysis fo
 
 ```typescript
 interface HBIInsight {
-  id: string;
-  type: "forecast" | "risk" | "opportunity" | "performance" | "alert";
-  severity: "low" | "medium" | "high";
-  title: string;
-  text: string;
-  action: string;
-  confidence: number;
-  relatedMetrics: string[];
-  project_id?: string;
+  id: string
+  type: "forecast" | "risk" | "opportunity" | "performance" | "alert"
+  severity: "low" | "medium" | "high"
+  title: string
+  text: string
+  action: string
+  confidence: number
+  relatedMetrics: string[]
+  project_id?: string
 }
 ```
 
 ## 🧩 **Key UI Components**
 
 ### **Core Features:**
+
 - **AI Stats Header**: Displays confidence levels and insight distribution
 - **Insights List**: Expandable cards showing individual insights with severity indicators
 - **Drill-Down Analysis**: Click-activated deep analysis overlay (New Enhancement)
@@ -41,6 +42,7 @@ interface HBIInsight {
 - **Interactive Selection**: Click insights to view detailed action recommendations
 
 ### **Recent Enhancement - Click-Based Drill Down:**
+
 - **Trigger**: "Drill Down" button in header (replaces hover effect)
 - **Content**: Comprehensive AI performance analytics and strategic recommendations
 - **UX**: Non-disruptive, intentional interaction pattern
@@ -49,8 +51,8 @@ interface HBIInsight {
 
 ```typescript
 interface EnhancedHBIInsightsProps {
-  config: HBIInsight[] | any;  // Insight data array or config object
-  cardId?: string;             // Optional card identifier for context-specific insights
+  config: HBIInsight[] | any // Insight data array or config object
+  cardId?: string // Optional card identifier for context-specific insights
 }
 ```
 
@@ -60,17 +62,19 @@ interface EnhancedHBIInsightsProps {
 - **Responsive Design**: Mobile-first approach with `sm:` and `lg:` breakpoints
 - **Severity Color Coding**:
   - High: Red (`red-50`, `red-600`)
-  - Medium: Yellow (`yellow-50`, `yellow-600`) 
+  - Medium: Yellow (`yellow-50`, `yellow-600`)
   - Low: Green (`green-50`, `green-600`)
 
 ## 💾 **Data Integration**
 
 ### **Context-Aware Insights:**
+
 - **Financial Cards**: Automatically loads financial-specific insights (cash flow, margins, contingency)
 - **Executive Dashboard**: General operational and strategic insights
 - **Project-Specific**: Filters insights by `project_id` when provided
 
 ### **Mock Data Sources:**
+
 - Financial insights for financial review cards
 - Executive insights for dashboard overview
 - Configurable via `config` prop
@@ -79,7 +83,7 @@ interface EnhancedHBIInsightsProps {
 
 - Avatar images referenced in logs may return 404 (cosmetic issue)
 - Responsive spacing has multiple conflicting classes in some areas
-- Mock data is static - needs integration with real AI analysis backend
+- Mock data is static - needs integration with real HBI Analysis backend
 
 ## 🚀 **Future Improvements**
 
@@ -93,6 +97,7 @@ interface EnhancedHBIInsightsProps {
 ## 📝 **Recent Changes**
 
 ### **v2.1 Enhancement - Click-Based Drill Down**
+
 - Converted hover-triggered drill-down to click-based interaction
 - Added prominent "Drill Down" button in component header
 - Improved user experience by eliminating disruptive hover effects
@@ -107,4 +112,4 @@ interface EnhancedHBIInsightsProps {
 
 ---
 
-*This component exemplifies HB Report's commitment to AI-driven construction intelligence while maintaining intuitive user interactions and responsive design patterns.* 
+_This component exemplifies HB Report's commitment to AI-driven construction intelligence while maintaining intuitive user interactions and responsive design patterns._

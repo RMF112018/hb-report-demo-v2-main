@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 
 interface KPIRowProps {
   userRole?: string
+  isCompact?: boolean
 }
 
 // Helper function to determine performance level based on value and type
@@ -81,8 +82,16 @@ const getPerformanceLevel = (
   }
 }
 
-export function KPIRow({ userRole }: KPIRowProps) {
+export function KPIRow({ userRole, isCompact }: KPIRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    gap: isCompact ? "gap-3" : "gap-4",
+    height: isCompact ? "h-20" : "h-32",
+    padding: isCompact ? "pb-1" : "pb-2",
+    marginBottom: isCompact ? "mb-4" : "mb-6",
+  }
 
   // KPI configurations by role
   function getKPIsForRole() {
@@ -389,7 +398,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
   const responsiveKpis = getResponsiveKPICount(kpis)
 
   return (
-    <div className="bg-card border-b border-gray-200 dark:border-gray-700">
+    <div className={`bg-card ${compactScale.marginBottom}`}>
       {/* Header with collapse toggle - always visible */}
       <div className="flex items-center justify-between px-0 sm:px-0 lg:px-0 py-0 sm:py-0">
         {/* Collapse toggle - visible on tablet and mobile */}
@@ -407,13 +416,13 @@ export function KPIRow({ userRole }: KPIRowProps) {
       {/* KPI Content - collapsible on smaller screens */}
       <div
         className={`transition-all duration-300 ease-in-out ${
-          isCollapsed ? "max-h-0 overflow-hidden opacity-0" : "max-h-[200px] opacity-100"
+          isCollapsed ? "max-h-0 overflow-hidden opacity-0" : `${compactScale.height} opacity-100`
         } lg:max-h-none lg:opacity-100`}
       >
-        <div className="px-0 sm:px-0 lg:px-0 pb-0 sm:pb-0 lg:pb-0">
+        <div className={`px-0 sm:px-0 lg:px-0 ${compactScale.padding}`}>
           {/* Mobile Layout - 3 KPIs filling full width */}
           {responsiveKpis.mobile.length > 0 && (
-            <div className="grid grid-cols-3 gap-1 sm:hidden">
+            <div className={`grid grid-cols-3 ${compactScale.gap} sm:hidden`}>
               {responsiveKpis.mobile.map((kpi, index) => (
                 <div key={index} className="min-w-0">
                   <KPIWidget
@@ -433,7 +442,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
 
           {/* Tablet Layout - 4 KPIs filling full width */}
           {responsiveKpis.tablet.length > 0 && (
-            <div className="hidden sm:grid lg:hidden grid-cols-4 gap-1.5">
+            <div className={`hidden sm:grid lg:hidden grid-cols-4 ${compactScale.gap}`}>
               {responsiveKpis.tablet.map((kpi, index) => (
                 <div key={index} className="min-w-0">
                   <KPIWidget
@@ -454,7 +463,7 @@ export function KPIRow({ userRole }: KPIRowProps) {
           {/* Desktop Layout - All KPIs in responsive grid */}
           {responsiveKpis.desktop.length > 0 && (
             <div
-              className="hidden lg:grid gap-1.5 xl:gap-2"
+              className={`hidden lg:grid ${compactScale.gap} xl:${compactScale.gap}`}
               style={{
                 gridTemplateColumns: `repeat(${Math.min(responsiveKpis.desktop.length, 6)}, 1fr)`,
               }}

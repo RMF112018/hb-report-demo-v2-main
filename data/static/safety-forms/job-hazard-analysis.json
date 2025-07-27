@@ -1,0 +1,358 @@
+{
+  "formId": "JHA-001",
+  "title": "Job Hazard Analysis (JHA)",
+  "description": "Systematic analysis of job tasks to identify potential hazards and establish safety controls",
+  "category": "hazard-analysis",
+  "version": "2.1",
+  "requiredFields": ["jobDescription", "location", "supervisor", "hazards", "controls"],
+  "estimatedTime": "15-30 minutes",
+  "frequency": "Before each new task/activity",
+  "applicablePhases": ["pre-construction", "construction", "closeout"],
+  "applicableTrades": ["all"],
+  "priority": "high",
+  "regulatoryRequirements": [
+    {
+      "agency": "OSHA",
+      "standard": "29 CFR 1926.95",
+      "description": "General safety and health provisions"
+    },
+    {
+      "agency": "Company Policy",
+      "standard": "HBC-SAF-001",
+      "description": "Job Hazard Analysis requirement"
+    }
+  ],
+  "formStructure": {
+    "sections": [
+      {
+        "id": "project-info",
+        "title": "Project Information",
+        "required": true,
+        "fields": [
+          {
+            "id": "projectName",
+            "label": "Project Name",
+            "type": "text",
+            "required": true,
+            "placeholder": "Enter project name"
+          },
+          {
+            "id": "location",
+            "label": "Work Location",
+            "type": "text",
+            "required": true,
+            "placeholder": "Specific area/floor/room"
+          },
+          {
+            "id": "dateCreated",
+            "label": "Date Created",
+            "type": "date",
+            "required": true,
+            "defaultValue": "today"
+          },
+          {
+            "id": "jobDescription",
+            "label": "Job/Task Description",
+            "type": "textarea",
+            "required": true,
+            "placeholder": "Detailed description of the work to be performed",
+            "rows": 3
+          }
+        ]
+      },
+      {
+        "id": "personnel",
+        "title": "Personnel Information",
+        "required": true,
+        "fields": [
+          {
+            "id": "supervisor",
+            "label": "Supervisor",
+            "type": "text",
+            "required": true,
+            "placeholder": "Name of supervising person"
+          },
+          {
+            "id": "preparedBy",
+            "label": "Prepared By",
+            "type": "text",
+            "required": true,
+            "placeholder": "Name of person completing JHA"
+          },
+          {
+            "id": "reviewedBy",
+            "label": "Reviewed By",
+            "type": "text",
+            "required": false,
+            "placeholder": "Safety officer or competent person"
+          },
+          {
+            "id": "crewSize",
+            "label": "Crew Size",
+            "type": "number",
+            "required": true,
+            "min": 1,
+            "max": 50
+          }
+        ]
+      },
+      {
+        "id": "hazard-analysis",
+        "title": "Hazard Analysis",
+        "required": true,
+        "description": "Identify each step of the job and associated hazards",
+        "fields": [
+          {
+            "id": "hazards",
+            "label": "Hazard Analysis Table",
+            "type": "repeatable-group",
+            "required": true,
+            "minItems": 1,
+            "maxItems": 20,
+            "fields": [
+              {
+                "id": "stepNumber",
+                "label": "Step #",
+                "type": "number",
+                "required": true,
+                "auto": true
+              },
+              {
+                "id": "jobStep",
+                "label": "Job Step/Task",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "Describe the specific work step"
+              },
+              {
+                "id": "potentialHazards",
+                "label": "Potential Hazards",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "What could go wrong?"
+              },
+              {
+                "id": "hazardType",
+                "label": "Hazard Type",
+                "type": "select",
+                "required": true,
+                "options": [
+                  "Falls",
+                  "Electrical",
+                  "Chemical",
+                  "Struck by/against",
+                  "Caught in/between",
+                  "Fire/explosion",
+                  "Temperature extremes",
+                  "Noise",
+                  "Ergonomic",
+                  "Biological",
+                  "Other"
+                ]
+              },
+              {
+                "id": "riskLevel",
+                "label": "Risk Level",
+                "type": "select",
+                "required": true,
+                "options": [
+                  { "value": "low", "label": "Low", "color": "green" },
+                  { "value": "medium", "label": "Medium", "color": "yellow" },
+                  { "value": "high", "label": "High", "color": "orange" },
+                  { "value": "critical", "label": "Critical", "color": "red" }
+                ]
+              },
+              {
+                "id": "controls",
+                "label": "Safety Controls/Measures",
+                "type": "textarea",
+                "required": true,
+                "placeholder": "How will the hazard be controlled?"
+              },
+              {
+                "id": "ppeRequired",
+                "label": "Required PPE",
+                "type": "multiselect",
+                "required": false,
+                "options": [
+                  "Hard hat",
+                  "Safety glasses",
+                  "Hearing protection",
+                  "Respirator",
+                  "Safety harness",
+                  "Cut-resistant gloves",
+                  "Chemical-resistant gloves",
+                  "Steel-toed boots",
+                  "High-visibility vest",
+                  "Face shield"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "environmental-conditions",
+        "title": "Environmental Conditions",
+        "required": true,
+        "fields": [
+          {
+            "id": "weatherConditions",
+            "label": "Weather Conditions",
+            "type": "multiselect",
+            "required": true,
+            "options": [
+              "Clear",
+              "Cloudy",
+              "Rain",
+              "Snow",
+              "High winds",
+              "Extreme heat",
+              "Extreme cold",
+              "Poor visibility"
+            ]
+          },
+          {
+            "id": "workingHeight",
+            "label": "Working Height",
+            "type": "select",
+            "required": true,
+            "options": ["Ground level", "6-10 feet", "10-20 feet", "20+ feet"]
+          },
+          {
+            "id": "confinedSpace",
+            "label": "Confined Space Work",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "hotWork",
+            "label": "Hot Work (welding, cutting, etc.)",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          }
+        ]
+      },
+      {
+        "id": "emergency-procedures",
+        "title": "Emergency Procedures",
+        "required": true,
+        "fields": [
+          {
+            "id": "emergencyContacts",
+            "label": "Emergency Contact Numbers",
+            "type": "textarea",
+            "required": true,
+            "placeholder": "Emergency: 911\nSite Office: xxx-xxx-xxxx\nSafety Officer: xxx-xxx-xxxx"
+          },
+          {
+            "id": "nearestHospital",
+            "label": "Nearest Hospital",
+            "type": "text",
+            "required": true,
+            "placeholder": "Hospital name and address"
+          },
+          {
+            "id": "firstAidLocation",
+            "label": "First Aid Kit Location",
+            "type": "text",
+            "required": true,
+            "placeholder": "Location of nearest first aid supplies"
+          },
+          {
+            "id": "evacuationPlan",
+            "label": "Evacuation Plan",
+            "type": "textarea",
+            "required": true,
+            "placeholder": "Emergency evacuation routes and assembly points"
+          }
+        ]
+      },
+      {
+        "id": "approval",
+        "title": "Approval and Review",
+        "required": true,
+        "fields": [
+          {
+            "id": "safetyOfficerReview",
+            "label": "Safety Officer Review Required",
+            "type": "radio",
+            "required": true,
+            "options": ["Yes", "No"]
+          },
+          {
+            "id": "additionalComments",
+            "label": "Additional Comments",
+            "type": "textarea",
+            "required": false,
+            "placeholder": "Any additional safety considerations or notes"
+          },
+          {
+            "id": "reviewDate",
+            "label": "Review Date",
+            "type": "date",
+            "required": false,
+            "description": "When should this JHA be reviewed again?"
+          }
+        ]
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "condition": "schedule_activity_contains",
+      "values": ["excavation", "demolition", "concrete", "steel", "roofing", "electrical", "plumbing"],
+      "description": "High-risk activities require JHA"
+    },
+    {
+      "condition": "project_phase",
+      "values": ["construction"],
+      "description": "JHA required for all construction activities"
+    },
+    {
+      "condition": "new_trade_mobilization",
+      "values": ["any"],
+      "description": "JHA required when new trades start work"
+    }
+  ],
+  "automationRules": [
+    {
+      "field": "projectName",
+      "source": "project_data.name",
+      "auto": true
+    },
+    {
+      "field": "location",
+      "source": "project_data.location",
+      "auto": false
+    },
+    {
+      "field": "supervisor",
+      "source": "project_data.project_manager",
+      "auto": false
+    }
+  ],
+  "validationRules": [
+    {
+      "rule": "hazards_min_count",
+      "value": 1,
+      "message": "At least one hazard analysis step is required"
+    },
+    {
+      "rule": "high_risk_requires_review",
+      "condition": "any_hazard_risk_level = high OR critical",
+      "requires": "safetyOfficerReview = Yes",
+      "message": "High or critical risk activities require safety officer review"
+    }
+  ],
+  "metadata": {
+    "createdBy": "HB Safety Team",
+    "createdDate": "2024-01-15",
+    "lastModified": "2024-12-15",
+    "modifiedBy": "Safety Department",
+    "language": "en-US",
+    "tags": ["safety", "hazard-analysis", "risk-assessment", "osha"]
+  }
+}

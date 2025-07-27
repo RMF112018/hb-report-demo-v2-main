@@ -1,0 +1,239 @@
+{
+  "id": "power-bi-beta-layout",
+  "name": "Power BI Beta Dashboard",
+  "description": "Beta demonstration of Power BI enterprise integration with embedded analytics, real-time streaming, and advanced security features",
+  "role": "power-bi-beta",
+  "cards": [
+    {
+      "id": "power-bi-main-dashboard",
+      "type": "power-bi-dashboard",
+      "title": "Power BI Enterprise Dashboard",
+      "size": "full-width",
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 16, "rows": 8 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showRealTime": true,
+        "compactMode": false,
+        "enableDrillDown": true,
+        "beta": true,
+        "features": [
+          "embedded-analytics",
+          "real-time-streaming",
+          "row-level-security",
+          "premium-capacity",
+          "advanced-governance"
+        ]
+      }
+    },
+    {
+      "id": "power-bi-usage-analytics",
+      "type": "enhanced-hbi-insights",
+      "title": "Power BI Usage Analytics",
+      "size": "standard",
+      "position": { "x": 0, "y": 8 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "scope": "power-bi-usage",
+        "maxVisibleInsights": 6,
+        "compactMode": false,
+        "insights": [
+          {
+            "id": "pbi-1",
+            "type": "performance",
+            "severity": "high",
+            "title": "Power BI Report Performance",
+            "text": "Average load time decreased by 15% with premium capacity optimization",
+            "action": "Review report optimization settings",
+            "confidence": 92,
+            "relatedMetrics": ["load-time", "capacity-usage"]
+          },
+          {
+            "id": "pbi-2",
+            "type": "opportunity",
+            "severity": "medium",
+            "title": "Data Refresh Optimization",
+            "text": "Implement incremental refresh for large datasets to improve performance",
+            "action": "Configure incremental refresh policies",
+            "confidence": 87,
+            "relatedMetrics": ["data-refresh", "storage-usage"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "power-bi-security-overview",
+      "type": "enhanced-hbi-insights",
+      "title": "Security & Compliance",
+      "size": "standard",
+      "position": { "x": 8, "y": 8 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "scope": "security-compliance",
+        "maxVisibleInsights": 5,
+        "compactMode": false,
+        "insights": [
+          {
+            "id": "sec-1",
+            "type": "alert",
+            "severity": "high",
+            "title": "Security Compliance Score",
+            "text": "Achieved 96% compliance score with enterprise security standards",
+            "action": "Monitor ongoing compliance metrics",
+            "confidence": 98,
+            "relatedMetrics": ["compliance-score", "security-incidents"]
+          },
+          {
+            "id": "sec-2",
+            "type": "forecast",
+            "severity": "low",
+            "title": "Row-Level Security Status",
+            "text": "RLS configured for all sensitive datasets with proper access controls",
+            "action": "Review access permissions quarterly",
+            "confidence": 95,
+            "relatedMetrics": ["rls-coverage", "access-control"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "power-bi-capacity-metrics",
+      "type": "pipeline-analytics",
+      "title": "Capacity & Performance Metrics",
+      "size": "wide",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 10, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrends": true,
+        "showConversionRate": false,
+        "detailLevel": "executive",
+        "compactMode": false,
+        "metrics": [
+          {
+            "name": "Premium Capacity Usage",
+            "value": 78,
+            "unit": "percentage",
+            "trend": "stable",
+            "target": 85
+          },
+          {
+            "name": "Report Load Time",
+            "value": 2.3,
+            "unit": "seconds",
+            "trend": "improving",
+            "target": 3.0
+          },
+          {
+            "name": "Data Refresh Success Rate",
+            "value": 98.5,
+            "unit": "percentage",
+            "trend": "stable",
+            "target": 95.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "power-bi-governance",
+      "type": "market-intelligence",
+      "title": "Governance & Administration",
+      "size": "standard",
+      "position": { "x": 10, "y": 12 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "showTrends": true,
+        "showCompetitiveAnalysis": false,
+        "detailLevel": "executive",
+        "compactMode": false,
+        "governanceMetrics": [
+          {
+            "name": "Data Loss Prevention",
+            "status": "active",
+            "coverage": 100,
+            "lastUpdate": "2024-01-15"
+          },
+          {
+            "name": "Workspace Governance",
+            "status": "configured",
+            "coverage": 95,
+            "lastUpdate": "2024-01-14"
+          },
+          {
+            "name": "Content Certification",
+            "status": "active",
+            "coverage": 87,
+            "lastUpdate": "2024-01-13"
+          }
+        ]
+      }
+    },
+    {
+      "id": "power-bi-user-adoption",
+      "type": "staffing-distribution",
+      "title": "User Adoption & Training",
+      "size": "wide",
+      "position": { "x": 0, "y": 16 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "compactCharts": false,
+        "focusMetrics": ["adoption", "training", "engagement"],
+        "adoptionData": [
+          {
+            "department": "Finance",
+            "users": 25,
+            "activeUsers": 23,
+            "adoptionRate": 92,
+            "trainingComplete": 100
+          },
+          {
+            "department": "Operations",
+            "users": 45,
+            "activeUsers": 38,
+            "adoptionRate": 84,
+            "trainingComplete": 87
+          },
+          {
+            "department": "Executive",
+            "users": 8,
+            "activeUsers": 8,
+            "adoptionRate": 100,
+            "trainingComplete": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "power-bi-cost-optimization",
+      "type": "cash-flow",
+      "title": "Cost Optimization",
+      "size": "wide",
+      "position": { "x": 8, "y": 16 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "executiveMode": true,
+        "showTrends": true,
+        "compactMode": false,
+        "timeframe": "monthly",
+        "costMetrics": {
+          "premiumCapacity": 4800,
+          "proLicenses": 1350,
+          "premiumPerUser": 2400,
+          "totalMonthlyCost": 8550,
+          "costPerUser": 68.4,
+          "budgetUtilization": 87.2,
+          "savings": 1200
+        }
+      }
+    }
+  ]
+}

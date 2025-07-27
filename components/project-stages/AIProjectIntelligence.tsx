@@ -117,7 +117,7 @@ export const AIProjectIntelligence = ({
         type: "prediction",
         title: "Schedule Acceleration Opportunity",
         description:
-          "AI analysis suggests potential for 12-day schedule acceleration through optimized resource allocation during electrical rough-in phase.",
+          "HBI Analysis suggests potential for 12-day schedule acceleration through optimized resource allocation during electrical rough-in phase.",
         confidence: 87,
         impact: "high",
         category: "Schedule Optimization",

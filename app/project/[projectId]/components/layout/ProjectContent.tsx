@@ -86,6 +86,7 @@ export function ProjectContent({
   const innerContentClasses = cn(
     "w-full",
     "h-full",
+    "min-w-0",
     "max-w-full",
     "overflow-hidden",
     "transition-all",
@@ -214,7 +215,7 @@ export function ProjectContent({
             ) : (
               <>
                 {/* Main content */}
-                <div className="relative">{children}</div>
+                <div className="relative w-full min-w-0 max-w-full overflow-hidden">{children}</div>
               </>
             )}
           </div>
@@ -229,7 +230,7 @@ export function ProjectContent({
           ) : (
             <>
               {/* Main content */}
-              <div className="relative h-full">{children}</div>
+              <div className="relative h-full w-full min-w-0 max-w-full overflow-hidden">{children}</div>
             </>
           )}
         </div>

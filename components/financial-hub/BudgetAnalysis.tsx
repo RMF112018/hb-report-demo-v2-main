@@ -23,14 +23,7 @@ import {
   FileText,
   Zap,
   TableIcon,
-  Search,
-  Filter,
   Download,
-  SortAsc,
-  SortDesc,
-  ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,7 +35,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FullscreenToggle } from "@/components/ui/fullscreen-toggle"
 import { CollapseWrapper } from "@/components/ui/collapse-wrapper"
 import { useFinancialHubStore } from "@/hooks/use-financial-hub-store"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table"
+import {
+  ProtectedGrid,
+  createProtectedColumn,
+  createReadOnlyColumn,
+  createLockedColumn,
+} from "@/components/ui/protected-grid"
+import type { ProtectedColDef, GridRow } from "@/components/ui/protected-grid"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -242,9 +242,6 @@ const monthlyPerformance = [
 
 type ViewMode = "overview" | "categories" | "variance" | "budget"
 
-type SortField = keyof BudgetItem
-type SortDirection = "asc" | "desc"
-
 export default function BudgetAnalysis({
   userRole,
   projectData,
@@ -255,14 +252,13 @@ export default function BudgetAnalysis({
   const { isFullscreen, toggleFullscreen } = useFinancialHubStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode as ViewMode)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [useBetaGrid, setUseBetaGrid] = useState(true)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   // Update view mode when initialViewMode changes
   useEffect(() => {
     setViewMode(initialViewMode as ViewMode)
   }, [initialViewMode])
-  const [sortField, setSortField] = useState<SortField>("Budget Code")
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [isBudgetTableFullscreen, setIsBudgetTableFullscreen] = useState(false)
 
   // Filter budget data to single project (2525840 - Palm Beach Luxury Estate)
@@ -292,41 +288,218 @@ export default function BudgetAnalysis({
   const riskLevel =
     summaryData.costPerformanceIndex < 0.95 ? "high" : summaryData.costPerformanceIndex < 1.05 ? "medium" : "low"
 
-  // Budget table search and sort functionality
-  const processedBudgetData = useMemo(() => {
-    let data = [...filteredBudgetData]
+  // Use filtered data directly for grid
+  const processedBudgetData = filteredBudgetData
 
-    // Apply search filter
-    if (searchTerm) {
-      data = data.filter(
-        (item) =>
-          item["Cost Code Tier 3"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item["Cost Type"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item["Budget Code Description"].toLowerCase().includes(searchTerm.toLowerCase())
-      )
+  // Transform budget data for ProtectedGrid
+  const createProtectedBudgetData = useMemo(() => {
+    return processedBudgetData.map((item, index) => ({
+      id: `budget-${index}`,
+      costCode: item["Cost Code Tier 3"],
+      costType: item["Cost Type"],
+      budgetCode: item["Budget Code"],
+      description: item["Budget Code Description"],
+      originalBudget: item["Original Budget Amount"],
+      budgetModifications: item["Budget Modifications"],
+      approvedCOs: item["Approved COs"],
+      revisedBudget: item["Revised Budget"],
+      pendingBudgetChanges: item["Pending Budget Changes"],
+      projectedBudget: item["Projected Budget"],
+      committedCosts: item["Committed Costs"],
+      commitmentInvoices: item["Committed Costs"] * 0.95, // Mock data for commitment invoices
+      directCosts: item["Direct Costs"],
+      jtdCosts: item["Job to Date Costs"],
+      pendingCostChanges: item["Pending Cost Changes"],
+      projectedCosts: item["Projected Costs"],
+      estimatedAtCompletion: item["Estimated Cost at Completion"],
+      forecastToComplete: item["Forecast To Complete"],
+      projectedOverUnder: item["Projected over Under"],
+    })) as GridRow[]
+  }, [processedBudgetData])
+
+  // Create column definitions for ProtectedGrid
+  const createProtectedBudgetColumns = useMemo(() => {
+    return [
+      createReadOnlyColumn("costCode", "CSI", {
+        pinned: "left",
+        cellRenderer: (params: any) => {
+          const data = params.data
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+              <div style={{ fontWeight: "600", fontSize: "11px" }}>{data.costCode}</div>
+              <div style={{ fontSize: "10px", color: "#6b7280" }}>{data.costType}</div>
+            </div>
+          )
+        },
+      }),
+      createReadOnlyColumn("description", "Description", {
+        pinned: "left",
+        cellRenderer: (params: any) => <div className="font-medium text-xs">{params.value}</div>,
+      }),
+      createLockedColumn("originalBudget", "Original Budget", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createProtectedColumn(
+        "budgetModifications",
+        "Budget Modifications",
+        { level: "none" },
+        {
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const value = params.value
+            return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
+          },
+          cellStyle: (params: any) => ({
+            fontFamily: "monospace",
+            fontSize: "11px",
+            color: params.value >= 0 ? "#16a34a" : "#dc2626",
+          }),
+        }
+      ),
+      createProtectedColumn(
+        "approvedCOs",
+        "Approved COs",
+        { level: "none" },
+        {
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const value = params.value
+            return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
+          },
+          cellStyle: (params: any) => ({
+            fontFamily: "monospace",
+            fontSize: "11px",
+            color: params.value >= 0 ? "#16a34a" : "#dc2626",
+          }),
+        }
+      ),
+      createReadOnlyColumn("revisedBudget", "Revised Budget", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontWeight: "600", fontSize: "11px" },
+      }),
+      createProtectedColumn(
+        "pendingBudgetChanges",
+        "Pending Budget Changes",
+        { level: "none" },
+        {
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const value = params.value
+            return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
+          },
+          cellStyle: (params: any) => ({
+            fontFamily: "monospace",
+            fontSize: "11px",
+            color: params.value >= 0 ? "#16a34a" : "#dc2626",
+          }),
+        }
+      ),
+      createReadOnlyColumn("projectedBudget", "Projected Budget", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("committedCosts", "Committed Costs", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("commitmentInvoices", "Commitment Invoices", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("directCosts", "ERP Direct Costs", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("jtdCosts", "ERP Job to Date Costs", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createProtectedColumn(
+        "pendingCostChanges",
+        "Pending Cost Changes",
+        { level: "none" },
+        {
+          type: "numericColumn",
+          valueFormatter: (params: any) => {
+            const value = params.value
+            return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
+          },
+          cellStyle: (params: any) => ({
+            fontFamily: "monospace",
+            fontSize: "11px",
+            color: params.value >= 0 ? "#16a34a" : "#dc2626",
+          }),
+        }
+      ),
+      createReadOnlyColumn("projectedCosts", "Projected Costs", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("estimatedAtCompletion", "Estimated Cost at Completion", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("forecastToComplete", "Forecast to Complete", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => formatCurrency(params.value),
+        cellStyle: { fontFamily: "monospace", fontSize: "11px" },
+      }),
+      createReadOnlyColumn("projectedOverUnder", "Projected Over Under", {
+        type: "numericColumn",
+        valueFormatter: (params: any) => {
+          const value = params.value
+          return `${value >= 0 ? "+" : ""}${formatCurrency(value)}`
+        },
+        cellStyle: (params: any) => ({
+          fontFamily: "monospace",
+          fontSize: "11px",
+          color: params.value >= 0 ? "#16a34a" : "#dc2626",
+        }),
+      }),
+    ] as ProtectedColDef[]
+  }, [])
+
+  // Custom totals calculator for budget grid
+  const budgetTotalsCalculator = (data: GridRow[], columnField: string): number | string => {
+    const numericFields = [
+      "originalBudget",
+      "budgetModifications",
+      "approvedCOs",
+      "revisedBudget",
+      "pendingBudgetChanges",
+      "projectedBudget",
+      "committedCosts",
+      "commitmentInvoices",
+      "directCosts",
+      "jtdCosts",
+      "pendingCostChanges",
+      "projectedCosts",
+      "estimatedAtCompletion",
+      "forecastToComplete",
+      "projectedOverUnder",
+    ]
+
+    if (numericFields.includes(columnField)) {
+      const total = data.reduce((sum, row) => sum + (row[columnField] || 0), 0)
+      return total
     }
 
-    // Apply sorting
-    data.sort((a, b) => {
-      const aValue = a[sortField]
-      const bValue = b[sortField]
+    if (columnField === "costCode") {
+      return "Total"
+    }
 
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue
-      }
-
-      const aStr = String(aValue).toLowerCase()
-      const bStr = String(bValue).toLowerCase()
-
-      if (sortDirection === "asc") {
-        return aStr.localeCompare(bStr)
-      } else {
-        return bStr.localeCompare(aStr)
-      }
-    })
-
-    return data
-  }, [filteredBudgetData, searchTerm, sortField, sortDirection])
+    return ""
+  }
 
   // Calculate totals for currency columns
   const columnTotals = useMemo(() => {
@@ -339,12 +512,13 @@ export default function BudgetAnalysis({
         pendingBudgetChanges: totals.pendingBudgetChanges + item["Pending Budget Changes"],
         projectedBudget: totals.projectedBudget + item["Projected Budget"],
         committedCosts: totals.committedCosts + item["Committed Costs"],
+        commitmentInvoices: totals.commitmentInvoices + item["Committed Costs"] * 0.95,
         directCosts: totals.directCosts + item["Direct Costs"],
         jtdCosts: totals.jtdCosts + item["Job to Date Costs"],
         pendingCostChanges: totals.pendingCostChanges + item["Pending Cost Changes"],
         projectedCosts: totals.projectedCosts + item["Projected Costs"],
-        forecastToComplete: totals.forecastToComplete + item["Forecast To Complete"],
         estimatedAtCompletion: totals.estimatedAtCompletion + item["Estimated Cost at Completion"],
+        forecastToComplete: totals.forecastToComplete + item["Forecast To Complete"],
         projectedOverUnder: totals.projectedOverUnder + item["Projected over Under"],
       }),
       {
@@ -355,25 +529,17 @@ export default function BudgetAnalysis({
         pendingBudgetChanges: 0,
         projectedBudget: 0,
         committedCosts: 0,
+        commitmentInvoices: 0,
         directCosts: 0,
         jtdCosts: 0,
         pendingCostChanges: 0,
         projectedCosts: 0,
-        forecastToComplete: 0,
         estimatedAtCompletion: 0,
+        forecastToComplete: 0,
         projectedOverUnder: 0,
       }
     )
   }, [processedBudgetData])
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortField(field)
-      setSortDirection("asc")
-    }
-  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -386,39 +552,45 @@ export default function BudgetAnalysis({
 
   const exportToCSV = () => {
     const headers = [
-      "Budget Code",
+      "CSI",
       "Description",
-      "Cost Code Tier 1",
-      "Cost Code Tier 2",
-      "Cost Type",
       "Original Budget",
       "Budget Modifications",
       "Approved COs",
       "Revised Budget",
+      "Pending Budget Changes",
+      "Projected Budget",
       "Committed Costs",
-      "Job to Date Costs",
+      "Commitment Invoices",
+      "ERP Direct Costs",
+      "ERP Job to Date Costs",
+      "Pending Cost Changes",
+      "Projected Costs",
+      "Estimated Cost at Completion",
       "Forecast to Complete",
-      "Estimated at Completion",
-      "Projected Over/Under",
+      "Projected Over Under",
     ]
 
     const csvContent = [
       headers.join(","),
       ...processedBudgetData.map((item) =>
         [
-          `"${item["Budget Code"]}"`,
+          `"${item["Cost Code Tier 3"]}"`,
           `"${item["Budget Code Description"]}"`,
-          `"${item["Cost Code Tier 1"]}"`,
-          `"${item["Cost Code Tier 2"]}"`,
-          `"${item["Cost Type"]}"`,
           item["Original Budget Amount"],
           item["Budget Modifications"],
           item["Approved COs"],
           item["Revised Budget"],
+          item["Pending Budget Changes"],
+          item["Projected Budget"],
           item["Committed Costs"],
+          item["Committed Costs"] * 0.95,
+          item["Direct Costs"],
           item["Job to Date Costs"],
-          item["Forecast To Complete"],
+          item["Pending Cost Changes"],
+          item["Projected Costs"],
           item["Estimated Cost at Completion"],
+          item["Forecast To Complete"],
           item["Projected over Under"],
         ].join(",")
       ),
@@ -433,6 +605,18 @@ export default function BudgetAnalysis({
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  // Handle grid data changes
+  const handleGridChange = (event: any) => {
+    console.log("Budget grid data changed:", event)
+    setHasUnsavedChanges(true)
+  }
+
+  // Save grid changes
+  const handleSaveChanges = () => {
+    console.log("Saving budget grid changes...")
+    setHasUnsavedChanges(false)
   }
 
   const ViewToggle = () => (
@@ -819,417 +1003,55 @@ export default function BudgetAnalysis({
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Search and Filter Controls */}
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      placeholder="Search cost codes, types, descriptions..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Badge variant="secondary" className="whitespace-nowrap">
-                    {processedBudgetData.length} items
-                  </Badge>
-                </div>
-
-                {/* Budget Data Table */}
-                <div className="rounded-md border">
-                  <div
-                    className={`overflow-auto w-full ${
-                      isBudgetTableFullscreen ? "max-h-[calc(100vh-200px)]" : "max-h-[calc(100vh-300px)]"
-                    }`}
-                    style={{ maxWidth: "100%" }}
-                  >
-                    <Table className="min-w-[1800px]">
-                      <TableHeader className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b-2 border-border/50 shadow-lg">
-                        <TableRow className="bg-background/95 backdrop-blur-md">
-                          <TableHead className="min-w-[200px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Cost Code Tier 3")}
-                            >
-                              Cost Code
-                              {sortField === "Cost Code Tier 3" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Original Budget Amount")}
-                            >
-                              Original Budget
-                              {sortField === "Original Budget Amount" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Budget Modifications")}
-                            >
-                              Modifications
-                              {sortField === "Budget Modifications" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Approved COs")}
-                            >
-                              Approved COs
-                              {sortField === "Approved COs" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Revised Budget")}
-                            >
-                              Revised Budget
-                              {sortField === "Revised Budget" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Pending Budget Changes")}
-                            >
-                              Pending Budget Changes
-                              {sortField === "Pending Budget Changes" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Projected Budget")}
-                            >
-                              Projected Budget
-                              {sortField === "Projected Budget" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Committed Costs")}
-                            >
-                              Committed Costs
-                              {sortField === "Committed Costs" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Direct Costs")}
-                            >
-                              Direct Costs
-                              {sortField === "Direct Costs" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Job to Date Costs")}
-                            >
-                              JTD Costs
-                              {sortField === "Job to Date Costs" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Pending Cost Changes")}
-                            >
-                              Pending Cost Changes
-                              {sortField === "Pending Cost Changes" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Projected Costs")}
-                            >
-                              Projected Costs
-                              {sortField === "Projected Costs" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Forecast To Complete")}
-                            >
-                              Forecast to Complete
-                              {sortField === "Forecast To Complete" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Estimated Cost at Completion")}
-                            >
-                              Est. at Completion
-                              {sortField === "Estimated Cost at Completion" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 font-semibold"
-                              onClick={() => handleSort("Projected over Under")}
-                            >
-                              Projected Over Under
-                              {sortField === "Projected over Under" &&
-                                (sortDirection === "asc" ? (
-                                  <SortAsc className="ml-2 h-4 w-4" />
-                                ) : (
-                                  <SortDesc className="ml-2 h-4 w-4" />
-                                ))}
-                            </Button>
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {processedBudgetData.slice(0, 50).map((item, index) => (
-                          <TableRow key={index} className="hover:bg-muted/50">
-                            <TableCell className="max-w-[200px]">
-                              <div className="space-y-1">
-                                <div className="font-medium text-sm">{item["Cost Code Tier 3"]}</div>
-                                <div className="text-xs text-muted-foreground truncate">{item["Cost Type"]}</div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Original Budget Amount"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              <span className={item["Budget Modifications"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                {item["Budget Modifications"] >= 0 ? "+" : ""}
-                                {formatCurrency(item["Budget Modifications"])}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              <span className={item["Approved COs"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                {item["Approved COs"] >= 0 ? "+" : ""}
-                                {formatCurrency(item["Approved COs"])}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm font-medium">
-                              {formatCurrency(item["Revised Budget"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              <span className={item["Pending Budget Changes"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                {item["Pending Budget Changes"] >= 0 ? "+" : ""}
-                                {formatCurrency(item["Pending Budget Changes"])}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Projected Budget"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Committed Costs"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Direct Costs"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Job to Date Costs"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              <span className={item["Pending Cost Changes"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                {item["Pending Cost Changes"] >= 0 ? "+" : ""}
-                                {formatCurrency(item["Pending Cost Changes"])}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Projected Costs"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Forecast To Complete"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              {formatCurrency(item["Estimated Cost at Completion"])}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              <span className={item["Projected over Under"] >= 0 ? "text-green-600" : "text-red-600"}>
-                                {item["Projected over Under"] >= 0 ? "+" : ""}
-                                {formatCurrency(item["Projected over Under"])}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                      <TableFooter>
-                        <TableRow className="bg-muted/50 font-semibold">
-                          <TableCell className="font-bold">Total</TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.originalBudget)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            <span className={columnTotals.budgetModifications >= 0 ? "text-green-600" : "text-red-600"}>
-                              {columnTotals.budgetModifications >= 0 ? "+" : ""}
-                              {formatCurrency(columnTotals.budgetModifications)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            <span className={columnTotals.approvedCOs >= 0 ? "text-green-600" : "text-red-600"}>
-                              {columnTotals.approvedCOs >= 0 ? "+" : ""}
-                              {formatCurrency(columnTotals.approvedCOs)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.revisedBudget)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            <span
-                              className={columnTotals.pendingBudgetChanges >= 0 ? "text-green-600" : "text-red-600"}
-                            >
-                              {columnTotals.pendingBudgetChanges >= 0 ? "+" : ""}
-                              {formatCurrency(columnTotals.pendingBudgetChanges)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.projectedBudget)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.committedCosts)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.directCosts)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.jtdCosts)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            <span className={columnTotals.pendingCostChanges >= 0 ? "text-green-600" : "text-red-600"}>
-                              {columnTotals.pendingCostChanges >= 0 ? "+" : ""}
-                              {formatCurrency(columnTotals.pendingCostChanges)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.projectedCosts)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.forecastToComplete)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            {formatCurrency(columnTotals.estimatedAtCompletion)}
-                          </TableCell>
-                          <TableCell className="text-right font-mono text-sm font-bold">
-                            <span className={columnTotals.projectedOverUnder >= 0 ? "text-green-600" : "text-red-600"}>
-                              {columnTotals.projectedOverUnder >= 0 ? "+" : ""}
-                              {formatCurrency(columnTotals.projectedOverUnder)}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      </TableFooter>
-                    </Table>
+                {/* Budget Grid Content */}
+                <div className="space-y-4">
+                  <ProtectedGrid
+                    columnDefs={createProtectedBudgetColumns}
+                    rowData={createProtectedBudgetData}
+                    config={{
+                      allowExport: true,
+                      allowImport: false,
+                      allowRowSelection: false,
+                      allowMultiSelection: false,
+                      allowColumnReordering: true,
+                      allowColumnResizing: true,
+                      allowSorting: true,
+                      allowFiltering: true,
+                      allowCellEditing: true,
+                      showToolbar: true,
+                      showStatusBar: true,
+                      enableRangeSelection: false, // Disabled - requires enterprise license
+                      protectionEnabled: true,
+                      userRole: userRole,
+                      theme: "quartz", // Use quartz theme for better dark mode support
+                      enableTotalsRow: true,
+                      stickyColumnsCount: 3,
+                      rowHeight: 32, // Reduced row height
+                    }}
+                    className="text-xs" // Smaller font size for the entire grid
+                    events={{
+                      onCellValueChanged: handleGridChange,
+                      onCellEditingStopped: handleGridChange,
+                      onGridReady: (event) => {
+                        // Auto-size all columns to fit their content
+                        event.api.autoSizeAllColumns()
+                      },
+                    }}
+                    height={isBudgetTableFullscreen ? "calc(100vh - 200px)" : "600px"}
+                    title="Budget Analysis Grid"
+                    enableSearch={true}
+                    totalsCalculator={budgetTotalsCalculator}
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    <Badge variant="secondary" className="mr-2">
+                      Total Items: {createProtectedBudgetData.length}
+                    </Badge>
+                    <Badge variant="secondary" className="mr-2">
+                      Totals Row: Enabled
+                    </Badge>
+                    <Badge variant="secondary">Sticky Columns: 1</Badge>
                   </div>
                 </div>
-
-                {processedBudgetData.length > 50 && (
-                  <div className="mt-4 text-center">
-                    <Badge variant="secondary">Showing first 50 of {processedBudgetData.length} items</Badge>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>

@@ -1,0 +1,125 @@
+{
+  "insights": {
+    "floridaMarketGrowth": {
+      "insight": "HBI analysis indicates Florida commercial construction will moderate to 5-7% growth through Q3 2025, driven by population migration and infrastructure investment.",
+      "confidence": 87,
+      "trend": "up",
+      "recommendation": "Focus on Central Florida expansion opportunities while monitoring Southeast market saturation indicators.",
+      "keyFactors": ["Population Growth", "Infrastructure Investment", "Tourism Recovery"],
+      "dataQuality": 94,
+      "timestamp": "2025-01-31T10:30:00Z"
+    },
+    "regionalHotspots": {
+      "insight": "Southeast Florida maintains dominance with $3B Q1-Q2 2025 deals. HBI models predict Central Florida emergence as next growth leader by Q4 2025.",
+      "confidence": 94,
+      "trend": "up",
+      "recommendation": "Strategic positioning in Orlando and Tampa corridors recommended for 18-month pipeline development.",
+      "keyFactors": ["Infrastructure Development", "Corporate Relocations", "Tourism Expansion"],
+      "keyFindings": [
+        "SE Florida: $3B in Q1-Q2 2025 deals",
+        "Miami-Dade leads with 68 active projects",
+        "Central Florida showing 15.7% growth acceleration",
+        "Industrial logistics driving Tampa expansion"
+      ],
+      "dataQuality": 96,
+      "timestamp": "2025-01-31T10:15:00Z"
+    },
+    "developerSentiment": {
+      "insight": "HBI sentiment analysis reveals mixed developer confidence (72.4/100) with rising insurance costs offset by positive demographic and economic indicators.",
+      "confidence": 82,
+      "trend": "up",
+      "recommendation": "Implement risk mitigation strategies for insurance volatility while capitalizing on population growth trends.",
+      "keyFactors": ["Insurance Cost Escalation", "Population Migration", "Interest Rate Environment"],
+      "keyMetrics": ["Market Confidence: 75.2", "Risk Assessment: 65.8", "Regulatory Environment: 78.1"],
+      "dataQuality": 89,
+      "timestamp": "2025-01-31T10:20:00Z"
+    },
+    "threatTracker": {
+      "insight": "HBI threat analysis identifies insurance costs (8.5/10 severity) and tariff-driven material inflation (5.0/10) as primary cost pressures for Q3-Q4 2025.",
+      "confidence": 91,
+      "trend": "stable",
+      "recommendation": "Diversify insurance carriers and lock in material pricing contracts for 6-month forward coverage.",
+      "keyFactors": ["Insurance Rate Increases", "Tariff Implementation", "Labor Market Tightness"],
+      "threatsIdentified": [
+        "Property insurance rates up 25-40% annually",
+        "Tariffs contributing 5% material cost increase",
+        "Office vacancy stabilizing at 10-15%"
+      ],
+      "dataQuality": 93,
+      "timestamp": "2025-01-31T10:25:00Z"
+    },
+    "opportunities": {
+      "insight": "HBI opportunity scanner detects modular construction (23.5% adoption) and data center development (45.2% growth) as highest-potential market segments.",
+      "confidence": 89,
+      "trend": "up",
+      "recommendation": "Invest in modular construction capabilities and pursue hyperscale data center partnerships for 24-36 month pipeline development.",
+      "keyFactors": ["Technology Adoption", "Hyperscale Demand", "ESG Requirements"],
+      "emergingTrends": [
+        "Modular construction delivering 20-30% timeline savings",
+        "Data center growth at 45.2% driven by cloud expansion",
+        "Green building premiums reaching 8-15% value add"
+      ],
+      "dataQuality": 91,
+      "timestamp": "2025-01-31T10:35:00Z"
+    },
+    "competitorBenchmark": {
+      "insight": "HBI competitive intelligence shows strong ultra-luxury positioning (15.2% market share) with expansion opportunities in commercial (8.7%) and multifamily (5.4%) segments.",
+      "confidence": 88,
+      "trend": "stable",
+      "recommendation": "Leverage luxury market leadership to cross-sell commercial capabilities while developing multifamily expertise through strategic partnerships.",
+      "keyFactors": ["Market Position", "Brand Strength", "Capability Gaps"],
+      "keyFindings": [
+        "Ultra-luxury: Market leader position maintained",
+        "Commercial: Growing presence vs Ajax Building (12.3%) and Skanska (15.8%)",
+        "Multifamily: Emerging opportunity vs Greystar dominance (22.1%)"
+      ],
+      "dataQuality": 92,
+      "timestamp": "2025-01-31T10:40:00Z"
+    },
+    "riskRewardRadar": {
+      "insight": "HBI SWOT analysis reveals balanced risk profile with high competitive rivalry (8.2/10) in Southeast markets offset by strong luxury market barriers to entry (7.5/10).",
+      "confidence": 85,
+      "trend": "stable",
+      "recommendation": "Maintain luxury market dominance while selectively expanding into less saturated Central Florida commercial opportunities.",
+      "keyFactors": ["Competitive Intensity", "Market Barriers", "Geographic Concentration"],
+      "strategicAssessment": [
+        "High rivalry intensity in SE Florida requires differentiation",
+        "Strong brand moat in luxury segment provides competitive advantage",
+        "Geographic diversification needed to reduce concentration risk"
+      ],
+      "dataQuality": 88,
+      "timestamp": "2025-01-31T10:45:00Z"
+    }
+  },
+  "forecasts": {
+    "threeMonthTrajectory": {
+      "commercialStarts": {
+        "prediction": "8-12% growth in Central Florida commercial starts through Q3 2025",
+        "confidence": 84,
+        "factors": ["Corporate relocations", "Infrastructure investment", "Tourism recovery"],
+        "timeline": "Q2-Q3 2025"
+      },
+      "luxuryMultifamily": {
+        "prediction": "Southeast Florida luxury multifamily opportunities constrained by land availability, 15-20% premium pricing sustainable",
+        "confidence": 79,
+        "factors": ["Land scarcity", "Population growth", "Wealth migration"],
+        "timeline": "Q2-Q4 2025"
+      },
+      "macroeconomicPressures": {
+        "prediction": "Insurance costs and Fed policy uncertainty to impact developer confidence in Q4 2025, potential 5-10% sentiment decline",
+        "confidence": 76,
+        "factors": ["Insurance market volatility", "Interest rate environment", "Election cycle uncertainty"],
+        "timeline": "Q3-Q4 2025"
+      }
+    }
+  },
+  "modelMetadata": {
+    "version": "HBI-3.2.1",
+    "trainingData": "2020-2025 Florida Construction Market",
+    "lastModelUpdate": "2025-01-15T00:00:00Z",
+    "predictionHorizon": "12 months",
+    "updateFrequency": "Daily",
+    "dataSourceCount": 127,
+    "averageAccuracy": 91.2
+  }
+}

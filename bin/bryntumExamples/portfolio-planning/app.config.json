@@ -1,0 +1,9 @@
+{
+  "title": "Portfolio planning demo",
+  "description": "Shows how to visualize multiple projects in a portfolio inside a single Gantt chart",
+  "source": [
+    "app.js",
+    "index.html",
+    "resources/app.scss"
+  ]
+}

@@ -118,6 +118,7 @@ export const useDashboardLayout = (userRole: UserRole): DashboardLayoutHookRetur
       case "executive":
         return [
           { filename: "executive-layout.json", displayName: "Overview" },
+          { filename: "executive-precon-layout.json", displayName: "Pre-Con Overview" },
           { filename: "executive-financial-layout.json", displayName: "Financial Review" },
         ]
       case "project-executive":
@@ -132,6 +133,8 @@ export const useDashboardLayout = (userRole: UserRole): DashboardLayoutHookRetur
         ]
       case "estimator":
         return [{ filename: "estimator-layout.json", displayName: "Dashboard" }]
+      case "hr-payroll":
+        return [{ filename: "hr-payroll-layout.json", displayName: "HR Overview" }]
       case "admin":
         return [{ filename: "it-layout.json", displayName: "IT Command Center" }]
       default:

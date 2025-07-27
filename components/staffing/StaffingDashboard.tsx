@@ -28,6 +28,7 @@ import {
   TeamExperienceCard,
   ProjectStaffingOverviewCard,
   StaffingAlertsCard,
+  TeamCompatibilityCard,
 } from "../cards/staffing/StaffingAnalyticsCards"
 
 interface StaffingDashboardProps {
@@ -42,12 +43,21 @@ interface StaffingDashboardProps {
 // Define the dashboard cards configuration
 const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
   {
+    id: "team-compatibility",
+    title: "Team Compatibility",
+    type: "team-compatibility",
+    visible: true,
+    position: { x: 0, y: 0 },
+    span: { cols: 6, rows: 6 },
+    config: { projectId },
+  },
+  {
     id: "team-utilization",
     title: "Team Utilization",
     type: "team-utilization",
     visible: true,
-    position: { x: 0, y: 0 },
-    span: { cols: 4, rows: 4 },
+    position: { x: 6, y: 0 },
+    span: { cols: 3, rows: 3 },
     config: { projectId },
   },
   {
@@ -55,8 +65,8 @@ const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
     title: "Labor Cost Analysis",
     type: "labor-cost-analysis",
     visible: true,
-    position: { x: 4, y: 0 },
-    span: { cols: 4, rows: 4 },
+    position: { x: 9, y: 0 },
+    span: { cols: 3, rows: 3 },
     config: { projectId },
   },
   {
@@ -64,8 +74,8 @@ const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
     title: "SPCR Activity",
     type: "spcr-activity",
     visible: true,
-    position: { x: 8, y: 0 },
-    span: { cols: 4, rows: 4 },
+    position: { x: 6, y: 3 },
+    span: { cols: 3, rows: 3 },
     config: { projectId },
   },
   {
@@ -73,8 +83,8 @@ const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
     title: "Team Experience",
     type: "team-experience",
     visible: true,
-    position: { x: 12, y: 0 },
-    span: { cols: 4, rows: 4 },
+    position: { x: 9, y: 3 },
+    span: { cols: 3, rows: 3 },
     config: { projectId },
   },
   {
@@ -82,8 +92,8 @@ const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
     title: "Project Staffing Overview",
     type: "project-staffing-overview",
     visible: true,
-    position: { x: 0, y: 4 },
-    span: { cols: 8, rows: 5 },
+    position: { x: 0, y: 6 },
+    span: { cols: 6, rows: 4 },
     config: { projectId },
   },
   {
@@ -91,8 +101,8 @@ const createStaffingDashboardCards = (projectId?: string): DashboardCard[] => [
     title: "Staffing Alerts",
     type: "staffing-alerts",
     visible: true,
-    position: { x: 8, y: 4 },
-    span: { cols: 8, rows: 5 },
+    position: { x: 6, y: 6 },
+    span: { cols: 6, rows: 4 },
     config: { projectId },
   },
 ]
@@ -122,6 +132,8 @@ const StaffingCardContent = ({
       return <SPCRActivityCard {...commonProps} />
     case "team-experience":
       return <TeamExperienceCard {...commonProps} />
+    case "team-compatibility":
+      return <TeamCompatibilityCard {...commonProps} />
     case "project-staffing-overview":
       return <ProjectStaffingOverviewCard {...commonProps} />
     case "staffing-alerts":

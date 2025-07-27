@@ -7,22 +7,14 @@
     "typescript": "javascript",
     "typescriptreact": "javascript"
   },
-  "tailwindCSS.classAttributes": [
-    "class",
-    "className",
-    "ngClass",
-    "ui",
-    "tw"
-  ],
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui", "tw"],
   "files.associations": {
     "*.css": "postcss"
   },
   "emmet.includeLanguages": {
     "postcss": "css"
   },
-  "css.customData": [
-    ".vscode/css_custom_data.json"
-  ],
+  "css.customData": [".vscode/css_custom_data.json"],
   "editor.quickSuggestions": {
     "strings": true
   },
@@ -35,4 +27,4 @@
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode"
-} 
+}

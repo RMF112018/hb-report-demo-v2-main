@@ -391,69 +391,7 @@ export default function EndpointManagementPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
-
-      {/* Header Section - Sticky, following project page pattern */}
-      <div className="sticky top-16 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
-        <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
-          <div className="max-w-[1920px] mx-auto">
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb className="mb-3">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard" className="text-muted-foreground hover:text-foreground text-sm">
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    href="/it-command-center"
-                    className="text-muted-foreground hover:text-foreground text-sm"
-                  >
-                    IT Command Center
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbPage className="font-medium text-sm">Endpoint Management</BreadcrumbPage>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Site Title and Actions - Responsive */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
-                  Endpoint Management
-                </h1>
-                <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                  Device Health
-                </Badge>
-              </div>
-
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <Badge variant="outline" className="text-green-600 border-green-200 text-xs">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  {endpointMetrics.compliantDevices}/{endpointMetrics.totalDevices} Compliant
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  Last: {lastRefresh.toLocaleTimeString()}
-                </Badge>
-                <Button variant="outline" size="sm" className="text-sm" onClick={handleRefresh}>
-                  <RefreshCw className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Refresh</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Module Navigation Row */}
-            <div className="mt-3 pt-3 border-t border-border/40" data-tour="it-module-navigation">
-              <ITModuleNavigation />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout - Following project page pattern */}
+      {/* Removed AppHeader and all header elements */}
       <div className="max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         {/* Mobile Priority Cards - Show at top on small screens */}
         <div className="block xl:hidden mb-4 sm:mb-6">

@@ -6,7 +6,7 @@ import { ActivityFeedConfig } from "@/types/activity-feed"
 
 interface ProjectSpecificActivityFeedProps {
   projectId: number
-  userRole: "executive" | "project-executive" | "project-manager" | "estimator"
+  userRole: "executive" | "project-executive" | "project-manager" | "estimator" | "admin"
   className?: string
 }
 

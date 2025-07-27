@@ -53,6 +53,7 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
 }) => {
   // State for dynamic sidebar content
   const [dynamicSidebarContent, setDynamicSidebarContent] = useState<React.ReactNode>(null)
+  const [selectedBidPackage, setSelectedBidPackage] = useState<string | null>(null)
 
   // Transform data to match expected format using useMemo for performance
   const projectData = useMemo(() => {
@@ -95,8 +96,8 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
         tool: null,
         subTool: null,
         coreTab: "dashboard", // Default to dashboard within core
-        staffingSubTab: null,
-        reportsSubTab: null,
+        staffingSubTab: undefined,
+        reportsSubTab: undefined,
       }
     }
 
@@ -113,10 +114,10 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
       tool: activeTab === "field-management" ? "Field Management" : null,
       subTool: null,
       coreTab: null,
-      staffingSubTab: null,
-      reportsSubTab: null,
+      staffingSubTab: undefined,
+      reportsSubTab: undefined,
     }
-  }, [activeTab])
+  }, [activeTab, selectedBidPackage])
 
   // Generate project metrics for sidebar
   const projectMetrics = useMemo(
@@ -135,18 +136,6 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
     [projectData]
   )
 
-  // Generate left sidebar content
-  const leftSidebarContent = useMemo(() => {
-    if (!projectData || !projectMetrics) return null
-
-    // If we have dynamic sidebar content, use it; otherwise use default
-    if (dynamicSidebarContent) {
-      return dynamicSidebarContent
-    }
-
-    return getProjectSidebarContent(projectData, navigationState, projectMetrics, activeTab)
-  }, [projectData, navigationState, projectMetrics, activeTab, dynamicSidebarContent])
-
   // Handle sidebar content updates from scheduler
   const handleSidebarContentChange = useCallback(
     (content: React.ReactNode) => {
@@ -157,6 +146,25 @@ const ProjectContent: React.FC<ProjectContentProps> = ({
     },
     [onSidebarContentChange]
   )
+
+  // Handle bid package selection from sidebar
+  const handleBidPackageSelect = useCallback((packageId: string) => {
+    setSelectedBidPackage(packageId)
+    // Trigger a custom event that the main content can listen to
+    window.dispatchEvent(new CustomEvent("bidPackageSelected", { detail: packageId }))
+  }, [])
+
+  // Generate left sidebar content
+  const leftSidebarContent = useMemo(() => {
+    if (!projectData || !projectMetrics) return null
+
+    // If we have dynamic sidebar content, use it; otherwise use default
+    if (dynamicSidebarContent) {
+      return dynamicSidebarContent
+    }
+
+    return getProjectSidebarContent(projectData, navigationState, projectMetrics, activeTab)
+  }, [projectData, navigationState, projectMetrics, activeTab, dynamicSidebarContent, handleBidPackageSelect])
 
   // Set up the global callback for sidebar updates
   React.useEffect(() => {

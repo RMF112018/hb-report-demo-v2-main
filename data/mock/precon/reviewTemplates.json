@@ -1,0 +1,372 @@
+{
+  "stages": [
+    {
+      "id": "schematic-design",
+      "name": "Schematic Design",
+      "description": "Conceptual design phase focusing on overall project feasibility and basic compliance",
+      "categories": [
+        {
+          "id": "design-feasibility",
+          "name": "Design Feasibility",
+          "weight": 35,
+          "items": [
+            "Verify conceptual layouts align with project goals",
+            "Assess feasibility of proposed building systems",
+            "Confirm design supports intended use"
+          ]
+        },
+        {
+          "id": "coordination-completeness",
+          "name": "Coordination and Completeness",
+          "weight": 15,
+          "items": ["Check basic alignment between disciplines", "Verify inclusion of major project components"]
+        },
+        {
+          "id": "compliance-regulatory",
+          "name": "Compliance and Regulatory",
+          "weight": 20,
+          "items": ["Assess compliance with zoning regulations", "Review environmental constraints"]
+        },
+        {
+          "id": "cost-schedule",
+          "name": "Cost and Schedule",
+          "weight": 20,
+          "items": [
+            "Evaluate design against initial budget",
+            "Identify early value engineering opportunities",
+            "Assess impact on preliminary schedule"
+          ]
+        },
+        {
+          "id": "constructability-safety",
+          "name": "Constructability and Safety",
+          "weight": 10,
+          "items": [
+            "Evaluate site access for construction",
+            "Identify major constructability challenges",
+            "Ensure design avoids obvious safety risks"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "50-design-development",
+      "name": "50% Design Development",
+      "description": "Early design development with increased coordination and preliminary BIM review",
+      "categories": [
+        {
+          "id": "design-feasibility",
+          "name": "Design Feasibility",
+          "weight": 25,
+          "items": [
+            "Confirm design supports functionality and aesthetics",
+            "Assess feasibility of selected materials and systems"
+          ]
+        },
+        {
+          "id": "coordination-completeness",
+          "name": "Coordination and Completeness",
+          "weight": 20,
+          "items": [
+            "Verify coordination between architectural and engineering disciplines",
+            "Check preliminary completeness of major systems",
+            "Review initial specifications framework"
+          ]
+        },
+        {
+          "id": "compliance-regulatory",
+          "name": "Compliance and Regulatory",
+          "weight": 15,
+          "items": [
+            "Verify compliance with building codes",
+            "Ensure accessibility requirements are addressed",
+            "Assess environmental compliance progress"
+          ]
+        },
+        {
+          "id": "cost-schedule",
+          "name": "Cost and Schedule",
+          "weight": 20,
+          "items": [
+            "Review design alignment with updated budget",
+            "Evaluate value engineering options",
+            "Assess schedule impacts of design choices"
+          ]
+        },
+        {
+          "id": "constructability-safety",
+          "name": "Constructability and Safety",
+          "weight": 15,
+          "items": [
+            "Evaluate constructability of detailed designs",
+            "Identify sequencing challenges",
+            "Ensure safety in design implementation"
+          ]
+        },
+        {
+          "id": "bim-review",
+          "name": "BIM Team Review",
+          "weight": 5,
+          "items": [
+            "Verify preliminary BIM model accuracy",
+            "Check initial clash detection results",
+            "Review BEP implementation status"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "100-design-development",
+      "name": "100% Design Development",
+      "description": "Complete design development with full coordination and enhanced BIM review",
+      "categories": [
+        {
+          "id": "design-feasibility",
+          "name": "Design Feasibility",
+          "weight": 15,
+          "items": [
+            "Confirm design supports functionality and aesthetics",
+            "Assess feasibility of selected materials and systems"
+          ]
+        },
+        {
+          "id": "coordination-completeness",
+          "name": "Coordination and Completeness",
+          "weight": 25,
+          "items": [
+            "Verify completeness of architectural and engineering drawings",
+            "Check coordination between disciplines",
+            "Confirm specifications outline major materials"
+          ]
+        },
+        {
+          "id": "compliance-regulatory",
+          "name": "Compliance and Regulatory",
+          "weight": 20,
+          "items": [
+            "Verify compliance with building codes",
+            "Ensure accessibility requirements are met",
+            "Assess environmental compliance"
+          ]
+        },
+        {
+          "id": "cost-schedule",
+          "name": "Cost and Schedule",
+          "weight": 15,
+          "items": [
+            "Review design alignment with updated budget",
+            "Evaluate value engineering options",
+            "Assess schedule impacts of design choices"
+          ]
+        },
+        {
+          "id": "constructability-safety",
+          "name": "Constructability and Safety",
+          "weight": 15,
+          "items": [
+            "Evaluate constructability of detailed designs",
+            "Identify sequencing challenges",
+            "Ensure safety in design implementation"
+          ]
+        },
+        {
+          "id": "bim-review",
+          "name": "BIM Team Review",
+          "weight": 10,
+          "items": [
+            "Verify BIM model accuracy for all major systems",
+            "Check clash detection for preliminary conflicts",
+            "Confirm BIM model includes specifications data",
+            "Review BEP implementation and updates",
+            "Assess model readiness for CD phase"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "80-construction-docs",
+      "name": "80% Construction Documents",
+      "description": "Near-complete construction documents with emphasis on coordination and BIM",
+      "categories": [
+        {
+          "id": "design-feasibility",
+          "name": "Design Feasibility",
+          "weight": 10,
+          "items": ["Confirm final design intent and feasibility", "Verify constructible design solutions"]
+        },
+        {
+          "id": "coordination-completeness",
+          "name": "Coordination and Completeness",
+          "weight": 25,
+          "items": [
+            "Verify full coordination between all disciplines",
+            "Check completeness of construction documents",
+            "Confirm specifications are comprehensive"
+          ]
+        },
+        {
+          "id": "compliance-regulatory",
+          "name": "Compliance and Regulatory",
+          "weight": 20,
+          "items": [
+            "Verify full compliance with building codes",
+            "Ensure all accessibility requirements are met",
+            "Confirm environmental compliance",
+            "Review permit application readiness"
+          ]
+        },
+        {
+          "id": "cost-schedule",
+          "name": "Cost and Schedule",
+          "weight": 15,
+          "items": [
+            "Verify final cost estimates align with budget",
+            "Review construction schedule feasibility",
+            "Assess final value engineering impacts"
+          ]
+        },
+        {
+          "id": "constructability-safety",
+          "name": "Constructability and Safety",
+          "weight": 15,
+          "items": [
+            "Evaluate constructability of final designs",
+            "Review construction sequencing plans",
+            "Ensure comprehensive safety planning"
+          ]
+        },
+        {
+          "id": "bim-review",
+          "name": "BIM Team Review",
+          "weight": 15,
+          "items": [
+            "Verify BIM model accuracy and completeness",
+            "Conduct comprehensive clash detection",
+            "Confirm model readiness for construction",
+            "Review 4D scheduling integration",
+            "Assess model handover requirements"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "100-construction-docs",
+      "name": "100% Construction Documents",
+      "description": "Complete construction documents ready for bidding and construction",
+      "categories": [
+        {
+          "id": "design-feasibility",
+          "name": "Design Feasibility",
+          "weight": 5,
+          "items": ["Confirm construction-ready design", "Verify all design issues resolved"]
+        },
+        {
+          "id": "coordination-completeness",
+          "name": "Coordination and Completeness",
+          "weight": 25,
+          "items": [
+            "Verify 100% coordination between all disciplines",
+            "Confirm complete construction document set",
+            "Ensure specifications are construction-ready"
+          ]
+        },
+        {
+          "id": "compliance-regulatory",
+          "name": "Compliance and Regulatory",
+          "weight": 20,
+          "items": [
+            "Verify complete compliance with all codes",
+            "Confirm accessibility compliance",
+            "Ensure environmental compliance",
+            "Verify permit-ready documentation"
+          ]
+        },
+        {
+          "id": "cost-schedule",
+          "name": "Cost and Schedule",
+          "weight": 15,
+          "items": [
+            "Confirm final cost estimates",
+            "Verify construction schedule accuracy",
+            "Review final budget alignment"
+          ]
+        },
+        {
+          "id": "constructability-safety",
+          "name": "Constructability and Safety",
+          "weight": 15,
+          "items": [
+            "Confirm construction-ready design",
+            "Verify construction sequencing",
+            "Ensure comprehensive safety documentation"
+          ]
+        },
+        {
+          "id": "bim-review",
+          "name": "BIM Team Review",
+          "weight": 20,
+          "items": [
+            "Verify construction-ready BIM model",
+            "Confirm zero critical clashes",
+            "Ensure model supports construction workflow",
+            "Verify 4D/5D model integration",
+            "Confirm model handover completeness",
+            "Review facility management model readiness"
+          ]
+        }
+      ]
+    }
+  ],
+  "gradingScale": {
+    "1": {
+      "label": "Major Issues",
+      "description": "Major issues, severe risks, incomplete or conflicting design",
+      "color": "red"
+    },
+    "2": {
+      "label": "Significant Issues",
+      "description": "Significant problems requiring substantial revision",
+      "color": "red"
+    },
+    "3": {
+      "label": "Notable Issues",
+      "description": "Notable issues requiring attention and revision",
+      "color": "orange"
+    },
+    "4": {
+      "label": "Below Average",
+      "description": "Below average quality with minor gaps",
+      "color": "orange"
+    },
+    "5": {
+      "label": "Average",
+      "description": "Average quality with some uncertainty",
+      "color": "yellow"
+    },
+    "6": {
+      "label": "Above Average",
+      "description": "Above average quality with minor improvements needed",
+      "color": "yellow"
+    },
+    "7": {
+      "label": "Good",
+      "description": "Good quality documents with few risks",
+      "color": "green"
+    },
+    "8": {
+      "label": "Very Good",
+      "description": "Very good quality with minimal risks",
+      "color": "green"
+    },
+    "9": {
+      "label": "Excellent",
+      "description": "Excellent quality, well-coordinated and compliant",
+      "color": "blue"
+    },
+    "10": {
+      "label": "Outstanding",
+      "description": "Outstanding - fully coordinated, code-compliant, and constructible",
+      "color": "blue"
+    }
+  }
+}

@@ -1,1128 +1,732 @@
-/**
- * @fileoverview Project Schedule Gantt View Component
- * @module ProjectSchedule
- * @version 3.0.0
- * @author HB Development Team
- * @since 2024-01-15
- *
- * Professional Gantt-style view with schedule updates, critical path visualization,
- * filtering, export options, and AI support for project schedule management.
- */
-
 "use client"
 
-import React, { useState, useMemo, useCallback, useRef } from "react"
+import React, { useEffect, useMemo, useState, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Toggle } from "@/components/ui/toggle"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Calendar,
-  Clock,
   Filter,
   Download,
-  GitBranch,
-  Eye,
-  EyeOff,
-  Diamond,
-  BarChart3,
-  Zap,
-  AlertTriangle,
-  Target,
-  TrendingUp,
-  TrendingDown,
-  Brain,
-  MessageSquare,
-  RefreshCw,
+  ZoomIn,
+  ZoomOut,
+  GripVertical,
+  Search,
+  SortAsc,
+  SortDesc,
   FileText,
-  Share2,
-  Settings,
-  ChevronRight,
+  User,
+  Users,
+  Building,
+  Plus,
+  MessageSquare,
+  Save,
+  Trash2,
   ChevronDown,
-  Info,
-  Sparkles,
+  ChevronRight,
+  AlertTriangle,
+  Clock,
+  Maximize,
+  Minimize,
+  CheckCircle,
+  Play,
+  Pause,
 } from "lucide-react"
-
-// TypeScript interfaces for schedule data
-interface ScheduleUpdate {
-  update_id: string
-  start: string
-  finish: string
-}
-
-interface ScheduleActivity {
-  activity_id: string
-  description: string
-  type: "Milestone" | "Task"
-  baseline_start: string
-  baseline_finish: string
-  updates: ScheduleUpdate[]
-}
-
-interface ScheduleData {
-  activities: ScheduleActivity[]
-  criticalPath: string[]
-  aiInsights: AIInsight[]
-}
-
-interface AIInsight {
-  id: string
-  type: "alert" | "opportunity" | "risk" | "forecast"
-  severity: "low" | "medium" | "high"
-  title: string
-  description: string
-  confidence: number
-  relatedActivities: string[]
-  suggestedActions: string[]
-}
-
-interface ActivityBar {
-  activity: ScheduleActivity
-  currentUpdate: ScheduleUpdate
-  baselineUpdate: ScheduleUpdate
-  isOnCriticalPath: boolean
-  durationDays: number
-  variance: number
-  position: {
-    start: number
-    width: number
-  }
-}
+import scheduleData from "@/data/mock/schedule/schedule.json"
+import {
+  parseISO,
+  isValid,
+  format,
+  addDays,
+  addWeeks,
+  addMonths,
+  addQuarters,
+  addYears,
+  differenceInDays,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  startOfQuarter,
+  endOfQuarter,
+  startOfYear,
+  endOfYear,
+  eachDayOfInterval,
+  isAfter,
+  isBefore,
+} from "date-fns"
 
 interface ProjectScheduleProps {
-  userRole: string
-  projectData: any
+  userRole?: string
+  projectData?: any
   projectId?: string
 }
 
-// Complete mock dataset with 20 activities (7 milestones, 13 tasks)
-const mockScheduleData: ScheduleData = {
-  activities: [
-    {
-      activity_id: "A001",
-      description: "Milestone - Project Kickoff",
-      type: "Milestone",
-      baseline_start: "2025-09-08",
-      baseline_finish: "2025-09-08",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-07", finish: "2025-09-07" },
-        { update_id: "Update_2", start: "2025-09-14", finish: "2025-09-14" },
-        { update_id: "Update_3", start: "2025-09-08", finish: "2025-09-08" },
-        { update_id: "Update_4", start: "2025-09-11", finish: "2025-09-11" },
-      ],
-    },
-    {
-      activity_id: "A002",
-      description: "Milestone - Design Approval",
-      type: "Milestone",
-      baseline_start: "2025-09-02",
-      baseline_finish: "2025-09-02",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-05", finish: "2025-09-05" },
-        { update_id: "Update_2", start: "2025-09-06", finish: "2025-09-06" },
-        { update_id: "Update_3", start: "2025-09-08", finish: "2025-09-08" },
-        { update_id: "Update_4", start: "2025-09-06", finish: "2025-09-06" },
-      ],
-    },
-    {
-      activity_id: "A003",
-      description: "Milestone - Foundation Complete",
-      type: "Milestone",
-      baseline_start: "2025-09-12",
-      baseline_finish: "2025-09-12",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-13", finish: "2025-09-13" },
-        { update_id: "Update_2", start: "2025-09-17", finish: "2025-09-17" },
-        { update_id: "Update_3", start: "2025-09-15", finish: "2025-09-15" },
-        { update_id: "Update_4", start: "2025-09-18", finish: "2025-09-18" },
-      ],
-    },
-    {
-      activity_id: "A004",
-      description: "Task - Site Preparation",
-      type: "Task",
-      baseline_start: "2025-09-05",
-      baseline_finish: "2025-09-19",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-04", finish: "2025-09-18" },
-        { update_id: "Update_2", start: "2025-09-06", finish: "2025-09-20" },
-        { update_id: "Update_3", start: "2025-09-07", finish: "2025-09-21" },
-        { update_id: "Update_4", start: "2025-09-06", finish: "2025-09-19" },
-      ],
-    },
-    {
-      activity_id: "A005",
-      description: "Task - Excavation Work",
-      type: "Task",
-      baseline_start: "2025-09-10",
-      baseline_finish: "2025-09-24",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-12", finish: "2025-09-26" },
-        { update_id: "Update_2", start: "2025-09-11", finish: "2025-09-25" },
-        { update_id: "Update_3", start: "2025-09-13", finish: "2025-09-27" },
-        { update_id: "Update_4", start: "2025-09-12", finish: "2025-09-26" },
-      ],
-    },
-    {
-      activity_id: "A006",
-      description: "Milestone - Permit Approval",
-      type: "Milestone",
-      baseline_start: "2025-09-15",
-      baseline_finish: "2025-09-15",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-16", finish: "2025-09-16" },
-        { update_id: "Update_2", start: "2025-09-18", finish: "2025-09-18" },
-        { update_id: "Update_3", start: "2025-09-17", finish: "2025-09-17" },
-        { update_id: "Update_4", start: "2025-09-19", finish: "2025-09-19" },
-      ],
-    },
-    {
-      activity_id: "A007",
-      description: "Task - Foundation Pour",
-      type: "Task",
-      baseline_start: "2025-09-20",
-      baseline_finish: "2025-10-05",
-      updates: [
-        { update_id: "Update_1", start: "2025-09-22", finish: "2025-10-07" },
-        { update_id: "Update_2", start: "2025-09-21", finish: "2025-10-06" },
-        { update_id: "Update_3", start: "2025-09-23", finish: "2025-10-08" },
-        { update_id: "Update_4", start: "2025-09-22", finish: "2025-10-07" },
-      ],
-    },
-    {
-      activity_id: "A008",
-      description: "Task - Structural Steel",
-      type: "Task",
-      baseline_start: "2025-10-08",
-      baseline_finish: "2025-10-30",
-      updates: [
-        { update_id: "Update_1", start: "2025-10-10", finish: "2025-11-01" },
-        { update_id: "Update_2", start: "2025-10-09", finish: "2025-10-31" },
-        { update_id: "Update_3", start: "2025-10-11", finish: "2025-11-02" },
-        { update_id: "Update_4", start: "2025-10-10", finish: "2025-11-01" },
-      ],
-    },
-    {
-      activity_id: "A009",
-      description: "Milestone - Structure Complete",
-      type: "Milestone",
-      baseline_start: "2025-11-05",
-      baseline_finish: "2025-11-05",
-      updates: [
-        { update_id: "Update_1", start: "2025-11-07", finish: "2025-11-07" },
-        { update_id: "Update_2", start: "2025-11-06", finish: "2025-11-06" },
-        { update_id: "Update_3", start: "2025-11-08", finish: "2025-11-08" },
-        { update_id: "Update_4", start: "2025-11-07", finish: "2025-11-07" },
-      ],
-    },
-    {
-      activity_id: "A010",
-      description: "Task - MEP Rough-In",
-      type: "Task",
-      baseline_start: "2025-11-10",
-      baseline_finish: "2025-12-15",
-      updates: [
-        { update_id: "Update_1", start: "2025-11-12", finish: "2025-12-17" },
-        { update_id: "Update_2", start: "2025-11-11", finish: "2025-12-16" },
-        { update_id: "Update_3", start: "2025-11-13", finish: "2025-12-18" },
-        { update_id: "Update_4", start: "2025-11-12", finish: "2025-12-17" },
-      ],
-    },
-    {
-      activity_id: "A011",
-      description: "Task - Drywall Installation",
-      type: "Task",
-      baseline_start: "2025-12-18",
-      baseline_finish: "2026-01-20",
-      updates: [
-        { update_id: "Update_1", start: "2025-12-20", finish: "2026-01-22" },
-        { update_id: "Update_2", start: "2025-12-19", finish: "2026-01-21" },
-        { update_id: "Update_3", start: "2025-12-21", finish: "2026-01-23" },
-        { update_id: "Update_4", start: "2025-12-20", finish: "2026-01-22" },
-      ],
-    },
-    {
-      activity_id: "A012",
-      description: "Milestone - MEP Complete",
-      type: "Milestone",
-      baseline_start: "2026-01-25",
-      baseline_finish: "2026-01-25",
-      updates: [
-        { update_id: "Update_1", start: "2026-01-27", finish: "2026-01-27" },
-        { update_id: "Update_2", start: "2026-01-26", finish: "2026-01-26" },
-        { update_id: "Update_3", start: "2026-01-28", finish: "2026-01-28" },
-        { update_id: "Update_4", start: "2026-01-27", finish: "2026-01-27" },
-      ],
-    },
-    {
-      activity_id: "A013",
-      description: "Task - Flooring Installation",
-      type: "Task",
-      baseline_start: "2026-01-30",
-      baseline_finish: "2026-02-25",
-      updates: [
-        { update_id: "Update_1", start: "2026-02-01", finish: "2026-02-27" },
-        { update_id: "Update_2", start: "2026-01-31", finish: "2026-02-26" },
-        { update_id: "Update_3", start: "2026-02-02", finish: "2026-02-28" },
-        { update_id: "Update_4", start: "2026-02-01", finish: "2026-02-27" },
-      ],
-    },
-    {
-      activity_id: "A014",
-      description: "Task - Painting & Finishes",
-      type: "Task",
-      baseline_start: "2026-02-28",
-      baseline_finish: "2026-03-20",
-      updates: [
-        { update_id: "Update_1", start: "2026-03-02", finish: "2026-03-22" },
-        { update_id: "Update_2", start: "2026-03-01", finish: "2026-03-21" },
-        { update_id: "Update_3", start: "2026-03-03", finish: "2026-03-23" },
-        { update_id: "Update_4", start: "2026-03-02", finish: "2026-03-22" },
-      ],
-    },
-    {
-      activity_id: "A015",
-      description: "Milestone - Interior Complete",
-      type: "Milestone",
-      baseline_start: "2026-03-25",
-      baseline_finish: "2026-03-25",
-      updates: [
-        { update_id: "Update_1", start: "2026-03-27", finish: "2026-03-27" },
-        { update_id: "Update_2", start: "2026-03-26", finish: "2026-03-26" },
-        { update_id: "Update_3", start: "2026-03-28", finish: "2026-03-28" },
-        { update_id: "Update_4", start: "2026-03-27", finish: "2026-03-27" },
-      ],
-    },
-    {
-      activity_id: "A016",
-      description: "Task - Final Inspections",
-      type: "Task",
-      baseline_start: "2026-03-28",
-      baseline_finish: "2026-04-10",
-      updates: [
-        { update_id: "Update_1", start: "2026-03-30", finish: "2026-04-12" },
-        { update_id: "Update_2", start: "2026-03-29", finish: "2026-04-11" },
-        { update_id: "Update_3", start: "2026-03-31", finish: "2026-04-13" },
-        { update_id: "Update_4", start: "2026-03-30", finish: "2026-04-12" },
-      ],
-    },
-    {
-      activity_id: "A017",
-      description: "Task - Commissioning",
-      type: "Task",
-      baseline_start: "2026-04-13",
-      baseline_finish: "2026-04-25",
-      updates: [
-        { update_id: "Update_1", start: "2026-04-15", finish: "2026-04-27" },
-        { update_id: "Update_2", start: "2026-04-14", finish: "2026-04-26" },
-        { update_id: "Update_3", start: "2026-04-16", finish: "2026-04-28" },
-        { update_id: "Update_4", start: "2026-04-15", finish: "2026-04-27" },
-      ],
-    },
-    {
-      activity_id: "A018",
-      description: "Milestone - Substantial Completion",
-      type: "Milestone",
-      baseline_start: "2026-04-30",
-      baseline_finish: "2026-04-30",
-      updates: [
-        { update_id: "Update_1", start: "2026-05-02", finish: "2026-05-02" },
-        { update_id: "Update_2", start: "2026-05-01", finish: "2026-05-01" },
-        { update_id: "Update_3", start: "2026-05-03", finish: "2026-05-03" },
-        { update_id: "Update_4", start: "2026-05-02", finish: "2026-05-02" },
-      ],
-    },
-    {
-      activity_id: "A019",
-      description: "Task - Punch List",
-      type: "Task",
-      baseline_start: "2026-05-03",
-      baseline_finish: "2026-05-15",
-      updates: [
-        { update_id: "Update_1", start: "2026-05-05", finish: "2026-05-17" },
-        { update_id: "Update_2", start: "2026-05-04", finish: "2026-05-16" },
-        { update_id: "Update_3", start: "2026-05-06", finish: "2026-05-18" },
-        { update_id: "Update_4", start: "2026-05-05", finish: "2026-05-17" },
-      ],
-    },
-    {
-      activity_id: "A020",
-      description: "Milestone - Final Completion",
-      type: "Milestone",
-      baseline_start: "2026-05-18",
-      baseline_finish: "2026-05-18",
-      updates: [
-        { update_id: "Update_1", start: "2026-05-20", finish: "2026-05-20" },
-        { update_id: "Update_2", start: "2026-05-19", finish: "2026-05-19" },
-        { update_id: "Update_3", start: "2026-05-21", finish: "2026-05-21" },
-        { update_id: "Update_4", start: "2026-05-20", finish: "2026-05-20" },
-      ],
-    },
-  ],
-  criticalPath: ["A001", "A002", "A004", "A007", "A008", "A009", "A010", "A012", "A018", "A020"],
-  aiInsights: [
-    {
-      id: "insight-1",
-      type: "alert",
-      severity: "high",
-      title: "Foundation Milestone Delayed",
-      description:
-        "Foundation completion milestone (A003) has shifted 6 days beyond baseline due to weather delays and permit issues.",
-      confidence: 94,
-      relatedActivities: ["A003", "A006", "A007"],
-      suggestedActions: [
-        "Expedite permit approval process",
-        "Implement weather protection measures",
-        "Consider overtime work to recover schedule",
-      ],
-    },
-    {
-      id: "insight-2",
-      type: "opportunity",
-      severity: "medium",
-      title: "Parallel MEP Activities",
-      description: "MEP rough-in activities show potential for 3-day acceleration through parallel execution.",
-      confidence: 87,
-      relatedActivities: ["A010", "A011"],
-      suggestedActions: [
-        "Coordinate MEP and drywall crews",
-        "Implement zone-based scheduling",
-        "Add MEP coordination support",
-      ],
-    },
-    {
-      id: "insight-3",
-      type: "risk",
-      severity: "high",
-      title: "Critical Path Extension",
-      description:
-        "Current schedule shows 2-day extension to critical path, impacting substantial completion milestone.",
-      confidence: 91,
-      relatedActivities: ["A018", "A020"],
-      suggestedActions: ["Review resource allocation", "Identify crash opportunities", "Accelerate final inspections"],
-    },
-  ],
+// Interface for schedule activity data
+interface ScheduleActivity {
+  id: string
+  activity_id: string
+  activity_name: string
+  start_date: string
+  end_date: string
+  status: string
+  activity_type: string
+  total_float: number
+  primary_base_start_date?: string
+  primary_base_end_date?: string
+  predecessors?: string[]
 }
 
-// Gantt Chart Time Scale Component
-const TimeScale: React.FC<{ startDate: Date; endDate: Date; timelineWidth: number }> = React.memo(
-  ({ startDate, endDate, timelineWidth }) => {
-    const timeScale = useMemo(() => {
-      const periods: Array<{ label: string; position: number; width: number; isMonth: boolean }> = []
-      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-
-      // Create unique month-year periods
-      const current = new Date(startDate)
-      current.setDate(1) // Start from the first day of the month
-      let cumulativeDays = 0
-
-      const uniqueMonths = new Set<string>()
-
-      while (current <= endDate) {
-        const monthYear = `${current.toLocaleDateString("en-US", {
-          month: "short",
-        })}-${current.getFullYear().toString().slice(-2)}`
-
-        // Skip if we already processed this month-year combination
-        if (uniqueMonths.has(monthYear)) {
-          current.setMonth(current.getMonth() + 1)
-          continue
-        }
-
-        uniqueMonths.add(monthYear)
-
-        // Calculate the period for this month
-        const monthStart = new Date(current)
-        const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0) // Last day of the month
-
-        // Adjust for timeline boundaries
-        const effectiveStart = monthStart < startDate ? startDate : monthStart
-        const effectiveEnd = monthEnd > endDate ? endDate : monthEnd
-
-        // Calculate days in this period
-        const periodDays = Math.ceil((effectiveEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1
-
-        // Calculate position based on days from timeline start
-        const daysFromStart = Math.floor((effectiveStart.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-        const position = (daysFromStart / totalDays) * timelineWidth
-        const width = (periodDays / totalDays) * timelineWidth
-
-        periods.push({
-          label: monthYear,
-          position,
-          width,
-          isMonth: true,
-        })
-
-        // Move to next month
-        current.setMonth(current.getMonth() + 1)
-      }
-
-      return periods
-    }, [startDate, endDate, timelineWidth])
-
-    return (
-      <div className="relative border-b border-border bg-muted h-12">
-        {timeScale.map((period, index) => (
-          <div
-            key={index}
-            className="absolute top-0 h-full border-r border-border flex items-center justify-center text-xs font-medium text-muted-foreground"
-            style={{
-              left: `${period.position}px`,
-              width: `${period.width}px`,
-            }}
-          >
-            {period.label}
-          </div>
-        ))}
-      </div>
-    )
-  }
-)
-
-// Activity Row Component
-const ActivityRow: React.FC<{
+interface ScheduleGanttItem {
+  id: string
   activity: ScheduleActivity
-  currentUpdate: ScheduleUpdate
-  baselineUpdate: ScheduleUpdate
-  isOnCriticalPath: boolean
-  showCriticalPath: boolean
-  showDifferences: boolean
-  comparisonMode: string
-  timelineStart: Date
-  timelineEnd: Date
-  timelineWidth: number
-  onActivityClick: (activity: ScheduleActivity) => void
-}> = React.memo(
-  ({
-    activity,
-    currentUpdate,
-    baselineUpdate,
-    isOnCriticalPath,
-    showCriticalPath,
-    showDifferences,
-    comparisonMode,
-    timelineStart,
-    timelineEnd,
-    timelineWidth,
-    onActivityClick,
-  }) => {
-    const activityBar = useMemo(() => {
-      const totalDays = Math.ceil((timelineEnd.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24))
-      const currentStart = new Date(currentUpdate.start)
-      const currentEnd = new Date(currentUpdate.finish)
-      const baselineStart = new Date(baselineUpdate.start)
-      const baselineEnd = new Date(baselineUpdate.finish)
+  startDate: Date
+  endDate: Date
+  position: number
+  annotation?: string
+}
 
-      const currentStartDay = Math.floor((currentStart.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24))
-      const currentDuration = Math.ceil((currentEnd.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24)) + 1
-      const baselineStartDay = Math.floor((baselineStart.getTime() - timelineStart.getTime()) / (1000 * 60 * 60 * 24))
-      const baselineDuration = Math.ceil((baselineEnd.getTime() - baselineStart.getTime()) / (1000 * 60 * 60 * 24)) + 1
+interface ScheduleGroupedData {
+  activityType: string
+  activities: ScheduleGanttItem[]
+}
 
-      const currentPosition = (currentStartDay / totalDays) * timelineWidth
-      const currentWidth = (currentDuration / totalDays) * timelineWidth
-      const baselinePosition = (baselineStartDay / totalDays) * timelineWidth
-      const baselineWidth = (baselineDuration / totalDays) * timelineWidth
+interface ScheduleFilters {
+  search: string
+  status: string
+  activityType: string
+}
 
-      const variance = Math.ceil((currentEnd.getTime() - baselineEnd.getTime()) / (1000 * 60 * 60 * 24))
+interface ScheduleViewMode {
+  viewMode: "week" | "month" | "quarter" | "year"
+}
 
-      return {
-        current: { position: currentPosition, width: currentWidth },
-        baseline: { position: baselinePosition, width: baselineWidth },
-        variance,
-      }
-    }, [currentUpdate, baselineUpdate, timelineStart, timelineEnd, timelineWidth])
-
-    const getActivityIcon = () => {
-      return activity.type === "Milestone" ? (
-        <Diamond className="h-4 w-4 text-primary" />
-      ) : (
-        <BarChart3 className="h-4 w-4 text-muted-foreground" />
-      )
-    }
-
-    const getVarianceColor = (variance: number) => {
-      if (variance === 0) return "text-muted-foreground"
-      return variance > 0 ? "text-destructive" : "text-green-600 dark:text-green-400"
-    }
-
-    const getVarianceIcon = (variance: number) => {
-      if (variance === 0) return null
-      return variance > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />
-    }
-
-    return (
-      <TooltipProvider>
-        <div className="h-10 flex items-center border-b border-border hover:bg-muted/50 transition-colors">
-          {/* Gantt Timeline */}
-          <div className="flex-1 relative h-6 bg-background">
-            {/* Baseline bar (if showing differences) */}
-            {showDifferences && (
-              <div
-                className="absolute top-2 h-2 bg-gray-300 rounded opacity-60"
-                style={{
-                  left: `${activityBar.baseline.position}px`,
-                  width: `${Math.max(activityBar.baseline.width, 2)}px`,
-                }}
-              />
-            )}
-
-            {/* Current bar */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={cn(
-                    "absolute top-2 h-2 cursor-pointer transition-all hover:brightness-110",
-                    activity.type === "Milestone"
-                      ? "bg-blue-600 transform rotate-45 w-2 h-2"
-                      : isOnCriticalPath && showCriticalPath
-                      ? "bg-red-500"
-                      : activity.description.includes("Milestone")
-                      ? "bg-blue-600"
-                      : "bg-orange-500"
-                  )}
-                  style={{
-                    left: `${activityBar.current.position}px`,
-                    width: activity.type === "Milestone" ? "8px" : `${Math.max(activityBar.current.width, 2)}px`,
-                  }}
-                  onClick={() => onActivityClick(activity)}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="text-sm">
-                  <div className="font-medium">{activity.description}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    <div>
-                      Current: {currentUpdate.start} - {currentUpdate.finish}
-                    </div>
-                    <div>
-                      Baseline: {baselineUpdate.start} - {baselineUpdate.finish}
-                    </div>
-                    <div>
-                      Variance: {activityBar.variance > 0 ? "+" : ""}
-                      {activityBar.variance} days
-                    </div>
-                  </div>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-      </TooltipProvider>
-    )
-  }
-)
-
-// Main Project Schedule Component
 const ProjectSchedule: React.FC<ProjectScheduleProps> = ({ userRole, projectData, projectId }) => {
-  const [selectedUpdate, setSelectedUpdate] = useState<string>("Update_4")
-  const [showCriticalPath, setShowCriticalPath] = useState<boolean>(false)
-  const [showDifferences, setShowDifferences] = useState<boolean>(false)
-  const [comparisonMode, setComparisonMode] = useState<string>("baseline")
-  const [activityFilter, setActivityFilter] = useState<string>("all")
-  const [highlightMilestones, setHighlightMilestones] = useState<boolean>(false)
-  const [showPreviousUpdates, setShowPreviousUpdates] = useState<boolean>(false)
-  const [selectedPreviousUpdate, setSelectedPreviousUpdate] = useState<string>("Update_3")
-  const [aiPanelOpen, setAiPanelOpen] = useState<boolean>(false)
-  const [aiQuery, setAiQuery] = useState<string>("")
-  const [selectedActivity, setSelectedActivity] = useState<ScheduleActivity | null>(null)
-  const ganttRef = useRef<HTMLDivElement>(null)
-  const timelineScrollRef = useRef<HTMLDivElement>(null)
+  const [activities, setActivities] = useState<ScheduleActivity[]>([])
+  const [filters, setFilters] = useState<ScheduleFilters>({
+    search: "",
+    status: "all",
+    activityType: "all",
+  })
+  const [viewMode, setViewMode] = useState<ScheduleViewMode["viewMode"]>("month")
+  const [sortField, setSortField] = useState<"name" | "type" | "status">("name")
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [annotationModal, setAnnotationModal] = useState<{
+    isOpen: boolean
+    item: ScheduleGanttItem | null
+    annotation: string
+  }>({
+    isOpen: false,
+    item: null,
+    annotation: "",
+  })
 
-  // Scroll synchronization handlers
-  const handleFixedScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement
-    if (timelineScrollRef.current) {
-      timelineScrollRef.current.scrollTop = target.scrollTop
-    }
-  }
+  useEffect(() => {
+    const loadedActivities: ScheduleActivity[] = []
 
-  const handleTimelineScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement
-    if (ganttRef.current) {
-      ganttRef.current.scrollTop = target.scrollTop
-    }
-  }
+    for (const item of scheduleData) {
+      const parsedStart = item.start_date ? parseISO(item.start_date) : null
+      const parsedEnd = item.end_date ? parseISO(item.end_date) : null
 
-  // Available updates for dropdown
-  const availableUpdates = useMemo(
-    () => [
-      { id: "Update_1", label: "Update 1 - Sept 2024" },
-      { id: "Update_2", label: "Update 2 - Oct 2024" },
-      { id: "Update_3", label: "Update 3 - Nov 2024" },
-      { id: "Update_4", label: "Update 4 - Dec 2024 (Current)" },
-    ],
-    []
-  )
+      if (!parsedStart || !parsedEnd || !isValid(parsedStart) || !isValid(parsedEnd)) {
+        console.warn("❌ Skipping invalid activity:", item.activity_id, item.start_date, item.end_date)
+        continue
+      }
 
-  // Filtered activities based on current filter
-  const filteredActivities = useMemo(() => {
-    let activities = mockScheduleData.activities
-
-    if (activityFilter === "milestones") {
-      activities = activities.filter((a) => a.type === "Milestone")
-    } else if (activityFilter === "tasks") {
-      activities = activities.filter((a) => a.type === "Task")
-    } else if (activityFilter === "critical") {
-      activities = activities.filter((a) => mockScheduleData.criticalPath.includes(a.activity_id))
+      loadedActivities.push({
+        id: item.activity_id,
+        activity_id: item.activity_id,
+        activity_name: item.activity_name,
+        start_date: item.start_date,
+        end_date: item.end_date,
+        status: item.status,
+        activity_type: item.activity_type,
+        total_float: item.total_float,
+        primary_base_start_date: item.primary_base_start_date,
+        primary_base_end_date: item.primary_base_end_date,
+        predecessors: item.predecessors,
+      })
     }
 
+    console.log("✅ Loaded Activities:", loadedActivities.slice(0, 5))
+    setActivities(loadedActivities)
+  }, [])
+
+  // Calculate date range based on view mode
+  const dateRange = useMemo(() => {
+    const now = new Date()
+    let start: Date, end: Date
+
+    switch (viewMode) {
+      case "week":
+        start = startOfWeek(addWeeks(now, -4))
+        end = endOfWeek(addWeeks(now, 8))
+        break
+      case "month":
+        start = startOfMonth(addMonths(now, -2))
+        end = endOfMonth(addMonths(now, 10))
+        break
+      case "quarter":
+        start = startOfQuarter(addQuarters(now, -2))
+        end = endOfQuarter(addQuarters(now, 6))
+        break
+      case "year":
+        start = startOfYear(addYears(now, -1))
+        end = endOfYear(addYears(now, 4))
+        break
+      default:
+        start = startOfMonth(addMonths(now, -2))
+        end = endOfMonth(addMonths(now, 10))
+    }
+
+    return { start, end }
+  }, [viewMode])
+
+  // Generate time periods for header
+  const timePeriods = useMemo(() => {
+    const { start, end } = dateRange
+    const periods: Date[] = []
+
+    switch (viewMode) {
+      case "week":
+        let weekStart = startOfWeek(start)
+        while (weekStart <= end) {
+          periods.push(weekStart)
+          weekStart = addWeeks(weekStart, 1)
+        }
+        break
+      case "month":
+        let monthStart = startOfMonth(start)
+        while (monthStart <= end) {
+          periods.push(monthStart)
+          monthStart = addMonths(monthStart, 1)
+        }
+        break
+      case "quarter":
+        let quarterStart = startOfQuarter(start)
+        while (quarterStart <= end) {
+          periods.push(quarterStart)
+          quarterStart = addQuarters(quarterStart, 1)
+        }
+        break
+      case "year":
+        let yearStart = startOfYear(start)
+        while (yearStart <= end) {
+          periods.push(yearStart)
+          yearStart = addYears(yearStart, 1)
+        }
+        break
+      default:
+        let defaultStart = startOfMonth(start)
+        while (defaultStart <= end) {
+          periods.push(defaultStart)
+          defaultStart = addMonths(defaultStart, 1)
+        }
+    }
+
+    return periods
+  }, [dateRange, viewMode])
+
+  // Convert activities to Gantt items
+  const ganttItems = useMemo((): ScheduleGanttItem[] => {
     return activities
-  }, [activityFilter])
+      .filter((activity) => {
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase()
+          if (
+            !activity.activity_name.toLowerCase().includes(searchLower) &&
+            !activity.activity_type.toLowerCase().includes(searchLower)
+          ) {
+            return false
+          }
+        }
+        if (filters.status !== "all" && activity.status !== filters.status) {
+          return false
+        }
+        if (filters.activityType !== "all" && activity.activity_type !== filters.activityType) {
+          return false
+        }
+        return true
+      })
+      .map((activity, index) => ({
+        id: activity.activity_id,
+        activity,
+        startDate: new Date(activity.start_date),
+        endDate: new Date(activity.end_date),
+        position: index,
+        annotation:
+          activity.status === "Completed"
+            ? "Completed"
+            : activity.status === "In Progress"
+            ? "In Progress"
+            : activity.status === "Not Started"
+            ? "Not Started"
+            : undefined,
+      }))
+      .sort((a, b) => {
+        const sortValueA =
+          sortField === "name"
+            ? a.activity.activity_name
+            : sortField === "type"
+            ? a.activity.activity_type
+            : a.activity.status
+        const sortValueB =
+          sortField === "name"
+            ? b.activity.activity_name
+            : sortField === "type"
+            ? b.activity.activity_type
+            : b.activity.status
 
-  // Timeline calculation
-  const timelineData = useMemo(() => {
-    const allDates = mockScheduleData.activities.flatMap((activity) => [
-      new Date(activity.baseline_start),
-      new Date(activity.baseline_finish),
-      ...activity.updates.flatMap((update) => [new Date(update.start), new Date(update.finish)]),
-    ])
+        const comparison = sortValueA.localeCompare(sortValueB)
+        return sortDirection === "asc" ? comparison : -comparison
+      })
+  }, [activities, filters, sortField, sortDirection])
 
-    const startDate = new Date(Math.min(...allDates.map((d) => d.getTime())))
-    const endDate = new Date(Math.max(...allDates.map((d) => d.getTime())))
+  // Group activities by type
+  const groupedData = useMemo((): ScheduleGroupedData[] => {
+    const groups = ganttItems.reduce((acc, item) => {
+      const type = item.activity.activity_type || "Task"
+      if (!acc[type]) {
+        acc[type] = []
+      }
+      acc[type].push(item)
+      return acc
+    }, {} as Record<string, ScheduleGanttItem[]>)
 
-    // Add padding
-    startDate.setDate(startDate.getDate() - 7)
-    endDate.setDate(endDate.getDate() + 7)
+    return Object.entries(groups).map(([type, items]) => ({
+      activityType: type,
+      activities: items,
+    }))
+  }, [ganttItems])
 
-    // Calculate a responsive timeline width based on available space
-    const maxAvailableWidth = Math.min(600, window?.innerWidth ? window.innerWidth - 600 : 600)
-    return { startDate, endDate, timelineWidth: maxAvailableWidth }
-  }, [])
-
-  // Handle activity click
-  const handleActivityClick = useCallback((activity: ScheduleActivity) => {
-    setSelectedActivity(activity)
-  }, [])
-
-  // Handle export
-  const handleExport = useCallback((format: string) => {
-    console.log(`Exporting schedule in ${format} format`)
-    // Implementation would go here
-  }, [])
-
-  // Handle AI query
-  const handleAiQuery = useCallback((query: string) => {
-    setAiQuery(query)
-    // Implementation would process AI query
-  }, [])
-
-  // AI Insights Panel
-  const AiInsightsPanel = useMemo(
-    () => (
-      <Card className="w-80 h-96 overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-600" />
-            AI Schedule Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="px-4 pb-3">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Ask about schedule..."
-                value={aiQuery}
-                onChange={(e) => setAiQuery(e.target.value)}
-                className="flex-1 px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground"
-              />
-              <Button size="sm" onClick={() => handleAiQuery(aiQuery)}>
-                <MessageSquare className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="h-72 overflow-y-auto px-4">
-            <div className="space-y-3">
-              {mockScheduleData.aiInsights.map((insight) => (
-                <div key={insight.id} className="p-3 bg-muted rounded-lg">
-                  <div className="flex items-start gap-2 mb-2">
-                    <div
-                      className={cn(
-                        "w-2 h-2 rounded-full mt-1.5",
-                        insight.severity === "high"
-                          ? "bg-destructive"
-                          : insight.severity === "medium"
-                          ? "bg-yellow-500 dark:bg-yellow-600"
-                          : "bg-green-500 dark:bg-green-600"
-                      )}
-                    />
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-foreground">{insight.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">{insight.description}</div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground">Confidence: {insight.confidence}%</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    ),
-    [aiQuery, handleAiQuery]
+  // Calculate position and width for Gantt bars
+  const calculatePosition = useCallback(
+    (date: Date) => {
+      const { start, end } = dateRange
+      const totalDays = differenceInDays(end, start)
+      const daysSinceStart = differenceInDays(date, start)
+      return Math.max(0, Math.min(100, (daysSinceStart / totalDays) * 100))
+    },
+    [dateRange]
   )
+
+  const calculateWidth = useCallback(
+    (startDate: Date, endDate: Date) => {
+      const { start, end } = dateRange
+      const totalDays = differenceInDays(end, start)
+      const itemDays = differenceInDays(endDate, startDate)
+      return Math.max(1, (itemDays / totalDays) * 100)
+    },
+    [dateRange]
+  )
+
+  // Get status color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return "bg-green-600"
+      case "In Progress":
+        return "bg-blue-600"
+      case "Not Started":
+        return "bg-gray-600"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
+  // Get status icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case "In Progress":
+        return <Play className="h-4 w-4 text-blue-600" />
+      case "Not Started":
+        return <Pause className="h-4 w-4 text-gray-600" />
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />
+    }
+  }
+
+  // Get unique statuses and activity types for filters
+  const uniqueStatuses = useMemo(() => {
+    return [...new Set(activities.map((activity) => activity.status))].sort()
+  }, [activities])
+
+  const uniqueActivityTypes = useMemo(() => {
+    return [...new Set(activities.map((activity) => activity.activity_type))].sort()
+  }, [activities])
+
+  // Sort handlers
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+  }
+
+  // Export handlers
+  const handleExportPDF = () => {
+    console.log("Exporting schedule to PDF...")
+  }
+
+  const handleExportExcel = () => {
+    console.log("Exporting schedule to Excel...")
+  }
+
+  // Annotation handlers
+  const handleAddAnnotation = (item: ScheduleGanttItem) => {
+    setAnnotationModal({
+      isOpen: true,
+      item,
+      annotation: item.annotation || "",
+    })
+  }
+
+  const handleSaveAnnotation = () => {
+    if (annotationModal.item) {
+      console.log(`Saving annotation for ${annotationModal.item.activity.activity_name}: ${annotationModal.annotation}`)
+    }
+    setAnnotationModal({ isOpen: false, item: null, annotation: "" })
+  }
+
+  // Helper components
+  const SortIcon = ({ field }: { field: typeof sortField }) => {
+    if (sortField !== field) return null
+    return sortDirection === "asc" ? <SortAsc className="h-3 w-3" /> : <SortDesc className="h-3 w-3" />
+  }
+
+  if (!activities.length) {
+    return <div className="p-4 text-muted-foreground text-sm">Loading schedule...</div>
+  }
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden" style={{ maxWidth: "calc(100vw - 4rem)" }}>
-      {/* Header Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 w-full max-w-full overflow-hidden min-w-0 pr-4">
-        <div className="flex items-center gap-4">
-          <Select value={selectedUpdate} onValueChange={setSelectedUpdate}>
-            <SelectTrigger className="w-64">
-              <SelectValue placeholder="Select Update View" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableUpdates.map((update) => (
-                <SelectItem key={update.id} value={update.id}>
-                  {update.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={activityFilter} onValueChange={setActivityFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter Activity Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Activities</SelectItem>
-              <SelectItem value="milestones">Milestones</SelectItem>
-              <SelectItem value="tasks">Tasks</SelectItem>
-              <SelectItem value="critical">Critical Path</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {showPreviousUpdates && (
-            <Select value={selectedPreviousUpdate} onValueChange={setSelectedPreviousUpdate}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select Previous Update" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableUpdates
-                  .filter((update) => update.id !== selectedUpdate)
-                  .map((update) => (
-                    <SelectItem key={update.id} value={update.id}>
-                      {update.label}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+    <div className={`w-full space-y-6 ${isFullscreen ? "fixed inset-0 z-[9999] bg-background p-6 overflow-auto" : ""}`}>
+      {/* Header with Title and Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Project Schedule {isFullscreen && "(Fullscreen)"}
+          </h3>
+          <Badge variant="outline" className="ml-2">
+            {ganttItems.length} activities
+          </Badge>
+          {isFullscreen && (
+            <Badge variant="secondary" className="ml-2">
+              Press Esc to exit
+            </Badge>
           )}
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Display Options */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Display Options
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel>Display Settings</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowCriticalPath(!showCriticalPath)}>
-                <div className="flex items-center justify-between w-full">
-                  <span>Show Critical Path</span>
-                  <Switch checked={showCriticalPath} onCheckedChange={setShowCriticalPath} />
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowDifferences(!showDifferences)}>
-                <div className="flex items-center justify-between w-full">
-                  <span>Show Differences</span>
-                  <Switch checked={showDifferences} onCheckedChange={setShowDifferences} />
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowPreviousUpdates(!showPreviousUpdates)}>
-                <div className="flex items-center justify-between w-full">
-                  <span>Show Previous Updates</span>
-                  <Switch checked={showPreviousUpdates} onCheckedChange={setShowPreviousUpdates} />
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title={isFullscreen ? "Exit Fullscreen (Esc)" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          </Button>
 
-          {/* Export Options */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Export Formats</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {[
-                { format: "xer", label: "XER Format" },
-                { format: "mpp", label: "Microsoft Project (MPP)" },
-                { format: "xml", label: "XML Format" },
-                { format: "csv", label: "CSV (Comma Separated)" },
-                { format: "pdf", label: "PDF Document" },
-              ].map((export_option) => (
-                <DropdownMenuItem key={export_option.format} onClick={() => handleExport(export_option.format)}>
-                  <Download className="h-4 w-4 mr-2" />
-                  {export_option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="z-[99999]">
+              <SelectItem value="week">Weekly</SelectItem>
+              <SelectItem value="month">Monthly</SelectItem>
+              <SelectItem value="quarter">Quarterly</SelectItem>
+              <SelectItem value="year">Yearly</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <Popover open={aiPanelOpen} onOpenChange={setAiPanelOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Brain className="h-4 w-4 mr-2" />
-                AI Insights
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              {AiInsightsPanel}
-            </PopoverContent>
-          </Popover>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <FileText className="h-4 w-4 mr-1" />
+              PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel}>
+              <Download className="h-4 w-4 mr-1" />
+              Excel
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Gantt Chart */}
-      <Card className="w-full max-w-full overflow-hidden">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Project Schedule - {availableUpdates.find((u) => u.id === selectedUpdate)?.label}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="border rounded-lg bg-background overflow-hidden max-w-full">
-            <div className="flex w-full max-w-full overflow-hidden">
-              {/* Fixed Columns Section */}
-              <div className="flex-shrink-0 border-r border-border bg-background">
-                {/* Fixed Header */}
-                <div className="border-b bg-muted p-3 h-12 flex items-center">
-                  <div className="flex gap-2 text-xs font-semibold text-muted-foreground">
-                    <div className="w-20">ID</div>
-                    <div className="w-56">Activity</div>
-                    <div className="w-24">BL Start</div>
-                    <div className="w-24">BL Finish</div>
-                    <div className="w-24">Start</div>
-                    <div className="w-24">Finish</div>
-                    {showPreviousUpdates && (
-                      <>
-                        <div className="w-24">{selectedPreviousUpdate.replace("Update_", "U")} Start</div>
-                        <div className="w-24">{selectedPreviousUpdate.replace("Update_", "U")} Finish</div>
-                      </>
-                    )}
-                  </div>
-                </div>
+      {/* Filters */}
+      <div className="flex items-center gap-4 mb-6 p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search activities..."
+            value={filters.search}
+            onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+            className="w-64"
+          />
+        </div>
 
-                {/* Fixed Content - Activity Info */}
-                <div className="divide-y max-h-96 overflow-y-auto" ref={ganttRef} onScroll={handleFixedScroll}>
-                  {filteredActivities.map((activity) => {
-                    const currentUpdate = activity.updates.find((u) => u.update_id === selectedUpdate)!
-                    const previousUpdate = activity.updates.find((u) => u.update_id === selectedPreviousUpdate)!
-                    const isOnCriticalPath = mockScheduleData.criticalPath.includes(activity.activity_id)
+        <Select value={filters.status} onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent className="z-[99999]">
+            <SelectItem value="all">All Statuses</SelectItem>
+            {uniqueStatuses.map((status) => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-                    return (
-                      <div
-                        key={activity.activity_id}
-                        className={cn(
-                          "p-3 h-10 flex items-center group hover:bg-muted/50",
-                          isOnCriticalPath && showCriticalPath ? "bg-red-50 dark:bg-red-900/10" : ""
-                        )}
-                      >
-                        <div className="flex gap-2 items-center w-full text-xs">
-                          <div className="w-20 font-medium">{activity.activity_id}</div>
-                          <div className="w-56 flex items-center gap-1">
-                            {activity.type === "Milestone" ? (
-                              <Diamond className="h-3 w-3 text-primary flex-shrink-0" />
-                            ) : (
-                              <BarChart3 className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                            )}
-                            <span className="truncate flex-1">{activity.description}</span>
-                            {isOnCriticalPath && showCriticalPath && (
-                              <Badge variant="destructive" className="text-[9px] px-1 py-0 h-3 flex-shrink-0">
-                                Critical
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="w-24 text-muted-foreground">
-                            {new Date(activity.baseline_start).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                          <div className="w-24 text-muted-foreground">
-                            {new Date(activity.baseline_finish).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                          <div className="w-24 text-muted-foreground">
-                            {new Date(currentUpdate.start).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                          <div className="w-24 text-muted-foreground">
-                            {new Date(currentUpdate.finish).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                          {showPreviousUpdates && (
-                            <>
-                              <div className="w-24 text-muted-foreground">
-                                {new Date(previousUpdate.start).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </div>
-                              <div className="w-24 text-muted-foreground">
-                                {new Date(previousUpdate.finish).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+        <Select
+          value={filters.activityType}
+          onValueChange={(value) => setFilters((prev) => ({ ...prev, activityType: value }))}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent className="z-[99999]">
+            <SelectItem value="all">All Types</SelectItem>
+            {uniqueActivityTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-              {/* Scrollable Timeline Section */}
-              <div
-                className="flex-1 overflow-x-auto overflow-y-hidden min-w-0 max-w-full"
-                ref={timelineScrollRef}
-                onScroll={handleTimelineScroll}
-                style={{
-                  scrollbarWidth: "auto",
-                  msOverflowStyle: "scrollbar",
-                  minWidth: 0,
-                  maxWidth: "100%",
-                }}
-              >
-                <div
-                  className="w-full max-w-full"
-                  style={{
-                    width: `${Math.min(600, timelineData.timelineWidth)}px`,
-                    minWidth: `${Math.min(400, timelineData.timelineWidth)}px`,
-                    maxWidth: "100%",
-                  }}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setFilters({ search: "", status: "all", activityType: "all" })}
+        >
+          Clear Filters
+        </Button>
+      </div>
+
+      {groupedData.length > 0 ? (
+        <div className="space-y-4">
+          {/* Timeline Header */}
+          <div className="relative border-b border-gray-200 dark:border-gray-700 pb-4">
+            <div className="flex">
+              <div className="w-[600px] flex-shrink-0 flex gap-6 text-sm font-medium text-gray-900 dark:text-gray-100">
+                <button
+                  className="w-48 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
+                  onClick={() => handleSort("name")}
                 >
-                  {/* Timeline Header */}
-                  <TimeScale
-                    startDate={timelineData.startDate}
-                    endDate={timelineData.endDate}
-                    timelineWidth={timelineData.timelineWidth}
-                  />
-
-                  {/* Timeline Content */}
-                  <div className="divide-y max-h-96 overflow-y-auto">
-                    {filteredActivities.map((activity) => {
-                      const currentUpdate = activity.updates.find((u) => u.update_id === selectedUpdate)!
-                      const baselineUpdate = {
-                        update_id: "baseline",
-                        start: activity.baseline_start,
-                        finish: activity.baseline_finish,
-                      }
-                      const isOnCriticalPath = mockScheduleData.criticalPath.includes(activity.activity_id)
-
-                      return (
-                        <ActivityRow
-                          key={activity.activity_id}
-                          activity={activity}
-                          currentUpdate={currentUpdate}
-                          baselineUpdate={baselineUpdate}
-                          isOnCriticalPath={isOnCriticalPath}
-                          showCriticalPath={showCriticalPath}
-                          showDifferences={showDifferences}
-                          comparisonMode={comparisonMode}
-                          timelineStart={timelineData.startDate}
-                          timelineEnd={timelineData.endDate}
-                          timelineWidth={timelineData.timelineWidth}
-                          onActivityClick={handleActivityClick}
-                        />
-                      )
-                    })}
-                  </div>
+                  <User className="h-4 w-4" />
+                  Activity Name
+                  <SortIcon field="name" />
+                </button>
+                <button
+                  className="w-44 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
+                  onClick={() => handleSort("type")}
+                >
+                  Type
+                  <SortIcon field="type" />
+                </button>
+                <button
+                  className="w-56 flex items-center gap-1 hover:bg-muted/50 p-2 rounded justify-start"
+                  onClick={() => handleSort("status")}
+                >
+                  <Building className="h-4 w-4" />
+                  Status
+                  <SortIcon field="status" />
+                </button>
+              </div>
+              <div className="flex-1 relative">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  {timePeriods.map((period, index) => (
+                    <div key={index} style={{ left: `${calculatePosition(period)}%` }} className="absolute">
+                      {format(
+                        period,
+                        viewMode === "week"
+                          ? "MMM dd"
+                          : viewMode === "month"
+                          ? "MMM yyyy"
+                          : viewMode === "quarter"
+                          ? "Qo yyyy"
+                          : "yyyy"
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Schedule Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
-              <div>
-                <div className="text-2xl font-bold text-foreground">{filteredActivities.length}</div>
-                <div className="text-sm text-muted-foreground">Total Activities</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Diamond className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <div>
-                <div className="text-2xl font-bold text-foreground">
-                  {filteredActivities.filter((a) => a.type === "Milestone").length}
+          {/* Timeline Rows */}
+          <div className="space-y-2 h-[576px] overflow-y-auto">
+            {groupedData.map((group) => (
+              <div key={group.activityType}>
+                {/* Activity Type Header */}
+                <div className="flex items-center gap-2 mb-2">
+                  <Building className="h-4 w-4" />
+                  <span className="text-sm font-medium">{group.activityType}</span>
+                  <Badge variant="outline" className="ml-2">
+                    {group.activities.length} activities
+                  </Badge>
                 </div>
-                <div className="text-sm text-muted-foreground">Milestones</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5 text-destructive" />
-              <div>
-                <div className="text-2xl font-bold text-foreground">{mockScheduleData.criticalPath.length}</div>
-                <div className="text-sm text-muted-foreground">Critical Activities</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                {/* Activities */}
+                <div className="ml-4">
+                  <div className="space-y-2">
+                    {group.activities.map((item) => (
+                      <div key={item.id} className="flex items-center group">
+                        {/* Activity Info */}
+                        <div className="w-[600px] flex-shrink-0 flex gap-6 pr-4">
+                          <div className="w-48 flex items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate">
+                              {item.activity.activity_name}
+                            </span>
+                          </div>
+                          <div className="w-44 flex items-center gap-2">
+                            <div className={`w-2.5 h-2.5 rounded-full ${getStatusColor(item.activity.status)}`}></div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              {item.activity.activity_type}
+                            </span>
+                          </div>
+                          <div className="w-56 flex items-center gap-2">
+                            {getStatusIcon(item.activity.status)}
+                            <span className="text-xs text-gray-600 dark:text-gray-400">{item.activity.status}</span>
+                          </div>
+                        </div>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              <div>
-                <div className="text-2xl font-bold text-foreground">+2d</div>
-                <div className="text-sm text-muted-foreground">Schedule Variance</div>
+                        {/* Timeline Bar */}
+                        <div className="flex-1 relative h-6">
+                          <div className="absolute inset-y-0 w-full bg-gray-100 dark:bg-gray-800 rounded"></div>
+
+                          {/* Activity Bar */}
+                          <div
+                            className={`absolute inset-y-1 rounded ${getStatusColor(
+                              item.activity.status
+                            )} hover:opacity-80 transition-opacity cursor-pointer group/bar`}
+                            style={{
+                              left: `${calculatePosition(item.startDate)}%`,
+                              width: `${calculateWidth(item.startDate, item.endDate)}%`,
+                            }}
+                            onClick={() => handleAddAnnotation(item)}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center text-white text-[10px] font-semibold opacity-0 group-hover/bar:opacity-100 transition-opacity">
+                              {differenceInDays(item.endDate, item.startDate)}d
+                            </div>
+
+                            {item.annotation && (
+                              <MessageSquare className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 text-yellow-500" />
+                            )}
+                          </div>
+
+                          {/* Today Line */}
+                          <div
+                            className="absolute top-0 bottom-0 w-0.5 bg-red-500 dark:bg-red-400 z-10"
+                            style={{ left: `${calculatePosition(new Date())}%` }}
+                          ></div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="w-16 flex-shrink-0 text-right">
+                          <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                            {item.activity.total_float}d float
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded"></div>
+                <span className="text-xs text-gray-600 dark:text-gray-400">Today</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-3 w-3 text-yellow-500" />
+                <span className="text-xs text-gray-600 dark:text-gray-400">Has Annotation</span>
+              </div>
+              {/* Status Legend */}
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-600 rounded"></div>
+                <span className="text-xs text-gray-600 dark:text-gray-400">Completed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-600 rounded"></div>
+                <span className="text-xs text-gray-600 dark:text-gray-400">In Progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-gray-600 rounded"></div>
+                <span className="text-xs text-gray-600 dark:text-gray-400">Not Started</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Showing {format(dateRange.start, "MMM dd")} - {format(dateRange.end, "MMM dd, yyyy")}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">
+          <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <div className="text-sm">No schedule activities found</div>
+          <div className="text-xs">Try adjusting your filters</div>
+        </div>
+      )}
+
+      {/* Annotation Modal */}
+      <Dialog
+        open={annotationModal.isOpen}
+        onOpenChange={(open) => setAnnotationModal((prev) => ({ ...prev, isOpen: open }))}
+      >
+        <DialogContent className="max-w-lg z-[99999]">
+          <DialogHeader>
+            <DialogTitle>Add Activity Annotation</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {annotationModal.item && (
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-sm font-medium">{annotationModal.item.activity.activity_name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {annotationModal.item.activity.activity_type} • {format(annotationModal.item.startDate, "MMM dd")} -{" "}
+                  {format(annotationModal.item.endDate, "MMM dd")}
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Annotation</label>
+              <Textarea
+                placeholder="Add notes about this activity..."
+                value={annotationModal.annotation}
+                onChange={(e) => setAnnotationModal((prev) => ({ ...prev, annotation: e.target.value }))}
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setAnnotationModal({ isOpen: false, item: null, annotation: "" })}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveAnnotation}>
+                <Save className="h-4 w-4 mr-1" />
+                Save Annotation
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

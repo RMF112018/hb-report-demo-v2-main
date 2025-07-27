@@ -38,11 +38,14 @@ export interface ContractDocument {
     probability: string
     clauseReference: string
   }>
-  complianceChecks: Record<string, {
-    status: string
-    lastChecked: string
-    nextReview: string
-  }>
+  complianceChecks: Record<
+    string,
+    {
+      status: string
+      lastChecked: string
+      nextReview: string
+    }
+  >
   aiInsights: {
     overallRisk: string
     costSavingsPotential: number
@@ -99,7 +102,7 @@ export class ContractDocumentsExportUtils {
           costSavingsIdentified: this.formatCurrency(stats.costSavingsIdentified),
           riskItemsResolved: stats.riskItemsResolved,
         },
-        documents: documents.map(doc => ({
+        documents: documents.map((doc) => ({
           id: doc.id,
           name: doc.name,
           type: doc.type,
@@ -117,25 +120,25 @@ export class ContractDocumentsExportUtils {
           costSavingsPotential: this.formatCurrency(doc.aiInsights?.costSavingsPotential || 0),
         })),
         riskAnalysis: {
-          highRiskDocs: documents.filter(doc => doc.riskLevel === "High").length,
-          mediumRiskDocs: documents.filter(doc => doc.riskLevel === "Medium").length,
-          lowRiskDocs: documents.filter(doc => doc.riskLevel === "Low").length,
+          highRiskDocs: documents.filter((doc) => doc.riskLevel === "High").length,
+          mediumRiskDocs: documents.filter((doc) => doc.riskLevel === "Medium").length,
+          lowRiskDocs: documents.filter((doc) => doc.riskLevel === "Low").length,
         },
         complianceAnalysis: {
-          compliantDocs: documents.filter(doc => doc.complianceScore >= 90).length,
-          needsAttentionDocs: documents.filter(doc => doc.complianceScore < 90).length,
+          compliantDocs: documents.filter((doc) => doc.complianceScore >= 90).length,
+          needsAttentionDocs: documents.filter((doc) => doc.complianceScore < 90).length,
           avgComplianceScore: documents.reduce((sum, doc) => sum + doc.complianceScore, 0) / documents.length,
         },
       }
 
       // Simulate PDF generation
       console.log("PDF Export Data:", reportData)
-      
+
       // Create a downloadable blob (simplified)
       const content = JSON.stringify(reportData, null, 2)
       const blob = new Blob([content], { type: "application/json" })
       const url = URL.createObjectURL(blob)
-      
+
       const link = document.createElement("a")
       link.href = url
       link.download = `${fileName}.json` // Would be .pdf in real implementation
@@ -175,11 +178,11 @@ export class ContractDocumentsExportUtils {
           "Key Risks",
           "Opportunities",
           "Cost Savings Potential",
-          "AI Analysis Status",
-          "Tags"
+          "HBI Analysis Status",
+          "Tags",
         ],
         // Data rows
-        ...documents.map(doc => [
+        ...documents.map((doc) => [
           doc.id,
           doc.name,
           doc.type,
@@ -196,18 +199,16 @@ export class ContractDocumentsExportUtils {
           doc.opportunities?.length || 0,
           doc.aiInsights?.costSavingsPotential || 0,
           doc.aiAnalysisStatus,
-          doc.tags.join(", ")
-        ])
+          doc.tags.join(", "),
+        ]),
       ]
 
       // Create CSV content (would be Excel in real implementation)
-      const csvContent = worksheetData
-        .map(row => row.map(cell => `"${cell}"`).join(","))
-        .join("\n")
+      const csvContent = worksheetData.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n")
 
       const blob = new Blob([csvContent], { type: "text/csv" })
       const url = URL.createObjectURL(blob)
-      
+
       const link = document.createElement("a")
       link.href = url
       link.download = `${fileName}.csv` // Would be .xlsx in real implementation
@@ -243,14 +244,14 @@ export class ContractDocumentsExportUtils {
           "Project Number",
           "Pages",
           "File Size",
-          "AI Analysis Status",
+          "HBI Analysis Status",
           "Key Risks Count",
           "Opportunities Count",
           "Cost Savings Potential",
-          "Tags"
+          "Tags",
         ],
         // Data rows
-        ...documents.map(doc => [
+        ...documents.map((doc) => [
           doc.id,
           doc.name,
           doc.type,
@@ -268,17 +269,15 @@ export class ContractDocumentsExportUtils {
           (doc.keyRisks?.length || 0).toString(),
           (doc.opportunities?.length || 0).toString(),
           (doc.aiInsights?.costSavingsPotential || 0).toString(),
-          doc.tags.join("; ")
-        ])
+          doc.tags.join("; "),
+        ]),
       ]
 
-      const csvContent = csvData
-        .map(row => row.map(cell => `"${cell}"`).join(","))
-        .join("\n")
+      const csvContent = csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n")
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
       const url = URL.createObjectURL(blob)
-      
+
       const link = document.createElement("a")
       link.href = url
       link.download = `${fileName}.csv`
@@ -298,18 +297,19 @@ export class ContractDocumentsExportUtils {
     fileName: string = "ContractRiskAnalysis"
   ): void {
     try {
-      const riskData = documents.flatMap(doc => 
-        doc.keyRisks?.map(risk => [
-          doc.id,
-          doc.name,
-          doc.type,
-          doc.project.name,
-          risk.category,
-          risk.description,
-          risk.severity,
-          risk.recommendation,
-          risk.clauseReference
-        ]) || []
+      const riskData = documents.flatMap(
+        (doc) =>
+          doc.keyRisks?.map((risk) => [
+            doc.id,
+            doc.name,
+            doc.type,
+            doc.project.name,
+            risk.category,
+            risk.description,
+            risk.severity,
+            risk.recommendation,
+            risk.clauseReference,
+          ]) || []
       )
 
       const csvData = [
@@ -323,19 +323,17 @@ export class ContractDocumentsExportUtils {
           "Risk Description",
           "Severity",
           "Recommendation",
-          "Clause Reference"
+          "Clause Reference",
         ],
         // Risk data
-        ...riskData
+        ...riskData,
       ]
 
-      const csvContent = csvData
-        .map(row => row.map(cell => `"${cell}"`).join(","))
-        .join("\n")
+      const csvContent = csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n")
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
       const url = URL.createObjectURL(blob)
-      
+
       const link = document.createElement("a")
       link.href = url
       link.download = `${fileName}.csv`
@@ -355,18 +353,19 @@ export class ContractDocumentsExportUtils {
     fileName: string = "ContractOpportunities"
   ): void {
     try {
-      const opportunityData = documents.flatMap(doc => 
-        doc.opportunities?.map(opp => [
-          doc.id,
-          doc.name,
-          doc.type,
-          doc.project.name,
-          opp.category,
-          opp.description,
-          opp.value,
-          opp.probability,
-          opp.clauseReference
-        ]) || []
+      const opportunityData = documents.flatMap(
+        (doc) =>
+          doc.opportunities?.map((opp) => [
+            doc.id,
+            doc.name,
+            doc.type,
+            doc.project.name,
+            opp.category,
+            opp.description,
+            opp.value,
+            opp.probability,
+            opp.clauseReference,
+          ]) || []
       )
 
       const csvData = [
@@ -380,19 +379,17 @@ export class ContractDocumentsExportUtils {
           "Description",
           "Value",
           "Probability",
-          "Clause Reference"
+          "Clause Reference",
         ],
         // Opportunity data
-        ...opportunityData
+        ...opportunityData,
       ]
 
-      const csvContent = csvData
-        .map(row => row.map(cell => `"${cell}"`).join(","))
-        .join("\n")
+      const csvContent = csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n")
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
       const url = URL.createObjectURL(blob)
-      
+
       const link = document.createElement("a")
       link.href = url
       link.download = `${fileName}.csv`
@@ -422,7 +419,7 @@ COMPLIANCE & RISK
 Compliance Rate: ${this.formatPercentage(stats.complianceRate)}
 Risk Items Resolved: ${stats.riskItemsResolved}
 
-AI ANALYSIS
+HBI Analysis
 Insights Generated: ${stats.aiInsightsGenerated}
 Cost Savings Identified: ${this.formatCurrency(stats.costSavingsIdentified)}
 
@@ -433,4 +430,4 @@ PERFORMANCE INDICATORS
 - Automated compliance monitoring ensuring regulatory adherence
     `.trim()
   }
-} 
+}

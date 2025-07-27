@@ -75,6 +75,11 @@ import {
   Import,
   ArrowRight,
   Home,
+  Ruler,
+  Gavel,
+  UserPlus,
+  Heart,
+  GraduationCap,
 } from "lucide-react"
 import type { UserRole } from "../../project/[projectId]/types/project"
 import type { ProcurementLogRecord, ProcoreCommitment, BidTabLink } from "../../../types/procurement"
@@ -82,9 +87,26 @@ import { useToast } from "../../../hooks/use-toast"
 import { useAuth } from "../../../context/auth-context"
 import { cn } from "../../../lib/utils"
 
+// Lazy-loaded staffing components for production-ready loading
+const ExecutiveStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ExecutiveStaffingView").then((module) => ({
+    default: module.ExecutiveStaffingView,
+  }))
+)
+const ProjectExecutiveStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ProjectExecutiveStaffingView").then((module) => ({
+    default: module.ProjectExecutiveStaffingView,
+  }))
+)
+const ProjectManagerStaffingView = React.lazy(() =>
+  import("../../../components/staffing/ProjectManagerStaffingView").then((module) => ({
+    default: module.ProjectManagerStaffingView,
+  }))
+)
+
 // Import staffing components
 import { EnhancedHBIInsights } from "../../../components/cards/EnhancedHBIInsights"
-import { InteractiveStaffingGantt } from "../../dashboard/staff-planning/components/InteractiveStaffingGantt"
+import { EnhancedInteractiveStaffingGantt } from "../../dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
 import { SPCRInboxPanel } from "../../dashboard/staff-planning/components/SPCRInboxPanel"
 import { LaborVsRevenuePanel } from "../../dashboard/staff-planning/components/LaborVsRevenuePanel"
 import { useStaffingStore } from "../../dashboard/staff-planning/store/useStaffingStore"
@@ -144,6 +166,61 @@ import type { Permit, PermitFilters as PermitFiltersType } from "../../../types/
 
 // Import permit mock data
 import permitsData from "../../../data/mock/logs/permits.json"
+
+// Import Safety components
+import { SafetyDashboard } from "../../../components/safety/SafetyDashboard"
+import { QualityDashboard } from "../../../components/quality/QualityDashboard"
+
+// Import estimating components
+import { CostSummaryModule } from "../../../components/estimating/CostSummaryModule"
+import { EstimatingProvider } from "../../../components/estimating/EstimatingProvider"
+
+// Lazy-load HR & Payroll components for production-ready loading
+const PersonnelPage = React.lazy(() =>
+  import("../../../components/hr-payroll/personnel/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const RecruitingPage = React.lazy(() =>
+  import("../../../components/hr-payroll/recruiting/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const TimesheetsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/timesheets/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const ExpensesPage = React.lazy(() =>
+  import("../../../components/hr-payroll/expenses/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const PayrollPage = React.lazy(() =>
+  import("../../../components/hr-payroll/payroll/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const BenefitsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/benefits/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const TrainingPage = React.lazy(() =>
+  import("../../../components/hr-payroll/training/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const CompliancePage = React.lazy(() =>
+  import("../../../components/hr-payroll/compliance/page").then((module) => ({
+    default: module.default,
+  }))
+)
+const SettingsPage = React.lazy(() =>
+  import("../../../components/hr-payroll/settings/page").then((module) => ({
+    default: module.default,
+  }))
+)
 
 interface User {
   firstName: string
@@ -267,6 +344,55 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { id: "log", label: "Constraints Log" },
     ],
   },
+  Safety: {
+    title: "Safety",
+    description: "Safety management, incident reporting, and compliance tracking",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "certifications", label: "Certifications" },
+      { id: "forms", label: "Forms" },
+      { id: "programs", label: "Programs" },
+      { id: "notices", label: "Notices" },
+      { id: "emergency", label: "Emergency" },
+    ],
+  },
+  "Quality Control": {
+    title: "Quality Control",
+    description: "Quality management, metrics tracking, warranty management, and compliance monitoring",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "metrics", label: "Quality Metrics" },
+      { id: "warranty", label: "Warranty Log" },
+      { id: "programs", label: "Programs & Procedures" },
+      { id: "notices", label: "Notices & Updates" },
+    ],
+  },
+  "Quality Control & Warranty": {
+    title: "Quality Control & Warranty",
+    description: "Quality management, metrics tracking, warranty management, and compliance monitoring",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "metrics", label: "Quality Metrics" },
+      { id: "warranty", label: "Warranty Log" },
+      { id: "programs", label: "Programs & Procedures" },
+      { id: "notices", label: "Notices & Updates" },
+    ],
+  },
+  "HR & Payroll": {
+    title: "HR & Payroll",
+    description: "Comprehensive human resources and payroll management system",
+    tabs: [
+      { id: "personnel", label: "Personnel" },
+      { id: "recruiting", label: "Recruiting" },
+      { id: "timesheets", label: "Timesheets" },
+      { id: "expenses", label: "Expenses" },
+      { id: "payroll", label: "Payroll" },
+      { id: "benefits", label: "Benefits" },
+      { id: "training", label: "Training" },
+      { id: "compliance", label: "Compliance" },
+      { id: "settings", label: "Settings" },
+    ],
+  },
 }
 
 const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: string }> = ({
@@ -349,7 +475,9 @@ const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: str
         </div>
 
         {/* Interactive Gantt */}
-        <InteractiveStaffingGantt userRole={userRole as "executive" | "project-executive" | "project-manager"} />
+        <EnhancedInteractiveStaffingGantt
+          userRole={userRole as "executive" | "project-executive" | "project-manager"}
+        />
 
         {/* HBI Insights Integration */}
         <EnhancedHBIInsights
@@ -409,6 +537,80 @@ const StaffingContent: React.FC<{ userRole: UserRole; user: User; activeTab: str
   }
 
   return null
+}
+
+// Production-Ready Role-Based Staffing Content with ExecutiveStaffingView Integration
+const ModularStaffingContent: React.FC<{
+  userRole: UserRole
+  user: User
+  onNavigateBack?: () => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, onNavigateBack, activeTab = "overview", onTabChange }) => {
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Handle component loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading staffing content...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Role-based content injection following v-3-0 modular architecture
+  const renderRoleSpecificContent = () => {
+    return (
+      <React.Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading staffing content...</p>
+            </div>
+          </div>
+        }
+      >
+        {userRole === "executive" && <ExecutiveStaffingView activeTab={activeTab} />}
+        {userRole === "project-executive" && <ProjectExecutiveStaffingView />}
+        {userRole === "project-manager" && <ProjectManagerStaffingView />}
+        {!["executive", "project-executive", "project-manager"].includes(userRole) && (
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Limited Access</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Your current role has limited access to staffing management features. Contact your administrator for
+              additional permissions.
+            </p>
+          </div>
+        )}
+      </React.Suspense>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation - Following v-3-0 standards */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Staffing</span>
+      </div>
+
+      {/* Role-Specific Content Injection */}
+      {renderRoleSpecificContent()}
+    </div>
+  )
 }
 
 // New Role-Based Staffing Content using modular components
@@ -539,7 +741,9 @@ const StaffingLegacyContent: React.FC<{
         {activeTab === "management" && (
           <div className="space-y-6">
             {/* Staff Assignment Management */}
-            <InteractiveStaffingGantt userRole={userRole as "executive" | "project-executive" | "project-manager"} />
+            <EnhancedInteractiveStaffingGantt
+              userRole={userRole as "executive" | "project-executive" | "project-manager"}
+            />
 
             {/* SPCR Management - Only for project-executive and project-manager */}
             {(userRole === "project-executive" || userRole === "project-manager") && (
@@ -988,7 +1192,7 @@ const FinancialHubContent: React.FC<{ userRole: UserRole; user: User; onNavigate
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">{/* Financial Hub Tabs */}</div>
 
       {/* Dynamic KPI Widgets - Tab Specific */}
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-3">
         {getDynamicKPIs(activeTab).map((kpi, index) => {
           const IconComponent = kpi.icon
           const colorClasses = {
@@ -3937,6 +4141,334 @@ const PermitLogContent: React.FC<{ userRole: UserRole; user: User; onNavigateBac
   )
 }
 
+// Safety Content Component
+const SafetyContent: React.FC<{ userRole: UserRole; user: User; onNavigateBack?: () => void }> = ({
+  userRole,
+  user,
+  onNavigateBack,
+}) => {
+  // Role-based access control - Executive users only
+  if (userRole !== "executive") {
+    return (
+      <div className="text-center py-8">
+        <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">Access Restricted</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Safety Control Center access is restricted to Executive users only. Contact your administrator for access.
+        </p>
+        <Button variant="outline" onClick={onNavigateBack} className="mt-4">
+          Back to Dashboard
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Safety Control Center</span>
+      </div>
+
+      {/* Safety Dashboard Content */}
+      <SafetyDashboard user={user} />
+    </div>
+  )
+}
+
+// Quality Control & Warranty Content Component
+const QualityControlContent: React.FC<{ userRole: UserRole; user: User; onNavigateBack?: () => void }> = ({
+  userRole,
+  user,
+  onNavigateBack,
+}) => {
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {user.firstName} {user.lastName}
+        </span>
+        <ChevronRight className="h-4 w-4" />
+        <span>Quality Control & Warranty</span>
+      </div>
+
+      {/* Quality Control Dashboard */}
+      <QualityDashboard userRole={userRole} user={user} />
+    </div>
+  )
+}
+
+const EstimatingContent: React.FC<{
+  userRole: UserRole
+  user: User
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, activeTab = "cost-summary", onTabChange }) => {
+  // Get the selected project from localStorage
+  const selectedProject = typeof window !== "undefined" ? localStorage.getItem("selectedProject") : null
+  const projectName = selectedProject ? `Project ${selectedProject}` : "Untitled Project"
+
+  return (
+    <EstimatingProvider>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Estimating Center</h1>
+            <p className="text-gray-600 dark:text-gray-400">Cost analysis and project estimation tools</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-sm">
+              {userRole}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Estimating Tabs */}
+        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="cost-summary" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Cost Summary
+            </TabsTrigger>
+            <TabsTrigger value="takeoff" className="flex items-center gap-2">
+              <Ruler className="h-4 w-4" />
+              Takeoff
+            </TabsTrigger>
+            <TabsTrigger value="bidding" className="flex items-center gap-2">
+              <Gavel className="h-4 w-4" />
+              Bidding
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="cost-summary" className="space-y-6">
+            <CostSummaryModule projectId={selectedProject || "demo"} projectName={projectName} />
+          </TabsContent>
+
+          <TabsContent value="takeoff" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Quantity Takeoff</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Takeoff functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="bidding" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bid Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Bid management functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Estimating Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Analytics functionality coming soon...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </EstimatingProvider>
+  )
+}
+
+const HRPayrollContent: React.FC<{
+  userRole: UserRole
+  user: User
+  onNavigateBack?: () => void
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
+}> = ({ userRole, user, onNavigateBack, activeTab = "personnel", onTabChange }) => {
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "personnel":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Personnel...</div>}>
+            <PersonnelPage />
+          </React.Suspense>
+        )
+      case "recruiting":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Recruiting...</div>}>
+            <RecruitingPage />
+          </React.Suspense>
+        )
+      case "timesheets":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Timesheets...</div>}>
+            <TimesheetsPage />
+          </React.Suspense>
+        )
+      case "expenses":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Expenses...</div>}>
+            <ExpensesPage />
+          </React.Suspense>
+        )
+      case "payroll":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Payroll...</div>}>
+            <PayrollPage />
+          </React.Suspense>
+        )
+      case "benefits":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Benefits...</div>}>
+            <BenefitsPage />
+          </React.Suspense>
+        )
+      case "training":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Training...</div>}>
+            <TrainingPage />
+          </React.Suspense>
+        )
+      case "compliance":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Compliance...</div>}>
+            <CompliancePage />
+          </React.Suspense>
+        )
+      case "settings":
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Settings...</div>}>
+            <SettingsPage />
+          </React.Suspense>
+        )
+      default:
+        return (
+          <React.Suspense fallback={<div className="flex items-center justify-center p-8">Loading Personnel...</div>}>
+            <PersonnelPage />
+          </React.Suspense>
+        )
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Breadcrumb and Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {user.firstName} {user.lastName}
+          </span>
+          <ChevronRight className="h-4 w-4" />
+          <span>HR & Payroll Management</span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">HR & Payroll Management</h1>
+            <p className="text-muted-foreground">Comprehensive human resources and payroll management system</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onNavigateBack}>
+              Back to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* HR & Payroll Tabs */}
+      <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+        <TabsList className="grid w-full grid-cols-9">
+          <TabsTrigger value="personnel" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Personnel
+          </TabsTrigger>
+          <TabsTrigger value="recruiting" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            Recruiting
+          </TabsTrigger>
+          <TabsTrigger value="timesheets" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Timesheets
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="payroll" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Payroll
+          </TabsTrigger>
+          <TabsTrigger value="benefits" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Benefits
+          </TabsTrigger>
+          <TabsTrigger value="training" className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Training
+          </TabsTrigger>
+          <TabsTrigger value="compliance" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Compliance
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personnel" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="recruiting" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="timesheets" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="expenses" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="payroll" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="benefits" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="training" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="compliance" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          {renderTabContent()}
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
 export const ToolContent: React.FC<ToolContentProps> = ({
   toolName,
   userRole,
@@ -3960,10 +4492,10 @@ export const ToolContent: React.FC<ToolContentProps> = ({
     )
   }
 
-  // Use legacy layout for Staffing tool
+  // Use modular layout for Staffing tool with proper ExecutiveStaffingView integration
   if (toolName === "Staffing") {
     return (
-      <StaffingLegacyContent
+      <ModularStaffingContent
         userRole={userRole}
         user={user}
         onNavigateBack={onNavigateBack}
@@ -3991,6 +4523,28 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   // Use Constraints Log layout for Constraints Log tool
   if (toolName === "Constraints Log") {
     return <ConstraintsLogContent onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Safety layout for Safety tool
+  if (toolName === "Safety") {
+    return <SafetyContent userRole={userRole} user={user} onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Quality Control layout for Quality Control & Warranty tool
+  if (toolName === "Quality Control & Warranty") {
+    return <QualityControlContent userRole={userRole} user={user} onNavigateBack={onNavigateBack} />
+  }
+
+  // Use Estimating layout for Estimating tool
+  if (toolName === "estimating") {
+    return <EstimatingContent userRole={userRole} user={user} activeTab={activeTab} onTabChange={onTabChange} />
+  }
+
+  // Use HR & Payroll layout for HR & Payroll tool
+  if (toolName === "HR & Payroll") {
+    // Navigate to the dedicated HR & Payroll Suite page
+    window.location.href = "/hr-payroll"
+    return null
   }
 
   // For other tools, use a simple layout without app-header

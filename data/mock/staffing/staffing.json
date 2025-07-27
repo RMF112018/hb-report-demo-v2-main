@@ -6,16 +6,96 @@
     "laborRate": 43.65,
     "billableRate": 199.09,
     "experience": 23,
-    "strengths": [
-      "Vendor Coordination",
-      "Quality Control",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Time Management"
-    ],
+    "strengths": ["Vendor Coordination", "Quality Control", "Risk Management"],
+    "weaknesses": ["Overcommunication", "Time Management"],
     "discProfile": "DI",
+    "behavioralProfile": {
+      "discProfile": {
+        "type": "DI",
+        "primaryStyle": "Dominance",
+        "secondaryStyle": "Influence",
+        "summary": "Casey is a dynamic leader who combines assertiveness with people skills. Excels at motivating teams and driving results through direct communication.",
+        "strengths": [
+          "Dynamic leadership and motivation",
+          "Building team enthusiasm",
+          "Quick decision-making",
+          "Inspiring team performance"
+        ],
+        "growthAreas": [
+          "Being more patient with process details",
+          "Following through on administrative tasks",
+          "Balancing enthusiasm with planning"
+        ],
+        "communicationTips": [
+          "Be direct and action-oriented",
+          "Use enthusiasm to motivate teams",
+          "Provide clear goals and expectations",
+          "Allow time for team input and discussion"
+        ],
+        "stressResponse": "Under stress, Casey becomes more direct and may need reminders to consider team input.",
+        "motivators": [
+          "Achieving visible results",
+          "Leading dynamic teams",
+          "Recognition for accomplishments",
+          "Fast-paced, challenging environments"
+        ],
+        "deMotivators": [
+          "Slow-moving processes",
+          "Excessive bureaucracy",
+          "Lack of team enthusiasm",
+          "Being micromanaged"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Creator",
+        "color": "Yellow",
+        "profile": {
+          "type": "Creator",
+          "description": "Casey is an innovative and energetic leader who excels at inspiring teams and driving creative solutions to challenges.",
+          "leadershipStrengths": [
+            "Inspiring and motivating teams",
+            "Creative problem-solving",
+            "Dynamic leadership style",
+            "Building team enthusiasm"
+          ],
+          "developmentAreas": [
+            "Following through on administrative details",
+            "Developing more systematic approaches",
+            "Enhancing planning and organization"
+          ],
+          "communicationStyle": "Energetic and inspiring",
+          "conflictResolution": "Prefers to address issues directly and find creative solutions",
+          "teamMotivation": "Motivates through enthusiasm, recognition, and visible progress",
+          "stressManagement": "Uses action and team engagement to manage stress"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 85,
+        "compatibilityMatrix": {
+          "9e1cbd21-541c-4f5d-9b4e-aded67ae226c": {
+            "score": 78,
+            "notes": "Good collaboration, different but complementary styles"
+          },
+          "dd615f90-f721-4ddd-8380-85904899b66b": {
+            "score": 92,
+            "notes": "Excellent partnership, shared enthusiasm and communication"
+          },
+          "4ecd2607-8e99-4e73-b725-b74c63c8225c": { "score": 65, "notes": "Some friction due to different work paces" },
+          "05a38407-a213-4f3d-a3e3-a04051eb4a4f": { "score": 88, "notes": "Strong working relationship, clear roles" }
+        },
+        "teamDynamics": [
+          "Works best with enthusiastic, action-oriented team members",
+          "May need support with detail-oriented colleagues",
+          "Excels in dynamic, fast-paced environments",
+          "Benefits from team members who can provide structure"
+        ],
+        "recommendations": [
+          "Pair with detail-oriented team members for balance",
+          "Provide opportunities to mentor enthusiastic staff",
+          "Consider team building activities to strengthen relationships"
+        ]
+      }
+    },
     "assignments": [
       {
         "project_id": 2525851,
@@ -38,14 +118,100 @@
     "laborRate": 85.55,
     "billableRate": 213.82,
     "experience": 14,
-    "strengths": [
-      "Budgeting",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Budgeting", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "CS",
+    "behavioralProfile": {
+      "discProfile": {
+        "type": "CS",
+        "primaryStyle": "Conscientiousness",
+        "secondaryStyle": "Steadiness",
+        "summary": "Samantha is a methodical and reliable professional who values accuracy and consistency. Excels at detailed analysis and maintaining high standards.",
+        "strengths": [
+          "Attention to detail and accuracy",
+          "Reliable and consistent performance",
+          "Analytical thinking",
+          "Quality-focused approach"
+        ],
+        "growthAreas": [
+          "Taking more initiative in decision-making",
+          "Being more flexible with changes",
+          "Building confidence in presenting ideas"
+        ],
+        "communicationTips": [
+          "Provide detailed information and context",
+          "Allow time for thorough analysis",
+          "Be patient with questions and clarifications",
+          "Recognize and appreciate accuracy and quality"
+        ],
+        "stressResponse": "Under stress, Samantha becomes more cautious and may need reassurance.",
+        "motivators": [
+          "Producing high-quality, accurate work",
+          "Having clear processes and expectations",
+          "Recognition for attention to detail",
+          "Stable and predictable work environment"
+        ],
+        "deMotivators": [
+          "Rushed deadlines without proper planning",
+          "Frequent changes without notice",
+          "Lack of clear expectations",
+          "Being pressured to compromise quality"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Refiner",
+        "color": "Green",
+        "profile": {
+          "type": "Refiner",
+          "description": "Samantha is a detail-oriented leader who excels at improving processes and ensuring quality through systematic approaches.",
+          "leadershipStrengths": [
+            "Process improvement and optimization",
+            "Quality control and standards",
+            "Analytical problem-solving",
+            "Reliable and consistent performance"
+          ],
+          "developmentAreas": [
+            "Taking more initiative in leadership",
+            "Building confidence in decision-making",
+            "Developing strategic thinking",
+            "Enhancing communication skills"
+          ],
+          "communicationStyle": "Thorough and detail-oriented",
+          "conflictResolution": "Prefers to analyze situations thoroughly before addressing conflicts",
+          "teamMotivation": "Motivates through quality standards and process improvement",
+          "stressManagement": "Uses systematic analysis and planning to manage stress"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 82,
+        "compatibilityMatrix": {
+          "88bbbffe-4d1b-4283-aa86-6608a98b6719": {
+            "score": 78,
+            "notes": "Good collaboration, different but complementary styles"
+          },
+          "dd615f90-f721-4ddd-8380-85904899b66b": {
+            "score": 75,
+            "notes": "Respectful working relationship, different approaches"
+          },
+          "4ecd2607-8e99-4e73-b725-b74c63c8225c": {
+            "score": 88,
+            "notes": "Excellent partnership, shared focus on quality"
+          },
+          "05a38407-a213-4f3d-a3e3-a04051eb4a4f": { "score": 85, "notes": "Strong collaboration, complementary skills" }
+        },
+        "teamDynamics": [
+          "Works well with detail-oriented team members",
+          "Provides stability and reliability to teams",
+          "May need support with fast-paced environments",
+          "Excels in structured, process-driven teams"
+        ],
+        "recommendations": [
+          "Pair with action-oriented team members for balance",
+          "Provide opportunities to lead process improvements",
+          "Consider mentoring roles for junior staff"
+        ]
+      }
+    },
     "assignments": [
       {
         "project_id": 2525843,
@@ -68,15 +234,100 @@
     "laborRate": 89.98,
     "billableRate": 115.58,
     "experience": 15,
-    "strengths": [
-      "Client Communication",
-      "Technical Writing",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Client Communication", "Technical Writing", "Contract Negotiation"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "IS",
+    "behavioralProfile": {
+      "discProfile": {
+        "type": "IS",
+        "primaryStyle": "Influence",
+        "secondaryStyle": "Steadiness",
+        "summary": "Jamie is a people-oriented professional who builds strong relationships and creates positive work environments. Excels at collaboration and team support.",
+        "strengths": [
+          "Building relationships and rapport",
+          "Collaborative team approach",
+          "Positive and encouraging communication",
+          "Creating supportive work environments"
+        ],
+        "growthAreas": [
+          "Being more direct with difficult feedback",
+          "Setting firmer boundaries",
+          "Taking more initiative in decision-making"
+        ],
+        "communicationTips": [
+          "Build rapport before diving into tasks",
+          "Use positive and encouraging language",
+          "Allow time for relationship building",
+          "Recognize and appreciate team contributions"
+        ],
+        "stressResponse": "Under stress, Jamie becomes more relationship-focused and may avoid conflict.",
+        "motivators": [
+          "Building strong team relationships",
+          "Creating positive work environments",
+          "Recognition for team contributions",
+          "Collaborative and supportive atmosphere"
+        ],
+        "deMotivators": [
+          "Conflict and confrontation",
+          "Isolated or competitive environments",
+          "Lack of team recognition",
+          "Being rushed or pressured"
+        ]
+      },
+      "integrus360": {
+        "leadershipType": "Supporter",
+        "color": "Blue",
+        "profile": {
+          "type": "Supporter",
+          "description": "Jamie is a relationship-focused leader who excels at building strong teams and creating supportive work environments.",
+          "leadershipStrengths": [
+            "Building strong team relationships",
+            "Creating supportive work environments",
+            "Collaborative leadership style",
+            "Positive team motivation"
+          ],
+          "developmentAreas": [
+            "Being more direct with difficult decisions",
+            "Setting clearer boundaries",
+            "Taking more initiative in leadership",
+            "Enhancing strategic thinking"
+          ],
+          "communicationStyle": "Relationship-focused and encouraging",
+          "conflictResolution": "Prefers to address issues through relationship building and collaboration",
+          "teamMotivation": "Motivates through support, recognition, and positive relationships",
+          "stressManagement": "Uses relationship building and team support to manage stress"
+        }
+      },
+      "teamCompatibility": {
+        "overallScore": 88,
+        "compatibilityMatrix": {
+          "88bbbffe-4d1b-4283-aa86-6608a98b6719": {
+            "score": 92,
+            "notes": "Excellent partnership, shared enthusiasm and communication"
+          },
+          "9e1cbd21-541c-4f5d-9b4e-aded67ae226c": {
+            "score": 75,
+            "notes": "Respectful working relationship, different approaches"
+          },
+          "4ecd2607-8e99-4e73-b725-b74c63c8225c": {
+            "score": 85,
+            "notes": "Strong collaboration, complementary skills"
+          },
+          "05a38407-a213-4f3d-a3e3-a04051eb4a4f": { "score": 90, "notes": "Excellent partnership, shared values" }
+        },
+        "teamDynamics": [
+          "Works best with relationship-focused team members",
+          "Creates positive and supportive team environments",
+          "May need support with task-focused colleagues",
+          "Excels in collaborative, team-oriented environments"
+        ],
+        "recommendations": [
+          "Pair with task-oriented team members for balance",
+          "Provide opportunities to lead team building activities",
+          "Consider mentoring roles for relationship-focused staff"
+        ]
+      }
+    },
     "assignments": [
       {
         "project_id": 2525847,
@@ -111,15 +362,8 @@
     "laborRate": 79.81,
     "billableRate": 128.32,
     "experience": 4,
-    "strengths": [
-      "Problem Solving",
-      "Contract Negotiation",
-      "Risk Management",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Problem Solving", "Contract Negotiation", "Risk Management", "Scheduling"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -143,13 +387,8 @@
     "laborRate": 87.07,
     "billableRate": 150.0,
     "experience": 10,
-    "strengths": [
-      "Quality Control",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Quality Control", "Client Communication"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -167,14 +406,8 @@
     "laborRate": 55.94,
     "billableRate": 213.54,
     "experience": 10,
-    "strengths": [
-      "Client Communication",
-      "Problem Solving",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Technology Adoption"
-    ],
+    "strengths": ["Client Communication", "Problem Solving", "Quality Control"],
+    "weaknesses": ["Technology Adoption"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -192,15 +425,8 @@
     "laborRate": 80.3,
     "billableRate": 173.52,
     "experience": 4,
-    "strengths": [
-      "Quality Control",
-      "Client Communication",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Overcommunication"
-    ],
+    "strengths": ["Quality Control", "Client Communication", "Team Leadership"],
+    "weaknesses": ["Public Speaking", "Overcommunication"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -242,15 +468,8 @@
     "laborRate": 69.64,
     "billableRate": 206.57,
     "experience": 8,
-    "strengths": [
-      "Budgeting",
-      "Contract Negotiation",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Delegation"
-    ],
+    "strengths": ["Budgeting", "Contract Negotiation", "Technical Writing"],
+    "weaknesses": ["Impatience", "Delegation"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -274,16 +493,8 @@
     "laborRate": 91.34,
     "billableRate": 201.88,
     "experience": 13,
-    "strengths": [
-      "Client Communication",
-      "Vendor Coordination",
-      "Contract Negotiation",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Public Speaking"
-    ],
+    "strengths": ["Client Communication", "Vendor Coordination", "Contract Negotiation", "Technical Writing"],
+    "weaknesses": ["Time Management", "Public Speaking"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -301,14 +512,8 @@
     "laborRate": 95.73,
     "billableRate": 156.36,
     "experience": 17,
-    "strengths": [
-      "Budgeting",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Budgeting", "Risk Management"],
+    "weaknesses": ["Technology Adoption", "Conflict Resolution"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -326,13 +531,8 @@
     "laborRate": 64.64,
     "billableRate": 182.9,
     "experience": 16,
-    "strengths": [
-      "Contract Negotiation",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Contract Negotiation", "Team Leadership"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -350,15 +550,8 @@
     "laborRate": 71.66,
     "billableRate": 139.07,
     "experience": 9,
-    "strengths": [
-      "Client Communication",
-      "Team Leadership",
-      "Problem Solving",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Impatience"
-    ],
+    "strengths": ["Client Communication", "Team Leadership", "Problem Solving", "Quality Control"],
+    "weaknesses": ["Impatience"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -376,15 +569,8 @@
     "laborRate": 93.86,
     "billableRate": 210.43,
     "experience": 6,
-    "strengths": [
-      "Client Communication",
-      "Technical Writing",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Public Speaking"
-    ],
+    "strengths": ["Client Communication", "Technical Writing", "Quality Control"],
+    "weaknesses": ["Conflict Resolution", "Public Speaking"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -408,14 +594,8 @@
     "laborRate": 93.94,
     "billableRate": 175.68,
     "experience": 13,
-    "strengths": [
-      "Risk Management",
-      "Contract Negotiation",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Risk Management", "Contract Negotiation", "Budgeting"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -433,14 +613,8 @@
     "laborRate": 77.36,
     "billableRate": 126.59,
     "experience": 9,
-    "strengths": [
-      "Scheduling",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Scheduling", "Risk Management"],
+    "weaknesses": ["Paperwork", "Conflict Resolution"],
     "discProfile": "CS",
     "assignments": [
       {
@@ -458,16 +632,8 @@
     "laborRate": 66.33,
     "billableRate": 130.69,
     "experience": 17,
-    "strengths": [
-      "Quality Control",
-      "Problem Solving",
-      "Risk Management",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Time Management"
-    ],
+    "strengths": ["Quality Control", "Problem Solving", "Risk Management", "Budgeting"],
+    "weaknesses": ["Conflict Resolution", "Time Management"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -485,14 +651,8 @@
     "laborRate": 64.46,
     "billableRate": 204.99,
     "experience": 25,
-    "strengths": [
-      "Contract Negotiation",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Impatience"
-    ],
+    "strengths": ["Contract Negotiation", "Technical Writing"],
+    "weaknesses": ["Technology Adoption", "Impatience"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -510,14 +670,8 @@
     "laborRate": 49.34,
     "billableRate": 151.7,
     "experience": 14,
-    "strengths": [
-      "Contract Negotiation",
-      "Budgeting",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Technology Adoption"
-    ],
+    "strengths": ["Contract Negotiation", "Budgeting", "Team Leadership"],
+    "weaknesses": ["Technology Adoption"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -541,16 +695,8 @@
     "laborRate": 75.11,
     "billableRate": 195.25,
     "experience": 19,
-    "strengths": [
-      "Team Leadership",
-      "Problem Solving",
-      "Client Communication",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Paperwork"
-    ],
+    "strengths": ["Team Leadership", "Problem Solving", "Client Communication", "Technical Writing"],
+    "weaknesses": ["Technology Adoption", "Paperwork"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -580,15 +726,8 @@
     "laborRate": 61.59,
     "billableRate": 188.11,
     "experience": 15,
-    "strengths": [
-      "Scheduling",
-      "Vendor Coordination",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Time Management"
-    ],
+    "strengths": ["Scheduling", "Vendor Coordination", "Team Leadership"],
+    "weaknesses": ["Technology Adoption", "Time Management"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -612,15 +751,8 @@
     "laborRate": 54.37,
     "billableRate": 146.52,
     "experience": 19,
-    "strengths": [
-      "Budgeting",
-      "Team Leadership",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Paperwork"
-    ],
+    "strengths": ["Budgeting", "Team Leadership", "Client Communication"],
+    "weaknesses": ["Public Speaking", "Paperwork"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -644,16 +776,8 @@
     "laborRate": 56.21,
     "billableRate": 155.52,
     "experience": 3,
-    "strengths": [
-      "Contract Negotiation",
-      "Risk Management",
-      "Scheduling",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Paperwork"
-    ],
+    "strengths": ["Contract Negotiation", "Risk Management", "Scheduling", "Quality Control"],
+    "weaknesses": ["Overcommunication", "Paperwork"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -671,13 +795,8 @@
     "laborRate": 68.95,
     "billableRate": 181.22,
     "experience": 11,
-    "strengths": [
-      "Vendor Coordination",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Vendor Coordination", "Scheduling"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -695,15 +814,8 @@
     "laborRate": 94.39,
     "billableRate": 121.11,
     "experience": 15,
-    "strengths": [
-      "Risk Management",
-      "Team Leadership",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Overcommunication"
-    ],
+    "strengths": ["Risk Management", "Team Leadership", "Scheduling"],
+    "weaknesses": ["Impatience", "Overcommunication"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -721,15 +833,8 @@
     "laborRate": 83.29,
     "billableRate": 122.24,
     "experience": 16,
-    "strengths": [
-      "Risk Management",
-      "Problem Solving",
-      "Budgeting",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Risk Management", "Problem Solving", "Budgeting", "Quality Control"],
+    "weaknesses": ["Delegation"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -747,16 +852,8 @@
     "laborRate": 80.48,
     "billableRate": 140.29,
     "experience": 6,
-    "strengths": [
-      "Problem Solving",
-      "Scheduling",
-      "Quality Control",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Time Management"
-    ],
+    "strengths": ["Problem Solving", "Scheduling", "Quality Control", "Contract Negotiation"],
+    "weaknesses": ["Delegation", "Time Management"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -774,16 +871,8 @@
     "laborRate": 51.95,
     "billableRate": 115.28,
     "experience": 19,
-    "strengths": [
-      "Vendor Coordination",
-      "Scheduling",
-      "Quality Control",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Time Management"
-    ],
+    "strengths": ["Vendor Coordination", "Scheduling", "Quality Control", "Technical Writing"],
+    "weaknesses": ["Paperwork", "Time Management"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -801,16 +890,8 @@
     "laborRate": 81.76,
     "billableRate": 168.09,
     "experience": 8,
-    "strengths": [
-      "Quality Control",
-      "Budgeting",
-      "Risk Management",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Quality Control", "Budgeting", "Risk Management", "Vendor Coordination"],
+    "weaknesses": ["Public Speaking", "Conflict Resolution"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -834,15 +915,8 @@
     "laborRate": 44.05,
     "billableRate": 126.03,
     "experience": 4,
-    "strengths": [
-      "Vendor Coordination",
-      "Scheduling",
-      "Team Leadership",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Technology Adoption"
-    ],
+    "strengths": ["Vendor Coordination", "Scheduling", "Team Leadership", "Budgeting"],
+    "weaknesses": ["Technology Adoption"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -878,15 +952,8 @@
     "laborRate": 70.77,
     "billableRate": 130.79,
     "experience": 21,
-    "strengths": [
-      "Vendor Coordination",
-      "Risk Management",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Public Speaking"
-    ],
+    "strengths": ["Vendor Coordination", "Risk Management", "Client Communication"],
+    "weaknesses": ["Impatience", "Public Speaking"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -910,13 +977,8 @@
     "laborRate": 78.72,
     "billableRate": 125.6,
     "experience": 9,
-    "strengths": [
-      "Budgeting",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Impatience"
-    ],
+    "strengths": ["Budgeting", "Technical Writing"],
+    "weaknesses": ["Impatience"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -934,15 +996,8 @@
     "laborRate": 68.89,
     "billableRate": 185.79,
     "experience": 18,
-    "strengths": [
-      "Scheduling",
-      "Vendor Coordination",
-      "Technical Writing",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Scheduling", "Vendor Coordination", "Technical Writing", "Contract Negotiation"],
+    "weaknesses": ["Delegation"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -960,15 +1015,8 @@
     "laborRate": 57.02,
     "billableRate": 152.14,
     "experience": 24,
-    "strengths": [
-      "Contract Negotiation",
-      "Budgeting",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Paperwork"
-    ],
+    "strengths": ["Contract Negotiation", "Budgeting", "Problem Solving"],
+    "weaknesses": ["Conflict Resolution", "Paperwork"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -986,16 +1034,8 @@
     "laborRate": 56.57,
     "billableRate": 180.29,
     "experience": 19,
-    "strengths": [
-      "Problem Solving",
-      "Quality Control",
-      "Vendor Coordination",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Paperwork"
-    ],
+    "strengths": ["Problem Solving", "Quality Control", "Vendor Coordination", "Client Communication"],
+    "weaknesses": ["Public Speaking", "Paperwork"],
     "discProfile": "CS",
     "assignments": [
       {
@@ -1013,14 +1053,8 @@
     "laborRate": 84.06,
     "billableRate": 210.87,
     "experience": 11,
-    "strengths": [
-      "Contract Negotiation",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Impatience"
-    ],
+    "strengths": ["Contract Negotiation", "Vendor Coordination"],
+    "weaknesses": ["Public Speaking", "Impatience"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -1050,14 +1084,8 @@
     "laborRate": 93.91,
     "billableRate": 179.34,
     "experience": 19,
-    "strengths": [
-      "Team Leadership",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Technology Adoption"
-    ],
+    "strengths": ["Team Leadership", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution", "Technology Adoption"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -1075,13 +1103,8 @@
     "laborRate": 57.68,
     "billableRate": 206.88,
     "experience": 11,
-    "strengths": [
-      "Technical Writing",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Technical Writing", "Budgeting"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -1105,14 +1128,8 @@
     "laborRate": 84.47,
     "billableRate": 153.7,
     "experience": 14,
-    "strengths": [
-      "Scheduling",
-      "Problem Solving",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Time Management"
-    ],
+    "strengths": ["Scheduling", "Problem Solving", "Contract Negotiation"],
+    "weaknesses": ["Time Management"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -1130,14 +1147,8 @@
     "laborRate": 60.77,
     "billableRate": 163.39,
     "experience": 13,
-    "strengths": [
-      "Problem Solving",
-      "Team Leadership",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Problem Solving", "Team Leadership", "Risk Management"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -1161,13 +1172,8 @@
     "laborRate": 78.97,
     "billableRate": 186.51,
     "experience": 12,
-    "strengths": [
-      "Risk Management",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Technology Adoption"
-    ],
+    "strengths": ["Risk Management", "Budgeting"],
+    "weaknesses": ["Technology Adoption"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1185,15 +1191,8 @@
     "laborRate": 90.32,
     "billableRate": 212.92,
     "experience": 6,
-    "strengths": [
-      "Team Leadership",
-      "Technical Writing",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Paperwork"
-    ],
+    "strengths": ["Team Leadership", "Technical Writing", "Client Communication"],
+    "weaknesses": ["Impatience", "Paperwork"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -1211,13 +1210,8 @@
     "laborRate": 85.68,
     "billableRate": 122.89,
     "experience": 22,
-    "strengths": [
-      "Contract Negotiation",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Contract Negotiation", "Risk Management"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -1235,15 +1229,8 @@
     "laborRate": 66.96,
     "billableRate": 203.74,
     "experience": 12,
-    "strengths": [
-      "Budgeting",
-      "Vendor Coordination",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Paperwork"
-    ],
+    "strengths": ["Budgeting", "Vendor Coordination", "Team Leadership"],
+    "weaknesses": ["Delegation", "Paperwork"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1267,14 +1254,8 @@
     "laborRate": 92.75,
     "billableRate": 186.33,
     "experience": 7,
-    "strengths": [
-      "Vendor Coordination",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Overcommunication"
-    ],
+    "strengths": ["Vendor Coordination", "Problem Solving"],
+    "weaknesses": ["Public Speaking", "Overcommunication"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1292,14 +1273,8 @@
     "laborRate": 81.89,
     "billableRate": 211.36,
     "experience": 25,
-    "strengths": [
-      "Team Leadership",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Paperwork"
-    ],
+    "strengths": ["Team Leadership", "Contract Negotiation"],
+    "weaknesses": ["Impatience", "Paperwork"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -1323,14 +1298,8 @@
     "laborRate": 48.7,
     "billableRate": 137.52,
     "experience": 5,
-    "strengths": [
-      "Contract Negotiation",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Delegation"
-    ],
+    "strengths": ["Contract Negotiation", "Vendor Coordination"],
+    "weaknesses": ["Impatience", "Delegation"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -1348,15 +1317,8 @@
     "laborRate": 42.86,
     "billableRate": 192.62,
     "experience": 19,
-    "strengths": [
-      "Budgeting",
-      "Contract Negotiation",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Delegation"
-    ],
+    "strengths": ["Budgeting", "Contract Negotiation", "Scheduling"],
+    "weaknesses": ["Time Management", "Delegation"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -1374,14 +1336,8 @@
     "laborRate": 47.87,
     "billableRate": 126.16,
     "experience": 5,
-    "strengths": [
-      "Risk Management",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Impatience"
-    ],
+    "strengths": ["Risk Management", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution", "Impatience"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -1417,16 +1373,8 @@
     "laborRate": 69.76,
     "billableRate": 205.71,
     "experience": 22,
-    "strengths": [
-      "Team Leadership",
-      "Scheduling",
-      "Quality Control",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Delegation"
-    ],
+    "strengths": ["Team Leadership", "Scheduling", "Quality Control", "Vendor Coordination"],
+    "weaknesses": ["Public Speaking", "Delegation"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -1450,16 +1398,8 @@
     "laborRate": 44.71,
     "billableRate": 180.88,
     "experience": 17,
-    "strengths": [
-      "Team Leadership",
-      "Problem Solving",
-      "Risk Management",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Time Management"
-    ],
+    "strengths": ["Team Leadership", "Problem Solving", "Risk Management", "Technical Writing"],
+    "weaknesses": ["Impatience", "Time Management"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -1495,14 +1435,8 @@
     "laborRate": 78.61,
     "billableRate": 127.95,
     "experience": 22,
-    "strengths": [
-      "Quality Control",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Overcommunication"
-    ],
+    "strengths": ["Quality Control", "Vendor Coordination"],
+    "weaknesses": ["Public Speaking", "Overcommunication"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1520,13 +1454,8 @@
     "laborRate": 48.3,
     "billableRate": 190.69,
     "experience": 8,
-    "strengths": [
-      "Quality Control",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Quality Control", "Vendor Coordination"],
+    "weaknesses": ["Delegation"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -1544,15 +1473,8 @@
     "laborRate": 47.25,
     "billableRate": 185.95,
     "experience": 7,
-    "strengths": [
-      "Quality Control",
-      "Risk Management",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Quality Control", "Risk Management", "Scheduling"],
+    "weaknesses": ["Delegation", "Conflict Resolution"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -1582,13 +1504,8 @@
     "laborRate": 71.9,
     "billableRate": 141.06,
     "experience": 21,
-    "strengths": [
-      "Quality Control",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Impatience"
-    ],
+    "strengths": ["Quality Control", "Vendor Coordination"],
+    "weaknesses": ["Impatience"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -1612,15 +1529,8 @@
     "laborRate": 95.41,
     "billableRate": 214.47,
     "experience": 4,
-    "strengths": [
-      "Risk Management",
-      "Contract Negotiation",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Impatience"
-    ],
+    "strengths": ["Risk Management", "Contract Negotiation", "Budgeting"],
+    "weaknesses": ["Technology Adoption", "Impatience"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1638,16 +1548,8 @@
     "laborRate": 58.07,
     "billableRate": 201.07,
     "experience": 23,
-    "strengths": [
-      "Quality Control",
-      "Team Leadership",
-      "Problem Solving",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Paperwork"
-    ],
+    "strengths": ["Quality Control", "Team Leadership", "Problem Solving", "Budgeting"],
+    "weaknesses": ["Overcommunication", "Paperwork"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -1683,15 +1585,8 @@
     "laborRate": 53.81,
     "billableRate": 146.62,
     "experience": 11,
-    "strengths": [
-      "Client Communication",
-      "Contract Negotiation",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Delegation"
-    ],
+    "strengths": ["Client Communication", "Contract Negotiation", "Scheduling"],
+    "weaknesses": ["Paperwork", "Delegation"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -1715,16 +1610,8 @@
     "laborRate": 56.23,
     "billableRate": 169.25,
     "experience": 16,
-    "strengths": [
-      "Budgeting",
-      "Client Communication",
-      "Technical Writing",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Budgeting", "Client Communication", "Technical Writing", "Problem Solving"],
+    "weaknesses": ["Technology Adoption", "Conflict Resolution"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -1742,13 +1629,8 @@
     "laborRate": 89.34,
     "billableRate": 201.65,
     "experience": 5,
-    "strengths": [
-      "Vendor Coordination",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Vendor Coordination", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -1766,15 +1648,8 @@
     "laborRate": 66.46,
     "billableRate": 125.37,
     "experience": 19,
-    "strengths": [
-      "Budgeting",
-      "Vendor Coordination",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Delegation"
-    ],
+    "strengths": ["Budgeting", "Vendor Coordination", "Problem Solving"],
+    "weaknesses": ["Technology Adoption", "Delegation"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1792,14 +1667,8 @@
     "laborRate": 68.64,
     "billableRate": 169.93,
     "experience": 3,
-    "strengths": [
-      "Client Communication",
-      "Quality Control",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Client Communication", "Quality Control", "Scheduling"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1835,16 +1704,8 @@
     "laborRate": 83.67,
     "billableRate": 206.0,
     "experience": 22,
-    "strengths": [
-      "Team Leadership",
-      "Quality Control",
-      "Technical Writing",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Delegation"
-    ],
+    "strengths": ["Team Leadership", "Quality Control", "Technical Writing", "Problem Solving"],
+    "weaknesses": ["Paperwork", "Delegation"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -1862,14 +1723,8 @@
     "laborRate": 71.27,
     "billableRate": 192.68,
     "experience": 7,
-    "strengths": [
-      "Risk Management",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Time Management"
-    ],
+    "strengths": ["Risk Management", "Budgeting"],
+    "weaknesses": ["Public Speaking", "Time Management"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -1893,14 +1748,8 @@
     "laborRate": 87.06,
     "billableRate": 131.35,
     "experience": 8,
-    "strengths": [
-      "Budgeting",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Public Speaking"
-    ],
+    "strengths": ["Budgeting", "Contract Negotiation"],
+    "weaknesses": ["Conflict Resolution", "Public Speaking"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -1918,14 +1767,8 @@
     "laborRate": 78.66,
     "billableRate": 112.3,
     "experience": 5,
-    "strengths": [
-      "Client Communication",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Time Management"
-    ],
+    "strengths": ["Client Communication", "Team Leadership"],
+    "weaknesses": ["Technology Adoption", "Time Management"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -1955,16 +1798,8 @@
     "laborRate": 92.85,
     "billableRate": 193.25,
     "experience": 18,
-    "strengths": [
-      "Scheduling",
-      "Team Leadership",
-      "Quality Control",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Technology Adoption"
-    ],
+    "strengths": ["Scheduling", "Team Leadership", "Quality Control", "Problem Solving"],
+    "weaknesses": ["Public Speaking", "Technology Adoption"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -1982,16 +1817,8 @@
     "laborRate": 88.91,
     "billableRate": 139.91,
     "experience": 7,
-    "strengths": [
-      "Contract Negotiation",
-      "Client Communication",
-      "Budgeting",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Overcommunication"
-    ],
+    "strengths": ["Contract Negotiation", "Client Communication", "Budgeting", "Vendor Coordination"],
+    "weaknesses": ["Public Speaking", "Overcommunication"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -2021,14 +1848,8 @@
     "laborRate": 42.5,
     "billableRate": 193.13,
     "experience": 3,
-    "strengths": [
-      "Client Communication",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Public Speaking"
-    ],
+    "strengths": ["Client Communication", "Budgeting"],
+    "weaknesses": ["Technology Adoption", "Public Speaking"],
     "discProfile": "CS",
     "assignments": [
       {
@@ -2052,15 +1873,8 @@
     "laborRate": 73.01,
     "billableRate": 166.19,
     "experience": 4,
-    "strengths": [
-      "Technical Writing",
-      "Quality Control",
-      "Contract Negotiation",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Technical Writing", "Quality Control", "Contract Negotiation", "Vendor Coordination"],
+    "weaknesses": ["Delegation"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -2090,13 +1904,8 @@
     "laborRate": 94.41,
     "billableRate": 201.6,
     "experience": 14,
-    "strengths": [
-      "Problem Solving",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Time Management"
-    ],
+    "strengths": ["Problem Solving", "Vendor Coordination"],
+    "weaknesses": ["Time Management"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -2120,15 +1929,8 @@
     "laborRate": 96.29,
     "billableRate": 137.35,
     "experience": 6,
-    "strengths": [
-      "Client Communication",
-      "Team Leadership",
-      "Scheduling",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Client Communication", "Team Leadership", "Scheduling", "Quality Control"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -2152,16 +1954,8 @@
     "laborRate": 57.37,
     "billableRate": 143.19,
     "experience": 8,
-    "strengths": [
-      "Vendor Coordination",
-      "Scheduling",
-      "Client Communication",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Paperwork"
-    ],
+    "strengths": ["Vendor Coordination", "Scheduling", "Client Communication", "Budgeting"],
+    "weaknesses": ["Delegation", "Paperwork"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -2179,16 +1973,8 @@
     "laborRate": 54.73,
     "billableRate": 203.36,
     "experience": 19,
-    "strengths": [
-      "Vendor Coordination",
-      "Team Leadership",
-      "Scheduling",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Time Management"
-    ],
+    "strengths": ["Vendor Coordination", "Team Leadership", "Scheduling", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution", "Time Management"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -2212,15 +1998,8 @@
     "laborRate": 53.37,
     "billableRate": 146.47,
     "experience": 9,
-    "strengths": [
-      "Scheduling",
-      "Vendor Coordination",
-      "Quality Control",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Scheduling", "Vendor Coordination", "Quality Control", "Technical Writing"],
+    "weaknesses": ["Delegation"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -2238,16 +2017,8 @@
     "laborRate": 85.02,
     "billableRate": 189.51,
     "experience": 15,
-    "strengths": [
-      "Vendor Coordination",
-      "Quality Control",
-      "Team Leadership",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Delegation"
-    ],
+    "strengths": ["Vendor Coordination", "Quality Control", "Team Leadership", "Problem Solving"],
+    "weaknesses": ["Time Management", "Delegation"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -2265,14 +2036,8 @@
     "laborRate": 63.19,
     "billableRate": 194.44,
     "experience": 11,
-    "strengths": [
-      "Technical Writing",
-      "Quality Control",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Technical Writing", "Quality Control", "Risk Management"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -2302,14 +2067,8 @@
     "laborRate": 44.56,
     "billableRate": 184.91,
     "experience": 13,
-    "strengths": [
-      "Contract Negotiation",
-      "Client Communication",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Contract Negotiation", "Client Communication", "Vendor Coordination"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -2333,14 +2092,8 @@
     "laborRate": 78.03,
     "billableRate": 115.73,
     "experience": 14,
-    "strengths": [
-      "Risk Management",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Paperwork"
-    ],
+    "strengths": ["Risk Management", "Team Leadership"],
+    "weaknesses": ["Overcommunication", "Paperwork"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -2358,15 +2111,8 @@
     "laborRate": 81.64,
     "billableRate": 110.09,
     "experience": 16,
-    "strengths": [
-      "Contract Negotiation",
-      "Technical Writing",
-      "Team Leadership",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Delegation"
-    ],
+    "strengths": ["Contract Negotiation", "Technical Writing", "Team Leadership", "Risk Management"],
+    "weaknesses": ["Delegation"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -2390,15 +2136,8 @@
     "laborRate": 57.55,
     "billableRate": 196.76,
     "experience": 14,
-    "strengths": [
-      "Vendor Coordination",
-      "Quality Control",
-      "Risk Management",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Vendor Coordination", "Quality Control", "Risk Management", "Technical Writing"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -2416,16 +2155,8 @@
     "laborRate": 66.85,
     "billableRate": 111.97,
     "experience": 19,
-    "strengths": [
-      "Team Leadership",
-      "Quality Control",
-      "Risk Management",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Technology Adoption"
-    ],
+    "strengths": ["Team Leadership", "Quality Control", "Risk Management", "Scheduling"],
+    "weaknesses": ["Conflict Resolution", "Technology Adoption"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -2443,15 +2174,8 @@
     "laborRate": 96.25,
     "billableRate": 180.18,
     "experience": 16,
-    "strengths": [
-      "Contract Negotiation",
-      "Problem Solving",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Time Management"
-    ],
+    "strengths": ["Contract Negotiation", "Problem Solving", "Risk Management"],
+    "weaknesses": ["Delegation", "Time Management"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -2487,14 +2211,8 @@
     "laborRate": 76.78,
     "billableRate": 171.78,
     "experience": 15,
-    "strengths": [
-      "Risk Management",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Overcommunication"
-    ],
+    "strengths": ["Risk Management", "Technical Writing"],
+    "weaknesses": ["Impatience", "Overcommunication"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -2518,14 +2236,8 @@
     "laborRate": 54.48,
     "billableRate": 196.06,
     "experience": 19,
-    "strengths": [
-      "Technical Writing",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Time Management"
-    ],
+    "strengths": ["Technical Writing", "Budgeting"],
+    "weaknesses": ["Overcommunication", "Time Management"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -2549,14 +2261,8 @@
     "laborRate": 69.75,
     "billableRate": 185.36,
     "experience": 9,
-    "strengths": [
-      "Technical Writing",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Technical Writing", "Team Leadership"],
+    "weaknesses": ["Delegation", "Conflict Resolution"],
     "discProfile": "DI",
     "assignments": [
       {
@@ -2580,14 +2286,8 @@
     "laborRate": 74.73,
     "billableRate": 123.11,
     "experience": 5,
-    "strengths": [
-      "Client Communication",
-      "Vendor Coordination",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Technology Adoption"
-    ],
+    "strengths": ["Client Communication", "Vendor Coordination", "Technical Writing"],
+    "weaknesses": ["Technology Adoption"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -2605,15 +2305,8 @@
     "laborRate": 71.12,
     "billableRate": 141.04,
     "experience": 14,
-    "strengths": [
-      "Problem Solving",
-      "Scheduling",
-      "Contract Negotiation",
-      "Client Communication"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Problem Solving", "Scheduling", "Contract Negotiation", "Client Communication"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -2637,14 +2330,8 @@
     "laborRate": 95.87,
     "billableRate": 133.61,
     "experience": 11,
-    "strengths": [
-      "Team Leadership",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Delegation"
-    ],
+    "strengths": ["Team Leadership", "Technical Writing"],
+    "weaknesses": ["Time Management", "Delegation"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -2668,14 +2355,8 @@
     "laborRate": 64.9,
     "billableRate": 123.04,
     "experience": 4,
-    "strengths": [
-      "Budgeting",
-      "Risk Management",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Budgeting", "Risk Management", "Problem Solving"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -2699,15 +2380,8 @@
     "laborRate": 66.39,
     "billableRate": 143.76,
     "experience": 5,
-    "strengths": [
-      "Vendor Coordination",
-      "Scheduling",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Overcommunication"
-    ],
+    "strengths": ["Vendor Coordination", "Scheduling", "Technical Writing"],
+    "weaknesses": ["Public Speaking", "Overcommunication"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -2731,14 +2405,8 @@
     "laborRate": 45.3,
     "billableRate": 172.15,
     "experience": 8,
-    "strengths": [
-      "Client Communication",
-      "Scheduling",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Time Management"
-    ],
+    "strengths": ["Client Communication", "Scheduling", "Risk Management"],
+    "weaknesses": ["Time Management"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -2762,14 +2430,8 @@
     "laborRate": 86.83,
     "billableRate": 168.37,
     "experience": 18,
-    "strengths": [
-      "Quality Control",
-      "Scheduling",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Quality Control", "Scheduling", "Budgeting"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -2787,15 +2449,8 @@
     "laborRate": 85.68,
     "billableRate": 147.8,
     "experience": 20,
-    "strengths": [
-      "Quality Control",
-      "Problem Solving",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Paperwork"
-    ],
+    "strengths": ["Quality Control", "Problem Solving", "Scheduling"],
+    "weaknesses": ["Overcommunication", "Paperwork"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -2819,14 +2474,8 @@
     "laborRate": 78.18,
     "billableRate": 152.46,
     "experience": 7,
-    "strengths": [
-      "Contract Negotiation",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Impatience"
-    ],
+    "strengths": ["Contract Negotiation", "Team Leadership"],
+    "weaknesses": ["Technology Adoption", "Impatience"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -2844,13 +2493,8 @@
     "laborRate": 60.94,
     "billableRate": 190.8,
     "experience": 18,
-    "strengths": [
-      "Team Leadership",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Time Management"
-    ],
+    "strengths": ["Team Leadership", "Contract Negotiation"],
+    "weaknesses": ["Time Management"],
     "discProfile": "DC",
     "assignments": [
       {
@@ -2868,16 +2512,8 @@
     "laborRate": 91.46,
     "billableRate": 146.84,
     "experience": 10,
-    "strengths": [
-      "Problem Solving",
-      "Scheduling",
-      "Team Leadership",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Impatience"
-    ],
+    "strengths": ["Problem Solving", "Scheduling", "Team Leadership", "Budgeting"],
+    "weaknesses": ["Time Management", "Impatience"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -2895,14 +2531,8 @@
     "laborRate": 90.89,
     "billableRate": 198.4,
     "experience": 3,
-    "strengths": [
-      "Budgeting",
-      "Vendor Coordination",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Budgeting", "Vendor Coordination", "Contract Negotiation"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "CS",
     "assignments": [
       {
@@ -2944,16 +2574,8 @@
     "laborRate": 76.94,
     "billableRate": 202.8,
     "experience": 17,
-    "strengths": [
-      "Technical Writing",
-      "Contract Negotiation",
-      "Scheduling",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Impatience"
-    ],
+    "strengths": ["Technical Writing", "Contract Negotiation", "Scheduling", "Vendor Coordination"],
+    "weaknesses": ["Overcommunication", "Impatience"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -2971,16 +2593,8 @@
     "laborRate": 51.52,
     "billableRate": 163.67,
     "experience": 23,
-    "strengths": [
-      "Vendor Coordination",
-      "Problem Solving",
-      "Quality Control",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Technology Adoption"
-    ],
+    "strengths": ["Vendor Coordination", "Problem Solving", "Quality Control", "Budgeting"],
+    "weaknesses": ["Delegation", "Technology Adoption"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -2998,13 +2612,8 @@
     "laborRate": 45.52,
     "billableRate": 142.86,
     "experience": 16,
-    "strengths": [
-      "Contract Negotiation",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Contract Negotiation", "Scheduling"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "SD",
     "assignments": [
       {
@@ -3022,14 +2631,8 @@
     "laborRate": 73.74,
     "billableRate": 202.75,
     "experience": 13,
-    "strengths": [
-      "Quality Control",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Public Speaking",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Quality Control", "Problem Solving"],
+    "weaknesses": ["Public Speaking", "Conflict Resolution"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -3047,13 +2650,8 @@
     "laborRate": 75.52,
     "billableRate": 118.12,
     "experience": 5,
-    "strengths": [
-      "Client Communication",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Client Communication", "Team Leadership"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -3083,14 +2681,8 @@
     "laborRate": 66.93,
     "billableRate": 209.52,
     "experience": 13,
-    "strengths": [
-      "Problem Solving",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Overcommunication"
-    ],
+    "strengths": ["Problem Solving", "Vendor Coordination"],
+    "weaknesses": ["Delegation", "Overcommunication"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -3108,16 +2700,8 @@
     "laborRate": 69.15,
     "billableRate": 195.77,
     "experience": 16,
-    "strengths": [
-      "Technical Writing",
-      "Team Leadership",
-      "Vendor Coordination",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Time Management",
-      "Conflict Resolution"
-    ],
+    "strengths": ["Technical Writing", "Team Leadership", "Vendor Coordination", "Risk Management"],
+    "weaknesses": ["Time Management", "Conflict Resolution"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -3141,13 +2725,8 @@
     "laborRate": 88.89,
     "billableRate": 113.86,
     "experience": 11,
-    "strengths": [
-      "Scheduling",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Paperwork"
-    ],
+    "strengths": ["Scheduling", "Vendor Coordination"],
+    "weaknesses": ["Paperwork"],
     "discProfile": "CD",
     "assignments": [
       {
@@ -3171,14 +2750,8 @@
     "laborRate": 84.87,
     "billableRate": 167.07,
     "experience": 5,
-    "strengths": [
-      "Problem Solving",
-      "Quality Control",
-      "Risk Management"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Problem Solving", "Quality Control", "Risk Management"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3196,15 +2769,8 @@
     "laborRate": 56.1,
     "billableRate": 118.1,
     "experience": 6,
-    "strengths": [
-      "Budgeting",
-      "Contract Negotiation",
-      "Technical Writing",
-      "Team Leadership"
-    ],
-    "weaknesses": [
-      "Public Speaking"
-    ],
+    "strengths": ["Budgeting", "Contract Negotiation", "Technical Writing", "Team Leadership"],
+    "weaknesses": ["Public Speaking"],
     "discProfile": "SC",
     "assignments": [
       {
@@ -3240,13 +2806,8 @@
     "laborRate": 62.76,
     "billableRate": 172.47,
     "experience": 11,
-    "strengths": [
-      "Vendor Coordination",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Vendor Coordination", "Quality Control"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3276,16 +2837,8 @@
     "laborRate": 72.52,
     "billableRate": 167.94,
     "experience": 23,
-    "strengths": [
-      "Quality Control",
-      "Budgeting",
-      "Team Leadership",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Public Speaking"
-    ],
+    "strengths": ["Quality Control", "Budgeting", "Team Leadership", "Scheduling"],
+    "weaknesses": ["Impatience", "Public Speaking"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3321,15 +2874,8 @@
     "laborRate": 91.84,
     "billableRate": 195.14,
     "experience": 25,
-    "strengths": [
-      "Quality Control",
-      "Team Leadership",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Impatience",
-      "Public Speaking"
-    ],
+    "strengths": ["Quality Control", "Team Leadership", "Vendor Coordination"],
+    "weaknesses": ["Impatience", "Public Speaking"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -3359,13 +2905,8 @@
     "laborRate": 91.91,
     "billableRate": 147.49,
     "experience": 24,
-    "strengths": [
-      "Client Communication",
-      "Quality Control"
-    ],
-    "weaknesses": [
-      "Impatience"
-    ],
+    "strengths": ["Client Communication", "Quality Control"],
+    "weaknesses": ["Impatience"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3395,14 +2936,8 @@
     "laborRate": 78.17,
     "billableRate": 157.59,
     "experience": 18,
-    "strengths": [
-      "Contract Negotiation",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Overcommunication"
-    ],
+    "strengths": ["Contract Negotiation", "Technical Writing"],
+    "weaknesses": ["Delegation", "Overcommunication"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3438,13 +2973,8 @@
     "laborRate": 70.72,
     "billableRate": 118.68,
     "experience": 24,
-    "strengths": [
-      "Risk Management",
-      "Technical Writing"
-    ],
-    "weaknesses": [
-      "Conflict Resolution"
-    ],
+    "strengths": ["Risk Management", "Technical Writing"],
+    "weaknesses": ["Conflict Resolution"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -3468,16 +2998,8 @@
     "laborRate": 72.83,
     "billableRate": 112.62,
     "experience": 24,
-    "strengths": [
-      "Quality Control",
-      "Scheduling",
-      "Client Communication",
-      "Vendor Coordination"
-    ],
-    "weaknesses": [
-      "Overcommunication",
-      "Delegation"
-    ],
+    "strengths": ["Quality Control", "Scheduling", "Client Communication", "Vendor Coordination"],
+    "weaknesses": ["Overcommunication", "Delegation"],
     "discProfile": "ID",
     "assignments": [
       {
@@ -3519,15 +3041,8 @@
     "laborRate": 92.55,
     "billableRate": 155.88,
     "experience": 25,
-    "strengths": [
-      "Problem Solving",
-      "Quality Control",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Time Management"
-    ],
+    "strengths": ["Problem Solving", "Quality Control", "Scheduling"],
+    "weaknesses": ["Paperwork", "Time Management"],
     "discProfile": "SI",
     "assignments": [
       {
@@ -3545,14 +3060,8 @@
     "laborRate": 45.09,
     "billableRate": 161.54,
     "experience": 11,
-    "strengths": [
-      "Vendor Coordination",
-      "Team Leadership",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Overcommunication"
-    ],
+    "strengths": ["Vendor Coordination", "Team Leadership", "Scheduling"],
+    "weaknesses": ["Overcommunication"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -3588,15 +3097,8 @@
     "laborRate": 63.42,
     "billableRate": 113.26,
     "experience": 25,
-    "strengths": [
-      "Contract Negotiation",
-      "Client Communication",
-      "Budgeting"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Time Management"
-    ],
+    "strengths": ["Contract Negotiation", "Client Communication", "Budgeting"],
+    "weaknesses": ["Delegation", "Time Management"],
     "discProfile": "IC",
     "assignments": [
       {
@@ -3620,16 +3122,8 @@
     "laborRate": 96.81,
     "billableRate": 210.29,
     "experience": 21,
-    "strengths": [
-      "Quality Control",
-      "Contract Negotiation",
-      "Technical Writing",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Delegation",
-      "Impatience"
-    ],
+    "strengths": ["Quality Control", "Contract Negotiation", "Technical Writing", "Problem Solving"],
+    "weaknesses": ["Delegation", "Impatience"],
     "discProfile": "IS",
     "assignments": [
       {
@@ -3665,15 +3159,8 @@
     "laborRate": 46.75,
     "billableRate": 117.18,
     "experience": 14,
-    "strengths": [
-      "Scheduling",
-      "Problem Solving",
-      "Contract Negotiation"
-    ],
-    "weaknesses": [
-      "Conflict Resolution",
-      "Public Speaking"
-    ],
+    "strengths": ["Scheduling", "Problem Solving", "Contract Negotiation"],
+    "weaknesses": ["Conflict Resolution", "Public Speaking"],
     "discProfile": "DS",
     "assignments": [
       {
@@ -3691,15 +3178,8 @@
     "laborRate": 61.28,
     "billableRate": 175.06,
     "experience": 4,
-    "strengths": [
-      "Team Leadership",
-      "Contract Negotiation",
-      "Scheduling"
-    ],
-    "weaknesses": [
-      "Technology Adoption",
-      "Overcommunication"
-    ],
+    "strengths": ["Team Leadership", "Contract Negotiation", "Scheduling"],
+    "weaknesses": ["Technology Adoption", "Overcommunication"],
     "discProfile": "CI",
     "assignments": [
       {
@@ -3717,15 +3197,8 @@
     "laborRate": 44.35,
     "billableRate": 119.05,
     "experience": 8,
-    "strengths": [
-      "Scheduling",
-      "Risk Management",
-      "Problem Solving"
-    ],
-    "weaknesses": [
-      "Paperwork",
-      "Time Management"
-    ],
+    "strengths": ["Scheduling", "Risk Management", "Problem Solving"],
+    "weaknesses": ["Paperwork", "Time Management"],
     "discProfile": "SD",
     "assignments": [
       {

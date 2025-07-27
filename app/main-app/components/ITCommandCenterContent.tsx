@@ -625,51 +625,6 @@ function ITCommandCenterMainContent({ user, selectedModule, onModuleSelect }: IT
     <div className="space-y-4">
       {/* Dashboard Header - Mirroring other dashboard headers */}
       <div className="mb-4 space-y-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-0.5">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-              Welcome back, {user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Administrator"}
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {currentModule.label} - {currentModule.description}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 italic">
-              Full system access with administrative privileges
-            </p>
-          </div>
-          <div className="flex flex-col items-end space-y-2">
-            {/* HB Logo */}
-            <div className="flex items-center">
-              <Image
-                src="/images/HB_Logo_Large.png"
-                alt="Hedrick Brothers Construction"
-                width={180}
-                height={60}
-                className="object-contain"
-                priority
-              />
-            </div>
-            {/* Badge and Edit Layout Button Row - Hidden on mobile */}
-            <div className="hidden md:flex items-center gap-2">
-              <Badge
-                variant="outline"
-                className="text-[10px] px-1.5 py-0.5 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-              >
-                System Administrator
-              </Badge>
-              {/* Edit Mode Toggle */}
-              <Button
-                variant={isEditing ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-                className="text-[10px] h-6 px-2"
-              >
-                {isEditing ? "Exit Edit" : "Edit Layout"}
-              </Button>
-            </div>
-          </div>
-        </div>
-
         {/* System Status and Edit Mode Controls */}
         <div className="flex items-center justify-between">
           {/* System Status */}
