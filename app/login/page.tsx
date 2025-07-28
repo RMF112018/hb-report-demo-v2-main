@@ -67,9 +67,10 @@ export default function LoginPage() {
       const showPresentation = urlParams.get("showPresentation")
 
       if (showPresentation === "true") {
-        console.log("🎠 Triggering presentation carousel from query parameter")
-        localStorage.setItem("presentationMode", "true")
-        setPresentationMode(true)
+        console.log("🎠 DISABLED: Presentation carousel trigger from query parameter")
+        // DISABLED: Automatic presentation mode trigger
+        // localStorage.setItem("presentationMode", "true")
+        // setPresentationMode(true)
 
         // Clean up the URL parameter
         const newUrl = window.location.pathname
@@ -274,11 +275,10 @@ export default function LoginPage() {
 
       const loggedInUser = demoUsers.find((u) => u.email === email)
       if (loggedInUser?.role === "presentation") {
-        // Set a flag to trigger Intel tour with 5-second delay
-        localStorage.setItem("triggerIntelTour", Date.now().toString())
-        // Clear any previous completion flag to allow tour to auto-launch
-        localStorage.removeItem("intelTourCompleted")
-        console.log("🎬 Login: Intel Tour flags set for presentation user")
+        // DISABLED: Automatic Intel tour trigger
+        // localStorage.setItem("triggerIntelTour", Date.now().toString())
+        // localStorage.removeItem("intelTourCompleted")
+        console.log("🎬 Login: Intel Tour flags disabled for presentation user")
       }
 
       toast({
@@ -325,17 +325,15 @@ export default function LoginPage() {
 
       // Special handling for presentation account
       if (account.key === "presentation") {
-        localStorage.setItem("presentationMode", "true")
-        // Set flag to trigger Intel tour with 5-second delay
-        localStorage.setItem("triggerIntelTour", Date.now().toString())
-        // Clear any previous completion flag to allow tour to auto-launch
-        localStorage.removeItem("intelTourCompleted")
-        setPresentationMode(true)
-        console.log("🎬 Demo Login: Intel Tour flags set for presentation account")
+        // DISABLED: Automatic presentation mode trigger
+        // localStorage.setItem("presentationMode", "true")
+        // setPresentationMode(true)
+        console.log("🎬 Demo Login: Presentation mode disabled for presentation account")
         toast({
           title: `Welcome to HB Intel`,
-          description: `Starting executive presentation...`,
+          description: `Presentation mode disabled - use manual triggers from sidebar menu`,
         })
+        router.push("/main-app")
       } else {
         toast({
           title: `Welcome, ${account.label}`,
@@ -356,12 +354,11 @@ export default function LoginPage() {
 
   const handlePresentationComplete = () => {
     localStorage.removeItem("presentationMode")
-    // Set flag to trigger Intel tour with 5-second delay
-    localStorage.setItem("triggerIntelTour", Date.now().toString())
-    // Clear any previous completion flag to allow tour to auto-launch
-    localStorage.removeItem("intelTourCompleted")
+    // DISABLED: Automatic Intel tour trigger
+    // localStorage.setItem("triggerIntelTour", Date.now().toString())
+    // localStorage.removeItem("intelTourCompleted")
     setPresentationMode(false)
-    console.log("🎬 Presentation Complete: Intel Tour flags set for transition to main app")
+    console.log("🎬 Presentation Complete: Intel Tour flags disabled for transition to main app")
     router.push("/main-app")
   }
 
