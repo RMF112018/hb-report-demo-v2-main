@@ -67,9 +67,10 @@ export default function LoginPage() {
       const showPresentation = urlParams.get("showPresentation")
 
       if (showPresentation === "true") {
-        console.log("🎠 Triggering presentation carousel from query parameter")
-        localStorage.setItem("presentationMode", "true")
-        setPresentationMode(true)
+        console.log("🎠 DISABLED: Presentation carousel trigger from query parameter")
+        // DISABLED: Automatic presentation mode trigger
+        // localStorage.setItem("presentationMode", "true")
+        // setPresentationMode(true)
 
         // Clean up the URL parameter
         const newUrl = window.location.pathname
@@ -324,16 +325,15 @@ export default function LoginPage() {
 
       // Special handling for presentation account
       if (account.key === "presentation") {
-        localStorage.setItem("presentationMode", "true")
-        // DISABLED: Automatic Intel tour trigger
-        // localStorage.setItem("triggerIntelTour", Date.now().toString())
-        // localStorage.removeItem("intelTourCompleted")
-        setPresentationMode(true)
-        console.log("🎬 Demo Login: Intel Tour flags disabled for presentation account")
+        // DISABLED: Automatic presentation mode trigger
+        // localStorage.setItem("presentationMode", "true")
+        // setPresentationMode(true)
+        console.log("🎬 Demo Login: Presentation mode disabled for presentation account")
         toast({
           title: `Welcome to HB Intel`,
-          description: `Starting executive presentation...`,
+          description: `Presentation mode disabled - use manual triggers from sidebar menu`,
         })
+        router.push("/main-app")
       } else {
         toast({
           title: `Welcome, ${account.label}`,
