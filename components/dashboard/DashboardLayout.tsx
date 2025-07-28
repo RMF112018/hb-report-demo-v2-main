@@ -56,11 +56,11 @@ export function DashboardLayout({
   const handleDashboardTabClick = (dashboardId: string) => {
     onDashboardSelect?.(dashboardId)
   }
-  // Determine spacing based on layout density - consistent horizontal and vertical
+  // Determine spacing based on layout density - increased minimum spacing to prevent over-compression
   const getSpacingClass = () => {
     switch (layoutDensity) {
       case "compact":
-        return "gap-2 sm:gap-2 lg:gap-3"
+        return "gap-3 sm:gap-3 lg:gap-4" // Increased from gap-2 to prevent over-compression
       case "spacious":
         return "gap-4 sm:gap-4 lg:gap-5"
       default:

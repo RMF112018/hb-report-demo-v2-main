@@ -227,15 +227,15 @@ const GRID_CONFIG = {
     xl: 16, // Large desktop - optimized for executive dashboard
     "2xl": 16, // Extra large desktop - consistent 16 columns
   },
-  // Base row height (in pixels) - reduced by 50% for compact view
+  // Base row height (in pixels) - increased minimum sizes to prevent over-compression
   rowHeight: {
-    compact: 28,
-    normal: 35,
+    compact: 40, // Increased from 28 to prevent over-compression
+    normal: 50, // Increased from 35 for better readability
   },
-  // Grid gaps - reduced by 50% for compact view
+  // Grid gaps - increased minimum sizes to prevent over-compression
   gap: {
-    compact: 6,
-    normal: 8,
+    compact: 12, // Increased from 6 to provide better spacing
+    normal: 16, // Increased from 8 for better visual separation
   },
 }
 
@@ -245,7 +245,8 @@ const getGridClasses = (isCompact: boolean, spacingClass: string) => {
 
   return cn(
     "grid w-full",
-    "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4",
+    // Use responsive grid that scales with container width
+    "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6",
     spacingClass || `gap-${gap / 4}`, // Convert px to Tailwind spacing
     "transition-all duration-300 ease-in-out"
   )
@@ -279,20 +280,20 @@ const getCardHeight = (card: DashboardCard, isCompact: boolean): number | "auto"
     return card.span.rows * rowHeight
   }
 
-  // Content-aware heights for different card types - reduced by 50% for all cards
+  // Content-aware heights for different card types - increased minimum sizes to prevent over-compression
   switch (card.type) {
     case "financial-review-panel":
-      return isCompact ? 100 : 125
+      return isCompact ? 140 : 160 // Increased from 100/125
     case "enhanced-hbi-insights":
-      return isCompact ? 87 : 100
+      return isCompact ? 120 : 140 // Increased from 87/100
     case "portfolio-overview":
-      return isCompact ? 75 : 87
+      return isCompact ? 100 : 120 // Increased from 75/87
     case "market-intelligence":
-      return isCompact ? 112 : 125
+      return isCompact ? 150 : 170 // Increased from 112/125
     case "staffing-distribution":
-      return isCompact ? 100 : 112
+      return isCompact ? 130 : 150 // Increased from 100/112
     default:
-      return isCompact ? 75 : 87
+      return isCompact ? 110 : 130 // Increased from 75/87
   }
 }
 
@@ -325,7 +326,8 @@ export function DashboardGrid({
 
   // Calculate grid position from mouse coordinates
   const getGridPosition = (x: number, y: number, containerRect: DOMRect, isCompact: boolean) => {
-    const gridColumns = 12 // Updated to 12-column grid for 50% narrower cards
+    // Use 6-column grid to match the new grid system and utilize full width
+    const gridColumns = 6
     const gridRows = 50 // Allow for tall layouts
 
     const relativeX = x - containerRect.left
@@ -1168,83 +1170,83 @@ function CardContent({
   }
 }
 
-// Get optimal size for cards (optimized for 16-column executive layout) - reduced by ~50% for compact view
-// Maximum 5 columns per card to ensure minimum 3 cards per row (16÷5 = 3.2 cards minimum)
+// Get optimal size for cards (optimized for 6-column responsive layout) - adjusted for full width utilization
+// Maximum 3 columns per card to ensure minimum 2 cards per row (6÷3 = 2 cards minimum)
 const getOptimalSize = (cardType: string): { cols: number; rows: number } => {
   switch (cardType) {
     case "financial-review-panel":
-      return { cols: 8, rows: 5 }
+      return { cols: 3, rows: 5 } // Reduced from 4 to 3 for better width distribution
     case "financial-dashboard":
-      return { cols: 5, rows: 9 }
+      return { cols: 3, rows: 9 } // Reduced from 4 to 3 for better width distribution
     case "enhanced-hbi-insights":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "portfolio-overview":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "pipeline-analytics":
-      return { cols: 5, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "market-intelligence":
-      return { cols: 3, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "staffing-distribution":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "quality-control":
-      return { cols: 2, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "safety":
-      return { cols: 2, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "cash-flow":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "power-bi-dashboard":
-      return { cols: 4, rows: 3 }
+      return { cols: 3, rows: 3 } // Reduced from 4 to 3 for better width distribution
     case "critical-dates":
-      return { cols: 3, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "schedule-monitor":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "health":
-      return { cols: 3, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     case "change-order-analysis":
-      return { cols: 4, rows: 2 }
+      return { cols: 3, rows: 2 } // Full width on mobile, half width on larger screens
     case "bd-opportunities":
-      return { cols: 3, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
     // Market Intelligence Dashboard cards
     case "simple-market-intel":
-      return { cols: 5, rows: 3 }
+      return { cols: 3, rows: 3 } // Reduced from 4 to 3 for better width distribution
     case "market-analytics":
-      return { cols: 5, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "ai-market-insights":
-      return { cols: 3, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "florida-market-growth":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "regional-hotspots":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "developer-sentiment":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "threat-tracker":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "ai-opportunities":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "competitor-benchmark":
-      return { cols: 5, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "risk-reward-radar":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     // HR & Payroll cards
     case "hr-workforce-overview":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "payroll-analytics":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "benefits-enrollment":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "compliance-monitoring":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "recruiting-pipeline":
-      return { cols: 4, rows: 4 }
+      return { cols: 3, rows: 4 } // Full width on mobile, half width on larger screens
     case "performance-metrics":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "training-development":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "expense-management":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     case "timesheet-analytics":
-      return { cols: 6, rows: 4 }
+      return { cols: 3, rows: 4 } // Reduced from 4 to 3 for better width distribution
     default:
-      return { cols: 3, rows: 2 }
+      return { cols: 3, rows: 2 } // Reduced from 4 to 3 for better width distribution
   }
 }
