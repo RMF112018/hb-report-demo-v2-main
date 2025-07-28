@@ -243,80 +243,80 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     setMounted(true)
   }, [])
 
-  // Handle tour logic - separate useEffect that depends on mounted state
-  useEffect(() => {
-    console.log("🔍 Executive Staffing Tour: Checking conditions...", { mounted })
-    if (mounted) {
-      // Check if tour should be triggered (sidebar has priority)
-      const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
-      const regularTourFlag = localStorage.getItem("execStaffingTour")
-      const timestamp = localStorage.getItem("execStaffingTourTimestamp")
-      const sidebarTimestamp = localStorage.getItem("staffingTourTimestamp")
+  // DISABLED: Automatic tour logic - separate useEffect that depends on mounted state
+  // useEffect(() => {
+  //   console.log("🔍 Executive Staffing Tour: Checking conditions...", { mounted })
+  //   if (mounted) {
+  //     // Check if tour should be triggered (sidebar has priority)
+  //     const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
+  //     const regularTourFlag = localStorage.getItem("execStaffingTour")
+  //     const timestamp = localStorage.getItem("execStaffingTourTimestamp")
+  //     const sidebarTimestamp = localStorage.getItem("staffingTourTimestamp")
 
-      console.log("🔍 Executive Staffing Tour: localStorage check result:", {
-        sidebarTourFlag,
-        regularTourFlag,
-        timestamp,
-        sidebarTimestamp,
-      })
-      console.log("🗄️ Executive Staffing Tour: All localStorage keys:", Object.keys(localStorage))
+  //     console.log("🔍 Executive Staffing Tour: localStorage check result:", {
+  //       sidebarTourFlag,
+  //       regularTourFlag,
+  //       timestamp,
+  //       sidebarTimestamp,
+  //     })
+  //     console.log("🗄️ Executive Staffing Tour: All localStorage keys:", Object.keys(localStorage))
 
-      // Check for sidebar-triggered tour first (has priority)
-      if (sidebarTourFlag === "true") {
-        console.log("✅ Executive Staffing Tour: Sidebar trigger flag found, launching tour in 3 seconds...")
-        const timer = setTimeout(() => {
-          setShowTour(true)
-          console.log("🎯 Executive Staffing Tour: Tour launched from sidebar trigger!")
-        }, 3000)
+  //     // Check for sidebar-triggered tour first (has priority)
+  //     if (sidebarTourFlag === "true") {
+  //       console.log("✅ Executive Staffing Tour: Sidebar trigger flag found, launching tour in 3 seconds...")
+  //       const timer = setTimeout(() => {
+  //         setShowTour(true)
+  //         console.log("🎯 Executive Staffing Tour: Tour launched from sidebar trigger!")
+  //       }, 3000)
 
-        return () => clearTimeout(timer)
-      }
-      // Check for regular tour flag (from page header carousel menu)
-      else if (regularTourFlag === "true") {
-        console.log("✅ Executive Staffing Tour: Regular tour flag found, launching tour in 3 seconds...")
-        const timer = setTimeout(() => {
-          setShowTour(true)
-          console.log("🎯 Executive Staffing Tour: Tour launched from header trigger!")
-        }, 3000)
+  //       return () => clearTimeout(timer)
+  //     }
+  //     // Check for regular tour flag (from page header carousel menu)
+  //     else if (regularTourFlag === "true") {
+  //       console.log("✅ Executive Staffing Tour: Regular tour flag found, launching tour in 3 seconds...")
+  //       const timer = setTimeout(() => {
+  //         setShowTour(true)
+  //         console.log("🎯 Executive Staffing Tour: Tour launched from header trigger!")
+  //       }, 3000)
 
-        return () => clearTimeout(timer)
-      } else {
-        console.log("⏭️ Executive Staffing Tour: No tour flags found, skipping tour")
-        // Also check for any remaining flags that might indicate a timing issue
-        const allLocalStorageKeys = Object.keys(localStorage)
-        const tourRelatedKeys = allLocalStorageKeys.filter((key) => key.includes("tour") || key.includes("Tour"))
-        console.log("🔍 Executive Staffing Tour: Tour-related localStorage keys:", tourRelatedKeys)
-      }
-    }
-  }, [mounted])
+  //       return () => clearTimeout(timer)
+  //     } else {
+  //       console.log("⏭️ Executive Staffing Tour: No tour flags found, skipping tour")
+  //       // Also check for any remaining flags that might indicate a timing issue
+  //       const allLocalStorageKeys = Object.keys(localStorage)
+  //       const tourRelatedKeys = allLocalStorageKeys.filter((key) => key.includes("tour") || key.includes("Tour"))
+  //       console.log("🔍 Executive Staffing Tour: Tour-related localStorage keys:", tourRelatedKeys)
+  //     }
+  //   }
+  // }, [mounted])
 
-  // Additional check for localStorage flag that might be set after component mount
-  useEffect(() => {
-    if (mounted && !showTour) {
-      const checkForTourFlag = () => {
-        const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
-        const regularTourFlag = localStorage.getItem("execStaffingTour")
+  // DISABLED: Additional check for localStorage flag that might be set after component mount
+  // useEffect(() => {
+  //   if (mounted && !showTour) {
+  //     const checkForTourFlag = () => {
+  //       const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
+  //       const regularTourFlag = localStorage.getItem("execStaffingTour")
 
-        if (sidebarTourFlag === "true") {
-          console.log("🎯 Executive Staffing Tour: Late sidebar flag detected, triggering tour now!")
-          setShowTour(true)
-        } else if (regularTourFlag === "true") {
-          console.log("🎯 Executive Staffing Tour: Late regular flag detected, triggering tour now!")
-          setShowTour(true)
-        }
-      }
+  //       if (sidebarTourFlag === "true") {
+  //         console.log("🎯 Executive Staffing Tour: Late sidebar flag detected, triggering tour now!")
+  //         setShowTour(true)
+  //       } else if (regularTourFlag === "true") {
+  //         console.log("🎯 Executive Staffing Tour: Late regular flag detected, triggering tour now!")
+  //         setShowTour(true)
+  //       }
+  //     }
 
-      // Check immediately and then periodically for a few seconds
-      checkForTourFlag()
-      const interval = setInterval(checkForTourFlag, 500)
-      const timeout = setTimeout(() => clearInterval(interval), 5000)
+  //     // Check immediately and then periodically for a few seconds
+  //     checkForTourFlag()
+  //     const interval = setInterval(checkForTourFlag, 500)
+  //     const timeout = setTimeout(() => clearInterval(interval), 5000)
 
-      return () => {
-        clearInterval(interval)
-        clearTimeout(timeout)
-      }
-    }
-  }, [mounted, showTour])
+  //     return () => {
+  //       clearInterval(interval)
+  //       clearTimeout(timeout)
+  //     }
+  //   }
+  // }, [mounted, showTour])
 
   // Mock data for staff needing assignment (3-6 members with assignments ending in 4-62 days)
   const needingAssignmentData = useMemo(() => {

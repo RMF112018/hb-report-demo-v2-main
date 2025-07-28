@@ -12,6 +12,7 @@
 "use client"
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
 import { Input } from "../../../components/ui/input"
@@ -28,6 +29,18 @@ import { QualityWarrantyCarousel } from "../../../components/quality/QualityWarr
 import { ProjectPageCarousel } from "../../../components/presentation/ProjectPageCarousel"
 import { CoreTabCarousel } from "../../../components/presentation/CoreTabCarousel"
 import { HBIntelPitchCarousel } from "../../../components/presentation/HBIntelPitchCarousel"
+import { PreconCarousel } from "../../../components/presentation/PreconCarousel"
+import { FinancialCarousel } from "../../../components/presentation/FinancialCarousel"
+import { FieldManagementCarousel } from "../../../components/presentation/FieldManagementCarousel"
+import { ComplianceCarousel } from "../../../components/presentation/ComplianceCarousel"
+import { ITCommandCenterCarousel } from "../../../components/presentation/ITCommandCenterCarousel"
+import { HRCarousel } from "../../../components/presentation/HRCarousel"
+import { PresentationCarousel } from "../../../components/presentation/PresentationCarousel"
+import { slides as slideDefinitions } from "../../../components/presentation/slide-definitions"
+import { intelTourSlides } from "../../../components/presentation/intelTourSlides"
+import { safetySlides } from "../../../components/presentation/safetySlides"
+import { qualitySlides } from "../../../components/presentation/qualitySlides"
+import { executiveStaffingSlides } from "../../../components/presentation/executiveStaffingSlides"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,6 +87,13 @@ import {
   GraduationCap,
   FileText,
   TrendingUp,
+  Target,
+  Users,
+  Sparkles,
+  Zap,
+  CheckCircle,
+  AlertTriangle,
+  UserCheck,
 } from "lucide-react"
 
 type UserRole =
@@ -545,6 +565,18 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   const [coreTabCarouselTimeout, setCoreTabCarouselTimeout] = useState<NodeJS.Timeout | null>(null)
   const [showHBIntelPitchCarousel, setShowHBIntelPitchCarousel] = useState(false)
 
+  // Additional carousel states for comprehensive presentation menu
+  const [showSlideDefinitionsCarousel, setShowSlideDefinitionsCarousel] = useState(false)
+  const [showIntelTourCarousel, setShowIntelTourCarousel] = useState(false)
+  const [showPreconCarousel, setShowPreconCarousel] = useState(false)
+  const [showFinancialCarousel, setShowFinancialCarousel] = useState(false)
+  const [showFieldManagementCarousel, setShowFieldManagementCarousel] = useState(false)
+  const [showComplianceCarousel, setShowComplianceCarousel] = useState(false)
+  const [showExecutiveStaffingCarousel, setShowExecutiveStaffingCarousel] = useState(false)
+  const [showSafetyCarousel, setShowSafetyCarousel] = useState(false)
+  const [showITCommandCenterCarousel, setShowITCommandCenterCarousel] = useState(false)
+  const [showHRCarousel, setShowHRCarousel] = useState(false)
+
   // New state for fluid navigation
   const [activeCategory, setActiveCategory] = useState<SidebarCategory | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -920,13 +952,14 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
       setProjectPageCarouselTimeout(null)
     }
 
-    // Trigger Core Tab carousel with 2-second delay
-    if (isPresentationMode) {
-      const timeout = setTimeout(() => {
-        setShowCoreTabCarousel(true)
-      }, 2000)
-      setCoreTabCarouselTimeout(timeout)
-    }
+    // DISABLED: Core Tab carousel trigger
+    // // Trigger Core Tab carousel with 2-second delay
+    // if (isPresentationMode) {
+    //   const timeout = setTimeout(() => {
+    //     setShowCoreTabCarousel(true)
+    //   }, 2000)
+    //   setCoreTabCarouselTimeout(timeout)
+    // }
   }
 
   // Handle core tab carousel completion
@@ -944,31 +977,74 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
     setShowHBIntelPitchCarousel(false)
   }
 
-  // Helper function to handle project selection with carousel logic
-  const handleProjectSelect = (projectId: string) => {
-    // Check if user is in presentation mode and a project is being selected
-    if (isPresentationMode && projectId) {
-      // Clear any existing timeout
-      if (projectPageCarouselTimeout) {
-        clearTimeout(projectPageCarouselTimeout)
-      }
+  // Handle additional carousel completions
+  const handleSlideDefinitionsCarouselComplete = () => {
+    setShowSlideDefinitionsCarousel(false)
+  }
 
-      // Set 3-second delay before showing carousel
-      const timeout = setTimeout(() => {
-        setShowProjectPageCarousel(true)
-      }, 3000)
-      setProjectPageCarouselTimeout(timeout)
-    }
+  const handleIntelTourCarouselComplete = () => {
+    setShowIntelTourCarousel(false)
+  }
+
+  const handlePreconCarouselComplete = () => {
+    setShowPreconCarousel(false)
+  }
+
+  const handleFinancialCarouselComplete = () => {
+    setShowFinancialCarousel(false)
+  }
+
+  const handleFieldManagementCarouselComplete = () => {
+    setShowFieldManagementCarousel(false)
+  }
+
+  const handleComplianceCarouselComplete = () => {
+    setShowComplianceCarousel(false)
+  }
+
+  const handleExecutiveStaffingCarouselComplete = () => {
+    setShowExecutiveStaffingCarousel(false)
+  }
+
+  const handleSafetyCarouselComplete = () => {
+    setShowSafetyCarousel(false)
+  }
+
+  const handleITCommandCenterCarouselComplete = () => {
+    setShowITCommandCenterCarousel(false)
+  }
+
+  const handleHRCarouselComplete = () => {
+    setShowHRCarousel(false)
+  }
+
+  // Helper function to handle project selection with carousel logic - DISABLED
+  const handleProjectSelect = (projectId: string) => {
+    // DISABLED: Project Page Carousel trigger
+    // // Check if user is in presentation mode and a project is being selected
+    // if (isPresentationMode && projectId) {
+    //   // Clear any existing timeout
+    //   if (projectPageCarouselTimeout) {
+    //     clearTimeout(projectPageCarouselTimeout)
+    //   }
+
+    //   // Set 3-second delay before showing carousel
+    //   const timeout = setTimeout(() => {
+    //     setShowProjectPageCarousel(true)
+    //   }, 3000)
+    //   setProjectPageCarouselTimeout(timeout)
+    // }
 
     // Call the original project selection function
     onProjectSelect(projectId)
   }
 
-  // Update the carousel trigger logic to use the callback
+  // Update the carousel trigger logic to use the callback - DISABLED
   const triggerProjectPageCarousel = () => {
-    if (onLaunchProjectPageCarousel) {
-      onLaunchProjectPageCarousel()
-    }
+    // DISABLED: Project Page Carousel trigger
+    // if (onLaunchProjectPageCarousel) {
+    //   onLaunchProjectPageCarousel()
+    // }
   }
 
   // Mobile floating button
@@ -1368,19 +1444,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                 key={tool.name}
                                 variant="ghost"
                                 onClick={() => {
-                                  // Check if Quality Control & Warranty is selected and trigger carousel
-                                  if (tool.name === "Quality Control & Warranty") {
-                                    // Clear any existing timeout
-                                    if (qualityCarouselTimeout) {
-                                      clearTimeout(qualityCarouselTimeout)
-                                    }
+                                  // DISABLED: Quality Control & Warranty carousel trigger
+                                  // // Check if Quality Control & Warranty is selected and trigger carousel
+                                  // if (tool.name === "Quality Control & Warranty") {
+                                  //   // Clear any existing timeout
+                                  //   if (qualityCarouselTimeout) {
+                                  //     clearTimeout(qualityCarouselTimeout)
+                                  //   }
 
-                                    // Set 3-second delay before showing carousel
-                                    const timeout = setTimeout(() => {
-                                      setShowQualityCarousel(true)
-                                    }, 3000)
-                                    setQualityCarouselTimeout(timeout)
-                                  }
+                                  //   // Set 3-second delay before showing carousel
+                                  //   const timeout = setTimeout(() => {
+                                  //     setShowQualityCarousel(true)
+                                  //   }, 3000)
+                                  //   setQualityCarouselTimeout(timeout)
+                                  // }
 
                                   onToolSelect?.(tool.name)
                                   setActiveSubCategory(null) // Close the panel after selection
@@ -1579,20 +1656,188 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        // Launch HB Intel Pitch carousel for executives
-                        setShowHBIntelPitchCarousel(true)
-                      }}
-                      className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
-                    >
-                      <GitCompareArrows className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative z-[60]"
+                        >
+                          <GitCompareArrows className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" className="w-80 z-[80] max-h-96 overflow-y-auto">
+                        <DropdownMenuLabel className="font-semibold text-gray-900 dark:text-gray-100">
+                          Presentation Options
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        {/* Why HB Intel? */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowSlideDefinitionsCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Zap className="h-4 w-4 text-blue-600" />
+                            <span>Why HB Intel?</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Welcome to HB Intel */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowIntelTourCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Sparkles className="h-4 w-4 text-purple-600" />
+                            <span>Welcome to HB Intel</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Project Control Center */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowProjectPageCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Target className="h-4 w-4 text-green-600" />
+                            <span>Project Control Center</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Each Project's Core */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowCoreTabCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="h-4 w-4 text-orange-600" />
+                            <span>Each Project's Core</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Pre-Construction that Follows the Project */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowPreconCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <TrendingUp className="h-4 w-4 text-indigo-600" />
+                            <span>Pre-Construction that Follows the Project</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Financial Management Centralized */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowFinancialCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <DollarSign className="h-4 w-4 text-green-600" />
+                            <span>Financial Management Centralized</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Everything from the Field */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowFieldManagementCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Drill className="h-4 w-4 text-yellow-600" />
+                            <span>Everything from the Field</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Omnipresent Project Compliance */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowComplianceCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Shield className="h-4 w-4 text-red-600" />
+                            <span>Omnipresent Project Compliance</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Modernized Staff Management */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowExecutiveStaffingCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <UserCheck className="h-4 w-4 text-blue-600" />
+                            <span>Modernized Staff Management</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* Safety, Quality Control, and Warranty in One Place */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowSafetyCarousel(true)
+                            // Show quality carousel after safety completes
+                            setTimeout(() => {
+                              setShowQualityCarousel(true)
+                            }, 100)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <AlertTriangle className="h-4 w-4 text-orange-600" />
+                            <span>Safety, Quality Control, and Warranty in One Place</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* IT Command Center */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowITCommandCenterCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Server className="h-4 w-4 text-cyan-600" />
+                            <span>IT Command Center</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        {/* HR & Payroll in Our Control */}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setShowHRCarousel(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <UserCheck className="h-4 w-4 text-pink-600" />
+                            <span>HR & Payroll in Our Control</span>
+                          </div>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="z-[70]">
-                    <p>HB Intel Executive Pitch Presentation</p>
+                    <p>Presentation Options</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -2018,19 +2263,20 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                     key={tool.name}
                                     variant="ghost"
                                     onClick={() => {
-                                      // Check if Quality Control & Warranty is selected and trigger carousel
-                                      if (tool.name === "Quality Control & Warranty") {
-                                        // Clear any existing timeout
-                                        if (qualityCarouselTimeout) {
-                                          clearTimeout(qualityCarouselTimeout)
-                                        }
+                                      // DISABLED: Quality Control & Warranty carousel trigger
+                                      // // Check if Quality Control & Warranty is selected and trigger carousel
+                                      // if (tool.name === "Quality Control & Warranty") {
+                                      //   // Clear any existing timeout
+                                      //   if (qualityCarouselTimeout) {
+                                      //     clearTimeout(qualityCarouselTimeout)
+                                      //   }
 
-                                        // Set 3-second delay before showing carousel
-                                        const timeout = setTimeout(() => {
-                                          setShowQualityCarousel(true)
-                                        }, 3000)
-                                        setQualityCarouselTimeout(timeout)
-                                      }
+                                      //   // Set 3-second delay before showing carousel
+                                      //   const timeout = setTimeout(() => {
+                                      //     setShowQualityCarousel(true)
+                                      //   }, 3000)
+                                      //   setQualityCarouselTimeout(timeout)
+                                      // }
 
                                       onToolSelect?.(tool.name)
                                       setActiveCategory(null) // Close the panel after selection
@@ -2083,6 +2329,75 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
 
         {/* HB Intel Pitch Carousel */}
         {showHBIntelPitchCarousel && <HBIntelPitchCarousel onComplete={handleHBIntelPitchCarouselComplete} />}
+
+        {/* Additional Carousels for Comprehensive Presentation Menu */}
+        {showSlideDefinitionsCarousel && (
+          <div className="z-[9999]">
+            {createPortal(
+              <PresentationCarousel
+                slides={slideDefinitions}
+                onComplete={handleSlideDefinitionsCarouselComplete}
+                ctaText="Return to HB Intel"
+                ctaIcon={Building}
+              />,
+              document.body
+            )}
+          </div>
+        )}
+
+        {showIntelTourCarousel && (
+          <div className="z-[9999]">
+            {createPortal(
+              <PresentationCarousel
+                slides={intelTourSlides}
+                onComplete={handleIntelTourCarouselComplete}
+                ctaText="Return to HB Intel"
+                ctaIcon={Brain}
+              />,
+              document.body
+            )}
+          </div>
+        )}
+
+        {showPreconCarousel && <PreconCarousel onComplete={handlePreconCarouselComplete} />}
+
+        {showFinancialCarousel && <FinancialCarousel onComplete={handleFinancialCarouselComplete} />}
+
+        {showFieldManagementCarousel && <FieldManagementCarousel onComplete={handleFieldManagementCarouselComplete} />}
+
+        {showComplianceCarousel && <ComplianceCarousel onComplete={handleComplianceCarouselComplete} />}
+
+        {showExecutiveStaffingCarousel && (
+          <div className="z-[9999]">
+            {createPortal(
+              <PresentationCarousel
+                slides={executiveStaffingSlides}
+                onComplete={handleExecutiveStaffingCarouselComplete}
+                ctaText="Return to Executive Staffing"
+                ctaIcon={Users}
+              />,
+              document.body
+            )}
+          </div>
+        )}
+
+        {showSafetyCarousel && (
+          <div className="z-[9999]">
+            {createPortal(
+              <PresentationCarousel
+                slides={safetySlides}
+                onComplete={handleSafetyCarouselComplete}
+                ctaText="Return to Safety"
+                ctaIcon={Shield}
+              />,
+              document.body
+            )}
+          </div>
+        )}
+
+        {showITCommandCenterCarousel && <ITCommandCenterCarousel onComplete={handleITCommandCenterCarouselComplete} />}
+
+        {showHRCarousel && <HRCarousel onComplete={handleHRCarouselComplete} />}
       </div>
     )
   }

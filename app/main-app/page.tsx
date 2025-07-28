@@ -317,40 +317,28 @@ export default function MainApplicationPage() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [router])
 
-  // Intel Tour logic triggered by successful login
+  // DISABLED: Intel Tour logic triggered by successful login
   useEffect(() => {
     if (mounted) {
-      // Check if Intel tour should be triggered (set at login)
-      const triggerTimestamp = localStorage.getItem("triggerIntelTour")
-      const intelTourCompleted = localStorage.getItem("intelTourCompleted")
-      const presentationMode = localStorage.getItem("presentationMode")
+      // DISABLED: Automatic Intel tour trigger
+      // const triggerTimestamp = localStorage.getItem("triggerIntelTour")
+      // const intelTourCompleted = localStorage.getItem("intelTourCompleted")
+      // const presentationMode = localStorage.getItem("presentationMode")
 
-      console.log("🔍 Intel Tour check:", {
-        triggerTimestamp: !!triggerTimestamp,
-        intelTourCompleted: !!intelTourCompleted,
-        presentationMode: !!presentationMode,
-        mounted,
-      })
+      console.log("🔍 Intel Tour check: DISABLED - Automatic triggers deactivated")
 
-      // Trigger Intel tour if:
-      // 1. Trigger flag is set OR presentation mode is active
-      // 2. Tour hasn't been completed yet
-      if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
-        console.log("🚀 Starting Intel Tour (3 seconds)")
-
-        // Clean up the trigger flag
-        localStorage.removeItem("triggerIntelTour")
-
-        // Set timer for 3 seconds after main app loads
-        const tourTimer = setTimeout(() => {
-          setShowIntelTour(true)
-          console.log("🎯 Intel Tour launched!")
-        }, 3000) // 3 second delay
-
-        return () => clearTimeout(tourTimer)
-      } else {
-        console.log("⏭️ Intel Tour skipped - conditions not met")
-      }
+      // DISABLED: Automatic Intel tour trigger
+      // if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
+      //   console.log("🚀 Starting Intel Tour (3 seconds)")
+      //   localStorage.removeItem("triggerIntelTour")
+      //   const tourTimer = setTimeout(() => {
+      //     setShowIntelTour(true)
+      //     console.log("🎯 Intel Tour launched!")
+      //   }, 3000)
+      //   return () => clearTimeout(tourTimer)
+      // } else {
+      //   console.log("⏭️ Intel Tour skipped - conditions not met")
+      // }
     }
   }, [mounted])
 
@@ -552,37 +540,38 @@ export default function MainApplicationPage() {
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
 
-    // Check if user is in presentation mode and selected "pre-construction" tab
-    if (isPresentationMode && tabId === "pre-construction") {
-      // Trigger Pre-Construction carousel with 2-second delay
-      setTimeout(() => {
-        setShowPreconCarousel(true)
-      }, 2000)
-    }
+    // DISABLED: Automatic carousel triggers
+    // // Check if user is in presentation mode and selected "pre-construction" tab
+    // if (isPresentationMode && tabId === "pre-construction") {
+    //   // Trigger Pre-Construction carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowPreconCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "financial-management" tab
-    if (isPresentationMode && tabId === "financial-management") {
-      // Trigger Financial Management carousel with 2-second delay
-      setTimeout(() => {
-        setShowFinancialCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "financial-management" tab
+    // if (isPresentationMode && tabId === "financial-management") {
+    //   // Trigger Financial Management carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowFinancialCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "field-management" tab
-    if (isPresentationMode && tabId === "field-management") {
-      // Trigger Field Management carousel with 2-second delay
-      setTimeout(() => {
-        setShowFieldManagementCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "field-management" tab
+    // if (isPresentationMode && tabId === "field-management") {
+    //   // Trigger Field Management carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowFieldManagementCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "compliance" tab
-    if (isPresentationMode && tabId === "compliance") {
-      // Trigger Compliance carousel with 2-second delay
-      setTimeout(() => {
-        setShowComplianceCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "compliance" tab
+    // if (isPresentationMode && tabId === "compliance") {
+    //   // Trigger Compliance carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowComplianceCarousel(true)
+    //   }, 2000)
+    // }
   }
 
   const handleIntelTourComplete = () => {
@@ -684,7 +673,8 @@ export default function MainApplicationPage() {
         break
       case "it-command-center":
         console.log("✅ IT Command Center case matched!")
-        setShowITCommandCenterCarousel(true)
+        // DISABLED: Automatic IT Command Center carousel trigger
+        // setShowITCommandCenterCarousel(true)
         break
       default:
         console.log(`❌ Unknown carousel type: "${carouselType}" (length: ${carouselType.length})`)
@@ -1384,7 +1374,10 @@ export default function MainApplicationPage() {
         onToolSelect={handleToolSelect}
         selectedModule={selectedModule}
         selectedTool={selectedTool}
-        onLaunchProjectPageCarousel={() => setShowProjectPageCarousel(true)}
+        onLaunchProjectPageCarousel={() => {
+          // DISABLED: Automatic Project Page Carousel trigger
+          // setShowProjectPageCarousel(true)
+        }}
       />
 
       {/* Sticky Page Header - Always visible at top */}
