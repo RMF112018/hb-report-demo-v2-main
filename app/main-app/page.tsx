@@ -317,40 +317,28 @@ export default function MainApplicationPage() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [router])
 
-  // Intel Tour logic triggered by successful login
+  // DISABLED: Intel Tour logic triggered by successful login
   useEffect(() => {
     if (mounted) {
-      // Check if Intel tour should be triggered (set at login)
-      const triggerTimestamp = localStorage.getItem("triggerIntelTour")
-      const intelTourCompleted = localStorage.getItem("intelTourCompleted")
-      const presentationMode = localStorage.getItem("presentationMode")
+      // DISABLED: Automatic Intel tour trigger
+      // const triggerTimestamp = localStorage.getItem("triggerIntelTour")
+      // const intelTourCompleted = localStorage.getItem("intelTourCompleted")
+      // const presentationMode = localStorage.getItem("presentationMode")
 
-      console.log("🔍 Intel Tour check:", {
-        triggerTimestamp: !!triggerTimestamp,
-        intelTourCompleted: !!intelTourCompleted,
-        presentationMode: !!presentationMode,
-        mounted,
-      })
+      console.log("🔍 Intel Tour check: DISABLED - Automatic triggers deactivated")
 
-      // Trigger Intel tour if:
-      // 1. Trigger flag is set OR presentation mode is active
-      // 2. Tour hasn't been completed yet
-      if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
-        console.log("🚀 Starting Intel Tour (3 seconds)")
-
-        // Clean up the trigger flag
-        localStorage.removeItem("triggerIntelTour")
-
-        // Set timer for 3 seconds after main app loads
-        const tourTimer = setTimeout(() => {
-          setShowIntelTour(true)
-          console.log("🎯 Intel Tour launched!")
-        }, 3000) // 3 second delay
-
-        return () => clearTimeout(tourTimer)
-      } else {
-        console.log("⏭️ Intel Tour skipped - conditions not met")
-      }
+      // DISABLED: Automatic Intel tour trigger
+      // if ((triggerTimestamp || presentationMode) && !intelTourCompleted) {
+      //   console.log("🚀 Starting Intel Tour (3 seconds)")
+      //   localStorage.removeItem("triggerIntelTour")
+      //   const tourTimer = setTimeout(() => {
+      //     setShowIntelTour(true)
+      //     console.log("🎯 Intel Tour launched!")
+      //   }, 3000)
+      //   return () => clearTimeout(tourTimer)
+      // } else {
+      //   console.log("⏭️ Intel Tour skipped - conditions not met")
+      // }
     }
   }, [mounted])
 
