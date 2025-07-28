@@ -552,37 +552,38 @@ export default function MainApplicationPage() {
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
 
-    // Check if user is in presentation mode and selected "pre-construction" tab
-    if (isPresentationMode && tabId === "pre-construction") {
-      // Trigger Pre-Construction carousel with 2-second delay
-      setTimeout(() => {
-        setShowPreconCarousel(true)
-      }, 2000)
-    }
+    // DISABLED: Automatic carousel triggers
+    // // Check if user is in presentation mode and selected "pre-construction" tab
+    // if (isPresentationMode && tabId === "pre-construction") {
+    //   // Trigger Pre-Construction carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowPreconCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "financial-management" tab
-    if (isPresentationMode && tabId === "financial-management") {
-      // Trigger Financial Management carousel with 2-second delay
-      setTimeout(() => {
-        setShowFinancialCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "financial-management" tab
+    // if (isPresentationMode && tabId === "financial-management") {
+    //   // Trigger Financial Management carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowFinancialCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "field-management" tab
-    if (isPresentationMode && tabId === "field-management") {
-      // Trigger Field Management carousel with 2-second delay
-      setTimeout(() => {
-        setShowFieldManagementCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "field-management" tab
+    // if (isPresentationMode && tabId === "field-management") {
+    //   // Trigger Field Management carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowFieldManagementCarousel(true)
+    //   }, 2000)
+    // }
 
-    // Check if user is in presentation mode and selected "compliance" tab
-    if (isPresentationMode && tabId === "compliance") {
-      // Trigger Compliance carousel with 2-second delay
-      setTimeout(() => {
-        setShowComplianceCarousel(true)
-      }, 2000)
-    }
+    // // Check if user is in presentation mode and selected "compliance" tab
+    // if (isPresentationMode && tabId === "compliance") {
+    //   // Trigger Compliance carousel with 2-second delay
+    //   setTimeout(() => {
+    //     setShowComplianceCarousel(true)
+    //   }, 2000)
+    // }
   }
 
   const handleIntelTourComplete = () => {
@@ -684,7 +685,8 @@ export default function MainApplicationPage() {
         break
       case "it-command-center":
         console.log("✅ IT Command Center case matched!")
-        setShowITCommandCenterCarousel(true)
+        // DISABLED: Automatic IT Command Center carousel trigger
+        // setShowITCommandCenterCarousel(true)
         break
       default:
         console.log(`❌ Unknown carousel type: "${carouselType}" (length: ${carouselType.length})`)
@@ -1384,7 +1386,10 @@ export default function MainApplicationPage() {
         onToolSelect={handleToolSelect}
         selectedModule={selectedModule}
         selectedTool={selectedTool}
-        onLaunchProjectPageCarousel={() => setShowProjectPageCarousel(true)}
+        onLaunchProjectPageCarousel={() => {
+          // DISABLED: Automatic Project Page Carousel trigger
+          // setShowProjectPageCarousel(true)
+        }}
       />
 
       {/* Sticky Page Header - Always visible at top */}
