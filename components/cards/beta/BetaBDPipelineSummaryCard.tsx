@@ -1,59 +1,54 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import {
-  Building,
-  TrendingUp,
-  DollarSign,
   Target,
-  Users,
-  Activity,
-  BarChart3,
-  PieChart,
-  FileText,
-  CheckCircle,
-  AlertTriangle,
-  Star,
-  Award,
-  Zap,
-  Lightbulb,
-  Brain,
-  Sparkles,
-  Rocket,
-  Shield,
-  Gavel,
-  Database,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
   RefreshCw,
   ExternalLink,
-  User,
-  Briefcase,
-  Calendar,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
+  AlertTriangle,
+  CheckCircle,
+  BarChart3,
   Building2,
-  UserCheck,
-  Activity as ActivityIcon,
+  Activity,
+  Timer,
+  Bell,
+  Sparkles,
+  Clock,
+  Users,
+  MapPin,
+  Calendar,
+  Star,
+  Award,
+  Briefcase,
+  Database,
+  Zap,
+  Lightbulb,
+  Filter,
+  User,
+  Building,
 } from "lucide-react"
 import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
   LineChart,
   Line,
-  Area,
-  AreaChart,
-  PieChart as RechartsPieChart,
+  PieChart,
   Pie,
   Cell,
   ComposedChart,
@@ -63,290 +58,208 @@ import {
   Funnel,
 } from "recharts"
 
-interface PipelineOpportunity {
-  id: string
-  clientName: string
-  projectName: string
-  stage: "Prequal" | "Proposal" | "Interview" | "Negotiation" | "Closed"
-  value: number
-  probability: number
-  expectedCloseDate: string
-  bdRep: string
-  lastActivity: string
-  weightedValue: number
-}
-
-interface TopClient {
-  name: string
-  totalValue: number
-  activePursuits: number
-  winRate: number
-  avatar: string
-  lastActivity: string
+interface PipelineData {
+  totalActivePursuits: number
+  weightedPipelineValue: number
+  stageDistribution: {
+    stage: string
+    count: number
+    value: number
+    percentage: number
+  }[]
+  topClients: {
+    name: string
+    value: number
+    opportunities: number
+    avatar: string
+  }[]
 }
 
 interface BetaBDPipelineSummaryCardProps {
   className?: string
+  config?: any
   isCompact?: boolean
+  userRole?: string
 }
 
-export function BetaBDPipelineSummaryCard({ className, isCompact = false }: BetaBDPipelineSummaryCardProps) {
+export default function BetaBDPipelineSummaryCard({
+  className,
+  config,
+  isCompact = false,
+  userRole,
+}: BetaBDPipelineSummaryCardProps) {
+  // Scale classes based on isCompact prop for 50% size reduction
+  const compactScale = {
+    iconSize: isCompact ? "h-3 w-3" : "h-5 w-5",
+    iconSizeSmall: isCompact ? "h-2 w-2" : "h-3 w-3",
+    textTitle: isCompact ? "text-sm" : "text-lg",
+    textSmall: isCompact ? "text-[10px]" : "text-xs",
+    textMedium: isCompact ? "text-xs" : "text-sm",
+    padding: isCompact ? "p-1" : "p-2",
+    paddingCard: isCompact ? "pb-1" : "pb-2",
+    gap: isCompact ? "gap-1" : "gap-2",
+    marginTop: isCompact ? "mt-0.5" : "mt-1",
+    chartHeight: isCompact ? "h-32" : "h-48",
+  }
+
   const [activeTab, setActiveTab] = useState("pipeline")
+  const [autoRefresh, setAutoRefresh] = useState(false)
 
+  // Mock Unanet CRM data for pipeline summary
   const pipelineData = useMemo(
-    () => [
-      {
-        id: "1",
-        clientName: "City of Tampa",
-        projectName: "Downtown Infrastructure",
-        stage: "Proposal",
-        value: 45000000,
-        probability: 75,
-        expectedCloseDate: "2025-03-15",
-        bdRep: "M. Alvarez",
-        lastActivity: "2025-01-24",
-        weightedValue: 33750000,
-      },
-      {
-        id: "2",
-        clientName: "Publix Real Estate",
-        projectName: "Corporate Campus",
-        stage: "Interview",
-        value: 68000000,
-        probability: 85,
-        expectedCloseDate: "2025-04-20",
-        bdRep: "D. Chen",
-        lastActivity: "2025-01-21",
-        weightedValue: 57800000,
-      },
-      {
-        id: "3",
-        clientName: "Tampa General Hospital",
-        projectName: "Medical Tower",
-        stage: "Prequal",
-        value: 32000000,
-        probability: 60,
-        expectedCloseDate: "2025-05-10",
-        bdRep: "M. Alvarez",
-        lastActivity: "2025-01-18",
-        weightedValue: 19200000,
-      },
-      {
-        id: "4",
-        clientName: "University of South Florida",
-        projectName: "Research Complex",
-        stage: "Negotiation",
-        value: 55000000,
-        probability: 90,
-        expectedCloseDate: "2025-02-28",
-        bdRep: "D. Chen",
-        lastActivity: "2025-01-15",
-        weightedValue: 49500000,
-      },
-      {
-        id: "5",
-        clientName: "Hillsborough County Schools",
-        projectName: "Elementary School",
-        stage: "Prequal",
-        value: 18000000,
-        probability: 45,
-        expectedCloseDate: "2025-06-15",
-        bdRep: "M. Alvarez",
-        lastActivity: "2025-01-10",
-        weightedValue: 8100000,
-      },
-      {
-        id: "6",
-        clientName: "Tampa International Airport",
-        projectName: "Terminal Expansion",
-        stage: "Proposal",
-        value: 89000000,
-        probability: 80,
-        expectedCloseDate: "2025-03-30",
-        bdRep: "D. Chen",
-        lastActivity: "2025-01-08",
-        weightedValue: 71200000,
-      },
-    ],
+    (): PipelineData => ({
+      totalActivePursuits: 24,
+      weightedPipelineValue: 285000000,
+      stageDistribution: [
+        { stage: "Prequal", count: 8, value: 85000000, percentage: 30 },
+        { stage: "Proposal", count: 12, value: 145000000, percentage: 51 },
+        { stage: "Interview", count: 4, value: 55000000, percentage: 19 },
+      ],
+      topClients: [
+        {
+          name: "City of Tampa",
+          value: 45000000,
+          opportunities: 3,
+          avatar: "TB",
+        },
+        {
+          name: "Publix Real Estate",
+          value: 68000000,
+          opportunities: 2,
+          avatar: "PR",
+        },
+        {
+          name: "Tampa General Hospital",
+          value: 32000000,
+          opportunities: 1,
+          avatar: "TG",
+        },
+      ],
+    }),
     []
   )
 
-  const topClients = useMemo(
-    () => [
-      {
-        name: "City of Tampa",
-        totalValue: 125000000,
-        activePursuits: 4,
-        winRate: 78,
-        avatar: "/avatars/tampa-city.png",
-        lastActivity: "2025-01-24",
-      },
-      {
-        name: "Publix Real Estate",
-        totalValue: 89000000,
-        activePursuits: 3,
-        winRate: 85,
-        avatar: "/avatars/publix.png",
-        lastActivity: "2025-01-21",
-      },
-      {
-        name: "Tampa General Hospital",
-        totalValue: 67000000,
-        activePursuits: 2,
-        winRate: 72,
-        avatar: "/avatars/tgh.png",
-        lastActivity: "2025-01-18",
-      },
-    ],
-    []
-  )
+  // Chart colors
+  const chartColors = {
+    primary: "#3B82F6",
+    secondary: "#10B981",
+    accent: "#8B5CF6",
+    warning: "#F59E0B",
+    danger: "#EF4444",
+    success: "#22C55E",
+  }
 
-  const stageDistribution = useMemo(() => {
-    const stages = pipelineData.reduce((acc, opportunity) => {
-      acc[opportunity.stage] = (acc[opportunity.stage] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
-
-    return Object.entries(stages).map(([stage, count]) => ({
-      stage,
-      count,
-      value: pipelineData.filter((p) => p.stage === stage).reduce((sum, p) => sum + p.value, 0),
-    }))
-  }, [pipelineData])
-
-  const totalActivePursuits = pipelineData.length
-  const totalWeightedValue = pipelineData.reduce((sum, p) => sum + p.weightedValue, 0)
-  const totalPipelineValue = pipelineData.reduce((sum, p) => sum + p.value, 0)
-
-  const formatCurrency = (value: number) => {
-    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`
-    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`
-    return `$${value.toLocaleString()}`
+  // Helper functions
+  const formatCurrency = (amount: number) => {
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
+    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
+    return `$${amount.toLocaleString()}`
   }
 
   const getStageColor = (stage: string) => {
-    const colors = {
-      Prequal: "#f59e0b",
-      Proposal: "#3b82f6",
-      Interview: "#10b981",
-      Negotiation: "#8b5cf6",
-      Closed: "#6b7280",
+    switch (stage) {
+      case "Prequal":
+        return chartColors.primary
+      case "Proposal":
+        return chartColors.success
+      case "Interview":
+        return chartColors.warning
+      default:
+        return chartColors.accent
     }
-    return colors[stage as keyof typeof colors] || "#6b7280"
-  }
-
-  const getProbabilityColor = (probability: number) => {
-    if (probability >= 80) return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-    if (probability >= 60) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-    return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
   }
 
   return (
     <Card
-      className={`bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800 ${className}`}
+      className={`bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border-slate-200 dark:border-slate-800 ${className}`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+          <div className="flex items-center gap-2">
+            <BarChart3 className={`${compactScale.iconSize} text-blue-600`} />
+            <CardTitle className={`${compactScale.textTitle} font-semibold text-slate-900 dark:text-slate-100`}>
               BD Pipeline Summary
             </CardTitle>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              Business Development opportunity pipeline overview
-            </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge
-              variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800"
-            >
-              <Database className="h-3 w-3 mr-1" />
-              Updated via Unanet CRM
-            </Badge>
-          </div>
+          <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+            Updated via Unanet CRM
+          </Badge>
         </div>
+        <CardDescription className="text-slate-600 dark:text-slate-400">
+          Business Development opportunity pipeline overview
+        </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-4">
         {/* Key Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{totalActivePursuits}</div>
-            <div className="text-xs text-blue-700 dark:text-blue-300">Active Pursuits</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {formatCurrency(totalWeightedValue)}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <div className={`${compactScale.textTitle} font-bold text-blue-600`}>
+              {pipelineData.totalActivePursuits}
             </div>
-            <div className="text-xs text-blue-700 dark:text-blue-300">Weighted Value</div>
+            <div className={`${compactScale.textSmall} text-slate-600 dark:text-slate-400`}>Active Pursuits</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {formatCurrency(totalPipelineValue)}
+          <div className="text-center p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <div className={`${compactScale.textTitle} font-bold text-green-600`}>
+              {formatCurrency(pipelineData.weightedPipelineValue)}
             </div>
-            <div className="text-xs text-blue-700 dark:text-blue-300">Total Pipeline</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {Math.round((totalWeightedValue / totalPipelineValue) * 100)}%
-            </div>
-            <div className="text-xs text-blue-700 dark:text-blue-300">Win Probability</div>
+            <div className={`${compactScale.textSmall} text-slate-600 dark:text-slate-400`}>Pipeline Value</div>
           </div>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-blue-100 dark:bg-blue-900">
-            <TabsTrigger value="pipeline" className="text-blue-900 dark:text-blue-100">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="pipeline" className="text-xs">
               Pipeline
             </TabsTrigger>
-            <TabsTrigger value="clients" className="text-blue-900 dark:text-blue-100">
+            <TabsTrigger value="clients" className="text-xs">
               Client Breakdown
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pipeline" className="space-y-4">
             {/* Stage Distribution Chart */}
-            <div className="h-48">
+            <div className={`${compactScale.chartHeight} w-full`}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stageDistribution} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="stage" type="category" width={80} />
-
-                  <Bar dataKey="value" fill="#3b82f6" />
+                <BarChart data={pipelineData.stageDistribution} layout="horizontal">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                  <XAxis type="number" stroke="#64748B" fontSize={compactScale.textSmall} />
+                  <YAxis dataKey="stage" type="category" stroke="#64748B" fontSize={compactScale.textSmall} />
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "white",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "8px",
+                      fontSize: compactScale.textSmall,
+                    }}
+                    formatter={(value, name) => [formatCurrency(value as number), "Value"]}
+                  />
+                  <Bar dataKey="value" fill={chartColors.primary} radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Pipeline Opportunities List */}
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {pipelineData.slice(0, 4).map((opportunity) => (
+            {/* Stage Distribution List */}
+            <div className="space-y-2">
+              {pipelineData.stageDistribution.map((stage) => (
                 <div
-                  key={opportunity.id}
-                  className="flex items-center justify-between p-2 bg-white dark:bg-blue-900/20 rounded-lg"
+                  key={stage.stage}
+                  className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
                 >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: getStageColor(opportunity.stage) }}
-                    ></div>
-                    <div>
-                      <div className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                        {opportunity.clientName}
-                      </div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400">{opportunity.projectName}</div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getStageColor(stage.stage) }} />
+                    <span className={`${compactScale.textMedium} font-medium text-slate-900 dark:text-slate-100`}>
+                      {stage.stage}
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                        {formatCurrency(opportunity.value)}
-                      </div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400">{opportunity.stage}</div>
+                  <div className="text-right">
+                    <div className={`${compactScale.textMedium} font-medium text-slate-900 dark:text-slate-100`}>
+                      {formatCurrency(stage.value)}
                     </div>
-                    <Badge className={`text-xs ${getProbabilityColor(opportunity.probability)}`}>
-                      {opportunity.probability}%
-                    </Badge>
+                    <div className={`${compactScale.textSmall} text-slate-500 dark:text-slate-400`}>
+                      {stage.count} pursuits ({stage.percentage}%)
+                    </div>
                   </div>
                 </div>
               ))}
@@ -354,57 +267,75 @@ export function BetaBDPipelineSummaryCard({ className, isCompact = false }: Beta
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-4">
-            {/* Top Clients */}
+            {/* Top Clients List */}
             <div className="space-y-3">
-              {topClients.map((client, index) => (
+              {pipelineData.topClients.map((client, index) => (
                 <div
                   key={client.name}
-                  className="flex items-center justify-between p-3 bg-white dark:bg-blue-900/20 rounded-lg"
+                  className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
                 >
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={client.avatar} />
-                      <AvatarFallback className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        {client.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm`}
+                      style={{ backgroundColor: Object.values(chartColors)[index % Object.values(chartColors).length] }}
+                    >
+                      {client.avatar}
+                    </div>
                     <div>
-                      <div className="text-sm font-medium text-blue-800 dark:text-blue-200">{client.name}</div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400">
-                        {client.activePursuits} active pursuits
+                      <div className={`${compactScale.textMedium} font-medium text-slate-900 dark:text-slate-100`}>
+                        {client.name}
+                      </div>
+                      <div className={`${compactScale.textSmall} text-slate-500 dark:text-slate-400`}>
+                        {client.opportunities} opportunities
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                      {formatCurrency(client.totalValue)}
+                    <div className={`${compactScale.textMedium} font-medium text-slate-900 dark:text-slate-100`}>
+                      {formatCurrency(client.value)}
                     </div>
-                    <div className="text-xs text-blue-600 dark:text-blue-400">{client.winRate}% win rate</div>
+                    <div className={`${compactScale.textSmall} text-slate-500 dark:text-slate-400`}>Pipeline Value</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Client Performance Summary */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-white dark:bg-blue-900/20 rounded-lg">
-                <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-                  {topClients.reduce((sum, c) => sum + c.activePursuits, 0)}
-                </div>
-                <div className="text-xs text-blue-700 dark:text-blue-300">Total Pursuits</div>
+            {/* Client Summary */}
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className={`${compactScale.iconSizeSmall} text-blue-600`} />
+                <span className={`${compactScale.textMedium} font-medium text-slate-900 dark:text-slate-100`}>
+                  Client Summary
+                </span>
               </div>
-              <div className="text-center p-3 bg-white dark:bg-blue-900/20 rounded-lg">
-                <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-                  {Math.round(topClients.reduce((sum, c) => sum + c.winRate, 0) / topClients.length)}%
-                </div>
-                <div className="text-xs text-blue-700 dark:text-blue-300">Avg Win Rate</div>
+              <div className={`${compactScale.textSmall} text-slate-600 dark:text-slate-400`}>
+                Top 3 clients represent{" "}
+                {(
+                  (pipelineData.topClients.reduce((sum, client) => sum + client.value, 0) /
+                    pipelineData.weightedPipelineValue) *
+                  100
+                ).toFixed(0)}
+                % of total pipeline value
               </div>
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Auto-refresh toggle */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2">
+            <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh} className="scale-75" />
+            <Label className={`${compactScale.textSmall} text-slate-600 dark:text-slate-400`}>Auto-refresh</Label>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`${compactScale.textSmall} text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100`}
+          >
+            <RefreshCw className={`${compactScale.iconSizeSmall} mr-1`} />
+            Refresh
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
