@@ -51,6 +51,15 @@ import BetaPipelineAnalytics from "../../../components/cards/beta/BetaPipelineAn
 import BetaBDOpportunities from "../../../components/cards/beta/BetaBDOpportunities"
 import BetaFinancialOverview from "../../../components/cards/beta/BetaFinancialOverview"
 import BetaMarketIntelligence from "../../../components/cards/beta/BetaMarketIntelligence"
+import BetaBuildingMaterialsIndexCard from "../../../components/cards/beta/BetaBuildingMaterialsIndexCard"
+import BetaPublicSectorConstructionCard from "../../../components/cards/beta/BetaPublicSectorConstructionCard"
+import BetaLuxuryRealEstateInsightsCard from "../../../components/cards/beta/BetaLuxuryRealEstateInsightsCard"
+import BetaMacroFinancialIndicatorsCard from "../../../components/cards/beta/BetaMacroFinancialIndicatorsCard"
+import BetaFloridaMultifamilyRealEstateCard from "../../../components/cards/beta/BetaFloridaMultifamilyRealEstateCard"
+import BetaFloridaMultifamilyConstructionCard from "../../../components/cards/beta/BetaFloridaMultifamilyConstructionCard"
+import BetaSoutheastIndustrialRealEstateCard from "../../../components/cards/beta/BetaSoutheastIndustrialRealEstateCard"
+import BetaCommercialConstructionTrendsCard from "../../../components/cards/market-intel/BetaCommercialConstructionTrendsCard"
+import BetaMarketIntelNewsFeedCard from "../../../components/cards/beta/BetaMarketIntelNewsFeedCard"
 import PowerBIDashboardCard from "../../../components/cards/PowerBIDashboardCard"
 import { CustomBarChart } from "../../../components/charts/BarChart"
 import { CustomLineChart } from "../../../components/charts/LineChart"
@@ -353,62 +362,70 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         case "hr-overview":
           return (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="columns-1 lg:columns-2 xl:columns-3 gap-6">
                 {/* Placeholder HR Overview Cards */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">Employee Count</CardTitle>
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">247</div>
-                    <p className="text-xs text-muted-foreground">Active employees</p>
-                  </CardContent>
-                </Card>
+                <div className="break-inside-avoid mb-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-sm font-medium">Employee Count</CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">247</div>
+                      <p className="text-xs text-muted-foreground">Active employees</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">Payroll Status</CardTitle>
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">Complete</div>
-                    <p className="text-xs text-muted-foreground">Last processed: Today</p>
-                  </CardContent>
-                </Card>
+                <div className="break-inside-avoid mb-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-sm font-medium">Payroll Status</CardTitle>
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">Complete</div>
+                      <p className="text-xs text-muted-foreground">Last processed: Today</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">Benefits</CardTitle>
-                      <UserCheck className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">98%</div>
-                    <p className="text-xs text-muted-foreground">Enrollment rate</p>
-                  </CardContent>
-                </Card>
+                <div className="break-inside-avoid mb-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-sm font-medium">Benefits</CardTitle>
+                        <UserCheck className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">98%</div>
+                      <p className="text-xs text-muted-foreground">Enrollment rate</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="break-inside-avoid mb-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>HR Overview Dashboard</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-8">
+                        <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">HR & Payroll Management</h3>
+                        <p className="text-muted-foreground">
+                          Welcome to the HR & Payroll Manager dashboard. Content will be implemented in future updates.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>HR Overview Dashboard</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">HR & Payroll Management</h3>
-                    <p className="text-muted-foreground">
-                      Welcome to the HR & Payroll Manager dashboard. Content will be implemented in future updates.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )
 
@@ -1002,9 +1019,13 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
       case "action-items":
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
-            <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
+          <div className="columns-1 gap-6">
+            <div className="break-inside-avoid mb-6">
+              <ActionItemsInbox userRole={userRole as "project-executive" | "project-manager"} />
+            </div>
+            <div className="break-inside-avoid mb-6">
+              <ActionItemsToDo userRole={userRole as "project-executive" | "project-manager"} />
+            </div>
           </div>
         )
 
@@ -1403,341 +1424,162 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
 
             {/* Dashboard Content */}
             <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "space-y-6 p-6"}>
-              {/* Market Intelligence Cards Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {/* Activity Trends Card */}
-                <ActivityTrendsCard
-                  userRole={userRole}
-                  className="h-[400px]"
-                  title="Market Activity Trends"
-                  description="Florida commercial construction market trends and forecasting"
-                  data={[
-                    { period: "Jan", value: 85 },
-                    { period: "Feb", value: 92 },
-                    { period: "Mar", value: 78 },
-                    { period: "Apr", value: 96 },
-                    { period: "May", value: 103 },
-                    { period: "Jun", value: 118 },
-                  ]}
-                  config={{
-                    chartType: "line",
-                    showRealTime: true,
-                    trendIndicator: true,
-                    showHBISummary: true,
-                    primaryColor: "#0021A5",
-                  }}
-                  hbiSummary={{
-                    insight:
-                      "28% growth in commercial activity over the past 6 months, driven by luxury multifamily projects",
-                    confidence: 91,
-                    trend: "up",
-                    recommendation: "Increase capacity allocation for luxury multifamily segments",
-                    keyFactors: ["Developer sentiment", "Interest rate stability", "Regional population growth"],
-                    dataQuality: 94,
-                  }}
-                />
+              {/* Market Intelligence Cards - True Masonry Layout */}
+              <div className="columns-1 lg:columns-2 xl:columns-3 gap-6 space-y-6">
+                {/* Market Intelligence News Feed Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMarketIntelNewsFeedCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-                {/* Estimating Progress Card */}
-                <EstimatingProgressCard
-                  userRole={userRole}
-                  className="h-[400px]"
-                  title="Market Intelligence Metrics"
-                  description="Key performance indicators and market insights"
-                  data={{
-                    metrics: [
-                      { label: "Market Size", value: "$459B", format: "text", trend: "up", change: 8.5 },
-                      { label: "Growth Rate", value: 28, format: "percentage", trend: "up", change: 12.3 },
-                      { label: "Confidence Level", value: 91.5, format: "percentage", trend: "stable" },
-                      { label: "Data Sources", value: "127+", format: "text", trend: "up" },
-                    ],
-                    progressData: [
-                      { category: "Southeast FL", value: 85, target: 90, color: "#0021A5" },
-                      { category: "Southwest FL", value: 72, target: 80, color: "#FA4616" },
-                      { category: "Central FL", value: 68, target: 75, color: "#2563eb" },
-                      { category: "North FL", value: 45, target: 60, color: "#64748b" },
-                    ],
-                  }}
-                  config={{
-                    showRealTime: true,
-                    showDistribution: true,
-                    showProgress: true,
-                    showHBISummary: true,
-                    primaryColor: "#0021A5",
-                  }}
-                  hbiSummary={{
-                    insight: "Florida commercial market shows strong fundamentals with Southeast region leading growth",
-                    confidence: 88,
-                    trend: "up",
-                    recommendation: "Focus investment in Southeast FL luxury multifamily projects",
-                    keyMetrics: ["Market penetration", "Regional diversity", "Growth velocity"],
-                    dataQuality: 92,
-                  }}
-                />
+                {/* Commercial Construction Trends Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaCommercialConstructionTrendsCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-                {/* Power BI Embed Card - Bar Chart */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[400px]"
-                  title="Market Intelligence Dashboard"
-                  description="Interactive Power BI report with real-time market data"
-                  reportId="market-intelligence-overview"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { category: "Luxury Multifamily", value: 45, trend: 12, volume: 285 },
-                    { category: "Commercial Office", value: 28, trend: -3, volume: 178 },
-                    { category: "Mixed Use", value: 18, trend: 8, volume: 95 },
-                    { category: "Hospitality", value: 9, trend: 15, volume: 52 },
-                    { category: "Industrial", value: 12, trend: 6, volume: 73 },
-                    { category: "Retail", value: 8, trend: -1, volume: 41 },
-                  ]}
-                  config={{
-                    chartType: "bar",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "Luxury multifamily segment driving 67% of new project volume in Florida market",
-                    confidence: 94,
-                    trend: "up",
-                    recommendation: "Prioritize luxury multifamily project pipeline development",
-                    keyFindings: ["Regional concentration", "Price point trends", "Developer activity"],
-                    dataQuality: 96,
-                  }}
-                />
-              </div>
+                {/* Building Materials Index Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaBuildingMaterialsIndexCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-              {/* Power BI Chart Variety Showcase */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {/* Line Chart - Performance Trends */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Performance Trends"
-                  description="Monthly performance metrics and KPI tracking"
-                  reportId="performance-trends"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { month: "Jan", revenue: 125, projects: 8, efficiency: 92 },
-                    { month: "Feb", revenue: 142, projects: 11, efficiency: 89 },
-                    { month: "Mar", revenue: 158, projects: 13, efficiency: 94 },
-                    { month: "Apr", revenue: 176, projects: 15, efficiency: 96 },
-                    { month: "May", revenue: 195, projects: 18, efficiency: 91 },
-                    { month: "Jun", revenue: 218, projects: 22, efficiency: 98 },
-                  ]}
-                  config={{
-                    chartType: "line",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "Consistent upward trend in revenue and project volume with efficiency optimization",
-                    confidence: 89,
-                    trend: "up",
-                    keyFindings: ["Revenue growth", "Project scaling", "Efficiency gains"],
-                    dataQuality: 93,
-                  }}
-                />
+                {/* Public Sector Construction Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaPublicSectorConstructionCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-                {/* Area Chart - Regional Growth */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Regional Growth Analysis"
-                  description="Market expansion across Florida regions"
-                  reportId="regional-growth"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { region: "Southeast FL", q1: 45, q2: 52, q3: 58, q4: 63 },
-                    { region: "Southwest FL", q1: 32, q2: 38, q3: 41, q4: 47 },
-                    { region: "Central FL", q1: 28, q2: 31, q3: 35, q4: 39 },
-                    { region: "North FL", q1: 18, q2: 22, q3: 26, q4: 29 },
-                  ]}
-                  config={{
-                    chartType: "area",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    gradientColors: ["#0021A5", "#FA4616"],
-                  }}
-                  aiSummary={{
-                    insight: "Southeast Florida leads growth with 40% year-over-year increase",
-                    confidence: 91,
-                    trend: "up",
-                    keyFindings: ["Regional dominance", "Consistent growth", "Market penetration"],
-                    dataQuality: 95,
-                  }}
-                />
+                {/* Luxury Real Estate Insights Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaLuxuryRealEstateInsightsCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-                {/* Composed Chart - Financial Metrics */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Financial Performance"
-                  description="Combined revenue, profit margin, and project metrics"
-                  reportId="financial-performance"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { month: "Jan", revenue: 125, margin: 15, projects: 8 },
-                    { month: "Feb", revenue: 142, margin: 18, projects: 11 },
-                    { month: "Mar", revenue: 158, margin: 16, projects: 13 },
-                    { month: "Apr", revenue: 176, margin: 20, projects: 15 },
-                    { month: "May", revenue: 195, margin: 22, projects: 18 },
-                    { month: "Jun", revenue: 218, margin: 24, projects: 22 },
-                  ]}
-                  config={{
-                    chartType: "composed",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "Strong correlation between project volume and profit margin improvement",
-                    confidence: 87,
-                    trend: "up",
-                    keyFindings: ["Profit optimization", "Scale benefits", "Operational efficiency"],
-                    dataQuality: 92,
-                  }}
-                />
-              </div>
+                {/* Macro Financial Indicators Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMacroFinancialIndicatorsCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-              {/* Advanced Power BI Visualizations */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Radar Chart - Performance Metrics */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Performance Radar"
-                  description="Multi-dimensional performance analysis across key metrics"
-                  reportId="performance-radar"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { metric: "Quality", value: 88, fullMark: 100 },
-                    { metric: "Schedule", value: 92, fullMark: 100 },
-                    { metric: "Budget", value: 85, fullMark: 100 },
-                    { metric: "Safety", value: 96, fullMark: 100 },
-                    { metric: "Client Satisfaction", value: 90, fullMark: 100 },
-                    { metric: "Team Efficiency", value: 87, fullMark: 100 },
-                  ]}
-                  config={{
-                    chartType: "radar",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "Safety leads performance metrics at 96%, with schedule adherence close behind at 92%",
-                    confidence: 88,
-                    trend: "stable",
-                    keyFindings: ["Safety excellence", "Strong scheduling", "Budget optimization needed"],
-                    dataQuality: 91,
-                  }}
-                />
+                {/* Florida Multifamily Real Estate Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
 
-                {/* Funnel Chart - Project Pipeline */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Project Pipeline Funnel"
-                  description="Lead-to-project conversion analysis and pipeline health"
-                  reportId="pipeline-funnel"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { stage: "Initial Leads", value: 450, conversion: 100 },
-                    { stage: "Qualified Prospects", value: 285, conversion: 63 },
-                    { stage: "Proposal Stage", value: 156, conversion: 35 },
-                    { stage: "Negotiation", value: 78, conversion: 17 },
-                    { stage: "Contract Awarded", value: 34, conversion: 8 },
-                    { stage: "Project Started", value: 32, conversion: 7 },
-                  ]}
-                  config={{
-                    chartType: "funnel",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "8% lead-to-contract conversion rate indicates strong qualification process",
-                    confidence: 90,
-                    trend: "up",
-                    keyFindings: ["Efficient filtering", "High close rate", "Pipeline health"],
-                    dataQuality: 94,
-                  }}
-                />
+                {/* Florida Multifamily Construction Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyConstructionCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Southeast Industrial Real Estate Card */}
+                <div className="break-inside-avoid mb-4">
+                  <BetaSoutheastIndustrialRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Additional Market Intelligence Content */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div className="columns-1 gap-6">
                 {/* Market Forecast Trends */}
-                <ActivityTrendsCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Market Forecast Trends"
-                  description="3-month forward-looking market projections"
-                  data={[
-                    { period: "Jul", value: 125 },
-                    { period: "Aug", value: 132 },
-                    { period: "Sep", value: 128 },
-                  ]}
-                  config={{
-                    chartType: "area",
-                    showRealTime: true,
-                    gradientColors: ["#0021A5", "#FA4616"],
-                    enableHBIForecast: true,
-                  }}
-                  hbiSummary={{
-                    insight:
-                      "Forecasted 15% growth in Q3 driven by seasonal construction activity and project launches",
-                    confidence: 85,
-                    trend: "up",
-                    keyFactors: ["Seasonal patterns", "Project pipeline", "Economic indicators"],
-                    dataQuality: 89,
-                  }}
-                />
+                <div className="break-inside-avoid mb-6">
+                  <ActivityTrendsCard
+                    userRole={userRole}
+                    title="Market Forecast Trends"
+                    description="3-month forward-looking market projections"
+                    data={[
+                      { period: "Jul", value: 125 },
+                      { period: "Aug", value: 132 },
+                      { period: "Sep", value: 128 },
+                    ]}
+                    config={{
+                      chartType: "area",
+                      showRealTime: true,
+                      gradientColors: ["#0021A5", "#FA4616"],
+                      enableHBIForecast: true,
+                    }}
+                    hbiSummary={{
+                      insight:
+                        "Forecasted 15% growth in Q3 driven by seasonal construction activity and project launches",
+                      confidence: 85,
+                      trend: "up",
+                      keyFactors: ["Seasonal patterns", "Project pipeline", "Economic indicators"],
+                      dataQuality: 89,
+                    }}
+                  />
+                </div>
 
                 {/* Competitive Analysis - Pie Chart */}
-                <PowerBIEmbedCard
-                  userRole={userRole}
-                  className="h-[350px]"
-                  title="Competitive Positioning"
-                  description="Market share and competitive analysis dashboard"
-                  reportId="competitive-analysis"
-                  workspaceId="hb-market-intel"
-                  data={[
-                    { name: "HB Construction", value: 23, growth: 18, color: "#0021A5" },
-                    { name: "Turner Construction", value: 19, growth: 8, color: "#FA4616" },
-                    { name: "Skanska USA", value: 15, growth: -2, color: "#2563eb" },
-                    { name: "Balfour Beatty", value: 12, growth: 5, color: "#7c3aed" },
-                    { name: "PCL Construction", value: 10, growth: 3, color: "#059669" },
-                    { name: "Other Competitors", value: 21, growth: 1, color: "#64748b" },
-                  ]}
-                  config={{
-                    chartType: "pie",
-                    showRealTime: true,
-                    showPowerBIBadge: true,
-                    showExternalLink: true,
-                    primaryColor: "#0021A5",
-                    secondaryColor: "#FA4616",
-                  }}
-                  aiSummary={{
-                    insight: "HB Construction maintains market leadership with 23% share and highest growth rate",
-                    confidence: 92,
-                    trend: "up",
-                    keyFindings: ["Market dominance", "Growth trajectory", "Competitive advantage"],
-                    dataQuality: 94,
-                  }}
-                />
+                <div className="break-inside-avoid mb-6">
+                  <PowerBIEmbedCard
+                    userRole={userRole}
+                    title="Competitive Positioning"
+                    description="Market share and competitive analysis dashboard"
+                    reportId="competitive-analysis"
+                    workspaceId="hb-market-intel"
+                    data={[
+                      { name: "HB Construction", value: 23, growth: 18, color: "#0021A5" },
+                      { name: "Turner Construction", value: 19, growth: 8, color: "#FA4616" },
+                      { name: "Skanska USA", value: 15, growth: -2, color: "#2563eb" },
+                      { name: "Balfour Beatty", value: 12, growth: 5, color: "#7c3aed" },
+                      { name: "PCL Construction", value: 10, growth: 3, color: "#059669" },
+                      { name: "Other Competitors", value: 21, growth: 1, color: "#64748b" },
+                    ]}
+                    config={{
+                      chartType: "pie",
+                      showRealTime: true,
+                      showPowerBIBadge: true,
+                      showExternalLink: true,
+                      primaryColor: "#0021A5",
+                      secondaryColor: "#FA4616",
+                    }}
+                    aiSummary={{
+                      insight: "HB Construction maintains market leadership with 23% share and highest growth rate",
+                      confidence: 92,
+                      trend: "up",
+                      keyFindings: ["Market dominance", "Growth trajectory", "Competitive advantage"],
+                      dataQuality: 94,
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

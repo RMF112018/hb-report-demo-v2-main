@@ -520,6 +520,28 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
   const [currentMockSequence, setCurrentMockSequence] = useState<{ question: string; answer: string }[]>([])
   const [mockSequenceIndex, setMockSequenceIndex] = useState(0)
 
+  // HBI Demo Modal States
+  const [showHBIDemoModal, setShowHBIDemoModal] = useState(false)
+  const [demoAnalysisStep, setDemoAnalysisStep] = useState(0)
+  const [isDemoAnalyzing, setIsDemoAnalyzing] = useState(false)
+  const [showFindings, setShowFindings] = useState(false)
+  const [correctionStep, setCorrectionStep] = useState(0)
+  const [isCorrections, setIsCorrections] = useState(false)
+  const [correctedFindings, setCorrectedFindings] = useState<boolean[]>([false, false, false])
+  const [isReanalyzing, setIsReanalyzing] = useState(false)
+  const [showConfidenceScore, setShowConfidenceScore] = useState(false)
+  const [confidenceScore, setConfidenceScore] = useState(0)
+  const [showSubmissionPrompt, setShowSubmissionPrompt] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionComplete, setSubmissionComplete] = useState(false)
+
+  // Post-submission states
+  const [forecastSubmitted, setForecastSubmitted] = useState(false)
+  const [submissionTime, setSubmissionTime] = useState<Date | null>(null)
+
+  // Animation timeout refs for cleanup
+  const animationTimeouts = useRef<NodeJS.Timeout[]>([])
+
   // Chat container ref for auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
@@ -1484,6 +1506,182 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
     return modes
   }
 
+  // HBI Demo Modal Functions
+  const startHBIDemoWorkflow = () => {
+    setShowHBIDemoModal(true)
+    setDemoAnalysisStep(0)
+    setIsDemoAnalyzing(true)
+
+    // Start the animated workflow
+    simulateDemoAnalysisSteps()
+  }
+
+  const simulateDemoAnalysisSteps = async () => {
+    const steps = [
+      "Analyzing forecast methodology and historical accuracy...",
+      "Checking for unaccounted commitments and payment application alignment...",
+      "Cross-referencing schedule, change events, and cost code volatility...",
+      "Evaluating forecast confidence and risk scoring...",
+    ]
+
+    for (let i = 0; i < steps.length; i++) {
+      setDemoAnalysisStep(i)
+      await new Promise((resolve) => setTimeout(resolve, 2500)) // 2.5 seconds per step
+    }
+
+    setIsDemoAnalyzing(false)
+    setDemoAnalysisStep(steps.length) // Complete state
+
+    // Show findings after a brief delay
+    const timeout = setTimeout(() => {
+      setShowFindings(true)
+    }, 1000)
+    animationTimeouts.current.push(timeout)
+  }
+
+  const resetHBIDemoModal = () => {
+    // Clear any ongoing timeouts
+    animationTimeouts.current.forEach((timeout) => clearTimeout(timeout))
+    animationTimeouts.current = []
+
+    // Reset all modal states
+    setShowHBIDemoModal(false)
+    setDemoAnalysisStep(0)
+    setIsDemoAnalyzing(false)
+    setShowFindings(false)
+    setCorrectionStep(0)
+    setIsCorrections(false)
+    setCorrectedFindings([false, false, false])
+    setIsReanalyzing(false)
+    setShowConfidenceScore(false)
+    setConfidenceScore(0)
+    setShowSubmissionPrompt(false)
+    setIsSubmitting(false)
+    setSubmissionComplete(false)
+    setForecastSubmitted(false)
+    setSubmissionTime(null)
+  }
+
+  const startSecondReview = async () => {
+    setIsReanalyzing(true)
+
+    // Simulate reanalysis process
+    await new Promise((resolve) => setTimeout(resolve, 3000)) // 3 seconds for reanalysis
+
+    setIsReanalyzing(false)
+    setShowConfidenceScore(true)
+
+    // Animate confidence score counting up
+    animateConfidenceScore()
+
+    // Show submission prompt after confidence score animation
+    const timeout = setTimeout(() => {
+      setShowSubmissionPrompt(true)
+    }, 2000)
+    animationTimeouts.current.push(timeout)
+  }
+
+  const animateConfidenceScore = () => {
+    let current = 0
+    const target = 91
+    const increment = 2
+    const interval = setInterval(() => {
+      current += increment
+      if (current >= target) {
+        current = target
+        clearInterval(interval)
+      }
+      setConfidenceScore(current)
+    }, 50) // Update every 50ms for smooth animation
+  }
+
+  const handleSubmission = async () => {
+    setIsSubmitting(true)
+
+    // Simulate submission process
+    await new Promise((resolve) => setTimeout(resolve, 3000)) // 3 seconds for submission
+
+    setIsSubmitting(false)
+    setSubmissionComplete(true)
+
+    // Set submission time and flag
+    const now = new Date()
+    setSubmissionTime(now)
+
+    // Auto-close modal after showing completion for 2 seconds
+    const timeout = setTimeout(() => {
+      setForecastSubmitted(true)
+      setShowHBIDemoModal(false)
+    }, 2000)
+    animationTimeouts.current.push(timeout)
+  }
+
+  const startCorrections = () => {
+    setIsCorrections(true)
+    setCorrectionStep(0)
+    simulateCorrections()
+  }
+
+  const simulateCorrections = async () => {
+    for (let i = 0; i < 3; i++) {
+      setCorrectionStep(i)
+      await new Promise((resolve) => setTimeout(resolve, 2500)) // 2.5 seconds per correction action
+
+      // Mark this finding as corrected
+      setCorrectedFindings((prev) => {
+        const updated = [...prev]
+        updated[i] = true
+        return updated
+      })
+
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // Longer pause to show completion animation
+    }
+    setCorrectionStep(3) // All corrections complete
+
+    // Start second HBI review after brief delay
+    const timeout = setTimeout(() => {
+      startSecondReview()
+    }, 2000)
+    animationTimeouts.current.push(timeout)
+  }
+
+  const getFindingsData = () => [
+    {
+      id: 1,
+      icon: "🔍",
+      title: "Forecast Inconsistency",
+      status: "High Priority",
+      message:
+        "Forecasted cost for 15-02-227, Waste Material Disposal, exceeds historical trends for similar projects at this stage by 47%.",
+      reason: "No linked Change Event or scope shift documented.",
+      guidance: "Ensure variances above 20% are supported by a change log or scope document.",
+      statusColor: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      userAction: "Updating April forecast value to reflect 18% increase instead of 47%",
+    },
+    {
+      id: 2,
+      icon: "👥",
+      title: "Staffing Forecast Inconsistency",
+      status: "Medium Priority",
+      message: "Labor forecast misaligned with current staffing plan by 23%.",
+      reason: "Projected crew size exceeds approved staffing allocation.",
+      guidance: "Align field supervision forecast with approved staffing plan.",
+      statusColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      userAction: "Adjusting labor forecast to match approved staffing allocation",
+    },
+    {
+      id: 3,
+      icon: "📉",
+      title: "Schedule Misalignment",
+      status: "Medium Priority",
+      message: "Forecast duration does not align with current schedule milestone for phase closeout.",
+      reason: "Forecast shows work extending 3 weeks beyond the phase deadline.",
+      guidance: "Cross-check with latest schedule to ensure your forecast duration matches phase logic.",
+      statusColor: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+      userAction: "Adjusting forecast end date to align with project milestone",
+    },
+  ]
+
   // Inline editing component
   const InlineEdit = ({
     value,
@@ -1723,6 +1921,44 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
 
   return (
     <div className="space-y-6 w-full min-w-0 max-w-full overflow-hidden" style={{ width: "100%", maxWidth: "100%" }}>
+      {/* Post-Submission Banner */}
+      {forecastSubmitted && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <Send className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">
+                  Forecast submitted. Awaiting PX Review.
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Rachel Martinez will review your forecast and provide feedback.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled className="opacity-50">
+                Revision Request
+              </Button>
+              <Button variant="outline" size="sm" disabled className="opacity-50">
+                PX Comments
+              </Button>
+              <Button
+                onClick={resetHBIDemoModal}
+                variant="outline"
+                size="sm"
+                className="text-gray-600 dark:text-gray-400"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Reset Demo
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Table Selection with Controls */}
       <div className="flex items-center justify-between">
         <div className="flex-1">
@@ -1741,12 +1977,34 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
         </div>
 
         <div className="flex items-center gap-4">
+          {forecastSubmitted && submissionTime && (
+            <div className="bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                Submitted {submissionTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
+          )}
           <Button
             onClick={startHBIReview}
-            className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white"
+            disabled={forecastSubmitted}
+            className={`${
+              forecastSubmitted
+                ? "opacity-50 cursor-not-allowed"
+                : "bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+            } text-white`}
           >
             <Brain className="h-4 w-4 mr-2" />
             HBI Review
+          </Button>
+          <Button
+            onClick={startHBIDemoWorkflow}
+            disabled={forecastSubmitted}
+            style={{ backgroundColor: forecastSubmitted ? undefined : "rgb(250, 70, 22)" }}
+            className={`${forecastSubmitted ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"} text-white`}
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Review & Submit
           </Button>
         </div>
       </div>
@@ -2632,6 +2890,442 @@ export default function Forecasting({ userRole, projectData }: ForecastingProps)
                 </div>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* HBI Demo Modal */}
+      <Dialog
+        open={showHBIDemoModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            resetHBIDemoModal()
+          } else {
+            setShowHBIDemoModal(open)
+          }
+        }}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">HBI Intelligent Review</h2>
+              <div className="bg-violet-100 dark:bg-violet-900 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium text-violet-700 dark:text-violet-300">Powered by HBI</span>
+              </div>
+            </div>
+
+            {isDemoAnalyzing ? (
+              <div className="space-y-4">
+                {/* Progress Steps */}
+                <div className="space-y-3">
+                  {[
+                    "Analyzing forecast methodology and historical accuracy...",
+                    "Checking for unaccounted commitments and payment application alignment...",
+                    "Cross-referencing schedule, change events, and cost code volatility...",
+                    "Evaluating forecast confidence and risk scoring...",
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                          index < demoAnalysisStep
+                            ? "bg-green-500"
+                            : index === demoAnalysisStep
+                            ? "bg-blue-500 animate-pulse"
+                            : "bg-gray-300 dark:bg-gray-600"
+                        }`}
+                      >
+                        {index < demoAnalysisStep ? (
+                          <CheckCircle className="h-4 w-4 text-white" />
+                        ) : index === demoAnalysisStep ? (
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                        ) : (
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              index === demoAnalysisStep ? "bg-white animate-pulse" : "bg-gray-400"
+                            }`}
+                          />
+                        )}
+                      </div>
+                      <div
+                        className={`text-xs ${
+                          index <= demoAnalysisStep
+                            ? "text-gray-900 dark:text-gray-100 font-medium"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {step}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Rotating Progress Indicator */}
+                <div className="flex justify-center py-2">
+                  <div className="relative">
+                    <div className="w-8 h-8 border-3 border-blue-200 dark:border-blue-800 rounded-full animate-spin border-t-blue-600 dark:border-t-blue-400"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Brain className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Processing step {demoAnalysisStep + 1} of 4...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {!showFindings ? (
+                  <div className="space-y-6">
+                    {/* Initial Completion State */}
+                    <div className="text-center space-y-4">
+                      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                        <CheckCircle className="h-10 w-10 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Review Complete</h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        HBI has successfully analyzed your forecast data...
+                      </p>
+                    </div>
+
+                    {/* Loading Findings */}
+                    <div className="flex justify-center">
+                      <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                        <div className="w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 rounded-full animate-spin"></div>
+                        <span className="text-sm">Identifying potential improvements...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Findings Header */}
+                    <div className="text-center space-y-2">
+                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mx-auto">
+                        <AlertTriangle className="h-4 w-4 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Issues Identified</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        HBI found 3 areas that need attention before submission
+                      </p>
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 mx-auto max-w-md">
+                        <p className="text-xs font-medium text-red-800 dark:text-red-200">
+                          💰 Potential Impact: $847,000 in forecast inaccuracies detected
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-400">
+                          These issues could lead to budget overruns and timeline delays if not addressed
+                        </p>
+                      </div>
+                    </div>
+
+                    {!isCorrections ? (
+                      <div className="space-y-3">
+                        {/* Findings List */}
+                        {getFindingsData().map((finding, index) => (
+                          <div
+                            key={finding.id}
+                            className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-start space-x-2">
+                              <div className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm">
+                                {finding.icon}
+                              </div>
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {finding.title}
+                                  </h4>
+                                  <span className={`px-2 py-1 rounded text-xs font-medium ${finding.statusColor}`}>
+                                    {finding.status}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-600 dark:text-gray-400">{finding.message}</p>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 border-l-3 border-blue-500 p-2 rounded-r">
+                                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                                    <strong>💡 Recommended Action:</strong> {finding.guidance}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        <div className="text-center pt-3">
+                          <Button
+                            onClick={startCorrections}
+                            style={{ backgroundColor: "rgb(250, 70, 22)" }}
+                            className="hover:opacity-90 text-white"
+                            size="sm"
+                          >
+                            <Settings className="h-4 w-4 mr-2" />
+                            Edit Forecast
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {/* Correction Progress */}
+                        <div className="text-center">
+                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Editing Forecast</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                            Applying corrections based on HBI recommendations
+                          </p>
+                        </div>
+
+                        <div className="space-y-4">
+                          {getFindingsData().map((finding, index) => (
+                            <div
+                              key={finding.id}
+                              className={`border rounded-lg p-4 transition-all duration-500 ${
+                                correctedFindings[index]
+                                  ? "border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700 opacity-75 scale-98"
+                                  : correctionStep === index
+                                  ? "border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700 scale-102"
+                                  : "border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700"
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    correctedFindings[index]
+                                      ? "bg-green-500"
+                                      : correctionStep === index
+                                      ? "bg-blue-500 animate-pulse"
+                                      : "bg-gray-300 dark:bg-gray-600"
+                                  }`}
+                                >
+                                  {correctedFindings[index] ? (
+                                    <CheckCircle className="h-5 w-5 text-white" />
+                                  ) : correctionStep === index ? (
+                                    <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
+                                  ) : (
+                                    <span className="text-sm font-bold text-gray-600">{index + 1}</span>
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h5 className="font-medium text-gray-900 dark:text-gray-100">{finding.title}</h5>
+                                    {correctedFindings[index] && (
+                                      <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full text-xs font-medium animate-fade-in">
+                                        Updated
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    {correctedFindings[index]
+                                      ? finding.userAction
+                                      : correctionStep === index
+                                      ? `${finding.userAction}...`
+                                      : "Pending user action"}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {correctionStep >= 3 && !isReanalyzing && !showConfidenceScore && (
+                          <div className="text-center bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 animate-fade-in">
+                            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                            <h4 className="font-semibold text-green-900 dark:text-green-100">
+                              Forecast Integrity Improved
+                            </h4>
+                            <p className="text-sm text-green-700 dark:text-green-300">
+                              User adjustments have improved forecast integrity. Initiating final review...
+                            </p>
+                            <div className="mt-3 text-xs text-green-600 dark:text-green-400 space-y-1">
+                              <div>✓ April forecast variance reduced from 47% to 18%</div>
+                              <div>✓ Labor forecast aligned with staffing plan allocation</div>
+                              <div>✓ End date aligned with project milestone</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Second HBI Review States */}
+                        {isReanalyzing && (
+                          <div className="text-center bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800 animate-fade-in">
+                            <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 rounded-full animate-spin border-t-blue-600 dark:border-t-blue-400 mx-auto mb-4"></div>
+                            <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                              Reanalyzing Updated Forecast...
+                            </h4>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                              HBI is verifying the improvements and recalculating confidence metrics
+                            </p>
+                          </div>
+                        )}
+
+                        {showConfidenceScore && !isSubmitting && !submissionComplete && (
+                          <div className="space-y-6">
+                            {/* Confidence Score Display */}
+                            <div className="text-center bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800 animate-fade-in">
+                              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-3" />
+                              <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+                                All Major Issues Resolved
+                              </h4>
+
+                              {/* Animated Confidence Ring */}
+                              <div className="relative w-24 h-24 mx-auto mb-4">
+                                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                                  <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    stroke="currentColor"
+                                    strokeWidth="8"
+                                    fill="transparent"
+                                    className="text-gray-200 dark:text-gray-700"
+                                  />
+                                  <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    stroke="currentColor"
+                                    strokeWidth="8"
+                                    fill="transparent"
+                                    strokeDasharray={`${(confidenceScore / 100) * 251.2} 251.2`}
+                                    className="text-green-500 transition-all duration-300 ease-out"
+                                    strokeLinecap="round"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                    {confidenceScore}%
+                                  </span>
+                                </div>
+                              </div>
+
+                              <p className="text-sm text-green-700 dark:text-green-300 mb-4">
+                                <strong>Forecast Confidence Score: {confidenceScore}%</strong>
+                              </p>
+                            </div>
+
+                            {/* Submission Prompt */}
+                            {showSubmissionPrompt && (
+                              <div className="bg-violet-50 dark:bg-violet-900/20 p-6 rounded-lg border border-violet-200 dark:border-violet-800 animate-fade-in">
+                                <div className="text-center mb-4">
+                                  <h4 className="font-semibold text-violet-900 dark:text-violet-100 mb-2">
+                                    Ready for Executive Review
+                                  </h4>
+                                  <p className="text-sm text-violet-700 dark:text-violet-300">
+                                    Are you ready to submit this forecast to Project Executive Rachel Martinez for
+                                    review?
+                                  </p>
+                                </div>
+
+                                <div className="flex gap-3 justify-center">
+                                  <Button
+                                    onClick={handleSubmission}
+                                    style={{ backgroundColor: "rgb(250, 70, 22)" }}
+                                    className="hover:opacity-90 text-white"
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Yes, Submit Now
+                                  </Button>
+                                  <Button disabled variant="outline" className="opacity-50">
+                                    ❌ Not Yet
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Submission Process */}
+                        {isSubmitting && (
+                          <div className="text-center bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800 animate-fade-in">
+                            <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 rounded-full animate-spin border-t-blue-600 dark:border-t-blue-400 mx-auto mb-4"></div>
+                            <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-lg mb-4">
+                              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                📤 Submitting to Rachel Martinez...
+                              </p>
+                            </div>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                              Sending forecast package with confidence metrics and HBI analysis
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Submission Complete */}
+                        {submissionComplete && (
+                          <div className="text-center bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800 animate-fade-in">
+                            <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-4" />
+                            <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+                              Submission Successful
+                            </h4>
+                            <div className="bg-green-100 dark:bg-green-800 p-3 rounded-lg mb-4">
+                              <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                                ✅ Forecast submitted to PE Rachel Martinez at{" "}
+                                {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                              </p>
+                            </div>
+                            <p className="text-sm text-green-700 dark:text-green-300">
+                              Rachel will be notified and can review the forecast with full HBI analysis and confidence
+                              metrics.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex justify-between mt-4">
+              <Button
+                onClick={resetHBIDemoModal}
+                variant="outline"
+                disabled={isDemoAnalyzing || (isCorrections && correctionStep < 3) || isReanalyzing || isSubmitting}
+              >
+                Cancel
+              </Button>
+              {!isDemoAnalyzing && (
+                <>
+                  {!showFindings ? (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Processing...
+                    </Button>
+                  ) : !isCorrections ? (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Issues Found
+                    </Button>
+                  ) : isReanalyzing ? (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <Brain className="h-4 w-4 mr-2 animate-pulse" />
+                      Reanalyzing...
+                    </Button>
+                  ) : isSubmitting ? (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <Send className="h-4 w-4 mr-2 animate-pulse" />
+                      Submitting...
+                    </Button>
+                  ) : submissionComplete ? (
+                    <Button
+                      onClick={resetHBIDemoModal}
+                      style={{ backgroundColor: "rgb(250, 70, 22)" }}
+                      className="hover:opacity-90 text-white"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Demo Complete
+                    </Button>
+                  ) : correctionStep >= 3 && !showSubmissionPrompt ? (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Preparing...
+                    </Button>
+                  ) : (
+                    <Button disabled variant="outline" className="opacity-50">
+                      <Settings className="h-4 w-4 mr-2 animate-spin" />
+                      Editing...
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

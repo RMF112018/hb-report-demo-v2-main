@@ -60,9 +60,8 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
     paddingCard: isCompact ? "pb-2" : "pb-2", // Increased from pb-1
     gap: isCompact ? "gap-2" : "gap-2", // Increased from gap-1
     marginTop: isCompact ? "mt-1" : "mt-1", // Increased from mt-0.5
-    chartHeight: isCompact ? "h-40" : "h-48", // Increased from h-32
-    // Additional minimum constraints
-    minCardHeight: isCompact ? "min-h-[400px]" : "min-h-[500px]",
+    chartHeight: isCompact ? "h-32" : "h-40", // Reduced for better auto-sizing
+    // Remove minimum constraints to allow automatic height
     minTextSize: isCompact ? "text-xs" : "text-sm",
     minButtonSize: isCompact ? "h-7 w-7" : "h-8 w-8",
     minBadgePadding: isCompact ? "px-2 py-1" : "px-2 py-1",
@@ -185,7 +184,7 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
 
   return (
     <Card
-      className={`h-full ${compactScale.minCardHeight} bg-gradient-to-br from-[#0021A5]/5 to-[#0021A5]/10 dark:from-[#0021A5]/20 dark:to-[#0021A5]/30 border-[#0021A5]/20 dark:border-[#0021A5]/40 ${className}`}
+      className={`bg-gradient-to-br from-[#0021A5]/5 to-[#0021A5]/10 dark:from-[#0021A5]/20 dark:to-[#0021A5]/30 border-[#0021A5]/20 dark:border-[#0021A5]/40 ${className}`}
     >
       <CardHeader className={compactScale.paddingCard}>
         <div className="flex items-center justify-between">
@@ -325,9 +324,13 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
             </div>
           </TabsContent>
 
-          <TabsContent value="breakdown" className="space-y-4">
+          <TabsContent value="breakdown" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Project Value Breakdown */}
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700">
+            <div
+              className={`bg-white dark:bg-gray-800 ${
+                isCompact ? "p-2" : "p-3"
+              } rounded-lg border border-blue-200 dark:border-gray-700`}
+            >
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Project Value Distribution</h4>
               <div className={compactScale.chartHeight}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -351,9 +354,13 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
             </div>
 
             {/* Individual Project Details */}
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700">
+            <div
+              className={`bg-white dark:bg-gray-800 ${
+                isCompact ? "p-2" : "p-3"
+              } rounded-lg border border-blue-200 dark:border-gray-700`}
+            >
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Project Details</h4>
-              <div className={`space-y-2 ${isCompact ? "max-h-40" : "max-h-32"} overflow-y-auto`}>
+              <div className={`space-y-2 ${isCompact ? "max-h-32" : "max-h-40"} overflow-y-auto`}>
                 {constructionProjects.map((project, index) => (
                   <div
                     key={project.project_id}
@@ -381,9 +388,13 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
             </div>
           </TabsContent>
 
-          <TabsContent value="trends" className="space-y-4">
+          <TabsContent value="trends" className={isCompact ? "space-y-2" : "space-y-4"}>
             {/* Profit Trend Chart */}
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700">
+            <div
+              className={`bg-white dark:bg-gray-800 ${
+                isCompact ? "p-2" : "p-3"
+              } rounded-lg border border-blue-200 dark:border-gray-700`}
+            >
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Profit Trend Analysis</h4>
               <div className={compactScale.chartHeight}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -407,7 +418,11 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
             </div>
 
             {/* Performance Indicators */}
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-gray-700">
+            <div
+              className={`bg-white dark:bg-gray-800 ${
+                isCompact ? "p-2" : "p-3"
+              } rounded-lg border border-blue-200 dark:border-gray-700`}
+            >
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Financial Performance</h4>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -455,7 +470,7 @@ export default function BetaFinancialOverview({ className, config, isCompact }: 
           </TabsContent>
         </Tabs>
 
-        <div className="mt-4 pt-3 border-t border-blue-200 dark:border-gray-700">
+        <div className={`${isCompact ? "mt-2 pt-2" : "mt-4 pt-3"} border-t border-blue-200 dark:border-gray-700`}>
           <div
             className={`flex items-center justify-between ${compactScale.minTextSize} text-gray-500 dark:text-gray-400`}
           >
