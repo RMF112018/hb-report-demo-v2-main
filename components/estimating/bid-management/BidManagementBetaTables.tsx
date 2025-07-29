@@ -324,30 +324,6 @@ export default function BidManagementBetaTables({
               </div>
             </CardHeader>
             <CardContent>
-              {/* Beta Grid Information Banner */}
-              <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <TestTube className="h-5 w-5 text-orange-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-semibold text-orange-800">Beta Grid Mode Active</h4>
-                    <p className="text-sm text-orange-700 mt-1">
-                      Experience our enhanced bid management grid with Excel-like functionality, including inline
-                      editing, advanced sorting, and sticky columns. This new interface provides improved performance
-                      and user experience.
-                    </p>
-                    {hasUnsavedChanges && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <Badge variant="destructive">Unsaved Changes</Badge>
-                        <Button onClick={handleSaveChanges} size="sm" variant="outline">
-                          <Save className="h-4 w-4 mr-1" />
-                          Save Changes
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {/* Beta Grid Content */}
               <div className="space-y-4">
                 <ProtectedGrid
@@ -407,29 +383,6 @@ export default function BidManagementBetaTables({
               </div>
             </CardHeader>
             <CardContent>
-              {/* Beta Grid Information Banner */}
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <TestTube className="h-5 w-5 text-green-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-semibold text-green-800">Beta Grid Mode Active</h4>
-                    <p className="text-sm text-green-700 mt-1">
-                      Pre-construction projects with enhanced grid functionality for project management and
-                      coordination. Track project progress, budgets, and key milestones with real-time updates.
-                    </p>
-                    {hasUnsavedChanges && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <Badge variant="destructive">Unsaved Changes</Badge>
-                        <Button onClick={handleSaveChanges} size="sm" variant="outline">
-                          <Save className="h-4 w-4 mr-1" />
-                          Save Changes
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {/* Beta Grid Content */}
               <div className="space-y-4">
                 <ProtectedGrid
@@ -489,29 +442,6 @@ export default function BidManagementBetaTables({
               </div>
             </CardHeader>
             <CardContent>
-              {/* Beta Grid Information Banner */}
-              <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <TestTube className="h-5 w-5 text-purple-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-semibold text-purple-800">Beta Grid Mode Active</h4>
-                    <p className="text-sm text-purple-700 mt-1">
-                      Comprehensive estimates grid with detailed cost analysis, budget tracking, and financial insights.
-                      Manage estimates with precision and track performance metrics.
-                    </p>
-                    {hasUnsavedChanges && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <Badge variant="destructive">Unsaved Changes</Badge>
-                        <Button onClick={handleSaveChanges} size="sm" variant="outline">
-                          <Save className="h-4 w-4 mr-1" />
-                          Save Changes
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {/* Beta Grid Content */}
               <div className="space-y-4">
                 <ProtectedGrid
