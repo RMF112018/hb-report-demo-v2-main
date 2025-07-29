@@ -175,7 +175,7 @@ export default function BetaBDCommercialPipelineCard({
       return acc
     }, {} as Record<string, number>)
 
-    const topClients = Object.entries(clientVolume)
+    const topClients = [...Object.entries(clientVolume)]
       .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 5)
       .map(([client, value]) => ({
