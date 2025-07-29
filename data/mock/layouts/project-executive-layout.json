@@ -5,170 +5,185 @@
   "role": "project-executive",
   "cards": [
     {
-      "id": "hbi-portfolio-insights",
-      "type": "enhanced-hbi-insights",
-      "title": "HBI Portfolio Insights",
-      "size": "large",
-      "position": { "x": 0, "y": 0 },
-      "span": { "cols": 8, "rows": 5 },
-      "visible": true,
-      "config": {
-        "portfolioMode": true,
-        "projectCount": 6,
-        "projects": [
-          "Medical Center East",
-          "Tech Campus Phase 2",
-          "Marina Bay Plaza",
-          "Tropical World",
-          "Grandview Heights",
-          "Riverside Plaza"
-        ]
-      }
-    },
-    {
-      "id": "portfolio-critical-dates",
-      "type": "critical-dates",
-      "title": "Portfolio Critical Dates",
-      "size": "large",
-      "position": { "x": 8, "y": 0 },
-      "span": { "cols": 8, "rows": 5 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-schedule-monitor",
-      "type": "schedule-monitor",
-      "title": "Portfolio Schedule Monitor",
-      "size": "large",
-      "position": { "x": 0, "y": 5 },
-      "span": { "cols": 8, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-health",
-      "type": "health",
-      "title": "Portfolio Health",
-      "size": "medium",
-      "position": { "x": 8, "y": 5 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "change-order-analysis",
-      "type": "change-order-analysis",
-      "title": "Change Order Analysis",
-      "size": "medium",
-      "position": { "x": 12, "y": 5 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-startup",
-      "type": "startup",
-      "title": "Portfolio Startup",
-      "size": "medium",
-      "position": { "x": 0, "y": 9 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-closeout",
-      "type": "closeout",
-      "title": "Portfolio Closeout",
-      "size": "medium",
-      "position": { "x": 4, "y": 9 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-field-reports",
-      "type": "field-reports",
-      "title": "Portfolio Field Reports",
-      "size": "medium",
-      "position": { "x": 8, "y": 9 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-safety-management",
-      "type": "safety",
-      "title": "Safety",
-      "size": "medium",
-      "position": { "x": 12, "y": 9 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true,
-      "config": {
-        "projectFilter": "portfolio",
-        "projectCount": 6,
-        "projects": [
-          "Medical Center East",
-          "Tech Campus Phase 2",
-          "Marina Bay Plaza",
-          "Tropical World",
-          "Grandview Heights",
-          "Riverside Plaza"
-        ]
-      }
-    },
-    {
-      "id": "portfolio-quality-control",
-      "type": "quality-control",
-      "title": "Quality Control",
-      "size": "medium",
-      "position": { "x": 0, "y": 13 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true,
-      "config": {
-        "projectFilter": "portfolio",
-        "projectCount": 6,
-        "projects": [
-          "Medical Center East",
-          "Tech Campus Phase 2",
-          "Marina Bay Plaza",
-          "Tropical World",
-          "Grandview Heights",
-          "Riverside Plaza"
-        ]
-      }
-    },
-    {
-      "id": "portfolio-rfi-management",
-      "type": "rfi",
-      "title": "Portfolio RFI Management",
-      "size": "medium",
-      "position": { "x": 4, "y": 13 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
-      "id": "portfolio-submittal-management",
-      "type": "submittal",
-      "title": "Portfolio Submittal Management",
-      "size": "medium",
-      "position": { "x": 8, "y": 13 },
-      "span": { "cols": 4, "rows": 4 },
-      "visible": true
-    },
-    {
       "id": "bd-opportunities",
       "type": "bd-opportunities",
       "title": "BD Opportunities",
       "size": "large",
-      "position": { "x": 0, "y": 17 },
-      "span": { "cols": 10, "rows": 5 },
-      "visible": true
+      "position": { "x": 0, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "critical-dates",
+      "type": "critical-dates",
+      "title": "Critical Dates",
+      "size": "large",
+      "position": { "x": 8, "y": 0 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "closeout",
+      "type": "closeout",
+      "title": "Project Closeout",
+      "size": "large",
+      "position": { "x": 0, "y": 6 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "pipeline-analytics",
+      "type": "pipeline-analytics",
+      "title": "Pipeline Analytics",
+      "size": "large",
+      "position": { "x": 8, "y": 6 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "financial-overview",
+      "type": "financial-overview",
+      "title": "Financial Overview",
+      "size": "large",
+      "position": { "x": 0, "y": 12 },
+      "span": { "cols": 8, "rows": 6 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
     },
     {
       "id": "market-intelligence",
       "type": "market-intelligence",
       "title": "Market Intelligence",
-      "size": "medium",
-      "position": { "x": 10, "y": 17 },
-      "span": { "cols": 6, "rows": 5 },
+      "size": "large",
+      "position": { "x": 8, "y": 12 },
+      "span": { "cols": 8, "rows": 6 },
       "visible": true,
       "config": {
-        "showTrends": true,
-        "showHotMarkets": true,
-        "detailLevel": "summary"
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "building-materials-index",
+      "type": "building-materials-index",
+      "title": "Building Materials Index",
+      "size": "medium",
+      "position": { "x": 0, "y": 18 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "public-sector-construction",
+      "type": "public-sector-construction",
+      "title": "Public Sector Construction",
+      "size": "medium",
+      "position": { "x": 6, "y": 18 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "luxury-real-estate-insights",
+      "type": "luxury-real-estate-insights",
+      "title": "Luxury Real Estate Insights",
+      "size": "medium",
+      "position": { "x": 12, "y": 18 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "macro-financial-indicators",
+      "type": "macro-financial-indicators",
+      "title": "Macro Financial Indicators",
+      "size": "medium",
+      "position": { "x": 0, "y": 22 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "florida-multifamily-real-estate",
+      "type": "florida-multifamily-real-estate",
+      "title": "Florida Multifamily Real Estate",
+      "size": "medium",
+      "position": { "x": 6, "y": 22 },
+      "span": { "cols": 6, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "florida-multifamily-construction",
+      "type": "florida-multifamily-construction",
+      "title": "Florida Multifamily Construction",
+      "size": "medium",
+      "position": { "x": 12, "y": 22 },
+      "span": { "cols": 4, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "southeast-industrial-real-estate",
+      "type": "southeast-industrial-real-estate",
+      "title": "Southeast Industrial Real Estate",
+      "size": "medium",
+      "position": { "x": 0, "y": 26 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
+      }
+    },
+    {
+      "id": "market-intel-news-feed",
+      "type": "market-intel-news-feed",
+      "title": "Market Intelligence News Feed",
+      "size": "medium",
+      "position": { "x": 8, "y": 26 },
+      "span": { "cols": 8, "rows": 4 },
+      "visible": true,
+      "config": {
+        "userRole": "project-executive",
+        "isCompact": false
       }
     }
   ]

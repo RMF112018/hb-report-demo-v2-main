@@ -55,11 +55,22 @@ import BetaBuildingMaterialsIndexCard from "../../../components/cards/beta/BetaB
 import BetaPublicSectorConstructionCard from "../../../components/cards/beta/BetaPublicSectorConstructionCard"
 import BetaLuxuryRealEstateInsightsCard from "../../../components/cards/beta/BetaLuxuryRealEstateInsightsCard"
 import BetaMacroFinancialIndicatorsCard from "../../../components/cards/beta/BetaMacroFinancialIndicatorsCard"
+import BetaFinancialStatus from "../../../components/cards/beta/BetaFinancialStatus"
+import BetaCashFlowAnalysis from "../../../components/cards/beta/BetaCashFlowAnalysis"
+import BetaContingencyAnalysis from "../../../components/cards/beta/BetaContingencyAnalysis"
+import BetaChangeOrderAnalysis from "../../../components/cards/beta/BetaChangeOrderAnalysis"
+import BetaSchedulePerformance from "../../../components/cards/beta/BetaSchedulePerformance"
+import BetaGeneralConditions from "../../../components/cards/beta/BetaGeneralConditions"
+import BetaProcurement from "../../../components/cards/beta/BetaProcurement"
+import BetaProcurementStatsPanel from "../../../components/cards/beta/BetaProcurementStatsPanel"
+import { BetaDrawForecast } from "../../../components/reports/demo/BetaDrawForecast"
 import BetaFloridaMultifamilyRealEstateCard from "../../../components/cards/beta/BetaFloridaMultifamilyRealEstateCard"
 import BetaFloridaMultifamilyConstructionCard from "../../../components/cards/beta/BetaFloridaMultifamilyConstructionCard"
 import BetaSoutheastIndustrialRealEstateCard from "../../../components/cards/beta/BetaSoutheastIndustrialRealEstateCard"
 import BetaCommercialConstructionTrendsCard from "../../../components/cards/market-intel/BetaCommercialConstructionTrendsCard"
 import BetaMarketIntelNewsFeedCard from "../../../components/cards/beta/BetaMarketIntelNewsFeedCard"
+import BetaCriticalDates from "../../../components/cards/beta/BetaCriticalDates"
+import BetaCloseout from "../../../components/cards/beta/BetaCloseout"
 import PowerBIDashboardCard from "../../../components/cards/PowerBIDashboardCard"
 import { CustomBarChart } from "../../../components/charts/BarChart"
 import { CustomLineChart } from "../../../components/charts/LineChart"
@@ -482,6 +493,167 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
     // Handle other roles as before
     switch (activeTab) {
       case "overview":
+        // Use masonry grid for Project Executive, regular layout for others
+        if (userRole === "project-executive") {
+          return (
+            <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
+              {/* Power BI Control Bar */}
+              <PowerBIControlBar
+                userRole={userRole}
+                onFocusToggle={() => setIsFocusMode(!isFocusMode)}
+                isFocusMode={isFocusMode}
+                className={isFocusMode ? "rounded-none" : ""}
+              />
+
+              {/* Dashboard Content - Masonry Grid for Project Executive */}
+              <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "p-6"}>
+                <div className="columns-1 lg:columns-2 xl:columns-3 gap-6 space-y-6">
+                  {/* Business Development Opportunities Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaBDOpportunities
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Critical Dates Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaCriticalDates
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Project Closeout Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaCloseout
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Pipeline Analytics Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaPipelineAnalytics
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Financial Overview Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaFinancialOverview
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Market Intelligence Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaMarketIntelligence
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Building Materials Index Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaBuildingMaterialsIndexCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Public Sector Construction Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaPublicSectorConstructionCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Luxury Real Estate Insights Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaLuxuryRealEstateInsightsCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Macro Financial Indicators Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaMacroFinancialIndicatorsCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Florida Multifamily Real Estate Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaFloridaMultifamilyRealEstateCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Florida Multifamily Construction Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaFloridaMultifamilyConstructionCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Southeast Industrial Real Estate Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaSoutheastIndustrialRealEstateCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* Market Intelligence News Feed Card */}
+                  <div className="break-inside-avoid mb-6">
+                    <BetaMarketIntelNewsFeedCard
+                      config={{
+                        showRealTime: true,
+                        isCompact: true,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // Regular layout for other roles
         return (
           <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
             {/* Power BI Control Bar */}
@@ -511,12 +683,7 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
                 dashboards={dashboards}
                 currentDashboardId={currentDashboardId ?? undefined}
                 onDashboardSelect={onDashboardSelect}
-                useBetaDashboard={
-                  userRole === "project-executive" ||
-                  userRole === "project-manager" ||
-                  userRole === "estimator" ||
-                  userRole === "admin"
-                }
+                useBetaDashboard={userRole === "project-manager" || userRole === "estimator" || userRole === "admin"}
               />
             </div>
           </div>
@@ -979,10 +1146,6 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
         )
 
       case "financial-review":
-        // Get financial dashboard layout if available, otherwise use current layout
-        const financialLayout = layouts?.find((l) => l.name.toLowerCase().includes("financial")) || layout
-        const financialCards = financialLayout?.cards || cards
-
         return (
           <div className={isFocusMode ? "fixed inset-0 z-50 bg-background" : ""}>
             {/* Power BI Control Bar */}
@@ -993,26 +1156,143 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               className={isFocusMode ? "rounded-none" : ""}
             />
 
-            {/* Dashboard Content */}
-            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
-              <DashboardLayout
-                cards={financialCards}
-                onLayoutChange={onLayoutChange}
-                onCardRemove={onCardRemove}
-                onCardConfigure={onCardConfigure}
-                onCardSizeChange={onCardSizeChange}
-                onCardAdd={onCardAdd}
-                onSave={onSave}
-                onReset={onReset}
-                isEditing={isEditing}
-                onToggleEdit={onToggleEdit}
-                layoutDensity={layoutDensity}
-                userRole={userRole}
-                dashboards={dashboards}
-                currentDashboardId={currentDashboardId ?? undefined}
-                onDashboardSelect={onDashboardSelect}
-                useBetaDashboard={true}
-              />
+            {/* Dashboard Content - Masonry Grid for Financial Review */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "p-6"}>
+              <div className="columns-1 lg:columns-2 xl:columns-3 gap-6 space-y-6">
+                {/* Beta Financial Overview Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFinancialOverview
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      financialMode: true,
+                      focusArea: "financial-forecasting",
+                      executiveMode: true,
+                    }}
+                  />
+                </div>
+
+                {/* Beta Cash Flow Analysis Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaCashFlowAnalysis
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      detailedTrends: true,
+                      timeframe: "monthly",
+                    }}
+                  />
+                </div>
+
+                {/* Beta Change Order Analysis Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaChangeOrderAnalysis
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      detailedAnalysis: true,
+                    }}
+                    userRole={userRole}
+                  />
+                </div>
+
+                {/* Beta Contingency Analysis Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaContingencyAnalysis
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      detailedAnalysis: true,
+                    }}
+                  />
+                </div>
+
+                {/* Beta Financial Status Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFinancialStatus
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      detailedView: true,
+                    }}
+                  />
+                </div>
+
+                {/* Beta General Conditions Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaGeneralConditions
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      compactMode: true,
+                    }}
+                  />
+                </div>
+
+                {/* Beta Procurement Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaProcurement
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      compactMode: true,
+                    }}
+                    userRole={userRole}
+                  />
+                </div>
+
+                {/* Beta Procurement Stats Panel Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaProcurementStatsPanel
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                      compactMode: true,
+                    }}
+                    userRole={userRole}
+                  />
+                </div>
+
+                {/* Florida Multifamily Real Estate Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Florida Multifamily Construction Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyConstructionCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Southeast Industrial Real Estate Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaSoutheastIndustrialRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Market Intelligence News Feed Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMarketIntelNewsFeedCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )
@@ -1352,26 +1632,129 @@ export const RoleDashboard: React.FC<RoleDashboardProps> = ({
               className={isFocusMode ? "rounded-none" : ""}
             />
 
-            {/* Dashboard Content */}
-            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto" : ""}>
-              <DashboardLayout
-                cards={myDashboardCards}
-                onLayoutChange={onLayoutChange}
-                onCardRemove={onCardRemove}
-                onCardConfigure={onCardConfigure}
-                onCardSizeChange={onCardSizeChange}
-                onCardAdd={onCardAdd}
-                onSave={onSave}
-                onReset={onReset}
-                isEditing={isEditing}
-                onToggleEdit={onToggleEdit}
-                layoutDensity={layoutDensity}
-                userRole={userRole}
-                dashboards={dashboards}
-                currentDashboardId={currentDashboardId ?? undefined}
-                onDashboardSelect={onDashboardSelect}
-                useBetaDashboard={true}
-              />
+            {/* Dashboard Content - Masonry Grid for My Dashboard */}
+            <div className={isFocusMode ? "h-[calc(100vh-120px)] overflow-auto p-6" : "p-6"}>
+              <div className="columns-1 lg:columns-2 xl:columns-3 gap-6 space-y-6">
+                {/* Financial Overview Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFinancialOverview
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Pipeline Analytics Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaPipelineAnalytics
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Business Development Opportunities Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaBDOpportunities
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Market Intelligence Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMarketIntelligence
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Building Materials Index Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaBuildingMaterialsIndexCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Public Sector Construction Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaPublicSectorConstructionCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Luxury Real Estate Insights Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaLuxuryRealEstateInsightsCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Macro Financial Indicators Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMacroFinancialIndicatorsCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Florida Multifamily Real Estate Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Florida Multifamily Construction Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaFloridaMultifamilyConstructionCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Southeast Industrial Real Estate Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaSoutheastIndustrialRealEstateCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+
+                {/* Market Intelligence News Feed Card */}
+                <div className="break-inside-avoid mb-6">
+                  <BetaMarketIntelNewsFeedCard
+                    config={{
+                      showRealTime: true,
+                      isCompact: true,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )
