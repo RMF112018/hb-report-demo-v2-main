@@ -46,6 +46,10 @@ import { Badge } from "../../components/ui/badge"
 import { Button } from "../../components/ui/button"
 import BetaBDCommercialPipelineCard from "../../components/cards/beta/business-dev/BetaBDCommercialPipelineCard"
 import BetaBDPublicSectorOpportunitiesCard from "../../components/cards/beta/business-dev/BetaBDPublicSectorOpportunitiesCard"
+import { BetaBDClientEngagementCard } from "../../components/cards/beta/BetaBDClientEngagementCard"
+import BetaBDPursuitConversionTrendsCard from "../../components/cards/beta/BetaBDPursuitConversionTrendsCard"
+import BetaBDStrategicFocusMapCard from "../../components/cards/beta/BetaBDStrategicFocusMapCard"
+import { PreconDashboardGrid } from "../../components/precon/PreconDashboardGrid"
 
 // Mock data imports
 import projectsData from "../../data/mock/projects.json"
@@ -74,7 +78,7 @@ export default function PreconstructionPage() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [activeTab, setActiveTab] = useState<string>("business-development")
+  const [activeTab, setActiveTab] = useState<string>("pre-con-overview")
   const [initialTabSet, setInitialTabSet] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState(64) // Default collapsed width
   const [headerHeight, setHeaderHeight] = useState(140) // Default header height
@@ -216,29 +220,21 @@ export default function PreconstructionPage() {
   // Handle tab changes
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
-
-    // Update URL to reflect the selected tab
-    router.push(`/preconstruction/${tabId}`)
+    // Don't change URL for tab changes - keep it as client-side state
   }
 
-  // Set initial tab based on URL path
+  // Set initial tab - always start with pre-con-overview
   useEffect(() => {
-    if (mounted && !initialTabSet && pathname) {
-      const pathSegments = pathname.split("/")
-      const tabFromPath = pathSegments[pathSegments.length - 1]
-
-      if (tabFromPath && tabFromPath !== "preconstruction") {
-        setActiveTab(tabFromPath)
-      } else {
-        setActiveTab("business-development")
-      }
+    if (mounted && !initialTabSet) {
+      setActiveTab("pre-con-overview")
       setInitialTabSet(true)
     }
-  }, [mounted, pathname, initialTabSet])
+  }, [mounted, initialTabSet])
 
   // Get tabs for pre-construction content
   const getTabsForContent = (): PageHeaderTab[] => {
     return [
+      { id: "pre-con-overview", label: "Pre-Con Overview" },
       { id: "business-development", label: "Business Development" },
       { id: "estimating", label: "Estimating" },
       { id: "marketing", label: "Marketing" },
@@ -254,13 +250,13 @@ export default function PreconstructionPage() {
     const navigationCallbacks = {
       onNavigateToHome: () => {
         setSelectedProject(null)
-        setActiveTab("business-development")
+        setActiveTab("pre-con-overview")
         localStorage.removeItem("selectedProject")
         router.push("/main-app")
       },
       onNavigateToProject: (projectId: string) => {
         setSelectedProject(projectId)
-        setActiveTab("business-development")
+        setActiveTab("pre-con-overview")
         localStorage.setItem("selectedProject", projectId)
       },
       onNavigateToModule: (moduleId: string) => {
@@ -271,7 +267,7 @@ export default function PreconstructionPage() {
       },
       onNavigateToTab: (tabId: string) => {
         setActiveTab(tabId)
-        router.push(`/preconstruction/${tabId}`)
+        // Don't change URL for tab changes - keep it as client-side state
       },
     }
 
@@ -302,15 +298,26 @@ export default function PreconstructionPage() {
     return {
       rightContent: (
         <div className="space-y-6">
+          {activeTab === "pre-con-overview" && <PreconDashboardGrid />}
+
           {activeTab === "business-development" && (
             <div className="space-y-6">
-              {/* Responsive Grid Layout */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {/* Responsive Grid Layout - 5 cards wrapping after 3 */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div className="w-full">
                   <BetaBDCommercialPipelineCard />
                 </div>
                 <div className="w-full">
                   <BetaBDPublicSectorOpportunitiesCard />
+                </div>
+                <div className="w-full">
+                  <BetaBDClientEngagementCard />
+                </div>
+                <div className="w-full">
+                  <BetaBDPursuitConversionTrendsCard />
+                </div>
+                <div className="w-full">
+                  <BetaBDStrategicFocusMapCard />
                 </div>
               </div>
             </div>

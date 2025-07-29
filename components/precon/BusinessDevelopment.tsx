@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Briefcase, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Target, 
+
+import {
+  Briefcase,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Target,
   Trophy,
   AlertTriangle,
   Clock,
@@ -33,7 +34,7 @@ import {
   Award,
   Lightbulb,
   Zap,
-  Brain
+  Brain,
 } from "lucide-react"
 import {
   ResponsiveContainer,
@@ -53,7 +54,7 @@ import {
   Cell,
   ScatterChart,
   Scatter,
-  ComposedChart
+  ComposedChart,
 } from "recharts"
 
 interface BusinessDevelopmentProps {
@@ -75,7 +76,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       qualifiedLeads: Math.floor(Math.random() * 12) + 5,
       proposals: Math.floor(Math.random() * 8) + 3,
       wins: Math.floor(Math.random() * 4) + 1,
-      conversionRate: (Math.random() * 20) + 15
+      conversionRate: Math.random() * 20 + 15,
     }))
   }, [])
 
@@ -84,11 +85,12 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
     const totalLeads = leadGenerationData.reduce((sum, month) => sum + month.newLeads, 0)
     const totalProposals = leadGenerationData.reduce((sum, month) => sum + month.proposals, 0)
     const totalWins = leadGenerationData.reduce((sum, month) => sum + month.wins, 0)
-    const avgConversionRate = leadGenerationData.reduce((sum, month) => sum + month.conversionRate, 0) / leadGenerationData.length
-    
+    const avgConversionRate =
+      leadGenerationData.reduce((sum, month) => sum + month.conversionRate, 0) / leadGenerationData.length
+
     const pipelineValue = summaryStats.totalPipelineValue
     const weightedValue = summaryStats.probabilityWeightedValue
-    
+
     return {
       totalLeads,
       totalProposals,
@@ -97,7 +99,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       pipelineValue,
       weightedValue,
       winRate: summaryStats.winRate || 0,
-      avgDealSize: pipelineValue / totalLeads || 0
+      avgDealSize: pipelineValue / totalLeads || 0,
     }
   }, [leadGenerationData, summaryStats])
 
@@ -108,9 +110,9 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       { name: "Education", leads: 8, value: 32000000, growth: 8.7, fill: "#10b981" },
       { name: "Commercial", leads: 15, value: 68000000, growth: 12.4, fill: "#f59e0b" },
       { name: "Industrial", leads: 6, value: 28000000, growth: -2.1, fill: "#ef4444" },
-      { name: "Residential", leads: 10, value: 35000000, growth: 18.9, fill: "#8b5cf6" }
+      { name: "Residential", leads: 10, value: 35000000, growth: 18.9, fill: "#8b5cf6" },
     ]
-    
+
     return sectors.sort((a, b) => b.value - a.value)
   }, [])
 
@@ -121,7 +123,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       { source: "Digital Marketing", count: 18, value: 34000000, cost: 15000, roi: 227 },
       { source: "Trade Shows", count: 12, value: 28000000, cost: 25000, roi: 112 },
       { source: "Cold Outreach", count: 8, value: 15000000, cost: 8000, roi: 188 },
-      { source: "Partnerships", count: 15, value: 42000000, cost: 5000, roi: 840 }
+      { source: "Partnerships", count: 15, value: 42000000, cost: 5000, roi: 840 },
     ]
   }, [])
 
@@ -132,7 +134,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       { name: "XYZ Builders", winRate: 28, avgBidRatio: 0.95, marketShare: 15 },
       { name: "Premium Contractors", winRate: 32, avgBidRatio: 1.08, marketShare: 12 },
       { name: "Elite Building Co", winRate: 25, avgBidRatio: 0.88, marketShare: 10 },
-      { name: "Others", winRate: 22, avgBidRatio: 0.98, marketShare: 45 }
+      { name: "Others", winRate: 22, avgBidRatio: 0.98, marketShare: 45 },
     ]
   }, [])
 
@@ -153,12 +155,8 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
             <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {bdMetrics.totalLeads}
-            </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              +12% from last period
-            </p>
+            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{bdMetrics.totalLeads}</div>
+            <p className="text-xs text-blue-600 dark:text-blue-400">+12% from last period</p>
           </CardContent>
         </Card>
 
@@ -171,9 +169,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
             <div className="text-2xl font-bold text-green-900 dark:text-green-100">
               {bdMetrics.avgConversionRate.toFixed(1)}%
             </div>
-            <p className="text-xs text-green-600 dark:text-green-400">
-              Lead to proposal rate
-            </p>
+            <p className="text-xs text-green-600 dark:text-green-400">Lead to proposal rate</p>
           </CardContent>
         </Card>
 
@@ -186,9 +182,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
             <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
               {formatCurrency(bdMetrics.avgDealSize)}
             </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">
-              Average opportunity
-            </p>
+            <p className="text-xs text-purple-600 dark:text-purple-400">Average opportunity</p>
           </CardContent>
         </Card>
 
@@ -201,9 +195,7 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
             <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
               {bdMetrics.winRate.toFixed(1)}%
             </div>
-            <p className="text-xs text-orange-600 dark:text-orange-400">
-              Historical average
-            </p>
+            <p className="text-xs text-orange-600 dark:text-orange-400">Historical average</p>
           </CardContent>
         </Card>
       </div>
@@ -253,7 +245,14 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
                     <Bar yAxisId="left" dataKey="newLeads" fill="#3b82f6" name="New Leads" />
                     <Bar yAxisId="left" dataKey="qualifiedLeads" fill="#10b981" name="Qualified" />
                     <Bar yAxisId="left" dataKey="proposals" fill="#f59e0b" name="Proposals" />
-                    <Line yAxisId="right" type="monotone" dataKey="conversionRate" stroke="#ef4444" name="Conversion Rate %" strokeWidth={2} />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="conversionRate"
+                      stroke="#ef4444"
+                      name="Conversion Rate %"
+                      strokeWidth={2}
+                    />
                   </ComposedChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -273,23 +272,29 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
                     <Lightbulb className="h-4 w-4 text-yellow-600 mt-1" />
                     <div className="text-sm">
                       <p className="font-medium text-indigo-900 dark:text-indigo-100">Market Opportunity</p>
-                      <p className="text-indigo-700 dark:text-indigo-300">Healthcare sector showing 15.2% growth - consider increasing focus</p>
+                      <p className="text-indigo-700 dark:text-indigo-300">
+                        Healthcare sector showing 15.2% growth - consider increasing focus
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3">
                     <Zap className="h-4 w-4 text-blue-600 mt-1" />
                     <div className="text-sm">
                       <p className="font-medium text-indigo-900 dark:text-indigo-100">Lead Quality</p>
-                      <p className="text-indigo-700 dark:text-indigo-300">Referral leads have 8x higher conversion rate than cold outreach</p>
+                      <p className="text-indigo-700 dark:text-indigo-300">
+                        Referral leads have 8x higher conversion rate than cold outreach
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-4 w-4 text-orange-600 mt-1" />
                     <div className="text-sm">
                       <p className="font-medium text-indigo-900 dark:text-indigo-100">Action Required</p>
-                      <p className="text-indigo-700 dark:text-indigo-300">5 high-value proposals need follow-up this week</p>
+                      <p className="text-indigo-700 dark:text-indigo-300">
+                        5 high-value proposals need follow-up this week
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -389,24 +394,19 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
                 {marketSectorData.map((sector, index) => (
                   <div key={sector.name} className="flex items-center justify-between p-3 rounded-lg border">
                     <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: sector.fill }}
-                      />
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: sector.fill }} />
                       <div>
                         <div className="font-medium text-sm">{sector.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {sector.leads} active leads
-                        </div>
+                        <div className="text-xs text-muted-foreground">{sector.leads} active leads</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">
-                        {formatCurrency(sector.value)}
-                      </div>
-                      <div className={`text-xs flex items-center gap-1 ${
-                        sector.growth > 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                      <div className="text-sm font-medium">{formatCurrency(sector.value)}</div>
+                      <div
+                        className={`text-xs flex items-center gap-1 ${
+                          sector.growth > 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
                         {sector.growth > 0 ? (
                           <ArrowUpRight className="h-3 w-3" />
                         ) : (
@@ -440,10 +440,10 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="cost" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} />
                     <YAxis dataKey="roi" tickFormatter={(value) => `${value}%`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: any, name: string) => {
-                        if (name === 'roi') return [`${value}%`, 'ROI']
-                        if (name === 'cost') return [`$${(value / 1000).toFixed(1)}K`, 'Cost']
+                        if (name === "roi") return [`${value}%`, "ROI"]
+                        if (name === "cost") return [`$${(value / 1000).toFixed(1)}K`, "Cost"]
                         return [value, name]
                       }}
                     />
@@ -473,12 +473,8 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium text-green-600">
-                          {source.roi}% ROI
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Cost: {formatCurrency(source.cost)}
-                        </div>
+                        <div className="text-sm font-medium text-green-600">{source.roi}% ROI</div>
+                        <div className="text-xs text-muted-foreground">Cost: {formatCurrency(source.cost)}</div>
                       </div>
                     </div>
                   ))}
@@ -577,4 +573,4 @@ export function BusinessDevelopment({ pipelineData, summaryStats, userRole }: Bu
       </Tabs>
     </div>
   )
-} 
+}

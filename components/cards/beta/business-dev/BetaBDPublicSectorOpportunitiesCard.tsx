@@ -580,7 +580,7 @@ export default function BetaBDPublicSectorOpportunitiesCard({
                   Top Performing Regions
                 </h4>
                 <div className="space-y-3">
-                  {publicSectorData.floridaRegions
+                  {[...publicSectorData.floridaRegions]
                     .sort((a, b) => b.hitRate - a.hitRate)
                     .slice(0, 3)
                     .map((region, index) => (
