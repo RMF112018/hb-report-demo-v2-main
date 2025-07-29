@@ -67,197 +67,224 @@ export function DueThisWeekPanel({ userRole, className }: DueThisWeekPanelProps)
 
   // Generate comprehensive mock due items based on user role
   const dueItems = useMemo(() => {
-    const endOfWeek = getEndOfWeek()
-    const today = new Date()
-    const items: DueItem[] = []
+    try {
+      const endOfWeek = getEndOfWeek()
+      const today = new Date()
+      const items: DueItem[] = []
 
-    // Helper function to generate dates within the current week for demo purposes
-    const generateDemoDate = (offsetHours: number) => {
-      const date = new Date(today.getTime() + offsetHours * 60 * 60 * 1000)
-      // Ensure the date is within this week window
-      if (date > endOfWeek) {
-        // If the date would be beyond this week, put it earlier in the week
-        return new Date(today.getTime() + (offsetHours % 72) * 60 * 60 * 1000).toISOString()
+      // Helper function to generate dates within the current week for demo purposes
+      const generateDemoDate = (offsetHours: number) => {
+        const date = new Date(today.getTime() + offsetHours * 60 * 60 * 1000)
+        // Ensure the date is within this week window
+        if (date > endOfWeek) {
+          // If the date would be beyond this week, put it earlier in the week
+          return new Date(today.getTime() + (offsetHours % 72) * 60 * 60 * 1000).toISOString()
+        }
+        return date.toISOString()
       }
-      return date.toISOString()
+
+      // Role-specific mock data
+      const mockDataByRole = {
+        "project-executive": {
+          projects: [
+            "Downtown Medical Center",
+            "Riverside Office Tower",
+            "Tech Campus Phase II",
+            "Harbor View Apartments",
+            "City Hall Renovation",
+            "Industrial Park Expansion",
+          ],
+          items: [
+            {
+              title: "Board presentation for Q4 portfolio review",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(-24), // Yesterday (overdue)
+              priority: "high" as const,
+              project: "Downtown Medical Center",
+              status: "overdue" as const,
+              category: "PX",
+            },
+            {
+              title: "Respond to owner's concerns about MEP coordination",
+              type: "message" as const,
+              dueDate: generateDemoDate(8), // Later today
+              priority: "high" as const,
+              project: "Tech Campus Phase II",
+              status: "due-soon" as const,
+              category: "PX",
+            },
+            {
+              title: "Weekly executive dashboard review meeting",
+              type: "task" as const,
+              dueDate: generateDemoDate(30), // Tomorrow
+              priority: "medium" as const,
+              project: "Portfolio Overview",
+              status: "pending" as const,
+              category: "PX",
+            },
+            {
+              title: "Sign-off on change orders exceeding $50K threshold",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(54), // Day after tomorrow
+              priority: "high" as const,
+              project: "Harbor View Apartments",
+              status: "pending" as const,
+              category: "PX",
+            },
+            {
+              title: "Client relationship review with major stakeholders",
+              type: "task" as const,
+              dueDate: generateDemoDate(78), // Three days from now
+              priority: "medium" as const,
+              project: "City Hall Renovation",
+              status: "pending" as const,
+              category: "PX",
+            },
+            {
+              title: "Risk assessment report for new project pursuits",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(102), // Four days from now
+              priority: "medium" as const,
+              project: "Industrial Park Expansion",
+              status: "pending" as const,
+              category: "PX",
+            },
+          ],
+        },
+        "project-manager": {
+          projects: ["Downtown Medical Center", "Riverside Office Tower"],
+          items: [
+            {
+              title: "Submit weekly progress report to owner",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(6), // Later today
+              priority: "high" as const,
+              project: "Downtown Medical Center",
+              status: "due-soon" as const,
+              category: "SPM",
+            },
+            {
+              title: "Coordinate with MEP contractor on ceiling conflicts",
+              type: "task" as const,
+              dueDate: generateDemoDate(26), // Tomorrow morning
+              priority: "high" as const,
+              project: "Downtown Medical Center",
+              status: "pending" as const,
+              category: "SPM",
+            },
+            {
+              title: "Review and approve concrete pour schedule",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(38), // Tomorrow afternoon
+              priority: "high" as const,
+              project: "Downtown Medical Center",
+              status: "pending" as const,
+              category: "SPM",
+            },
+            {
+              title: "Respond to architect's RFI about facade details",
+              type: "message" as const,
+              dueDate: generateDemoDate(50), // Day after tomorrow
+              priority: "medium" as const,
+              project: "Downtown Medical Center",
+              status: "pending" as const,
+              category: "SPM",
+            },
+            {
+              title: "Conduct weekly safety walkthrough with superintendent",
+              type: "task" as const,
+              dueDate: generateDemoDate(62), // Mid-week
+              priority: "medium" as const,
+              project: "Downtown Medical Center",
+              status: "pending" as const,
+              category: "SPM",
+            },
+            {
+              title: "Update project schedule for elevator delays",
+              type: "responsibility" as const,
+              dueDate: generateDemoDate(74), // Later in week
+              priority: "high" as const,
+              project: "Downtown Medical Center",
+              status: "pending" as const,
+              category: "SPM",
+            },
+          ],
+        },
+      }
+
+      // Get role-specific data with fallback
+      const roleData = mockDataByRole[userRole] || mockDataByRole["project-manager"] // Fallback to project-manager data
+      const taskCategory = userRole === "project-executive" ? "PX" : "SPM"
+
+      // Add role-specific items (always show for demo purposes)
+      if (roleData && roleData.items && Array.isArray(roleData.items)) {
+        roleData.items.forEach((item, index) => {
+          items.push({
+            ...item,
+            id: `${userRole}-${index}`,
+          })
+        })
+      }
+
+      // If no items were added (shouldn't happen with our demo dates), add at least one demo item
+      if (items.length === 0) {
+        items.push({
+          id: `${userRole}-demo`,
+          title: "Demo task - Review project status",
+          type: "task" as const,
+          dueDate: today.toISOString(),
+          priority: "medium" as const,
+          project: "Demo Project",
+          status: "pending" as const,
+          category: userRole === "project-executive" ? "PX" : "SPM",
+        })
+      }
+
+      // Ensure we always have at least one item
+      if (items.length === 0) {
+        // Fallback item if everything else fails
+        items.push({
+          id: "fallback-demo",
+          title: "Demo task - Review project status",
+          type: "task" as const,
+          dueDate: today.toISOString(),
+          priority: "medium" as const,
+          project: "Demo Project",
+          status: "pending" as const,
+          category: "SPM",
+        })
+      }
+
+      // Sort by due date and status priority (overdue first, then due-soon, then pending)
+      const sortedItems = items
+        .sort((a, b) => {
+          // First sort by status priority
+          const statusOrder = { overdue: 0, "due-soon": 1, pending: 2 }
+          const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+          if (statusDiff !== 0) return statusDiff
+
+          // Then sort by due date
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        })
+        .slice(0, 6) // Show up to 6 items
+
+      return sortedItems
+    } catch (error) {
+      console.error("Error generating due items:", error)
+      // Return an empty array or a default item to prevent crashing
+      return [
+        {
+          id: "error-demo",
+          title: "Error generating due items",
+          type: "task" as const,
+          dueDate: new Date().toISOString(),
+          priority: "medium" as const,
+          project: "Error Project",
+          status: "pending" as const,
+          category: "SPM",
+        },
+      ]
     }
-
-    // Role-specific mock data
-    const mockDataByRole = {
-      "project-executive": {
-        projects: [
-          "Downtown Medical Center",
-          "Riverside Office Tower",
-          "Tech Campus Phase II",
-          "Harbor View Apartments",
-          "City Hall Renovation",
-          "Industrial Park Expansion",
-        ],
-        items: [
-          {
-            title: "Board presentation for Q4 portfolio review",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(-24), // Yesterday (overdue)
-            priority: "high" as const,
-            project: "Downtown Medical Center",
-            status: "overdue" as const,
-            category: "PX",
-          },
-          {
-            title: "Respond to owner's concerns about MEP coordination",
-            type: "message" as const,
-            dueDate: generateDemoDate(8), // Later today
-            priority: "high" as const,
-            project: "Tech Campus Phase II",
-            status: "due-soon" as const,
-            category: "PX",
-          },
-          {
-            title: "Weekly executive dashboard review meeting",
-            type: "task" as const,
-            dueDate: generateDemoDate(30), // Tomorrow
-            priority: "medium" as const,
-            project: "Portfolio Overview",
-            status: "pending" as const,
-            category: "PX",
-          },
-          {
-            title: "Sign-off on change orders exceeding $50K threshold",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(54), // Day after tomorrow
-            priority: "high" as const,
-            project: "Harbor View Apartments",
-            status: "pending" as const,
-            category: "PX",
-          },
-          {
-            title: "Client relationship review with major stakeholders",
-            type: "task" as const,
-            dueDate: generateDemoDate(78), // Three days from now
-            priority: "medium" as const,
-            project: "City Hall Renovation",
-            status: "pending" as const,
-            category: "PX",
-          },
-          {
-            title: "Risk assessment report for new project pursuits",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(102), // Four days from now
-            priority: "medium" as const,
-            project: "Industrial Park Expansion",
-            status: "pending" as const,
-            category: "PX",
-          },
-        ],
-      },
-      "project-manager": {
-        projects: ["Downtown Medical Center", "Riverside Office Tower"],
-        items: [
-          {
-            title: "Submit weekly progress report to owner",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(6), // Later today
-            priority: "high" as const,
-            project: "Downtown Medical Center",
-            status: "due-soon" as const,
-            category: "SPM",
-          },
-          {
-            title: "Coordinate with MEP contractor on ceiling conflicts",
-            type: "task" as const,
-            dueDate: generateDemoDate(26), // Tomorrow morning
-            priority: "high" as const,
-            project: "Downtown Medical Center",
-            status: "pending" as const,
-            category: "SPM",
-          },
-          {
-            title: "Review and approve concrete pour schedule",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(38), // Tomorrow afternoon
-            priority: "high" as const,
-            project: "Downtown Medical Center",
-            status: "pending" as const,
-            category: "SPM",
-          },
-          {
-            title: "Respond to architect's RFI about facade details",
-            type: "message" as const,
-            dueDate: generateDemoDate(50), // Day after tomorrow
-            priority: "medium" as const,
-            project: "Downtown Medical Center",
-            status: "pending" as const,
-            category: "SPM",
-          },
-          {
-            title: "Conduct weekly safety walkthrough with superintendent",
-            type: "task" as const,
-            dueDate: generateDemoDate(62), // Mid-week
-            priority: "medium" as const,
-            project: "Downtown Medical Center",
-            status: "pending" as const,
-            category: "SPM",
-          },
-          {
-            title: "Update project schedule for elevator delays",
-            type: "responsibility" as const,
-            dueDate: generateDemoDate(74), // Later in week
-            priority: "high" as const,
-            project: "Downtown Medical Center",
-            status: "pending" as const,
-            category: "SPM",
-          },
-        ],
-      },
-    }
-
-    // Get role-specific data
-    const roleData = mockDataByRole[userRole]
-    const taskCategory = userRole === "project-executive" ? "PX" : "SPM"
-
-    // Add role-specific items (always show for demo purposes)
-    roleData.items.forEach((item, index) => {
-      items.push({
-        ...item,
-        id: `${userRole}-${index}`,
-      })
-    })
-
-    // If no items were added (shouldn't happen with our demo dates), add at least one demo item
-    if (items.length === 0) {
-      items.push({
-        id: `${userRole}-demo`,
-        title: "Demo task - Review project status",
-        type: "task" as const,
-        dueDate: today.toISOString(),
-        priority: "medium" as const,
-        project: "Demo Project",
-        status: "pending" as const,
-        category: userRole === "project-executive" ? "PX" : "SPM",
-      })
-    }
-
-    // Sort by due date and status priority (overdue first, then due-soon, then pending)
-    const sortedItems = items
-      .sort((a, b) => {
-        // First sort by status priority
-        const statusOrder = { overdue: 0, "due-soon": 1, pending: 2 }
-        const statusDiff = statusOrder[a.status] - statusOrder[b.status]
-        if (statusDiff !== 0) return statusDiff
-
-        // Then sort by due date
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-      })
-      .slice(0, 6) // Show up to 6 items
-
-    // Debug logging
-    console.log(`DueThisWeekPanel - ${userRole}:`, {
-      totalItems: sortedItems.length,
-      endOfWeek: endOfWeek.toISOString(),
-      items: sortedItems.map((item) => ({ title: item.title, dueDate: item.dueDate, status: item.status })),
-    })
-
-    return sortedItems
   }, [userRole])
 
   const getTypeIcon = (type: string) => {

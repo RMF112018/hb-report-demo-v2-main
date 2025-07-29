@@ -396,7 +396,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   },
   {
     name: "Staffing",
-    href: "/dashboard/staff-planning",
+    href: "#",
     category: "Core Tools",
     description: "Resource planning and scheduling",
   },

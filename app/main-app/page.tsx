@@ -1084,7 +1084,16 @@ export default function MainApplicationPage() {
         setSelectedModule(null)
         setSelectedTool(toolName)
         if (toolName === "Staffing") {
-          setActiveTab("portfolio")
+          // Set appropriate tab based on user role
+          if (userRole === "executive") {
+            setActiveTab("overview")
+          } else if (userRole === "project-executive") {
+            setActiveTab("portfolio")
+          } else if (userRole === "project-manager") {
+            setActiveTab("team")
+          } else {
+            setActiveTab("overview")
+          }
         } else if (toolName === "HR & Payroll") {
           setActiveTab("personnel")
         } else {
@@ -1235,7 +1244,25 @@ export default function MainApplicationPage() {
 
     if (selectedTool) {
       // Tools can provide left sidebar content
+      const hasLeftContent =
+        (selectedTool === "estimating" && activeTab === "cost-summary") ||
+        (selectedTool === "Staffing" &&
+          ((effectiveRole === "executive" && activeTab === "overview") ||
+            (effectiveRole === "project-executive" && activeTab === "portfolio") ||
+            (effectiveRole === "project-manager" && activeTab === "team"))) // Show sidebar for staffing based on role and tab
+
       return {
+        leftContent: hasLeftContent ? (
+          <ToolContent
+            toolName={selectedTool}
+            userRole={effectiveRole}
+            user={user!}
+            onNavigateBack={() => handleToolSelect(null)}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            renderMode="leftContent"
+          />
+        ) : undefined,
         rightContent: (
           <ToolContent
             toolName={selectedTool}
@@ -1244,9 +1271,10 @@ export default function MainApplicationPage() {
             onNavigateBack={() => handleToolSelect(null)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
+            renderMode="rightContent"
           />
         ),
-        hasLeftContent: selectedTool === "estimating" && activeTab === "cost-summary", // Show sidebar for estimating cost-summary
+        hasLeftContent,
       }
     }
 

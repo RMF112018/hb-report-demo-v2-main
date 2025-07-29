@@ -349,24 +349,6 @@ export default function BetaBuildingMaterialsIndexCard({
             <p className={`${compactScale.textMedium} text-[#FA4616]/70 dark:text-[#FF8A67]/80`}>
               ENR Cost Index • BLS PPI • LME Metals • EIA Fuel
             </p>
-            <div className={`flex items-center ${compactScale.gap} ${compactScale.marginTop}`}>
-              <Badge
-                variant="outline"
-                className={`${compactScale.textSmall} bg-[#FA4616]/10 text-[#FA4616] dark:bg-[#FA4616]/30 dark:text-[#FF8A67]`}
-              >
-                <Package className={`${compactScale.iconSizeSmall} mr-0.5`} />
-                Power BI Enhanced
-              </Badge>
-              {isRealTime && (
-                <Badge
-                  variant="outline"
-                  className={`${compactScale.textSmall} bg-[#0021A5]/10 text-[#0021A5] dark:bg-[#0021A5]/30 dark:text-[#4A7FD6]`}
-                >
-                  <Clock className={`${compactScale.iconSizeSmall} mr-0.5`} />
-                  Live Data
-                </Badge>
-              )}
-            </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
