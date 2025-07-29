@@ -739,3 +739,27 @@
     max-width: 100%;
   }
 }
+
+/* Custom animations for HBI Demo Modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.scale-98 {
+  transform: scale(0.98);
+}
+
+.scale-102 {
+  transform: scale(1.02);
+}

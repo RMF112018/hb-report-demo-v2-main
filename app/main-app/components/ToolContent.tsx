@@ -38,6 +38,8 @@ import {
   Settings,
   Building2,
   UserCheck,
+  Clock,
+  CheckCircle,
   ChevronDown,
   ChevronUp,
   BarChart3,
@@ -45,9 +47,7 @@ import {
   Target,
   Zap,
   CheckCircle2,
-  Clock,
   XCircle,
-  CheckCircle,
   Eye,
   Calculator,
   Receipt,
@@ -279,6 +279,7 @@ interface ToolContentProps {
   onNavigateBack?: () => void
   activeTab?: string
   onTabChange?: (tabId: string) => void
+  renderMode?: "leftContent" | "rightContent"
 }
 
 interface ToolConfig {
@@ -546,7 +547,8 @@ const ModularStaffingContent: React.FC<{
   onNavigateBack?: () => void
   activeTab?: string
   onTabChange?: (tabId: string) => void
-}> = ({ userRole, user, onNavigateBack, activeTab = "overview", onTabChange }) => {
+  renderMode?: "leftContent" | "rightContent"
+}> = ({ userRole, user, onNavigateBack, activeTab = "overview", onTabChange, renderMode = "rightContent" }) => {
   const [isLoading, setIsLoading] = useState(true)
 
   // Handle component loading state
@@ -568,6 +570,145 @@ const ModularStaffingContent: React.FC<{
 
   // Role-based content injection following v-3-0 modular architecture
   const renderRoleSpecificContent = () => {
+    // For left content mode, show sidebar content based on role and tab
+    if (
+      renderMode === "leftContent" &&
+      ((userRole === "executive" && activeTab === "overview") ||
+        (userRole === "project-executive" && activeTab === "portfolio") ||
+        (userRole === "project-manager" && activeTab === "team"))
+    ) {
+      return (
+        <div className="space-y-4">
+          {/* Executive Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                Executive Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Total Staff</span>
+                <span className="font-medium">248</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Utilization Rate</span>
+                <span className="font-medium text-green-600">89.5%</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Monthly Labor Cost</span>
+                <span className="font-medium">$2.03M</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Cash Inflow on Labor</span>
+                <span className="font-medium text-blue-600">$2,819,400</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Needing Assignment */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                Needing Assignment (5)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-2">
+              <div className="h-48 overflow-auto">
+                <div className="space-y-1">
+                  {[
+                    { name: "Emily Davis", role: "Project Engineer", days: 7 },
+                    { name: "Michael Chen", role: "Senior PM", days: 12 },
+                    { name: "Sarah Johnson", role: "Project Manager II", days: 28 },
+                    { name: "Alex Rodriguez", role: "Project Admin", days: 45 },
+                    { name: "James Wilson", role: "Project Manager I", days: 62 },
+                  ].map((staff, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center py-1 px-2 text-xs border-b border-border"
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium">{staff.name}</div>
+                        <div className="text-muted-foreground text-[10px]">{staff.role}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`font-medium ${
+                            staff.days <= 14 ? "text-red-600" : staff.days <= 30 ? "text-yellow-600" : "text-green-600"
+                          }`}
+                        >
+                          {staff.days}d
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Approved SPCRs */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                Approved SPCRs (6)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-2">
+              <div className="h-64 overflow-auto">
+                <div className="space-y-3">
+                  {[
+                    {
+                      position: "Senior Project Manager",
+                      project: "Oceanfront Resort",
+                      type: "increase",
+                      budget: 125000,
+                    },
+                    { position: "Project Engineer", project: "Downtown Office", type: "increase", budget: 89000 },
+                    { position: "Site Supervisor", project: "Medical Center", type: "decrease", budget: 67000 },
+                  ].map((spcr, index) => (
+                    <div
+                      key={index}
+                      className="p-3 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-xs">{spcr.position}</div>
+                            <div className="text-[10px] text-muted-foreground">{spcr.project}</div>
+                          </div>
+                          <div className="text-right">
+                            <div
+                              className={`text-xs font-medium ${
+                                spcr.type === "increase" ? "text-green-600" : "text-orange-600"
+                              }`}
+                            >
+                              {spcr.type === "increase" ? "+" : "-"}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">${(spcr.budget / 1000).toFixed(0)}K</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 pt-1">
+                          <Button size="sm" className="h-6 px-2 text-[10px] bg-green-600 hover:bg-green-700">
+                            <UserCheck className="h-3 w-3 mr-1" />
+                            Assign Staff
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
+
+    // For right content mode, show main content
     return (
       <React.Suspense
         fallback={
@@ -579,7 +720,7 @@ const ModularStaffingContent: React.FC<{
           </div>
         }
       >
-        {userRole === "executive" && <ExecutiveStaffingView activeTab={activeTab} />}
+        {userRole === "executive" && <ExecutiveStaffingView activeTab={activeTab} mode="injected" />}
         {userRole === "project-executive" && <ProjectExecutiveStaffingView />}
         {userRole === "project-manager" && <ProjectManagerStaffingView />}
         {!["executive", "project-executive", "project-manager"].includes(userRole) && (
@@ -4476,6 +4617,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   onNavigateBack,
   activeTab = "overview",
   onTabChange,
+  renderMode = "rightContent",
 }) => {
   const config = TOOL_CONFIGS[toolName]
   if (!config) {
@@ -4501,6 +4643,7 @@ export const ToolContent: React.FC<ToolContentProps> = ({
         onNavigateBack={onNavigateBack}
         activeTab={activeTab}
         onTabChange={onTabChange}
+        renderMode={renderMode}
       />
     )
   }

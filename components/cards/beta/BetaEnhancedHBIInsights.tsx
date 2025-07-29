@@ -47,7 +47,9 @@ import {
   Lock,
   Shield,
   Database,
+  MoreVertical,
 } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu"
 
 interface BetaEnhancedHBIInsightsProps {
   className?: string
@@ -258,21 +260,25 @@ export default function BetaEnhancedHBIInsights({
             </div>
           </div>
           <div className={`flex items-center ${compactScale.gap}`}>
-            <div className={`flex items-center ${compactScale.gap}`}>
-              <Label htmlFor="ai-toggle" className={compactScale.textSmall}>
-                AI Processing
-              </Label>
-              <Switch id="ai-toggle" checked={aiEnabled} onCheckedChange={setAiEnabled} />
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReprocess}
-              disabled={isProcessing}
-              className={isCompact ? "h-6 w-6 p-0" : "h-8 w-8 p-0"}
-            >
-              <RefreshCw className={`${compactScale.iconSizeSmall} ${isProcessing ? "animate-spin" : ""}`} />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-transparent">
+                  <MoreVertical className={`${compactScale.iconSize} scale-150`} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <Switch id="ai-toggle" checked={aiEnabled} onCheckedChange={setAiEnabled} />
+                  <Label htmlFor="ai-toggle" className={compactScale.textSmall}>
+                    AI Processing
+                  </Label>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleReprocess} disabled={isProcessing}>
+                  <RefreshCw className={`${compactScale.iconSize} mr-2 ${isProcessing ? "animate-spin" : ""}`} />
+                  {isProcessing ? "Processing..." : "Refresh Data"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <div className={`flex items-center justify-between ${compactScale.textSmall} text-muted-foreground`}>
@@ -426,9 +432,6 @@ export default function BetaEnhancedHBIInsights({
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className={`${isCompact ? "h-5 text-[10px]" : "h-6 text-xs"}`}>
-                      View Details
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -508,10 +511,6 @@ export default function BetaEnhancedHBIInsights({
               <Sparkles className="h-4 w-4 text-purple-600" />
               <span className="text-xs text-muted-foreground">AI-Powered by HBI Intelligence & Power BI</span>
             </div>
-            <Button variant="outline" size="sm" className="h-6 text-xs">
-              <ExternalLink className="h-3 w-3 mr-1" />
-              View in Power BI
-            </Button>
           </div>
         </div>
       </CardContent>

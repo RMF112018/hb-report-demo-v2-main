@@ -396,7 +396,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   },
   {
     name: "Staffing",
-    href: "/dashboard/staff-planning",
+    href: "#",
     category: "Core Tools",
     description: "Resource planning and scheduling",
   },
@@ -483,7 +483,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   // Pre-Construction
   {
     name: "Pre-Construction Dashboard",
-    href: "/pre-con",
+    href: "/preconstruction",
     category: "Pre-Construction",
     description: "Pre-construction command center and pipeline overview",
   },
@@ -1459,7 +1459,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                   //   setQualityCarouselTimeout(timeout)
                                   // }
 
-                                  onToolSelect?.(tool.name)
+                                  // Handle tools with href property (like Pre-Construction Dashboard)
+                                  if (tool.href && tool.href !== "#") {
+                                    router.push(tool.href)
+                                  } else {
+                                    onToolSelect?.(tool.name)
+                                  }
                                   setActiveSubCategory(null) // Close the panel after selection
                                 }}
                                 className="w-full p-3 h-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -2278,7 +2283,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
                                       //   setQualityCarouselTimeout(timeout)
                                       // }
 
-                                      onToolSelect?.(tool.name)
+                                      // Handle tools with href property (like Pre-Construction Dashboard)
+                                      if (tool.href && tool.href !== "#") {
+                                        router.push(tool.href)
+                                      } else {
+                                        onToolSelect?.(tool.name)
+                                      }
                                       setActiveCategory(null) // Close the panel after selection
                                     }}
                                     className="w-full px-3 py-2 h-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

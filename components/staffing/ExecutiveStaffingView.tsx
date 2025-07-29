@@ -50,8 +50,6 @@ import { cn } from "@/lib/utils"
 import { AppHeader } from "@/components/layout/app-header"
 
 // Import presentation components
-import { PresentationCarousel } from "@/components/presentation/PresentationCarousel"
-import { executiveStaffingSlides } from "@/components/presentation/executiveStaffingSlides"
 
 // Import components
 import { EnhancedInteractiveStaffingGantt } from "@/app/dashboard/staff-planning/components/EnhancedInteractiveStaffingGantt"
@@ -158,6 +156,7 @@ interface SPCR {
 
 interface ExecutiveStaffingViewProps {
   activeTab?: string
+  mode?: "standalone" | "injected" // Add mode prop to determine layout
 }
 
 interface AssignmentData {
@@ -194,7 +193,10 @@ interface AssignmentModal {
   }
 }
 
-export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ activeTab = "overview" }) => {
+export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({
+  activeTab = "overview",
+  mode = "standalone",
+}) => {
   console.log("🏗️ ExecutiveStaffingView: Component loading...")
   const { user } = useAuth()
   const { toast } = useToast()
@@ -209,9 +211,6 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Presentation mode state
-  const [showTour, setShowTour] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const [assignmentModal, setAssignmentModal] = useState<AssignmentModal>({
     isOpen: false,
     spcr: null,
@@ -236,87 +235,6 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     setProjects(projectsData as Project[])
     setSpcrs(spcrData as SPCR[])
   }, [])
-
-  // Handle component mount
-  useEffect(() => {
-    console.log("🔧 Executive Staffing Tour: Setting mounted to true")
-    setMounted(true)
-  }, [])
-
-  // DISABLED: Automatic tour logic - separate useEffect that depends on mounted state
-  // useEffect(() => {
-  //   console.log("🔍 Executive Staffing Tour: Checking conditions...", { mounted })
-  //   if (mounted) {
-  //     // Check if tour should be triggered (sidebar has priority)
-  //     const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
-  //     const regularTourFlag = localStorage.getItem("execStaffingTour")
-  //     const timestamp = localStorage.getItem("execStaffingTourTimestamp")
-  //     const sidebarTimestamp = localStorage.getItem("staffingTourTimestamp")
-
-  //     console.log("🔍 Executive Staffing Tour: localStorage check result:", {
-  //       sidebarTourFlag,
-  //       regularTourFlag,
-  //       timestamp,
-  //       sidebarTimestamp,
-  //     })
-  //     console.log("🗄️ Executive Staffing Tour: All localStorage keys:", Object.keys(localStorage))
-
-  //     // Check for sidebar-triggered tour first (has priority)
-  //     if (sidebarTourFlag === "true") {
-  //       console.log("✅ Executive Staffing Tour: Sidebar trigger flag found, launching tour in 3 seconds...")
-  //       const timer = setTimeout(() => {
-  //         setShowTour(true)
-  //         console.log("🎯 Executive Staffing Tour: Tour launched from sidebar trigger!")
-  //       }, 3000)
-
-  //       return () => clearTimeout(timer)
-  //     }
-  //     // Check for regular tour flag (from page header carousel menu)
-  //     else if (regularTourFlag === "true") {
-  //       console.log("✅ Executive Staffing Tour: Regular tour flag found, launching tour in 3 seconds...")
-  //       const timer = setTimeout(() => {
-  //         setShowTour(true)
-  //         console.log("🎯 Executive Staffing Tour: Tour launched from header trigger!")
-  //       }, 3000)
-
-  //       return () => clearTimeout(timer)
-  //     } else {
-  //       console.log("⏭️ Executive Staffing Tour: No tour flags found, skipping tour")
-  //       // Also check for any remaining flags that might indicate a timing issue
-  //       const allLocalStorageKeys = Object.keys(localStorage)
-  //       const tourRelatedKeys = allLocalStorageKeys.filter((key) => key.includes("tour") || key.includes("Tour"))
-  //       console.log("🔍 Executive Staffing Tour: Tour-related localStorage keys:", tourRelatedKeys)
-  //     }
-  //   }
-  // }, [mounted])
-
-  // DISABLED: Additional check for localStorage flag that might be set after component mount
-  // useEffect(() => {
-  //   if (mounted && !showTour) {
-  //     const checkForTourFlag = () => {
-  //       const sidebarTourFlag = localStorage.getItem("staffingTourFromSidebar")
-  //       const regularTourFlag = localStorage.getItem("execStaffingTour")
-
-  //       if (sidebarTourFlag === "true") {
-  //         console.log("🎯 Executive Staffing Tour: Late sidebar flag detected, triggering tour now!")
-  //         setShowTour(true)
-  //       } else if (regularTourFlag === "true") {
-  //         console.log("🎯 Executive Staffing Tour: Late regular flag detected, triggering tour now!")
-  //         setShowTour(true)
-  //       }
-  //     }
-
-  //     // Check immediately and then periodically for a few seconds
-  //     checkForTourFlag()
-  //     const interval = setInterval(checkForTourFlag, 500)
-  //     const timeout = setTimeout(() => clearInterval(interval), 5000)
-
-  //     return () => {
-  //       clearInterval(interval)
-  //       clearTimeout(timeout)
-  //     }
-  //   }
-  // }, [mounted, showTour])
 
   // Mock data for staff needing assignment (3-6 members with assignments ending in 4-62 days)
   const needingAssignmentData = useMemo(() => {
@@ -793,17 +711,240 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
     }
   }
 
-  // Handle tour completion
-  const handleTourComplete = () => {
-    console.log("🏁 Executive Staffing Tour: Tour completed, clearing localStorage")
-    localStorage.removeItem("execStaffingTour")
-    localStorage.removeItem("execStaffingTourTimestamp")
-    localStorage.removeItem("staffingTourFromSidebar")
-    localStorage.removeItem("staffingTourTimestamp")
-    setShowTour(false)
-    console.log("✅ Executive Staffing Tour: Tour completed and all localStorage flags cleared")
+  // Content-only rendering for injection mode
+  const renderContent = () => (
+    <div className="space-y-6">
+      {/* Overview Content */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          {/* Overview Collapsible Section */}
+          <Collapsible open={isOverviewExpanded} onOpenChange={setIsOverviewExpanded}>
+            <Card>
+              <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Staffing Overview
+                    </CardTitle>
+                    <div className="flex items-center">
+                      {isOverviewExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                    </div>
+                  </div>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-6">
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium">Staff Utilization</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold">{overviewAnalytics.utilizationRate.toFixed(1)}%</div>
+                          <Progress value={overviewAnalytics.utilizationRate} className="h-2" />
+                          <div className="text-xs text-muted-foreground">
+                            {overviewAnalytics.assignedStaff} of {overviewAnalytics.totalStaff} assigned
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DollarSign className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium">Monthly Labor Cost</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">${(2032000 / 1000000).toFixed(2)}M</div>
+                          <div className="text-xs text-muted-foreground">
+                            +${(overviewAnalytics.burden / 1000).toFixed(0)}K burden
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="h-4 w-4 text-purple-600" />
+                          <span className="text-sm font-medium">Cash Inflow on Labor</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">${(2819400).toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Last: ${(overviewAnalytics.lastInflow / 1000).toFixed(0)}K
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="h-4 w-4 text-orange-600" />
+                          <span className="text-sm font-medium">SPCR Status</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-2xl font-bold">{overviewAnalytics.approvedSpcrs}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {overviewAnalytics.pendingSpcrs} pending review
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* HBI Insights */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-blue-600" />
+                      HBI Staffing Insights
+                    </h3>
+                    <EnhancedHBIInsights config={staffingInsights} cardId="staffing-executive" />
+                  </div>
+
+                  {/* Behavioral Analytics */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      Behavioral Analytics
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <span className="text-sm font-medium">Team Diversity</span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="text-2xl font-bold">
+                              {(() => {
+                                const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                const discTypes = staffWithProfiles.map((s) => s.behavioralProfile!.discProfile.type)
+                                const uniqueTypes = new Set(discTypes)
+                                return Math.round((uniqueTypes.size / discTypes.length) * 100)
+                              })()}
+                              %
+                            </div>
+                            <div className="text-xs text-muted-foreground">Behavioral diversity across teams</div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Star className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-medium">High Compatibility</span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="text-2xl font-bold">
+                              {(() => {
+                                const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                const highCompatibility = staffWithProfiles.filter(
+                                  (s) => s.behavioralProfile!.teamCompatibility.overallScore >= 80
+                                )
+                                return Math.round((highCompatibility.length / staffWithProfiles.length) * 100)
+                              })()}
+                              %
+                            </div>
+                            <div className="text-xs text-muted-foreground">Staff with excellent team fit</div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                            <span className="text-sm font-medium">Risk Assessment</span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="text-2xl font-bold">
+                              {(() => {
+                                const staffWithProfiles = staffMembers.filter((s) => s.behavioralProfile)
+                                const lowCompatibility = staffWithProfiles.filter(
+                                  (s) => s.behavioralProfile!.teamCompatibility.overallScore < 60
+                                )
+                                return Math.round((lowCompatibility.length / staffWithProfiles.length) * 100)
+                              })()}
+                              %
+                            </div>
+                            <div className="text-xs text-muted-foreground">Staff needing placement review</div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        </div>
+      )}
+
+      {/* Assignments & SPCR Management Content */}
+      {activeTab === "assignments" && (
+        <div className="space-y-6">
+          {/* Staff Assignment Management */}
+          <EnhancedInteractiveStaffingGantt userRole="executive" />
+        </div>
+      )}
+    </div>
+  )
+
+  // For injected mode, just return the content
+  if (mode === "injected") {
+    return (
+      <>
+        {renderContent()}
+
+        {/* Export Modal */}
+        <ExportModal
+          open={isExportModalOpen}
+          onOpenChange={setIsExportModalOpen}
+          onExport={handleExportSubmit}
+          defaultFileName="staffing-export"
+        />
+
+        {/* SPCR Assignment Modal - same as standalone */}
+        <Dialog
+          open={assignmentModal.isOpen}
+          onOpenChange={(open) => setAssignmentModal((prev) => ({ ...prev, isOpen: open }))}
+        >
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[99999]">
+            <DialogHeader>
+              <DialogTitle>
+                {assignmentModal.step === "overview"
+                  ? "Assignment Overview"
+                  : assignmentModal.step === "staff-selection"
+                  ? "Select Staff Members"
+                  : assignmentModal.step === "compatibility-analysis"
+                  ? "Team Compatibility Analysis"
+                  : assignmentModal.step === "assignment-config"
+                  ? "Configure Assignment"
+                  : "Confirm Assignment"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="text-center py-8 text-muted-foreground">
+                <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <div className="text-sm">SPCR Assignment Modal</div>
+                <div className="text-xs">Full modal content available in standalone mode</div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    )
   }
 
+  // Standalone mode - full page layout
   return (
     <>
       <div
@@ -1864,25 +2005,6 @@ export const ExecutiveStaffingView: React.FC<ExecutiveStaffingViewProps> = ({ ac
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Presentation Carousel - Rendered outside main container for full-screen coverage */}
-      {showTour && typeof window !== "undefined" && (
-        <>
-          {(() => {
-            console.log("🎬 Executive Staffing Tour: Rendering PresentationCarousel")
-            return null
-          })()}
-          {createPortal(
-            <PresentationCarousel
-              slides={executiveStaffingSlides}
-              onComplete={handleTourComplete}
-              ctaText="Return to Executive Staffing"
-              ctaIcon={UserCheck}
-            />,
-            document.body
-          )}
-        </>
-      )}
     </>
   )
 }
