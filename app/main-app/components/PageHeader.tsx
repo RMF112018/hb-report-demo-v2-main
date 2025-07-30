@@ -316,6 +316,89 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         }
       }
     }
+    // Handle pre-construction specific pages (when not in project context)
+    else if (
+      navigationState?.currentViewType?.startsWith("pre-construction") ||
+      navigationState?.currentViewType?.includes("strategic") ||
+      navigationState?.currentViewType?.includes("bd-toolkit") ||
+      navigationState?.currentViewType?.includes("client-relations") ||
+      navigationState?.currentViewType?.includes("market-expansion") ||
+      navigationState?.currentViewType?.includes("collaboration")
+    ) {
+      // Add Pre-Construction as the parent breadcrumb
+      breadcrumb.push({
+        id: "pre-construction",
+        label: "Pre-Construction",
+        onClick: () => {
+          // Navigate back to pre-construction main page
+          if (typeof window !== "undefined") {
+            window.location.href = "/preconstruction"
+          }
+        },
+      })
+
+      // Add specific pre-construction sub-pages
+      if (navigationState?.currentViewType === "strategic-opportunity-intel") {
+        breadcrumb.push({
+          id: "strategic-opportunity-intel",
+          label: "Strategic Opportunity Intel",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/preconstruction/strategic-opportunity-intel"
+            }
+          },
+        })
+      } else if (navigationState?.currentViewType === "bd-toolkit") {
+        breadcrumb.push({
+          id: "bd-toolkit",
+          label: "BD Toolkit",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/preconstruction/bd-toolkit"
+            }
+          },
+        })
+      } else if (navigationState?.currentViewType === "client-relations-intel") {
+        breadcrumb.push({
+          id: "client-relations-intel",
+          label: "Client Relations Intel",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/preconstruction/client-relations-intel"
+            }
+          },
+        })
+      } else if (navigationState?.currentViewType === "market-expansion-support") {
+        breadcrumb.push({
+          id: "market-expansion-support",
+          label: "Market Expansion Support",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/preconstruction/market-expansion-support"
+            }
+          },
+        })
+      } else if (navigationState?.currentViewType === "collaboration-coaching") {
+        breadcrumb.push({
+          id: "collaboration-coaching",
+          label: "Collaboration & Coaching",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/preconstruction/collaboration-coaching"
+            }
+          },
+        })
+      }
+
+      // Add active tab if it exists and is not overview
+      if (navigationState?.activeTab && navigationState?.activeTabLabel && navigationState.activeTab !== "overview") {
+        breadcrumb.push({
+          id: `pre-con-${navigationState.activeTab}`,
+          label: navigationState.activeTabLabel,
+          onClick: () => onNavigateToTab?.(navigationState.activeTab!),
+        })
+      }
+    }
     // Add IT module if selected
     else if (navigationState?.selectedModule) {
       breadcrumb.push({
@@ -341,6 +424,23 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         })
       }
     }
+    // Handle dashboard-specific navigation (when no project, module, or tool is selected)
+    else if (navigationState?.currentViewType === "dashboard" || navigationState?.isDashboardView) {
+      // Add dashboard category based on active tab
+      if (navigationState?.activeTab && navigationState?.activeTabLabel) {
+        const tabId = navigationState.activeTab
+
+        // Map dashboard tabs to proper breadcrumb labels
+        const tabLabel = getDashboardTabLabel(tabId)
+        if (tabLabel) {
+          breadcrumb.push({
+            id: `dashboard-${tabId}`,
+            label: tabLabel,
+            onClick: () => onNavigateToTab?.(tabId),
+          })
+        }
+      }
+    }
 
     return breadcrumb
   }
@@ -358,6 +458,38 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         return "Field Reports"
       default:
         return capitalizeTitle(toolName)
+    }
+  }
+
+  // Helper function to get proper dashboard tab labels
+  const getDashboardTabLabel = (tabId: string): string | null => {
+    switch (tabId) {
+      case "overview":
+        return "Overview"
+      case "pre-con-overview":
+        return "Pre-Con Overview"
+      case "ops-overview":
+        return "Ops Overview"
+      case "activity-feed":
+        return "Activity Feed"
+      case "staffing":
+        return "Staffing"
+      case "financial":
+        return "Financial"
+      case "quality":
+        return "Quality"
+      case "safety":
+        return "Safety"
+      case "compliance":
+        return "Compliance"
+      case "warranty":
+        return "Warranty"
+      case "tools":
+        return "Tools"
+      case "settings":
+        return "Settings"
+      default:
+        return null
     }
   }
 

@@ -389,7 +389,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   },
   {
     name: "Reports",
-    href: "/dashboard/reports",
+    href: "#",
     category: "Core Tools",
     description: "Comprehensive reporting dashboard with approval workflows",
     visibleRoles: ["project-manager", "project-executive", "executive", "admin"],
@@ -489,7 +489,7 @@ const TOOLS_MENU: ToolMenuConfig[] = [
   },
   {
     name: "Business Development",
-    href: "/pre-con#business-dev",
+    href: "#",
     category: "Pre-Construction",
     description: "Lead generation and pursuit management",
   },

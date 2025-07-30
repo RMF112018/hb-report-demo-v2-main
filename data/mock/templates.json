@@ -1,0 +1,193 @@
+{
+  "categories": [
+    {
+      "id": "proposals",
+      "name": "Proposals",
+      "description": "Standard proposal templates for different project types",
+      "icon": "FileText",
+      "color": "blue",
+      "files": [
+        {
+          "id": "prop-001",
+          "filename": "General_Proposal_Template_v3.2.docx",
+          "description": "Comprehensive proposal template with executive summary, technical approach, and pricing sections",
+          "size": "2.4 MB",
+          "lastModified": "2024-01-15T10:30:00Z",
+          "version": "3.2",
+          "tags": ["general", "comprehensive", "pricing"]
+        },
+        {
+          "id": "prop-002",
+          "filename": "Healthcare_Proposal_Template.docx",
+          "description": "Specialized template for healthcare facility projects with infection control considerations",
+          "size": "1.8 MB",
+          "lastModified": "2024-01-10T14:20:00Z",
+          "version": "2.1",
+          "tags": ["healthcare", "specialized", "infection-control"]
+        },
+        {
+          "id": "prop-003",
+          "filename": "Government_RFP_Response_Template.docx",
+          "description": "Government RFP response template with required certifications and compliance sections",
+          "size": "3.1 MB",
+          "lastModified": "2024-01-08T09:15:00Z",
+          "version": "4.0",
+          "tags": ["government", "compliance", "certifications"]
+        },
+        {
+          "id": "prop-004",
+          "filename": "Educational_Facility_Proposal.docx",
+          "description": "Template for educational institution projects with accessibility and safety requirements",
+          "size": "2.7 MB",
+          "lastModified": "2024-01-05T16:45:00Z",
+          "version": "2.8",
+          "tags": ["education", "accessibility", "safety"]
+        }
+      ]
+    },
+    {
+      "id": "presentations",
+      "name": "Presentations",
+      "description": "Presentation templates for client meetings and project updates",
+      "icon": "Presentation",
+      "color": "purple",
+      "files": [
+        {
+          "id": "pres-001",
+          "filename": "Company_Overview_Presentation.pptx",
+          "description": "Standard company overview presentation with project portfolio and capabilities",
+          "size": "15.2 MB",
+          "lastModified": "2024-01-12T11:30:00Z",
+          "version": "5.1",
+          "tags": ["company-overview", "portfolio", "capabilities"]
+        },
+        {
+          "id": "pres-002",
+          "filename": "Project_Kickoff_Presentation.pptx",
+          "description": "Project kickoff meeting template with timeline, team structure, and communication plan",
+          "size": "8.7 MB",
+          "lastModified": "2024-01-09T13:20:00Z",
+          "version": "3.4",
+          "tags": ["kickoff", "timeline", "team"]
+        },
+        {
+          "id": "pres-003",
+          "filename": "Progress_Update_Presentation.pptx",
+          "description": "Monthly progress update template with milestones, challenges, and next steps",
+          "size": "6.3 MB",
+          "lastModified": "2024-01-06T15:10:00Z",
+          "version": "2.9",
+          "tags": ["progress", "milestones", "updates"]
+        },
+        {
+          "id": "pres-004",
+          "filename": "Technical_Approach_Presentation.pptx",
+          "description": "Technical approach presentation template for complex construction projects",
+          "size": "12.1 MB",
+          "lastModified": "2024-01-03T10:45:00Z",
+          "version": "4.2",
+          "tags": ["technical", "approach", "complex"]
+        }
+      ]
+    },
+    {
+      "id": "qualifications",
+      "name": "Qualification Statements",
+      "description": "Standard qualification statements and company credentials",
+      "icon": "Award",
+      "color": "green",
+      "files": [
+        {
+          "id": "qual-001",
+          "filename": "General_Qualification_Statement.pdf",
+          "description": "Comprehensive company qualification statement with certifications and experience",
+          "size": "4.2 MB",
+          "lastModified": "2024-01-14T08:30:00Z",
+          "version": "6.0",
+          "tags": ["general", "certifications", "experience"]
+        },
+        {
+          "id": "qual-002",
+          "filename": "Healthcare_Qualification_Statement.pdf",
+          "description": "Healthcare-specific qualification statement with medical facility experience",
+          "size": "3.8 MB",
+          "lastModified": "2024-01-11T12:15:00Z",
+          "version": "4.1",
+          "tags": ["healthcare", "medical", "facilities"]
+        },
+        {
+          "id": "qual-003",
+          "filename": "Government_Qualification_Statement.pdf",
+          "description": "Government qualification statement with required certifications and past performance",
+          "size": "5.1 MB",
+          "lastModified": "2024-01-07T14:50:00Z",
+          "version": "5.3",
+          "tags": ["government", "certifications", "performance"]
+        },
+        {
+          "id": "qual-004",
+          "filename": "Educational_Qualification_Statement.pdf",
+          "description": "Educational institution qualification statement with campus development experience",
+          "size": "3.5 MB",
+          "lastModified": "2024-01-04T09:25:00Z",
+          "version": "3.8",
+          "tags": ["education", "campus", "development"]
+        }
+      ]
+    },
+    {
+      "id": "capabilities",
+      "name": "Capability Sheets",
+      "description": "Detailed capability sheets for specific project types and services",
+      "icon": "Briefcase",
+      "color": "orange",
+      "files": [
+        {
+          "id": "cap-001",
+          "filename": "Healthcare_Construction_Capability.pdf",
+          "description": "Comprehensive healthcare construction capabilities with case studies and references",
+          "size": "7.8 MB",
+          "lastModified": "2024-01-13T16:20:00Z",
+          "version": "3.5",
+          "tags": ["healthcare", "construction", "case-studies"]
+        },
+        {
+          "id": "cap-002",
+          "filename": "Educational_Facility_Capability.pdf",
+          "description": "Educational facility construction capabilities with campus development expertise",
+          "size": "6.4 MB",
+          "lastModified": "2024-01-10T11:40:00Z",
+          "version": "2.9",
+          "tags": ["education", "campus", "facilities"]
+        },
+        {
+          "id": "cap-003",
+          "filename": "Government_Construction_Capability.pdf",
+          "description": "Government construction capabilities with compliance and security expertise",
+          "size": "8.2 MB",
+          "lastModified": "2024-01-08T13:55:00Z",
+          "version": "4.1",
+          "tags": ["government", "compliance", "security"]
+        },
+        {
+          "id": "cap-004",
+          "filename": "Commercial_Development_Capability.pdf",
+          "description": "Commercial development capabilities with mixed-use and retail experience",
+          "size": "5.9 MB",
+          "lastModified": "2024-01-05T10:15:00Z",
+          "version": "3.2",
+          "tags": ["commercial", "mixed-use", "retail"]
+        },
+        {
+          "id": "cap-005",
+          "filename": "Infrastructure_Development_Capability.pdf",
+          "description": "Infrastructure development capabilities with roads, bridges, and utilities experience",
+          "size": "9.1 MB",
+          "lastModified": "2024-01-02T14:30:00Z",
+          "version": "4.7",
+          "tags": ["infrastructure", "roads", "bridges", "utilities"]
+        }
+      ]
+    }
+  ]
+}

@@ -87,6 +87,11 @@ import { useToast } from "../../../hooks/use-toast"
 import { useAuth } from "../../../context/auth-context"
 import { cn } from "../../../lib/utils"
 
+// Import the ReportsContent component
+import { ReportsContent } from "./ReportsContent"
+// Import the BusinessDevelopmentContent component
+import { BusinessDevelopmentContent } from "./BusinessDevelopmentContent"
+
 // Lazy-loaded staffing components for production-ready loading
 const ExecutiveStaffingView = React.lazy(() =>
   import("../../../components/staffing/ExecutiveStaffingView").then((module) => ({
@@ -392,6 +397,16 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { id: "training", label: "Training" },
       { id: "compliance", label: "Compliance" },
       { id: "settings", label: "Settings" },
+    ],
+  },
+  "Business Development": {
+    title: "Business Development",
+    description: "Pipeline analysis, lead generation, and market intelligence",
+    tabs: [
+      { id: "overview", label: "Overview" },
+      { id: "pipeline", label: "Pipeline" },
+      { id: "leads", label: "Lead Management" },
+      { id: "intelligence", label: "Market Intelligence" },
     ],
   },
 }
@@ -4681,6 +4696,34 @@ export const ToolContent: React.FC<ToolContentProps> = ({
   // Use Estimating layout for Estimating tool
   if (toolName === "estimating") {
     return <EstimatingContent userRole={userRole} user={user} activeTab={activeTab} onTabChange={onTabChange} />
+  }
+
+  // Use Reports layout for Reports tool
+  if (toolName === "Reports") {
+    return (
+      <ReportsContent
+        userRole={userRole}
+        user={user}
+        onNavigateBack={onNavigateBack}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        renderMode={renderMode}
+      />
+    )
+  }
+
+  // Use Business Development layout for Business Development tool
+  if (toolName === "Business Development") {
+    return (
+      <BusinessDevelopmentContent
+        userRole={userRole}
+        user={user}
+        onNavigateBack={onNavigateBack}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        renderMode={renderMode}
+      />
+    )
   }
 
   // Use HR & Payroll layout for HR & Payroll tool

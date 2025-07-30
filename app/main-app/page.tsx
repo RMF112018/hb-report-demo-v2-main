@@ -785,6 +785,22 @@ export default function MainApplicationPage() {
             { id: "compliance", label: "Compliance" },
             { id: "settings", label: "Settings" },
           ]
+        case "Reports":
+          return [
+            { id: "overview", label: "Overview" },
+            { id: "project-reports", label: "Project Reports" },
+            { id: "financial-reports", label: "Financial Reports" },
+            { id: "progress-reports", label: "Progress Reports" },
+            { id: "owner-reports", label: "Owner Reports" },
+            { id: "analytics", label: "Analytics" },
+          ]
+        case "Business Development":
+          return [
+            { id: "overview", label: "Overview" },
+            { id: "pipeline", label: "Pipeline" },
+            { id: "leads", label: "Lead Management" },
+            { id: "intelligence", label: "Market Intelligence" },
+          ]
         default:
           return [
             { id: "overview", label: "Overview" },
@@ -1109,6 +1125,29 @@ export default function MainApplicationPage() {
     }
 
     if (selectedTool) {
+      // Special handling for specific tools
+      if (selectedTool === "Reports") {
+        return {
+          userName,
+          moduleTitle: "Reports Dashboard",
+          subHead: "Comprehensive reporting dashboard with approval workflows and analytics",
+          tabs: getTabsForContent(),
+          navigationState,
+          ...navigationCallbacks,
+        }
+      }
+
+      if (selectedTool === "Business Development") {
+        return {
+          userName,
+          moduleTitle: "Business Development",
+          subHead: "Pipeline analysis, lead generation, and market intelligence",
+          tabs: getTabsForContent(),
+          navigationState,
+          ...navigationCallbacks,
+        }
+      }
+
       return {
         userName,
         moduleTitle: selectedTool.replace(/([A-Z])/g, " $1").trim(),
@@ -1249,7 +1288,9 @@ export default function MainApplicationPage() {
         (selectedTool === "Staffing" &&
           ((effectiveRole === "executive" && activeTab === "overview") ||
             (effectiveRole === "project-executive" && activeTab === "portfolio") ||
-            (effectiveRole === "project-manager" && activeTab === "team"))) // Show sidebar for staffing based on role and tab
+            (effectiveRole === "project-manager" && activeTab === "team"))) || // Show sidebar for staffing based on role and tab
+        selectedTool === "Reports" || // Show sidebar for Reports tool
+        selectedTool === "Business Development" // Show sidebar for Business Development tool
 
       return {
         leftContent: hasLeftContent ? (

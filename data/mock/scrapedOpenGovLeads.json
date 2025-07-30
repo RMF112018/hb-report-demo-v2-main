@@ -1,0 +1,112 @@
+[
+  {
+    "id": "og-001",
+    "title": "Miami-Dade County Courthouse Renovation and Expansion",
+    "location": "Miami-Dade County, FL",
+    "postedDate": "2024-01-15T08:00:00Z",
+    "deadline": "2024-03-20T17:00:00Z",
+    "category": "Public Safety",
+    "sourceUrl": "https://procurement.opengov.com/portal/miami-dade-county-fl/projects/12345",
+    "estimatedValue": "$45,000,000",
+    "description": "Comprehensive renovation and expansion of the Miami-Dade County Courthouse including structural upgrades, HVAC systems, and accessibility improvements."
+  },
+  {
+    "id": "og-002",
+    "title": "Orlando International Airport Terminal 3 Construction",
+    "location": "Orlando, FL",
+    "postedDate": "2024-01-12T10:30:00Z",
+    "deadline": "2024-04-15T17:00:00Z",
+    "category": "Transportation",
+    "sourceUrl": "https://procurement.opengov.com/portal/orlando-airport/projects/67890",
+    "estimatedValue": "$120,000,000",
+    "description": "Construction of new Terminal 3 at Orlando International Airport including baggage handling systems and retail space."
+  },
+  {
+    "id": "og-003",
+    "title": "Tampa Bay Water Treatment Plant Upgrade",
+    "location": "Tampa Bay, FL",
+    "postedDate": "2024-01-10T14:15:00Z",
+    "deadline": "2024-03-30T17:00:00Z",
+    "category": "Infrastructure",
+    "sourceUrl": "https://procurement.opengov.com/portal/tampa-bay-water/projects/11223",
+    "estimatedValue": "$28,500,000",
+    "description": "Major upgrade to water treatment facilities including new filtration systems and chemical treatment equipment."
+  },
+  {
+    "id": "og-004",
+    "title": "Jacksonville Public Library System Modernization",
+    "location": "Jacksonville, FL",
+    "postedDate": "2024-01-08T09:45:00Z",
+    "deadline": "2024-04-10T17:00:00Z",
+    "category": "Education",
+    "sourceUrl": "https://procurement.opengov.com/portal/jacksonville-fl/projects/44556",
+    "estimatedValue": "$15,750,000",
+    "description": "Modernization of 8 branch libraries including technology upgrades, HVAC systems, and ADA compliance improvements."
+  },
+  {
+    "id": "og-005",
+    "title": "Fort Lauderdale Beachfront Promenade Development",
+    "location": "Fort Lauderdale, FL",
+    "postedDate": "2024-01-05T11:20:00Z",
+    "deadline": "2024-05-15T17:00:00Z",
+    "category": "Recreation",
+    "sourceUrl": "https://procurement.opengov.com/portal/fort-lauderdale-fl/projects/77889",
+    "estimatedValue": "$32,000,000",
+    "description": "Development of beachfront promenade including boardwalk construction, landscaping, and recreational facilities."
+  },
+  {
+    "id": "og-006",
+    "title": "Gainesville University Medical Center Expansion",
+    "location": "Gainesville, FL",
+    "postedDate": "2024-01-03T16:30:00Z",
+    "deadline": "2024-06-20T17:00:00Z",
+    "category": "Healthcare",
+    "sourceUrl": "https://procurement.opengov.com/portal/gainesville-fl/projects/33445",
+    "estimatedValue": "$85,000,000",
+    "description": "Expansion of University of Florida Medical Center including new patient wings, surgical suites, and research facilities."
+  },
+  {
+    "id": "og-007",
+    "title": "Sarasota Performing Arts Center Construction",
+    "location": "Sarasota, FL",
+    "postedDate": "2024-01-01T13:00:00Z",
+    "deadline": "2024-07-30T17:00:00Z",
+    "category": "Cultural",
+    "sourceUrl": "https://procurement.opengov.com/portal/sarasota-fl/projects/66778",
+    "estimatedValue": "$65,000,000",
+    "description": "Construction of new performing arts center with 1,200-seat theater, rehearsal spaces, and educational facilities."
+  },
+  {
+    "id": "og-008",
+    "title": "Palm Beach County Emergency Operations Center",
+    "location": "Palm Beach County, FL",
+    "postedDate": "2023-12-28T10:15:00Z",
+    "deadline": "2024-04-25T17:00:00Z",
+    "category": "Public Safety",
+    "sourceUrl": "https://procurement.opengov.com/portal/palm-beach-county-fl/projects/88990",
+    "estimatedValue": "$22,500,000",
+    "description": "Construction of new emergency operations center with command facilities, communications systems, and backup power."
+  },
+  {
+    "id": "og-009",
+    "title": "Tallahassee State Capitol Renovation",
+    "location": "Tallahassee, FL",
+    "postedDate": "2023-12-26T15:45:00Z",
+    "deadline": "2024-08-15T17:00:00Z",
+    "category": "Government",
+    "sourceUrl": "https://procurement.opengov.com/portal/tallahassee-fl/projects/11234",
+    "estimatedValue": "$95,000,000",
+    "description": "Comprehensive renovation of the Florida State Capitol building including structural upgrades, security systems, and accessibility improvements."
+  },
+  {
+    "id": "og-010",
+    "title": "Daytona Beach International Speedway Infrastructure",
+    "location": "Daytona Beach, FL",
+    "postedDate": "2023-12-24T12:30:00Z",
+    "deadline": "2024-05-30T17:00:00Z",
+    "category": "Sports",
+    "sourceUrl": "https://procurement.opengov.com/portal/daytona-beach-fl/projects/55667",
+    "estimatedValue": "$18,750,000",
+    "description": "Infrastructure improvements at Daytona International Speedway including parking facilities, utilities, and access roads."
+  }
+]
