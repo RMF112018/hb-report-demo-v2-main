@@ -24,7 +24,7 @@ import {
   Send,
   History,
   DollarSign,
-  Building2,
+  Building,
   Timer,
   RefreshCw,
   XCircle,
@@ -57,11 +57,12 @@ interface Report {
 }
 
 interface ReportsDashboardProps {
-  projectId: string
-  projectData: any
+  projectId?: string
+  projectData?: any
   userRole: string
   user: any
   onTabChange?: (tabId: string) => void
+  renderMode?: "leftContent" | "rightContent"
 }
 
 interface DashboardStats {
@@ -76,7 +77,14 @@ interface DashboardStats {
   overdue: number
 }
 
-export function ReportsDashboard({ projectId, projectData, userRole, user, onTabChange }: ReportsDashboardProps) {
+export function ReportsDashboard({
+  projectId,
+  projectData,
+  userRole,
+  user,
+  onTabChange,
+  renderMode = "rightContent",
+}: ReportsDashboardProps) {
   const { toast } = useToast()
 
   const [reports, setReports] = useState<Report[]>([])
@@ -89,7 +97,7 @@ export function ReportsDashboard({ projectId, projectData, userRole, user, onTab
       id: "rpt-001",
       name: "Monthly Financial Review - December 2024",
       type: "financial-review",
-      projectId: projectId,
+      projectId: projectId || "project-001",
       projectName: projectData?.name || "Current Project",
       status: "approved",
       creatorId: "user-001",
@@ -109,7 +117,7 @@ export function ReportsDashboard({ projectId, projectData, userRole, user, onTab
       id: "rpt-002",
       name: "Monthly Progress Report - November 2024",
       type: "monthly-progress",
-      projectId: projectId,
+      projectId: projectId || "project-001",
       projectName: projectData?.name || "Current Project",
       status: "submitted",
       creatorId: "user-001",
@@ -127,7 +135,7 @@ export function ReportsDashboard({ projectId, projectData, userRole, user, onTab
       id: "rpt-003",
       name: "Owner Report - Q4 2024",
       type: "monthly-owner",
-      projectId: projectId,
+      projectId: projectId || "project-001",
       projectName: projectData?.name || "Current Project",
       status: "draft",
       creatorId: "user-001",
@@ -241,7 +249,7 @@ export function ReportsDashboard({ projectId, projectData, userRole, user, onTab
       case "monthly-progress":
         return <BarChart3 className="h-4 w-4" />
       case "monthly-owner":
-        return <Building2 className="h-4 w-4" />
+        return <Building className="h-4 w-4" />
       default:
         return <FileText className="h-4 w-4" />
     }
@@ -297,6 +305,92 @@ export function ReportsDashboard({ projectId, projectData, userRole, user, onTab
     )
   }
 
+  // Render different content based on renderMode
+  if (renderMode === "leftContent") {
+    return (
+      <div className="space-y-4">
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+              onClick={() => onTabChange?.("project-reports")}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Report
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+              Refresh Data
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Recent Reports */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Recent Reports</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {reports.slice(0, 3).map((report) => (
+                <div key={report.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
+                  <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-full">
+                    {getTypeIcon(report.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{report.name}</div>
+                    <div className="text-xs text-muted-foreground">{formatTimeAgo(report.updatedAt)}</div>
+                  </div>
+                  {getStatusBadge(report.status)}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Total Reports</span>
+              <span className="font-semibold">{stats.totalReports}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Pending</span>
+              <span className="font-semibold text-yellow-600">{stats.pendingApproval}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Approved</span>
+              <span className="font-semibold text-green-600">{stats.approved}</span>
+            </div>
+            {stats.overdue > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Overdue</span>
+                <span className="font-semibold text-red-600">{stats.overdue}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Main content (rightContent)
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Header Actions */}

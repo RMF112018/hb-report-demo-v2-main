@@ -1,0 +1,190 @@
+{
+  "categories": [
+    {
+      "id": "strategy-best-practices",
+      "name": "Strategy & Best Practices",
+      "description": "Strategic approaches and proven methodologies for business development success",
+      "icon": "Target",
+      "color": "blue"
+    },
+    {
+      "id": "brand-standards",
+      "name": "Brand Standards",
+      "description": "HB brand guidelines, templates, and visual identity resources",
+      "icon": "Palette",
+      "color": "purple"
+    },
+    {
+      "id": "past-win-examples",
+      "name": "Past Win Examples",
+      "description": "Successful proposal examples and case studies from previous wins",
+      "icon": "Trophy",
+      "color": "green"
+    },
+    {
+      "id": "public-procurement-guidance",
+      "name": "Public Procurement Guidance",
+      "description": "Government procurement processes, requirements, and compliance guidelines",
+      "icon": "Building2",
+      "color": "orange"
+    }
+  ],
+  "resources": [
+    {
+      "id": "strategy-001",
+      "categoryId": "strategy-best-practices",
+      "title": "Go/No-Go Decision Framework",
+      "summary": "Comprehensive framework for evaluating project opportunities and making strategic go/no-go decisions based on market analysis, capacity, and profitability.",
+      "type": "pdf",
+      "fileSize": "2.4 MB",
+      "downloadUrl": "/resources/strategy/go-no-go-framework.pdf",
+      "viewUrl": "/resources/strategy/go-no-go-framework",
+      "lastUpdated": "2024-12-15",
+      "tags": ["decision-making", "strategy", "evaluation"]
+    },
+    {
+      "id": "strategy-002",
+      "categoryId": "strategy-best-practices",
+      "title": "Competitive Analysis Template",
+      "summary": "Structured template for conducting thorough competitive analysis including market positioning, strengths/weaknesses, and differentiation strategies.",
+      "type": "docx",
+      "fileSize": "1.8 MB",
+      "downloadUrl": "/resources/strategy/competitive-analysis-template.docx",
+      "viewUrl": "/resources/strategy/competitive-analysis-template",
+      "lastUpdated": "2024-11-28",
+      "tags": ["competitive-analysis", "market-research", "positioning"]
+    },
+    {
+      "id": "strategy-003",
+      "categoryId": "strategy-best-practices",
+      "title": "Client Relationship Management Guide",
+      "summary": "Best practices for building and maintaining strong client relationships throughout the business development process.",
+      "type": "pdf",
+      "fileSize": "3.1 MB",
+      "downloadUrl": "/resources/strategy/client-relationship-guide.pdf",
+      "viewUrl": "/resources/strategy/client-relationship-guide",
+      "lastUpdated": "2024-12-03",
+      "tags": ["client-relations", "relationship-building", "communication"]
+    },
+    {
+      "id": "brand-001",
+      "categoryId": "brand-standards",
+      "title": "HB Brand Guidelines 2024",
+      "summary": "Complete brand guidelines including logo usage, color palette, typography, and visual identity standards for all marketing materials.",
+      "type": "pdf",
+      "fileSize": "8.2 MB",
+      "downloadUrl": "/resources/brand/hb-brand-guidelines-2024.pdf",
+      "viewUrl": "/resources/brand/hb-brand-guidelines-2024",
+      "lastUpdated": "2024-01-15",
+      "tags": ["brand-guidelines", "visual-identity", "logo-usage"]
+    },
+    {
+      "id": "brand-002",
+      "categoryId": "brand-standards",
+      "title": "Proposal Template Library",
+      "summary": "Collection of standardized proposal templates for different project types including cover pages, executive summaries, and technical sections.",
+      "type": "zip",
+      "fileSize": "15.6 MB",
+      "downloadUrl": "/resources/brand/proposal-template-library.zip",
+      "viewUrl": "/resources/brand/proposal-template-library",
+      "lastUpdated": "2024-12-10",
+      "tags": ["templates", "proposals", "standardization"]
+    },
+    {
+      "id": "brand-003",
+      "categoryId": "brand-standards",
+      "title": "Presentation Templates",
+      "summary": "Professional presentation templates for client meetings, interviews, and internal presentations with HB branding.",
+      "type": "pptx",
+      "fileSize": "12.3 MB",
+      "downloadUrl": "/resources/brand/presentation-templates.pptx",
+      "viewUrl": "/resources/brand/presentation-templates",
+      "lastUpdated": "2024-11-20",
+      "tags": ["presentations", "templates", "branding"]
+    },
+    {
+      "id": "wins-001",
+      "categoryId": "past-win-examples",
+      "title": "Palm Beach County Courthouse - Winning Proposal",
+      "summary": "Complete winning proposal for the $120M Palm Beach County Courthouse project, including technical approach, team composition, and innovative solutions.",
+      "type": "pdf",
+      "fileSize": "45.2 MB",
+      "downloadUrl": "/resources/wins/palm-beach-courthouse-proposal.pdf",
+      "viewUrl": "/resources/wins/palm-beach-courthouse-proposal",
+      "lastUpdated": "2023-08-15",
+      "tags": ["courthouse", "government", "winning-proposal"]
+    },
+    {
+      "id": "wins-002",
+      "categoryId": "past-win-examples",
+      "title": "Miami International Airport - Case Study",
+      "summary": "Detailed case study of the successful Miami International Airport expansion project, highlighting key success factors and lessons learned.",
+      "type": "pdf",
+      "fileSize": "18.7 MB",
+      "downloadUrl": "/resources/wins/miami-airport-case-study.pdf",
+      "viewUrl": "/resources/wins/miami-airport-case-study",
+      "lastUpdated": "2023-06-22",
+      "tags": ["airport", "case-study", "expansion"]
+    },
+    {
+      "id": "wins-003",
+      "categoryId": "past-win-examples",
+      "title": "Orlando Medical Center - Interview Presentation",
+      "summary": "Winning interview presentation for the Orlando Medical Center project, showcasing innovative healthcare construction approaches.",
+      "type": "pptx",
+      "fileSize": "28.9 MB",
+      "downloadUrl": "/resources/wins/orlando-medical-center-presentation.pptx",
+      "viewUrl": "/resources/wins/orlando-medical-center-presentation",
+      "lastUpdated": "2023-09-12",
+      "tags": ["healthcare", "presentation", "medical-center"]
+    },
+    {
+      "id": "procurement-001",
+      "categoryId": "public-procurement-guidance",
+      "title": "Florida Public Procurement Handbook",
+      "summary": "Comprehensive guide to Florida's public procurement processes, including bidding requirements, evaluation criteria, and compliance standards.",
+      "type": "pdf",
+      "fileSize": "6.8 MB",
+      "downloadUrl": "/resources/procurement/florida-procurement-handbook.pdf",
+      "viewUrl": "/resources/procurement/florida-procurement-handbook",
+      "lastUpdated": "2024-10-05",
+      "tags": ["florida", "procurement", "compliance"]
+    },
+    {
+      "id": "procurement-002",
+      "categoryId": "public-procurement-guidance",
+      "title": "Federal Contracting Requirements",
+      "summary": "Guide to federal contracting requirements including Davis-Bacon Act, Buy American Act, and other federal compliance standards.",
+      "type": "pdf",
+      "fileSize": "4.2 MB",
+      "downloadUrl": "/resources/procurement/federal-contracting-requirements.pdf",
+      "viewUrl": "/resources/procurement/federal-contracting-requirements",
+      "lastUpdated": "2024-09-18",
+      "tags": ["federal", "compliance", "contracting"]
+    },
+    {
+      "id": "procurement-003",
+      "categoryId": "public-procurement-guidance",
+      "title": "Bid Bond and Insurance Guide",
+      "summary": "Comprehensive guide to bid bonds, performance bonds, and insurance requirements for public construction projects.",
+      "type": "pdf",
+      "fileSize": "3.5 MB",
+      "downloadUrl": "/resources/procurement/bid-bond-insurance-guide.pdf",
+      "viewUrl": "/resources/procurement/bid-bond-insurance-guide",
+      "lastUpdated": "2024-11-30",
+      "tags": ["bonds", "insurance", "requirements"]
+    },
+    {
+      "id": "procurement-004",
+      "categoryId": "public-procurement-guidance",
+      "title": "MWBE Compliance Checklist",
+      "summary": "Step-by-step checklist for Minority/Women Business Enterprise compliance requirements and documentation.",
+      "type": "docx",
+      "fileSize": "1.2 MB",
+      "downloadUrl": "/resources/procurement/mwbe-compliance-checklist.docx",
+      "viewUrl": "/resources/procurement/mwbe-compliance-checklist",
+      "lastUpdated": "2024-12-01",
+      "tags": ["mwbe", "compliance", "diversity"]
+    }
+  ]
+}

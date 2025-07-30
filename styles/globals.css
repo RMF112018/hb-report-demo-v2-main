@@ -71,6 +71,9 @@
 /* Import Gantt chart styles */
 @import "./gantt.css";
 
+/* Import Leaflet styles */
+@import "leaflet/dist/leaflet.css";
+
 /* Professional Dashboard Grid System */
 .dashboard-grid {
   display: grid;

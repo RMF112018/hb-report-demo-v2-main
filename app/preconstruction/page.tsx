@@ -40,6 +40,9 @@ import {
   FileText,
   TrendingUp,
   Sparkles,
+  Target,
+  Wrench,
+  Globe,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
@@ -302,6 +305,91 @@ export default function PreconstructionPage() {
 
           {activeTab === "business-development" && (
             <div className="space-y-6">
+              {/* Business Development Navigation Cards - Full width layout */}
+              <div className="grid grid-cols-5 gap-2 pb-4 w-full">
+                <Card
+                  className="cursor-pointer transition-all hover:shadow-md w-full hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+                  onClick={() => router.push("/preconstruction/strategic-opportunity-intel")}
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center space-y-1">
+                      <div className="relative">
+                        <Target className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                          Strategic Opportunity Intel
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className="cursor-pointer transition-all hover:shadow-md w-full hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+                  onClick={() => router.push("/preconstruction/bd-toolkit")}
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center space-y-1">
+                      <div className="relative">
+                        <Wrench className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100">BD Toolkit</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className="cursor-pointer transition-all hover:shadow-md w-full hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+                  onClick={() => router.push("/preconstruction/client-relations-intel")}
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center space-y-1">
+                      <div className="relative">
+                        <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100">Client Relations Intel</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className="cursor-pointer transition-all hover:shadow-md w-full hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+                  onClick={() => router.push("/preconstruction/market-expansion-support")}
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center space-y-1">
+                      <div className="relative">
+                        <Globe className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100">Market Expansion Support</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className="cursor-pointer transition-all hover:shadow-md w-full hover:border-[#FA4616]/50 hover:bg-[#FA4616]/5"
+                  onClick={() => router.push("/preconstruction/collaboration-coaching")}
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center text-center space-y-1">
+                      <div className="relative">
+                        <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100">Collaboration & Coaching</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Responsive Grid Layout - 5 cards wrapping after 3 */}
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div className="w-full">
